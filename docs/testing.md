@@ -16,10 +16,12 @@ checks, one new MCP schema/transport test and two distribution/version checks.
 [Commands, evidence and limits](test-results/m1-query-portable-0.3.0.md).
 The full historical suite was not rerun; CI discovery now includes 53 distinct
 test methods. This count is inventory, not evidence that all 53 were rerun here.
-The owner reports the [query batch](m1-query-batch.md) performed; three diagnostics
-confirm startup/discovery/context but omit query responses. Outcomes await
-existing chat results/observations; [runtime record](test-results/m1-query-runtime-0.3.0.md).
-This evidence-only follow-up runs no developer tests. The batch does not repeat
+The [three bounded owner query cases PASS](test-results/m1-query-runtime-0.3.0.md),
+based on the supplied existing query results report correlated with diagnostic
+session/UUIDs. Two column identities, distinct pages/full summary, observed type/
+layer/attribute equality and passive omission are verified within that scope.
+Changed-source stale rejection, TTL/restart, geometry and full M1 remain separate.
+Evidence-only follow-ups run no developer tests. The batch does not repeat
 accepted M0 or context correction tests and does not accept full M1.
 
 Developer commands:

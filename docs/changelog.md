@@ -10,7 +10,11 @@ restart/eviction handling. No partial selection is created on budget failure.
 24 relevant portable checks pass; wheel/sdist and evaluation ZIP are built.
 [Contract](tool-reference.md), [portable evidence](test-results/m1-query-portable-0.3.0.md).
 
-Allplan query verification is pending. The accepted 0.2.1 context reader is
+The three bounded owner query cases subsequently **PASS** on the two-column
+scene: scope, metadata, pages/full summary and observed-value predicates.
+[Runtime evidence](test-results/m1-query-runtime-0.3.0.md) is recorded after the
+original archive was built; that archive and its hash are unchanged. Broader
+query behaviors retain portable evidence only. The accepted 0.2.1 context reader is
 reused; its correction batch need not be repeated. Geometry/spatial filtering,
 offset conversion, top-level native component counting and demo binding remain
 pending. M1 is not accepted. [New small owner batch](m1-query-batch.md).

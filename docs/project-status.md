@@ -48,8 +48,8 @@ No repeat of the correction batch is needed.
 | Task | 0.3.0 state | Evidence / remaining scope |
 | --- | --- | --- |
 | M1.1 | Partial implementation | Explicit scope/identity/completeness contracts; session-bound model/type references, passive sign handling, missing identity exclusion. Geometry units/offset normalization, levels, durable refs and writability still pending. |
-| M1.2 | Bounded query implemented, runtime pending | Typed type/layer/raw-attribute predicates, all/any/not, null/missing/unknown, case and numeric tolerance. No geometric/spatial predicates or whole-project coverage. |
-| M1.3 | Bounded read-only selection implementation, runtime pending | Full cached result, deterministic opaque-cursor pages, full-selection summary, fresh source/context revalidation, TTL/eviction/restart and work/size limits. No downstream audit/edit consumer or persistence yet. |
+| M1.2 | Bounded runtime batch PASS; task remains partial | Two native column identities, passive scope, observed type GUID/layer and raw attribute 498 equality pass. Other predicate combinations have portable evidence only. Geometry/spatial/native hierarchy coverage pending. |
+| M1.3 | Unchanged-source paging/full summary PASS; task remains partial | Two distinct pages and full cached selection summary pass. Changed-source staleness, TTL/eviction/restart and limits remain portable-only. No downstream audit/edit consumer or persistence yet. |
 | M1.4 | Pending | Needs actual attribute/layer/type metadata and schema validation. No profile activation or final fixture claimed. |
 
 **24 relevant portable checks PASS** on Linux/Python 3.12.14/FastMCP 3.2.4:
@@ -57,19 +57,23 @@ No repeat of the correction batch is needed.
 and two package/version checks. Wheel/sdist and deterministic evaluation ZIP
 build succeed. The full historical M0 suite was not rerun; a discovery import
 initially repeated 11 handler checks and was corrected to avoid duplicate CI
-discovery. Windows/CI execution and Allplan query verification are not claimed.
+discovery. Windows/CI automated execution is not claimed by that portable report;
+owner Allplan evidence is recorded separately below.
 [Portable report](test-results/m1-query-portable-0.3.0.md).
 
-Owner reports performing the three 0.3.0 tests. Three uploaded diagnostics
-confirm installation/integrity, seven-tool discovery and context in the same
-two-column session. They contain no query responses: counts, type/layer/
-attributes, pages and summary are not evidenced. Query outcomes and a visible
-model-preservation observation remain pending, not failed or accepted.
+**Three bounded 0.3.0 owner query cases PASS**. The supplied query results report
+matches the diagnostics' host session and column model/view UUIDs: two matched
+identities, two distinct pages, full summary by file/type, exact type/layer and
+raw attribute 498 predicates, and explicit passive-file omission with incomplete
+requested scope. Native type Column_TypeUUID/GUID and layer 3736 are observed.
+Attribute 498 is observed on file 1 and returned missing on passive file 2;
+do not infer a bound mark or native absence under every access state.
+The report states no model changes; independent geometry/visual readback is not
+claimed. Static runtime_verified=false is not an acceptance registry.
 [0.3.0 runtime record](test-results/m1-query-runtime-0.3.0.md).
 
-Next: obtain existing Codex responses/owner observations for the
-[0.3.0 query batch](m1-query-batch.md) without repeating completed tests,
-record actual type/layer/attribute and paging evidence, resolve any discrepancies,
-then prepare geometry/unit/offset and parent/child counting probes. Complete
+Next: prepare focused metadata/passive-attribute, geometry/unit/offset and
+parent/child counting probes. Do not repeat the passed
+[0.3.0 query batch](m1-query-batch.md) without a relevant change or defect. Complete
 M1.4 binding from verified resources before the six-column/ten-component UAT.
 The demo profile remains **unbound and inactive**; **M1 is not accepted**.

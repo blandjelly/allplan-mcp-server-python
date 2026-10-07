@@ -6,11 +6,13 @@ owner's Windows setup with local Codex. UAT-00 and UAT-01 PASS; M0 is closed.
 This is evidence for the tested setup, not every Allplan 2026 hotfix or client.
 
 Current package **0.3.0** adds the read-only scope/query/selection slice, with
-**24 relevant portable checks PASS and no Allplan query runtime evidence yet**.
+**24 relevant portable checks PASS and three bounded owner query cases PASS**.
 [Query contract](tool-reference.md), [portable report](test-results/m1-query-portable-0.3.0.md).
-Owner supplied three 0.3.0 diagnostics after reporting three tests performed:
-startup/integrity/discovery/context are observed, but query responses and case
-verdicts are absent. [Runtime evidence and gap](test-results/m1-query-runtime-0.3.0.md).
+Owner supplied three diagnostics and a query results report, correlated by host
+session and model/view UUIDs. Scope, metadata, pages/full summary and observed-
+value predicates pass on the two-column scene. The report states no model edits;
+independent geometry/visual readback is not claimed.
+[Runtime evidence and limits](test-results/m1-query-runtime-0.3.0.md).
 The **0.2.1** context correction remains accepted. Its **31 portable tests pass**.
 Owner 0.2.0 logs verify loaded-file states/passive inclusion and
 model/view GUIDs; project lookup fails. The **0.2.1 correction batch PASS** verifies
@@ -31,8 +33,8 @@ Accepted 0.1.2 evidence does not automatically accept the new package.
 | ESC/restart, minimize/restore, project switching | Owner confirms all requested UI tests; logs prove host absence and restart with a new session ID | In-flight queued-request rejection is portable simulated-dispatch evidence only. Closing the listener does not undo a running write. |
 | Development Python execution | Opt-in on both sides; absent from evaluation catalog | AST filtering is not isolation. No tunnel/shared setup support. |
 | Context workflow tool | 0.2.1 bounded runtime batch PASS: project lookup/switch, loaded file states, unload exclusion and model/view GUIDs; 31 portable tests pass | Raw zero offset only; unit/offset normalization, levels, durable references and component counts pending. |
-| Read-only model_query / explicit scope / predicates | Implemented, 2026 signatures checked; portable checks pass; actual 0.3.0 MCP discovery observed | Owner reports tests performed, but diagnostics omit query responses; runtime outcomes pending. Type GUID/name, layer and raw attributes only; no spatial/geometric filtering or proven top-level component counts. |
-| Reusable selections / paging / summary / staleness | Implemented with portable tests | Memory-only, five-minute TTL, eight cached selections, host-bound read evidence; query-field/context freshness only. Owner paging batch pending. No write authorization or downstream audit/edit consumer. |
+| Read-only model_query / explicit scope / predicates | Bounded 0.3.0 owner batch PASS on two native columns: loaded/passive scope, type GUID/layer and raw attribute 498 equality | Other predicate combinations retain portable evidence. No spatial/geometric filtering or top-level component counts. Passive attribute 498 returned missing; native absence/profile binding not established. |
+| Reusable selections / paging / summary / staleness | Two distinct pages/full-selection summary and unchanged-source reuse PASS; other behaviors portable-tested | Changed-source stale rejection, TTL/eviction/restart and larger-model limits lack owner runtime evidence. Memory-only, read-only, field-bound references; no write authorization or downstream audit/edit consumer. |
 | Remaining workflow tools / active demo profile | Planned only | Geometry/offset/native counts and M1.4–M7 pending; draft profile unbound and inactive. |
 | Claude / cloud-to-Windows connection | Not tested / not provided | Accepted first client is local Windows Codex. Cloud localhost is another machine. |
 

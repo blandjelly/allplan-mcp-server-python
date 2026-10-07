@@ -1,9 +1,9 @@
 # M1 query batch — 0.3.0
 
-Status: **owner reports three tests performed; query outcomes awaiting evidence**.
-Three 0.3.0 diagnostics verify startup/discovery/context but contain no query
-responses. [Recorded evidence and gap](test-results/m1-query-runtime-0.3.0.md).
-Use existing Codex results before considering a repeat. This is a bounded query
+Status: **three bounded owner query cases PASS**, based on the supplied query
+results report correlated with 0.3.0 diagnostics. [Recorded evidence and limits](test-results/m1-query-runtime-0.3.0.md).
+The prompts below are retained for reproducibility; no repeat is needed without
+a relevant change or defect. This is a bounded query
 batch, not full UAT-02/UAT-03 or M1 acceptance. Do not repeat the accepted M0 or
 0.2.1 context correction batch. New tool behavior is the only target here.
 

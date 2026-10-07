@@ -17,11 +17,13 @@ attribute predicates, reusable pages and full-selection summaries with query-
 field/context staleness checks. **24 relevant portable checks pass**; wheel/sdist
 and evaluation ZIP build. [Contracts](tool-reference.md),
 [portable evidence and limits](test-results/m1-query-portable-0.3.0.md).
-**Owner reports three tests performed**; uploaded 0.3.0 diagnostics confirm
-startup/integrity/discovery/context but omit query responses. Query outcomes
-and visible model preservation await existing Codex results/owner observations.
-[Runtime evidence and gap](test-results/m1-query-runtime-0.3.0.md),
-[small owner card](m1-query-batch.md). Do not repeat tests merely to obtain logs.
+**Three bounded 0.3.0 query cases PASS**: the supplied query results report,
+correlated with diagnostic session/UUIDs, verifies two column identities,
+distinct pages/full summary, type/layer/raw-attribute equality and passive
+exclusion. The report states no model changes; independent geometry/visual
+readback is not claimed. [Runtime evidence and limits](test-results/m1-query-runtime-0.3.0.md),
+[small owner card](m1-query-batch.md). No repeat is needed without a relevant
+change/defect. Changed-source staleness and TTL/restart retain portable evidence.
 
 The full M1 milestone remains in progress: geometry unit/offset normalization,
 levels, durable references, spatial/dimensional predicates, parent/child native
@@ -36,10 +38,10 @@ hashes; build any further runtime changes under a new package version. The
 earlier 31-test baseline and new targeted checks are separate records; the full
 historical suite was not rerun for this slice. Allplan runtime evidence is separate.
 
-Next: retrieve existing 0.3.0 query/type/layer/attribute/paging responses and
-owner observations, record outcomes, fix any
-adapter discrepancies, then prepare separate unit/offset/native hierarchy probes
-and bind validated demo resources. Do not ask the owner to research identifiers
+Next: prepare metadata/passive-attribute and separate unit/offset/native hierarchy
+probes, then bind validated demo resources. Attribute 498 was observed on file 1
+but returned missing on passive file 2; do not infer native absence or mark
+binding without further evidence. Do not ask the owner to research identifiers
 or construct the final unbound fixture prematurely.
 
 ## Task

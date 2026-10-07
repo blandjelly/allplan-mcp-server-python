@@ -5,6 +5,10 @@ Recorded: 2026-10-07. Base: current `origin/main`
 context correction remains accepted. Historical evidence uploads and their
 archive hashes are unchanged.
 
+Subsequent owner evidence: [three bounded query cases PASS](m1-query-runtime-0.3.0.md).
+This report preserves the portable implementation evidence recorded before
+that follow-up; no developer tests or original archives were repeated/rebuilt.
+
 ## Delivered slice and evidence levels
 
 - **M1.1 partial:** explicit file/passive/visibility scope; session/project/file/

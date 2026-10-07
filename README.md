@@ -17,9 +17,12 @@ workflow toolkit capabilities begin with M1.
 Current package **0.3.0** adds a bounded read-only `model_query`: explicit loaded
 file/passive scope, type/layer/raw-attribute predicates, paginated session
 selections and full-selection summaries with stale-read rejection. **24 relevant
-portable checks pass; query runtime verification in Allplan is pending**.
+portable checks pass; three bounded owner query cases PASS**.
 [Contracts](docs/tool-reference.md), [portable evidence](docs/test-results/m1-query-portable-0.3.0.md)
 and [small owner query batch](docs/m1-query-batch.md).
+[0.3.0 runtime evidence and limits](docs/test-results/m1-query-runtime-0.3.0.md)
+record scope, metadata, pages/full summary and observed-value predicates on two
+native columns. Changed-source staleness and geometry remain separately pending.
 The earlier **0.2.1 context correction batch remains PASS**; do not repeat it.
 [Accepted context evidence](docs/test-results/m1-context-runtime-0.2.1.md).
 Geometry/offset normalization, native component counting and demo profile binding

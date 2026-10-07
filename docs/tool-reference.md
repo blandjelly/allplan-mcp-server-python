@@ -1,9 +1,13 @@
 # M1 scope and model query contract — 0.3.0
 
-Status: **implemented; Allplan runtime verification pending**. Schema
+Status: **implemented; three bounded owner query cases PASS**. Schema
 `m1-query-1`, public MCP tool `model_query`, typed bridge route `/model-query`.
 This is a bounded M1.1–M1.3 slice. The accepted 0.2.1 context reader is reused;
 its raw units/offset and context probe schema retain their earlier meaning.
+[0.3.0 evidence and limits](test-results/m1-query-runtime-0.3.0.md) verify scope,
+metadata, two distinct pages/full summary and observed-value predicates on the
+owner's two-column scene. Other predicate variants, changed-source stale checks,
+TTL/restart and geometry do not gain runtime acceptance from that batch.
 
 ## Scope and identity
 
