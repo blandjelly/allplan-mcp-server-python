@@ -1,0 +1,2 @@
+# Preserve uploaded diagnostic evidence byte-for-byte, including Windows CRLF.
+docs/test-results/evidence/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

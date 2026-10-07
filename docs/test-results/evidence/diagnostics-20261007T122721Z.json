@@ -1,0 +1,129 @@
+{
+  "schema_version": "m0-1",
+  "captured_at": "2026-10-07T12:27:18.588663+00:00",
+  "external_python": "3.14.8",
+  "platform": "Windows",
+  "package_version": "0.1.2",
+  "host_url": "http://127.0.0.1:5679",
+  "mcp_url": "http://127.0.0.1:8888/mcp",
+  "allplan_acceptance": "not_run",
+  "host": {
+    "version": "2026.1",
+    "allplan_release": {
+      "Version": "2026.1",
+      "MainReleaseName": "2026",
+      "SubReleaseName": "2026.1",
+      "WindowsReleaseName": ""
+    },
+    "executable_versions": {
+      "status": "observed",
+      "file_version": "16.1617.8659.814",
+      "product_version": "2026.0.1.0",
+      "source": "running_process_executable"
+    },
+    "hotfix": {
+      "status": "not_checked",
+      "value": null
+    },
+    "embedded_python": {
+      "version": "3.13.13",
+      "implementation": "CPython"
+    },
+    "bridge_package": {
+      "version": "0.1.2",
+      "source_commit": "f98bef8a2fc030216408b2b7dbbba1ce02684f9f",
+      "integrity": "sha256-verified",
+      "bridge_files": {
+        "Library/PythonHost/StartPythonHost.pyp": "b1aba49ed554eeefa9e44f4e9a6f06992e74d4f2916277ef451de11d72167813",
+        "PythonPartsScripts/PythonHost/PythonHostHandler.py": "a018170b3b3d1788092ac7fc70deea520cd6b9e9f391eb9c30d54b2a70de413f",
+        "PythonPartsScripts/PythonHost/runtime_info.py": "6d46a44d0c8e8d3c1d757a22b4012a9919eb782bb8ea60577a1e229acfde91a2",
+        "PythonPartsScripts/PythonHost/sandbox/__init__.py": "b895513c191ba9ea7a8748f3aef1c6c9d74875b990d8ef41e10faf3904e0e586",
+        "PythonPartsScripts/PythonHost/sandbox/const.py": "168b93f376d54ddaf67ac62ffc5fb7e94570ab24e1f828d0732effa097e659d4",
+        "PythonPartsScripts/PythonHost/sandbox/executor.py": "c06f9810291a1c9e6f3deb7939d4b6615905d15c6662a6e69d7973b3fcbf0f6a",
+        "PythonPartsScripts/PythonHost/sandbox/validator.py": "5a4d3bf2bb6d2556512285a778083385c5c5049a398bc7a77cdaab9c5d8ddaec",
+        "PythonPartsScripts/PythonHost/StartPythonHost.py": "f56aa99f99ef5f0d5c5daec3d98b8140d7d78e94c67a9438ac8c8b5b37fbeb35",
+        "PythonPartsScripts/PythonHost/transport.py": "3e6b5acffee05494e0af8a4dca74ecd19c3a8d21325acdd5f67035f5663e2ed3"
+      }
+    },
+    "installed_bridge_integrity": {
+      "status": "verified",
+      "mismatches": []
+    },
+    "compatibility": {
+      "target_major": "2026",
+      "major_matches": true,
+      "runtime_verified": false
+    },
+    "request_id": "8983796a-4027-4ac1-bd40-f4e96ace20be",
+    "host_session_id": "528f7d87-1f3f-439d-99ce-13c5f67c0078"
+  },
+  "mcp": {
+    "ok": true,
+    "discovered_tools": [
+      "allplan_health",
+      "get_allplan_version",
+      "get_all_object_names",
+      "create_cube",
+      "create_box"
+    ],
+    "allplan_health": {
+      "ok": true,
+      "allplan_version": "2026.1",
+      "runtime": {
+        "version": "2026.1",
+        "allplan_release": {
+          "Version": "2026.1",
+          "MainReleaseName": "2026",
+          "SubReleaseName": "2026.1",
+          "WindowsReleaseName": ""
+        },
+        "executable_versions": {
+          "status": "observed",
+          "file_version": "16.1617.8659.814",
+          "product_version": "2026.0.1.0",
+          "source": "running_process_executable"
+        },
+        "hotfix": {
+          "status": "not_checked",
+          "value": null
+        },
+        "embedded_python": {
+          "version": "3.13.13",
+          "implementation": "CPython"
+        },
+        "bridge_package": {
+          "version": "0.1.2",
+          "source_commit": "f98bef8a2fc030216408b2b7dbbba1ce02684f9f",
+          "integrity": "sha256-verified",
+          "bridge_files": {
+            "Library/PythonHost/StartPythonHost.pyp": "b1aba49ed554eeefa9e44f4e9a6f06992e74d4f2916277ef451de11d72167813",
+            "PythonPartsScripts/PythonHost/PythonHostHandler.py": "a018170b3b3d1788092ac7fc70deea520cd6b9e9f391eb9c30d54b2a70de413f",
+            "PythonPartsScripts/PythonHost/runtime_info.py": "6d46a44d0c8e8d3c1d757a22b4012a9919eb782bb8ea60577a1e229acfde91a2",
+            "PythonPartsScripts/PythonHost/sandbox/__init__.py": "b895513c191ba9ea7a8748f3aef1c6c9d74875b990d8ef41e10faf3904e0e586",
+            "PythonPartsScripts/PythonHost/sandbox/const.py": "168b93f376d54ddaf67ac62ffc5fb7e94570ab24e1f828d0732effa097e659d4",
+            "PythonPartsScripts/PythonHost/sandbox/executor.py": "c06f9810291a1c9e6f3deb7939d4b6615905d15c6662a6e69d7973b3fcbf0f6a",
+            "PythonPartsScripts/PythonHost/sandbox/validator.py": "5a4d3bf2bb6d2556512285a778083385c5c5049a398bc7a77cdaab9c5d8ddaec",
+            "PythonPartsScripts/PythonHost/StartPythonHost.py": "f56aa99f99ef5f0d5c5daec3d98b8140d7d78e94c67a9438ac8c8b5b37fbeb35",
+            "PythonPartsScripts/PythonHost/transport.py": "3e6b5acffee05494e0af8a4dca74ecd19c3a8d21325acdd5f67035f5663e2ed3"
+          }
+        },
+        "installed_bridge_integrity": {
+          "status": "verified",
+          "mismatches": []
+        },
+        "compatibility": {
+          "target_major": "2026",
+          "major_matches": true,
+          "runtime_verified": false
+        },
+        "request_id": "faa51183-d378-4d2e-8aa5-1f54198cc15c",
+        "host_session_id": "528f7d87-1f3f-439d-99ce-13c5f67c0078"
+      },
+      "external_python": "3.14.8",
+      "mcp_package_version": "0.1.2",
+      "request_id": "faa51183-d378-4d2e-8aa5-1f54198cc15c",
+      "allplan_host_url": "http://127.0.0.1:5679"
+    },
+    "get_allplan_version": "2026.1"
+  }
+}

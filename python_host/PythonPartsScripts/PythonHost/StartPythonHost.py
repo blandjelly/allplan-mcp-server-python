@@ -1,18 +1,14 @@
-
 from __future__ import annotations
 import sys
 import os
-import json
-import traceback
 import clr
 
-from threading import Thread
-from http.server import HTTPServer, BaseHTTPRequestHandler
 from typing import List
 
 import NemAll_Python_IFW_Input as AllplanIFW
 
 from .PythonHostHandler import RequestHandler
+from .transport import BridgeServer
 from BuildingElement import BuildingElement
 from BuildingElementComposite import BuildingElementComposite
 from BuildingElementControlProperties import BuildingElementControlProperties
@@ -56,48 +52,6 @@ def invoke_in_ui_thread(func):
     return Application.Current.Dispatcher.Invoke(Func[Object](func))
 
 
-# http POST handler
-
-class WebRequestHandler(BaseHTTPRequestHandler):
-    """ Implementation that handles requests from HTTP server
-
-    Args:
-        BaseHTTPRequestHandler: base HTTP handler
-    """
-
-    request_handler : RequestHandler
-
-    def do_POST(self):
-        """ Handles HTTP POST request
-        """
-
-        try:
-            content_len = int(self.headers.get("Content-Length"))
-            request = None
-
-            if (content_len > 0):
-                request_json = self.rfile.read(content_len)
-                request = json.loads(request_json)
-            
-            result_json = ""
-            result = invoke_in_ui_thread(
-                lambda: self.request_handler.handle(self.path, request)
-            )
-
-            if (result != None):
-                result_json = json.dumps(result)
-        except:
-            self.send_response(500) # Internal Server Error
-            self.send_header("Content-Type", "text/plain")
-            self.end_headers()
-            error = traceback.format_exc()
-            self.wfile.write(f"Server stack trace:\n{str(error)}".encode("utf-8"))
-        else:
-            self.send_response(200) # OK    
-            self.send_header("Content-Type", "application/json")        
-            self.end_headers()
-            self.wfile.write(result_json.encode("utf-8"))
-
 # entry point
 
 def create_interactor(coord_input             : AllplanIFW.CoordinateInput,
@@ -122,19 +76,19 @@ def create_interactor(coord_input             : AllplanIFW.CoordinateInput,
           Created interactor object
     """
 
-    return PythonHostInteractor(coord_input, 
-                                pyp_path, 
+    return PythonHostInteractor(coord_input,
+                                pyp_path,
                                 global_str_table_service,
-                                build_ele_list, 
-                                build_ele_composite, 
-                                control_props_list, 
+                                build_ele_list,
+                                build_ele_composite,
+                                control_props_list,
                                 modification_ele_list)
 
 
 class PythonHostInteractor():
     """ Definition of class PythonHostInteractor
     """
-    
+
     def __init__(self,
                  coord_input             : AllplanIFW.CoordinateInput,
                  pyp_path                : str,
@@ -157,7 +111,7 @@ class PythonHostInteractor():
         Returns:
             Created interactor object
         """
-        
+
         self.coord_input = coord_input
         self.build_ele_list = build_ele_list
         self.build_ele_composite = build_ele_composite
@@ -169,63 +123,53 @@ class PythonHostInteractor():
                                                              None,
                                                              self.control_props_list,
                                                              "StartPythonHost.pyp")
-        
+
         build_ele = self.build_ele_list[0]
         self.palette_service.show_palette(build_ele.script_name)
 
         # start http server
         address = "127.0.0.1"
         port = 5679
-        self.server = HTTPServer((address, port), WebRequestHandler)
-        self.server.allow_reuse_address = True
-        self.server.RequestHandlerClass.request_handler = RequestHandler(self.coord_input)
-
-        thread = Thread(target=self.start_server)
-        thread.daemon = True
-        thread.start()
+        try:
+            self.server = BridgeServer((address, port), RequestHandler(self.coord_input), invoke_in_ui_thread)
+            self.server.start()
+        except Exception:
+            self.palette_service.close_palette()
+            raise
 
         print("Python Host is started")
-        
+
         # this timer pushes python thread to process requests if user minimized main window
         self.timer = DispatcherTimer()
         self.timer.Interval = TimeSpan.FromMilliseconds(50)
         self.timer.Tick += self.push_python_thread
         self.timer.Start()
-    
+
     @staticmethod
     def push_python_thread(sender, args):
         # do nothing
         return
 
-    def start_server(self):
-        """ Starts HTTP server
-        """
-
-        try:
-            self.server.serve_forever()
-        except Exception as err:
-            print(f"Python Host failed to start:\n{err}")
-               
     def on_cancel_function(self) -> bool:
         """ Handles the cancel function event (e.g. by ESC, ...)
 
         Returns:
             True/False for success.
         """
-        
-        self.server.server_close()
+
+        self.server.stop()
         self.palette_service.close_palette()
         self.timer.Stop()
+        self.timer.Tick -= self.push_python_thread
         print("Python Host is stopped")
 
         return True
-    
-    def process_mouse_msg(self, mouse_msg, pnt, msg_info) -> bool:     
+
+    def process_mouse_msg(self, mouse_msg, pnt, msg_info) -> bool:
         return True
-    
+
     def on_preview_draw(self):
         return
-            
+
     def on_mouse_leave(self):
         return
-    

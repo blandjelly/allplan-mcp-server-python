@@ -179,6 +179,9 @@ Each milestone should be delivered in small reviewable PRs. Use task IDs below i
 
 ### M0 — Reproducible installation and bridge baseline
 
+**Completed 2026-10-07:** M0.1–M0.5; UAT-00/UAT-01 PASS on Allplan 2026-1-7,
+package 0.1.2. [Acceptance record](test-results/m0-acceptance-0.1.2.md).
+
 **Tasks**
 
 - **M0.1** Recheck fork/upstream provenance, exact baseline, applicable license, existing edits, and client/Windows/Allplan environment. Record external and embedded Python versions separately.

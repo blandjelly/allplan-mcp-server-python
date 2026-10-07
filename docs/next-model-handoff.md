@@ -1,5 +1,26 @@
 # Next-model handoff
 
+## Current handoff — 2026-10-07
+
+The initial M0 instructions below are historical. **M0 is closed** on the owner's
+Allplan 2026-1-7 / local Windows Codex setup using package 0.1.2.
+[Acceptance](test-results/m0-acceptance-0.1.2.md).
+
+Current implementation version **0.2.1** has a bounded read-only
+`get_model_context` probe. Its owner follow-up batch passes project lookup/switch,
+loaded/passive file states, unload exclusion and separate model/view GUID reads;
+the owner confirms matching project names and unchanged model.
+[Runtime evidence](test-results/m1-context-runtime-0.2.1.md).
+The full M1 milestone remains in progress: scope/unit/offset/identity contracts,
+M1.2 queries, M1.3 paging/staleness and M1.4 profile binding are still pending.
+The demonstration profile remains unbound and inactive.
+
+Start from [project-status.md](project-status.md) and the current code, then use
+the roadmap below. Do not repeat accepted owner batches without a new defect or
+change that requires verification. Preserve the tested ZIPs and their recorded
+hashes; build any further runtime changes under a new package version. Portable
+validation currently passes 31 tests; Allplan runtime evidence is separate.
+
 ## Task
 
 Implement the Allplan 2026 workflow toolkit incrementally in the existing fork. Start with installation and the first working Codex connection, then deliver native-model querying, auditing and controlled cleanup. Use [implementation-plan.md](implementation-plan.md) as the roadmap and record progress against its task IDs.

@@ -1,5 +1,9 @@
 # POST execution exploration
 
+Updated for M0 package 0.1.1. The original discussion below motivates typed
+handlers. Actual default behavior now disables development execution on both
+the bridge and MCP sides; AST checks remain a development aid, not isolation.
+
 ## Current architecture
 
 The system already executes Allplan actions through HTTP POST calls:
@@ -61,18 +65,18 @@ small validation, and a clear return shape.
 
 ## Development-only option
 
-If a raw Python execution endpoint is needed for local experiments, keep it out
-of the normal MCP tool list and require all of these controls:
+The raw `/execute-python` handler requires `ALLPLAN_MCP_ENABLE_PYTHON_EXEC=1`
+in the Allplan process. The MCP server registers `execute_python` only with that
+same explicit opt-in in its own process. A stopped/restarted Allplan process may
+be needed to change inherited environment variables. The Windows evaluation
+launcher forces the external opt-in off.
 
-- Bind the Allplan host to `127.0.0.1` only.
-- Enable it with an explicit environment variable, for example
-  `ALLPLAN_MCP_ENABLE_PYTHON_EXEC=1`.
-- Require a strong per-session token in the POST body or header.
-- Return only JSON-serializable values.
-- Disable it before using ngrok or any shared agent.
-
-Even then, prefer using it only as a temporary debugging aid and replace it with
-explicit command handlers once the workflow is known.
+The bridge remains on loopback. Imports, private/dunder attributes and builtins
+are filtered, but this code still receives live Allplan objects and has no
+process-level isolation or execution timeout. No session token is implemented;
+the earlier token proposal was a recommendation, not existing behavior. Do not
+use this path for the production workflow toolkit or expose it through a tunnel.
+M0 diagnostics uses typed, read-only routes and does not depend on generated Python.
 
 ## Practical next step
 

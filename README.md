@@ -6,6 +6,30 @@ The existing Allplan PythonPart starts a small local HTTP host at `127.0.0.1:567
 This package adds a FastMCP server in front of it, so agents can call MCP tools
 over Streamable HTTP at `/mcp`.
 
+## Windows / Codex evaluation
+
+Version **0.1.2** prepares reproducible bridge installation and recovery, local Codex
+configuration, read-only runtime diagnostics and a small acceptance batch. Allplan
+baseline is **accepted on Allplan 2026-1-7** with local Windows Codex
+(UAT-00/UAT-01 PASS). [M0 is closed](docs/test-results/m0-acceptance-0.1.2.md);
+workflow toolkit capabilities begin with M1.
+
+Current package **0.2.1** continues M1.1 with the read-only `get_model_context`
+context/identity probe. The bounded owner runtime batch passes for project
+lookup/switching, loaded file states, unload exclusion and model/view GUIDs;
+31 portable tests pass. [Runtime evidence and remaining scope](docs/test-results/m1-context-runtime-0.2.1.md).
+`model_query` and the demonstration profile are not active yet.
+
+- [Windows installation and restore](docs/windows-setup.md)
+- [UAT-00 / UAT-01 prompts and result form](docs/m0-acceptance-batch.md)
+- [Actual task status and evidence](docs/project-status.md)
+- [Version history](docs/changelog.md)
+- [Portable testing and package build](docs/testing.md)
+- [Compatibility and limitations](docs/support-matrix.md)
+
+End users use the versioned ZIP and its Explorer launchers. The following source
+setup is for development.
+
 ## Setup
 
 ```bash
@@ -22,7 +46,7 @@ utils\register_python_host.cmd
 By default this copies the bridge to:
 
 ```text
-%USERPROFILE%\Documents\Nemetschek\Allplan\2026\Usr\Local\PythonParts\PythonHost
+%USERPROFILE%\Documents\Nemetschek\Allplan\2026\Usr\Local\Library\PythonHost
 %USERPROFILE%\Documents\Nemetschek\Allplan\2026\Usr\Local\PythonPartsScripts\PythonHost
 ```
 
@@ -63,7 +87,8 @@ MCP_PATH=/mcp
 - `get_all_object_names`: returns display names for elements in the current document.
 - `create_cube`: creates a cube in the current document.
 - `create_box`: creates a rectangular cuboid in the current document.
-- `execute_python`: executes sandboxed Python inside the running Allplan host
+- `execute_python`: optional development tool, registered only when
+  `ALLPLAN_MCP_ENABLE_PYTHON_EXEC=1`; the Allplan process must also opt in.
 
 ## Skill resources
 
@@ -120,17 +145,22 @@ planning artifacts; they do not describe already implemented tools:
 - [Demo profile and owner-built model](docs/demo-model-and-profile.md)
 - [Manual acceptance tests](docs/manual-acceptance-tests.md)
 
-## Sandboxed exec
+## Development execution
 
-The bridge exposes a sandboxed Python execution path for local experiments.
+Python execution is disabled by default on the host and omitted from the MCP tool
+catalog. The evaluation launcher explicitly disables it. Developers may opt in
+separately in the Allplan process and MCP process for local experiments.
 
 Behavior:
 
-- The raw Allplan bridge accepts `POST /execute-python`
-- The external MCP server exposes `execute_python(...)`
+- With the host opt-in, the raw Allplan bridge accepts `POST /execute-python`
+- With the MCP opt-in, the external server exposes `execute_python(...)`
 - The endpoint remains bound to `127.0.0.1`
 - Imports are blocked by AST validation
 - Private and dunder attribute access is blocked by AST validation
 - Only a restricted builtin whitelist is available at runtime
 
-Do not expose `execute_python` through ngrok or a shared agent setup.
+AST filtering is not a process isolation boundary. It grants access to live
+Allplan API objects. Do not expose this development path through a tunnel or a
+shared agent setup. Production workflows use typed handlers. See the
+[execution boundary](docs/post-execution-exploration.md).

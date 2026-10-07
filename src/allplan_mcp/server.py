@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import os
+import math
+import platform
+from importlib.metadata import version
 from typing import Annotated, Any
 
 from fastmcp import FastMCP
 
-from allplan_mcp.allplan_client import AllplanHostClient
+from allplan_mcp.allplan_client import AllplanHostClient, AllplanHostError
 from allplan_mcp.skills import SkillsManager
 
 
@@ -91,6 +94,10 @@ def allplan_health() -> dict[str, Any]:
     return {
         "ok": True,
         "allplan_version": response.get("version"),
+        "runtime": response,
+        "external_python": platform.python_version(),
+        "mcp_package_version": version("allplan-mcp-server"),
+        "request_id": response.get("request_id"),
         "allplan_host_url": os.getenv("ALLPLAN_HOST_URL", DEFAULT_ALLPLAN_HOST_URL),
     }
 
@@ -100,7 +107,22 @@ def get_allplan_version() -> str:
     """Get the version of the running Allplan instance."""
 
     response = _allplan_client().post("/get-allplan-version")
+    if not response.get("version"):
+        raise AllplanHostError("The host could not read the installed Allplan version.", code="version_unavailable", request_id=response.get("request_id"))
     return str(response["version"])
+
+
+@mcp.tool
+def get_model_context(identity_sample_size: int = 0) -> dict[str, Any]:
+    """Read-only M1 probe: project, loaded file states, input units and raw offset.
+
+    Optional 0–20 raw adapters expose model/view UUIDs separately. This sample
+    is not a component count, reusable selection or write target. Unavailable
+    fields are not_checked; units/offset conversion still needs runtime checks.
+    """
+    if isinstance(identity_sample_size, bool) or not isinstance(identity_sample_size, int) or not 0 <= identity_sample_size <= 20:
+        raise ValueError("identity_sample_size must be from 0 to 20.")
+    return _allplan_client().post("/get-model-context", {"identity_sample_size": identity_sample_size})
 
 
 @mcp.tool
@@ -117,12 +139,12 @@ def get_all_object_names() -> list[str]:
 
 @mcp.tool
 def create_cube(size: float) -> dict[str, Any]:
-    """Create a cube in the current Allplan document."""
+    """Submit one cube in the current Allplan document; size is in mm. Inspect the result before retrying."""
 
-    if size <= 0:
+    if not math.isfinite(size) or size <= 0:
         raise ValueError("size must be greater than zero.")
 
-    _allplan_client().post(
+    response = _allplan_client().post(
         "/create-box",
         {
             "length": size,
@@ -131,7 +153,9 @@ def create_cube(size: float) -> dict[str, Any]:
         },
     )
     return {
-        "created": True,
+        "submitted": True,
+        "readback_verified": False,
+        "request_id": response.get("request_id"),
         "type": "cube",
         "dimensions": {
             "length": size,
@@ -143,12 +167,12 @@ def create_cube(size: float) -> dict[str, Any]:
 
 @mcp.tool
 def create_box(length: float, width: float, height: float) -> dict[str, Any]:
-    """Create a cuboid in the current Allplan document."""
+    """Submit one cuboid in the current Allplan document; dimensions are in mm. Inspect before retrying."""
 
-    if length <= 0 or width <= 0 or height <= 0:
+    if any(not math.isfinite(v) or v <= 0 for v in (length, width, height)):
         raise ValueError("length, width, and height must be greater than zero.")
 
-    _allplan_client().post(
+    response = _allplan_client().post(
         "/create-box",
         {
             "length": length,
@@ -157,7 +181,9 @@ def create_box(length: float, width: float, height: float) -> dict[str, Any]:
         },
     )
     return {
-        "created": True,
+        "submitted": True,
+        "readback_verified": False,
+        "request_id": response.get("request_id"),
         "type": "cuboid",
         "dimensions": {
             "length": length,
@@ -167,12 +193,11 @@ def create_box(length: float, width: float, height: float) -> dict[str, Any]:
     }
 
 
-@mcp.tool
 def execute_python(
     code: str,
     result_expression: str | None = None,
 ) -> dict[str, Any]:
-    """Execute Python inside Allplan"""
+    """Development only: execute AST-filtered Python inside Allplan; not an isolation boundary."""
 
     if not code.strip():
         raise ValueError("code must be a non-empty string.")
@@ -182,6 +207,10 @@ def execute_python(
         payload["result_expression"] = result_expression
 
     return _allplan_client().post("/execute-python", payload)
+
+
+if os.getenv("ALLPLAN_MCP_ENABLE_PYTHON_EXEC") == "1":
+    mcp.tool(execute_python)
 
 
 def main() -> None:
