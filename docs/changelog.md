@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.5.0 — 2026-10-07
+
+Complete the bounded M1 read implementation: mm geometry/AABB summaries,
+dimensional and spatial predicates with explicit frame/boundary/tolerance,
+parent-resolved native component counts, geometry/hierarchy/profile-sensitive
+stale checks and schema-versioned demo resource binding. ModelContext can return
+configured levels with explicit provenance. Profile queries resolve real IDs
+freshly and reject unbound/mismatched resources; mark/status use separate demo
+text attributes, not Object_name 498. No write profile is activated.
+
+Add M1 Profile.cmd / M1 Final.cmd and full diagnostic batch/page/summary capture,
+keeping seven MCP tools. **56 targeted portable checks PASS**; distributions and
+versioned evaluation ZIP build. [Evidence](test-results/m1-completion-portable-0.5.0.md),
+[final UI recipe and owner gate](m1-final-batch.md). M1 code is ready for owner
+test; UAT-02/UAT-03 geometry/display-unit/nonzero-offset/hierarchy and actual
+demo binding are still pending. Preserve accepted 0.2.1/0.3.0/0.4.0 evidence and
+archives; do not repeat their accepted owner batches.
+
 ## 0.4.0 — 2026-10-07
 
 Add typed `model_query` action `inspect`: explicit scope, bounded raw element

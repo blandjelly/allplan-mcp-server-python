@@ -11,6 +11,7 @@ from fastmcp import FastMCP
 from allplan_mcp.allplan_client import AllplanHostClient, AllplanHostError
 from allplan_mcp.skills import SkillsManager
 from allplan_mcp.query_models import QueryRequest
+from allplan_mcp.demo_profile import load_demo_profile
 
 
 DEFAULT_ALLPLAN_HOST_URL = "http://127.0.0.1:5679"
@@ -20,6 +21,13 @@ DEFAULT_MCP_PATH = "/mcp"
 
 mcp = FastMCP("Allplan MCP Server")
 skills_manager = SkillsManager()
+
+
+@mcp.resource("allplan://profiles/native-model-qa-demo", mime_type="application/json")
+def native_model_qa_demo_profile() -> str:
+    """Versioned demo rules/resource names; project IDs require action=profile."""
+    import json
+    return json.dumps(load_demo_profile(), ensure_ascii=False, indent=2)
 
 
 def _allplan_client() -> AllplanHostClient:
@@ -114,7 +122,7 @@ def get_allplan_version() -> str:
 
 
 @mcp.tool
-def get_model_context(identity_sample_size: int = 0) -> dict[str, Any]:
+def get_model_context(identity_sample_size: int = 0, profile_id: str | None = None) -> dict[str, Any]:
     """Read-only M1 probe: project, loaded file states, input units and raw offset.
 
     Optional 0–20 raw adapters expose model/view UUIDs separately. This sample
@@ -123,26 +131,43 @@ def get_model_context(identity_sample_size: int = 0) -> dict[str, Any]:
     """
     if isinstance(identity_sample_size, bool) or not isinstance(identity_sample_size, int) or not 0 <= identity_sample_size <= 20:
         raise ValueError("identity_sample_size must be from 0 to 20.")
-    return _allplan_client().post("/get-model-context", {"identity_sample_size": identity_sample_size})
+    payload = {"identity_sample_size": identity_sample_size}
+    if profile_id is not None:
+        if profile_id != "native-model-qa-demo":
+            raise ValueError("Unknown profile_id.")
+        payload["profile"] = load_demo_profile()
+    return _allplan_client().post("/get-model-context", payload)
 
 
 @mcp.tool
 def model_query(request: QueryRequest) -> dict[str, Any]:
-    """Read-only model query, page, full-selection summary or metadata inspection.
+    """Read-only model query, page, summary, metadata inspection or profile binding.
 
     Query requires explicit positive drawing_files, include_passive and
     visibility=api_select_all. Use observed type GUID/name, layer ID or
     attribute:<ID> predicates with all/any/not. Missing/failed reads are distinct.
     Pages and summaries revalidate query fields; stale selections are rejected.
     Selections expire after five minutes or host restart, count model UUIDs rather
-    than top-level components, and cannot authorize writes. Geometry/spatial
-    predicates and the draft demo profile are unsupported in this slice.
+    than components by default, and cannot authorize writes. Explicit
+    component_kind=top_level_component resolves parent chains for ordinary
+    columns/beams/walls/slabs. Geometry uses mm, model_local or project_global
+    (local plus project offset once), with size_*_mm axis-aligned extents.
+    spatial_box is a declared inclusive/exclusive AABB intersects/contained test,
+    not exact solid intersection. These new native readers need Allplan acceptance.
     Inspect requires explicit scope and attribute_ids (up to 32), returns a
     bounded sample (1..20), raw values and project attribute/layer metadata.
     A missing passive attribute is an API omission, not proof of native absence.
-    Metadata inspection needs Allplan verification; it does not activate profiles.
+    profile_id=native-model-qa-demo binds named resources freshly; mark/status
+    aliases require compatible string attributes and the configured file scope.
+    action=profile reports missing resources without creating them. Profile
+    binding is read-only; mutation eligibility remains not_checked.
     """
     payload = request.model_dump(by_alias=True, exclude_unset=True)
+    profile_id = payload.pop("profile_id", None)
+    if profile_id is not None:
+        payload["profile"] = load_demo_profile()
+    if payload.get("spatial_box") is None:
+        payload.pop("spatial_box", None)
     if payload.get("action") == "page" and payload.get("cursor") is None:
         payload.pop("cursor", None)
     payload["schema_version"] = "m1-query-1"

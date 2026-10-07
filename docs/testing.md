@@ -24,6 +24,13 @@ Changed-source stale rejection, TTL/restart, geometry and full M1 remain separat
 Evidence-only follow-ups run no developer tests. The batch does not repeat
 accepted M0 or context correction tests and does not accept full M1.
 
+The **0.5.0** M1 completion slice passes **56 distinct relevant portable checks**:
+23 new completion cases, two new MCP cases and 31 relevant regression checks.
+The scan/schema/profile/payload changed; these repetitions are justified.
+[Commands and limits](test-results/m1-completion-portable-0.5.0.md). The full
+historical M0 suite and accepted owner batches were not repeated. The
+[remaining final Allplan gate](m1-final-batch.md) is separate and pending.
+
 Developer commands:
 
 The **0.4.0** resource-probe slice passes **12 targeted checks**, including eight

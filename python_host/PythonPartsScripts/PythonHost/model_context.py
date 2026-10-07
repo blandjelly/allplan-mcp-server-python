@@ -48,8 +48,11 @@ def guid(value):
 
 def context_probe(doc, base, settings, request):
     limit = request.get("identity_sample_size", 0)
-    if set(request) - {"identity_sample_size"} or isinstance(limit, bool) or not isinstance(limit, int) or not 0 <= limit <= 20:
+    if set(request) - {"identity_sample_size", "profile"} or isinstance(limit, bool) or not isinstance(limit, int) or not 0 <= limit <= 20:
         raise BridgeError("invalid_payload", "identity_sample_size must be an integer from 0 to 20; no other fields are accepted.")
+    if "profile" in request:
+        from .profile_contracts import validate_profile
+        validate_profile(request["profile"])
 
     def project():
         name, host = base.ProjectService.GetCurrentProjectNameAndHost()
@@ -124,7 +127,9 @@ def context_probe(doc, base, settings, request):
         "project_offset": observation(offset),
         "levels": {"status": "not_checked", "value": None},
         "capabilities": {"context": "probe_only", "model_query": "implemented_runtime_pending",
-                         "reusable_selections": "session_bound_read_only_runtime_pending", "model_write": "not_supported_by_this_tool"},
+                         "reusable_selections": "session_bound_read_only_runtime_pending",
+                         "geometry_query": "implemented_runtime_pending", "native_hierarchy_query": "implemented_runtime_pending",
+                         "demo_profile_binding": "implemented_read_only_runtime_pending", "model_write": "not_supported_by_this_tool"},
         "coverage": {"file_inventory": "loaded_only", "unloaded_files": "not_enumerated",
                      "visibility": "API_selection_semantics_not_verified",
                      "native_component_counts": "not_checked"},
@@ -152,4 +157,13 @@ def context_probe(doc, base, settings, request):
                                          "coverage": "bounded_raw_adapters_not_component_count"})
         if "reason" in sampled:
             result["identity_sample"]["reason"] = sampled["reason"]
+    if "profile" in request:
+        import time
+        from .profile_contracts import bind_profile
+        started = time.monotonic()
+        def budget():
+            if time.monotonic() - started >= 5:
+                raise BridgeError("scan_limit_exceeded", "Context profile binding exceeded its read budget.", 409)
+        result["profile_binding"] = bind_profile(doc, base, request["profile"], result, budget)
+        result["levels"] = result["profile_binding"]["levels"]
     return result

@@ -8,9 +8,25 @@ Profile: [native-model-qa.demo.json](../profiles/examples/native-model-qa.demo.j
 
 ## Status and binding responsibility
 
-The JSON file is a concrete draft of the intended rules and expected results. The current server does not load this profile. Its schema is proposed, and attribute, layer and native-type identifiers are intentionally `null` because the installed Allplan build and project resources have not been inspected. An implementation must reject this unbound profile rather than guess identifiers or silently omit rules.
+Version **0.5.0** loads and validates schema **m1-profile-1**, demo profile
+**1.0.0**, through the packaged profile resource and typed model_query. The
+ordinary-column type GUID is the observed 0.3.0/0.4.0 runtime value. Mark/status
+are separate user text attributes **MCP_QA_MARK / MCP_QA_STATUS**; attribute 498
+is Nazwa obiektu and is not reused as a mark. Two layers retain the short names
+MCP_QA_STRUCTURE / MCP_QA_REVIEW. Names are resolved to real project-local IDs
+and checked by round trip and observed text-type code on every profile read.
+No global ID is guessed or edited by the owner. Missing/incompatible resources
+return not_checked or block profile queries with profile_unbound.
 
-During M0/M1, the implementation model must:
+[Final M1 card](m1-final-batch.md) supplies exact UI resource/fixture setup and
+M1 Profile.cmd / M1 Final.cmd. Binding status bound_for_read means resource
+resolution only; it does not prove native writability. Geometry, hierarchy and
+profile runtime acceptance remain pending. The canonical JSON shipped in the
+external wheel matches the example file; configured levels are labeled profile
+configuration, not native BWS. The schema validates the four rule references for
+future M2/M3, but audit/repair tools are not implemented by M1.
+
+The implementation/acceptance responsibilities remain:
 
 1. Read the exact installed Allplan version/build and available type/attribute metadata through prepared diagnostics.
 2. Select actual writable text attributes for `mark` and demo `status`, preserving their actual API IDs and data types. A display name alone is not a binding. If project attributes must be added, supply a supported setup action or exact UI steps.

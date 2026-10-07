@@ -9,7 +9,10 @@ import re
 from .transport import BridgeError
 
 SCHEMA = "m1-query-1"
-FIELDS = {"display_name", "type_name", "type_uuid", "layer_id", "drawing_file", "file_state"}
+BASIC_FIELDS = {"display_name", "type_name", "type_uuid", "layer_id", "drawing_file", "file_state"}
+GEOMETRY_FIELDS = {"bounding_box_mm", "size_x_mm", "size_y_mm", "size_z_mm",
+                   "center_x_mm", "center_y_mm", "center_z_mm", "min_z_mm", "max_z_mm"}
+FIELDS = BASIC_FIELDS | GEOMETRY_FIELDS | {"hierarchy", "mark", "status"}
 OPS = {"eq", "ne", "lt", "lte", "gt", "gte", "in", "contains", "exists", "is_null"}
 
 
@@ -61,7 +64,7 @@ def predicate_fields(node, depth=0, budget=None):
             return result
     keys(node, {"field", "op", "value", "tolerance", "case_sensitive", "trim"}, {"field", "op"})
     field, op = node["field"], node["op"]
-    if not isinstance(field, str) or (field not in FIELDS and attribute_id(field) is None):
+    if not isinstance(field, str) or (field not in FIELDS - {"bounding_box_mm", "hierarchy"} and attribute_id(field) is None):
         invalid("Unknown predicate field; use a supported field or attribute:<positive ID>.")
     if attribute_id(field) is not None:
         bounded_int(attribute_id(field), 1, 2147483647, "attribute ID")
@@ -92,18 +95,38 @@ def predicate_fields(node, depth=0, budget=None):
 
 
 def validate_request(request):
+    if isinstance(request, dict) and request.get("action") == "profile":
+        keys(request, {"schema_version", "action", "profile"}, {"schema_version", "action", "profile"})
+        if request["schema_version"] != SCHEMA:
+            invalid(f"schema_version must be {SCHEMA}.")
+        from .profile_contracts import validate_profile
+        validate_profile(request["profile"])
+        return
     if isinstance(request, dict) and request.get("action") == "inspect":
         keys(request, {"schema_version", "action", "scope", "attribute_ids", "sample_limit", "max_adapters"},
              {"schema_version", "action", "scope", "attribute_ids"})
         bounded_int(request.get("sample_limit", 10), 1, 20, "sample_limit")
         validate_request({**{k: v for k, v in request.items() if k != "sample_limit"}, "action": "query"})
         return
-    keys(request, {"schema_version", "action", "scope", "predicate", "fields", "attribute_ids", "page_size", "max_adapters", "selection_id", "cursor"}, {"schema_version", "action"})
+    extensions = {"component_kind", "coordinate_frame", "spatial_box", "profile"}
+    keys(request, {"schema_version", "action", "scope", "predicate", "fields", "attribute_ids", "page_size", "max_adapters", "selection_id", "cursor"} | extensions, {"schema_version", "action"})
     if request["schema_version"] != SCHEMA:
         invalid(f"schema_version must be {SCHEMA}.")
     action = request["action"]
     if action == "query":
-        keys(request, {"schema_version", "action", "scope", "predicate", "fields", "attribute_ids", "page_size", "max_adapters"}, {"schema_version", "action", "scope"})
+        keys(request, {"schema_version", "action", "scope", "predicate", "fields", "attribute_ids", "page_size", "max_adapters"} | extensions, {"schema_version", "action", "scope"})
+        if request.get("component_kind", "model_identity") not in ("model_identity", "top_level_component"):
+            invalid("component_kind must be model_identity or top_level_component.")
+        if request.get("coordinate_frame", "model_local") not in ("model_local", "project_global"):
+            invalid("coordinate_frame must be model_local or project_global.")
+        if "spatial_box" in request:
+            from .spatial_contracts import validate_spatial
+            validate_spatial(request["spatial_box"])
+            if request["spatial_box"]["frame"] != request.get("coordinate_frame", "model_local"):
+                invalid("Spatial box frame must equal coordinate_frame.")
+        if "profile" in request:
+            from .profile_contracts import validate_profile
+            validate_profile(request["profile"])
         scope = request["scope"]
         keys(scope, {"drawing_files", "include_passive", "visibility"}, {"drawing_files", "include_passive", "visibility"})
         files = scope["drawing_files"]
@@ -127,6 +150,8 @@ def validate_request(request):
             invalid("Duplicate attribute IDs are not allowed.")
         needed = predicate_fields(request.get("predicate"))
         needed.update(fields)
+        if needed & {"mark", "status"} and "profile" not in request:
+            invalid("mark/status fields require an explicit validated profile.")
         needed.update(f"attribute:{ident}" for ident in ids)
         if len({f for f in needed if attribute_id(f) is not None}) > 32:
             invalid("At most 32 distinct attributes may be read.")
@@ -142,7 +167,7 @@ def validate_request(request):
         if "cursor" in request and (not isinstance(request["cursor"], str) or not re.fullmatch(r"[0-9a-f]{32}", request["cursor"])):
             invalid("cursor must be a returned opaque cursor; omit it for the first page.")
     else:
-        invalid("action must be query, page, summary or inspect.")
+        invalid("action must be query, page, summary, inspect or profile.")
     if action != "summary":
         bounded_int(request.get("page_size", 100), 1, 200, "page_size")
 

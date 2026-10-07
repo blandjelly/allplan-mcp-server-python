@@ -11,7 +11,19 @@ Accepted version **0.2.1** has a bounded read-only
 loaded/passive file states, unload exclusion and separate model/view GUID reads;
 the owner confirms matching project names and unchanged model.
 [Runtime evidence](test-results/m1-context-runtime-0.2.1.md).
-Current implementation version **0.4.0** adds typed `model_query` action `inspect`,
+Current implementation version **0.5.0** completes the bounded M1 read code: mm
+geometry summaries, dimensional/AABB predicates, declared model_local/global
+transform, supported native top-level parent resolution and demo profile
+m1-profile-1 validation/fresh resource binding. **56 targeted portable checks
+PASS**, distributions and versioned ZIP build. **ready_for_owner_test**; the full
+M1 exit gate is pending final Allplan evidence.
+[Completion evidence](test-results/m1-completion-portable-0.5.0.md),
+[final card and concrete UI recipe](m1-final-batch.md). M1 Profile.cmd checks
+named resources and M1 Final.cmd saves responses, summaries and bounded pages.
+Do not claim the API model-local/nonzero-offset convention or ten-component
+fixture accepted from fake geometry tests.
+
+Earlier **0.4.0** adds typed `model_query` action `inspect`,
 bounded raw samples and attribute/layer metadata with per-field observations.
 **M1 Metadata.cmd** saves the explicit request and full response in diagnostics,
 addressing the earlier evidence gap. **12 targeted portable checks PASS**;
@@ -38,11 +50,13 @@ readback is not claimed. [Runtime evidence and limits](test-results/m1-query-run
 [small owner card](m1-query-batch.md). No repeat is needed without a relevant
 change/defect. Changed-source staleness and TTL/restart retain portable evidence.
 
-The full M1 milestone remains in progress: geometry unit/offset normalization,
-levels, durable references, spatial/dimensional predicates, parent/child native
-component counts and M1.4 profile binding are still pending. Selections are
-memory-only, read-only and bound to the fields they actually read. The demo
-profile remains unbound and inactive. Do not claim full UAT-02/UAT-03 acceptance.
+The bounded M1 implementation is complete; geometry/frame/native hierarchy
+and demo-resource/fixture **runtime acceptance remains pending**. Native BWS
+levels are not claimed; the optional profile explicitly supplies configuration.
+Selections remain memory-only/session-bound read evidence; durable references
+and mutation eligibility are not established. The demo binds freshly for reads
+after UI resource setup and remains inactive for writes. Do not claim full
+UAT-02/UAT-03 acceptance until the final card has recorded results.
 
 Start from [project-status.md](project-status.md) and the current code, then use
 the roadmap below. Do not repeat accepted owner batches without a new defect or
@@ -51,9 +65,9 @@ hashes; build any further runtime changes under a new package version. The
 earlier 31-test baseline and new targeted checks are separate records; the full
 historical suite was not rerun for this slice. Allplan runtime evidence is separate.
 
-Next: continue geometry/unit/offset/native hierarchy probes and profile schema
-using the accepted bounded 0.4.0 resources, then
-bind validated demo resources. Attribute 498 was observed on file 1
+Next: evaluate the 0.5.0 final card preflight and A/B/C fixture captures, fix
+any native read/frame discrepancy, then close M1 only with linked runtime
+evidence. Continue M2 after that read foundation is accepted. Attribute 498 was observed on file 1
 but returned missing on passive file 2; do not infer native absence or mark
 binding without further evidence. Do not ask the owner to research identifiers
 or construct the final unbound fixture prematurely.

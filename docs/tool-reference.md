@@ -1,8 +1,10 @@
-# M1 scope and model query contract — 0.4.0
+# M1 scope and model query contract — 0.5.0
 
 Status: **implemented; three bounded owner query cases PASS**. Schema
 `m1-query-1`, public MCP tool `model_query`, typed bridge route `/model-query`.
-This is a bounded M1.1–M1.3 slice. The accepted 0.2.1 context reader is reused;
+0.5.0 completes the bounded M1.1–M1.4 read implementation with 56 portable
+checks; its final native geometry/frame/hierarchy/demo fixture gate is pending.
+[Final owner card](m1-final-batch.md). The accepted 0.2.1 context reader is reused;
 its raw units/offset and context probe schema retain their earlier meaning.
 [0.3.0 evidence and limits](test-results/m1-query-runtime-0.3.0.md) verify scope,
 metadata, two distinct pages/full summary and observed-value predicates on the
@@ -38,9 +40,14 @@ If project key, document ID or file inventory cannot be read, querying fails wit
 Identical file/model UUIDs are combined across returned representations. If
 requested/mandatory fields disagree, that identity is excluded as a conflict.
 Missing model/type UUIDs are excluded; an unavailable view UUID is separately
-reported. Counts describe **unique file/model UUIDs**, not top-level native
-components, children, wall tiers or geometric solids. Parent/child resolution is
-pending. References are session-bound read evidence with
+reported. Default counts describe **unique file/model UUIDs**. Explicit
+component_kind=top_level_component instead follows at most 16 parent levels,
+rejects cycles/cross-file parents and deduplicates supported ordinary Column,
+Beam, Wall and Slab root identities. Children/tiers map to their root; labels
+and other root types are counted as excluded non_component_adapters. Failed
+hierarchy reads reduce scope completeness; they never become a guessed count.
+Grouped/Structural Framing/arbitrary native trees are outside the bounded
+fixture contract. The new Allplan count gate remains pending. References are session-bound read evidence with
 `durable_identity_verified: false` and `usable_for_write: false`.
 
 ## Predicates and fields
@@ -48,11 +55,16 @@ pending. References are session-bound read evidence with
 `predicate` is optional (all identifiable in-scope candidates). Use exactly one
 of `all: [...]`, `any: [...]`, `not: {...}`, or a leaf `{field, op, ...}`. Groups
 must be nonempty; the complete tree is validated before enumeration, with at
-most 64 nodes and depth 8. Unsupported keys, geometry/dimension/spatial predicates
-and profile arguments are errors, never ignored filters.
+most 64 nodes and depth 8. Unsupported keys/fields and inconsistent spatial
+frames are errors, never ignored filters. New dimensions and aliases below use
+the same three-valued scalar comparison semantics.
 
 Supported fields: `type_name`, `type_uuid`, `layer_id`, `display_name`,
-`drawing_file`, `file_state`, and `attribute:<positive integer ID>`. Type names
+`drawing_file`, `file_state`, and `attribute:<positive integer ID>`. New scalar
+geometry fields: size_x_mm / size_y_mm / size_z_mm, center_x_mm / center_y_mm /
+center_z_mm, min_z_mm / max_z_mm. Projection-only bounding_box_mm and hierarchy
+are structured observations and cannot be scalar predicate fields. mark/status
+require profile_id=native-model-qa-demo. Type names
 come from `GetTypeName()`, type GUIDs from `GetGuid()` and layers from common
 properties. Use observed values; localized display names are not unique IDs.
 Defaults project `display_name` and `layer_id`. Model/type identity is mandatory;
@@ -174,17 +186,70 @@ uses a DocumentAdapter; [LayerService](https://pythonparts.allplan.com/2026/api_
 uses an integer document ID. This documentation evidence is separate from
 [portable checks](test-results/m1-metadata-portable-0.4.0.md) and Allplan verification.
 
-## Units, offset and next boundary
+## Geometry, spatial scope and coordinate convention
 
-Canonical future geometry uses millimetres/degrees in a declared model-local
-frame. A later boundary must identify the API source unit/frame and apply any
-project-offset transform exactly once when converting to another declared frame.
-Input display units remain independent. This package reads no model geometry,
-normalizes no geometry and applies no offset. Spatial filtering, dimensions,
-nonzero-offset behavior and input-unit invariance remain pending Allplan probes.
-Future bounding-box intersection/containment must explicitly state whether
-boundaries are inclusive and whether the test is merely a broad-phase box check.
-They must not imply exact solid intersection. Those operations are rejected now.
+Geometry is read only for projected/predicate geometry fields or spatial_box,
+inside the resolved file scope. GetModelGeometry supplies Polyhedron3D/BRep3D;
+CalcMinMax returns (MinMax3D, eServiceResult), with native NO_ERR checked. General
+GetGeometry is not used because architectural results depend on the view.
+Wall roots use the union of all direct WallTier geometries, including hidden
+tiers, with a 256-child budget. Failed/unsupported geometry is not_checked.
+Axis-aligned size fields are box extents, not rotated native cross-sections.
+
+coordinate_frame defaults to model_local; project_global adds the project offset
+once. Source coordinates and offset use the declared API-mm/model-local
+convention; display units are not used as a scaling factor. Conversion metadata
+preserves source API, source frame, offset, applied flag and runtime_verified=false.
+The explicit arithmetic has portable evidence. The **native source convention,
+physical unit invariance and nonzero-offset interpretation require the final
+Allplan gate** and must not be assumed accepted from arithmetic tests. ModelContext
+retains raw offset/input-unit observations; geometry queries supply the canonical
+summaries. No angular/orientation/native-level geometry reader is claimed.
+
+spatial_box requires finite min/max triples, relation=intersects or contained,
+boundary=inclusive or exclusive, frame matching coordinate_frame, and optional
+nonnegative tolerance_mm. This is an AABB broad-phase test, not exact solid
+intersection. Inclusive includes touching; exclusive excludes equality. Tolerance
+expands requested bounds. Missing geometry propagates unknown through composition
+and negation. Geometry source fields, rejected candidates and queried parent
+chains join the source fingerprint; geometry/hierarchy/profile changes invalidate
+reused pages/summary. Budget failure creates no partial selection.
+
+## Validated demo profile and configured levels
+
+The packaged allplan://profiles/native-model-qa-demo resource is schema
+m1-profile-1, version 1.0.0. It validates the four future QA rule references,
+explicit units/frame, family GUID, file scope, resource names/types and tolerance.
+No M2 audit or M3 repair is implemented by this read profile.
+
+model_query action=profile, profile_id=native-model-qa-demo freshly resolves
+MCP_QA_MARK / MCP_QA_STATUS and MCP_QA_STRUCTURE / MCP_QA_REVIEW. Positive IDs,
+exact name/short-name round trips, distinct resources and the expected observed
+string type code are required. Attribute 498 remains Object_name; it is not a
+mark binding. No resource is created. Missing/incompatible definitions return
+not_checked; profile queries fail with profile_unbound before creating a selection.
+
+Queries with this profile bind its declared column family and restrict requested
+files to its configured file-101 scope. mark/status aliases read actual resolved
+attribute IDs and require observed string values. A binding fingerprint includes
+profile/version and fresh project/document/resource reads; it is added to the
+selection source binding. Fresh page/summary revalidation catches changed binding.
+Binding status bound_for_read is resource compatibility, not proof of writable
+native properties. active_for_write=false and write_eligibility=not_checked remain
+explicit. No persistent globally bound profile or durable write references are
+created. Actual project binding is recorded by the owner's preflight JSON.
+
+get_model_context accepts optional profile_id=native-model-qa-demo and then exposes
+its configured floor mapping, explicitly labeled profile_configuration_not_native_BWS.
+Absent profile leaves levels not_checked. User-created UI resources and a real
+fixture are prerequisites; the [final UI recipe](m1-final-batch.md) supplies them
+without asking the owner to edit JSON or discover IDs.
+
+M1 Final.cmd uses a typed six-request JSON batch, adds summaries and follows each
+returned cursor with a 50-page cap, records errors and preserves earlier pages.
+All inputs are validated before the diagnostic's network work. The normal
+single-request diagnostic behavior stays unchanged. This is read-only evidence
+capture, not a write retry or automatic acceptance registry.
 
 ## Examples
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 
 from .model_context import integer, observation, text
-from .query_contracts import FIELDS, SCHEMA, fingerprint
+from .query_contracts import BASIC_FIELDS, SCHEMA, fingerprint
 from .transport import BridgeError
 
 
@@ -25,7 +25,7 @@ def enum_code(value):
 def inspect_metadata(service, doc, base, settings, request):
     started = service.clock()
     query = {"schema_version": SCHEMA, "action": "query", "scope": request["scope"],
-             "fields": sorted(FIELDS), "attribute_ids": request["attribute_ids"],
+             "fields": sorted(BASIC_FIELDS), "attribute_ids": request["attribute_ids"],
              "max_adapters": request.get("max_adapters", 5000)}
     snapshot = service._scan(doc, base, settings, query)
 

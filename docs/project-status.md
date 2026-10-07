@@ -28,7 +28,22 @@ nor upstream reports a license and none was invented. [Support matrix](support-m
 
 ## Current M1 implementation and next action
 
-**M1 in progress**, current package **0.4.0** metadata/evidence-capture slice.
+**M1 implementation complete for the bounded read contract**, current package
+**0.5.0**, **ready_for_owner_test**. **56 targeted portable checks PASS**.
+New mm geometry and dimensional/AABB predicates, declared local/global transform,
+parent-chain native component counts, profile schema/resource resolution and
+configured level provenance are implemented. Source fingerprints cover queried
+geometry/hierarchy/profile changes and retain read-only session binding.
+[Completion evidence](test-results/m1-completion-portable-0.5.0.md),
+[final UAT-02/UAT-03 card](m1-final-batch.md).
+
+**M1 exit gate remains pending**: 0.5.0 native geometry/frame behavior, ten-
+component fixture and actual demo resource binding must pass in Allplan.
+Persistence/write eligibility belong to downstream mutation work; no write
+profile is activated. The server resolves real project IDs after UI setup;
+missing resources block the query instead of guessing.
+
+Earlier **0.4.0** metadata/evidence-capture slice remains bounded accepted.
 **12 targeted portable checks PASS; bounded Allplan metadata batch PASS**.
 [Runtime evidence](test-results/m1-metadata-runtime-0.4.0.md) verifies two stable
 column identities, attribute 498 metadata (Nazwa obiektu, codes 67/69, empty unit
@@ -41,7 +56,7 @@ file 2 restored to passive and the same Allplan 2026-1-7 build. No repeat needed
 `inspect`; metadata is read per field, sample/layer coverage is bounded, passive
 missing values do not establish native absence, and full responses are saved by
 **M1 Metadata.cmd**. The profile remains unbound; M1.4 now has a resource probe,
-but schema validation/binding are still pending.
+with schema/binding implemented in 0.5.0 and its new runtime gate pending.
 
 The earlier **0.3.0** scope/query slice remains bounded-runtime accepted.
 Work started from
@@ -63,10 +78,10 @@ No repeat of the correction batch is needed.
 
 | Task | Current state | Evidence / remaining scope |
 | --- | --- | --- |
-| M1.1 | Partial implementation | Explicit scope/identity/completeness contracts; session-bound model/type references, passive sign handling, missing identity exclusion. Geometry units/offset normalization, levels, durable refs and writability still pending. |
-| M1.2 | Bounded runtime batch PASS; task remains partial | Two native column identities, passive scope, observed type GUID/layer and raw attribute 498 equality pass. Other predicate combinations have portable evidence only. Geometry/spatial/native hierarchy coverage pending. |
-| M1.3 | Unchanged-source paging/full summary PASS; task remains partial | Two distinct pages and full cached selection summary pass. Changed-source staleness, TTL/eviction/restart and limits remain portable-only. No downstream audit/edit consumer or persistence yet. |
-| M1.4 | Partial implementation; bounded resource batch PASS | 0.4.0 attribute/layer metadata and complete response capture verified on two columns, with explicit passive omission. Schema validation, semantic binding and write eligibility remain pending. No activation or final fixture claimed. |
+| M1.1 | Implemented; final runtime gate pending | Explicit scope/session/model identity, passive handling, mm/frame transform and configured-level provenance. Raw context/session behavior accepted; nonzero-offset/native geometry still needs owner evidence. Durable/write authorization is not claimed. |
+| M1.2 | Implemented; bounded old batch PASS | Typed scalar/dimensional/AABB predicates and four-family top-level parent resolution implemented. New geometry/native counts have portable evidence and final Allplan gate pending. |
+| M1.3 | Implemented; unchanged-source runtime PASS | Full cached selections/page/summary and geometry/hierarchy/profile-sensitive revalidation implemented. Changed-source staleness, TTL/eviction/restart retain portable evidence. Downstream mutation/persistence is deferred. |
+| M1.4 | Implemented read binding; fixture runtime pending | Versioned demo schema and fresh name/type/ID/layer round trips, configured levels, exact UI recipe and diagnostic batch implemented. Actual named resources and full fixture need owner evidence; write eligibility remains not_checked. |
 
 **24 relevant portable checks PASS** on Linux/Python 3.12.14/FastMCP 3.2.4:
 21 new query contract/fake-adapter checks, one new real MCP transport check,
@@ -88,8 +103,9 @@ The report states no model changes; independent geometry/visual readback is not
 claimed. Static runtime_verified=false is not an acceptance registry.
 [0.3.0 runtime record](test-results/m1-query-runtime-0.3.0.md).
 
-Next: implement geometry/unit/offset and parent/child counting probes, plus
-profile schema, using the recorded resources. The
+Next: obtain the remaining 0.5.0 final fixture/display-unit/nonzero-offset
+captures, interpret them against the documented gate, and fix any native read
+failures before accepting full M1. Then proceed to M2 audit. The
 [0.4.0 metadata batch](m1-metadata-batch.md) is complete within its scope; no
 repeat or extra capture is required. Do not repeat the passed
 [0.3.0 query batch](m1-query-batch.md) without a relevant change or defect. Complete

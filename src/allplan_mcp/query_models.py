@@ -6,7 +6,9 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 Scalar = str | int | float | bool | None
-QueryField = Literal["display_name", "type_name", "type_uuid", "layer_id", "drawing_file", "file_state"]
+QueryField = Literal["display_name", "type_name", "type_uuid", "layer_id", "drawing_file", "file_state",
+                     "bounding_box_mm", "size_x_mm", "size_y_mm", "size_z_mm", "center_x_mm", "center_y_mm",
+                     "center_z_mm", "min_z_mm", "max_z_mm", "hierarchy", "mark", "status"]
 
 
 class ContractModel(BaseModel):
@@ -33,6 +35,15 @@ class Predicate(ContractModel):
     trim: bool = False
 
 
+class SpatialBox(ContractModel):
+    min: list[Annotated[float, Field(allow_inf_nan=False)]] = Field(min_length=3, max_length=3)
+    max: list[Annotated[float, Field(allow_inf_nan=False)]] = Field(min_length=3, max_length=3)
+    relation: Literal["intersects", "contained"]
+    boundary: Literal["inclusive", "exclusive"]
+    frame: Literal["model_local", "project_global"]
+    tolerance_mm: float = Field(default=0, ge=0, allow_inf_nan=False)
+
+
 class QueryInput(ContractModel):
     action: Literal["query"]
     scope: QueryScope
@@ -41,6 +52,10 @@ class QueryInput(ContractModel):
     attribute_ids: list[Annotated[int, Field(ge=1, le=2147483647)]] = Field(default_factory=list, max_length=32)
     page_size: int = Field(default=100, ge=1, le=200)
     max_adapters: int = Field(default=5000, ge=1, le=10000)
+    component_kind: Literal["model_identity", "top_level_component"] = "model_identity"
+    coordinate_frame: Literal["model_local", "project_global"] = "model_local"
+    spatial_box: SpatialBox | None = None
+    profile_id: Literal["native-model-qa-demo"] | None = None
 
 
 class PageInput(ContractModel):
@@ -63,4 +78,9 @@ class InspectInput(ContractModel):
     max_adapters: int = Field(default=5000, ge=1, le=10000)
 
 
-QueryRequest = Annotated[QueryInput | PageInput | SummaryInput | InspectInput, Field(discriminator="action")]
+class ProfileInput(ContractModel):
+    action: Literal["profile"]
+    profile_id: Literal["native-model-qa-demo"]
+
+
+QueryRequest = Annotated[QueryInput | PageInput | SummaryInput | InspectInput | ProfileInput, Field(discriminator="action")]

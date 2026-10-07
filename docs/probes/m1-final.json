@@ -1,0 +1,135 @@
+[
+  {
+    "action": "profile",
+    "profile_id": "native-model-qa-demo"
+  },
+  {
+    "action": "query",
+    "scope": {
+      "drawing_files": [
+        101,
+        102,
+        103
+      ],
+      "include_passive": true,
+      "visibility": "api_select_all"
+    },
+    "component_kind": "top_level_component",
+    "fields": [
+      "bounding_box_mm",
+      "size_z_mm"
+    ],
+    "page_size": 200
+  },
+  {
+    "action": "query",
+    "scope": {
+      "drawing_files": [
+        101
+      ],
+      "include_passive": false,
+      "visibility": "api_select_all"
+    },
+    "component_kind": "top_level_component",
+    "profile_id": "native-model-qa-demo",
+    "fields": [
+      "mark",
+      "status",
+      "layer_id",
+      "bounding_box_mm",
+      "size_x_mm",
+      "size_y_mm",
+      "size_z_mm"
+    ],
+    "page_size": 200
+  },
+  {
+    "action": "query",
+    "scope": {
+      "drawing_files": [
+        101
+      ],
+      "include_passive": false,
+      "visibility": "api_select_all"
+    },
+    "component_kind": "top_level_component",
+    "profile_id": "native-model-qa-demo",
+    "fields": [
+      "mark",
+      "status",
+      "layer_id",
+      "bounding_box_mm",
+      "size_x_mm",
+      "size_y_mm",
+      "size_z_mm"
+    ],
+    "page_size": 200,
+    "predicate": {
+      "field": "mark",
+      "op": "eq",
+      "value": "S02"
+    }
+  },
+  {
+    "action": "query",
+    "scope": {
+      "drawing_files": [
+        101
+      ],
+      "include_passive": false,
+      "visibility": "api_select_all"
+    },
+    "component_kind": "top_level_component",
+    "profile_id": "native-model-qa-demo",
+    "fields": [
+      "mark",
+      "status",
+      "layer_id",
+      "bounding_box_mm",
+      "size_x_mm",
+      "size_y_mm",
+      "size_z_mm"
+    ],
+    "page_size": 200,
+    "predicate": {
+      "field": "size_z_mm",
+      "op": "eq",
+      "value": 3000,
+      "tolerance": 1
+    },
+    "spatial_box": {
+      "min": [
+        -201,
+        -201,
+        -1
+      ],
+      "max": [
+        201,
+        201,
+        3001
+      ],
+      "frame": "model_local",
+      "relation": "contained",
+      "boundary": "exclusive"
+    }
+  },
+  {
+    "action": "query",
+    "scope": {
+      "drawing_files": [
+        101
+      ],
+      "include_passive": false,
+      "visibility": "api_select_all"
+    },
+    "component_kind": "top_level_component",
+    "coordinate_frame": "project_global",
+    "fields": [
+      "bounding_box_mm",
+      "size_x_mm",
+      "size_y_mm",
+      "size_z_mm"
+    ],
+    "page_size": 200
+  }
+]

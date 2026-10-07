@@ -36,6 +36,51 @@ class FakeBridge:
 
 
 class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
+    async def test_final_batch_transports_geometry_profile_and_saves_summaries(self):
+        from allplan_mcp.demo_profile import load_demo_profile
+        request = {"action": "query", "scope": {"drawing_files": [101], "include_passive": False, "visibility": "api_select_all"},
+                   "component_kind": "top_level_component", "coordinate_frame": "model_local", "profile_id": "native-model-qa-demo",
+                   "fields": ["mark", "bounding_box_mm", "size_z_mm"],
+                   "spatial_box": {"min": [-201,-201,-1], "max": [201,201,3001], "relation": "contained", "boundary": "exclusive", "frame": "model_local"}}
+        requests = [{"action": "profile", "profile_id": "native-model-qa-demo"}, request]
+        report = await collect_diagnostics(self.host_url, self.url, query_batch=requests)
+        records = report["mcp"]["model_query_batch"]
+        self.assertEqual(len(records), 2)
+        self.assertEqual(records[0]["response"]["request"]["profile"], load_demo_profile())
+        self.assertNotIn("profile_id", records[1]["response"]["request"])
+        self.assertEqual(records[1]["summary"]["request"]["action"], "summary")
+        self.assertEqual(len(records[1]["pages"]),1)
+        self.assertNotIn("error", records[1])
+        json.dumps(report, allow_nan=False)
+        before = len(self.bridge_handler.calls)
+        with self.assertRaises(ValueError):
+            await collect_diagnostics(self.host_url, self.url, query_batch=[request, {"action": "create_box"}])
+        with self.assertRaises(ValueError):
+            await collect_diagnostics(self.host_url, self.url, query_batch=[{**request, "spatial_box": {
+                **request["spatial_box"], "max": [float("inf"),1,1]}}])
+        self.assertEqual(len(self.bridge_handler.calls), before)
+        async with Client(self.url, timeout=5) as client:
+            resource = await client.read_resource("allplan://profiles/native-model-qa-demo")
+            self.assertEqual(json.loads(resource[0].text), load_demo_profile())
+        self.assertFalse(any(route == "/create-box" for route, _ in self.bridge_handler.calls))
+
+    async def test_diagnostic_repeated_cursor_is_bounded_and_preserves_partial_evidence(self):
+        original = self.bridge_handler.handle
+        def repeat_cursor(path, payload):
+            response = original(path, payload)
+            if path == "/model-query" and payload["action"] in {"query", "page"}:
+                response["page"] = {"next_cursor": "b" * 32}
+            return response
+        self.bridge_handler.handle = repeat_cursor
+        request = {"action": "query", "scope": {"drawing_files": [101], "include_passive": False, "visibility": "api_select_all"}}
+        report = await collect_diagnostics(self.host_url, self.url, query_batch=[request])
+        record = report["mcp"]["model_query_batch"][0]
+        self.assertIn("cursor budget", record["error"]["message"])
+        self.assertIn("response", record)
+        self.assertEqual(len(record["pages"]), 2)
+        pages = [payload for path, payload in self.bridge_handler.calls if path == "/model-query" and payload["action"] == "page"]
+        self.assertEqual(len(pages),1)
+
     async def test_metadata_inspect_diagnostics_capture_and_invalid_request_no_native_call(self):
         request = {"action": "inspect", "scope": {"drawing_files": [1, 2], "include_passive": True, "visibility": "api_select_all"},
                    "attribute_ids": [498], "sample_limit": 10}

@@ -8,7 +8,7 @@ from collections import Counter, OrderedDict
 from uuid import uuid4
 
 from .model_context import context_probe, guid, integer, observation, text
-from .query_contracts import SCHEMA, attribute_id, evaluate, fingerprint, predicate_fields, scalar, validate_request
+from .query_contracts import BASIC_FIELDS, GEOMETRY_FIELDS, SCHEMA, attribute_id, evaluate, fingerprint, predicate_fields, scalar, validate_request
 from .transport import BridgeError
 
 
@@ -25,6 +25,13 @@ class ModelQueryService:
 
     def handle(self, doc, base, settings, request):
         validate_request(request)
+        if request["action"] == "profile":
+            from .profile_contracts import bind_profile
+            started = self.clock()
+            def budget():
+                if self.clock() - started >= self.SCAN_SECONDS:
+                    raise BridgeError("scan_limit_exceeded", "Profile binding exceeded its read budget.", 409)
+            return bind_profile(doc, base, request["profile"], context_probe(doc, base, settings, {}), budget)
         if request["action"] == "inspect":
             from .model_metadata import inspect_metadata
             return inspect_metadata(self, doc, base, settings, request)
@@ -76,6 +83,7 @@ class ModelQueryService:
                 "scope": copy.deepcopy(snapshot["scope"]), "counts": copy.deepcopy(snapshot["counts"]),
                 "coverage": copy.deepcopy(snapshot["coverage"]), "omissions": copy.deepcopy(snapshot["omissions"]),
                 "not_checked_samples": copy.deepcopy(snapshot["not_checked_samples"]),
+                "profile_binding": copy.deepcopy(snapshot.get("profile_binding")),
                 "usable_for_write": False}
 
     def _page(self, ident, entry, offset, size):
@@ -101,6 +109,19 @@ class ModelQueryService:
                 or context["document_id"]["status"] != "observed" or context["loaded_drawing_files"]["status"] != "observed"):
             raise BridgeError("context_unavailable", "Project key, document identity and loaded-file inventory must be readable before querying.", 409)
         scope = request["scope"]
+        def check_budget():
+            if self.clock() - started >= self.SCAN_SECONDS:
+                raise BridgeError("scan_limit_exceeded", "Query exceeded its time budget; no selection was created.", 409)
+        profile_binding = None
+        predicate = request.get("predicate")
+        if "profile" in request:
+            from .profile_contracts import bind_profile, require_bound
+            profile_binding = bind_profile(doc, base, request["profile"], context, check_budget)
+            require_bound(profile_binding)
+            if not set(scope["drawing_files"]) <= set(request["profile"]["scope"]["drawing_files"]):
+                raise BridgeError("profile_scope_mismatch", "Requested files exceed the explicit demo profile scope.")
+            family = {"field": "type_uuid", "op": "eq", "value": request["profile"]["target"]["native_type_id"]}
+            predicate = {"all": [family, predicate]} if predicate else family
         states = {f["number"]: f["state"] for f in context["loaded_drawing_files"]["value"]}
         included, omitted = [], []
         for number in sorted(scope["drawing_files"]):
@@ -114,9 +135,19 @@ class ModelQueryService:
                 included.append({"drawing_file": number, "state": state, "write_eligibility": "not_checked"})
         binding = {"query_session_id": self.session_id, "project_key": project["value"]["key"],
                    "document_id": context["document_id"]["value"]}
+        if profile_binding:
+            binding["profile_binding_fingerprint"] = profile_binding["binding_fingerprint"]
         needed = predicate_fields(request.get("predicate")) | set(request.get("fields", ["display_name", "layer_id"]))
         needed.update({"type_name", "type_uuid"})
         needed.update(f"attribute:{number}" for number in request.get("attribute_ids", []))
+        if "spatial_box" in request:
+            needed.add("bounding_box_mm")
+        if request.get("component_kind") == "top_level_component":
+            needed.add("hierarchy")
+        for role in needed & {"mark", "status"}:
+            needed.add(f"attribute:{profile_binding['attributes'][role]['value']['attribute_id']}")
+        if len({f for f in needed if attribute_id(f) is not None}) > 32:
+            raise BridgeError("invalid_payload", "Profile aliases and requested attributes exceed the 32-attribute budget.")
         files = {f["drawing_file"] for f in included}
         groups, source, samples = {}, [], []
         source_bytes = 0
@@ -132,7 +163,8 @@ class ModelQueryService:
         counts = Counter({"raw_adapters_visited": 0, "in_scope_adapters": 0, "matched_model_identities": 0,
                           "nonmatching_model_identities": 0, "predicate_not_checked": 0,
                           "identity_not_checked": 0, "conflicting_model_identities": 0,
-                          "duplicate_representations": 0, "file_identity_not_checked": 0, "file_state_conflicts": 0})
+                          "duplicate_representations": 0, "file_identity_not_checked": 0, "file_state_conflicts": 0,
+                          "hierarchy_not_checked": 0, "non_component_adapters": 0})
         try:
             adapters = base.ElementsSelectService.SelectAllElements(doc) if files else []
             for adapter in adapters:
@@ -155,16 +187,52 @@ class ModelQueryService:
                     sample("file_state_conflict", record)
                     continue
                 counts["in_scope_adapters"] += 1
-                values = self._fields(adapter, base, needed, number, states[number])
+                chain = None
+                if request.get("component_kind") == "top_level_component" or "hierarchy" in needed:
+                    from .native_readers import root_adapter, COMPONENT_TYPES
+                    try:
+                        root, chain = root_adapter(adapter, check_budget)
+                    except BridgeError:
+                        raise
+                    except Exception as exc:
+                        counts["hierarchy_not_checked"] += 1
+                        record = {"drawing_file": number, "model_uuid": observation(lambda: guid(adapter.GetModelElementUUID())), "reason": type(exc).__name__}
+                        add_source(record)
+                        sample("hierarchy_not_checked", record)
+                        if request.get("component_kind") == "top_level_component":
+                            continue
+                    if request.get("component_kind") == "top_level_component":
+                        adapter = root
+                basic_needed = {f for f in needed if f in BASIC_FIELDS or attribute_id(f) is not None}
+                values = self._fields(adapter, base, basic_needed, number, states[number])
+                if needed & GEOMETRY_FIELDS:
+                    from .native_readers import geometry_fields
+                    values.update(geometry_fields(adapter, settings, request.get("coordinate_frame", "model_local"), needed & GEOMETRY_FIELDS, check_budget))
+                if "hierarchy" in needed:
+                    root_ref = {k: v for k, v in chain[-1].items() if k != "view_uuid"} if chain else None
+                    values["hierarchy"] = ({"status": "observed", "value": {"root": root_ref, "top_level": len(chain) == 1}}
+                                           if chain else {"status": "not_checked", "value": None, "reason": "hierarchy_unavailable"})
+                    if request.get("component_kind") == "top_level_component":
+                        values["hierarchy"] = {"status": "observed", "value": {"root": root_ref, "top_level": True}}
+                for role in needed & {"mark", "status"}:
+                    value = values[f"attribute:{profile_binding['attributes'][role]['value']['attribute_id']}"]
+                    if value["status"] == "observed" and not isinstance(value["value"], str):
+                        value = {"status": "not_checked", "value": None, "reason": "profile_string_value_required"}
+                    values[role] = copy.deepcopy(value)
                 model = observation(lambda: guid(adapter.GetModelElementUUID()))
                 view = observation(lambda: guid(adapter.GetElementUUID()))
                 record = {"signed_drawing_file_number": signed["value"], "model_uuid": model,
                           "view_uuid": view, "fields": values}
+                if chain:
+                    record["source_hierarchy"] = chain
                 add_source(record)
                 if (model["status"] != "observed" or values["type_uuid"]["status"] != "observed"
                         or values["type_name"]["status"] != "observed"):
                     counts["identity_not_checked"] += 1
                     sample("identity_not_checked", record)
+                    continue
+                if request.get("component_kind") == "top_level_component" and values["type_name"].get("value") not in COMPONENT_TYPES:
+                    counts["non_component_adapters"] += 1
                     continue
                 key = (number, model["value"])
                 groups.setdefault(key, []).append(record)
@@ -184,7 +252,12 @@ class ModelQueryService:
                 sample("representation_conflict", {"drawing_file": number, "model_uuid": model_uuid})
                 continue
             values = records[0]["fields"]
-            match = evaluate(request.get("predicate"), values)
+            match = evaluate(predicate, values)
+            if "spatial_box" in request:
+                from .spatial_contracts import matches_box
+                bounds = values["bounding_box_mm"]
+                spatial_match = matches_box(bounds["value"], request["spatial_box"]) if bounds["status"] == "observed" else None
+                match = False if match is False or spatial_match is False else None if match is None or spatial_match is None else True
             if match is None:
                 counts["predicate_not_checked"] += 1
                 sample("predicate_not_checked", {"drawing_file": number, "model_uuid": model_uuid, "fields": values})
@@ -194,14 +267,15 @@ class ModelQueryService:
                 continue
             counts["matched_model_identities"] += 1
             elements.append({"ref": {**binding, "drawing_file": number, "model_uuid": model_uuid,
-                                     "type_uuid": values["type_uuid"]["value"], "durable_identity_verified": False},
+                                     "type_uuid": values["type_uuid"]["value"], "durable_identity_verified": False,
+                                     "component_kind": request.get("component_kind", "model_identity")},
                              "signed_drawing_file_numbers": sorted({r["signed_drawing_file_number"] for r in records}),
                              "view_uuids": sorted({r["view_uuid"]["value"] for r in records if r["view_uuid"]["status"] == "observed"}),
                              "view_identity_not_checked": any(r["view_uuid"]["status"] != "observed" for r in records),
                              "fields": values, "source_fingerprint": fingerprint(records), "usable_for_write": False})
         # Source includes rejected candidates so additions and changes into the result are detected.
         source.sort(key=fingerprint)
-        complete = not omitted and not any(counts[key] for key in ("predicate_not_checked", "identity_not_checked", "conflicting_model_identities", "file_identity_not_checked", "file_state_conflicts"))
+        complete = not omitted and not any(counts[key] for key in ("predicate_not_checked", "identity_not_checked", "conflicting_model_identities", "file_identity_not_checked", "file_state_conflicts", "hierarchy_not_checked"))
         failed_fields = sum(v["status"] == "not_checked" for e in elements for v in e["fields"].values())
         return {"scope": {"requested": copy.deepcopy(scope), "included_files": included},
                 "counts": dict(counts), "elements": elements, "omissions": omitted, "not_checked_samples": samples,
@@ -209,8 +283,11 @@ class ModelQueryService:
                              "returned_fields_complete": failed_fields == 0, "returned_fields_not_checked": failed_fields,
                              "whole_project": False, "unloaded_files": "not_enumerated",
                              "visibility": "api_select_all_screen_and_occlusion_not_checked",
-                             "count_kind": "unique_file_model_uuid_not_top_level_components",
-                             "native_component_counts": "not_checked", "geometry_units_offset": "not_checked"},
+                             "count_kind": ("supported_native_top_level_components" if request.get("component_kind") == "top_level_component" else "unique_file_model_uuid_not_top_level_components"),
+                             "native_component_counts": "implemented_runtime_pending" if request.get("component_kind") == "top_level_component" else "not_checked",
+                             "supported_component_types": ["Column_TypeUUID", "Beam_TypeUUID", "Wall_TypeUUID", "Slab_TypeUUID"],
+                             "geometry_units_offset": "implemented_runtime_pending" if needed & GEOMETRY_FIELDS else "not_checked"},
+                "profile_binding": profile_binding,
                 "source_fingerprint": fingerprint({"binding": binding, "included": included, "omissions": omitted, "source": source})}
 
     @staticmethod

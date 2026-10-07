@@ -14,7 +14,16 @@ baseline is **accepted on Allplan 2026-1-7** with local Windows Codex
 (UAT-00/UAT-01 PASS). [M0 is closed](docs/test-results/m0-acceptance-0.1.2.md);
 workflow toolkit capabilities begin with M1.
 
-Current package **0.4.0** adds bounded resource metadata inspection and
+Current package **0.5.0** completes the bounded M1 read implementation: mm
+geometry summaries, declared local/global frames, dimensional/AABB filtering,
+native parent resolution and freshly validated demo resource binding.
+**56 targeted portable checks PASS; final Allplan exit gate remains pending**.
+[Final owner card](docs/m1-final-batch.md) and
+[completion evidence](docs/test-results/m1-completion-portable-0.5.0.md).
+M1 Profile.cmd checks resources; M1 Final.cmd captures the complete final batch.
+No write workflow is enabled.
+
+Earlier package **0.4.0** adds bounded resource metadata inspection and
 **M1 Metadata.cmd**, which saves the full request/response for an active/passive
 attribute comparison. **12 targeted portable checks pass; the bounded owner metadata batch PASS**. [New owner card](docs/m1-metadata-batch.md),
 [portable evidence](docs/test-results/m1-metadata-portable-0.4.0.md),
@@ -33,8 +42,10 @@ record scope, metadata, pages/full summary and observed-value predicates on two
 native columns. Changed-source staleness and geometry remain separately pending.
 The earlier **0.2.1 context correction batch remains PASS**; do not repeat it.
 [Accepted context evidence](docs/test-results/m1-context-runtime-0.2.1.md).
-Geometry/offset normalization, native component counting and demo profile binding
-remain pending. The demonstration profile is unbound and inactive; M1 is not accepted.
+Geometry/offset/native counts and the new demo binding have portable evidence
+in 0.5.0; their final Allplan verification remains pending. The demo resources
+resolve per project after the packaged UI setup, and write eligibility is
+not_checked. M1 is not yet accepted on the full fixture.
 
 - [Windows installation and restore](docs/windows-setup.md)
 - [UAT-00 / UAT-01 prompts and result form](docs/m0-acceptance-batch.md)

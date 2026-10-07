@@ -68,3 +68,12 @@ Backups live outside the extracted package. Keep them until this batch is accept
 | Integrity check fails | Extract a fresh package. Do not mix files from different versions. |
 
 The [2026 AllplanVersion API](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_AllplanSettings/AllplanVersion/) provides release strings; these alone do not establish a full build/hotfix. The diagnostics also reads version resources from the running process executable on Windows. If the hotfix remains unavailable, include the value visible in Allplan's About / version dialog with your result. Do not infer it from a folder name or a Python version.
+
+## Final M1 read package 0.5.0
+
+Use the [final owner card](m1-final-batch.md) for named demo resources, the
+10-component fixture and the remaining display-unit/nonzero-offset verification.
+M1 Profile.cmd resolves resources without creating them; M1 Final.cmd captures
+the packaged query batch with summaries/pages. Restart StartPythonHost after
+normal UI setup/file-state commands that end it. Seven tools remain exposed.
+Accepted old batches/archives do not need a repeat; the final 0.5.0 gate is pending.
