@@ -55,7 +55,7 @@ GUIDs. Owner confirms names match and model unchanged.
 
 No repeat of the correction batch is needed.
 
-| Task | 0.3.0 state | Evidence / remaining scope |
+| Task | Current state | Evidence / remaining scope |
 | --- | --- | --- |
 | M1.1 | Partial implementation | Explicit scope/identity/completeness contracts; session-bound model/type references, passive sign handling, missing identity exclusion. Geometry units/offset normalization, levels, durable refs and writability still pending. |
 | M1.2 | Bounded runtime batch PASS; task remains partial | Two native column identities, passive scope, observed type GUID/layer and raw attribute 498 equality pass. Other predicate combinations have portable evidence only. Geometry/spatial/native hierarchy coverage pending. |

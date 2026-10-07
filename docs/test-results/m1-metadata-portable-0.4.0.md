@@ -35,6 +35,12 @@ Wheel/sdist and evaluation ZIP build successfully. The package's embedded
 manifest identifies its exact source commit and hashes. Original accepted ZIPs
 and raw owner evidence remain unchanged. Windows execution/CI is not claimed.
 
+Exact artifact: `allplan-mcp-0.4.0-windows-evaluation.zip`, clean source commit
+`0b0daf9f1a3cc03a881fcf5638b8176fc6f720a9` (`source_modified=false`). SHA-256:
+`1818498341b961403aed59f9880de1ee0992aac97b677f221efd6d5f89ef5e1f`.
+This artifact record was added after building; the ZIP is not rebuilt for the
+documentation-only follow-up.
+
 2026 API documentation establishes signature feasibility only:
 [AttributeService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/AttributeService/),
 [LayerService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/LayerService/).
