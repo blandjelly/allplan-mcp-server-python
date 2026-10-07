@@ -16,9 +16,11 @@ workflow toolkit capabilities begin with M1.
 
 Current package **0.4.0** adds bounded resource metadata inspection and
 **M1 Metadata.cmd**, which saves the full request/response for an active/passive
-attribute comparison. **12 targeted portable checks pass; Allplan verification
-is pending**. [New owner card](docs/m1-metadata-batch.md),
-[portable evidence](docs/test-results/m1-metadata-portable-0.4.0.md).
+attribute comparison. **12 targeted portable checks pass; the bounded owner metadata batch PASS**. [New owner card](docs/m1-metadata-batch.md),
+[portable evidence](docs/test-results/m1-metadata-portable-0.4.0.md),
+[Allplan evidence and limits](docs/test-results/m1-metadata-runtime-0.4.0.md).
+Attribute 498 is observed as Nazwa obiektu; the file-2 passive read omits it,
+while the active-background read returns Słup. No repeat is needed.
 
 Package **0.3.0** adds a bounded read-only `model_query`: explicit loaded
 file/passive scope, type/layer/raw-attribute predicates, paginated session

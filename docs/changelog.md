@@ -9,7 +9,11 @@ values remain API omissions without a native-absence or profile-binding claim.
 Add **M1 Metadata.cmd** and diagnostics request/full-response capture, retaining
 the seven-tool catalog. **12 targeted portable checks PASS**; distributions and
 versioned evaluation ZIP build. [Portable evidence](test-results/m1-metadata-portable-0.4.0.md).
-[Two-capture owner card](m1-metadata-batch.md) is pending in Allplan. Accepted
+[Two-capture owner card](m1-metadata-batch.md) subsequently **PASS** on the two
+columns: complete JSON, resource metadata and passive/active raw 498 comparison.
+Owner confirms columns unchanged, passive state restored and unchanged build.
+[Runtime evidence](test-results/m1-metadata-runtime-0.4.0.md) remains separate from
+automated checks; archive and raw uploads are preserved unchanged. Accepted
 0.3.0 query evidence and original ZIP are unchanged; previous batches need no
 repeat. Geometry/offset/hierarchy and demo schema/binding remain pending.
 

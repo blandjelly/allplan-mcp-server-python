@@ -45,5 +45,7 @@ documentation-only follow-up.
 [AttributeService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/AttributeService/),
 [LayerService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/LayerService/).
 Fake-resource tests cannot confirm those APIs or passive attribute behavior in
-Allplan. [New owner card](../m1-metadata-batch.md) is **pending**; geometry,
-offset/units, hierarchy and profile activation are unverified.
+Allplan. [Owner card](../m1-metadata-batch.md) subsequently has bounded PASS
+[Allplan evidence](m1-metadata-runtime-0.4.0.md), recorded separately without
+rerunning developer tests or rebuilding the ZIP. Geometry, offset/units,
+hierarchy and profile activation remain unverified.

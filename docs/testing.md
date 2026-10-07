@@ -31,7 +31,11 @@ new tests and four existing checks relevant to changed validation/transport/
 packaging. [Exact commands and evidence](test-results/m1-metadata-portable-0.4.0.md).
 No historical full-suite or accepted owner batch was repeated. The updated CI
 inventory has 61 distinct methods; this is inventory, not a local full run.
-The [two metadata captures](m1-metadata-batch.md) remain pending in Allplan.
+The [two metadata captures](m1-metadata-batch.md) subsequently PASS within their
+bounded scope, with owner unchanged-column/build and restored passive-state
+confirmation. [Runtime evidence](test-results/m1-metadata-runtime-0.4.0.md) is
+separate from the automated checks. This evidence-only follow-up runs no tests
+and rebuilds no archive.
 
 ```bash
 uv sync --frozen

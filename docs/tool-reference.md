@@ -123,7 +123,7 @@ The timer cannot interrupt a blocking native API call. Paging reduces response
 size; revalidation still scans the bounded candidate set. Runtime performance
 remains unmeasured.
 
-## Metadata inspection (new in 0.4.0; Allplan pending)
+## Metadata inspection (0.4.0; bounded Allplan batch PASS)
 
 `action=inspect` requires the same explicit `scope` and an explicit
 `attribute_ids` list (0–32 distinct positive IDs). `sample_limit` is 1–20,
@@ -154,7 +154,9 @@ Passive native absence remains `not_checked`; null, empty string and zero retain
 their observed raw values. No fallback read changes state or creates attributes.
 `runtime_verified=false`, `usable_for_write=false`, `profile_binding=not_checked`
 remain explicit. Units are metadata strings without conversion. The demo
-profile remains unbound. [Owner card](m1-metadata-batch.md) is pending.
+profile remains unbound. [Owner card](m1-metadata-batch.md) has bounded PASS
+[Allplan evidence](test-results/m1-metadata-runtime-0.4.0.md); these static flags
+are not an acceptance registry.
 
 ```json
 {"action":"inspect","scope":{"drawing_files":[1,2],"include_passive":true,"visibility":"api_select_all"},"attribute_ids":[498],"sample_limit":10}

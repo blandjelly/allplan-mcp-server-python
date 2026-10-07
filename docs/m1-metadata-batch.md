@@ -1,6 +1,12 @@
 # M1 metadata and passive-attribute probe — 0.4.0
 
-Status: **Allplan verification pending**. This is a new resource/read probe,
+Status: **bounded owner batch PASS**.
+[Recorded evidence and limits](test-results/m1-metadata-runtime-0.4.0.md) verify
+complete replies, resource metadata and passive/active raw 498 comparison. Owner
+confirms columns unchanged, file 2 restored passive and the same Allplan build.
+The first attempts failed with host_absent; the later two captures succeed.
+No repeat or extra capture is needed without a relevant change or defect.
+The instructions below are retained for reproducibility. This is a resource/read probe,
 not a repeat of the accepted 0.3.0 paging/predicate batch. M0 and the 0.2.1
 context correction stay accepted. The demo profile stays unbound/inactive.
 

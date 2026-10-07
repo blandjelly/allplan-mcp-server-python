@@ -15,7 +15,12 @@ Current implementation version **0.4.0** adds typed `model_query` action `inspec
 bounded raw samples and attribute/layer metadata with per-field observations.
 **M1 Metadata.cmd** saves the explicit request and full response in diagnostics,
 addressing the earlier evidence gap. **12 targeted portable checks PASS**;
-wheel/sdist and evaluation ZIP build. **New Allplan verification is pending**.
+wheel/sdist and evaluation ZIP build. **Bounded metadata owner batch PASS**.
+[Runtime evidence](test-results/m1-metadata-runtime-0.4.0.md) records two stable
+columns, attribute 498 Nazwa obiektu (codes 67/69, empty unit), layer 3736 AR_SŁUP
+and complete response capture. File-2 raw 498 is missing while passive and Słup
+while active background; host/query sessions also differ. Owner confirms columns
+unchanged, file 2 restored passive and Allplan 2026-1-7 unchanged. No repeat needed.
 [Implementation evidence](test-results/m1-metadata-portable-0.4.0.md),
 [two-capture owner card](m1-metadata-batch.md). No profile activation is implemented.
 
@@ -46,8 +51,8 @@ hashes; build any further runtime changes under a new package version. The
 earlier 31-test baseline and new targeted checks are separate records; the full
 historical suite was not rerun for this slice. Allplan runtime evidence is separate.
 
-Next: interpret the pending 0.4.0 active/passive metadata captures; continue
-separate geometry/unit/offset/native hierarchy probes and profile schema, then
+Next: continue geometry/unit/offset/native hierarchy probes and profile schema
+using the accepted bounded 0.4.0 resources, then
 bind validated demo resources. Attribute 498 was observed on file 1
 but returned missing on passive file 2; do not infer native absence or mark
 binding without further evidence. Do not ask the owner to research identifiers

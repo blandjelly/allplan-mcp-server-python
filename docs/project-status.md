@@ -29,7 +29,13 @@ nor upstream reports a license and none was invented. [Support matrix](support-m
 ## Current M1 implementation and next action
 
 **M1 in progress**, current package **0.4.0** metadata/evidence-capture slice.
-**12 targeted portable checks PASS; Allplan verification pending**.
+**12 targeted portable checks PASS; bounded Allplan metadata batch PASS**.
+[Runtime evidence](test-results/m1-metadata-runtime-0.4.0.md) verifies two stable
+column identities, attribute 498 metadata (Nazwa obiektu, codes 67/69, empty unit
+label), layer 3736 AR_SŁUP and complete response capture. File 2 omits raw 498
+while passive and returns Słup while active background. Sessions also changed;
+do not infer a universal state-only cause. Owner confirms columns unchanged,
+file 2 restored to passive and the same Allplan 2026-1-7 build. No repeat needed.
 [New implementation evidence](test-results/m1-metadata-portable-0.4.0.md) and
 [two-capture owner card](m1-metadata-batch.md). `model_query` now includes typed
 `inspect`; metadata is read per field, sample/layer coverage is bounded, passive
@@ -60,7 +66,7 @@ No repeat of the correction batch is needed.
 | M1.1 | Partial implementation | Explicit scope/identity/completeness contracts; session-bound model/type references, passive sign handling, missing identity exclusion. Geometry units/offset normalization, levels, durable refs and writability still pending. |
 | M1.2 | Bounded runtime batch PASS; task remains partial | Two native column identities, passive scope, observed type GUID/layer and raw attribute 498 equality pass. Other predicate combinations have portable evidence only. Geometry/spatial/native hierarchy coverage pending. |
 | M1.3 | Unchanged-source paging/full summary PASS; task remains partial | Two distinct pages and full cached selection summary pass. Changed-source staleness, TTL/eviction/restart and limits remain portable-only. No downstream audit/edit consumer or persistence yet. |
-| M1.4 | Partial implementation; runtime pending | 0.4.0 resource metadata probe and full-response capture have portable evidence. Actual resource/passive behavior, schema validation and binding remain pending. No activation or final fixture claimed. |
+| M1.4 | Partial implementation; bounded resource batch PASS | 0.4.0 attribute/layer metadata and complete response capture verified on two columns, with explicit passive omission. Schema validation, semantic binding and write eligibility remain pending. No activation or final fixture claimed. |
 
 **24 relevant portable checks PASS** on Linux/Python 3.12.14/FastMCP 3.2.4:
 21 new query contract/fake-adapter checks, one new real MCP transport check,
@@ -82,9 +88,10 @@ The report states no model changes; independent geometry/visual readback is not
 claimed. Static runtime_verified=false is not an acceptance registry.
 [0.3.0 runtime record](test-results/m1-query-runtime-0.3.0.md).
 
-Next: evaluate the new metadata/passive-attribute captures using the
-[0.4.0 owner card](m1-metadata-batch.md); separately implement geometry/unit/offset
-and parent/child counting probes. Do not repeat the passed
+Next: implement geometry/unit/offset and parent/child counting probes, plus
+profile schema, using the recorded resources. The
+[0.4.0 metadata batch](m1-metadata-batch.md) is complete within its scope; no
+repeat or extra capture is required. Do not repeat the passed
 [0.3.0 query batch](m1-query-batch.md) without a relevant change or defect. Complete
 M1.4 binding from verified resources before the six-column/ten-component UAT.
 The demo profile remains **unbound and inactive**; **M1 is not accepted**.
