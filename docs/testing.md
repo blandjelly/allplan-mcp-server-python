@@ -26,6 +26,13 @@ accepted M0 or context correction tests and does not accept full M1.
 
 Developer commands:
 
+The **0.4.0** resource-probe slice passes **12 targeted checks**, including eight
+new tests and four existing checks relevant to changed validation/transport/
+packaging. [Exact commands and evidence](test-results/m1-metadata-portable-0.4.0.md).
+No historical full-suite or accepted owner batch was repeated. The updated CI
+inventory has 61 distinct methods; this is inventory, not a local full run.
+The [two metadata captures](m1-metadata-batch.md) remain pending in Allplan.
+
 ```bash
 uv sync --frozen
 uv run --frozen python -m unittest discover -s tests -v

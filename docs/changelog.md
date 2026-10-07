@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.4.0 — 2026-10-07
+
+Add typed `model_query` action `inspect`: explicit scope, bounded raw element
+sample, per-field attribute name/type/control/unit and layer name reads,
+resource-sensitive probe fingerprints and read/size budgets. Missing passive
+values remain API omissions without a native-absence or profile-binding claim.
+Add **M1 Metadata.cmd** and diagnostics request/full-response capture, retaining
+the seven-tool catalog. **12 targeted portable checks PASS**; distributions and
+versioned evaluation ZIP build. [Portable evidence](test-results/m1-metadata-portable-0.4.0.md).
+[Two-capture owner card](m1-metadata-batch.md) is pending in Allplan. Accepted
+0.3.0 query evidence and original ZIP are unchanged; previous batches need no
+repeat. Geometry/offset/hierarchy and demo schema/binding remain pending.
+
 ## 0.3.0 — 2026-10-07
 
 Add read-only `model_query` with explicit drawing-file/passive/visibility scope,

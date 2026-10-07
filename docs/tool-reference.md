@@ -1,4 +1,4 @@
-# M1 scope and model query contract — 0.3.0
+# M1 scope and model query contract — 0.4.0
 
 Status: **implemented; three bounded owner query cases PASS**. Schema
 `m1-query-1`, public MCP tool `model_query`, typed bridge route `/model-query`.
@@ -122,6 +122,55 @@ with `scan_limit_exceeded`, with **no partial selection or complete count**.
 The timer cannot interrupt a blocking native API call. Paging reduces response
 size; revalidation still scans the bounded candidate set. Runtime performance
 remains unmeasured.
+
+## Metadata inspection (new in 0.4.0; Allplan pending)
+
+`action=inspect` requires the same explicit `scope` and an explicit
+`attribute_ids` list (0–32 distinct positive IDs). `sample_limit` is 1–20,
+default 10; `max_adapters` retains the query limits. Predicate, paging, field
+projection and selection IDs are rejected for this action. The public typed
+schema and dependency-free host both validate before native enumeration.
+
+Inspection scans the bounded scope using the existing identity/conflict rules,
+then samples in drawing-file/model-UUID order. It returns `counts`, original
+scope/coverage/omissions, raw element fields and requested attributes,
+`sample.is_full_selection`, and project resource metadata. The sample limit
+limits returned elements, not the scan. It creates no reusable selection.
+Layer names/short names cover only observed layer IDs in the returned sample;
+attribute names, integer type/control codes and raw unit labels cover requested
+IDs. Each field retains observed or not_checked independently. Empty labels
+remain raw empty strings; enum codes have no guessed semantic labels.
+
+`source_fingerprint` covers scanned candidate/context fields. A separate
+`probe_fingerprint` also covers metadata and the sample report; it is evidence
+identity, not a durable/write reference. Total inspection uses a five-second
+cooperative budget and rejects responses above 4 MiB. Blocking native reads
+cannot be interrupted by this timer. No partial success is returned on budget
+failure. `metadata_reads_complete` concerns read failures and does not establish
+attribute existence, semantic validity, writability or profile binding.
+
+`missing` means a requested ID was absent from `GetAttributes(ReadAll)` output.
+Passive native absence remains `not_checked`; null, empty string and zero retain
+their observed raw values. No fallback read changes state or creates attributes.
+`runtime_verified=false`, `usable_for_write=false`, `profile_binding=not_checked`
+remain explicit. Units are metadata strings without conversion. The demo
+profile remains unbound. [Owner card](m1-metadata-batch.md) is pending.
+
+```json
+{"action":"inspect","scope":{"drawing_files":[1,2],"include_passive":true,"visibility":"api_select_all"},"attribute_ids":[498],"sample_limit":10}
+```
+
+**M1 Metadata.cmd** captures this packaged request and its full MCP response
+in `logs/diagnostics-*.json`. Ordinary **Diagnostics.cmd** retains basic
+health/version/context behavior. Developer CLI `--query-request <JSON path>`
+can capture another typed read-only request; it never automatically pages,
+retries a write or marks acceptance. Raw results require separate interpretation.
+
+2026 resource signatures checked:
+[AttributeService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/AttributeService/)
+uses a DocumentAdapter; [LayerService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/LayerService/)
+uses an integer document ID. This documentation evidence is separate from
+[portable checks](test-results/m1-metadata-portable-0.4.0.md) and Allplan verification.
 
 ## Units, offset and next boundary
 

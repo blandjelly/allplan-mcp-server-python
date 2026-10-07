@@ -1,0 +1,11 @@
+{
+  "action": "inspect",
+  "scope": {
+    "drawing_files": [1, 2],
+    "include_passive": true,
+    "visibility": "api_select_all"
+  },
+  "attribute_ids": [498],
+  "sample_limit": 10,
+  "max_adapters": 5000
+}

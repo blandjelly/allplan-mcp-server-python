@@ -14,7 +14,13 @@ baseline is **accepted on Allplan 2026-1-7** with local Windows Codex
 (UAT-00/UAT-01 PASS). [M0 is closed](docs/test-results/m0-acceptance-0.1.2.md);
 workflow toolkit capabilities begin with M1.
 
-Current package **0.3.0** adds a bounded read-only `model_query`: explicit loaded
+Current package **0.4.0** adds bounded resource metadata inspection and
+**M1 Metadata.cmd**, which saves the full request/response for an active/passive
+attribute comparison. **12 targeted portable checks pass; Allplan verification
+is pending**. [New owner card](docs/m1-metadata-batch.md),
+[portable evidence](docs/test-results/m1-metadata-portable-0.4.0.md).
+
+Package **0.3.0** adds a bounded read-only `model_query`: explicit loaded
 file/passive scope, type/layer/raw-attribute predicates, paginated session
 selections and full-selection summaries with stale-read rejection. **24 relevant
 portable checks pass; three bounded owner query cases PASS**.

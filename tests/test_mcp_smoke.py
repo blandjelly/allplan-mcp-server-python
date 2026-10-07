@@ -36,6 +36,23 @@ class FakeBridge:
 
 
 class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
+    async def test_metadata_inspect_diagnostics_capture_and_invalid_request_no_native_call(self):
+        request = {"action": "inspect", "scope": {"drawing_files": [1, 2], "include_passive": True, "visibility": "api_select_all"},
+                   "attribute_ids": [498], "sample_limit": 10}
+        report = await collect_diagnostics(self.host_url, self.url, request)
+        self.assertEqual(report["model_query_request"], request)
+        self.assertEqual(report["mcp"]["model_query"]["request"], {"schema_version": "m1-query-1", **request})
+        self.assertTrue(report["mcp"]["model_query"]["request_id"])
+        self.assertEqual(report["allplan_acceptance"], "not_run")
+        before = len(self.bridge_handler.calls)
+        with self.assertRaises(ValueError):
+            await collect_diagnostics(self.host_url, self.url, {**request, "sample_limit": 21})
+        self.assertEqual(len(self.bridge_handler.calls), before)
+        async with Client(self.url, timeout=5) as client:
+            bad = await client.call_tool("model_query", {"request": {**request, "attribute_ids": [True]}}, raise_on_error=False)
+            self.assertTrue(bad.is_error)
+        self.assertFalse(any(route == "/create-box" for route, _ in self.bridge_handler.calls))
+
     async def asyncSetUp(self):
         self.bridge_handler = FakeBridge()
         self.bridge = transport.BridgeServer(("127.0.0.1", 0), self.bridge_handler, lambda callback: callback())

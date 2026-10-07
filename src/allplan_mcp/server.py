@@ -128,7 +128,7 @@ def get_model_context(identity_sample_size: int = 0) -> dict[str, Any]:
 
 @mcp.tool
 def model_query(request: QueryRequest) -> dict[str, Any]:
-    """Read-only model query, page or full-selection summary (M1 runtime pending).
+    """Read-only model query, page, full-selection summary or metadata inspection.
 
     Query requires explicit positive drawing_files, include_passive and
     visibility=api_select_all. Use observed type GUID/name, layer ID or
@@ -137,6 +137,10 @@ def model_query(request: QueryRequest) -> dict[str, Any]:
     Selections expire after five minutes or host restart, count model UUIDs rather
     than top-level components, and cannot authorize writes. Geometry/spatial
     predicates and the draft demo profile are unsupported in this slice.
+    Inspect requires explicit scope and attribute_ids (up to 32), returns a
+    bounded sample (1..20), raw values and project attribute/layer metadata.
+    A missing passive attribute is an API omission, not proof of native absence.
+    Metadata inspection needs Allplan verification; it does not activate profiles.
     """
     payload = request.model_dump(by_alias=True, exclude_unset=True)
     if payload.get("action") == "page" and payload.get("cursor") is None:

@@ -5,7 +5,13 @@ owner's Windows setup with local Codex. UAT-00 and UAT-01 PASS; M0 is closed.
 [Acceptance record and exact artifact](test-results/m0-acceptance-0.1.2.md).
 This is evidence for the tested setup, not every Allplan 2026 hotfix or client.
 
-Current package **0.3.0** adds the read-only scope/query/selection slice, with
+Current package **0.4.0** adds bounded attribute/layer metadata and full-response
+capture, with **12 targeted portable checks PASS; Allplan verification pending**.
+[New evidence](test-results/m1-metadata-portable-0.4.0.md) and
+[owner card](m1-metadata-batch.md). No broader build support or profile activation
+is inferred from fake resources.
+
+Earlier package **0.3.0** adds the read-only scope/query/selection slice, with
 **24 relevant portable checks PASS and three bounded owner query cases PASS**.
 [Query contract](tool-reference.md), [portable report](test-results/m1-query-portable-0.3.0.md).
 Owner supplied three diagnostics and a query results report, correlated by host
@@ -23,6 +29,7 @@ Accepted 0.1.2 evidence does not automatically accept the new package.
 
 | Capability | Evidence | Limit |
 | --- | --- | --- |
+| Resource metadata inspection / captured query responses | 0.4.0 targeted portable checks and documented 2026 signatures | Allplan resource/enum codes, active/passive attribute behavior and Windows launcher execution pending. No normalized units, semantic bindings or profile activation. |
 | Complete host installation / repeat install / restore | Recursive installer and rollback/migration/restore pass portable tests; actual Windows installation/startup accepted | Restore logic is portable-tested; no separate owner Windows restore case was required or reported. |
 | Windows setup / launcher / Codex configuration | Owner installation and local Windows Codex connection accepted | Codex app and Windows version not supplied. |
 | FastMCP Streamable HTTP / baseline tools | Real Windows diagnostic and Codex calls accepted; FastMCP 3.2.4 | Bundled skill resources have portable protocol evidence; no separate owner skill-reading test is claimed. |

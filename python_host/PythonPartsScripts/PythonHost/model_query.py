@@ -25,6 +25,9 @@ class ModelQueryService:
 
     def handle(self, doc, base, settings, request):
         validate_request(request)
+        if request["action"] == "inspect":
+            from .model_metadata import inspect_metadata
+            return inspect_metadata(self, doc, base, settings, request)
         self._expire()
         if request["action"] == "query":
             snapshot = self._scan(doc, base, settings, request)

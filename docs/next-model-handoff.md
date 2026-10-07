@@ -11,7 +11,15 @@ Accepted version **0.2.1** has a bounded read-only
 loaded/passive file states, unload exclusion and separate model/view GUID reads;
 the owner confirms matching project names and unchanged model.
 [Runtime evidence](test-results/m1-context-runtime-0.2.1.md).
-Current implementation version **0.3.0** adds explicit file/passive/visibility
+Current implementation version **0.4.0** adds typed `model_query` action `inspect`,
+bounded raw samples and attribute/layer metadata with per-field observations.
+**M1 Metadata.cmd** saves the explicit request and full response in diagnostics,
+addressing the earlier evidence gap. **12 targeted portable checks PASS**;
+wheel/sdist and evaluation ZIP build. **New Allplan verification is pending**.
+[Implementation evidence](test-results/m1-metadata-portable-0.4.0.md),
+[two-capture owner card](m1-metadata-batch.md). No profile activation is implemented.
+
+Earlier version **0.3.0** adds explicit file/passive/visibility
 scope, session-bound references, typed read-only `model_query`, type/layer/raw-
 attribute predicates, reusable pages and full-selection summaries with query-
 field/context staleness checks. **24 relevant portable checks pass**; wheel/sdist
@@ -38,8 +46,9 @@ hashes; build any further runtime changes under a new package version. The
 earlier 31-test baseline and new targeted checks are separate records; the full
 historical suite was not rerun for this slice. Allplan runtime evidence is separate.
 
-Next: prepare metadata/passive-attribute and separate unit/offset/native hierarchy
-probes, then bind validated demo resources. Attribute 498 was observed on file 1
+Next: interpret the pending 0.4.0 active/passive metadata captures; continue
+separate geometry/unit/offset/native hierarchy probes and profile schema, then
+bind validated demo resources. Attribute 498 was observed on file 1
 but returned missing on passive file 2; do not infer native absence or mark
 binding without further evidence. Do not ask the owner to research identifiers
 or construct the final unbound fixture prematurely.

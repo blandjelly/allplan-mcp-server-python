@@ -55,4 +55,12 @@ class SummaryInput(ContractModel):
     selection_id: str = Field(pattern=r"^[0-9a-f]{32}$")
 
 
-QueryRequest = Annotated[QueryInput | PageInput | SummaryInput, Field(discriminator="action")]
+class InspectInput(ContractModel):
+    action: Literal["inspect"]
+    scope: QueryScope
+    attribute_ids: list[Annotated[int, Field(ge=1, le=2147483647)]] = Field(max_length=32)
+    sample_limit: int = Field(default=10, ge=1, le=20)
+    max_adapters: int = Field(default=5000, ge=1, le=10000)
+
+
+QueryRequest = Annotated[QueryInput | PageInput | SummaryInput | InspectInput, Field(discriminator="action")]

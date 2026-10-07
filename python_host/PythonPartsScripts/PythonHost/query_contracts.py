@@ -92,6 +92,12 @@ def predicate_fields(node, depth=0, budget=None):
 
 
 def validate_request(request):
+    if isinstance(request, dict) and request.get("action") == "inspect":
+        keys(request, {"schema_version", "action", "scope", "attribute_ids", "sample_limit", "max_adapters"},
+             {"schema_version", "action", "scope", "attribute_ids"})
+        bounded_int(request.get("sample_limit", 10), 1, 20, "sample_limit")
+        validate_request({**{k: v for k, v in request.items() if k != "sample_limit"}, "action": "query"})
+        return
     keys(request, {"schema_version", "action", "scope", "predicate", "fields", "attribute_ids", "page_size", "max_adapters", "selection_id", "cursor"}, {"schema_version", "action"})
     if request["schema_version"] != SCHEMA:
         invalid(f"schema_version must be {SCHEMA}.")
@@ -136,7 +142,7 @@ def validate_request(request):
         if "cursor" in request and (not isinstance(request["cursor"], str) or not re.fullmatch(r"[0-9a-f]{32}", request["cursor"])):
             invalid("cursor must be a returned opaque cursor; omit it for the first page.")
     else:
-        invalid("action must be query, page or summary.")
+        invalid("action must be query, page, summary or inspect.")
     if action != "summary":
         bounded_int(request.get("page_size", 100), 1, 200, "page_size")
 
