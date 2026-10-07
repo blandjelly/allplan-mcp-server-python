@@ -1,6 +1,9 @@
 # M1 query batch — 0.3.0
 
-Status: **ready_for_owner_test; NOT_RUN in Allplan**. This is a bounded query
+Status: **owner reports three tests performed; query outcomes awaiting evidence**.
+Three 0.3.0 diagnostics verify startup/discovery/context but contain no query
+responses. [Recorded evidence and gap](test-results/m1-query-runtime-0.3.0.md).
+Use existing Codex results before considering a repeat. This is a bounded query
 batch, not full UAT-02/UAT-03 or M1 acceptance. Do not repeat the accepted M0 or
 0.2.1 context correction batch. New tool behavior is the only target here.
 

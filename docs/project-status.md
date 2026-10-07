@@ -60,8 +60,16 @@ initially repeated 11 handler checks and was corrected to avoid duplicate CI
 discovery. Windows/CI execution and Allplan query verification are not claimed.
 [Portable report](test-results/m1-query-portable-0.3.0.md).
 
-Next: run only the [0.3.0 query owner batch](m1-query-batch.md), collect actual
-type/layer/attribute and paging evidence, resolve any runtime discrepancies,
+Owner reports performing the three 0.3.0 tests. Three uploaded diagnostics
+confirm installation/integrity, seven-tool discovery and context in the same
+two-column session. They contain no query responses: counts, type/layer/
+attributes, pages and summary are not evidenced. Query outcomes and a visible
+model-preservation observation remain pending, not failed or accepted.
+[0.3.0 runtime record](test-results/m1-query-runtime-0.3.0.md).
+
+Next: obtain existing Codex responses/owner observations for the
+[0.3.0 query batch](m1-query-batch.md) without repeating completed tests,
+record actual type/layer/attribute and paging evidence, resolve any discrepancies,
 then prepare geometry/unit/offset and parent/child counting probes. Complete
 M1.4 binding from verified resources before the six-column/ten-component UAT.
 The demo profile remains **unbound and inactive**; **M1 is not accepted**.
