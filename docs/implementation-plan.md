@@ -196,6 +196,12 @@ package 0.1.2. [Acceptance record](test-results/m0-acceptance-0.1.2.md).
 
 ### M1 — Context, identity, selection and query
 
+**Current 0.3.0 slice:** explicit scopes, typed type/layer/raw-attribute queries,
+bounded session selections, paging/summary and staleness are implemented with
+targeted portable checks. Allplan query verification remains pending; geometry,
+offset, native hierarchy and demo binding are not complete. See
+[current status](project-status.md) and [contracts](tool-reference.md).
+
 - **M1.1** Implement `ModelContext`, `Scope`, model references, capability reporting, units and offset conversion. Probe loaded editable/passive files and model versus view identity.
 - **M1.2** Implement `get_model_context` and basic `model_query`; define predicate composition, null/missing behavior, case rules, numeric tolerances, and spatial selection semantics.
 - **M1.3** Add pagination, reusable selections, explicit completeness and stale-selection behavior; restrict scans to the requested fields and scope.

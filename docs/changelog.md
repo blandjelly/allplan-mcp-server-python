@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.0 — 2026-10-07
+
+Add read-only `model_query` with explicit drawing-file/passive/visibility scope,
+observed type/layer/raw-attribute predicates, all/any/not composition and distinct
+missing/failed reads. Add bounded full selections, deterministic pages and
+summaries, per-read source/context revalidation, five-minute expiration and
+restart/eviction handling. No partial selection is created on budget failure.
+24 relevant portable checks pass; wheel/sdist and evaluation ZIP are built.
+[Contract](tool-reference.md), [portable evidence](test-results/m1-query-portable-0.3.0.md).
+
+Allplan query verification is pending. The accepted 0.2.1 context reader is
+reused; its correction batch need not be repeated. Geometry/spatial filtering,
+offset conversion, top-level native component counting and demo binding remain
+pending. M1 is not accepted. [New small owner batch](m1-query-batch.md).
+
 ## 0.2.1 — 2026-10-07
 
 Preserve project name/host when project-path lookup fails and retain each

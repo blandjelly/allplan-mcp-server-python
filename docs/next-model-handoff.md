@@ -6,20 +6,36 @@ The initial M0 instructions below are historical. **M0 is closed** on the owner'
 Allplan 2026-1-7 / local Windows Codex setup using package 0.1.2.
 [Acceptance](test-results/m0-acceptance-0.1.2.md).
 
-Current implementation version **0.2.1** has a bounded read-only
+Accepted version **0.2.1** has a bounded read-only
 `get_model_context` probe. Its owner follow-up batch passes project lookup/switch,
 loaded/passive file states, unload exclusion and separate model/view GUID reads;
 the owner confirms matching project names and unchanged model.
 [Runtime evidence](test-results/m1-context-runtime-0.2.1.md).
-The full M1 milestone remains in progress: scope/unit/offset/identity contracts,
-M1.2 queries, M1.3 paging/staleness and M1.4 profile binding are still pending.
-The demonstration profile remains unbound and inactive.
+Current implementation version **0.3.0** adds explicit file/passive/visibility
+scope, session-bound references, typed read-only `model_query`, type/layer/raw-
+attribute predicates, reusable pages and full-selection summaries with query-
+field/context staleness checks. **24 relevant portable checks pass**; wheel/sdist
+and evaluation ZIP build. [Contracts](tool-reference.md),
+[portable evidence and limits](test-results/m1-query-portable-0.3.0.md).
+**Allplan query batch NOT_RUN**: [small owner card](m1-query-batch.md).
+
+The full M1 milestone remains in progress: geometry unit/offset normalization,
+levels, durable references, spatial/dimensional predicates, parent/child native
+component counts and M1.4 profile binding are still pending. Selections are
+memory-only, read-only and bound to the fields they actually read. The demo
+profile remains unbound and inactive. Do not claim full UAT-02/UAT-03 acceptance.
 
 Start from [project-status.md](project-status.md) and the current code, then use
 the roadmap below. Do not repeat accepted owner batches without a new defect or
 change that requires verification. Preserve the tested ZIPs and their recorded
-hashes; build any further runtime changes under a new package version. Portable
-validation currently passes 31 tests; Allplan runtime evidence is separate.
+hashes; build any further runtime changes under a new package version. The
+earlier 31-test baseline and new targeted checks are separate records; the full
+historical suite was not rerun for this slice. Allplan runtime evidence is separate.
+
+Next: collect the 0.3.0 query/type/layer/attribute/paging owner evidence, fix any
+adapter discrepancies, then prepare separate unit/offset/native hierarchy probes
+and bind validated demo resources. Do not ask the owner to research identifiers
+or construct the final unbound fixture prematurely.
 
 ## Task
 

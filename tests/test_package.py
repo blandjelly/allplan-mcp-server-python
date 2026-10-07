@@ -39,6 +39,9 @@ class PackageTests(unittest.TestCase):
             local.mkdir()
             registration.register(package, local)
             self.assertTrue((local / "PythonPartsScripts/PythonHost/sandbox/executor.py").is_file())
+            for name in ("model_context.py", "query_contracts.py", "model_query.py"):
+                self.assertTrue((local / "PythonPartsScripts/PythonHost" / name).is_file())
+            self.assertTrue((package / "src/allplan_mcp/query_models.py").is_file())
             (package / "python_host/PythonPartsScripts/PythonHost/sandbox/const.py").write_text("tampered")
             with self.assertRaisesRegex(ValueError, "integrity"):
                 registration.register(package, local)

@@ -10,6 +10,7 @@ from fastmcp import FastMCP
 
 from allplan_mcp.allplan_client import AllplanHostClient, AllplanHostError
 from allplan_mcp.skills import SkillsManager
+from allplan_mcp.query_models import QueryRequest
 
 
 DEFAULT_ALLPLAN_HOST_URL = "http://127.0.0.1:5679"
@@ -123,6 +124,25 @@ def get_model_context(identity_sample_size: int = 0) -> dict[str, Any]:
     if isinstance(identity_sample_size, bool) or not isinstance(identity_sample_size, int) or not 0 <= identity_sample_size <= 20:
         raise ValueError("identity_sample_size must be from 0 to 20.")
     return _allplan_client().post("/get-model-context", {"identity_sample_size": identity_sample_size})
+
+
+@mcp.tool
+def model_query(request: QueryRequest) -> dict[str, Any]:
+    """Read-only model query, page or full-selection summary (M1 runtime pending).
+
+    Query requires explicit positive drawing_files, include_passive and
+    visibility=api_select_all. Use observed type GUID/name, layer ID or
+    attribute:<ID> predicates with all/any/not. Missing/failed reads are distinct.
+    Pages and summaries revalidate query fields; stale selections are rejected.
+    Selections expire after five minutes or host restart, count model UUIDs rather
+    than top-level components, and cannot authorize writes. Geometry/spatial
+    predicates and the draft demo profile are unsupported in this slice.
+    """
+    payload = request.model_dump(by_alias=True, exclude_unset=True)
+    if payload.get("action") == "page" and payload.get("cursor") is None:
+        payload.pop("cursor", None)
+    payload["schema_version"] = "m1-query-1"
+    return _allplan_client().post("/model-query", payload)
 
 
 @mcp.tool

@@ -11,6 +11,14 @@ The [short correction batch](m1-context-fix-batch.md) subsequently passed on the
 owner's Allplan setup; [0.2.1 runtime evidence](test-results/m1-context-runtime-0.2.1.md)
 is separate from UAT-02/UAT-03 and complete M1 acceptance.
 
+The **0.3.0** slice passes **24 relevant targeted portable checks**: 21 new query
+checks, one new MCP schema/transport test and two distribution/version checks.
+[Commands, evidence and limits](test-results/m1-query-portable-0.3.0.md).
+The full historical suite was not rerun; CI discovery now includes 53 distinct
+test methods. This count is inventory, not evidence that all 53 were rerun here.
+The [new owner query batch](m1-query-batch.md) is **NOT_RUN**. It does not repeat
+accepted M0 or context correction tests and does not accept full M1.
+
 Developer commands:
 
 ```bash

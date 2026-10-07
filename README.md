@@ -14,11 +14,16 @@ baseline is **accepted on Allplan 2026-1-7** with local Windows Codex
 (UAT-00/UAT-01 PASS). [M0 is closed](docs/test-results/m0-acceptance-0.1.2.md);
 workflow toolkit capabilities begin with M1.
 
-Current package **0.2.1** continues M1.1 with the read-only `get_model_context`
-context/identity probe. The bounded owner runtime batch passes for project
-lookup/switching, loaded file states, unload exclusion and model/view GUIDs;
-31 portable tests pass. [Runtime evidence and remaining scope](docs/test-results/m1-context-runtime-0.2.1.md).
-`model_query` and the demonstration profile are not active yet.
+Current package **0.3.0** adds a bounded read-only `model_query`: explicit loaded
+file/passive scope, type/layer/raw-attribute predicates, paginated session
+selections and full-selection summaries with stale-read rejection. **24 relevant
+portable checks pass; query runtime verification in Allplan is pending**.
+[Contracts](docs/tool-reference.md), [portable evidence](docs/test-results/m1-query-portable-0.3.0.md)
+and [small owner query batch](docs/m1-query-batch.md).
+The earlier **0.2.1 context correction batch remains PASS**; do not repeat it.
+[Accepted context evidence](docs/test-results/m1-context-runtime-0.2.1.md).
+Geometry/offset normalization, native component counting and demo profile binding
+remain pending. The demonstration profile is unbound and inactive; M1 is not accepted.
 
 - [Windows installation and restore](docs/windows-setup.md)
 - [UAT-00 / UAT-01 prompts and result form](docs/m0-acceptance-batch.md)
@@ -85,6 +90,8 @@ MCP_PATH=/mcp
 - `allplan_health`: checks whether the Allplan host is reachable.
 - `get_allplan_version`: returns the running Allplan version.
 - `get_all_object_names`: returns display names for elements in the current document.
+- `get_model_context`: bounded read-only context/identity probe; missing reads are explicit.
+- `model_query`: typed read-only query/page/summary with explicit file scope; [contract and limits](docs/tool-reference.md).
 - `create_cube`: creates a cube in the current document.
 - `create_box`: creates a rectangular cuboid in the current document.
 - `execute_python`: optional development tool, registered only when

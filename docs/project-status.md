@@ -26,9 +26,12 @@ are not implemented. The in-flight race is portable-probe evidence, separate fro
 owner UI tests. License/public redistribution remains unresolved; neither fork
 nor upstream reports a license and none was invented. [Support matrix](support-matrix.md).
 
-## Next concrete action
+## Current M1 implementation and next action
 
-**M1 STARTED — M1.1 in progress**, current package **0.2.1** context/identity probe.
+**M1 in progress**, current package **0.3.0** scope/query slice. Work started from
+current `origin/main` **d8bd1ef8388daa956e8b51863b17ac33d784dca9**, preserving
+accepted evidence and original archive hashes. The **0.2.1** context/identity probe
+and its accepted reader correction are reused.
 `get_model_context` is implemented as a bounded read-only probe; project/file
 states, units, raw offset and optional model/view identity sampling are included
 in diagnostics. **31 portable tests pass**. Owner 0.2.0 logs verify file-state
@@ -40,7 +43,25 @@ GUIDs. Owner confirms names match and model unchanged.
 [0.2.1 runtime evidence](test-results/m1-context-runtime-0.2.1.md).
 [Implementation and limits](test-results/m1-context-probe-0.2.0.md).
 
-No repeat of the correction batch is needed. Next: finish
-scope/unit/offset/identity contracts and implement M1.2–M1.3 query predicates and
-reusable paginated selections. M1.4 profile binding requires actual metadata.
-The demo profile remains **unbound and inactive**; M1 is not accepted.
+No repeat of the correction batch is needed.
+
+| Task | 0.3.0 state | Evidence / remaining scope |
+| --- | --- | --- |
+| M1.1 | Partial implementation | Explicit scope/identity/completeness contracts; session-bound model/type references, passive sign handling, missing identity exclusion. Geometry units/offset normalization, levels, durable refs and writability still pending. |
+| M1.2 | Bounded query implemented, runtime pending | Typed type/layer/raw-attribute predicates, all/any/not, null/missing/unknown, case and numeric tolerance. No geometric/spatial predicates or whole-project coverage. |
+| M1.3 | Bounded read-only selection implementation, runtime pending | Full cached result, deterministic opaque-cursor pages, full-selection summary, fresh source/context revalidation, TTL/eviction/restart and work/size limits. No downstream audit/edit consumer or persistence yet. |
+| M1.4 | Pending | Needs actual attribute/layer/type metadata and schema validation. No profile activation or final fixture claimed. |
+
+**24 relevant portable checks PASS** on Linux/Python 3.12.14/FastMCP 3.2.4:
+21 new query contract/fake-adapter checks, one new real MCP transport check,
+and two package/version checks. Wheel/sdist and deterministic evaluation ZIP
+build succeed. The full historical M0 suite was not rerun; a discovery import
+initially repeated 11 handler checks and was corrected to avoid duplicate CI
+discovery. Windows/CI execution and Allplan query verification are not claimed.
+[Portable report](test-results/m1-query-portable-0.3.0.md).
+
+Next: run only the [0.3.0 query owner batch](m1-query-batch.md), collect actual
+type/layer/attribute and paging evidence, resolve any runtime discrepancies,
+then prepare geometry/unit/offset and parent/child counting probes. Complete
+M1.4 binding from verified resources before the six-column/ten-component UAT.
+The demo profile remains **unbound and inactive**; **M1 is not accepted**.

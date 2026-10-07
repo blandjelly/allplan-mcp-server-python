@@ -29,6 +29,9 @@ class FakeBridge:
                     "identity_sample": {"requested": payload["identity_sample_size"], "items": []}}
         if path == "/create-box":
             return {"ok": True}
+        if path == "/model-query":
+            return {"schema_version": "m1-query-1", "read_only": True, "request": payload,
+                    "selection_id": "a" * 32, "source_fingerprint": "fake-only"}
         raise transport.BridgeError("unknown_route", "Unknown route", 404)
 
 
@@ -75,7 +78,7 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
     async def test_discovery_health_version_names_box_and_diagnostic_bundle(self):
         async with Client(self.url, timeout=5) as client:
             names = {t.name for t in await client.list_tools()}
-            self.assertEqual(names, {"allplan_health", "get_allplan_version", "get_all_object_names", "create_cube", "create_box", "get_model_context"})
+            self.assertEqual(names, {"allplan_health", "get_allplan_version", "get_all_object_names", "create_cube", "create_box", "get_model_context", "model_query"})
             resources = await client.list_resources()
             self.assertIn("allplan://skills", {str(r.uri) for r in resources})
             health = (await client.call_tool("allplan_health")).data
@@ -107,3 +110,30 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
             result = await client.call_tool("allplan_health", raise_on_error=False)
             self.assertTrue(result.is_error)
             self.assertIn("host_absent", str(result.content))
+
+    async def test_model_query_schema_transport_predicates_pages_and_summary(self):
+        query = {"action": "query", "scope": {"drawing_files": [101, 102], "include_passive": True, "visibility": "api_select_all"},
+                 "predicate": {"all": [{"field": "type_name", "op": "eq", "value": "Column_TypeUUID"},
+                                       {"not": {"field": "attribute:83", "op": "eq", "value": None}}]},
+                 "attribute_ids": [83], "page_size": 1}
+        async with Client(self.url, timeout=5) as client:
+            tool = next(t for t in await client.list_tools() if t.name == "model_query")
+            self.assertIn("request", tool.inputSchema["properties"])
+            result = (await client.call_tool("model_query", {"request": query})).data
+            self.assertTrue(result["read_only"])
+            self.assertEqual(result["request"], {"schema_version": "m1-query-1", **query})
+            for action in ("page", "summary"):
+                follow = {"action": action, "selection_id": result["selection_id"]}
+                response = (await client.call_tool("model_query", {"request": follow})).data
+                self.assertEqual(response["request"], {"schema_version": "m1-query-1", **follow})
+            null_cursor = {"action": "page", "selection_id": result["selection_id"], "cursor": None}
+            response = (await client.call_tool("model_query", {"request": null_cursor})).data
+            self.assertNotIn("cursor", response["request"])
+            before = len(self.bridge_handler.calls)
+            for bad in ({"action": "query", "scope": {"drawing_files": [-101], "include_passive": False, "visibility": "api_select_all"}},
+                        {"action": "query", "scope": query["scope"], "page_size": True},
+                        {"action": "summary", "selection_id": "a" * 32, "scope": query["scope"]}):
+                result = await client.call_tool("model_query", {"request": bad}, raise_on_error=False)
+                self.assertTrue(result.is_error)
+            self.assertEqual(len(self.bridge_handler.calls), before)
+        self.assertFalse(any(path == "/create-box" for path, _ in self.bridge_handler.calls))

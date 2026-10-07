@@ -2,7 +2,7 @@
 setlocal
 cd /d "%~dp0"
 if not exist "pyproject.toml" cd ..
-echo Allplan MCP 0.1.2 evaluation setup. Close Allplan before installing.
+echo Allplan MCP 0.3.0 evaluation setup. Close Allplan before installing.
 where py >nul 2>nul
 if errorlevel 1 goto python_fallback
 py -3 -c "import sys; sys.exit(sys.version_info < (3, 11))"
