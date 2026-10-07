@@ -46,6 +46,12 @@ packaged profile. Registration installs the three new host reader/contract files
 without native imports in the external process. No Windows/CI execution is
 claimed here. The old 0.3.0 and 0.4.0 ZIP hashes are preserved.
 
+Exact artifact: `allplan-mcp-0.5.0-windows-evaluation.zip`, clean source commit
+`b3336c48a202f901d3994b4e83961af8aaae67b0` (`source_modified=false`). SHA-256:
+`d647c7e52ca254404b4b07f50cea7fc7f563aa112901e19bb400756890c2a7f8`.
+This artifact-identification follow-up is documentation only; it does not
+rebuild the ZIP or rerun tests.
+
 2026 signatures were checked separately from runtime support:
 [BaseElementAdapter](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_ElementAdapter/BaseElementAdapter/),
 [CalcMinMax](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_Geometry/),
