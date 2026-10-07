@@ -109,6 +109,17 @@ depend on cross imports between skill folders.
 
 - [POST execution exploration](docs/post-execution-exploration.md)
 
+## Development roadmap
+
+The Allplan 2026 workflow toolkit is planned incrementally, starting with native
+model queries, audits, and controlled cleanup through Codex. The following are
+planning artifacts; they do not describe already implemented tools:
+
+- [Implementation plan](docs/implementation-plan.md)
+- [Next-model handoff](docs/next-model-handoff.md)
+- [Demo profile and owner-built model](docs/demo-model-and-profile.md)
+- [Manual acceptance tests](docs/manual-acceptance-tests.md)
+
 ## Sandboxed exec
 
 The bridge exposes a sandboxed Python execution path for local experiments.

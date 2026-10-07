@@ -1,0 +1,101 @@
+{
+  "profile_id": "native-model-qa-demo",
+  "profile_version": "0.1.0-draft",
+  "schema_version": "draft-1",
+  "status": "illustrative_unbound",
+  "description": "Proposed demonstration profile for native-column query, audit and controlled repair. Not a production office standard or an executable profile for the current server.",
+  "target": {
+    "allplan_major_version": 2026,
+    "verified_builds": [],
+    "primary_client": "Codex",
+    "element_family": "native_ordinary_column",
+    "native_type_id": null
+  },
+  "binding_policy": "The implementation model must resolve and verify every API identifier, then validate the schema before activation. Unbound profiles must be rejected without model changes.",
+  "units": {
+    "length": "mm",
+    "angle": "degrees"
+  },
+  "scope": {
+    "drawing_files": [101],
+    "uniqueness_scope": ["drawing_file", "element_family"],
+    "floor_mapping": {
+      "101": "Ground",
+      "102": "Reference",
+      "103": "Excluded"
+    }
+  },
+  "bindings": {
+    "attributes": {
+      "mark": {
+        "attribute_id": null,
+        "data_type": "string",
+        "purpose": "Element design mark stored as data; separate from graphical labels"
+      },
+      "status": {
+        "attribute_id": null,
+        "data_type": "string",
+        "purpose": "Writable demo lifecycle status with no effect on structural geometry"
+      }
+    },
+    "layers": {
+      "structure": {"display_name": "MCP_QA_STRUCTURE", "layer_id": null},
+      "review": {"display_name": "MCP_QA_REVIEW", "layer_id": null}
+    }
+  },
+  "normalization": {
+    "mark": {"trim_whitespace": true, "case_sensitive": true},
+    "status": {"trim_whitespace": true, "case_sensitive": true}
+  },
+  "rules": [
+    {
+      "rule_id": "QA-001",
+      "kind": "required_attribute",
+      "attribute": "mark",
+      "empty_string_is_missing": true,
+      "severity": "error",
+      "automatic_repair": null
+    },
+    {
+      "rule_id": "QA-002",
+      "kind": "unique_attribute",
+      "attribute": "mark",
+      "ignore_missing": true,
+      "reporting": "one finding per member of a duplicate group",
+      "severity": "error",
+      "automatic_repair": null
+    },
+    {
+      "rule_id": "QA-003",
+      "kind": "required_layer",
+      "expected_layer": "structure",
+      "severity": "error",
+      "repair": {"operation": "set_layer", "value": "structure", "requires_reviewed_plan": true}
+    },
+    {
+      "rule_id": "QA-004",
+      "kind": "allowed_attribute_values",
+      "attribute": "status",
+      "allowed_values": ["NEW", "EXISTING"],
+      "severity": "error",
+      "repair": {
+        "operation": "map_attribute_value",
+        "mapping": {"NWE": "NEW"},
+        "unmapped_value_action": "manual_review",
+        "requires_reviewed_plan": true
+      }
+    }
+  ],
+  "numeric_tolerances": {
+    "length_mm": 1.0
+  },
+  "expected_fixture_results": {
+    "file_101_native_columns": 6,
+    "file_101_top_level_model_components": 10,
+    "audit_findings_before_repairs": 5,
+    "duplicate_mark_groups": 1,
+    "affected_columns_before_repairs": 5,
+    "deterministic_repairs": 2,
+    "audit_findings_after_deterministic_repairs": 3
+  }
+}
