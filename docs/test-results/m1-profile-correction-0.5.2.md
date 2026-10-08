@@ -38,3 +38,11 @@ lookup diagnostics; version/lock agreement; deterministic package integrity/fres
 registration; real MCP profile-resource/batch transport with a fake native bridge.
 Wheel/sdist build PASS. No native success or full M1 acceptance is inferred.
 No accepted owner batch or unrelated geometry test was repeated.
+
+## Exact artifact
+
+`allplan-mcp-0.5.2-windows-evaluation.zip`, clean source commit
+`c4cfbd52938328c6e41405998ba110314bca8930`, source_modified=false. SHA-256:
+`7748a2020b8f5968aba377e6674917f3ee419e7ccb11502684ca945cbf0d6605`.
+Wheel profile matches canonical JSON. Older evaluation archives are unchanged.
+This identification record is a separate documentation-only commit.
