@@ -75,3 +75,12 @@ PYTHONPATH=tests .venv/bin/python -m unittest \
   test_package.PackageTests.test_deterministic_archive_integrity_and_fresh_install_from_extracted_payload -v
 UV_CACHE_DIR=/workspace/.cache/uv uv build --offline
 ```
+
+## Exact evaluation artifact
+
+`allplan-mcp-0.5.3-windows-evaluation.zip`, clean source commit
+`4f685766e1577cddb681ee3726bbabd3f2b3d743`, source_modified=false. SHA-256:
+`15262b1f029d818e5fea871a0b669603d90a5b6ca68e80d5355457b8656ed104`.
+Native reader payloads match source, wheel profile matches canonical revision
+1.0.2, and the 0.5.2 archive hash is unchanged. The identification record is
+a separate documentation-only commit; the artifact is not rebuilt for it.
