@@ -1,0 +1,40 @@
+# M1 profile setup correction — 0.5.2
+
+2026-10-08. Full M1 native acceptance remains pending. This is a sanitized
+record of technical findings; it does not publish the uploaded report or screenshots.
+
+## Owner findings, separate from automated checks
+
+0.5.1 installed integrity has no mismatches and MCP transport succeeds.
+Profile remains not_checked: both GetAttributeID calls return -1 and both
+GetIDByShortName calls with full names return 0. No later name/type reads occur.
+Signatures match the documented Allplan 2026 argument order.
+
+Owner layer screenshot shows actual short names SZ_OGÓ01/SZ_OGÓ02 opposite
+full names Ogólne01/Ogólne02. Attribute screenshot shows demo-named entries in
+the left Attribute group tree and an empty right Attributes list for the selected
+group. This supports creation of groups rather than the required definitions;
+The owner then corrects the setup: the latest screenshot shows MCP_QA_MARK
+and MCP_QA_STATUS in the right Attributes list under group MCP_QA. Exact
+IDs/type compatibility still require the next native preflight.
+
+## Change and owner action
+
+Profile 1.0.2 packages corrected short names; 1.0.0/1.0.1 remain accepted.
+No change to native resource lookup APIs or model state. Existing groups may
+remain. The owner has corrected the definitions in a user group; preserve them.
+Required string/input definitions have empty default and no unit/formula/enum;
+those details still need native verification. Install 0.5.2/start the host and
+run only M1 Profile.cmd.
+Do not repeat accepted owner batches or build the final fixture until binding.
+
+[Updated owner card](../m1-final-batch.md).
+
+## Portable validation
+
+Six relevant checks PASS: corrected Unicode short names with both older profile
+revisions accepted; exact name/type/ID binding via fake resource services; failed
+lookup diagnostics; version/lock agreement; deterministic package integrity/fresh
+registration; real MCP profile-resource/batch transport with a fake native bridge.
+Wheel/sdist build PASS. No native success or full M1 acceptance is inferred.
+No accepted owner batch or unrelated geometry test was repeated.

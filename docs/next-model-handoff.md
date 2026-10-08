@@ -2,16 +2,18 @@
 
 ## Current handoff — 2026-10-08
 
-Current package **0.5.1**, profile revision **1.0.1**: the owner cannot create
-new layers and supplied existing short names **Ogólne01/Ogólne02**. Both text
-attributes were created according to the owner. Uploaded 0.5.0 preflight
-`diagnostics-20261008T182010Z.json` has valid installation/transport/project but
-all four bindings not_checked/BridgeError; no exact lookup return value was
-recorded. Do not assume attribute absence or successful binding. 0.5.1 changes
-profile layer names and records failure stages/validated returned IDs/names/types.
-Next: owner reinstalls 0.5.1 and runs **only M1 Profile.cmd**; diagnose the new
-report before fixture construction if it remains not_checked. Preserve 0.5.0 ZIP.
-[Follow-up](test-results/m1-profile-followup-0.5.1.md).
+Current package **0.5.2**, profile revision **1.0.2**. Owner 0.5.1 preflight
+has both attribute IDs -1 and both layer IDs 0. Uploaded UI screenshots explain
+the mismatch: short names **SZ_OGÓ01/SZ_OGÓ02**, full names Ogólne01/Ogólne02;
+demo names are empty attribute groups in the left tree, not definitions in the
+right Attributes list. Owner corrected this: the latest screenshot shows both
+actual names in the right Attributes list under user group MCP_QA. IDs/types
+are not visible or runtime verified yet. 0.5.2 corrects the short names and recipe.
+Next: owner installs 0.5.2, preserves the corrected definitions, then runs
+**only M1 Profile.cmd**. Do not construct the fixture before binding succeeds.
+[Sanitized evidence](test-results/m1-profile-correction-0.5.2.md). Raw 0.5.1
+upload contains environment data and is not published; no permission to publish
+it is inferred from the request to diagnose it. Preserve older ZIPs.
 
 The initial M0 instructions below are historical. **M0 is closed** on the owner's
 Allplan 2026-1-7 / local Windows Codex setup using package 0.1.2.

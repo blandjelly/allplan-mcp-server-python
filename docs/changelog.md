@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.2 — 2026-10-08
+
+Correct owner demo bindings to the actual layer **short** names
+SZ_OGÓ01/SZ_OGÓ02 (full names Ogólne01/Ogólne02), profile revision 1.0.2.
+Owner screenshots also show empty user attribute groups with demo names,
+not definitions in the Attributes list; clarify group versus attribute creation
+and ordinary text/input definitions before repeating the resource preflight.
+No native writes; older profile revisions and evidence archives are preserved.
+[Sanitized runtime findings and validation](test-results/m1-profile-correction-0.5.2.md).
+
 ## 0.5.1 — 2026-10-08
 
 Use owner-supplied existing layer short names Ogólne01/Ogólne02 in demo

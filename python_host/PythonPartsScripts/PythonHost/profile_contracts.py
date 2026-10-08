@@ -14,7 +14,7 @@ from .transport import BridgeError
 def validate_profile(profile):
     keys(profile, {"schema_version", "profile_id", "profile_version", "target", "units", "scope", "bindings", "rules", "numeric_tolerances"},
          {"schema_version", "profile_id", "profile_version", "target", "units", "scope", "bindings", "rules", "numeric_tolerances"})
-    if profile["schema_version"] != "m1-profile-1" or profile["profile_id"] != "native-model-qa-demo" or profile["profile_version"] not in {"1.0.0", "1.0.1"}:
+    if profile["schema_version"] != "m1-profile-1" or profile["profile_id"] != "native-model-qa-demo" or profile["profile_version"] not in {"1.0.0", "1.0.1", "1.0.2"}:
         invalid("Unsupported demo profile/schema version.")
     try:
         serialized = json.dumps(profile, allow_nan=False)

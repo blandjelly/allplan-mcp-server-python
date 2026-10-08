@@ -29,12 +29,17 @@ nor upstream reports a license and none was invented. [Support matrix](support-m
 ## Current M1 implementation and next action
 
 **M1 implementation complete for the bounded read contract**, current package
-**0.5.1**, **ready_for_owner_test**. The 0.5.0 implementation has **56 targeted portable checks PASS**.
-The 0.5.0 resource preflight returned not_checked for both attributes and layers.
-Owner confirms both text attributes exist and supplies existing layer short
-names Ogólne01/Ogólne02. Profile revision 1.0.1 uses those names; 0.5.1 adds
-failure-stage/raw-ID diagnostics. Repeat only M1 Profile.cmd before fixture
-construction; actual binding and the final M1 runtime gate remain pending.
+**0.5.2**, **ready_for_owner_test**. The 0.5.0 implementation has **56 targeted portable checks PASS**.
+0.5.1 owner preflight still returns not_checked: GetAttributeID=-1 for both
+demo names, GetIDByShortName=0 for both full layer names. Owner screenshots
+resolve the setup: actual short names are SZ_OGÓ01/SZ_OGÓ02; demo-named
+entries were empty attribute groups on the left, not actual definitions.
+Owner then corrected the attributes; the latest screenshot shows both names
+in the right Attributes list under group MCP_QA. IDs/types remain unverified.
+0.5.2/profile 1.0.2 corrects layer names and clarifies group/attribute distinction.
+Next: install 0.5.2, preserve corrected definitions, then M1 Profile.cmd only.
+Full M1 native acceptance remains pending.
+[Correction evidence](test-results/m1-profile-correction-0.5.2.md).
 [Follow-up evidence](test-results/m1-profile-followup-0.5.1.md).
 New mm geometry and dimensional/AABB predicates, declared local/global transform,
 parent-chain native component counts, profile schema/resource resolution and
