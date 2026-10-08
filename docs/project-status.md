@@ -133,3 +133,14 @@ not identified C01 evidence. Input-view/session enumeration cause remains
 unresolved; no model rebuild, speculative API fix or automated rerun. Next:
 fresh host/model view with 101 foreground/102 passive/103 unloaded and capture
 A only. B/C remain pending. [Sanitized report](test-results/m1-final-runtime-0.5.2.md).
+
+### Capture A after file reassignment — partial PASS
+
+Latest report diagnostics-20261008T193947Z.json resolves enumeration of 101.
+Six column geometries and two S02/one C01 matches pass; C01 agrees with owner
+400x400x3000 mm and XY=(0,0). Full A is still pending: only seven supported
+roots in 101, no supported beam/slab roots despite a raw slab context sample.
+Next: raw type/parent probe via M1 Component Types.cmd add-on, no reinstall or
+rebuild. Remaining setup discrepancies: 102 active background, C05 wrong demo
+layer, C03 literal undefined text. B/C pending; no full M1 acceptance.
+[Sanitized findings](test-results/m1-final-runtime-0.5.2.md).

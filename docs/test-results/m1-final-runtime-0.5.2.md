@@ -50,3 +50,49 @@ input-view/session scope from the later component/geometry logic. If 101 still
 has no adapters, retain the new report and a view/file-state screenshot for an
 implementation fix. Do not proceed to B/C until the file-101 read is resolved.
 The prior resource gate and accepted older owner batches need no separate repeat.
+
+## Capture A after file reassignment — partial PASS, 2026-10-08
+
+Owner clarified the elements were not correctly assigned to drawing files.
+No cached-document/native selection defect is established from the first capture.
+The intervening report diagnostics-20261008T193822Z.json had host connectivity
+but no MCP connection, so no final requests ran; it is not model evidence.
+
+Latest upload diagnostics-20261008T193947Z.json completes all six requests,
+summaries and pages on verified 0.5.2. Seventeen raw adapters are enumerated,
+sixteen from 101 and one from 102. The broad supported-root scan returns
+7 components in 101 (6 columns plus 1 wall) and 1 column in 102. Three duplicate
+representations and six non_component_adapters are reported, with no
+identity/hierarchy/field-read failure. The prepared fixture expects 10 supported
+components in 101; the two beams and slab are not returned as supported roots.
+The context sample contains a slab display name and component axes, so do not
+ask the owner to recreate missing objects or infer raw native type names.
+
+| Bounded check | Latest result |
+| --- | --- |
+| Read-resource binding | bound_for_read |
+| Profile columns in 101 | 6; all dimension readbacks approximately 400x400x3000 mm |
+| S02 predicate | 2 columns, at (6000,0) and (0,6000) XY |
+| Height/spatial C01 predicate | 1 column S01 at XY=(0,0) |
+| C01 AABB | approximately (-200,-200,0) to (200,200,3000) mm |
+| Zero-offset local/global read | identical boxes/dimensions for the same returned roots |
+| Unloaded 103 | explicit unloaded_or_unavailable omission |
+
+C01 dimensions and XY center now agree with the owner's prior UI report;
+the placement-reference concern is resolved for this column. Bounded column
+geometry/projections/filters/summary-page consistency pass on this capture.
+No acceptance is inferred for display-unit changes, nonzero offset or beam/slab
+hierarchy, nor for an independent visible-unchanged claim not yet supplied.
+
+Recipe discrepancies remain: 102 is still active_background instead of passive;
+C05/S05 uses layer 3700 (SZ_OGÓ01) instead of 3701 (SZ_OGÓ02); C03's raw mark
+is the literal string <niezdefiniowany>, not an empty/missing value. Preserve
+this literal evidence; M1 does not silently normalize it or execute future QA.
+
+Next: read raw model identities/types and root hierarchy in 101 using the
+new docs/probes/m1-component-types.json and M1 Component Types.cmd add-on.
+This removes supported-root filtering and geometry/profile predicates without
+changing the model or host code. Public and host typed request validation plus
+ZIP-content checks pass; no unrelated tests are rerun. The original 0.5.2 archive
+is unchanged. Resolve the native types before fixture changes/full A rerun;
+B/C remain pending. Raw reports/environment paths are not published.

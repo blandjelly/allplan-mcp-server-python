@@ -9,18 +9,20 @@ bound_for_read, mark/status 5001/5002 (names exact, type 67 string), layers
 Installation and transport verified. The prior empty-group/full-name setup
 problem is resolved. IDs are observations, never hard-code them. Write
 eligibility remains not_checked. Full M1 geometry/hierarchy/frame acceptance
-remains pending. Next: resolve **first capture A NOT ACCEPTED**. Upload
-diagnostics-20261008T192549Z.json enumerates only one column in 102; all 101
-queries return zero despite owner confirming ten visible components there.
-102 was active background rather than passive. Code already resolves the input
-view document per request; no cached-document defect or native absence is proven.
-Next bounded step: save/stop host, set 101 foreground/102 passive/103 unloaded,
-focus 101 model view, restart host, repeat capture A only. Keep fixture/package;
-B/C pending. Owner unsure center versus corner insertion; do not infer C01 from
-file-102 geometry. [Final capture findings](test-results/m1-final-runtime-0.5.2.md),
+remains pending. Latest capture A diagnostics-20261008T193947Z.json is **partial PASS**:
+file reassignment resolved the first empty-101 result. Six columns, two S02
+matches, one C01 spatial/height match and 400x400x3000 mm centered C01 agree
+with owner evidence. Broad scan finds only 7 supported roots in 101 (6 columns
++ wall) plus 1 in 102; beams/slab native types/hierarchy remain unresolved.
+Raw context sample includes a slab and component axes. Next: owner runs the
+small **M1 Component Types.cmd** add-on in installed 0.5.2, reading raw types and
+parent roots in 101 without supported-family filtering. No reinstall/full A
+repeat or object rebuild yet. 102 is still active background; C05/S05 has layer
+3700 instead of 3701; C03 is literal <niezdefiniowany> rather than empty. B/C
+pending. [Capture findings](test-results/m1-final-runtime-0.5.2.md),
 [resource evidence](test-results/m1-profile-correction-0.5.2.md),
 [owner card](m1-final-batch.md). Raw new uploads are not published. Preserve
-older ZIPs; no speculative runtime package change is made.
+older ZIPs; no host/runtime code or archive change is made.
 
 The initial M0 instructions below are historical. **M0 is closed** on the owner's
 Allplan 2026-1-7 / local Windows Codex setup using package 0.1.2.

@@ -5,12 +5,15 @@ Status: **ready_for_owner_test**, not accepted in Allplan yet. The bounded
 the remaining geometry/unit/offset and native hierarchy gates. The 0.5.2
 standalone demo read-resource binding preflight passed on 2026-10-08;
 [bounded evidence](test-results/m1-profile-correction-0.5.2.md).
-The first capture A is **not accepted**: only one file-102 column was returned,
-with no file-101 adapters despite owner confirmation of the full visible fixture.
-[Findings and bounded follow-up](test-results/m1-final-runtime-0.5.2.md).
-Save the model, stop the host, restore 101 foreground / 102 passive / 103 unloaded,
-focus the model view containing 101, then restart StartPythonHost and repeat A
-only. Keep the fixture and package unchanged; defer B/C until 101 is readable.
+The latest capture A is **partial PASS** after the owner corrected file
+assignments: six column geometries, two S02 matches and one centered C01 match
+agree with the recipe. The broad scan still returns only seven supported roots
+in 101 (columns plus wall), with beams/slab not recognized as supported roots.
+[Findings and follow-up](test-results/m1-final-runtime-0.5.2.md).
+Next: use the small **M1 Component Types.cmd** add-on to read raw types/root
+hierarchy in 101; no reinstall, full A repeat or object rebuild is needed yet.
+102 remains active background; C05/S05 is on structure rather than review layer;
+C03 is a literal undefined string. Resolve types/setup before full A or B/C.
 
 No model edits are made by either packaged diagnostic command. Audit/repair
 tools belong to M2/M3 and are not exercised here.
