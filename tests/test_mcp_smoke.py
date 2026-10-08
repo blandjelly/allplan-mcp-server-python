@@ -11,7 +11,7 @@ from pathlib import Path
 
 from fastmcp import Client
 from allplan_mcp.diagnostics import collect_diagnostics
-from test_transport import transport
+from test_transport import stop_test_server, transport
 
 
 class FakeBridge:
@@ -102,7 +102,7 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
         self.bridge_handler = FakeBridge()
         self.bridge = transport.BridgeServer(("127.0.0.1", 0), self.bridge_handler, lambda callback: callback())
         self.bridge.start()
-        self.addCleanup(self.bridge.stop)
+        self.addCleanup(stop_test_server, self, self.bridge)
         with socket.socket() as reservation:
             reservation.bind(("127.0.0.1", 0))
             port = reservation.getsockname()[1]

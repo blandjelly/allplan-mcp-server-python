@@ -14,6 +14,14 @@ transport = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(transport)
 
 
+def stop_test_server(test_case, server):
+    # stop() is deliberately nonblocking on Allplan's UI thread. Test teardown
+    # must also let the accept thread finish before interpreter shutdown.
+    server.stop()
+    server.thread.join(2)
+    test_case.assertFalse(server.thread.is_alive(), "Bridge accept thread did not stop")
+
+
 class Handler:
     def __init__(self):
         self.calls = []
@@ -31,7 +39,7 @@ class TransportTests(unittest.TestCase):
     def server(self, handler=None, dispatch=lambda callback: callback()):
         server = transport.BridgeServer(("127.0.0.1", 0), handler or Handler(), dispatch)
         server.start()
-        self.addCleanup(server.stop)
+        self.addCleanup(stop_test_server, self, server)
         return server
 
     def test_http_dispatch_and_request_id(self):
@@ -104,7 +112,7 @@ class TransportTests(unittest.TestCase):
         self.assertEqual(errors[0]["error"]["code"], "session_unavailable")
         restarted = transport.BridgeServer(server.server_address, Handler(), lambda f: f())
         restarted.start()
-        self.addCleanup(restarted.stop)
+        self.addCleanup(stop_test_server, self, restarted)
         with self.request(restarted) as response:
             self.assertEqual(response.status, 200)
         restarted.stop()
