@@ -1,76 +1,90 @@
 # Next-model handoff
 
-## Current handoff — 2026-10-07
+## Latest runtime handoff — 2026-10-07, package 0.2.1
 
-The initial M0 instructions below are historical. **M0 is closed** on the owner's
-Allplan 2026-1-7 / local Windows Codex setup using package 0.1.2.
-[Acceptance](test-results/m0-acceptance-0.1.2.md).
+**M0 is closed. The bounded M1.1 context/identity batch passed. Full M1 remains in
+progress.** This is the latest handoff after the M1 probe, not full M1 acceptance.
+No implementation/runtime acceptance changed during the 2026-10-09 documentation
+cleanup. Historical setup tasks and duplicate reports have been removed; current
+implementation facts and the latest original diagnostics remain here.
 
-Current implementation version **0.2.1** has a bounded read-only
-`get_model_context` probe. Its owner follow-up batch passes project lookup/switch,
-loaded/passive file states, unload exclusion and separate model/view GUID reads;
-the owner confirms matching project names and unchanged model.
-[Runtime evidence](test-results/m1-context-runtime-0.2.1.md).
-The full M1 milestone remains in progress: scope/unit/offset/identity contracts,
-M1.2 queries, M1.3 paging/staleness and M1.4 profile binding are still pending.
-The demonstration profile remains unbound and inactive.
+Read [architecture](architecture.md), [features](features.md) and
+[stages](implementation-plan.md), then inspect the current working tree and code.
+The demo [profile](../profiles/examples/native-model-qa.demo.json) remains
+**unbound and inactive**; the server does not consume it.
 
-Start from [project-status.md](project-status.md) and the current code, then use
-the roadmap below. Do not repeat accepted owner batches without a new defect or
-change that requires verification. Preserve the tested ZIPs and their recorded
-hashes; build any further runtime changes under a new package version. Portable
-validation currently passes 31 tests; Allplan runtime evidence is separate.
+## Verified baseline
 
-## Task
+- Fork: `blandjelly/allplan-mcp-server-python`; upstream: `AlejoDuarte23/allplan-mcp-server-python`.
+- M0.1–M0.5 accepted with **UAT-00/UAT-01 PASS** on Allplan UI build **2026-1-7**,
+  local Windows Codex, package **0.1.2**. Owner confirmed installation, box count/
+  dimensions, ESC/restart, minimize/restore, project switching and cleanup.
+- Observed API release **2026.1**, executable file/product versions
+  **16.1617.8659.814 / 2026.0.1.0**, embedded CPython **3.13.13**, external Python
+  **3.14.8**. UI hotfix is owner-reported; executable metadata is not a hotfix mapping.
+  Windows/Codex app versions remain unspecified.
+- Last recorded portable validation: **31 tests PASS**, Linux Python **3.12.14**,
+  FastMCP **3.2.4**, uv **0.12.19**. This is separate from Allplan runtime acceptance.
+  GitHub Actions matrix execution is not claimed.
 
-Implement the Allplan 2026 workflow toolkit incrementally in the existing fork. Start with installation and the first working Codex connection, then deliver native-model querying, auditing and controlled cleanup. Use [implementation-plan.md](implementation-plan.md) as the roadmap and record progress against its task IDs.
+Keep the tested archives unchanged; do not overwrite them with rebuilt packages.
+Use a new package version for further runtime changes. Their recorded hashes are:
 
-## Owner decisions — 2026-10-07
+| Tested archive | SHA-256 |
+| --- | --- |
+| `allplan-mcp-0.1.2-windows-evaluation.zip` | `d97b6761b13f8cd6e80c7954f1c91de513d4a813a5b236c6917b14b0882ac528` |
+| `allplan-mcp-0.2.1-windows-evaluation.zip` | `26ca92690be0365eca3d580b947c52b443e536cc8ee10d8b1ca7b1de594bc6e8` |
 
-- Codex is the first MCP client; Claude may follow later. Keep the core MCP API client-neutral.
-- First useful result: search, audit and cleanup of native Allplan elements.
-- The existing MCP bridge has not yet been tested.
-- Detect the installed Allplan version/build yourself when connected; do not infer it from the repository's 2026 defaults.
-- Prepare a demonstration profile. The owner will build the model using your Allplan UI recipe.
-- The owner tests in Allplan and reports visible results. You own coding, automated tests, diagnostics, installation and fixes.
-- GitHub documentation, issues, PRs, release notes and recorded test results are in English. Owner-facing conversation and walkthroughs may be in Polish.
+## Latest M1 runtime evidence
 
-## Read first
+`get_model_context` is read-only: project, foreground/loaded file states, input
+unit enums, raw offset and optional **0–20 raw adapter** model/view UUID samples.
+The 0.2.1 correction resolves project lookup, including the tested alternate
+`GetProjectPath(host_name, project_name)` order: error 0/nonempty path, where the
+published name/host order returned -1/empty path on this build.
 
-1. [Implementation plan](implementation-plan.md), especially baseline findings, contracts, milestones and exit gates.
-2. [Demo model and profile](demo-model-and-profile.md) and [draft profile JSON](../profiles/examples/native-model-qa.demo.json).
-3. [Manual acceptance tests](manual-acceptance-tests.md).
-4. Current `README.md`, `pyproject.toml`, `src/allplan_mcp/server.py`, `src/allplan_mcp/allplan_client.py`, the host scripts and registration utilities.
-5. Applicable repository instructions and the current working tree. Recheck the baseline before editing.
+| Original diagnostic | Observed result |
+| --- | --- |
+| [132549](test-results/evidence/diagnostics-20261007T132549Z.json) | `Nowy projekt 1`: file 1 foreground, file 2 passive; active/passive model and view UUIDs read separately. |
+| [132700](test-results/evidence/diagnostics-20261007T132700Z.json) | Same project: unloaded file 2 excluded from inventory/sample, file-1 UUIDs unchanged. |
+| [132822](test-results/evidence/diagnostics-20261007T132822Z.json) | Switched to `test`: file 21 foreground, file 1 active background; changed project fingerprint. |
 
-The plan's baseline is commit `701f35366cc94b90085dd8b55d42b16f4166c95b` in `blandjelly/allplan-mcp-server-python`. Do not discard changes made after it.
+The owner confirmed **“Nazwy projektu sie zgadzaja, model bez zmiany”** (names
+match, model unchanged). Each capture has a different host session ID;
+`document_id=0` is not project identity. Unit enums **3/1** and offset **[0,0,0]**
+were read, but UI unit comparison and nonzero-offset normalization were not tested.
 
-## Immediate work
+Original diagnostic SHA-256 values, retained byte-for-byte:
 
-1. Inspect the current repository, upstream provenance, installation files and execution environment. Update a concise English `docs/project-status.md` as implementation begins.
-2. Fix the observed non-recursive installer: `source_scripts.glob("*.py")` omits the imported `sandbox/` package. Add a real temporary-directory installation regression test and package integrity checks.
-3. Prepare a versioned Windows package with a launcher, setup instructions for Codex and a restore path. The owner should not need to edit code or manually copy internal modules.
-4. Establish health/version calls through the owner's Allplan session. Inspect the full build/hotfix and embedded Python. This planning session had Linux only and no connected Allplan tools, so none of those runtime facts is verified yet.
-5. Validate host cancellation/restart and request dispatch. UI-thread dispatch already exists; investigate lifecycle behavior instead of replacing the bridge without evidence.
-6. Deliver only UAT-00/UAT-01 initially. If runtime feedback is pending, continue independent contracts/portable tests, while keeping integrated status pending.
-7. Implement M1 context/query, bind the demo profile to real IDs, and give the owner the finalized fixture recipe. Then proceed through M2 and M3.
+```text
+132549: b793bbcada5d540eb5b12ffbd777dadd2f33418c6e6abeb8599c2cd045db28c6
+132700: acf137c1655c3ce13d6ac620ac88745ed14c34231b6d8ac865080d31aa68575f
+132822: b1db2cc225066c307862de810005985d66ba0031f00a11c9a71712f3745be90b
+```
 
-## Technical boundaries
+## Next work and unresolved limits
 
-- Keep Allplan API objects/imports inside the host. Pure logic and JSON contracts should run in ordinary CI without Allplan.
-- Build typed workflow handlers. Do not implement the toolkit by sending arbitrary generated Python for every production operation.
-- Treat the draft JSON profile as unbound. The current server does not consume it; implement and validate the schema before activation.
-- Use model identity, explicit scope, normalized units, source fingerprints, preview/apply and readback. Respect passive/unloaded drawing files.
-- Validate actual write behavior for each type/property. Ordinary native columns and Structural Framing have different documented capabilities.
-- Missing data is `not_checked`, not a successful audit. A network timeout is not proof that a write did not happen.
-- Keep request deduplication, partial failure, Undo, registry persistence and exported-file recovery explicit.
-- Use 2026 API references. Do not import 2027-only capabilities into the support claim.
-- Documentation feasibility, fake-adapter tests and Allplan runtime verification are separate evidence levels.
+1. Finish **M1.1** explicit scope, unit/offset conversion and identity contracts.
+   Project key is a non-durable name/host/path fingerprint; copy/rename/move
+   semantics, levels, file write eligibility and full component coverage are unresolved.
+2. Implement **M1.2** read-only type/layer/attribute queries, then **M1.3** paging,
+   reusable selections, deduplication and stale-state checks. Adapter samples are
+   not component counts, selections or write targets.
+3. Complete **M1.4** metadata/profile binding and the exact UI fixture recipe.
+   Full UAT-02/UAT-03 and the M1 exit gate remain pending. No repeat of the passed
+   0.2.1 correction batch is needed without a relevant change or defect.
+4. Continue **M2–M3** for the first search/audit/cleanup MVP.
 
-## Completion and handoff discipline
+Baseline box tools lack automatic readback and durable write deduplication.
+Queued cancellation has portable simulated-dispatch evidence; closing the listener
+does not undo an already running write. Static diagnostics flags
+`runtime_verified=false` / `allplan_acceptance=not_run` are not a live acceptance
+registry. No other workflow tools or Claude/cloud-to-Windows integration are accepted.
+Neither inspected repository has a license; public redistribution remains
+unresolved and no release publication is recorded.
 
-Deliver one reviewable slice with English documentation and relevant checks before widening the scope. For every owner test batch, provide the exact package version, small set of prompts, expected visual/count results, reset instructions and a copyable result form. The owner does not run developer test commands.
-
-Update completed task IDs, actual evidence, unresolved questions, pending owner tests, compatibility and the next concrete action. Do not mark a capability accepted without recorded Allplan evidence. Do not wait on optional product questions that can be resolved from the owner's confirmed decisions or prepared defaults.
-
-The planning work added documentation and an illustrative profile only. No workflow tool was implemented, no Allplan session was tested, and nothing was published to GitHub as part of preparing this handoff.
+Keep Allplan APIs inside the host, use typed workflows and shared preview/apply,
+and report missing data as `not_checked`. Verify per-type/property writes and
+readback on Allplan 2026. The model owns code, checks and ready-to-use test packages;
+the owner observes the UI. Record accepted task IDs, evidence, remaining scope
+and the next action here after each completed slice.

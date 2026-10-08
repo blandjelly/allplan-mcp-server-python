@@ -24,7 +24,7 @@ if errorlevel 1 goto failed
 if errorlevel 1 goto failed
 .venv\Scripts\python.exe windows\actions.py install
 if errorlevel 1 goto failed
-echo Setup completed. Follow docs\windows-setup.md, then Launch Allplan MCP.cmd.
+echo Setup completed. Follow README.md, then Launch Allplan MCP.cmd.
 pause
 exit /b 0
 :runtime_error

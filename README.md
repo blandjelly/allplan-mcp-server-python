@@ -1,166 +1,69 @@
 # Allplan MCP Server
 
-FastMCP server that exposes the local Allplan Python host as MCP tools.
+A local FastMCP bridge for working with Allplan 2026 through Codex. The project
+extends an existing PythonPart host into 13 workflow tools for inspecting native
+models, auditing quality, applying controlled repairs, generating structures and
+preparing documentation. The first useful release is context → query → audit →
+previewed attribute/layer repairs. Codex is the first client; MCP contracts stay
+client-neutral for a later Claude integration.
 
-The existing Allplan PythonPart starts a small local HTTP host at `127.0.0.1:5679`.
-This package adds a FastMCP server in front of it, so agents can call MCP tools
-over Streamable HTTP at `/mcp`.
+## Project context
 
-## Windows / Codex evaluation
+Read these files in order when continuing implementation:
 
-Version **0.1.2** prepares reproducible bridge installation and recovery, local Codex
-configuration, read-only runtime diagnostics and a small acceptance batch. Allplan
-baseline is **accepted on Allplan 2026-1-7** with local Windows Codex
-(UAT-00/UAT-01 PASS). [M0 is closed](docs/test-results/m0-acceptance-0.1.2.md);
-workflow toolkit capabilities begin with M1.
+1. [Current handoff](docs/next-model-handoff.md): verified state, limits and next work.
+2. [Architecture](docs/architecture.md): runtime boundary and shared contracts.
+3. [Features](docs/features.md): the 13 tools and demonstration fixture.
+4. [Implementation stages](docs/implementation-plan.md): task IDs and exit gates.
 
-Current package **0.2.1** continues M1.1 with the read-only `get_model_context`
-context/identity probe. The bounded owner runtime batch passes for project
-lookup/switching, loaded file states, unload exclusion and model/view GUIDs;
-31 portable tests pass. [Runtime evidence and remaining scope](docs/test-results/m1-context-runtime-0.2.1.md).
-`model_query` and the demonstration profile are not active yet.
+Current package: **0.2.1**. **M0 is accepted** on Allplan **2026-1-7** with local
+Windows Codex. The bounded **M1.1 context probe passed**; **full M1 is in progress**.
+The demo profile is unbound and inactive. Detailed current evidence is in the
+handoff; planned features are not accepted capabilities.
 
-- [Windows installation and restore](docs/windows-setup.md)
-- [UAT-00 / UAT-01 prompts and result form](docs/m0-acceptance-batch.md)
-- [Actual task status and evidence](docs/project-status.md)
-- [Version history](docs/changelog.md)
-- [Portable testing and package build](docs/testing.md)
-- [Compatibility and limitations](docs/support-matrix.md)
+Repository documentation and API identifiers use English. Owner-facing
+walkthroughs may use Polish. The implementation model owns coding, diagnostics,
+packages and automated checks; the owner tests through Codex and the Allplan UI.
+The owner does not edit Python/JSON or research API identifiers.
 
-End users use the versioned ZIP and its Explorer launchers. The following source
-setup is for development.
+## Local Windows setup
 
-## Setup
+Use a versioned evaluation ZIP on the Windows machine running Allplan and Codex.
+It requires external Python 3.11+ and internet access for locked dependencies;
+it does not bundle Allplan, Python or Codex.
 
-```bash
-uv sync
-```
+1. Extract the complete ZIP into a writable, versioned folder. Close Allplan.
+2. Run **Setup.cmd** and select the actual Allplan user `Local` folder, commonly
+   `Documents\Nemetschek\Allplan\2026\Usr\Local`. The installer checks hashes,
+   installs the full bridge and backs up its previous version.
+3. Open Allplan and the intended project. In Library → Private → PythonHost,
+   start **StartPythonHost** and keep it running.
+4. Run **Launch Allplan MCP.cmd**, then **Connect Codex.cmd** and restart Codex.
+   Use a local Windows chat; cloud localhost cannot reach the Windows bridge.
+5. Run **Diagnostics.cmd** for a read-only report in `logs`.
 
-Register the Allplan PythonPart bridge on the Windows machine where Allplan is
-installed:
+The bridge listens at `http://127.0.0.1:5679`; MCP uses
+`http://127.0.0.1:8888/mcp`. The connection helper preserves existing Codex settings
+and adds `[mcp_servers.allplan_m0]` with that URL. For updates, close Allplan and
+the MCP console, extract a new package and run Setup again. To roll back, close
+both and run **Restore bridge.cmd**, then use the previous package's launcher.
 
-```cmd
-utils\register_python_host.cmd
-```
+For `host_absent` or `session_unavailable`, open the intended project and restart
+StartPythonHost. For a lost write response (`execution_unknown`), inspect/reconcile
+the model before retrying. Never mix files from different versioned packages.
 
-By default this copies the bridge to:
-
-```text
-%USERPROFILE%\Documents\Nemetschek\Allplan\2026\Usr\Local\Library\PythonHost
-%USERPROFILE%\Documents\Nemetschek\Allplan\2026\Usr\Local\PythonPartsScripts\PythonHost
-```
-
-For a different Allplan version:
-
-```cmd
-utils\register_python_host.cmd --allplan-version 2025
-```
-
-In Allplan, start the `StartPythonHost` PythonPart after registration. It must
-keep running while the MCP server is being used.
-
-## Run locally
+## Source development
 
 ```bash
-uv run allplan-mcp
+uv sync --frozen
+uv run --frozen allplan-mcp
+uv run --frozen python -m unittest discover -s tests -v
+uv build
+uv run --frozen python utils/build_windows_package.py
 ```
 
-By default this starts the MCP server at:
-
-```text
-http://127.0.0.1:8888/mcp
-```
-
-Useful environment variables:
-
-```bash
-ALLPLAN_HOST_URL=http://127.0.0.1:5679
-MCP_HOST=127.0.0.1
-MCP_PORT=8888
-MCP_PATH=/mcp
-```
-
-## Tools
-
-- `allplan_health`: checks whether the Allplan host is reachable.
-- `get_allplan_version`: returns the running Allplan version.
-- `get_all_object_names`: returns display names for elements in the current document.
-- `create_cube`: creates a cube in the current document.
-- `create_box`: creates a rectangular cuboid in the current document.
-- `execute_python`: optional development tool, registered only when
-  `ALLPLAN_MCP_ENABLE_PYTHON_EXEC=1`; the Allplan process must also opt in.
-
-## Skill resources
-
-Bundled skills are also exposed through MCP resources so clients can discover and read
-them through the protocol.
-
-Simple folder layout:
-
-```text
-src/allplan_mcp/allplan_skills/
-  api-reference/
-    SKILL.md
-    assets/
-    scripts/
-  geometry/
-    SKILL.md
-    assets/
-    scripts/
-  rebar/
-    SKILL.md
-    assets/
-    scripts/
-  utilities/
-    SKILL.md
-    assets/
-    scripts/
-```
-
-Resource URIs:
-
-- `allplan://skills`
-- `allplan://skills/api-reference`
-- `allplan://skills/geometry`
-- `allplan://skills/rebar`
-- `allplan://skills/utilities`
-- `allplan://skills/{skill_name}/assets/{asset_name}`
-- `allplan://skills/{skill_name}/scripts/{script_name}`
-
-The scripts are simple templates. They are meant to guide generated code and do not
-depend on cross imports between skill folders.
-
-## Notes
-
-- [POST execution exploration](docs/post-execution-exploration.md)
-
-## Development roadmap
-
-The Allplan 2026 workflow toolkit is planned incrementally, starting with native
-model queries, audits, and controlled cleanup through Codex. The following are
-planning artifacts; they do not describe already implemented tools:
-
-- [Implementation plan](docs/implementation-plan.md)
-- [Next-model handoff](docs/next-model-handoff.md)
-- [Demo profile and owner-built model](docs/demo-model-and-profile.md)
-- [Manual acceptance tests](docs/manual-acceptance-tests.md)
-
-## Development execution
-
-Python execution is disabled by default on the host and omitted from the MCP tool
-catalog. The evaluation launcher explicitly disables it. Developers may opt in
-separately in the Allplan process and MCP process for local experiments.
-
-Behavior:
-
-- With the host opt-in, the raw Allplan bridge accepts `POST /execute-python`
-- With the MCP opt-in, the external server exposes `execute_python(...)`
-- The endpoint remains bound to `127.0.0.1`
-- Imports are blocked by AST validation
-- Private and dunder attribute access is blocked by AST validation
-- Only a restricted builtin whitelist is available at runtime
-
-AST filtering is not a process isolation boundary. It grants access to live
-Allplan API objects. Do not expose this development path through a tunnel or a
-shared agent setup. Production workflows use typed handlers. See the
-[execution boundary](docs/post-execution-exploration.md).
+For source registration on Windows, use `utils\register_python_host.cmd`.
+External-server dependencies stay outside Allplan's embedded Python. Environment
+settings: `ALLPLAN_HOST_URL`, `ALLPLAN_HOST_TIMEOUT`, `MCP_HOST`, `MCP_PORT`,
+`MCP_PATH`. Development Python execution requires opt-in on both runtimes; see
+[architecture](docs/architecture.md).
