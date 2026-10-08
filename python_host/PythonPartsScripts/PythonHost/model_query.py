@@ -7,6 +7,7 @@ import time
 from collections import Counter, OrderedDict
 from uuid import uuid4
 
+from .native_readers import COMPONENT_TYPES
 from .model_context import context_probe, guid, integer, observation, text
 from .query_contracts import BASIC_FIELDS, GEOMETRY_FIELDS, SCHEMA, attribute_id, evaluate, fingerprint, predicate_fields, scalar, validate_request
 from .transport import BridgeError
@@ -189,7 +190,7 @@ class ModelQueryService:
                 counts["in_scope_adapters"] += 1
                 chain = None
                 if request.get("component_kind") == "top_level_component" or "hierarchy" in needed:
-                    from .native_readers import root_adapter, COMPONENT_TYPES
+                    from .native_readers import root_adapter
                     try:
                         root, chain = root_adapter(adapter, check_budget)
                     except BridgeError:
@@ -285,7 +286,7 @@ class ModelQueryService:
                              "visibility": "api_select_all_screen_and_occlusion_not_checked",
                              "count_kind": ("supported_native_top_level_components" if request.get("component_kind") == "top_level_component" else "unique_file_model_uuid_not_top_level_components"),
                              "native_component_counts": "implemented_runtime_pending" if request.get("component_kind") == "top_level_component" else "not_checked",
-                             "supported_component_types": ["Column_TypeUUID", "Beam_TypeUUID", "Wall_TypeUUID", "Slab_TypeUUID"],
+                             "supported_component_types": sorted(COMPONENT_TYPES),
                              "geometry_units_offset": "implemented_runtime_pending" if needed & GEOMETRY_FIELDS else "not_checked"},
                 "profile_binding": profile_binding,
                 "source_fingerprint": fingerprint({"binding": binding, "included": included, "omissions": omitted, "source": source})}

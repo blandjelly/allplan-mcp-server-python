@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.3 — 2026-10-09
+
+Owner raw-type evidence identifies two SkeletonBeam_TypeUUID roots and one
+MultiSlab_TypeUUID root with a Slab_TypeUUID child, explaining three omitted
+components. Add these exact root families to bounded reads; aggregate slab
+AABBs union direct slab tiers, preserving child/file/read budgets and failure
+observations. Axes/tiers deduplicate to roots, without expanding to arbitrary
+Structural Framing families or enabling writes. Profile/resources remain unchanged.
+New fake-native regressions are separate from pending Allplan solid readback.
+[Evidence and owner next action](test-results/m1-native-families-0.5.3.md).
+
 ## 0.5.2 — 2026-10-08
 
 Correct owner demo bindings to the actual layer **short** names

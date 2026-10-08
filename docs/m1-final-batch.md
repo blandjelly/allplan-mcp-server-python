@@ -1,19 +1,20 @@
-# Final M1 owner verification — 0.5.2
+# Final M1 owner verification — 0.5.3
 
 Status: **ready_for_owner_test**, not accepted in Allplan yet. The bounded
 0.2.1/0.3.0/0.4.0 batches remain accepted; do not repeat them. This card closes
 the remaining geometry/unit/offset and native hierarchy gates. The 0.5.2
 standalone demo read-resource binding preflight passed on 2026-10-08;
 [bounded evidence](test-results/m1-profile-correction-0.5.2.md).
-The latest capture A is **partial PASS** after the owner corrected file
-assignments: six column geometries, two S02 matches and one centered C01 match
-agree with the recipe. The broad scan still returns only seven supported roots
-in 101 (columns plus wall), with beams/slab not recognized as supported roots.
-[Findings and follow-up](test-results/m1-final-runtime-0.5.2.md).
-Next: use the small **M1 Component Types.cmd** add-on to read raw types/root
-hierarchy in 101; no reinstall, full A repeat or object rebuild is needed yet.
-102 remains active background; C05/S05 is on structure rather than review layer;
-C03 is a literal undefined string. Resolve types/setup before full A or B/C.
+The 0.5.2 capture A passed bounded column geometry/S02/C01 filters but omitted
+three actual root families. The component-type follow-up identifies two
+SkeletonBeam_TypeUUID roots and one MultiSlab_TypeUUID root with a Slab tier.
+0.5.3 reads these exact families and unions slab tiers; native solid geometry
+for them still requires verification. [Findings and correction](test-results/m1-native-families-0.5.3.md).
+Install 0.5.3 in a new folder, retaining model and existing resources. Keep the
+structural beams and slab; no rebuild is required. Restore file 102 passive and
+put C05/S05 on SZ_OGÓ02. Repeat A to verify the changed counts/geometry, then
+continue B/C after A passes. No standalone profile/type probe or earlier accepted
+owner batch needs repetition. The final batch freshly validates its context.
 
 No model edits are made by either packaged diagnostic command. Audit/repair
 tools belong to M2/M3 and are not exercised here.
@@ -21,7 +22,7 @@ tools belong to M2/M3 and are not exercised here.
 ## Install and resource preflight
 
 Keep accepted archives unchanged. Close Allplan and the MCP console; extract
-`allplan-mcp-0.5.2-windows-evaluation.zip` into a new folder and run **Setup.cmd**
+`allplan-mcp-0.5.3-windows-evaluation.zip` into a new folder and run **Setup.cmd**
 against the same Allplan Local folder. Reopen Allplan and **Launch Allplan MCP.cmd**.
 The seven-tool catalog is unchanged. Restart **StartPythonHost** after normal
 Allplan commands/file-state changes that end its interactor. An open MCP console
@@ -62,14 +63,14 @@ model resolves the cause. Do not guess IDs or rename a different native field.
 Attribute 498 is **Nazwa obiektu**, not the demo mark/status.
 
 The earlier group/full-name setup issue is resolved. Keep the existing two
-attribute definitions and layers, and use the already-installed 0.5.2 package.
-No reinstall or standalone preflight is required. The six-request final batch
-still includes a fresh resource binding as normal query-context validation.
+attribute definitions and layers. The native reader correction requires the
+new 0.5.3 package, but no standalone preflight is required. The six-request
+final batch still includes a fresh resource binding as normal query-context validation.
 
 ## Build the fixture once
 
 Use millimetres, zero offset, ungrouped **ordinary native columns** (not
-Structural Framing), common center insertion reference and manual bottom/top
+Structural Framing columns), common center insertion reference and manual bottom/top
 levels **0 / 3000 mm**. Create six columns, **400 × 400 mm**, in file 101:
 
 | Label for the recipe | Center X / Y (mm) | MCP_QA_MARK | Layer | MCP_QA_STATUS |
@@ -81,12 +82,19 @@ levels **0 / 3000 mm**. Create six columns, **400 × 400 mm**, in file 101:
 | C05 | 6000 / 6000 | S05 | SZ_OGÓ02 | NEW |
 | C06 | 12000 / 6000 | S06 | SZ_OGÓ01 | NWE |
 
+C03 is intended as a blank mark. Allplan returned the literal string
+<niezdefiniowany> in the owner capture; retain/report this native value rather
+than silently treating it as missing. Future M2 QA normalization is separate.
+
 Labels C01–C06 are recipe positions; no extra C01 attribute or graphical label
 is required. Assign the two demo attributes to each column through normal UI.
 
-Add in file 101: two ordinary beams (300 × 500 mm) between the C01/C02 and
-C02/C03 axes at a documented elevation; one single-layer wall (200 mm thick,
-4000 mm long, 3000 mm high); one slab (4000 × 4000 mm, 200 mm thick). Put wall
+Keep the two owner-created structural beams (SkeletonBeam_TypeUUID,
+300 × 500 mm) in file 101 between the C01/C02 and C02/C03 axes at a documented
+elevation. Ordinary Beam_TypeUUID beams also remain supported. Keep one
+single-layer wall (200 mm thick, 4000 mm long, 3000 mm high) and one native
+aggregate slab (MultiSlab_TypeUUID with Slab_TypeUUID tier geometry),
+4000 × 4000 mm and 200 mm thick. Put wall
 and slab away from C01's test box, for example beyond X=20000 mm. Do not group
 these components or add openings for this bounded fixture. Expected file 101:
 **10 supported top-level components = 6 columns + 2 beams + wall + slab**.
@@ -128,7 +136,7 @@ and leave reference file 102 passive and 103 unloaded. No cleanup or repair is
 requested. Submit the preflight JSON, A/B/C JSON and this short result form:
 
 ```text
-Package: 0.5.2
+Package: 0.5.3
 Allplan UI build: [actual]
 Preflight / capture A / B / C filenames: [...]
 All columns/components visibly unchanged during captures: yes / no / not checked

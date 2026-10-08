@@ -4,7 +4,10 @@ from __future__ import annotations
 from .model_context import boolean, guid, integer, observation, text
 from .spatial_contracts import box, convert_point, vector
 
-COMPONENT_TYPES = {"Column_TypeUUID", "Beam_TypeUUID", "Wall_TypeUUID", "Slab_TypeUUID"}
+# Root families observed/read through native adapters. Child axes/tiers resolve
+# to these roots; unrelated Structural Framing families remain unsupported.
+COMPONENT_TYPES = {"Column_TypeUUID", "Beam_TypeUUID", "SkeletonBeam_TypeUUID",
+                   "Wall_TypeUUID", "Slab_TypeUUID", "MultiSlab_TypeUUID"}
 
 
 def adapter_ref(adapter):
@@ -50,21 +53,25 @@ def geometry_box(adapter, check_budget):
         lo, hi = bounds.GetMin(), bounds.GetMax()
         return box([lo.X, lo.Y, lo.Z], [hi.X, hi.Y, hi.Z])
 
-    if adapter.GetElementAdapterType().GetTypeName() != "Wall_TypeUUID":
+    root_type = adapter.GetElementAdapterType().GetTypeName()
+    part_types = {"Wall_TypeUUID": "WallTier_TypeUUID", "MultiSlab_TypeUUID": "Slab_TypeUUID"}
+    if root_type not in part_types:
+        # Includes the two observed SkeletonBeam roots. Their axes are not
+        # geometry substitutes; unavailable solid geometry remains not_checked.
         return direct(adapter)
-    # Architectural walls carry geometry on their tiers; include all tiers,
-    # including hidden ones, without treating openings/labels as wall geometry.
+    # Wall/aggregate slab roots carry geometry on their direct tiers. Include
+    # hidden tiers without using axes, openings or labels as solid geometry.
     parts = []
     for index, child in enumerate(adapters.BaseElementAdapterChildElementsService.GetChildModelElements(adapter, True)):
         if index >= 256:
-            raise ValueError("Wall child budget exceeded")
+            raise ValueError("Component child budget exceeded")
         check_budget()
-        if child.GetElementAdapterType().GetTypeName() == "WallTier_TypeUUID":
+        if child.GetElementAdapterType().GetTypeName() == part_types[root_type]:
             if abs(integer(child.GetDrawingfileNumber())) != abs(integer(adapter.GetDrawingfileNumber())):
-                raise ValueError("Wall tier crosses drawing file")
+                raise ValueError("Component tier crosses drawing file")
             parts.append(direct(child))
     if not parts:
-        raise ValueError("No readable wall tiers")
+        raise ValueError("No readable component tiers")
     return box([min(p["min"][i] for p in parts) for i in range(3)],
                [max(p["max"][i] for p in parts) for i in range(3)])
 

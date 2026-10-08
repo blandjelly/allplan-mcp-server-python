@@ -42,12 +42,17 @@ requested/mandatory fields disagree, that identity is excluded as a conflict.
 Missing model/type UUIDs are excluded; an unavailable view UUID is separately
 reported. Default counts describe **unique file/model UUIDs**. Explicit
 component_kind=top_level_component instead follows at most 16 parent levels,
-rejects cycles/cross-file parents and deduplicates supported ordinary Column,
-Beam, Wall and Slab root identities. Children/tiers map to their root; labels
+rejects cycles/cross-file parents and deduplicates Column_TypeUUID,
+Beam_TypeUUID, Wall_TypeUUID and Slab_TypeUUID plus the observed
+SkeletonBeam_TypeUUID and MultiSlab_TypeUUID roots (0.5.3). Children/tiers map to their root; labels
 and other root types are counted as excluded non_component_adapters. Failed
 hierarchy reads reduce scope completeness; they never become a guessed count.
-Grouped/Structural Framing/arbitrary native trees are outside the bounded
-fixture contract. The new Allplan count gate remains pending. References are session-bound read evidence with
+SkeletonAxis children map to their supported beam roots; Slab_TypeUUID
+children map to MultiSlab roots. Aggregate slab geometry unions direct slab
+tier solids, including hidden tiers, with the same 256-child/file-scope bound
+as walls. Missing/failed tier or beam solids remain not_checked; axes are
+never geometry substitutes. Other Structural Framing families, grouped roots
+and arbitrary native trees remain outside this bounded fixture contract. The new Allplan count gate remains pending. References are session-bound read evidence with
 `durable_identity_verified: false` and `usable_for_write: false`.
 
 ## Predicates and fields

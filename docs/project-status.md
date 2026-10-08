@@ -1,6 +1,6 @@
 # Project status
 
-Updated: 2026-10-08. **M0 CLOSED**, accepted on **Allplan 2026-1-7**, package
+Updated: 2026-10-09. **M0 CLOSED**, accepted on **Allplan 2026-1-7**, package
 **0.1.2 evaluation**. **UAT-00 PASS; UAT-01 PASS**. The owner confirmed all
 remaining tests work correctly. [Acceptance and evidence](test-results/m0-acceptance-0.1.2.md).
 
@@ -29,15 +29,19 @@ nor upstream reports a license and none was invented. [Support matrix](support-m
 ## Current M1 implementation and next action
 
 **M1 implementation complete for the bounded read contract**, current package
-**0.5.2**, **ready_for_owner_test**. The 0.5.0 implementation has **56 targeted portable checks PASS**.
+**0.5.3**, **ready_for_owner_test**. The 0.5.0 implementation has **56 targeted portable checks PASS**.
 The 0.5.2 native resource preflight **PASS**: profile 1.0.2 bound_for_read;
 MCP_QA_MARK/MCP_QA_STATUS IDs 5001/5002 with exact names and string type 67;
 SZ_OGÓ01/SZ_OGÓ02 IDs 3700/3701 with exact short-name round trips. Installed
 integrity and transport verified. The group-versus-definition/full-versus-short-
 name setup issue is resolved. These IDs are context observations, not constants.
 Write eligibility remains not_checked; geometry/hierarchy/display-unit/offset
-and full M1 runtime acceptance remain pending. Next: fixture construction and
-final A/B/C captures on the same 0.5.2 package; no standalone preflight repeat.
+and full M1 runtime acceptance remain pending. The owner type probe identified
+SkeletonBeam and MultiSlab roots excluded by the old family list. 0.5.3 adds
+these exact families and slab-tier geometry; keep the existing model/resources.
+Next: install 0.5.3, restore 102 passive/C05 review layer, then A for changed
+component/solid reads; B/C afterward. No standalone profile/type probe repeat.
+[Native-family correction](test-results/m1-native-families-0.5.3.md).
 [Correction and bounded runtime evidence](test-results/m1-profile-correction-0.5.2.md).
 [Follow-up evidence](test-results/m1-profile-followup-0.5.1.md).
 New mm geometry and dimensional/AABB predicates, declared local/global transform,
@@ -48,7 +52,8 @@ geometry/hierarchy/profile changes and retain read-only session binding.
 [final UAT-02/UAT-03 card](m1-final-batch.md).
 
 **M1 exit gate remains pending**: 0.5.0 native geometry/frame behavior, ten-
-component fixture and actual demo resource binding must pass in Allplan.
+component geometry/hierarchy fixture and frame/unit captures must pass in
+Allplan; bounded demo resource binding already passed in 0.5.2.
 Persistence/write eligibility belong to downstream mutation work; no write
 profile is activated. The server resolves real project IDs after UI setup;
 missing resources block the query instead of guessing.
@@ -65,8 +70,8 @@ file 2 restored to passive and the same Allplan 2026-1-7 build. No repeat needed
 [two-capture owner card](m1-metadata-batch.md). `model_query` now includes typed
 `inspect`; metadata is read per field, sample/layer coverage is bounded, passive
 missing values do not establish native absence, and full responses are saved by
-**M1 Metadata.cmd**. The profile remains unbound; M1.4 now has a resource probe,
-with schema/binding implemented in 0.5.0 and its new runtime gate pending.
+**M1 Metadata.cmd**. The 0.5.0 schema/read-binding implementation subsequently passed the bounded
+0.5.2 owner preflight; write eligibility remains not_checked.
 
 The earlier **0.3.0** scope/query slice remains bounded-runtime accepted.
 Work started from

@@ -66,3 +66,8 @@ Portable coverage:
 `uv build` checks wheel/sdist construction. The ZIP builder uses explicit payload directories; it excludes runtimes, caches, credentials, logs and Git internals. The pure-Python wheel contains the external MCP server and bundled skills. The separate evaluation ZIP also contains the host, installer, launcher, docs and draft profile.
 
 The owner runs no developer commands. [UAT-00 / UAT-01](m0-acceptance-batch.md) supplies UI steps, exact prompts, reset instructions and a result form. The owner subsequently confirmed UAT-00/UAT-01 on Allplan 2026-1-7 with package 0.1.2; see [M0 acceptance](test-results/m0-acceptance-0.1.2.md). Windows installation/connection, UI lifecycle and visible box dimensions are accepted for that setup. The in-flight race remains portable-probe evidence and GitHub Actions execution is not claimed.
+
+The 0.5.3 native-family correction runs six new fake-native regression cases
+and targeted hierarchy/wall/scope/C01/package checks. See
+[exact results and runtime limits](test-results/m1-native-families-0.5.3.md).
+These checks do not establish actual beam/slab solid readback in Allplan.

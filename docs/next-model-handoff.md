@@ -1,8 +1,8 @@
 # Next-model handoff
 
-## Current handoff — 2026-10-08
+## Current handoff — 2026-10-09
 
-Current package **0.5.2**, profile revision **1.0.2**. Owner preflight
+Current package **0.5.3**, profile revision **1.0.2**. Owner preflight
 `diagnostics-20261008T184008Z.json` **PASS for bounded read-resource binding**:
 bound_for_read, mark/status 5001/5002 (names exact, type 67 string), layers
 3700/3701 (short names SZ_OGÓ01/SZ_OGÓ02, full names Ogólne01/Ogólne02).
@@ -14,15 +14,19 @@ file reassignment resolved the first empty-101 result. Six columns, two S02
 matches, one C01 spatial/height match and 400x400x3000 mm centered C01 agree
 with owner evidence. Broad scan finds only 7 supported roots in 101 (6 columns
 + wall) plus 1 in 102; beams/slab native types/hierarchy remain unresolved.
-Raw context sample includes a slab and component axes. Next: owner runs the
-small **M1 Component Types.cmd** add-on in installed 0.5.2, reading raw types and
-parent roots in 101 without supported-family filtering. No reinstall/full A
-repeat or object rebuild yet. 102 is still active background; C05/S05 has layer
-3700 instead of 3701; C03 is literal <niezdefiniowany> rather than empty. B/C
-pending. [Capture findings](test-results/m1-final-runtime-0.5.2.md),
-[resource evidence](test-results/m1-profile-correction-0.5.2.md),
-[owner card](m1-final-batch.md). Raw new uploads are not published. Preserve
-older ZIPs; no host/runtime code or archive change is made.
+Owner raw-type probe diagnostics-20261008T222009Z.json resolves the gap:
+two SkeletonBeam_TypeUUID roots, each with SkeletonAxis child; MultiSlab_TypeUUID
+root with Slab_TypeUUID child. Six columns + two beams + wall + slab are present.
+0.5.3 adds these exact root families and direct-slab-tier geometry union. Other
+framing/grouped roots stay unsupported; axes never substitute for solid geometry.
+Profile 1.0.2 unchanged. Native identities/hierarchy were observed; beam/slab
+solid readback and full M1 exit gate are still pending. Next: install 0.5.3,
+keep existing objects/resources, set 102 passive/C05 review layer, capture A
+for changed family counts/geometry, then B/C. Do not repeat standalone preflight,
+type probe or accepted older batches. C03 remains literal <niezdefiniowany>, not
+silently normalized to missing. [Correction](test-results/m1-native-families-0.5.3.md),
+[capture findings](test-results/m1-final-runtime-0.5.2.md),
+[owner card](m1-final-batch.md). Raw new uploads are not published; keep old ZIPs.
 
 The initial M0 instructions below are historical. **M0 is closed** on the owner's
 Allplan 2026-1-7 / local Windows Codex setup using package 0.1.2.

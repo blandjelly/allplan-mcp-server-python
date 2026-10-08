@@ -42,8 +42,9 @@ record scope, metadata, pages/full summary and observed-value predicates on two
 native columns. Changed-source staleness and geometry remain separately pending.
 The earlier **0.2.1 context correction batch remains PASS**; do not repeat it.
 [Accepted context evidence](docs/test-results/m1-context-runtime-0.2.1.md).
-Geometry/offset/native counts and the new demo binding have portable evidence
-in 0.5.0; their final Allplan verification remains pending. The demo resources
+0.5.2 native demo binding and bounded column geometry/filter captures pass.
+0.5.3 corrects observed SkeletonBeam/MultiSlab root reads and slab tier geometry;
+final beam/slab counts, display-unit and nonzero-offset acceptance remain pending. The demo resources
 resolve per project after the packaged UI setup, and write eligibility is
 not_checked. M1 is not yet accepted on the full fixture.
 
