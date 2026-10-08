@@ -20,7 +20,7 @@ this acceptance documentation does not rebuild the tested package.
 
 | Gate | Evidence | Result |
 | --- | --- | --- |
-| Context/project/file identity and scope | Accepted [0.2.1 context batch](m1-context-runtime-0.2.1.md); A/B/C foreground 101, explicit unloaded 103 omission; B/C passive 102 | PASS |
+| Context/project/file identity and scope | Accepted [0.2.1 context batch](../next-model-handoff.md#earlier-context-evidence--021); A/B/C foreground 101, explicit unloaded 103 omission; B/C passive 102 | PASS |
 | Fresh demo read resources | Accepted [0.5.2 preflight](m1-profile-correction-0.5.2.md); A/B/C profile bound_for_read | PASS |
 | Native roots and geometry | A diagnostics-20261008T223235Z.json: 10 components in 101, one reference in 102, 17 raw adapters, six child representations deduplicated | PASS |
 | Filters and complete read selections | A/B/C: six file-101 columns, two S02, one C01 spatial/height match; summaries/pages agree with queries | PASS |

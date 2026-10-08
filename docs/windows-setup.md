@@ -1,6 +1,6 @@
 # Windows setup — 0.5.3 evaluation
 
-M0.2 / M0.5. This is a local evaluation package. M0 is accepted on the owner’s Allplan 2026-1-7 setup with local Windows Codex; see [the acceptance record](test-results/m0-acceptance-0.1.2.md). The Linux portable checks are separate evidence. The package does not install or include Allplan, Python, or Codex. Initial setup needs internet access for the pinned external-server dependencies.
+This is a local evaluation package. M0 is accepted on the owner’s Allplan 2026-1-7 setup with local Windows Codex; see [the verified baseline](next-model-handoff.md#verified-baseline). Portable checks are separate evidence. The package does not install or include Allplan, Python, or Codex. Initial setup needs internet access for the pinned external-server dependencies.
 
 **M1 is closed; UAT-02/UAT-03 PASS within the bounded read contract** on
 Allplan 2026-1-7, package 0.5.3 and demo profile revision 1.0.2. Resource binding,

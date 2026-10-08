@@ -1,202 +1,71 @@
 # Allplan MCP Server
 
-FastMCP server that exposes the local Allplan Python host as MCP tools.
+A local FastMCP bridge for working with Allplan 2026 through Codex. The project
+extends an existing PythonPart host into 13 workflow tools for inspecting native
+models, auditing quality, applying controlled repairs, generating structures and
+preparing documentation. The first useful release is context → query → audit →
+previewed attribute/layer repairs. Codex is the first client; MCP contracts stay
+client-neutral for a later Claude integration.
 
-The existing Allplan PythonPart starts a small local HTTP host at `127.0.0.1:5679`.
-This package adds a FastMCP server in front of it, so agents can call MCP tools
-over Streamable HTTP at `/mcp`.
+## Project context
 
-## Windows / Codex evaluation
+Read these files in order when continuing implementation:
 
-Version **0.1.2** prepares reproducible bridge installation and recovery, local Codex
-configuration, read-only runtime diagnostics and a small acceptance batch. Allplan
-baseline is **accepted on Allplan 2026-1-7** with local Windows Codex
-(UAT-00/UAT-01 PASS). [M0 is closed](docs/test-results/m0-acceptance-0.1.2.md);
-workflow toolkit capabilities begin with M1.
+1. [Current handoff](docs/next-model-handoff.md): verified state, limits and next work.
+2. [Architecture](docs/architecture.md): runtime boundary and shared contracts.
+3. [Features](docs/features.md): the 13 tools and demonstration fixture.
+4. [Implementation stages](docs/implementation-plan.md): task IDs and exit gates.
 
-Current package **0.5.3** completes the bounded M1 read implementation: mm
-geometry summaries, declared local/global frames, dimensional/AABB filtering,
-native parent resolution and freshly validated demo resource binding.
-**M1 CLOSED on Allplan 2026-1-7; UAT-02/UAT-03 PASS within the bounded read contract**.
-[Acceptance and exact tested artifact](docs/test-results/m1-acceptance-0.5.3.md).
-The 56 original/14 native-family portable checks remain separate from native evidence.
-[Final owner card](docs/m1-final-batch.md) and
-[completion evidence](docs/test-results/m1-completion-portable-0.5.0.md).
-M1 Profile.cmd checks resources; M1 Final.cmd captures the complete final batch.
-No write workflow is enabled.
+Current package: **0.5.3**, demo profile **1.0.2**. **M0 and bounded M1 are
+accepted** on Allplan **2026-1-7** with local Windows Codex; UAT-00–UAT-03 PASS.
+The demo profile binds freshly for reads and remains inactive for writes.
+[Acceptance and limits](docs/test-results/m1-acceptance-0.5.3.md) cover the known
+fixture, display-unit invariance and nonzero XY offset. M2 audit is next;
+planned audit, repair and generation tools are not implemented.
 
-Earlier package **0.4.0** adds bounded resource metadata inspection and
-**M1 Metadata.cmd**, which saves the full request/response for an active/passive
-attribute comparison. **12 targeted portable checks pass; the bounded owner metadata batch PASS**. [New owner card](docs/m1-metadata-batch.md),
-[portable evidence](docs/test-results/m1-metadata-portable-0.4.0.md),
-[Allplan evidence and limits](docs/test-results/m1-metadata-runtime-0.4.0.md).
-Attribute 498 is observed as Nazwa obiektu; the file-2 passive read omits it,
-while the active-background read returns Słup. No repeat is needed.
+Repository documentation and API identifiers use English. Owner-facing
+walkthroughs may use Polish. The implementation model owns coding, diagnostics,
+packages and automated checks; the owner tests through Codex and the Allplan UI.
+The owner does not edit Python/JSON or research API identifiers.
 
-Package **0.3.0** adds a bounded read-only `model_query`: explicit loaded
-file/passive scope, type/layer/raw-attribute predicates, paginated session
-selections and full-selection summaries with stale-read rejection. **24 relevant
-portable checks pass; three bounded owner query cases PASS**.
-[Contracts](docs/tool-reference.md), [portable evidence](docs/test-results/m1-query-portable-0.3.0.md)
-and [small owner query batch](docs/m1-query-batch.md).
-[0.3.0 runtime evidence and limits](docs/test-results/m1-query-runtime-0.3.0.md)
-record scope, metadata, pages/full summary and observed-value predicates on two
-native columns. Changed-source staleness retains portable evidence; later native
-geometry acceptance is recorded separately below.
-The earlier **0.2.1 context correction batch remains PASS**; do not repeat it.
-[Accepted context evidence](docs/test-results/m1-context-runtime-0.2.1.md).
-0.5.2 native demo binding and bounded column geometry/filter captures pass.
-0.5.3 corrects observed SkeletonBeam/MultiSlab root reads and slab tier geometry;
-bounded native counts/solid readback pass with owner UI confirmation.
-Capture B passes native display-unit read invariance (mm to metres) and verifies
-the corrected passive reference/review layer. Capture C passes nonzero XY offset
-with independent owner UI coordinates and unchanged-appearance confirmation. The demo resources
-resolve per project after the packaged UI setup, and write eligibility is
-not_checked. M1 is accepted for the recorded build/fixture; M2 audit is next.
+## Local Windows setup
 
-- [Windows installation and restore](docs/windows-setup.md)
-- [UAT-00 / UAT-01 prompts and result form](docs/m0-acceptance-batch.md)
-- [Actual task status and evidence](docs/project-status.md)
-- [Version history](docs/changelog.md)
-- [Portable testing and package build](docs/testing.md)
-- [Compatibility and limitations](docs/support-matrix.md)
+Use a versioned evaluation ZIP on the Windows machine running Allplan and Codex.
+It requires external Python 3.11+ and internet access for locked dependencies;
+it does not bundle Allplan, Python or Codex. See the [Windows setup guide](docs/windows-setup.md).
 
-End users use the versioned ZIP and its Explorer launchers. The following source
-setup is for development.
+1. Extract the complete ZIP into a writable, versioned folder. Close Allplan.
+2. Run **Setup.cmd** and select the actual Allplan user `Local` folder, commonly
+   `Documents\Nemetschek\Allplan\2026\Usr\Local`. The installer checks hashes,
+   installs the full bridge and backs up its previous version.
+3. Open Allplan and the intended project. In Library → Private → PythonHost,
+   start **StartPythonHost** and keep it running.
+4. Run **Launch Allplan MCP.cmd**, then **Connect Codex.cmd** and restart Codex.
+   Use a local Windows chat; cloud localhost cannot reach the Windows bridge.
+5. Run **Diagnostics.cmd** for a read-only report in `logs`.
 
-## Setup
+The bridge listens at `http://127.0.0.1:5679`; MCP uses
+`http://127.0.0.1:8888/mcp`. The connection helper preserves existing Codex settings
+and adds `[mcp_servers.allplan_m0]` with that URL. For updates, close Allplan and
+the MCP console, extract a new package and run Setup again. To roll back, close
+both and run **Restore bridge.cmd**, then use the previous package's launcher.
+
+For `host_absent` or `session_unavailable`, open the intended project and restart
+StartPythonHost. For a lost write response (`execution_unknown`), inspect/reconcile
+the model before retrying. Never mix files from different versioned packages.
+
+## Source development
 
 ```bash
-uv sync
+uv sync --frozen
+uv run --frozen allplan-mcp
+uv run --frozen python -m unittest discover -s tests -v
+uv build
+uv run --frozen python utils/build_windows_package.py
 ```
 
-Register the Allplan PythonPart bridge on the Windows machine where Allplan is
-installed:
-
-```cmd
-utils\register_python_host.cmd
-```
-
-By default this copies the bridge to:
-
-```text
-%USERPROFILE%\Documents\Nemetschek\Allplan\2026\Usr\Local\Library\PythonHost
-%USERPROFILE%\Documents\Nemetschek\Allplan\2026\Usr\Local\PythonPartsScripts\PythonHost
-```
-
-For a different Allplan version:
-
-```cmd
-utils\register_python_host.cmd --allplan-version 2025
-```
-
-In Allplan, start the `StartPythonHost` PythonPart after registration. It must
-keep running while the MCP server is being used.
-
-## Run locally
-
-```bash
-uv run allplan-mcp
-```
-
-By default this starts the MCP server at:
-
-```text
-http://127.0.0.1:8888/mcp
-```
-
-Useful environment variables:
-
-```bash
-ALLPLAN_HOST_URL=http://127.0.0.1:5679
-MCP_HOST=127.0.0.1
-MCP_PORT=8888
-MCP_PATH=/mcp
-```
-
-## Tools
-
-- `allplan_health`: checks whether the Allplan host is reachable.
-- `get_allplan_version`: returns the running Allplan version.
-- `get_all_object_names`: returns display names for elements in the current document.
-- `get_model_context`: bounded read-only context/identity probe; missing reads are explicit.
-- `model_query`: typed read-only query/page/summary with explicit file scope; [contract and limits](docs/tool-reference.md).
-- `create_cube`: creates a cube in the current document.
-- `create_box`: creates a rectangular cuboid in the current document.
-- `execute_python`: optional development tool, registered only when
-  `ALLPLAN_MCP_ENABLE_PYTHON_EXEC=1`; the Allplan process must also opt in.
-
-## Skill resources
-
-Bundled skills are also exposed through MCP resources so clients can discover and read
-them through the protocol.
-
-Simple folder layout:
-
-```text
-src/allplan_mcp/allplan_skills/
-  api-reference/
-    SKILL.md
-    assets/
-    scripts/
-  geometry/
-    SKILL.md
-    assets/
-    scripts/
-  rebar/
-    SKILL.md
-    assets/
-    scripts/
-  utilities/
-    SKILL.md
-    assets/
-    scripts/
-```
-
-Resource URIs:
-
-- `allplan://skills`
-- `allplan://skills/api-reference`
-- `allplan://skills/geometry`
-- `allplan://skills/rebar`
-- `allplan://skills/utilities`
-- `allplan://skills/{skill_name}/assets/{asset_name}`
-- `allplan://skills/{skill_name}/scripts/{script_name}`
-
-The scripts are simple templates. They are meant to guide generated code and do not
-depend on cross imports between skill folders.
-
-## Notes
-
-- [POST execution exploration](docs/post-execution-exploration.md)
-
-## Development roadmap
-
-The Allplan 2026 workflow toolkit is planned incrementally, starting with native
-model queries, audits, and controlled cleanup through Codex. The following are
-planning artifacts; they do not describe already implemented tools:
-
-- [Implementation plan](docs/implementation-plan.md)
-- [Next-model handoff](docs/next-model-handoff.md)
-- [Demo profile and owner-built model](docs/demo-model-and-profile.md)
-- [Manual acceptance tests](docs/manual-acceptance-tests.md)
-
-## Development execution
-
-Python execution is disabled by default on the host and omitted from the MCP tool
-catalog. The evaluation launcher explicitly disables it. Developers may opt in
-separately in the Allplan process and MCP process for local experiments.
-
-Behavior:
-
-- With the host opt-in, the raw Allplan bridge accepts `POST /execute-python`
-- With the MCP opt-in, the external server exposes `execute_python(...)`
-- The endpoint remains bound to `127.0.0.1`
-- Imports are blocked by AST validation
-- Private and dunder attribute access is blocked by AST validation
-- Only a restricted builtin whitelist is available at runtime
-
-AST filtering is not a process isolation boundary. It grants access to live
-Allplan API objects. Do not expose this development path through a tunnel or a
-shared agent setup. Production workflows use typed handlers. See the
-[execution boundary](docs/post-execution-exploration.md).
+For source registration on Windows, use `utils\register_python_host.cmd`.
+External-server dependencies stay outside Allplan's embedded Python. Environment
+settings: `ALLPLAN_HOST_URL`, `ALLPLAN_HOST_TIMEOUT`, `MCP_HOST`, `MCP_PORT`,
+`MCP_PATH`. Development Python execution requires opt-in on both runtimes; see
+[architecture](docs/architecture.md).
