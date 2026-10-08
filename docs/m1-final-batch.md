@@ -7,8 +7,9 @@ standalone demo read-resource binding preflight passed on 2026-10-08;
 [bounded evidence](test-results/m1-profile-correction-0.5.2.md).
 The latest 0.5.3 capture A **passes bounded native component/solid read checks**:
 10 components in 101, one reference in 102; six columns/two S02/one C01;
-both beam solids and slab-tier bounds are readable. Independent owner beam/slab
-UI dimensions/unchanged appearance confirmation remains requested and pending.
+both beam solids and slab-tier bounds are readable. Owner independently
+confirms matching beam/slab UI dimensions and unchanged appearance; bounded
+A geometry/hierarchy is accepted with the setup exceptions below.
 [Native evidence](test-results/m1-native-families-0.5.3.md).
 Keep the installed 0.5.3 package and model geometry. Correct file 102 to passive
 and C05/S05 to SZ_OGÓ02, then continue B/C without another full A. These declared

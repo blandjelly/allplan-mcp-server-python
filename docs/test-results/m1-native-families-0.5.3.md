@@ -124,3 +124,12 @@ Keep the model geometry and 0.5.3 installation; continue B/C using M1 Final.cmd.
 No standalone profile/type probe, runtime code/archive change or repeated
 automated test accompanies this evidence record. Raw diagnostics/private paths
 are not published.
+
+### Owner UI confirmation — 2026-10-09
+
+Owner confirms that all elements remained visually unchanged during A and the
+UI beam cross-sections 300x500 mm/slab dimensions 4000x4000x200 mm agree with
+the readback. This closes the requested independent appearance/dimension check
+for A. The bounded A geometry/hierarchy gate is accepted with the recorded
+102-state/C05-layer setup exceptions; those corrections are checked in B.
+Full M1 remains pending B/C; no native write eligibility is inferred.

@@ -38,8 +38,8 @@ name setup issue is resolved. These IDs are context observations, not constants.
 Write eligibility remains not_checked; geometry/hierarchy/display-unit/offset
 and full M1 runtime acceptance remain pending. The latest 0.5.3 A capture
 passes bounded ten-component/native-solid reads, including both SkeletonBeam
-roots and MultiSlab tier geometry. Owner UI confirmation of beam/slab dimensions
-and unchanged appearance is pending. Keep installation/model geometry; correct
+roots and MultiSlab tier geometry. Owner confirms matching beam/slab UI
+dimensions and unchanged appearance; bounded A geometry/hierarchy is accepted. Keep installation/model geometry; correct
 102 passive/C05 review layer, then B/C. No full A, standalone profile/type probe
 or previously accepted old batch repeat. Record setup changes separately when
 comparing B with A file-101 geometry.
@@ -54,8 +54,8 @@ geometry/hierarchy/profile changes and retain read-only session binding.
 [final UAT-02/UAT-03 card](m1-final-batch.md).
 
 **M1 exit gate remains pending**: 0.5.3 bounded native component/solid reads
-and demo resource binding pass; display-unit/nonzero-offset captures and final
-owner UI confirmation remain pending.
+and demo resource binding pass with owner UI confirmation; display-unit and
+nonzero-offset captures remain pending.
 Persistence/write eligibility belong to downstream mutation work; no write
 profile is activated. The server resolves real project IDs after UI setup;
 missing resources block the query instead of guessing.

@@ -8,9 +8,9 @@ diagnostics-20261008T223235Z.json **PASS for bounded component/solid read checks
 in 102, six child representations deduplicated, readable geometry throughout.
 Columns/S02/C01 counts 6/2/1; C01 400x400x3000 mm centered XY=(0,0), beams
 6000x300x500 and slab 4000x4000x200 mm. Query/summary/pages and zero-offset
-local/global boxes agree. Profile binding/integrity pass. Independent owner UI
-confirmation of beam/slab dimensions and unchanged appearance is requested and
-pending; display-unit/nonzero-offset and full M1 exit gate remain pending.
+local/global boxes agree. Profile binding/integrity pass. Owner independently confirms unchanged appearance and matching beam/slab UI
+dimensions. Bounded A geometry/hierarchy gate accepted with the recorded setup
+exceptions; display-unit/nonzero-offset and full M1 exit gate remain pending.
 
 Next: keep installation/geometry, correct 102 to passive and C05/S05 to SZ_OGÓ02,
 then capture B (metres display) and C (separate nonzero-offset copy). No full A
