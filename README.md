@@ -45,7 +45,9 @@ The earlier **0.2.1 context correction batch remains PASS**; do not repeat it.
 0.5.2 native demo binding and bounded column geometry/filter captures pass.
 0.5.3 corrects observed SkeletonBeam/MultiSlab root reads and slab tier geometry;
 bounded native counts/solid readback pass with owner UI confirmation.
-Display-unit and nonzero-offset captures remain pending. The demo resources
+Capture B passes native display-unit read invariance (mm to metres) and verifies
+the corrected passive reference/review layer. Nonzero-offset capture C and final
+owner UI observations remain pending. The demo resources
 resolve per project after the packaged UI setup, and write eligibility is
 not_checked. M1 is not yet accepted on the full fixture.
 

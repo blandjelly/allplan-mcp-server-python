@@ -35,14 +35,16 @@ MCP_QA_MARK/MCP_QA_STATUS IDs 5001/5002 with exact names and string type 67;
 SZ_OGÓ01/SZ_OGÓ02 IDs 3700/3701 with exact short-name round trips. Installed
 integrity and transport verified. The group-versus-definition/full-versus-short-
 name setup issue is resolved. These IDs are context observations, not constants.
-Write eligibility remains not_checked; geometry/hierarchy/display-unit/offset
-and full M1 runtime acceptance remain pending. The latest 0.5.3 A capture
-passes bounded ten-component/native-solid reads, including both SkeletonBeam
-roots and MultiSlab tier geometry. Owner confirms matching beam/slab UI
-dimensions and unchanged appearance; bounded A geometry/hierarchy is accepted. Keep installation/model geometry; correct
-102 passive/C05 review layer, then B/C. No full A, standalone profile/type probe
-or previously accepted old batch repeat. Record setup changes separately when
-comparing B with A file-101 geometry.
+Write eligibility remains not_checked. Native 0.5.3 A geometry/hierarchy reads
+pass for ten components in 101, including both SkeletonBeam roots and MultiSlab
+tier geometry; owner confirms matching beam/slab UI dimensions and unchanged
+appearance. Native B display-unit read invariance **PASS**: input mm to metres,
+exactly equal canonical geometry/identities/counts in all five queries. B verifies
+102 passive and C05/S05 review layer; those setup corrections are recorded
+separately. Keep installation/model geometry and original baseline; only the
+separate nonzero-offset C capture and final owner UI observations remain.
+No A/B, standalone profile/type probe or accepted old batch repeat.
+
 [Native-family correction](test-results/m1-native-families-0.5.3.md).
 [Correction and bounded runtime evidence](test-results/m1-profile-correction-0.5.2.md).
 [Follow-up evidence](test-results/m1-profile-followup-0.5.1.md).
@@ -54,8 +56,9 @@ geometry/hierarchy/profile changes and retain read-only session binding.
 [final UAT-02/UAT-03 card](m1-final-batch.md).
 
 **M1 exit gate remains pending**: 0.5.3 bounded native component/solid reads
-and demo resource binding pass with owner UI confirmation; display-unit and
-nonzero-offset captures remain pending.
+and demo resource binding pass with owner A UI confirmation; B display-unit
+read invariance and fixture corrections pass. Nonzero-offset C and final owner
+UI observations remain pending.
 Persistence/write eligibility belong to downstream mutation work; no write
 profile is activated. The server resolves real project IDs after UI setup;
 missing resources block the query instead of guessing.
@@ -95,10 +98,10 @@ No repeat of the correction batch is needed.
 
 | Task | Current state | Evidence / remaining scope |
 | --- | --- | --- |
-| M1.1 | Implemented; final runtime gate pending | Explicit scope/session/model identity, passive handling, mm/frame transform and configured-level provenance. Raw context/session behavior accepted; nonzero-offset/native geometry still needs owner evidence. Durable/write authorization is not claimed. |
-| M1.2 | Implemented; bounded old batch PASS | Typed scalar/dimensional/AABB predicates and four-family top-level parent resolution implemented. New geometry/native counts have portable evidence and final Allplan gate pending. |
+| M1.1 | Implemented; final runtime gate pending | Explicit scope/session/model identity, passive handling, mm/frame transform and configured-level provenance. Raw context/session, native geometry and B display-unit reads accepted; nonzero-offset C needs owner evidence. Durable/write authorization is not claimed. |
+| M1.2 | Implemented; bounded native A/B read gates PASS | Typed scalar/dimensional/AABB predicates and six-family top-level parent resolution. Native ten-component geometry/counts and display-unit invariance pass; full M1 waits for C/UI observations. |
 | M1.3 | Implemented; unchanged-source runtime PASS | Full cached selections/page/summary and geometry/hierarchy/profile-sensitive revalidation implemented. Changed-source staleness, TTL/eviction/restart retain portable evidence. Downstream mutation/persistence is deferred. |
-| M1.4 | Implemented read binding; fixture runtime pending | Versioned demo schema and fresh name/type/ID/layer round trips, configured levels, exact UI recipe and diagnostic batch implemented. Actual named resources and full fixture need owner evidence; write eligibility remains not_checked. |
+| M1.4 | Implemented; bounded demo read binding PASS | Actual named resources bind for reads; B verifies both fixture layers/reference state. Configured levels are not native BWS. Write eligibility remains not_checked; full M1 waits for C/UI observations. |
 
 **24 relevant portable checks PASS** on Linux/Python 3.12.14/FastMCP 3.2.4:
 21 new query contract/fake-adapter checks, one new real MCP transport check,
@@ -120,14 +123,12 @@ The report states no model changes; independent geometry/visual readback is not
 claimed. Static runtime_verified=false is not an acceptance registry.
 [0.3.0 runtime record](test-results/m1-query-runtime-0.3.0.md).
 
-Next: obtain the remaining 0.5.0 final fixture/display-unit/nonzero-offset
-captures, interpret them against the documented gate, and fix any native read
-failures before accepting full M1. Then proceed to M2 audit. The
-[0.4.0 metadata batch](m1-metadata-batch.md) is complete within its scope; no
-repeat or extra capture is required. Do not repeat the passed
-[0.3.0 query batch](m1-query-batch.md) without a relevant change or defect. Complete
-M1.4 binding from verified resources before the six-column/ten-component UAT.
-The demo profile remains **unbound and inactive**; **M1 is not accepted**.
+Next: obtain only the remaining 0.5.3 nonzero-offset capture C and independent
+UI observations, interpret them against the documented gate, and fix any native
+frame discrepancy before accepting full M1. Then proceed to M2 audit. Do not
+repeat accepted 0.2.1/0.3.0/0.4.0 batches, preflight, component-type probe or A/B
+without a relevant change or defect. The demo profile is **bound_for_read** and
+**inactive for writes**; **full M1 is not accepted**.
 
 ## First final capture A — 2026-10-08
 

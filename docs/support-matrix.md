@@ -5,7 +5,8 @@ owner's Windows setup with local Codex. UAT-00 and UAT-01 PASS; M0 is closed.
 [Acceptance record and exact artifact](test-results/m0-acceptance-0.1.2.md).
 This is evidence for the tested setup, not every Allplan 2026 hotfix or client.
 
-Current package **0.5.0** implements the remaining bounded M1 read contract.
+Current package **0.5.3** includes the bounded M1 read contract implemented in 0.5.0
+and the observed native-family correction.
 **56 targeted portable checks PASS; final Allplan exit gate pending**.
 [Completion evidence](test-results/m1-completion-portable-0.5.0.md),
 [final card](m1-final-batch.md). Fake geometry does not accept native coordinates
@@ -38,7 +39,7 @@ Accepted 0.1.2 evidence does not automatically accept the new package.
 
 | Capability | Evidence | Limit |
 | --- | --- | --- |
-| M1 dimensional/AABB/frame queries | 0.5.0 portable contracts/native-reader checks and 2026 signatures | 0.5.2 column read agrees with owner UI; 0.5.3 beam/slab solids readable. Owner confirms matching beam/slab UI dimensions and unchanged appearance. Display-unit/nonzero-offset acceptance pending. BBoxes are broad phase and axis aligned, not native rotated cross-sections or exact solid intersections. |
+| M1 dimensional/AABB/frame queries | 0.5.0 portable contracts/native-reader checks and 2026 signatures; 0.5.3 native A/B read gates PASS | Owner confirms A beam/slab UI dimensions and unchanged appearance. B mm-to-metres display change preserves all canonical boxes/dimensions and result identities. Nonzero-offset C and final owner UI observations pending. BBoxes are broad phase and axis aligned, not native rotated cross-sections or exact solid intersections. |
 | M1 top-level native components | 0.5.0 parent-chain/cycle/scope checks; 0.5.3 observed-type fixture regressions | Six root types: original four plus SkeletonBeam and MultiSlab. Child axes/tiers map to roots; no arbitrary framing/group hierarchy support. 0.5.3 native ten-component count/read PASS for the bounded owner tree. Other hierarchy shapes remain unverified. |
 | M1 demo read profile and configured levels | 0.5.0 schema and fresh resource round-trip checks, packaged template/UI recipe | 0.5.2 native read binding PASS for demo text attributes and owner layers. Profile-unbound errors block reads. Native BWS, writability, active repair/audit profile and full fixture acceptance pending. |
 | Resource metadata inspection / captured query responses | 0.4.0 bounded Allplan batch PASS: complete inspect JSON, attribute 498 Nazwa obiektu with raw codes 67/69, layer 3736 AR_SŁUP, passive omission versus active Słup | Two known columns only; sessions also changed. No universal passive-access rule, normalized units, semantic binding or profile activation. |

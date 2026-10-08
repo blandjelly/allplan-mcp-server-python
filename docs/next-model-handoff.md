@@ -2,25 +2,33 @@
 
 ## Current handoff — 2026-10-09
 
-Current package **0.5.3**, profile revision **1.0.2**. Latest native capture A
-diagnostics-20261008T223235Z.json **PASS for bounded component/solid read checks**:
+Current package **0.5.3**, profile revision **1.0.2**. Native capture A
+diagnostics-20261008T223235Z.json passes bounded geometry/hierarchy reads:
 10 roots in 101 (6 columns + 2 SkeletonBeam + wall + MultiSlab), one reference
 in 102, six child representations deduplicated, readable geometry throughout.
 Columns/S02/C01 counts 6/2/1; C01 400x400x3000 mm centered XY=(0,0), beams
-6000x300x500 and slab 4000x4000x200 mm. Query/summary/pages and zero-offset
-local/global boxes agree. Profile binding/integrity pass. Owner independently confirms unchanged appearance and matching beam/slab UI
-dimensions. Bounded A geometry/hierarchy gate accepted with the recorded setup
-exceptions; display-unit/nonzero-offset and full M1 exit gate remain pending.
+6000x300x500 and slab 4000x4000x200 mm. Owner independently confirms unchanged
+appearance and matching beam/slab UI dimensions in A.
 
-Next: keep installation/geometry, correct 102 to passive and C05/S05 to SZ_OGÓ02,
-then capture B (metres display) and C (separate nonzero-offset copy). No full A
-repeat needed. Compare B's same file-101 identities/geometry with A and explicitly
-record the C05 layer/reference-state setup changes separately from display-unit
-invariance. B checks the corrected state/layer/passive reference. C03 remains
-literal <niezdefiniowany> with no silent missing-value normalization. Do not repeat
-standalone profile/type probes or accepted old batches. Supported new roots are
-exactly SkeletonBeam and MultiSlab; other framing/grouped families remain outside
-scope. [Native evidence](test-results/m1-native-families-0.5.3.md),
+Capture B diagnostics-20261008T224141Z.json **PASS for bounded native display-unit
+read invariance**. Input-length enum changes 0 to 3 (mm to metres); all five
+queries retain exactly equal canonical geometry, result identities/type IDs and
+counts. Query/summary/pages agree within each capture. Profile binding/integrity
+pass. Declared setup corrections are verified separately: 102 is now passive,
+C05/S05 uses bound review layer SZ_OGÓ02 (3701); all other column fields match A.
+103 remains explicitly unloaded. Full M1 exit gate remains pending C and final
+owner UI observations; unchanged appearance in B is not independently reported.
+
+Next: keep installation/geometry and original zero-offset baseline; **C only**,
+on a separate saved project copy with offset X=100000/Y=200000/Z=0 mm. Collect
+C's M1 Final.cmd report plus independent UI offset values/unit, C01 coordinates/
+unit, B/C unchanged-appearance and retained-baseline confirmation. Restart the
+host after setup changes. Do not infer nonzero-offset source-frame semantics
+from portable arithmetic; compare C with the documented transform and UI values.
+No A/B, standalone profile/type probe, reinstall or accepted old batch repeat.
+C03 remains literal <niezdefiniowany>; no silent missing-value normalization.
+Supported new roots are exactly SkeletonBeam and MultiSlab; other framing/grouped
+families remain outside scope. [Native evidence](test-results/m1-native-families-0.5.3.md),
 [owner card](m1-final-batch.md). Raw new uploads are not published; old ZIPs intact.
 
 The initial M0 instructions below are historical. **M0 is closed** on the owner's
@@ -41,8 +49,8 @@ M1 exit gate is pending final Allplan evidence.
 [Completion evidence](test-results/m1-completion-portable-0.5.0.md),
 [final card and concrete UI recipe](m1-final-batch.md). M1 Profile.cmd checks
 named resources and M1 Final.cmd saves responses, summaries and bounded pages.
-Do not claim the API model-local/nonzero-offset convention or ten-component
-fixture accepted from fake geometry tests.
+The ten-component gate is now accepted from native A/B evidence. Do not claim
+the API nonzero-offset convention accepted from fake geometry tests.
 
 Earlier **0.4.0** adds typed `model_query` action `inspect`,
 bounded raw samples and attribute/layer metadata with per-field observations.
@@ -71,8 +79,9 @@ readback is not claimed. [Runtime evidence and limits](test-results/m1-query-run
 [small owner card](m1-query-batch.md). No repeat is needed without a relevant
 change/defect. Changed-source staleness and TTL/restart retain portable evidence.
 
-The bounded M1 implementation is complete; geometry/frame/native hierarchy
-and demo-resource/fixture **runtime acceptance remains pending**. Native BWS
+The bounded M1 implementation is complete; native geometry/hierarchy, demo read
+binding and display-unit invariance pass for the owner fixture. Nonzero-offset
+C and final UI observations remain pending. Native BWS
 levels are not claimed; the optional profile explicitly supplies configuration.
 Selections remain memory-only/session-bound read evidence; durable references
 and mutation eligibility are not established. The demo binds freshly for reads
@@ -86,8 +95,8 @@ hashes; build any further runtime changes under a new package version. The
 earlier 31-test baseline and new targeted checks are separate records; the full
 historical suite was not rerun for this slice. Allplan runtime evidence is separate.
 
-Next: evaluate the 0.5.0 final card preflight and A/B/C fixture captures, fix
-any native read/frame discrepancy, then close M1 only with linked runtime
+Next: evaluate the remaining 0.5.3 capture C and independent UI observations,
+fix any native frame discrepancy, then close M1 only with linked runtime
 evidence. Continue M2 after that read foundation is accepted. Attribute 498 was observed on file 1
 but returned missing on passive file 2; do not infer native absence or mark
 binding without further evidence. Do not ask the owner to research identifiers

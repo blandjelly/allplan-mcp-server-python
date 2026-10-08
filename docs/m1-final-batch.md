@@ -9,13 +9,14 @@ The latest 0.5.3 capture A **passes bounded native component/solid read checks**
 10 components in 101, one reference in 102; six columns/two S02/one C01;
 both beam solids and slab-tier bounds are readable. Owner independently
 confirms matching beam/slab UI dimensions and unchanged appearance; bounded
-A geometry/hierarchy is accepted with the setup exceptions below.
+A geometry/hierarchy is accepted; its setup exceptions were corrected in B.
 [Native evidence](test-results/m1-native-families-0.5.3.md).
-Keep the installed 0.5.3 package and model geometry. Correct file 102 to passive
-and C05/S05 to SZ_OGÓ02, then continue B/C without another full A. These declared
-state/layer setup changes are recorded separately from display-unit changes;
-compare file-101 identities and geometry to the saved A capture. B validates
-corrected state/layer/passive reference access as well as display-unit invariance.
+Capture B diagnostics-20261008T224141Z.json **passes bounded native display-unit
+read invariance**: enum 0 to 3 (mm to metres), identical canonical geometry,
+identities and counts across all five queries. Both setup corrections are now
+verified: 102 passive and C05/S05 on SZ_OGÓ02. Keep the installed 0.5.3 package
+and model geometry; continue **C only**, without repeating A/B or reinstalling.
+Include independent unchanged-appearance confirmation for B with C's UI values.
 No standalone profile/type probe or accepted owner batch needs repetition.
 
 No model edits are made by either packaged diagnostic command. Audit/repair
@@ -109,6 +110,7 @@ The reference columns are outside the demo uniqueness scope.
 
 ## Three final captures
 
+**A/B read checks are complete; only C remains.** Keep the earlier reports.
 Start StartPythonHost after each setup change. Run **M1 Final.cmd** for each
 capture below and retain the resulting `logs/diagnostics-*.json`. It runs six
 packaged read requests with full responses, summaries and bounded page traversal:
@@ -135,7 +137,8 @@ geometry gate not_checked, even if some counts happen to match.
 
 Reset: keep the original zero-offset baseline, restore preferred display units,
 and leave reference file 102 passive and 103 unloaded. No cleanup or repair is
-requested. Submit the preflight JSON, A/B/C JSON and this short result form:
+requested. Preflight/A/B reports are already supplied; submit C's JSON and the
+remaining UI observations from this short result form:
 
 ```text
 Package: 0.5.3
@@ -143,7 +146,7 @@ Allplan UI build: [actual]
 Preflight / capture A / B / C filenames: [...]
 All columns/components visibly unchanged during captures: yes / no / not checked
 C01 UI dimensions: [..., with unit]
-C01 UI coordinates and displayed unit in offset copy: [...]
+C01 UI coordinates, measured point and displayed unit in offset copy: [...]
 Offset UI values and unit: [...]
 Original baseline retained; reference 102 passive / 103 unloaded: yes / no
 Unexpected counts, read failures or UI behavior: [...]

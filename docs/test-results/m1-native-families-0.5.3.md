@@ -47,6 +47,10 @@ previous TestCase into automatic discovery.
 
 ## Owner next action
 
+The steps below describe the original delivery. A and B now pass their bounded
+read gates, as recorded below. Only C and the remaining owner UI observations
+are requested; keep the installed artifact and do not repeat A/B or preflight.
+
 Install 0.5.3 in a new folder with Allplan/MCP closed. Preserve the existing
 fixture, structural beams, slab and bound resources; no rebuild is required.
 Restore 102 passive, 101 foreground, 103 unloaded; C05/S05 must use SZ_OGÓ02.
@@ -133,3 +137,40 @@ the readback. This closes the requested independent appearance/dimension check
 for A. The bounded A geometry/hierarchy gate is accepted with the recorded
 102-state/C05-layer setup exceptions; those corrections are checked in B.
 Full M1 remains pending B/C; no native write eligibility is inferred.
+
+## Native capture B display-unit invariance PASS — 2026-10-09
+
+Owner upload diagnostics-20261008T224141Z.json uses the same verified 0.5.3
+bridge/source payload and the same six requests as A. The observed input-length
+enum changes from 0 (millimetres) to 3 (metres); raw project offset remains zero.
+Direct A/B comparison by file/model identity finds exactly equal canonical
+bounding boxes and requested size fields for every result in all five queries,
+including local and global queries. No tolerance adjustment is needed.
+
+| Native B read check | Result |
+| --- | --- |
+| Broad roots / file-101 roots / profile columns / S02 / C01 | 11 / 10 / 6 / 2 / 1 |
+| Same result identities, type IDs and canonical geometry as A | PASS in all five queries |
+| Query/summary/page consistency within B | counts, coverage, fingerprints, selection/session IDs and result IDs agree |
+| Requested geometry fields / read-error counters | complete / zero |
+| Corrected reference file 102 | passive_background; one readable reference |
+| Corrected C05/S05 layer | 3701, bound review layer SZ_OGÓ02 |
+| Excluded file 103 | explicit unloaded_or_unavailable omission |
+| Fresh profile binding | bound_for_read; write eligibility not_checked |
+
+The only changed profile-column field is S05 layer_id 3700 to 3701. Together
+with 102 active_background to passive_background, these are the declared fixture
+setup corrections, separate from display-unit invariance. Marks/statuses and
+all other column fields are unchanged, including C03's literal undefined text.
+The broad scope is intentionally incomplete because 103 is unloaded; file-101
+scans remain complete. Changing host/query sessions is expected after restart;
+cross-capture fingerprints are not required to agree after setup changes.
+
+This closes the bounded native display-unit read gate and both setup exceptions.
+It is analysis of owner Allplan captures, not another portable automated test
+run. Independent unchanged-appearance confirmation for B has not been supplied;
+retain that distinction and request it with C's UI observations. Full M1 remains
+pending the separate nonzero-offset copy, independent UI offset/coordinate values
+and final owner appearance/baseline confirmation. No runtime code, archive or
+static runtime_verified flag changes; no accepted test is repeated. Raw reports,
+owner environment paths and model/session identifiers are not published.
