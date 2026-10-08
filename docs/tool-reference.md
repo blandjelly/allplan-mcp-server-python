@@ -174,7 +174,8 @@ Passive native absence remains `not_checked`; null, empty string and zero retain
 their observed raw values. No fallback read changes state or creates attributes.
 `runtime_verified=false`, `usable_for_write=false`, `profile_binding=not_checked`
 remain explicit. Units are metadata strings without conversion. The demo
-profile remains unbound. [Owner card](m1-metadata-batch.md) has bounded PASS
+binding is not established by metadata inspection. The separate profile action
+freshly resolves resources for reads. [Owner card](m1-metadata-batch.md) has bounded PASS
 [Allplan evidence](test-results/m1-metadata-runtime-0.4.0.md); these static flags
 are not an acceptance registry.
 
@@ -208,9 +209,11 @@ coordinate_frame defaults to model_local; project_global adds the project offset
 once. Source coordinates and offset use the declared API-mm/model-local
 convention; display units are not used as a scaling factor. Conversion metadata
 preserves source API, source frame, offset, applied flag and runtime_verified=false.
-The explicit arithmetic has portable evidence. The **native source convention,
-physical unit invariance and nonzero-offset interpretation require the final
-Allplan gate** and must not be assumed accepted from arithmetic tests. ModelContext
+The explicit arithmetic has portable evidence. The native source convention,
+display-unit invariance and nonzero XY offset passed A/B/C plus independent
+owner UI observations on Allplan 2026-1-7; see [acceptance and limits](test-results/m1-acceptance-0.5.3.md).
+Nonzero Z offsets remain untested. The static runtime_verified annotation is
+unchanged; acceptance applies to the recorded build/fixture. ModelContext
 retains raw offset/input-unit observations; geometry queries supply the canonical
 summaries. No angular/orientation/native-level geometry reader is claimed.
 
@@ -226,12 +229,13 @@ reused pages/summary. Budget failure creates no partial selection.
 ## Validated demo profile and configured levels
 
 The packaged allplan://profiles/native-model-qa-demo resource is schema
-m1-profile-1, version 1.0.0. It validates the four future QA rule references,
+m1-profile-1, version 1.0.2. It validates the four future QA rule references,
 explicit units/frame, family GUID, file scope, resource names/types and tolerance.
 No M2 audit or M3 repair is implemented by this read profile.
 
 model_query action=profile, profile_id=native-model-qa-demo freshly resolves
-MCP_QA_MARK / MCP_QA_STATUS and MCP_QA_STRUCTURE / MCP_QA_REVIEW. Positive IDs,
+MCP_QA_MARK / MCP_QA_STATUS and layer short names SZ_OGÓ01 (structure) /
+SZ_OGÓ02 (review). Positive IDs,
 exact name/short-name round trips, distinct resources and the expected observed
 string type code are required. Attribute 498 remains Object_name; it is not a
 mark binding. No resource is created. Missing/incompatible definitions return

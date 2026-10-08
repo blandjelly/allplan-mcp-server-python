@@ -66,16 +66,22 @@ class RegistrationTests(unittest.TestCase):
         registration.register(self.repo, self.local)
         pyp = self.local / "Library/PythonHost/StartPythonHost.pyp"
         pyp.write_text("previous palette")
+        scripts = self.local / "PythonPartsScripts/PythonHost"
+        (scripts / "previous.py").write_text("previous script")
+        current = self.local / registration.STATE_FOLDER / "current.json"
+        before = current.read_bytes()
         original = registration.shutil.copytree
         def fail_second_tree(source, destination, *args, **kwargs):
-            if "stage-" in str(source) and str(destination).endswith("PythonPartsScripts/PythonHost"):
+            if Path(source).parent.parent.name.startswith("stage-") and Path(destination).resolve() == scripts.resolve():
                 raise OSError("simulated copy failure")
             return original(source, destination, *args, **kwargs)
         with patch.object(registration.shutil, "copytree", side_effect=fail_second_tree):
             with self.assertRaisesRegex(OSError, "simulated"):
                 registration.register(self.repo, self.local)
         self.assertEqual(pyp.read_text(), "previous palette")
+        self.assertEqual((scripts / "previous.py").read_text(), "previous script")
         self.assertTrue((self.local / "PythonPartsScripts/PythonHost/sandbox/executor.py").exists())
+        self.assertEqual(current.read_bytes(), before)
 
     def test_dry_run_does_not_create_installation_or_state(self):
         registration.register(self.repo, self.local, dry_run=True)
@@ -136,7 +142,8 @@ class RegistrationTests(unittest.TestCase):
         installed = self.local / "Library/PythonHost/StartPythonHost.pyp"
         self.assertTrue(installed.is_file())
         self.assertFalse(legacy.exists())
-        self.assertEqual(Path(result["pythonpart_path"]), installed)
+        # Windows may return the long name for a temporary path using an 8.3 alias.
+        self.assertTrue(Path(result["pythonpart_path"]).samefile(installed))
         self.assertEqual(other.read_text(), "unrelated")
         backup = self.local / registration.STATE_FOLDER / "backups" / result["backup_id"]
         record_path = backup / "backup.json"

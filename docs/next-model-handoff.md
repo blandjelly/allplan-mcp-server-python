@@ -5,10 +5,9 @@
 ### Checkout and reading order
 
 The completed M1 code and acceptance docs are on branch
-`codex/m1-scope-model-query`, pushed to origin, in open **draft**
+`codex/m1-scope-model-query`, pushed to origin, in open
 [PR #1](https://github.com/blandjelly/allplan-mcp-server-python/pull/1).
-At this handoff, it is **not merged**: PR base/main is
-`d8bd1ef8388daa956e8b51863b17ac33d784dca9`; closure is recorded in
+At this handoff, it is **not merged**: closure is recorded in
 `c6d82867e67342d2b145513bf816eea8bdfa8be7`, followed by documentation updates.
 Recheck remote/PR state before editing. Continue from the latest M1 branch, or
 from main only after it contains this work; starting solely from the current

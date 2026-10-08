@@ -28,7 +28,7 @@ nor upstream reports a license and none was invented. [Support matrix](support-m
 
 ## Current M1 implementation and next action
 
-Integration: completed M1 is pushed on `codex/m1-scope-model-query` in open draft
+Integration: completed M1 is pushed on `codex/m1-scope-model-query` in open
 [PR #1](https://github.com/blandjelly/allplan-mcp-server-python/pull/1), not yet
 merged into main at this handoff. Closure commit
 `c6d82867e67342d2b145513bf816eea8bdfa8be7`; subsequent documentation updates
