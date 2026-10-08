@@ -1,6 +1,8 @@
 # M1 observed native-family correction — 0.5.3
 
-2026-10-09 (Europe/Warsaw). Full M1 exit gate remains pending. Sanitized
+2026-10-09 (Europe/Warsaw). M1 is now closed by the subsequent
+[A/B/C acceptance record](m1-acceptance-0.5.3.md). Earlier pending states below
+describe the evidence available at each step. Sanitized
 technical findings only; no raw diagnostics/environment paths are published.
 
 ## Owner native evidence, separate from portable tests
@@ -174,3 +176,12 @@ pending the separate nonzero-offset copy, independent UI offset/coordinate value
 and final owner appearance/baseline confirmation. No runtime code, archive or
 static runtime_verified flag changes; no accepted test is repeated. Raw reports,
 owner environment paths and model/session identifiers are not published.
+
+## Subsequent native capture C and owner confirmation
+
+diagnostics-20261008T225219Z.json passes the nonzero-offset gate, with unchanged
+dimensions/counts, local boxes and scalar fields; all ten global boxes add
+(100000,200000,0) mm exactly once. The owner independently reports offset
+100/200 m and C01 base-section center 100/200/0 m, confirms B/C unchanged
+appearance and the retained original baseline. **M1 closed**, with the exact
+scope, numerical residuals and remaining limits in the linked acceptance record.

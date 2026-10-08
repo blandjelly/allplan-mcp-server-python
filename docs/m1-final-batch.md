@@ -1,23 +1,13 @@
 # Final M1 owner verification — 0.5.3
 
-Status: **ready_for_owner_test**, not accepted in Allplan yet. The bounded
-0.2.1/0.3.0/0.4.0 batches remain accepted; do not repeat them. This card closes
-the remaining geometry/unit/offset and native hierarchy gates. The 0.5.2
-standalone demo read-resource binding preflight passed on 2026-10-08;
-[bounded evidence](test-results/m1-profile-correction-0.5.2.md).
-The latest 0.5.3 capture A **passes bounded native component/solid read checks**:
-10 components in 101, one reference in 102; six columns/two S02/one C01;
-both beam solids and slab-tier bounds are readable. Owner independently
-confirms matching beam/slab UI dimensions and unchanged appearance; bounded
-A geometry/hierarchy is accepted; its setup exceptions were corrected in B.
-[Native evidence](test-results/m1-native-families-0.5.3.md).
-Capture B diagnostics-20261008T224141Z.json **passes bounded native display-unit
-read invariance**: enum 0 to 3 (mm to metres), identical canonical geometry,
-identities and counts across all five queries. Both setup corrections are now
-verified: 102 passive and C05/S05 on SZ_OGÓ02. Keep the installed 0.5.3 package
-and model geometry; continue **C only**, without repeating A/B or reinstalling.
-Include independent unchanged-appearance confirmation for B with C's UI values.
-No standalone profile/type probe or accepted owner batch needs repetition.
+Status: **accepted_on_build: Allplan 2026-1-7; M1 CLOSED** on 2026-10-09.
+[Acceptance, exact artifact and limits](test-results/m1-acceptance-0.5.3.md).
+Preflight and A/B/C pass; owner independently confirms dimensions/coordinates,
+unchanged appearance and retained original baseline. C adds the configured
+100/200/0 m offset exactly once; local geometry and 10/6/2/1 counts are unchanged.
+B separately verifies 102 passive and C05/S05 review layer. Keep the installed
+0.5.3 artifact. **No reinstall, repeated capture or further M1 test is requested.**
+The setup/capture recipe below is retained for reference, not a new owner task.
 
 No model edits are made by either packaged diagnostic command. Audit/repair
 tools belong to M2/M3 and are not exercised here.
@@ -110,7 +100,7 @@ The reference columns are outside the demo uniqueness scope.
 
 ## Three final captures
 
-**A/B read checks are complete; only C remains.** Keep the earlier reports.
+**A/B/C are complete.** Keep the earlier reports; do not repeat this recipe.
 Start StartPythonHost after each setup change. Run **M1 Final.cmd** for each
 capture below and retain the resulting `logs/diagnostics-*.json`. It runs six
 packaged read requests with full responses, summaries and bounded page traversal:
@@ -122,8 +112,8 @@ packaged read requests with full responses, summaries and bounded page traversal
 | C | Separate saved copy; configured offset X=100000, Y=200000, Z=0 mm (enter 100/200/0 if the dialog uses metres) | Raw offset agrees with UI; dimensions/counts stay unchanged. Compare C01's model-local center with its global center; the declared transform adds offset exactly once. Record an independent UI coordinate reading and its unit. |
 
 The implemented API source-frame convention is **model_local in mm**. Its
-nonzero-offset interpretation is a required runtime gate, not a fact already
-proved by portable arithmetic. If Allplan's returned coordinates or the UI
+nonzero XY offset interpretation passed native C plus the independent owner UI
+reading; nonzero Z offset is not tested. Portable arithmetic alone is insufficient. If Allplan's returned coordinates or the UI
 disagree, preserve the log/UI values and mark the offset case FAIL/NOT_CHECKED;
 do not adjust the expected values silently. Changed project/session bindings
 between copies are expected; UUID equality across project copies is not required.
@@ -137,8 +127,8 @@ geometry gate not_checked, even if some counts happen to match.
 
 Reset: keep the original zero-offset baseline, restore preferred display units,
 and leave reference file 102 passive and 103 unloaded. No cleanup or repair is
-requested. Preflight/A/B reports are already supplied; submit C's JSON and the
-remaining UI observations from this short result form:
+requested. All reports and required UI observations are already supplied; this
+result form is retained for reference:
 
 ```text
 Package: 0.5.3
@@ -152,6 +142,5 @@ Original baseline retained; reference 102 passive / 103 unloaded: yes / no
 Unexpected counts, read failures or UI behavior: [...]
 ```
 
-M1 closes only after these remaining runtime gates pass. The earlier accepted
-batches do not need new evidence. The planned five audit findings and two repairs
+M1 is closed for the recorded read scope. No accepted batch needs new evidence. The planned five audit findings and two repairs
 remain future M2/M3 acceptance; this card verifies the read foundation only.

@@ -2,34 +2,29 @@
 
 ## Current handoff — 2026-10-09
 
-Current package **0.5.3**, profile revision **1.0.2**. Native capture A
-diagnostics-20261008T223235Z.json passes bounded geometry/hierarchy reads:
-10 roots in 101 (6 columns + 2 SkeletonBeam + wall + MultiSlab), one reference
-in 102, six child representations deduplicated, readable geometry throughout.
-Columns/S02/C01 counts 6/2/1; C01 400x400x3000 mm centered XY=(0,0), beams
-6000x300x500 and slab 4000x4000x200 mm. Owner independently confirms unchanged
-appearance and matching beam/slab UI dimensions in A.
+**M1 CLOSED; UAT-02/UAT-03 PASS for the bounded read contract**, current package
+**0.5.3**, profile revision **1.0.2**, owner's Allplan **2026-1-7**.
+[Acceptance, exact artifact and limits](test-results/m1-acceptance-0.5.3.md).
+A native geometry/hierarchy and B display-unit invariance pass. C
+diagnostics-20261008T225219Z.json passes nonzero XY offset: raw offset
+(100000,200000,0) mm, unchanged local boxes/dimensions/counts, all ten global
+boxes add offset exactly once. Owner independently reports offset 100/200 m and
+C01 base-section center 100/200/0 m; AABB center is 100/200/1.5 m. Owner confirms
+B/C unchanged appearance and the retained original zero-offset baseline.
 
-Capture B diagnostics-20261008T224141Z.json **PASS for bounded native display-unit
-read invariance**. Input-length enum changes 0 to 3 (mm to metres); all five
-queries retain exactly equal canonical geometry, result identities/type IDs and
-counts. Query/summary/pages agree within each capture. Profile binding/integrity
-pass. Declared setup corrections are verified separately: 102 is now passive,
-C05/S05 uses bound review layer SZ_OGÓ02 (3701); all other column fields match A.
-103 remains explicitly unloaded. Full M1 exit gate remains pending C and final
-owner UI observations; unchanged appearance in B is not independently reported.
+Fixture: ten roots in 101 (6 Column + 2 SkeletonBeam + Wall + MultiSlab), one
+readable passive reference in 102, unloaded 103 explicitly omitted. Filter counts
+6/2/1; six child representations deduplicated. Profile bound_for_read, corrected
+C05/S05 review layer verified. Write eligibility remains not_checked; configured
+levels are not native BWS. No mutation/durable-reference acceptance is inferred.
 
-Next: keep installation/geometry and original zero-offset baseline; **C only**,
-on a separate saved project copy with offset X=100000/Y=200000/Z=0 mm. Collect
-C's M1 Final.cmd report plus independent UI offset values/unit, C01 coordinates/
-unit, B/C unchanged-appearance and retained-baseline confirmation. Restart the
-host after setup changes. Do not infer nonzero-offset source-frame semantics
-from portable arithmetic; compare C with the documented transform and UI values.
-No A/B, standalone profile/type probe, reinstall or accepted old batch repeat.
-C03 remains literal <niezdefiniowany>; no silent missing-value normalization.
-Supported new roots are exactly SkeletonBeam and MultiSlab; other framing/grouped
-families remain outside scope. [Native evidence](test-results/m1-native-families-0.5.3.md),
-[owner card](m1-final-batch.md). Raw new uploads are not published; old ZIPs intact.
+Next: **M2 profile/audit contracts and read-only findings**, using the retained
+fixture. Explicitly decide how C03's literal <niezdefiniowany> is treated; do not
+silently normalize native values. Other framing/grouped families remain outside
+scope. No A/B/C, preflight, type probe, reinstall or accepted old batch repeat.
+Keep 0.5.3 and older ZIPs/hashes unchanged; further runtime code needs a new
+version. Raw new uploads stay private. Portable test results and owner Allplan
+verification remain separate; no automated suite was rerun for this closure.
 
 The initial M0 instructions below are historical. **M0 is closed** on the owner's
 Allplan 2026-1-7 / local Windows Codex setup using package 0.1.2.
@@ -44,8 +39,8 @@ Implementation version **0.5.0** completes the bounded M1 read code: mm
 geometry summaries, dimensional/AABB predicates, declared model_local/global
 transform, supported native top-level parent resolution and demo profile
 m1-profile-1 validation/fresh resource binding. **56 targeted portable checks
-PASS**, distributions and versioned ZIP build. **ready_for_owner_test**; the full
-M1 exit gate is pending final Allplan evidence.
+PASS**, distributions and versioned ZIP build. The subsequent 0.5.3 native
+A/B/C evidence and owner confirmations close the bounded M1 exit gate.
 [Completion evidence](test-results/m1-completion-portable-0.5.0.md),
 [final card and concrete UI recipe](m1-final-batch.md). M1 Profile.cmd checks
 named resources and M1 Final.cmd saves responses, summaries and bounded pages.
@@ -80,13 +75,13 @@ readback is not claimed. [Runtime evidence and limits](test-results/m1-query-run
 change/defect. Changed-source staleness and TTL/restart retain portable evidence.
 
 The bounded M1 implementation is complete; native geometry/hierarchy, demo read
-binding and display-unit invariance pass for the owner fixture. Nonzero-offset
-C and final UI observations remain pending. Native BWS
+binding, display-unit invariance and nonzero XY offset pass for the owner fixture.
+M1 is accepted within the linked scope. Native BWS
 levels are not claimed; the optional profile explicitly supplies configuration.
 Selections remain memory-only/session-bound read evidence; durable references
 and mutation eligibility are not established. The demo binds freshly for reads
-after UI resource setup and remains inactive for writes. Do not claim full
-UAT-02/UAT-03 acceptance until the final card has recorded results.
+after UI resource setup and remains inactive for writes. UAT-02/UAT-03 acceptance
+is bounded to the recorded build/fixture; M2/M3 remain unimplemented/unrun.
 
 Start from [project-status.md](project-status.md) and the current code, then use
 the roadmap below. Do not repeat accepted owner batches without a new defect or
@@ -95,12 +90,11 @@ hashes; build any further runtime changes under a new package version. The
 earlier 31-test baseline and new targeted checks are separate records; the full
 historical suite was not rerun for this slice. Allplan runtime evidence is separate.
 
-Next: evaluate the remaining 0.5.3 capture C and independent UI observations,
-fix any native frame discrepancy, then close M1 only with linked runtime
-evidence. Continue M2 after that read foundation is accepted. Attribute 498 was observed on file 1
-but returned missing on passive file 2; do not infer native absence or mark
-binding without further evidence. Do not ask the owner to research identifiers
-or construct the final unbound fixture prematurely.
+Next: implement M2's versioned audit profile and read-only findings with
+explicit evidence/not_checked semantics. Reuse accepted M1 reads; preserve scope,
+fresh binding and unchanged-model guarantees. Prepare focused portable checks
+and a concrete owner UAT-04 card when ready. Do not start repairs or repeat M1
+acceptance merely to begin M2.
 
 ## Task
 

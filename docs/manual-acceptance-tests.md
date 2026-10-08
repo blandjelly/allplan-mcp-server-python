@@ -1,6 +1,10 @@
 # Manual acceptance tests in Allplan
 
-Status: planned test catalog. None of these cases was executed while preparing the plan. Run a card only when the implementation model supplies the corresponding working release.
+Status: test catalog; no cases were executed while initially preparing the plan.
+Subsequent M0 UAT-00/UAT-01 and bounded M1 UAT-02/UAT-03 are accepted on the
+owner setup. [M1 acceptance and limits](test-results/m1-acceptance-0.5.3.md).
+UAT-04 onward remain NOT_RUN. Do not repeat accepted batches without a relevant
+change/defect; run new cards only when a working release is supplied.
 
 The owner interacts with Codex and the Allplan UI. The model supplies installation packages, actual MCP commands behind the prompts, diagnostics and fixes. No source editing, API research, terminal debugging or test-framework operation is assigned to the owner.
 

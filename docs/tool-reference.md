@@ -1,9 +1,11 @@
-# M1 scope and model query contract — 0.5.0
+# M1 scope and model query contract — 0.5.3
 
-Status: **implemented; three bounded owner query cases PASS**. Schema
+Status: **M1 accepted on Allplan 2026-1-7 within the bounded read contract**.
+[Acceptance and limits](test-results/m1-acceptance-0.5.3.md). Schema
 `m1-query-1`, public MCP tool `model_query`, typed bridge route `/model-query`.
 0.5.0 completes the bounded M1.1–M1.4 read implementation with 56 portable
-checks; its final native geometry/frame/hierarchy/demo fixture gate is pending.
+checks; 0.5.3 adds the observed-family correction with 14 targeted checks.
+Native A/B/C geometry/hierarchy/demo/display-unit/nonzero XY offset gates PASS.
 [Final owner card](m1-final-batch.md). The accepted 0.2.1 context reader is reused;
 its raw units/offset and context probe schema retain their earlier meaning.
 [0.3.0 evidence and limits](test-results/m1-query-runtime-0.3.0.md) verify scope,
@@ -52,7 +54,8 @@ children map to MultiSlab roots. Aggregate slab geometry unions direct slab
 tier solids, including hidden tiers, with the same 256-child/file-scope bound
 as walls. Missing/failed tier or beam solids remain not_checked; axes are
 never geometry substitutes. Other Structural Framing families, grouped roots
-and arbitrary native trees remain outside this bounded fixture contract. The new Allplan count gate remains pending. References are session-bound read evidence with
+and arbitrary native trees remain outside this bounded fixture contract. The native
+ten-component gate passes for the recorded fixture. References remain session-bound read evidence with
 `durable_identity_verified: false` and `usable_for_write: false`.
 
 ## Predicates and fields

@@ -14,10 +14,12 @@ baseline is **accepted on Allplan 2026-1-7** with local Windows Codex
 (UAT-00/UAT-01 PASS). [M0 is closed](docs/test-results/m0-acceptance-0.1.2.md);
 workflow toolkit capabilities begin with M1.
 
-Current package **0.5.0** completes the bounded M1 read implementation: mm
+Current package **0.5.3** completes the bounded M1 read implementation: mm
 geometry summaries, declared local/global frames, dimensional/AABB filtering,
 native parent resolution and freshly validated demo resource binding.
-**56 targeted portable checks PASS; final Allplan exit gate remains pending**.
+**M1 CLOSED on Allplan 2026-1-7; UAT-02/UAT-03 PASS within the bounded read contract**.
+[Acceptance and exact tested artifact](docs/test-results/m1-acceptance-0.5.3.md).
+The 56 original/14 native-family portable checks remain separate from native evidence.
 [Final owner card](docs/m1-final-batch.md) and
 [completion evidence](docs/test-results/m1-completion-portable-0.5.0.md).
 M1 Profile.cmd checks resources; M1 Final.cmd captures the complete final batch.
@@ -39,17 +41,18 @@ portable checks pass; three bounded owner query cases PASS**.
 and [small owner query batch](docs/m1-query-batch.md).
 [0.3.0 runtime evidence and limits](docs/test-results/m1-query-runtime-0.3.0.md)
 record scope, metadata, pages/full summary and observed-value predicates on two
-native columns. Changed-source staleness and geometry remain separately pending.
+native columns. Changed-source staleness retains portable evidence; later native
+geometry acceptance is recorded separately below.
 The earlier **0.2.1 context correction batch remains PASS**; do not repeat it.
 [Accepted context evidence](docs/test-results/m1-context-runtime-0.2.1.md).
 0.5.2 native demo binding and bounded column geometry/filter captures pass.
 0.5.3 corrects observed SkeletonBeam/MultiSlab root reads and slab tier geometry;
 bounded native counts/solid readback pass with owner UI confirmation.
 Capture B passes native display-unit read invariance (mm to metres) and verifies
-the corrected passive reference/review layer. Nonzero-offset capture C and final
-owner UI observations remain pending. The demo resources
+the corrected passive reference/review layer. Capture C passes nonzero XY offset
+with independent owner UI coordinates and unchanged-appearance confirmation. The demo resources
 resolve per project after the packaged UI setup, and write eligibility is
-not_checked. M1 is not yet accepted on the full fixture.
+not_checked. M1 is accepted for the recorded build/fixture; M2 audit is next.
 
 - [Windows installation and restore](docs/windows-setup.md)
 - [UAT-00 / UAT-01 prompts and result form](docs/m0-acceptance-batch.md)

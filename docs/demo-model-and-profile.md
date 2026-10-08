@@ -8,8 +8,8 @@ Profile: [native-model-qa.demo.json](../profiles/examples/native-model-qa.demo.j
 
 ## Status and binding responsibility
 
-Version **0.5.0** loads and validates schema **m1-profile-1**, demo profile
-**1.0.0**, through the packaged profile resource and typed model_query. The
+Version **0.5.3** loads and validates schema **m1-profile-1**, demo profile
+**1.0.2**, through the packaged profile resource and typed model_query. The
 ordinary-column type GUID is the observed 0.3.0/0.4.0 runtime value. Mark/status
 are separate user text attributes **MCP_QA_MARK / MCP_QA_STATUS**; attribute 498
 is Nazwa obiektu and is not reused as a mark. Two layers retain the short names
@@ -20,8 +20,8 @@ return not_checked or block profile queries with profile_unbound.
 
 [Final M1 card](m1-final-batch.md) supplies exact UI resource/fixture setup and
 M1 Profile.cmd / M1 Final.cmd. Binding status bound_for_read means resource
-resolution only; it does not prove native writability. Geometry, hierarchy and
-profile runtime acceptance remain pending. The canonical JSON shipped in the
+resolution only; it does not prove native writability. Bounded native geometry,
+hierarchy and profile reads are accepted in the [M1 record](test-results/m1-acceptance-0.5.3.md). The canonical JSON shipped in the
 external wheel matches the example file; configured levels are labeled profile
 configuration, not native BWS. The schema validates the four rule references for
 future M2/M3, but audit/repair tools are not implemented by M1.
@@ -59,6 +59,9 @@ Create six **ordinary native columns**, each 400 × 400 mm and 3000 mm high, bot
 | C04 | 0 / 6000 | S02 | SZ_OGÓ01 | NEW | Shares a mark with C02. |
 | C05 | 6000 / 6000 | S05 | SZ_OGÓ02 | NEW | Wrong layer. |
 | C06 | 12000 / 6000 | S06 | SZ_OGÓ01 | NWE | Misspelled demo status. |
+
+The accepted owner fixture uses two SkeletonBeam roots and a MultiSlab root
+with a Slab tier; their bounded read support is recorded in M1 acceptance.
 
 Also create in file 101:
 

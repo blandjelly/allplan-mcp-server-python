@@ -7,7 +7,9 @@ This is evidence for the tested setup, not every Allplan 2026 hotfix or client.
 
 Current package **0.5.3** includes the bounded M1 read contract implemented in 0.5.0
 and the observed native-family correction.
-**56 targeted portable checks PASS; final Allplan exit gate pending**.
+**M1 CLOSED; UAT-02/UAT-03 PASS on Allplan 2026-1-7 within the bounded read contract**.
+[Acceptance and limits](test-results/m1-acceptance-0.5.3.md). Portable checks remain
+separate: 56 for original completion, 14 for the observed-family correction.
 [Completion evidence](test-results/m1-completion-portable-0.5.0.md),
 [final card](m1-final-batch.md). Fake geometry does not accept native coordinates
 or offset conventions. Named demo resources bind for reads after UI setup;
@@ -33,15 +35,15 @@ The **0.2.1** context correction remains accepted. Its **31 portable tests pass*
 Owner 0.2.0 logs verify loaded-file states/passive inclusion and
 model/view GUIDs; project lookup fails. The **0.2.1 correction batch PASS** verifies
 project lookup, unload exclusion and project switching; owner confirms matching
-names and unchanged model. Full M1 acceptance remains pending.
+names and unchanged model. Later A/B/C evidence closes the bounded M1 exit gate.
 Accepted 0.1.2 evidence does not automatically accept the new package.
 [Current runtime evidence](test-results/m1-context-runtime-0.2.1.md).
 
 | Capability | Evidence | Limit |
 | --- | --- | --- |
-| M1 dimensional/AABB/frame queries | 0.5.0 portable contracts/native-reader checks and 2026 signatures; 0.5.3 native A/B read gates PASS | Owner confirms A beam/slab UI dimensions and unchanged appearance. B mm-to-metres display change preserves all canonical boxes/dimensions and result identities. Nonzero-offset C and final owner UI observations pending. BBoxes are broad phase and axis aligned, not native rotated cross-sections or exact solid intersections. |
+| M1 dimensional/AABB/frame queries | 0.5.0 portable contracts/native-reader checks and 2026 signatures; 0.5.3 native A/B/C read gates PASS | Owner confirms A beam/slab UI dimensions and unchanged appearance. B mm-to-metres display change preserves all canonical boxes/dimensions and result identities. C nonzero XY offset adds once and agrees with owner UI; B/C unchanged appearance confirmed. Nonzero Z offset is unverified. BBoxes are broad phase and axis aligned, not native rotated cross-sections or exact solid intersections. |
 | M1 top-level native components | 0.5.0 parent-chain/cycle/scope checks; 0.5.3 observed-type fixture regressions | Six root types: original four plus SkeletonBeam and MultiSlab. Child axes/tiers map to roots; no arbitrary framing/group hierarchy support. 0.5.3 native ten-component count/read PASS for the bounded owner tree. Other hierarchy shapes remain unverified. |
-| M1 demo read profile and configured levels | 0.5.0 schema and fresh resource round-trip checks, packaged template/UI recipe | 0.5.2 native read binding PASS for demo text attributes and owner layers. Profile-unbound errors block reads. Native BWS, writability, active repair/audit profile and full fixture acceptance pending. |
+| M1 demo read profile and configured levels | 0.5.0 schema and fresh resource round-trip checks, packaged template/UI recipe | 0.5.2 native read binding PASS for demo text attributes and owner layers. Profile-unbound errors block reads. Bounded read fixture accepted; native BWS, writability and active repair/audit profile are not implemented/verified. |
 | Resource metadata inspection / captured query responses | 0.4.0 bounded Allplan batch PASS: complete inspect JSON, attribute 498 Nazwa obiektu with raw codes 67/69, layer 3736 AR_SŁUP, passive omission versus active Słup | Two known columns only; sessions also changed. No universal passive-access rule, normalized units, semantic binding or profile activation. |
 | Complete host installation / repeat install / restore | Recursive installer and rollback/migration/restore pass portable tests; actual Windows installation/startup accepted | Restore logic is portable-tested; no separate owner Windows restore case was required or reported. |
 | Windows setup / launcher / Codex configuration | Owner installation and local Windows Codex connection accepted | Codex app and Windows version not supplied. |
@@ -52,10 +54,10 @@ Accepted 0.1.2 evidence does not automatically accept the new package.
 | Names / baseline generic box | Local Codex calls and owner UAT accepted; 1000 mm box checked by owner | Names are not stable model identity. Box has no automatic readback or durable deduplication; inspect before retrying. |
 | ESC/restart, minimize/restore, project switching | Owner confirms all requested UI tests; logs prove host absence and restart with a new session ID | In-flight queued-request rejection is portable simulated-dispatch evidence only. Closing the listener does not undo a running write. |
 | Development Python execution | Opt-in on both sides; absent from evaluation catalog | AST filtering is not isolation. No tunnel/shared setup support. |
-| Context workflow tool | 0.2.1 bounded runtime batch PASS: project lookup/switch, loaded file states, unload exclusion and model/view GUIDs; 31 portable tests pass | Raw zero offset only; unit/offset normalization, levels, durable references and component counts pending. |
+| Context workflow tool | 0.2.1 bounded runtime batch PASS: project lookup/switch, loaded file states, unload exclusion and model/view GUIDs; 31 portable tests pass | Later 0.5.3 A/B/C verify canonical geometry, nonzero XY offset and component counts. Native BWS levels/durable references are not established. |
 | Read-only model_query / explicit scope / predicates | Bounded 0.3.0 owner batch PASS on two native columns: loaded/passive scope, type GUID/layer and raw attribute 498 equality | Other predicate combinations retain portable evidence. That 0.3.0 evidence does not accept the new 0.5.0 spatial/geometry/component readers. Passive attribute 498 returned missing; native absence is not established. |
 | Reusable selections / paging / summary / staleness | Two distinct pages/full-selection summary and unchanged-source reuse PASS; other behaviors portable-tested | Changed-source stale rejection, TTL/eviction/restart and larger-model limits lack owner runtime evidence. Memory-only, read-only, field-bound references; no write authorization or downstream audit/edit consumer. |
-| Remaining workflow tools / active demo profile | Planned only | M2–M7 pending; new M1 geometry/hierarchy/demo binding awaits its final runtime gate; no write profile is activated. |
+| Remaining workflow tools / active demo profile | Planned only | M2–M7 pending; bounded M1 read exit gate met; no write profile is activated. |
 | Claude / cloud-to-Windows connection | Not tested / not provided | Accepted first client is local Windows Codex. Cloud localhost is another machine. |
 
 This evaluation rejects model operations outside major 2026 while allowing

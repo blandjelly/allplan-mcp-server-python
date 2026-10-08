@@ -8,7 +8,10 @@ components. Add these exact root families to bounded reads; aggregate slab
 AABBs union direct slab tiers, preserving child/file/read budgets and failure
 observations. Axes/tiers deduplicate to roots, without expanding to arbitrary
 Structural Framing families or enabling writes. Profile/resources remain unchanged.
-New fake-native regressions are separate from pending Allplan solid readback.
+Fourteen targeted portable checks are separate from native A/B/C verification.
+Subsequent native captures and independent owner UI confirmations close M1
+UAT-02/UAT-03 for the bounded build/fixture.
+[Acceptance and limits](test-results/m1-acceptance-0.5.3.md).
 [Evidence and owner next action](test-results/m1-native-families-0.5.3.md).
 
 ## 0.5.2 — 2026-10-08

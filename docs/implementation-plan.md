@@ -196,11 +196,13 @@ package 0.1.2. [Acceptance record](test-results/m0-acceptance-0.1.2.md).
 
 ### M1 — Context, identity, selection and query
 
-**Current 0.3.0 slice:** explicit scopes, typed type/layer/raw-attribute queries,
-bounded session selections, paging/summary and staleness are implemented with
-targeted portable checks. Allplan query verification remains pending; geometry,
-offset, native hierarchy and demo binding are not complete. See
-[current status](project-status.md) and [contracts](tool-reference.md).
+**M1 CLOSED — 2026-10-09**, package 0.5.3, Allplan 2026-1-7. UAT-02/UAT-03
+PASS for the bounded read fixture: scope/identity, predicates, pages/full summary,
+native geometry/hierarchy, demo read binding, display-unit invariance and nonzero
+XY offset. Owner confirms matching UI readings, unchanged appearance and retained
+baseline. [Acceptance and limits](test-results/m1-acceptance-0.5.3.md),
+[current status](project-status.md), [contracts](tool-reference.md). M2 is next;
+portable checks and native evidence remain separate.
 
 - **M1.1** Implement `ModelContext`, `Scope`, model references, capability reporting, units and offset conversion. Probe loaded editable/passive files and model versus view identity.
 - **M1.2** Implement `get_model_context` and basic `model_query`; define predicate composition, null/missing behavior, case rules, numeric tolerances, and spatial selection semantics.
