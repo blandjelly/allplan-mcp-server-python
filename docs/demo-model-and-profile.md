@@ -13,7 +13,7 @@ Version **0.5.0** loads and validates schema **m1-profile-1**, demo profile
 ordinary-column type GUID is the observed 0.3.0/0.4.0 runtime value. Mark/status
 are separate user text attributes **MCP_QA_MARK / MCP_QA_STATUS**; attribute 498
 is Nazwa obiektu and is not reused as a mark. Two layers retain the short names
-MCP_QA_STRUCTURE / MCP_QA_REVIEW. Names are resolved to real project-local IDs
+Ogólne01 / Ogólne02. Names are resolved to real project-local IDs
 and checked by round trip and observed text-type code on every profile read.
 No global ID is guessed or edited by the owner. Missing/incompatible resources
 return not_checked or block profile queries with profile_unbound.
@@ -53,12 +53,12 @@ Create six **ordinary native columns**, each 400 × 400 mm and 3000 mm high, bot
 
 | Fixture label | Center X / Y (mm) | Mark | Layer | Demo status | Deliberate defect |
 | --- | --- | --- | --- | --- | --- |
-| C01 | 0 / 0 | S01 | MCP_QA_STRUCTURE | NEW | None. |
-| C02 | 6000 / 0 | S02 | MCP_QA_STRUCTURE | NEW | Shares a mark with C04. |
-| C03 | 12000 / 0 | Empty | MCP_QA_STRUCTURE | NEW | Missing mark. |
-| C04 | 0 / 6000 | S02 | MCP_QA_STRUCTURE | NEW | Shares a mark with C02. |
-| C05 | 6000 / 6000 | S05 | MCP_QA_REVIEW | NEW | Wrong layer. |
-| C06 | 12000 / 6000 | S06 | MCP_QA_STRUCTURE | NWE | Misspelled demo status. |
+| C01 | 0 / 0 | S01 | Ogólne01 | NEW | None. |
+| C02 | 6000 / 0 | S02 | Ogólne01 | NEW | Shares a mark with C04. |
+| C03 | 12000 / 0 | Empty | Ogólne01 | NEW | Missing mark. |
+| C04 | 0 / 6000 | S02 | Ogólne01 | NEW | Shares a mark with C02. |
+| C05 | 6000 / 6000 | S05 | Ogólne02 | NEW | Wrong layer. |
+| C06 | 12000 / 6000 | S06 | Ogólne01 | NWE | Misspelled demo status. |
 
 Also create in file 101:
 
@@ -78,7 +78,7 @@ Save a clean copy before running repairs. Keep a screenshot of the six-column ar
 | --- | --- | --- |
 | QA-001 | Every selected column has a non-empty mark. | C03: 1 finding. |
 | QA-002 | Non-empty marks are unique within drawing file and element family. | C02 and C04: 2 findings in 1 duplicate group. |
-| QA-003 | Selected columns use MCP_QA_STRUCTURE. | C05: 1 finding. |
+| QA-003 | Selected columns use Ogólne01. | C05: 1 finding. |
 | QA-004 | Demo status is NEW or EXISTING. | C06: 1 finding. |
 
 Expected result: **5 findings affecting 5 columns**. C01 passes. Missing marks are ignored by the duplicate rule, so C03 is not double-counted. The passive/unloaded columns do not affect this audit.
@@ -89,7 +89,7 @@ For this bound and readable fixture, all four rules should be checkable. If bind
 
 The first preview should propose exactly two deterministic repairs:
 
-1. C05: layer `MCP_QA_REVIEW` → `MCP_QA_STRUCTURE`.
+1. C05: layer `Ogólne02` → `Ogólne01`.
 2. C06: demo status `NWE` → `NEW`, using the explicit mapping in the profile.
 
 It should leave marks unchanged and explain the missing/duplicate values. After the owner applies this exact plan, the expected audit has **3 remaining findings**: missing mark on C03, duplicate-mark findings on C02 and C04. Applying the same request again must not repeat the operation.

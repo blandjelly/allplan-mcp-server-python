@@ -1,6 +1,6 @@
 # Project status
 
-Updated: 2026-10-07. **M0 CLOSED**, accepted on **Allplan 2026-1-7**, package
+Updated: 2026-10-08. **M0 CLOSED**, accepted on **Allplan 2026-1-7**, package
 **0.1.2 evaluation**. **UAT-00 PASS; UAT-01 PASS**. The owner confirmed all
 remaining tests work correctly. [Acceptance and evidence](test-results/m0-acceptance-0.1.2.md).
 
@@ -29,7 +29,13 @@ nor upstream reports a license and none was invented. [Support matrix](support-m
 ## Current M1 implementation and next action
 
 **M1 implementation complete for the bounded read contract**, current package
-**0.5.0**, **ready_for_owner_test**. **56 targeted portable checks PASS**.
+**0.5.1**, **ready_for_owner_test**. The 0.5.0 implementation has **56 targeted portable checks PASS**.
+The 0.5.0 resource preflight returned not_checked for both attributes and layers.
+Owner confirms both text attributes exist and supplies existing layer short
+names Ogólne01/Ogólne02. Profile revision 1.0.1 uses those names; 0.5.1 adds
+failure-stage/raw-ID diagnostics. Repeat only M1 Profile.cmd before fixture
+construction; actual binding and the final M1 runtime gate remain pending.
+[Follow-up evidence](test-results/m1-profile-followup-0.5.1.md).
 New mm geometry and dimensional/AABB predicates, declared local/global transform,
 parent-chain native component counts, profile schema/resource resolution and
 configured level provenance are implemented. Source fingerprints cover queried

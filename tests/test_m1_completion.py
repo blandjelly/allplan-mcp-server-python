@@ -68,8 +68,8 @@ class M1CompletionTests(unittest.TestCase):
         self.base.AttributeService.GetAttributeID.side_effect = lambda doc, name: ids.get(name, -1)
         self.base.AttributeService.GetAttributeName.side_effect = lambda doc, ident: names[ident]
         self.base.AttributeService.GetAttributeType.return_value = 67
-        self.base.LayerService.GetIDByShortName.side_effect = lambda name, doc: {'MCP_QA_STRUCTURE':7, 'MCP_QA_REVIEW':8}[name]
-        self.base.LayerService.GetShortNameByID.side_effect = lambda ident, docid: {7:'MCP_QA_STRUCTURE',8:'MCP_QA_REVIEW'}[ident]
+        self.base.LayerService.GetIDByShortName.side_effect = lambda name, doc: {'Ogólne01':7, 'Ogólne02':8}[name]
+        self.base.LayerService.GetShortNameByID.side_effect = lambda ident, docid: {7:'Ogólne01',8:'Ogólne02'}[ident]
         self.base.LayerService.GetNameByID.side_effect = lambda ident, docid: {7:'QA Structure',8:'QA Review'}[ident]
 
     def test_conversion_scales_then_applies_offset_once_and_round_trips(self):
@@ -193,6 +193,40 @@ class M1CompletionTests(unittest.TestCase):
         context=self.handler.handle('/get-model-context',{'profile':load_demo_profile()})
         self.assertEqual(context['levels']['source'],'profile_configuration_not_native_BWS')
         self.base.CreateElements.assert_not_called()
+
+    def test_profile_unresolved_ids_preserve_lookup_stage_and_do_not_scan(self):
+        self.native(); self.resources()
+        self.base.AttributeService.GetAttributeID.side_effect = None
+        self.base.AttributeService.GetAttributeID.return_value = 0
+        self.base.LayerService.GetIDByShortName.side_effect = None
+        self.base.LayerService.GetIDByShortName.return_value = -1
+        result = self.handler.handle('/model-query', {'schema_version':'m1-query-1', 'action':'profile', 'profile':load_demo_profile()})
+        self.assertEqual(result['status'], 'not_checked')
+        self.assertEqual(result['attributes']['mark']['diagnostic'], {'requested_name':'MCP_QA_MARK', 'stage':'GetAttributeID', 'returned_id':0})
+        self.assertEqual(result['layers']['review']['diagnostic'], {'requested_short_name':'Ogólne02', 'stage':'GetIDByShortName', 'returned_id':-1})
+        self.base.AttributeService.GetAttributeName.assert_not_called()
+        self.assertEqual(len(self.handler.model_queries.selections), 0)
+
+    def test_profile_type_mismatch_and_native_exception_preserve_safe_diagnostics(self):
+        self.native(); self.resources()
+        self.base.AttributeService.GetAttributeType.return_value = 73
+        self.base.LayerService.GetShortNameByID.side_effect = RuntimeError('native details must not be published')
+        result = self.handler.handle('/model-query', {'schema_version':'m1-query-1', 'action':'profile', 'profile':load_demo_profile()})
+        diagnostic = result['attributes']['status']['diagnostic']
+        self.assertEqual(diagnostic['stage'], 'attribute_round_trip')
+        self.assertEqual(diagnostic['returned_type_code'], 73)
+        self.assertEqual(diagnostic['expected_type_code'], 67)
+        self.assertEqual(result['layers']['structure']['diagnostic']['stage'], 'GetShortNameByID')
+        self.assertNotIn('native details', json.dumps(result))
+
+    def test_owner_profile_uses_distinct_unicode_existing_layers_and_old_profile_still_validates(self):
+        self.native(); self.resources()
+        profile = load_demo_profile()
+        self.assertEqual(profile['profile_version'], '1.0.1')
+        self.assertEqual(profile['bindings']['layers'], {'structure':{'short_name':'Ogólne01'}, 'review':{'short_name':'Ogólne02'}})
+        profile['profile_version'] = '1.0.0'
+        profile['bindings']['layers'] = {'structure':{'short_name':'MCP_QA_STRUCTURE'}, 'review':{'short_name':'MCP_QA_REVIEW'}}
+        self.profile_contracts.validate_profile(profile)
 
     def test_profile_missing_resource_and_wrong_native_type_code_block_query(self):
         self.native([self.element()]);self.resources()

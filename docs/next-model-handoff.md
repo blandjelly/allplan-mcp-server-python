@@ -1,6 +1,17 @@
 # Next-model handoff
 
-## Current handoff — 2026-10-07
+## Current handoff — 2026-10-08
+
+Current package **0.5.1**, profile revision **1.0.1**: the owner cannot create
+new layers and supplied existing short names **Ogólne01/Ogólne02**. Both text
+attributes were created according to the owner. Uploaded 0.5.0 preflight
+`diagnostics-20261008T182010Z.json` has valid installation/transport/project but
+all four bindings not_checked/BridgeError; no exact lookup return value was
+recorded. Do not assume attribute absence or successful binding. 0.5.1 changes
+profile layer names and records failure stages/validated returned IDs/names/types.
+Next: owner reinstalls 0.5.1 and runs **only M1 Profile.cmd**; diagnose the new
+report before fixture construction if it remains not_checked. Preserve 0.5.0 ZIP.
+[Follow-up](test-results/m1-profile-followup-0.5.1.md).
 
 The initial M0 instructions below are historical. **M0 is closed** on the owner's
 Allplan 2026-1-7 / local Windows Codex setup using package 0.1.2.
@@ -11,7 +22,7 @@ Accepted version **0.2.1** has a bounded read-only
 loaded/passive file states, unload exclusion and separate model/view GUID reads;
 the owner confirms matching project names and unchanged model.
 [Runtime evidence](test-results/m1-context-runtime-0.2.1.md).
-Current implementation version **0.5.0** completes the bounded M1 read code: mm
+Implementation version **0.5.0** completes the bounded M1 read code: mm
 geometry summaries, dimensional/AABB predicates, declared model_local/global
 transform, supported native top-level parent resolution and demo profile
 m1-profile-1 validation/fresh resource binding. **56 targeted portable checks

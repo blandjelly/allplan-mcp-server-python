@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.1 — 2026-10-08
+
+Use owner-supplied existing layer short names Ogólne01/Ogólne02 in demo
+profile revision 1.0.1. Retain revision 1.0.0 contract compatibility. Failed read
+bindings now retain the lookup stage and validated returned IDs/names/type
+codes instead of only a generic exception class. No model/resource writes.
+The owner created both demo text attributes, but the 0.5.0 preflight is
+not_checked; their native lookup cause is still unproven. Repeat only the
+resource preflight on 0.5.1 before building the fixture.
+[Evidence](test-results/m1-profile-followup-0.5.1.md).
+
 ## 0.5.0 — 2026-10-07
 
 Complete the bounded M1 read implementation: mm geometry/AABB summaries,

@@ -14,7 +14,7 @@ from .transport import BridgeError
 def validate_profile(profile):
     keys(profile, {"schema_version", "profile_id", "profile_version", "target", "units", "scope", "bindings", "rules", "numeric_tolerances"},
          {"schema_version", "profile_id", "profile_version", "target", "units", "scope", "bindings", "rules", "numeric_tolerances"})
-    if profile["schema_version"] != "m1-profile-1" or profile["profile_id"] != "native-model-qa-demo" or profile["profile_version"] != "1.0.0":
+    if profile["schema_version"] != "m1-profile-1" or profile["profile_id"] != "native-model-qa-demo" or profile["profile_version"] not in {"1.0.0", "1.0.1"}:
         invalid("Unsupported demo profile/schema version.")
     try:
         serialized = json.dumps(profile, allow_nan=False)
@@ -81,31 +81,51 @@ def validate_profile(profile):
 def bind_profile(doc, base, profile, context, check_budget):
     validate_profile(profile)
     attributes, layers = {}, {}
-    def read(reader):
+    def read(reader, diagnostic):
         check_budget()
         result = observation(reader)
         check_budget()
+        if result["status"] == "not_checked":
+            result["diagnostic"] = copy.deepcopy(diagnostic)
         return result
     for role, resource in profile["bindings"]["attributes"].items():
-        def attribute(resource=resource):
-            ident = bounded_int(integer(base.AttributeService.GetAttributeID(doc, resource["name"])), 1, 2147483647, "resolved attribute ID")
+        diagnostic = {"requested_name": resource["name"], "stage": "GetAttributeID"}
+        def attribute(resource=resource, diagnostic=diagnostic):
+            raw_id = integer(base.AttributeService.GetAttributeID(doc, resource["name"]))
+            diagnostic["returned_id"] = raw_id
+            ident = bounded_int(raw_id, 1, 2147483647, "resolved attribute ID")
+            diagnostic["stage"] = "GetAttributeName"
             name = bounded_text(base.AttributeService.GetAttributeName(doc, ident))
+            diagnostic["returned_name"] = name
+            diagnostic["stage"] = "GetAttributeType"
             code = enum_code(base.AttributeService.GetAttributeType(doc, ident))
+            diagnostic["returned_type_code"] = code
+            diagnostic["expected_type_code"] = resource["expected_type_code"]
+            diagnostic["stage"] = "attribute_round_trip"
             if name != resource["name"] or code != resource["expected_type_code"]:
                 raise ValueError("Attribute name/type round-trip mismatch")
             return {"attribute_id": ident, "name": name, "type_code": code, "data_type": "string",
                     "write_eligibility": "not_checked"}
-        attributes[role] = read(attribute)
+        attributes[role] = read(attribute, diagnostic)
     for role, resource in profile["bindings"]["layers"].items():
-        def layer(resource=resource):
-            ident = bounded_int(integer(base.LayerService.GetIDByShortName(resource["short_name"], doc)), 1, 2147483647, "resolved layer ID")
+        diagnostic = {"requested_short_name": resource["short_name"], "stage": "GetIDByShortName"}
+        def layer(resource=resource, diagnostic=diagnostic):
+            raw_id = integer(base.LayerService.GetIDByShortName(resource["short_name"], doc))
+            diagnostic["returned_id"] = raw_id
+            ident = bounded_int(raw_id, 1, 2147483647, "resolved layer ID")
+            diagnostic["stage"] = "GetDocumentID"
             doc_id = integer(doc.GetDocumentID())
+            diagnostic["stage"] = "GetShortNameByID"
             short_name = bounded_text(base.LayerService.GetShortNameByID(ident, doc_id))
+            diagnostic["returned_short_name"] = short_name
+            diagnostic["stage"] = "layer_round_trip"
             if short_name != resource["short_name"]:
                 raise ValueError("Layer short-name round-trip mismatch")
+            diagnostic["stage"] = "GetNameByID"
+            name = bounded_text(base.LayerService.GetNameByID(ident, doc_id))
             return {"layer_id": ident, "short_name": short_name,
-                    "name": bounded_text(base.LayerService.GetNameByID(ident, doc_id)), "write_eligibility": "not_checked"}
-        layers[role] = read(layer)
+                    "name": name, "write_eligibility": "not_checked"}
+        layers[role] = read(layer, diagnostic)
     complete = all(v["status"] == "observed" for v in list(attributes.values()) + list(layers.values()))
     if complete:
         complete = (len({v["value"]["attribute_id"] for v in attributes.values()}) == 2

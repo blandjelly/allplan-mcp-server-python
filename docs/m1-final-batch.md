@@ -1,4 +1,4 @@
-# Final M1 owner verification — 0.5.0
+# Final M1 owner verification — 0.5.1
 
 Status: **ready_for_owner_test**, not accepted in Allplan yet. The bounded
 0.2.1/0.3.0/0.4.0 batches remain accepted; do not repeat them. This card closes
@@ -9,7 +9,7 @@ tools belong to M2/M3 and are not exercised here.
 ## Install and resource preflight
 
 Keep accepted archives unchanged. Close Allplan and the MCP console; extract
-`allplan-mcp-0.5.0-windows-evaluation.zip` into a new folder and run **Setup.cmd**
+`allplan-mcp-0.5.1-windows-evaluation.zip` into a new folder and run **Setup.cmd**
 against the same Allplan Local folder. Reopen Allplan and **Launch Allplan MCP.cmd**.
 The seven-tool catalog is unchanged. Restart **StartPythonHost** after normal
 Allplan commands/file-state changes that end its interactor. An open MCP console
@@ -20,11 +20,14 @@ Reserve **empty files 101, 102 and 103**. If any is occupied, stop and report th
 conflict; the supplied profile/batch uses these exact files and must be prepared
 again before using different numbers. Do not overwrite an existing model.
 
-In Allplan's attribute-definition management, create two user text attributes:
+The owner has already created the two user text attributes. Verify their
+definitions in Allplan's attribute-definition management:
 **MCP_QA_MARK** and **MCP_QA_STATUS**, both ordinary free text, initially empty,
-without enumerated choices, units, formulas or links to native geometry. In
-layer management create short names **MCP_QA_STRUCTURE** and **MCP_QA_REVIEW**.
-Keep both visible. The owner chooses no API IDs and edits no JSON. These manual
+without enumerated choices, units, formulas or links to native geometry.
+Use the two existing layers whose short names the owner supplied:
+**Ogólne01** for structure and **Ogólne02** for review. Keep both visible.
+No new layer creation or renaming is required. The owner chooses no API IDs
+and edits no JSON. These manual
 setup changes are separate from the read-only server. If names already exist,
 check their text definitions instead of creating duplicates.
 
@@ -37,6 +40,14 @@ positive IDs. This is a read binding, not tested write eligibility. If it is
 model resolves the cause. Do not guess IDs or rename a different native field.
 Attribute 498 is **Nazwa obiektu**, not the demo mark/status.
 
+The 0.5.0 preflight returned `BridgeError` for all four bindings. It does not
+prove that the owner-created attributes are absent. The 0.5.1 profile revision
+1.0.1 uses the existing owner layers and adds failure-stage/returned-ID/name/type
+diagnostics. Reinstall 0.5.1 and repeat **only M1 Profile.cmd** first. If it still
+returns `not_checked`, submit that JSON and stop; do not recreate the attributes,
+guess IDs, or continue to M1 Final.cmd. Changing the selected UI layer alone
+does not change profile bindings.
+
 ## Build the fixture once
 
 Use millimetres, zero offset, ungrouped **ordinary native columns** (not
@@ -45,12 +56,12 @@ levels **0 / 3000 mm**. Create six columns, **400 × 400 mm**, in file 101:
 
 | Label for the recipe | Center X / Y (mm) | MCP_QA_MARK | Layer | MCP_QA_STATUS |
 | --- | --- | --- | --- | --- |
-| C01 | 0 / 0 | S01 | MCP_QA_STRUCTURE | NEW |
-| C02 | 6000 / 0 | S02 | MCP_QA_STRUCTURE | NEW |
-| C03 | 12000 / 0 | empty | MCP_QA_STRUCTURE | NEW |
-| C04 | 0 / 6000 | S02 | MCP_QA_STRUCTURE | NEW |
-| C05 | 6000 / 6000 | S05 | MCP_QA_REVIEW | NEW |
-| C06 | 12000 / 6000 | S06 | MCP_QA_STRUCTURE | NWE |
+| C01 | 0 / 0 | S01 | Ogólne01 | NEW |
+| C02 | 6000 / 0 | S02 | Ogólne01 | NEW |
+| C03 | 12000 / 0 | empty | Ogólne01 | NEW |
+| C04 | 0 / 6000 | S02 | Ogólne01 | NEW |
+| C05 | 6000 / 6000 | S05 | Ogólne02 | NEW |
+| C06 | 12000 / 6000 | S06 | Ogólne01 | NWE |
 
 Labels C01–C06 are recipe positions; no extra C01 attribute or graphical label
 is required. Assign the two demo attributes to each column through normal UI.
@@ -99,7 +110,7 @@ and leave reference file 102 passive and 103 unloaded. No cleanup or repair is
 requested. Submit the preflight JSON, A/B/C JSON and this short result form:
 
 ```text
-Package: 0.5.0
+Package: 0.5.1
 Allplan UI build: [actual]
 Preflight / capture A / B / C filenames: [...]
 All columns/components visibly unchanged during captures: yes / no / not checked
