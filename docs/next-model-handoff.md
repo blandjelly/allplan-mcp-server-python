@@ -2,6 +2,26 @@
 
 ## Current handoff — 2026-10-09
 
+### Checkout and reading order
+
+The completed M1 code and acceptance docs are on branch
+`codex/m1-scope-model-query`, pushed to origin, in open **draft**
+[PR #1](https://github.com/blandjelly/allplan-mcp-server-python/pull/1).
+At this handoff, it is **not merged**: PR base/main is
+`d8bd1ef8388daa956e8b51863b17ac33d784dca9`; closure is recorded in
+`c6d82867e67342d2b145513bf816eea8bdfa8be7`, followed by documentation updates.
+Recheck remote/PR state before editing. Continue from the latest M1 branch, or
+from main only after it contains this work; starting solely from the current
+main would omit the completed M1 implementation. Preserve unrelated owner edits.
+
+Read this current section, [project status](project-status.md),
+[M1 acceptance](test-results/m1-acceptance-0.5.3.md), then M2 in
+[implementation plan](implementation-plan.md), the
+[read contracts](tool-reference.md) and [demo fixture/profile](demo-model-and-profile.md).
+The older milestone narratives below are history, not unfinished owner tasks.
+
+### Accepted state and next implementation
+
 **M1 CLOSED; UAT-02/UAT-03 PASS for the bounded read contract**, current package
 **0.5.3**, profile revision **1.0.2**, owner's Allplan **2026-1-7**.
 [Acceptance, exact artifact and limits](test-results/m1-acceptance-0.5.3.md).
@@ -25,6 +45,17 @@ scope. No A/B/C, preflight, type probe, reinstall or accepted old batch repeat.
 Keep 0.5.3 and older ZIPs/hashes unchanged; further runtime code needs a new
 version. Raw new uploads stay private. Portable test results and owner Allplan
 verification remain separate; no automated suite was rerun for this closure.
+
+M2 entry points: `src/allplan_mcp/server.py` and `query_models.py` for typed MCP
+contracts; host `model_query.py`, `query_contracts.py`, `profile_contracts.py`
+and `native_readers.py` under `python_host/PythonPartsScripts/PythonHost/` for
+scope/fresh binding/read observations. The packaged profile is
+`src/allplan_mcp/profiles/native-model-qa.demo.json`, identical to
+`profiles/examples/native-model-qa.demo.json`. Relevant portable examples are
+`tests/test_model_query.py`, `test_m1_completion.py` and `test_m1_native_families.py`.
+Keep Allplan imports/services inside the host; prepare focused new audit checks
+without rerunning accepted M1 batches solely for handoff. UAT-04 is the next
+owner case after a runnable audit package exists; it remains NOT_RUN.
 
 The initial M0 instructions below are historical. **M0 is closed** on the owner's
 Allplan 2026-1-7 / local Windows Codex setup using package 0.1.2.
@@ -113,14 +144,17 @@ Implement the Allplan 2026 workflow toolkit incrementally in the existing fork. 
 ## Read first
 
 1. [Implementation plan](implementation-plan.md), especially baseline findings, contracts, milestones and exit gates.
-2. [Demo model and profile](demo-model-and-profile.md) and [draft profile JSON](../profiles/examples/native-model-qa.demo.json).
+2. [Demo model and profile](demo-model-and-profile.md) and [canonical read-profile JSON](../profiles/examples/native-model-qa.demo.json).
 3. [Manual acceptance tests](manual-acceptance-tests.md).
 4. Current `README.md`, `pyproject.toml`, `src/allplan_mcp/server.py`, `src/allplan_mcp/allplan_client.py`, the host scripts and registration utilities.
 5. Applicable repository instructions and the current working tree. Recheck the baseline before editing.
 
 The plan's baseline is commit `701f35366cc94b90085dd8b55d42b16f4166c95b` in `blandjelly/allplan-mcp-server-python`. Do not discard changes made after it.
 
-## Immediate work
+## Historical initial M0 work — completed
+
+Retained planning instructions below are superseded by the current handoff.
+Do not repeat them or treat their original unverified state as current.
 
 1. Inspect the current repository, upstream provenance, installation files and execution environment. Update a concise English `docs/project-status.md` as implementation begins.
 2. Fix the observed non-recursive installer: `source_scripts.glob("*.py")` omits the imported `sandbox/` package. Add a real temporary-directory installation regression test and package integrity checks.
@@ -134,7 +168,7 @@ The plan's baseline is commit `701f35366cc94b90085dd8b55d42b16f4166c95b` in `bla
 
 - Keep Allplan API objects/imports inside the host. Pure logic and JSON contracts should run in ordinary CI without Allplan.
 - Build typed workflow handlers. Do not implement the toolkit by sending arbitrary generated Python for every production operation.
-- Treat the draft JSON profile as unbound. The current server does not consume it; implement and validate the schema before activation.
+- The server validates profile m1-profile-1 and freshly binds demo resources for reads. Keep write eligibility explicit and the profile inactive for writes until downstream native write behavior is verified; do not confuse read binding with write activation.
 - Use model identity, explicit scope, normalized units, source fingerprints, preview/apply and readback. Respect passive/unloaded drawing files.
 - Validate actual write behavior for each type/property. Ordinary native columns and Structural Framing have different documented capabilities.
 - Missing data is `not_checked`, not a successful audit. A network timeout is not proof that a write did not happen.

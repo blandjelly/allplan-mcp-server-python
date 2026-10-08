@@ -28,6 +28,12 @@ nor upstream reports a license and none was invented. [Support matrix](support-m
 
 ## Current M1 implementation and next action
 
+Integration: completed M1 is pushed on `codex/m1-scope-model-query` in open draft
+[PR #1](https://github.com/blandjelly/allplan-mcp-server-python/pull/1), not yet
+merged into main at this handoff. Closure commit
+`c6d82867e67342d2b145513bf816eea8bdfa8be7`; subsequent documentation updates
+do not change the tested artifact. Continue from the latest branch/PR state.
+
 **M1 CLOSED; UAT-02/UAT-03 PASS within the bounded read contract**, current
 package **0.5.3**, profile revision **1.0.2**, Allplan **2026-1-7**.
 [Acceptance and exact tested artifact](test-results/m1-acceptance-0.5.3.md).
