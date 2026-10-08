@@ -84,3 +84,43 @@ UV_CACHE_DIR=/workspace/.cache/uv uv build --offline
 Native reader payloads match source, wheel profile matches canonical revision
 1.0.2, and the 0.5.2 archive hash is unchanged. The identification record is
 a separate documentation-only commit; the artifact is not rebuilt for it.
+
+## Native capture A read checks PASS — 2026-10-09
+
+Owner upload diagnostics-20261008T223235Z.json on 0.5.3 has verified installed
+integrity, clean source 4f685766, complete MCP batch and bound_for_read profile.
+Seventeen raw adapters resolve to eleven roots: ten in 101 (six columns, two
+SkeletonBeam, one wall, one MultiSlab) plus a reference column in 102. Six
+child representations deduplicate; no excluded-family, identity, hierarchy or
+requested-field read errors remain. 103 has the expected explicit unloaded
+omission. Full requested-project coverage is not inferred from that omission.
+
+| Native read check | Result |
+| --- | --- |
+| Profile columns / S02 / C01 spatial-height query | 6 / 2 / 1 |
+| C01 box | approximately (-200,-200,0) to (200,200,3000) mm |
+| Both beam box extents | 6000x300x500 mm; Z 3000..3500 mm |
+| Aggregate slab box extents | 4000x4000x200 mm; Z 2300..2500 mm |
+| Wall box extents | 4000x200x3000 mm |
+| Query/summary/page consistency | counts/fingerprints/selection and result IDs agree |
+| Local/global at zero offset | all ten file-101 boxes agree |
+
+The beam/slab native solid readback and ten-component count gates now pass for
+this bounded fixture. Native dimensional read results agree with the recipe;
+C01 also agrees with the owner's prior explicit UI report. Independent owner UI
+confirmation of beam/slab dimensions and visibly unchanged model is requested
+and pending; do not infer it solely from successful read transport. Display-unit
+change and nonzero-offset gates remain pending; full M1 is not closed.
+
+Setup exceptions remain: 102 reports active_background instead of passive;
+C05/S05 remains on layer 3700 instead of review layer 3701. C03 is still raw
+<niezdefiniowany>, preserved literally. Correct 102 state and C05 layer before B;
+these declared setup changes are separate from display-unit changes. No full A
+rerun is needed: compare B with A's same file-101 identities, canonical boxes and
+dimensions, explicitly accounting for the changed C05 layer and reference-file
+state. B also verifies the corrected state/layer/passive reference access.
+If extra changes or read failures appear, re-evaluate that bounded evidence.
+Keep the model geometry and 0.5.3 installation; continue B/C using M1 Final.cmd.
+No standalone profile/type probe, runtime code/archive change or repeated
+automated test accompanies this evidence record. Raw diagnostics/private paths
+are not published.

@@ -36,11 +36,13 @@ SZ_OGÓ01/SZ_OGÓ02 IDs 3700/3701 with exact short-name round trips. Installed
 integrity and transport verified. The group-versus-definition/full-versus-short-
 name setup issue is resolved. These IDs are context observations, not constants.
 Write eligibility remains not_checked; geometry/hierarchy/display-unit/offset
-and full M1 runtime acceptance remain pending. The owner type probe identified
-SkeletonBeam and MultiSlab roots excluded by the old family list. 0.5.3 adds
-these exact families and slab-tier geometry; keep the existing model/resources.
-Next: install 0.5.3, restore 102 passive/C05 review layer, then A for changed
-component/solid reads; B/C afterward. No standalone profile/type probe repeat.
+and full M1 runtime acceptance remain pending. The latest 0.5.3 A capture
+passes bounded ten-component/native-solid reads, including both SkeletonBeam
+roots and MultiSlab tier geometry. Owner UI confirmation of beam/slab dimensions
+and unchanged appearance is pending. Keep installation/model geometry; correct
+102 passive/C05 review layer, then B/C. No full A, standalone profile/type probe
+or previously accepted old batch repeat. Record setup changes separately when
+comparing B with A file-101 geometry.
 [Native-family correction](test-results/m1-native-families-0.5.3.md).
 [Correction and bounded runtime evidence](test-results/m1-profile-correction-0.5.2.md).
 [Follow-up evidence](test-results/m1-profile-followup-0.5.1.md).
@@ -51,9 +53,9 @@ geometry/hierarchy/profile changes and retain read-only session binding.
 [Completion evidence](test-results/m1-completion-portable-0.5.0.md),
 [final UAT-02/UAT-03 card](m1-final-batch.md).
 
-**M1 exit gate remains pending**: 0.5.0 native geometry/frame behavior, ten-
-component geometry/hierarchy fixture and frame/unit captures must pass in
-Allplan; bounded demo resource binding already passed in 0.5.2.
+**M1 exit gate remains pending**: 0.5.3 bounded native component/solid reads
+and demo resource binding pass; display-unit/nonzero-offset captures and final
+owner UI confirmation remain pending.
 Persistence/write eligibility belong to downstream mutation work; no write
 profile is activated. The server resolves real project IDs after UI setup;
 missing resources block the query instead of guessing.

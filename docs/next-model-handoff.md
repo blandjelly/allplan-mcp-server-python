@@ -2,31 +2,26 @@
 
 ## Current handoff — 2026-10-09
 
-Current package **0.5.3**, profile revision **1.0.2**. Owner preflight
-`diagnostics-20261008T184008Z.json` **PASS for bounded read-resource binding**:
-bound_for_read, mark/status 5001/5002 (names exact, type 67 string), layers
-3700/3701 (short names SZ_OGÓ01/SZ_OGÓ02, full names Ogólne01/Ogólne02).
-Installation and transport verified. The prior empty-group/full-name setup
-problem is resolved. IDs are observations, never hard-code them. Write
-eligibility remains not_checked. Full M1 geometry/hierarchy/frame acceptance
-remains pending. Latest capture A diagnostics-20261008T193947Z.json is **partial PASS**:
-file reassignment resolved the first empty-101 result. Six columns, two S02
-matches, one C01 spatial/height match and 400x400x3000 mm centered C01 agree
-with owner evidence. Broad scan finds only 7 supported roots in 101 (6 columns
-+ wall) plus 1 in 102; beams/slab native types/hierarchy remain unresolved.
-Owner raw-type probe diagnostics-20261008T222009Z.json resolves the gap:
-two SkeletonBeam_TypeUUID roots, each with SkeletonAxis child; MultiSlab_TypeUUID
-root with Slab_TypeUUID child. Six columns + two beams + wall + slab are present.
-0.5.3 adds these exact root families and direct-slab-tier geometry union. Other
-framing/grouped roots stay unsupported; axes never substitute for solid geometry.
-Profile 1.0.2 unchanged. Native identities/hierarchy were observed; beam/slab
-solid readback and full M1 exit gate are still pending. Next: install 0.5.3,
-keep existing objects/resources, set 102 passive/C05 review layer, capture A
-for changed family counts/geometry, then B/C. Do not repeat standalone preflight,
-type probe or accepted older batches. C03 remains literal <niezdefiniowany>, not
-silently normalized to missing. [Correction](test-results/m1-native-families-0.5.3.md),
-[capture findings](test-results/m1-final-runtime-0.5.2.md),
-[owner card](m1-final-batch.md). Raw new uploads are not published; keep old ZIPs.
+Current package **0.5.3**, profile revision **1.0.2**. Latest native capture A
+diagnostics-20261008T223235Z.json **PASS for bounded component/solid read checks**:
+10 roots in 101 (6 columns + 2 SkeletonBeam + wall + MultiSlab), one reference
+in 102, six child representations deduplicated, readable geometry throughout.
+Columns/S02/C01 counts 6/2/1; C01 400x400x3000 mm centered XY=(0,0), beams
+6000x300x500 and slab 4000x4000x200 mm. Query/summary/pages and zero-offset
+local/global boxes agree. Profile binding/integrity pass. Independent owner UI
+confirmation of beam/slab dimensions and unchanged appearance is requested and
+pending; display-unit/nonzero-offset and full M1 exit gate remain pending.
+
+Next: keep installation/geometry, correct 102 to passive and C05/S05 to SZ_OGÓ02,
+then capture B (metres display) and C (separate nonzero-offset copy). No full A
+repeat needed. Compare B's same file-101 identities/geometry with A and explicitly
+record the C05 layer/reference-state setup changes separately from display-unit
+invariance. B checks the corrected state/layer/passive reference. C03 remains
+literal <niezdefiniowany> with no silent missing-value normalization. Do not repeat
+standalone profile/type probes or accepted old batches. Supported new roots are
+exactly SkeletonBeam and MultiSlab; other framing/grouped families remain outside
+scope. [Native evidence](test-results/m1-native-families-0.5.3.md),
+[owner card](m1-final-batch.md). Raw new uploads are not published; old ZIPs intact.
 
 The initial M0 instructions below are historical. **M0 is closed** on the owner's
 Allplan 2026-1-7 / local Windows Codex setup using package 0.1.2.

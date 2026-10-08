@@ -5,16 +5,17 @@ Status: **ready_for_owner_test**, not accepted in Allplan yet. The bounded
 the remaining geometry/unit/offset and native hierarchy gates. The 0.5.2
 standalone demo read-resource binding preflight passed on 2026-10-08;
 [bounded evidence](test-results/m1-profile-correction-0.5.2.md).
-The 0.5.2 capture A passed bounded column geometry/S02/C01 filters but omitted
-three actual root families. The component-type follow-up identifies two
-SkeletonBeam_TypeUUID roots and one MultiSlab_TypeUUID root with a Slab tier.
-0.5.3 reads these exact families and unions slab tiers; native solid geometry
-for them still requires verification. [Findings and correction](test-results/m1-native-families-0.5.3.md).
-Install 0.5.3 in a new folder, retaining model and existing resources. Keep the
-structural beams and slab; no rebuild is required. Restore file 102 passive and
-put C05/S05 on SZ_OGÓ02. Repeat A to verify the changed counts/geometry, then
-continue B/C after A passes. No standalone profile/type probe or earlier accepted
-owner batch needs repetition. The final batch freshly validates its context.
+The latest 0.5.3 capture A **passes bounded native component/solid read checks**:
+10 components in 101, one reference in 102; six columns/two S02/one C01;
+both beam solids and slab-tier bounds are readable. Independent owner beam/slab
+UI dimensions/unchanged appearance confirmation remains requested and pending.
+[Native evidence](test-results/m1-native-families-0.5.3.md).
+Keep the installed 0.5.3 package and model geometry. Correct file 102 to passive
+and C05/S05 to SZ_OGÓ02, then continue B/C without another full A. These declared
+state/layer setup changes are recorded separately from display-unit changes;
+compare file-101 identities and geometry to the saved A capture. B validates
+corrected state/layer/passive reference access as well as display-unit invariance.
+No standalone profile/type probe or accepted owner batch needs repetition.
 
 No model edits are made by either packaged diagnostic command. Audit/repair
 tools belong to M2/M3 and are not exercised here.
@@ -114,7 +115,7 @@ packaged read requests with full responses, summaries and bounded page traversal
 | Capture | UI setup | Expected result |
 | --- | --- | --- |
 | A | Original fixture, zero offset, mm display | Resource read binding; 10 components in 101 and one accessible reference in 102; explicit unloaded 103 omission; six profile columns, two marks S02, one spatial/dimension match C01. Column boxes are 400 × 400 × 3000 mm; C01 center (0,0,1500). |
-| B | Same fixture and file states; change only displayed length unit to metres | Same physical dimensions, identities, 10/6/2/1 counts and C01 result. Canonical numbers remain mm. |
+| B | Geometry unchanged; restore 102 passive/C05 review layer as declared setup corrections, then change displayed length unit to metres | Same physical dimensions, identities, 10/6/2/1 counts and C01 result. Canonical numbers remain mm. |
 | C | Separate saved copy; configured offset X=100000, Y=200000, Z=0 mm (enter 100/200/0 if the dialog uses metres) | Raw offset agrees with UI; dimensions/counts stay unchanged. Compare C01's model-local center with its global center; the declared transform adds offset exactly once. Record an independent UI coordinate reading and its unit. |
 
 The implemented API source-frame convention is **model_local in mm**. Its
