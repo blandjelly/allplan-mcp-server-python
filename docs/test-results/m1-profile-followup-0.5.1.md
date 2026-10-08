@@ -37,3 +37,12 @@ both and start StartPythonHost. Run **only M1 Profile.cmd** and submit its JSON.
 No new layers, renamed native attributes, guessed IDs, fixture reconstruction or
 M1 Final.cmd is requested before read binding succeeds. Once bound_for_read,
 use the [updated final card](../m1-final-batch.md) with Ogólne01/Ogólne02.
+
+## Exact evaluation artifact
+
+`allplan-mcp-0.5.1-windows-evaluation.zip`, clean source commit
+`2067a2b2fcbe471956c3ed6f8b8bd96fe0ded448`, source_modified=false. SHA-256:
+`c91a8abd93059a7d5a9670bd11333bb2ad71e1acdccc63e3fc6883cd0303e4c3`.
+Wheel/sdist build PASS; wheel profile and original uploaded evidence bytes
+verified. This artifact record is a separate documentation-only commit.
+The original 0.5.0 archive remains unchanged.
