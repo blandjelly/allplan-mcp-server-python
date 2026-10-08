@@ -9,6 +9,9 @@ not definitions in the Attributes list; clarify group versus attribute creation
 and ordinary text/input definitions before repeating the resource preflight.
 No native writes; older profile revisions and evidence archives are preserved.
 [Sanitized runtime findings and validation](test-results/m1-profile-correction-0.5.2.md).
+Subsequent owner preflight **PASS**: exact mark/status text definitions and
+existing layer short names bind for reads. Final geometry/hierarchy/frame
+captures remain pending; no write eligibility or full M1 acceptance is claimed.
 
 ## 0.5.1 — 2026-10-08
 

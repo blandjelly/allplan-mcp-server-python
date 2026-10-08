@@ -2,18 +2,18 @@
 
 ## Current handoff — 2026-10-08
 
-Current package **0.5.2**, profile revision **1.0.2**. Owner 0.5.1 preflight
-has both attribute IDs -1 and both layer IDs 0. Uploaded UI screenshots explain
-the mismatch: short names **SZ_OGÓ01/SZ_OGÓ02**, full names Ogólne01/Ogólne02;
-demo names are empty attribute groups in the left tree, not definitions in the
-right Attributes list. Owner corrected this: the latest screenshot shows both
-actual names in the right Attributes list under user group MCP_QA. IDs/types
-are not visible or runtime verified yet. 0.5.2 corrects the short names and recipe.
-Next: owner installs 0.5.2, preserves the corrected definitions, then runs
-**only M1 Profile.cmd**. Do not construct the fixture before binding succeeds.
-[Sanitized evidence](test-results/m1-profile-correction-0.5.2.md). Raw 0.5.1
-upload contains environment data and is not published; no permission to publish
-it is inferred from the request to diagnose it. Preserve older ZIPs.
+Current package **0.5.2**, profile revision **1.0.2**. Owner preflight
+`diagnostics-20261008T184008Z.json` **PASS for bounded read-resource binding**:
+bound_for_read, mark/status 5001/5002 (names exact, type 67 string), layers
+3700/3701 (short names SZ_OGÓ01/SZ_OGÓ02, full names Ogólne01/Ogólne02).
+Installation and transport verified. The prior empty-group/full-name setup
+problem is resolved. IDs are observations, never hard-code them. Write
+eligibility remains not_checked. Full M1 geometry/hierarchy/frame acceptance
+remains pending. Next: owner builds the prepared fixture and runs final A/B/C
+captures on the same 0.5.2 package; do not repeat standalone M1 Profile.cmd or
+accepted older batches. [Sanitized evidence](test-results/m1-profile-correction-0.5.2.md),
+[final owner card](m1-final-batch.md). Raw new uploads contain environment data
+and are not published. Preserve older ZIPs; no new runtime package is needed.
 
 The initial M0 instructions below are historical. **M0 is closed** on the owner's
 Allplan 2026-1-7 / local Windows Codex setup using package 0.1.2.

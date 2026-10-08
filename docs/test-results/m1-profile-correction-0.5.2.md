@@ -46,3 +46,35 @@ No accepted owner batch or unrelated geometry test was repeated.
 `7748a2020b8f5968aba377e6674917f3ee419e7ccb11502684ca945cbf0d6605`.
 Wheel profile matches canonical JSON. Older evaluation archives are unchanged.
 This identification record is a separate documentation-only commit.
+
+## Native read-resource preflight PASS — 2026-10-08
+
+Owner upload `diagnostics-20261008T184008Z.json` reports package/bridge 0.5.2,
+source c4cfbd52938328c6e41405998ba110314bca8930, installed integrity verified
+without mismatches, successful MCP transport and profile revision 1.0.2
+**bound_for_read**. Sanitized observations:
+
+| Role | Observed native definition | ID | Type |
+| --- | --- | --- | --- |
+| mark | MCP_QA_MARK | 5001 | 67 / string |
+| status | MCP_QA_STATUS | 5002 | 67 / string |
+| structure | SZ_OGÓ01 (Ogólne01) | 3700 | layer |
+| review | SZ_OGÓ02 (Ogólne02) | 3701 | layer |
+
+All four reads are observed; exact name/type round trips succeeded, IDs are
+positive and distinct within their resource kinds. File 101 is foreground and
+raw project offset is zero. IDs are observations in this tested resource context,
+not constants to hard-code or durable identities.
+
+The **bounded resource-binding owner gate PASS** is separate from the six
+portable checks. Write eligibility remains not_checked and active_for_write=false.
+No geometry, hierarchy, nonzero-offset, display-unit or full M1 acceptance is
+inferred. Attribute input-control/unit/default/enum details were not independently
+inspected by this action; string type is verified. No original diagnostic or
+private environment paths/project/session identifiers are published here.
+
+Next: build the fixture once and collect final A/B/C captures using the same
+0.5.2 archive and [owner card](../m1-final-batch.md). Do not repeat M1 Profile.cmd
+alone or the already accepted 0.2.1/0.3.0/0.4.0 batches. The final batch's own
+fresh read binding remains necessary context validation. No code, archive or
+automated test changes accompany this evidence record.

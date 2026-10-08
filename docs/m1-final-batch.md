@@ -2,7 +2,9 @@
 
 Status: **ready_for_owner_test**, not accepted in Allplan yet. The bounded
 0.2.1/0.3.0/0.4.0 batches remain accepted; do not repeat them. This card closes
-the remaining geometry/unit/offset, native hierarchy and demo-binding gate.
+the remaining geometry/unit/offset and native hierarchy gates. The 0.5.2
+standalone demo read-resource binding preflight passed on 2026-10-08;
+[bounded evidence](test-results/m1-profile-correction-0.5.2.md).
 No model edits are made by either packaged diagnostic command. Audit/repair
 tools belong to M2/M3 and are not exercised here.
 
@@ -38,8 +40,10 @@ and edits no JSON. These manual
 setup changes are separate from the read-only server. If names already exist,
 check their text definitions instead of creating duplicates.
 
-With file 101 foreground, start StartPythonHost and double-click
-**M1 Profile.cmd**. The JSON in `logs` contains fresh names/IDs/types and layer
+The owner has already passed **M1 Profile.cmd** on 0.5.2; do not repeat it
+separately. Continue to fixture construction. For a genuinely changed resource
+setup, the standalone preflight remains available with file 101 foreground and
+StartPythonHost running. The JSON in `logs` contains fresh names/IDs/types and layer
 names/IDs. Expected: `mcp.model_query.status=bound_for_read`; mark/status have
 distinct IDs and the configured observed text type code 67; layers have distinct
 positive IDs. This is a read binding, not tested write eligibility. If it is
@@ -47,13 +51,10 @@ positive IDs. This is a read binding, not tested write eligibility. If it is
 model resolves the cause. Do not guess IDs or rename a different native field.
 Attribute 498 is **Nazwa obiektu**, not the demo mark/status.
 
-The 0.5.1 preflight resolves both attribute names to -1 and both full layer
-names to 0. Owner screenshots identify the layer short names; a follow-up
-screenshot confirms correction from empty groups to actual attribute definitions.
-Profile revision 1.0.2 corrects the short names; the server makes no resource
-writes. Install 0.5.2, then repeat **only M1 Profile.cmd**.
-If it remains not_checked, submit that JSON and stop before fixture construction
-or M1 Final.cmd. Changing the selected UI layer alone does not change bindings.
+The earlier group/full-name setup issue is resolved. Keep the existing two
+attribute definitions and layers, and use the already-installed 0.5.2 package.
+No reinstall or standalone preflight is required. The six-request final batch
+still includes a fresh resource binding as normal query-context validation.
 
 ## Build the fixture once
 
