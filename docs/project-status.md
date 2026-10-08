@@ -121,3 +121,15 @@ repeat or extra capture is required. Do not repeat the passed
 [0.3.0 query batch](m1-query-batch.md) without a relevant change or defect. Complete
 M1.4 binding from verified resources before the six-column/ten-component UAT.
 The demo profile remains **unbound and inactive**; **M1 is not accepted**.
+
+## First final capture A — 2026-10-08
+
+**Not accepted.** All five scans enumerate only one column from file 102;
+file-101 queries return zero despite owner confirmation of the full visible
+ten-component fixture. 102 is active background rather than recipe-passive;
+103 unloaded omission is explicit. Resource binding remains successful.
+The file-102 column AABB is 400x400x3000 mm with XY center (200,200),
+not identified C01 evidence. Input-view/session enumeration cause remains
+unresolved; no model rebuild, speculative API fix or automated rerun. Next:
+fresh host/model view with 101 foreground/102 passive/103 unloaded and capture
+A only. B/C remain pending. [Sanitized report](test-results/m1-final-runtime-0.5.2.md).

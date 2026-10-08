@@ -9,11 +9,18 @@ bound_for_read, mark/status 5001/5002 (names exact, type 67 string), layers
 Installation and transport verified. The prior empty-group/full-name setup
 problem is resolved. IDs are observations, never hard-code them. Write
 eligibility remains not_checked. Full M1 geometry/hierarchy/frame acceptance
-remains pending. Next: owner builds the prepared fixture and runs final A/B/C
-captures on the same 0.5.2 package; do not repeat standalone M1 Profile.cmd or
-accepted older batches. [Sanitized evidence](test-results/m1-profile-correction-0.5.2.md),
-[final owner card](m1-final-batch.md). Raw new uploads contain environment data
-and are not published. Preserve older ZIPs; no new runtime package is needed.
+remains pending. Next: resolve **first capture A NOT ACCEPTED**. Upload
+diagnostics-20261008T192549Z.json enumerates only one column in 102; all 101
+queries return zero despite owner confirming ten visible components there.
+102 was active background rather than passive. Code already resolves the input
+view document per request; no cached-document defect or native absence is proven.
+Next bounded step: save/stop host, set 101 foreground/102 passive/103 unloaded,
+focus 101 model view, restart host, repeat capture A only. Keep fixture/package;
+B/C pending. Owner unsure center versus corner insertion; do not infer C01 from
+file-102 geometry. [Final capture findings](test-results/m1-final-runtime-0.5.2.md),
+[resource evidence](test-results/m1-profile-correction-0.5.2.md),
+[owner card](m1-final-batch.md). Raw new uploads are not published. Preserve
+older ZIPs; no speculative runtime package change is made.
 
 The initial M0 instructions below are historical. **M0 is closed** on the owner's
 Allplan 2026-1-7 / local Windows Codex setup using package 0.1.2.
