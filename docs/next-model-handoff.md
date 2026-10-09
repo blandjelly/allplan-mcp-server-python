@@ -3,7 +3,12 @@
 ## Current handoff — 2026-10-09, package 0.7.0
 
 Continue from **`codex/m3-repair-preview`**, based on accepted M2 commit
-`bedb264`. The owner requested continuation from M2 until native owner testing
+`bedb264`. This branch is currently local: automatic approval review rejected
+the outbound push because continuation was not treated as authorization to
+publish the source/documentation. Obtain the owner's approval before pushing
+this branch to the same GitHub repository; no remote PR was created. The
+delivered ZIP contains the complete runtime source and documentation.
+The owner requested continuation from M2 until native owner testing
 is required. The first read-only M3.1/M3.2 slice is now
 **ready_for_owner_test**: [contract](m3-repair-contract.md),
 [portable validation](test-results/m3-preview-portable-0.7.0.md),
