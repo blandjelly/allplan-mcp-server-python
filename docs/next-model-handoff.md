@@ -1,6 +1,55 @@
 # Next-model handoff
 
-## Current handoff — 2026-10-09, package 0.7.0
+## Current handoff — 2026-10-09, package 0.8.0
+
+Continue on **`codex/m3-repair-preview`**, existing draft
+[PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2).
+The owner requested continued M3 work until user testing is required and
+explicitly authorized GitHub actions. The previously accepted 0.7.0 preview
+archive/evidence remain unchanged; M0–M2 acceptance is preserved.
+
+**Delivered next slice: ready_for_owner_test**, native writes/Undo **not_run**.
+Read [execution contract](m3-execution-contract.md),
+[portable checks](test-results/m3-execution-portable-0.8.0.md) and
+[Polish write/Undo card](m3-apply-batch.md). New-version artifacts are under
+`evaluation-packages/0.8.0`; the delivery manifest records their exact source
+commit and SHA-256. Never rebuild under an accepted artifact's version.
+
+Implemented bounded native ChangeLayer/ChangeAttributes evaluation apply for
+exactly the retained C05/S05 layer and C06/S06 status repairs in foreground
+file 101, with a reviewed plan/hash and explicit disposable-copy acknowledgement.
+Full fresh audit/source/TTL checks and all-target root resolution/eligibility
+precede setters. Each target is checked again, written once and freshly read
+back; failure stops later targets. Final audit expects three mark findings and
+all returned audited fields to match only the two planned changes. Collateral
+audited changes/unavailable post-checks fail verification. Generic writable
+profiles/refs remain inactive; other native types/scopes are unavailable.
+
+Local OS serialization and atomically persisted write-ahead execution records
+deduplicate exact execution IDs across restart/plan expiry/UI Undo. Conflicting
+IDs, full/corrupt/unwritable journals and unresolved outcomes block new writes.
+Recover is read-only: it reconciles observed current old/new values, never
+resumes setters and does not prove mutation causality or cross-copy identity.
+The owner CLI saves an execution request before sending, has no automatic retry,
+and provides **M3 Apply.cmd**, **M3 Recover.cmd**, **M3 Check Undo.cmd**.
+Undo is manual native UI observation; no grouping/rollback API is assumed.
+
+**Next action requires the owner:** install 0.8.0 on a disposable copy, review
+the two values and run the write/readback/replay → host restart/recovery → UI
+Undo/readback card. Return original JSON/TXT, UI target/value/unchanged-other-
+elements observations and number of Undo steps. No repeat of accepted M1/M2
+or standalone 0.7.0 preview batch is requested. Stop at this native gate;
+M3.3, broader apply/registry behavior and native manual-edit conflicts remain
+pending. M3 and UAT-05/UAT-06 are not closed. Cloud cannot run Windows/Allplan.
+
+Portable validation: **146 tests PASS**, Linux Python 3.12.14; frozen sync,
+wheel/sdist build, deterministic source-only Windows ZIP, integrity and recursive
+registration. Real MCP/HTTP tests include lost completed response with saved ID
+and no automatic retry. Remote CI is separate and must be checked for the
+published commit. Main's independent documentation cleanup remains outside this
+M3 slice; no main/PR merge is performed. Recheck remote state before integration.
+
+## Prior handoff — 2026-10-09, package 0.7.0 (historical)
 
 Continue from **`codex/m3-repair-preview`**, based on accepted M2 commit
 `bedb264`. The owner explicitly approved publishing all prepared work to GitHub

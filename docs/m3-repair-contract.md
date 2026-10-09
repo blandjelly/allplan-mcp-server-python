@@ -1,5 +1,9 @@
 # M3 repair preview contract — 0.7.0
 
+This document preserves the accepted 0.7.0 read-only behavior. Package **0.8.0**
+adds a separate [bounded disposable-copy execution contract](m3-execution-contract.md)
+with a [new owner gate](m3-apply-batch.md); its native acceptance is pending.
+
 First M3.1/M3.2 slice: **accepted_on_build within the retained read-only preview
 scope**, package 0.7.0 on the previously owner-identified Allplan 2026-1-7 fixture;
 [native evidence and limits](test-results/m3-preview-acceptance-0.7.0.md). Tool

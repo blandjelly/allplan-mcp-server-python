@@ -1,4 +1,4 @@
-"""First M3 slice: explicit, read-only repair plans and revalidation."""
+"""M3 plans, bounded disposable-copy execution and read-only recovery."""
 from typing import Annotated, Literal
 
 from pydantic import Field, model_validator
@@ -57,4 +57,15 @@ class RepairRevalidate(ContractModel):
     plan_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
-RepairRequest = Annotated[RepairPreview | RepairRevalidate, Field(discriminator="action")]
+class RepairApply(RepairRevalidate):
+    action: Literal["apply"]
+    execution_id: str = Field(pattern=r"^[0-9a-f]{32}$")
+    acknowledgement: Literal["disposable_copy_reviewed_two_repairs"]
+
+
+class RepairRecover(ContractModel):
+    action: Literal["recover"]
+    execution_id: str = Field(pattern=r"^[0-9a-f]{32}$")
+
+
+RepairRequest = Annotated[RepairPreview | RepairRevalidate | RepairApply | RepairRecover, Field(discriminator="action")]

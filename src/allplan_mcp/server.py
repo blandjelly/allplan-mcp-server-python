@@ -205,14 +205,19 @@ def model_audit(request: AuditRequest) -> dict[str, Any]:
 
 @mcp.tool
 def fix_model_issues(request: RepairRequest) -> dict[str, Any]:
-    """Preview explicit layer/status repairs or revalidate a session-local plan.
+    """Preview/revalidate repairs, apply the bounded disposable-copy gate, or recover.
 
     Preview takes a fresh audit request and explicit rule_id/value choices.
     Optional finding_ids restrict targets to those exact fresh findings.
     Returns old/new values, exclusions, locators, plan ID/hash and a five-minute
     lifetime. Revalidate requires that exact ID/hash and rereads the full scope.
     Changed evidence conflicts; restart/expiry/eviction require a new preview.
-    This first M3 slice is read-only: apply, writable refs and Undo are unavailable.
+    Evaluation apply supports only the two retained file-101 Column repairs,
+    with exact plan ID/hash, persistent execution_id and acknowledgement
+    disposable_copy_reviewed_two_repairs. It checks native eligibility, stops on
+    failure and reads back results. Repeated execution IDs never repeat setters.
+    Recover reads persisted execution/current values without resuming writes.
+    General apply and native Undo acceptance remain unavailable.
     """
     payload = request.model_dump(exclude_unset=True, exclude_none=True)
     if payload["action"] == "preview":

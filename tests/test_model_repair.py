@@ -146,7 +146,7 @@ class RepairTests(unittest.TestCase):
                         self.request(audit={**fixtures.AuditTests.request(self), "scope":{"drawing_files":[101],"include_passive":True,"visibility":"api_select_all"}}),
                         self.request(finding_ids=["0" * 64] * 2), self.request(unknown=True)]
         for request in bad_requests:
-            self.assert_code("repair_apply_unavailable" if request["action"] == "apply" else "invalid_payload",
+            self.assert_code("invalid_payload",
                              lambda: self.handler.handle("/fix-model-issues", request))
         self.coord.GetInputViewDocument.assert_not_called()
         self.base.ElementsSelectService.SelectAllElements.assert_not_called()

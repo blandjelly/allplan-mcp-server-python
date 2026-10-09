@@ -67,7 +67,13 @@ inclusion. Report omitted/unloaded/read-only scope explicitly.
 
 ## Shared mutation lifecycle
 
-The first M3 slice in 0.7.0 implements only explicit preview and fresh evidence
+Package **0.8.0** adds the bounded evaluation executor `repair_execution.py`
+and 2026 `native_repairs.py`: fresh target/eligibility checks, write-ahead Local
+journal, serialized execution, readback/full audited-field verification and
+read-only recovery. Exact execution-ID replay never repeats setters. General
+writes and native Undo remain unaccepted; see [execution contract](m3-execution-contract.md).
+
+The earlier M3 slice in 0.7.0 implements only explicit preview and fresh evidence
 revalidation: host `repair_contracts.py` / `model_repair.py`, public
 `repair_models.py` and `fix_model_issues`. Its bounded session-local cache stores
 immutable returned-plan copies with ID/hash and expiry; no apply/writability,

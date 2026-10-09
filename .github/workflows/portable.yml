@@ -1,4 +1,4 @@
-name: Portable M0, M1, M2 and M3 preview checks
+name: Portable M0, M1, M2 and M3 execution checks
 on:
   push:
   pull_request:

@@ -60,7 +60,14 @@ The earlier crash's precise cause remains unproven. No repeated owner test is re
 **Exit gate (UAT-04):** demo returns exactly 5 findings on 5 columns, correct
 uniqueness scope, explicit unavailable data and locatable targets; no writes.
 
-## M3 — Controlled repairs and standards: bounded preview gate PASS, apply pending
+## M3 — Controlled repairs and standards: preview PASS, execution ready for owner test
+
+Package **0.8.0** implements bounded disposable-copy native layer/status apply,
+fresh resolution/eligibility, per-target readback, collateral audited-field checks,
+persistent execution identity and read-only recovery. Portable evidence is
+[recorded separately](test-results/m3-execution-portable-0.8.0.md).
+The [new write/Undo gate](m3-apply-batch.md) is pending; no native acceptance,
+Undo grouping or M3 closure is claimed. [Execution limits](m3-execution-contract.md).
 
 Package **0.7.0** implements the first read-only M3.1/M3.2 slice:
 `fix_model_issues` explicit layer/status preview and plan revalidation, full fresh
@@ -72,10 +79,9 @@ stale/expiry/restart controls. [Contract](m3-repair-contract.md),
 Owner confirms target/value correspondence and continued host/Allplan operation;
 native revalidation/follow-up audit retain identical audited source. No repeated
 preview batch is required. Manual-edit native conflicts remain unverified.
-No native apply or setter invocation is
-implemented. UAT-05/UAT-06 are not closed. M3.1's mutation/Undo lifecycle,
-M3.2 apply/readback, M3.3 and M3.4 remain pending; the portable read-only cache
-does not establish durable write identity or retry deduplication.
+The 0.7.0 package invokes no setters. In 0.8.0, M3.1/M3.2/M3.4 have a bounded
+implementation awaiting native write/readback/restart/Undo observations.
+UAT-05/UAT-06, broader mutation/registry guarantees and M3.3 remain pending.
 
 - **M3.1** Shared preview/apply, stale checks, serialized writes, request identity, readback, partial outcomes and tested Undo limits.
 - **M3.2** `fix_model_issues` for writable attributes/layers; data marks and graphical labels stay distinct.

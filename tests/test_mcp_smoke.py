@@ -41,6 +41,73 @@ class FakeBridge:
 
 
 class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
+    async def test_m3_lost_apply_response_saves_identity_and_recovery_does_not_retry(self):
+        from test_repair_execution import ExecutionTests
+        from allplan_mcp.repair_diagnostics import apply_gate, recovery_gate
+        native = ExecutionTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        native.writable_fixture()
+        original = self.bridge_handler.handle
+        lost = [False]
+        def handle(path, payload):
+            if path in {"/fix-model-issues", "/model-audit"}:
+                self.bridge_handler.calls.append((path, payload))
+                result = native.handler.handle(path, payload)
+                if payload.get("action") == "apply" and not lost[0]:
+                    lost[0] = True
+                    raise transport.BridgeError("execution_unknown", "Simulated lost completed reply", 503)
+                return result
+            return original(path, payload)
+        self.bridge_handler.handle = handle
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "lost.json"
+            result = await apply_gate(self.host_url, self.url, path, confirm=lambda prompt: "NAPRAW KOPIE")
+            self.assertEqual(result["state"], "unknown")
+            self.assertEqual(sum(p.get("action") == "apply" for _, p in self.bridge_handler.calls), 1)
+            previous = json.loads((Path(directory) / "m3-last-execution.json").read_text(encoding="utf-8"))
+            recovered = await recovery_gate(self.host_url, self.url, Path(directory) / "recover.json", previous)
+            self.assertEqual(recovered["state"], "ready_for_ui_observation", recovered)
+            native.base.ElementsLayerService.ChangeLayer.assert_called_once()
+            native.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+
+    async def test_m3_apply_cli_and_recovery_use_real_transport_with_persisted_execution(self):
+        from test_repair_execution import ExecutionTests
+        from allplan_mcp.repair_diagnostics import apply_gate, recovery_gate
+        native = ExecutionTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        elements = native.writable_fixture()
+        original = self.bridge_handler.handle
+        def handle(path, payload):
+            if path in {"/fix-model-issues", "/model-audit"}:
+                self.bridge_handler.calls.append((path, payload))
+                try:
+                    return native.handler.handle(path, payload)
+                except native.module.BridgeError as exc:
+                    raise transport.BridgeError(exc.code, str(exc), exc.status) from exc
+            return original(path, payload)
+        self.bridge_handler.handle = handle
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "apply.json"
+            cancelled = await apply_gate(self.host_url, self.url, path, confirm=lambda prompt: "")
+            self.assertEqual(cancelled["state"], "cancelled")
+            native.base.ElementsLayerService.ChangeLayer.assert_not_called()
+            applied = await apply_gate(self.host_url, self.url, path, confirm=lambda prompt: "NAPRAW KOPIE")
+            self.assertEqual(applied["state"], "ready_for_ui_observation", applied)
+            self.assertTrue(path.with_suffix(".txt").exists())
+            previous = json.loads((Path(directory) / "m3-last-execution.json").read_text(encoding="utf-8"))
+            self.assertEqual(previous["state"], "apply_pending")
+            self.assertEqual(previous["execution_id"], applied["execution_id"])
+            recovered = await recovery_gate(self.host_url, self.url, Path(directory) / "recover.json", previous)
+            self.assertEqual(recovered["state"], "ready_for_ui_observation", recovered)
+            elements[4].GetCommonProperties.return_value.Layer = 8
+            elements[5].GetAttributes.return_value = [(20001, "S06"), (20002, "NWE")]
+            undone = await recovery_gate(self.host_url, self.url, Path(directory) / "undo.json", previous, True)
+            self.assertEqual(undone["state"], "ready_for_ui_observation", undone)
+            native.base.ElementsLayerService.ChangeLayer.assert_called_once()
+            native.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+
     async def test_m3_preview_gate_real_transport_and_cli_preserve_two_changes_and_five_findings(self):
         from test_model_repair import RepairTests
         native = RepairTests()

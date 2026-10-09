@@ -1,4 +1,4 @@
-"""Session-local, bounded plans over fresh M2 evidence. No native setters."""
+"""Bounded plans over fresh M2 evidence; explicit evaluation execution is separate."""
 import copy
 import json
 from collections import OrderedDict
@@ -16,12 +16,17 @@ class RepairPlanService:
     MAX_PLAN_BYTES = 4 * 1024 * 1024
     MAX_CACHE_BYTES = 8 * 1024 * 1024
 
-    def __init__(self, queries):
+    def __init__(self, queries, journal_path=None):
         self.queries = queries
         self.plans = OrderedDict()
+        from pathlib import Path
+        from .repair_execution import RepairExecutor
+        self.executor = RepairExecutor(self, journal_path or Path(__file__).resolve().parents[2] / ".allplan-mcp" / "repairs")
 
     def handle(self, doc, base, settings, request):
         validate_repair_request(request)
+        if request["action"] in {"apply", "recover"}:
+            return self.executor.handle(doc, base, settings, request)
         now = self.queries.clock()
         for ident, entry in list(self.plans.items()):
             if now - entry["created"] >= self.TTL_SECONDS:
@@ -86,6 +91,8 @@ class RepairPlanService:
                 "expires_after_seconds": self.TTL_SECONDS,
                 "reference_lifetime": "host_session_project_document_snapshot; no persistence or authorization",
                 "report_text": self._text(changes, exclusions, complete)}
+        plan["evaluation_apply_available"] = self.executor.evaluation_scope(plan)
+        plan["evaluation_apply_limit"] = "disposable_copy_reviewed_two_repairs; native acceptance pending"
         plan["plan_hash"] = fingerprint({"plan": plan, "request": request})
         entry = {"created": created, "request": copy.deepcopy(request), "plan": plan}
         size = len(json.dumps(entry, ensure_ascii=False, allow_nan=False).encode())
@@ -120,13 +127,14 @@ class RepairPlanService:
                 "current_audit_report_fingerprint": report["report_fingerprint"],
                 "expires_in_seconds": max(0, int(self.TTL_SECONDS - (self.queries.clock() - entry["created"]))),
                 "apply_available": False, "usable_for_write": False,
-                "report_text": "Plan evidence unchanged; apply remains unavailable." if valid else
+                "evaluation_apply_available": valid and plan["evaluation_apply_available"],
+                "report_text": "Plan evidence unchanged; bounded disposable-copy evaluation apply requires explicit acknowledgement." if valid else
                                "Plan conflict: identity, resources, scope or audited source changed. Preview again."}
 
     @staticmethod
     def _text(changes, exclusions, complete):
         lines = [f"Repair preview: {len(changes)} proposed changes; {len(exclusions)} excluded findings.",
-                 f"Audit complete: {complete}. Read-only; native apply unavailable."]
+                 f"Audit complete: {complete}. Preview requests no writes; evaluation apply requires a reviewed disposable copy."]
         for change in changes:
             loc = change["locator"]
             lines.append(f"{change['rule_id']}: file {loc['drawing_file']}, mark {loc['mark'].get('value')!r}, "

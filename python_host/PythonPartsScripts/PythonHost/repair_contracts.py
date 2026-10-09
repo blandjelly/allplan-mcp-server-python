@@ -9,17 +9,23 @@ SCHEMA = "m3-repair-1"
 
 
 def validate_repair_request(request):
-    if isinstance(request, dict) and request.get("action") == "apply":
-        raise BridgeError("repair_apply_unavailable", "Native repair apply is unavailable in this preview package. Verify the M3 owner gate first.", 409)
     if not isinstance(request, dict):
         invalid("Repair request must be an object.")
     action = request.get("action")
-    if action == "revalidate":
+    if action in {"revalidate", "apply", "recover"}:
         required = {"schema_version", "action", "plan_id", "plan_hash"}
+        if action == "recover":
+            required = {"schema_version", "action", "execution_id"}
+        elif action == "apply":
+            required |= {"execution_id", "acknowledgement"}
         keys(request, required, required)
-        for key, size in (("plan_id", 32), ("plan_hash", 64)):
+        for key, size in (("plan_id", 32), ("plan_hash", 64), ("execution_id", 32)):
+            if key not in required:
+                continue
             if not isinstance(request[key], str) or not re.fullmatch(r"[0-9a-f]{" + str(size) + "}", request[key]):
                 invalid(f"Invalid {key}.")
+        if action == "apply" and request["acknowledgement"] != "disposable_copy_reviewed_two_repairs":
+            invalid("Apply requires acknowledgement of the reviewed repairs on a disposable project copy.")
     elif action == "preview":
         required = {"schema_version", "action", "audit", "repairs"}
         keys(request, required | {"finding_ids"}, required)
@@ -56,7 +62,7 @@ def validate_repair_request(request):
                     or len(set(ids)) != len(ids)):
                 invalid("finding_ids must contain 1..100 distinct finding hashes.")
     else:
-        invalid("Repair action must be preview or revalidate.")
+        invalid("Repair action must be preview, revalidate, apply or recover.")
     if request["schema_version"] != SCHEMA:
         invalid(f"schema_version must be {SCHEMA}.")
 
