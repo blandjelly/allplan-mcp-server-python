@@ -1,6 +1,12 @@
-# M3 — zapis i Undo na kopii projektu, pakiet 0.8.0
+# M3 — zapis i Undo na kopii projektu, pakiet 0.8.1
 
 Status: **ready_for_owner_test**. Natywny zapis i Undo nie są jeszcze zaliczone.
+Test 0.8.0 zatrzymał się przed pierwszym zapisem na błędnej kontroli IsInMacro.
+[Diagnoza i oryginalne logi](test-results/m3-apply-rejection-0.8.0.md).
+Allplan i serwer pozostały uruchomione; właściciel nie widzi zmian.
+Nie wykonuj Undo ani Recover dla tego odrzuconego żądania. Zachowaj archiwum
+0.8.0 i logi; przejdź na nowy pakiet. Możesz użyć tej samej, niezmienionej
+jednorazowej kopii projektu — nie trzeba odbudowywać sześciu słupów.
 Podgląd 0.7.0 jest już zaliczony; nowy test dotyczy zapisu, odczytu wyniku,
 powtórzenia żądania i Undo. Nie powtarzaj M1/M2 ani nie przebudowuj modelu.
 
@@ -9,11 +15,11 @@ powtórzenia żądania i Undo. Nie powtarzaj M1/M2 ani nie przebudowuj modelu.
 1. Zachowaj oryginalny projekt referencyjny i sprawdzone archiwa. W Allplanie
    wykonaj **osobną, jednorazową kopię projektu** ze sprawdzonymi sześcioma
    słupami i pięcioma usterkami w pliku 101. Pracuj wyłącznie na tej kopii.
-2. Zamknij Allplan i poprzednie okno MCP. Rozpakuj cały ZIP **0.8.0** do nowego
+2. Zamknij Allplan i poprzednie okno MCP. Rozpakuj cały ZIP **0.8.1** do nowego
    folderu, uruchom **Setup.cmd**, wskaż rzeczywisty dotychczasowy `Local`.
 3. Otwórz kopię w Allplan **2026-1-7**. Plik **101** ma być na pierwszym planie;
    warstwy słupów dostępne do modyfikacji. Uruchom Library → Private →
-   PythonHost → StartPythonHost oraz **Launch Allplan MCP.cmd** z folderu 0.8.0.
+   PythonHost → StartPythonHost oraz **Launch Allplan MCP.cmd** z folderu 0.8.1.
    Nie wykonuj innych operacji w trakcie testu. Nie trzeba zmieniać połączenia Codex.
 
 ## Zapis dwóch zmian
@@ -54,7 +60,13 @@ zgodność obu celów/wartości, niezmienione pozostałe elementy i liczbę krok
 `logs/m3-last-execution.json` przechowuje identyfikator do odzyskiwania; zachowaj
 go, cały folder pakietu i dziennik `Local/.allplan-mcp/repairs`.
 
-Przy błędzie albo utracie odpowiedzi **nie uruchamiaj ponownie M3 Apply**.
+Wynik **rejected** z `native_setters_started=false` oznacza jawne odrzucenie
+tego żądania przed zapisem. Zachowaj logi i zgłoś przyczynę; Undo/Recover dla
+tego odrzucenia nie są potrzebne. Program zapisuje również końcowy status w
+`m3-last-execution.json`. Dalsza próba wymaga rozwiązania zgłoszonej przyczyny
+i świeżego podglądu.
+
+Przy błędzie bez takiego potwierdzenia albo utracie odpowiedzi **nie uruchamiaj ponownie M3 Apply**.
 Nie wykonuj kolejnych zmian. Jeśli Allplan działa, uruchom M3 Recover; jeśli
 trzeba, uruchom ponownie host w tej samej kopii. Zachowaj logi i zgłoś stan.
 Brak zapisu w dzienniku może oznaczać odrzucenie przed pierwszym setterem;

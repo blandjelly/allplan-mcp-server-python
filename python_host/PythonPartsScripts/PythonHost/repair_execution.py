@@ -138,8 +138,11 @@ class RepairExecutor:
             if change["operation"] == "set_attribute" and "status" in fields:
                 fields["status"] = copy.deepcopy(fields[change["field"]])
         # Resolve and check every target before recording or invoking any setter.
+        target_preflight = []
         for change in plan["changes"]:
-            element = native_repairs.resolve(doc, base, self.plans.queries, change, writable=True)
+            diagnostics = {"ref": copy.deepcopy(change["ref"])}
+            element = native_repairs.resolve(doc, base, self.plans.queries, change, writable=True, diagnostics=diagnostics)
+            target_preflight.append(diagnostics)
             if native_repairs.read(base, self.plans.queries, element, change) != change["old_value"]:
                 raise BridgeError("repair_conflict", "Target old value differs from the reviewed plan.", 409)
         if self.plans.queries.clock() - entry["created"] >= self.plans.TTL_SECONDS:
@@ -148,6 +151,7 @@ class RepairExecutor:
                   "request_hash": fingerprint(request), "plan_id": plan["plan_id"], "plan_hash": plan["plan_hash"],
                   "state": "running", "audit_request": entry["request"]["audit"],
                   "changes": copy.deepcopy(plan["changes"]),
+                  "target_preflight": target_preflight,
                   "outcomes": [{"state": "skipped", "reason": "not_attempted"} for _ in plan["changes"]]}
         self.save(record)
         self.plans.plans.clear()

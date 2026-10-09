@@ -41,6 +41,40 @@ class FakeBridge:
 
 
 class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
+    async def test_explicit_apply_rejection_is_not_unknown_and_recovery_never_replays_it(self):
+        from test_repair_execution import ExecutionTests
+        from allplan_mcp.repair_diagnostics import apply_gate, recovery_gate
+        native = ExecutionTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        elements = native.writable_fixture()
+        original = self.bridge_handler.handle
+        def handle(path, payload):
+            if path in {"/fix-model-issues", "/model-audit"}:
+                self.bridge_handler.calls.append((path, payload))
+                if payload.get("action") == "apply":
+                    elements[5].IsInActiveLayer.return_value = False
+                try:
+                    return native.handler.handle(path, payload)
+                except native.module.BridgeError as exc:
+                    raise transport.BridgeError(exc.code, str(exc), exc.status) from exc
+            return original(path, payload)
+        self.bridge_handler.handle = handle
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "reject.json"
+            rejected = await apply_gate(self.host_url, self.url, path, confirm=lambda prompt: "NAPRAW KOPIE")
+            self.assertEqual(rejected["state"], "rejected", rejected)
+            self.assertFalse(rejected["native_setters_started"])
+            self.assertEqual(rejected["steps"][-1]["response"]["error"]["code"], "target_not_writable")
+            previous = json.loads((Path(directory) / "m3-last-execution.json").read_text(encoding="utf-8"))
+            self.assertEqual(previous["state"], "rejected")
+            before = len(self.bridge_handler.calls)
+            recovered = await recovery_gate(self.host_url, self.url, Path(directory) / "recover.json", previous)
+            self.assertEqual(recovered["state"], "rejected")
+            self.assertEqual(len(self.bridge_handler.calls), before)
+        native.base.ElementsLayerService.ChangeLayer.assert_not_called()
+        native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
     async def test_m3_lost_apply_response_saves_identity_and_recovery_does_not_retry(self):
         from test_repair_execution import ExecutionTests
         from allplan_mcp.repair_diagnostics import apply_gate, recovery_gate

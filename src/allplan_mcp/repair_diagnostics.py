@@ -65,6 +65,12 @@ async def apply_gate(host_url, mcp_url, path, confirm=input):
         async with Client(mcp_url, timeout=90) as client:
             step = "apply_readback"
             response = (await client.call_tool("fix_model_issues", {"request": request})).data
+            if response.get("state") == "rejected" and response.get("native_setters_started") is False:
+                report["steps"].append({"name": step, "ok": False, "response": response})
+                report.update(state="rejected", native_setters_started=False,
+                              message=response["report_text"] + ". No write/Undo/recovery is needed for this rejected request. Preserve logs.")
+                save(path.parent / "m3-last-execution.json", report)
+                return report
             ok = (response.get("state") == "completed" and response.get("execution_id") == execution_id
                   and [o["state"] for o in response.get("outcomes", [])] == ["applied", "applied"]
                   and response.get("audited_fields_match_plan") is True
@@ -94,6 +100,11 @@ async def recovery_gate(host_url, mcp_url, path, previous, check_undo=False):
     execution_id = previous["execution_id"]
     report = {"state": "recovery_pending", "execution_id": execution_id, "read_only": True,
               "steps": [], "allplan_acceptance": "not_run"}
+    if previous.get("state") == "rejected" and previous.get("native_setters_started") is False:
+        report.update(state="rejected", native_setters_started=False,
+                      message="Saved request was explicitly rejected before setters. Recovery/replay was not sent.")
+        save(path, report)
+        return report
     try:
         async with Client(mcp_url, timeout=90) as client:
             request = {"action": "recover", "execution_id": execution_id}

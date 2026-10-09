@@ -1,6 +1,43 @@
 # Next-model handoff
 
-## Current handoff — 2026-10-09, package 0.8.0
+## Current handoff — 2026-10-09, package 0.8.1
+
+Continue **`codex/m3-repair-preview`**, draft [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2).
+The owner supplied four original write-gate logs and reports that the tool did
+not work, Allplan/server still run, and no model changes are visible.
+[Rejection record and exact evidence](test-results/m3-apply-rejection-0.8.0.md)
+establish **BLOCKED before setters** for execution
+`9232c4149bd9497496b42c92a5dc0aed`: host `target_not_writable`, IsInMacro.
+All 22 installed bridge hashes match the unchanged 0.8.0 archive; preview and
+its audit/revalidation/health pass. The CLI's `unknown` and pointer's
+`apply_pending` are incorrect/incomplete client labels, not evidence of a write.
+No Undo or replay of that rejected plan is required.
+
+**Correction 0.8.1, ready_for_owner_test:** IsInMacro is parent-object diagnostic
+evidence, not a macro-only veto. Required native parent traversal must terminate
+at the reviewed exact Column root; macro/unknown ancestors, ambiguous identity,
+null/deleted/invalid/passive/inactive/label targets still block writes. Execution
+records retain root/flag observations. The MCP wrapper categorizes known pre-setter
+errors as `rejected/native_setters_started=false`; owner CLI finalizes that pointer
+and never sends recovery/replay for a rejected request. Journal, unexpected and
+transport errors remain conservatively unknown. No automatic retry/Undo added.
+
+149 portable tests PASS on Linux Python 3.12.14, including native-style
+IsInMacro=true Column roots, macro/unknown ancestor rejection, real MCP/HTTP
+explicit rejection and no recovery replay; previous crash/disk/lost-reply checks
+remain. New exact artifacts are delivered under `evaluation-packages/0.8.1`;
+delivery manifest records clean source/hash. All previous archives are unchanged.
+CI must be checked separately for the newly published commit.
+
+**Next owner action:** install **0.8.1** and run [the write card](m3-apply-batch.md)
+on the same unchanged disposable project copy. It creates a fresh plan/ID;
+do not replay the failed 0.8.0 request. If write/readback succeeds, continue
+restart/recovery and manual UI Undo/readback. Return original JSON/TXT and UI
+observations. Do not repeat accepted M1/M2 or rebuild the fixture. Native writes,
+Undo and UAT-05/UAT-06 remain unaccepted; broader M3 work still waits for this gate.
+GitHub authorization from the owner remains valid; no main/PR merge is performed.
+
+## Prior handoff — 2026-10-09, package 0.8.0 (historical)
 
 Continue on **`codex/m3-repair-preview`**, existing draft
 [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2).

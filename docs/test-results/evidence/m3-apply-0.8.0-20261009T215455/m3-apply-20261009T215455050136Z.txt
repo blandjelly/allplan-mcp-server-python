@@ -1,0 +1,4 @@
+M3 disposable-copy gate: unknown. Execution: 9232c4149bd9497496b42c92a5dc0aed.
+preview_preflight: OK
+apply_readback: FAILED
+Operation stopped: Error calling tool 'fix_model_issues': Target fails IsInMacro; no write requested. [code=target_not_writable, request_id=58643917-d05c-4223-b0bf-b383c2ff565f]. No automatic retry. If apply started, use M3 Recover.

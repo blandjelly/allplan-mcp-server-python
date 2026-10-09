@@ -62,7 +62,10 @@ uniqueness scope, explicit unavailable data and locatable targets; no writes.
 
 ## M3 — Controlled repairs and standards: preview PASS, execution ready for owner test
 
-Package **0.8.0** implements bounded disposable-copy native layer/status apply,
+Package **0.8.1** corrects 0.8.0's overly broad IsInMacro preflight rejection;
+[original failed native gate and correction](test-results/m3-apply-rejection-0.8.0.md).
+The rejected request called no setters; new native write/Undo acceptance is pending.
+The package retains bounded disposable-copy native layer/status apply,
 fresh resolution/eligibility, per-target readback, collateral audited-field checks,
 persistent execution identity and read-only recovery. Portable evidence is
 [recorded separately](test-results/m3-execution-portable-0.8.0.md).

@@ -1,0 +1,31 @@
+# M3 0.8.1 regression validation
+
+Status **ready_for_owner_test**, native corrected write/readback/Undo **not_run**.
+[Native 0.8.0 rejection](m3-apply-rejection-0.8.0.md) and original uploaded files
+are preserved; previous archives remain unchanged.
+
+**149 portable tests PASS** on Linux Python 3.12.14, FastMCP 3.2.4, uv 0.12.19.
+Frozen synchronization, wheel/sdist build, deterministic Windows ZIP/integrity
+and recursive registration are verified separately from native acceptance.
+
+Added regressions establish:
+
+- Terminal native Column roots with IsInMacro=true can pass the independent
+  required hierarchy/eligibility checks, execute exactly two setters, retain
+  raw flags and produce three remaining findings with verified audited fields.
+- Macro/MacroPlacement/unknown ancestors cannot resolve to the reviewed
+  terminal Column and do not invoke setters.
+- Real MCP/HTTP explicit native eligibility rejection is structured `rejected`,
+  records `native_setters_started=false` and finalizes the client recovery pointer.
+  Recovery of that rejected request sends neither a recovery request nor an
+  apply replay. Required inactive/label/invalid-target checks still reject.
+- Existing lost-response, crash, disk failure, corruption, concurrency,
+  persistent replay and UI-Undo simulation regressions remain passing; journal/
+  transport failures are not misclassified as safe pre-write rejections.
+
+Only known host codes that escape before the current request's setters are
+classified; no message-text parsing is used. Portable adapters do not prove native
+parent semantics, writability or mutation effects. Repeat only the corrected
+[write/restart/Undo card](../m3-apply-batch.md), using the unchanged disposable
+project copy and a fresh plan. Remote CI must be observed for the published
+commit before reporting a matrix pass.

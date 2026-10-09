@@ -89,7 +89,7 @@ class ExecutionTests(unittest.TestCase):
 
     def test_all_targets_checked_before_first_write_and_manual_change_conflicts(self):
         for method, value in (("IsDeleted", True), ("IsValid", False), ("IsInActiveLayer", False),
-                              ("IsInMacro", True), ("IsLabelElement", True)):
+                              ("IsLabelElement", True)):
             with self.subTest(method=method):
                 elements = self.writable_fixture()
                 request = self.apply_request(self.preview())
@@ -102,6 +102,33 @@ class ExecutionTests(unittest.TestCase):
         elements[5].GetAttributes.return_value = [(20001, "S06"), (20002, "EXISTING")]
         self.assert_code("repair_conflict", lambda: self.call(request))
         self.base.ElementsLayerService.ChangeLayer.assert_not_called()
+
+    def test_native_column_parent_flag_does_not_mean_macro_and_is_retained(self):
+        elements = self.writable_fixture()
+        # Reproduce the observed 0.8.0 rejection flag, while the required parent
+        # service establishes both terminal roots as the reviewed Columns.
+        for element in elements[:6]:
+            element.IsInMacro.return_value = True
+        result = self.call(self.apply_request(self.preview()))
+        self.assertEqual(result["state"], "completed")
+        self.assertEqual(result["audit_after"]["counts"]["findings"], 3)
+        self.assertEqual([d["native_flags"]["IsInMacro"]["value"] for d in result["target_preflight"]], [True, True])
+        self.base.ElementsLayerService.ChangeLayer.assert_called_once()
+        self.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+
+    def test_macro_or_unknown_ancestor_cannot_become_a_writable_column_root(self):
+        for name in ("Macro_TypeUUID", "MacroPlacement_TypeUUID", "Unknown_TypeUUID"):
+            with self.subTest(name=name):
+                elements = self.writable_fixture()
+                plan = self.preview()
+                container = self.element(70, name=name)
+                self.parents[id(elements[4])] = container
+                adapter = importlib.import_module("test_allplan_host.native_repairs")
+                self.assert_code("repair_conflict", lambda: adapter.resolve(
+                    self.coord.GetInputViewDocument(), self.base, self.handler.model_queries,
+                    plan["changes"][0], writable=True))
+                self.base.ElementsLayerService.ChangeLayer.assert_not_called()
+                self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
 
     def test_no_change_and_exception_stop_without_second_write_or_rollback(self):
         self.writable_fixture()

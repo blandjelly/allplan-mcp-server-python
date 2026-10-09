@@ -1,9 +1,32 @@
-# M3 bounded execution contract — 0.8.0
+# M3 bounded execution contract — 0.8.1
+
+The first 0.8.0 native write gate was **BLOCKED before setters**,
+[evidence and correction](test-results/m3-apply-rejection-0.8.0.md).
+0.8.1 records the broad IsInMacro parent-object flag as diagnostic evidence;
+required native hierarchy must terminate at the reviewed Column root. Explicit
+known pre-setter apply errors become `rejected`, not `unknown`; transport,
+unexpected and journal errors retain conservative unknown handling.
 
 Status **ready_for_owner_test**, native apply/readback/Undo **not_run**.
 The accepted [0.7.0 preview](test-results/m3-preview-acceptance-0.7.0.md)
 and its unchanged archive remain separate. [Polish owner gate](m3-apply-batch.md).
 This slice advances M3.1/M3.2/M3.4; M3 and UAT-05/UAT-06 remain open.
+
+## Eligibility correction and rejected requests
+
+IsInMacro=true alone is not a macro classifier. Macro/container ancestors cannot
+match the required terminal Column root in the native parent traversal; unknown
+or cyclic/unreadable hierarchy still fails closed. Successful preflight records
+contain exact root identity and raw flag observations. Other required native
+null/deleted/valid/active-document/active-layer/label checks are unchanged.
+
+The public MCP wrapper uses categorized AllplanHostError codes, never message
+text, for a small set of known pre-setter failures. `rejected` responses include
+`native_setters_started=false`, execution ID, request ID and the host error.
+That statement concerns this request; it does not erase earlier historical
+executions. CLI recovery pointers record the final rejection and recovery sends
+no apply replay for them. Journal/transport/unexpected failures cannot be
+classified as pre-write safety because they may happen after a setter.
 
 ## Disposable-copy apply
 
@@ -37,7 +60,7 @@ audit and compares source/report hashes, expiry and exact reviewed hash.
 It takes another fresh audited snapshot, re-resolves every root by
 file/model/type UUID without retaining adapters across requests, and checks
 old values plus native IsNull/IsDeleted/IsValid/IsInActiveDocument/
-IsInActiveLayer/IsInMacro/IsLabelElement booleans. Unknown or ambiguous
+IsInActiveLayer/IsLabelElement booleans. IsInMacro is diagnostic only. Unknown or ambiguous
 resolution blocks writes. Each target is checked again immediately before its
 setter. These documented eligibility checks are provisional; they do not prove
 all permission/property restrictions on the installed build.

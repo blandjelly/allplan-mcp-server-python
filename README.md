@@ -16,7 +16,7 @@ Read these files in order when continuing implementation:
 3. [Features](docs/features.md): the 13 tools and demonstration fixture.
 4. [Implementation stages](docs/implementation-plan.md): task IDs and exit gates.
 
-Current package: **0.8.0**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
+Current package: **0.8.1**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
 **M0 and bounded M1 are accepted** on Allplan **2026-1-7** with local Windows Codex; UAT-00–UAT-03 PASS.
 The demo profile binds freshly for reads and remains inactive for writes.
 [Acceptance and limits](docs/test-results/m1-acceptance-0.5.3.md) cover the known
@@ -39,7 +39,10 @@ checks. **Bounded M3 preview gate PASS**;
 [completed owner card](docs/m3-preview-batch.md);
 [contract](docs/m3-repair-contract.md). Package 0.8.0 adds bounded disposable-copy
 apply/readback, a durable execution journal and read-only recovery, **ready for
-owner testing**. [Execution contract](docs/m3-execution-contract.md),
+owner testing**. The first 0.8.0 native write was rejected before setters by
+an overly broad IsInMacro check; [original evidence and correction](docs/test-results/m3-apply-rejection-0.8.0.md).
+0.8.1 uses verified root hierarchy and reports explicit pre-write rejections.
+[Execution contract](docs/m3-execution-contract.md),
 [write/Undo owner card](docs/m3-apply-batch.md). Native writes/Undo remain
 unaccepted, broader repairs and generation pending. M3 is not closed.
 

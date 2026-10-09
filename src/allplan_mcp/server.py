@@ -226,7 +226,22 @@ def fix_model_issues(request: RepairRequest) -> dict[str, Any]:
             audit["profile"] = load_audit_profile()
         audit["schema_version"] = "m2-audit-1"
     payload["schema_version"] = "m3-repair-1"
-    return _allplan_client().post("/fix-model-issues", payload)
+    try:
+        return _allplan_client().post("/fix-model-issues", payload)
+    except AllplanHostError as exc:
+        # These apply errors originate before any setter in the current request.
+        # Journal/transport/unexpected failures may occur after a write and must
+        # remain errors with unknown outcomes; never infer safety from text.
+        before_write = {"target_not_writable", "plan_expired", "plan_hash_mismatch",
+                        "repair_scope_unavailable", "repair_conflict", "repair_journal_full",
+                        "execution_id_conflict", "repair_recovery_required"}
+        if payload["action"] != "apply" or exc.code not in before_write:
+            raise
+        return {"schema_version": "m3-execution-1", "action": "apply", "state": "rejected",
+                "read_only": True, "native_setters_started": False,
+                "execution_id": payload["execution_id"], "request_id": exc.request_id,
+                "error": {"code": exc.code, "message": str(exc)},
+                "report_text": "Apply rejected before native setters: " + str(exc)}
 
 
 @mcp.tool
