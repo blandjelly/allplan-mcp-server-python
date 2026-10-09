@@ -102,9 +102,14 @@ existing limits. Successful recovery of this completed execution does not prove
 unknown-outcome recovery or mutation causality. Broader M3.3 services and generic
 writable registry guarantees are unimplemented/unaccepted.
 
-Next owner gate: [the focused manual-edit conflict card](../m3-conflict-batch.md).
-Use the current repaired disposable copy and installed 0.8.1; do not repeat
-M1/M2, rebuild the fixture, reinstall or rerun the accepted two-write test.
+Subsequent owner observation: **other columns unchanged** in the retained copy;
+see [the original restart evidence](m3-plan-restart-acceptance-0.8.1.md).
+That UI action interrupted the host, blocking same-session manual-edit conflict;
+revalidation after restart correctly returned plan_expired. No repeat of that
+blocked scenario is requested. Next owner gate:
+[stale Apply rejection after restart](../m3-stale-apply-batch.md).
+Use the current disposable copy and installed 0.8.1; do not repeat M1/M2,
+rebuild the fixture, reinstall or rerun the accepted two-write test.
 [149 portable tests and six-job CI](m3-execution-portable-0.8.1.md) remain
 separate from this native evidence. This update changes documentation/evidence
 only and publishes no new executable package or GitHub release.

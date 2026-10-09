@@ -48,8 +48,12 @@ an overly broad IsInMacro check; [original evidence and correction](docs/test-re
 collateral verification, exact-ID replay across host sessions, two separate
 Undo steps, and recovery after owner-confirmed Redo;
 [evidence and limits](docs/test-results/m3-execution-acceptance-0.8.1.md).
-Next is the [read-only manual-edit conflict test](docs/m3-conflict-batch.md)
-using the installed 0.8.1. Broader repairs and generation remain pending.
+The UI interrupted the host in the subsequent manual-edit scenario;
+[native old-plan rejection after restart PASS](docs/test-results/m3-plan-restart-acceptance-0.8.1.md).
+Same-session manual-edit conflict is blocked in that observed lifecycle and
+is not claimed as accepted. Next is the
+[stale Apply rejection test](docs/m3-stale-apply-batch.md) using installed 0.8.1
+without UI editing or a new preview. Broader repairs and generation remain pending.
 M3 is not closed.
 
 Repository documentation and API identifiers use English. Owner-facing

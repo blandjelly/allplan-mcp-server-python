@@ -73,8 +73,11 @@ fresh resolution/eligibility, per-target readback, collateral audited-field chec
 persistent execution identity and read-only recovery. Portable evidence is
 [recorded separately](test-results/m3-execution-portable-0.8.1.md).
 The [write/Undo gate](m3-apply-batch.md) is complete for this fixture; no repeated
-Apply is requested. Native manual-edit conflicts require the
-[next read-only card](m3-conflict-batch.md). Undo grouping and M3 closure remain
+Apply is requested. The manual-edit card's UI action interrupted the host;
+[native old-plan revalidation after restart PASS](test-results/m3-plan-restart-acceptance-0.8.1.md).
+Native same-session conflicts remain blocked; no repeat on this build is requested.
+The [next card](m3-stale-apply-batch.md) tests mutation-entry-point rejection of
+that stale plan with unchanged audits. Undo grouping and M3 closure remain
 unclaimed. [Execution limits](m3-execution-contract.md).
 
 Package **0.7.0** implements the first read-only M3.1/M3.2 slice:
@@ -89,7 +92,7 @@ native revalidation/follow-up audit retain identical audited source. No repeated
 preview batch is required. Manual-edit native conflicts remain unverified.
 The 0.7.0 package invokes no setters. The 0.8.1 bounded M3.1/M3.2/M3.4
 implementation has the native observations above. UAT-05/UAT-06 remain open
-for native manual-edit/stale-plan evidence and broader required behavior;
+for native stale-Apply evidence and broader required behavior;
 unknown-outcome recovery, broader mutation/registry guarantees and M3.3 remain
 unaccepted. Current recovery evidence concerns a completed saved execution.
 

@@ -1,8 +1,16 @@
 # M3 — konflikt po ręcznej edycji, pakiet 0.8.1
 
-Status: **ready_for_owner_test**. Zapis dwóch zmian, odczyt, dwa osobne kroki
+Status: **BLOCKED dla konfliktu w tej samej sesji; odrzucenie po restarcie PASS**.
+[Oryginalne logi i wynik](test-results/m3-plan-restart-acceptance-0.8.1.md):
+podgląd miał 0 zmian i `unchanged`; kliknięcie w UI zakończyło hosta.
+Po restarcie stary plan zwrócił `plan_expired`, a właściciel potwierdza
+niezmienione pozostałe słupy. To poprawne zabezpieczenie po restarcie.
+Nie powtarzaj tego scenariusza w tej wersji. Następny test to
+[odrzucenie starego Apply po restarcie](m3-stale-apply-batch.md), bez edycji UI.
+
+Poniżej zachowano pierwotną procedurę. Zapis dwóch zmian, odczyt, dwa osobne kroki
 Undo i Recover po Redo są [zaliczone](test-results/m3-execution-acceptance-0.8.1.md).
-Nie powtarzaj Apply, M1/M2 ani instalacji. Ten krótki test sprawdza, czy plan
+Nie powtarzaj Apply, M1/M2 ani instalacji. Procedura sprawdzała, czy plan
 wykryje późniejszą ręczną edycję w Allplanie. MCP wykonuje tylko odczyty.
 
 ## Bieżąca kopia i podgląd

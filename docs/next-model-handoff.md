@@ -1,6 +1,70 @@
 # Next-model handoff
 
-## Current handoff — 2026-10-10 Europe/Warsaw, 0.8.1 execution gate PASS
+## Current handoff — 2026-10-10 Europe/Warsaw, 0.8.1 restart invalidation PASS
+
+Continue **`codex/m3-repair-preview`**, draft [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2).
+The owner supplied four original local-Codex read-only preview/revalidation
+files. After the first test, a UI click interrupted the host; the owner restarted
+it before the second test and reports **other columns unchanged**.
+[Native restart record and originals](test-results/m3-plan-restart-acceptance-0.8.1.md)
+establish **PASS for old-plan rejection after restart**, **BLOCKED for native
+same-session manual-edit conflict**. Do not ask to repeat that blocked scenario
+on this build. The host is an interactive PythonPart; cancellation stops its
+server/palette/timer, and new RequestHandler instances get an empty plan cache.
+Do not preserve old plans/adapters or weaken restart invalidation to manufacture
+a same-session pass. No cancellation callback trace was uploaded.
+
+First capture **00:35:48.998 local**: 0 changes, 3 excluded findings, 3 audit
+findings, complete coverage; read-only preview_ready and immediate unchanged
+revalidation, 296 seconds remaining. Plan **500b57e169df4a6d99e982d413282542**,
+hash **8687e394b90923fd99ca666fdc3f3ee588fe92dec7b5effdd483e16268dfa420**,
+host **fdca1b5c-b147-4ac4-9c9e-4019eda2203b**.
+Second capture **00:38:45.545 local**: host
+**22d3d4d9-7334-4260-9126-97960bffb6fc**, healthy, changed session, exact old
+plan revalidate raises **plan_expired**. No conflict/source_unchanged/read_only
+fields accompany that tool error; no stale Apply was called.
+All 22 installed bridge hashes in both sessions independently match the exact
+unchanged 0.8.1 ZIP; the plan hash recomputes using the card request/bundled
+profile; response text/structuredContent and TXT identifiers/results agree.
+Originals/manifests/verification are under
+`test-results/evidence/m3-plan-restart-0.8.1-20261009T223548`.
+No post-edit audit or explicit S06 restoration was supplied; do not infer its
+current value from filenames or assume the host interruption caused an edit.
+
+The earlier **two-target write/readback, two-step Undo, Redo and persisted
+read-only recovery/replay gate remains PASS**; see the prior handoff and
+[execution acceptance](test-results/m3-execution-acceptance-0.8.1.md).
+This owner observation adds unchanged-other-columns UI evidence for the retained
+fixture, not a whole-project/every-property guarantee. No runtime code or package
+changes are made by this evidence/documentation update. Clean source
+8074905536ff5c95e20de4a59a70d513f8694314 and ZIP SHA-256
+b31909379244cc085168cc1b5283fa08284954f19334261779ea766fbbf36c47 remain unchanged.
+149 portable tests/six-job CI run 37997427257 concern the published artifact
+commit, not later documentation commits.
+
+**Next owner boundary:** [one stale Apply rejection test](m3-stale-apply-batch.md).
+Use installed 0.8.1/same disposable copy/current state. No reinstall, rebuilding,
+new preview, M3 Apply.cmd or UI editing. Local Windows Codex checks healthy
+verified 0.8.1 in a session different from the original above; captures a complete
+six-column audit; saves one fresh execution ID/exact stale-plan Apply request
+without overwriting m3-last-execution.json; sends once, expecting
+rejected/native_setters_started=false/read_only=true/error.code=plan_expired.
+Only after explicit rejection, capture matching post-audit/same-session health.
+Return originals plus unchanged UI observations. Other errors stop without retry.
+This tests rejection at the mutation entry point in the supported restarted-host
+workflow. Cloud cannot perform this owner-native test.
+
+M3/UAT-05/UAT-06 remain open; same-session manual-edit/source conflict has portable
+evidence but no runnable native gate in this observed lifecycle. Native stale
+Apply rejection, unknown-outcome recovery, grouped Undo, arbitrary scopes/types,
+full application/OS restart, crash/power-loss persistence and broader M3.3 remain
+unaccepted. After the next supported-lifecycle gate, continue shared-service
+office-standard/rule-based implementation with explicit scope/limits and a new
+package version if runtime code changes. Do not rebuild the accepted 0.8.1 ZIP.
+GitHub authorization persists; no main/PR merge or release. Recheck remote state
+and main/base documentation reconciliation before future integration.
+
+## Prior handoff — 2026-10-10 Europe/Warsaw, 0.8.1 execution gate PASS
 
 Continue **`codex/m3-repair-preview`**, draft [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2).
 The owner supplied six original Apply/Check Undo/Recover logs and confirms both

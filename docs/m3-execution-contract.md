@@ -12,8 +12,10 @@ Status **bounded native execution gate PASS**, 2026-10-10 Europe/Warsaw:
 The two retained Column repairs, audited-field verification, exact-ID read-only
 replay across host sessions, manual **two-step Undo**, and recovery after
 owner-confirmed Redo pass. Grouped Undo is unavailable. Native manual-edit
-conflicts and broader execution remain pending;
-[next focused owner card](m3-conflict-batch.md).
+conflicts and broader execution remain pending. The owner-observed UI action
+cancelled the host; [old-plan revalidation after restart passes](test-results/m3-plan-restart-acceptance-0.8.1.md),
+while native same-session conflict is blocked in that lifecycle.
+[Next supported-lifecycle owner card](m3-stale-apply-batch.md).
 The accepted [0.7.0 preview](test-results/m3-preview-acceptance-0.7.0.md)
 and its unchanged archive remain separate. [Polish owner gate](m3-apply-batch.md).
 This slice advances M3.1/M3.2/M3.4; M3 and UAT-05/UAT-06 remain open.
@@ -102,6 +104,12 @@ they are not authentication. The journal must be writable before the first sette
 A write-ahead `unknown` marker is persisted before each setter; post-readback
 states are persisted before another target. Journal failures stop execution.
 
+The interactive host's cancellation stops its server; restarting creates a new
+session-local plan cache. A preview from before the UI cancellation cannot be
+continued after restart: native revalidation returns plan_expired in the accepted
+restart capture. Fresh previews after restart are separate plans, not renewals
+of the old authorization. Persisted executions remain a separate mechanism.
+
 The same execution ID with the same apply request returns saved outcomes
 without invoking setters, even after host restart, plan expiry or UI Undo.
 Reusing an ID with another request conflicts. Request transport IDs are separate.
@@ -145,4 +153,7 @@ for the retained fixture. Whole-model collateral UI verification, native
 manual-edit conflicts, unknown-outcome recovery and crash/power-loss persistence
 remain outside that acceptance. M3.3 office-standard/rule-based services and
 broader mutation/registry guarantees remain pending. No repeated two-write gate
-is required; the next card inspects native manual-edit conflicts read-only.
+is required. The same-session manual-edit card was blocked by UI host
+cancellation, with restart invalidation correctly observed; do not repeat that
+scenario on this build. The next card tests a single stale Apply rejection after
+restart with before/after audits, without UI editing or a fresh preview.

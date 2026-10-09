@@ -29,8 +29,10 @@ Only known host codes that escape before the current request's setters are
 classified; no message-text parsing is used. Portable adapters do not prove native
 parent semantics, writability or mutation effects. The corrected
 [write/restart/Undo card](../m3-apply-batch.md) is complete for the retained
-fixture; do not repeat that test. The next native evidence is the
-[read-only manual-edit conflict card](../m3-conflict-batch.md).
+fixture; do not repeat that test. The manual-edit UI action interrupted the host;
+[native restart invalidation passes](m3-plan-restart-acceptance-0.8.1.md), while
+same-session source conflict remains blocked. The next native evidence is the
+[stale-Apply rejection card](../m3-stale-apply-batch.md).
 
 [CI run 37997427257](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/37997427257)
 passes all six Windows/Ubuntu Python 3.11–3.13 test/build/Windows-ZIP jobs for

@@ -5,7 +5,9 @@ Status **bounded native execution gate PASS**, 2026-10-10 Europe/Warsaw:
 The two retained writes/readbacks, audited-field comparison, exact-ID replay
 across host sessions, **two-step native Undo**, and recovery after confirmed Redo
 pass. Do not repeat Apply; use the installed package and repaired copy for the
-[next read-only conflict card](../../docs/m3-conflict-batch.md).
+[next stale-Apply rejection card](../../docs/m3-stale-apply-batch.md).
+The subsequent UI action interrupted the host; native same-session conflict
+is blocked, while [old-plan rejection after restart passes](../../docs/test-results/m3-plan-restart-acceptance-0.8.1.md).
 The delivery manifest and embedded archive record the original pre-test state;
 this document supersedes that acceptance status without changing the artifacts.
 The 0.8.0 request was rejected before setters by an overly broad IsInMacro check.

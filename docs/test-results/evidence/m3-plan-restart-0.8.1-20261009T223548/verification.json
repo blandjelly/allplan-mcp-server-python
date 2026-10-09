@@ -1,0 +1,15 @@
+{
+  "decision": "native_restart_plan_invalidation_pass",
+  "same_session_manual_edit_conflict": "blocked_host_cancelled_by_ui",
+  "plan_id": "500b57e169df4a6d99e982d413282542",
+  "plan_hash_recomputed_using_card_and_bundled_profile": "8687e394b90923fd99ca666fdc3f3ee588fe92dec7b5effdd483e16268dfa420",
+  "old_host_session": "fdca1b5c-b147-4ac4-9c9e-4019eda2203b",
+  "new_host_session": "22d3d4d9-7334-4260-9126-97960bffb6fc",
+  "bridge_files_verified_in_each_session": 22,
+  "archive_sha256": "b31909379244cc085168cc1b5283fa08284954f19334261779ea766fbbf36c47",
+  "response_text_matches_structured_content": true,
+  "txt_identifiers_and_results_match_json": true,
+  "post_edit_model_audit": "not_supplied",
+  "stale_apply_after_restart": "not_run",
+  "owner_observation": "UI ended host; host restarted before second test; other columns unchanged"
+}
