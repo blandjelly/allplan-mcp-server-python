@@ -3,6 +3,7 @@
 Status: **ready_for_owner_test**. Odrzucenie starego Apply w 0.8.1 jest
 [zaliczone](test-results/m3-stale-apply-acceptance-0.8.1.md); nie powtarzaj go.
 Nowy test sprawdza dwa nowe narzędzia i wybór elementów. Wykonuje tylko odczyty.
+[Dokładny pakiet i suma kontrolna](../evaluation-packages/0.9.0/README.md).
 
 1. Użyj tej samej naprawionej, jednorazowej kopii z sześcioma słupami w pliku
    **101**. **S05 = SZ_OGÓ01**, **S06 MCP_QA_STATUS = NEW**. Pozostałe trzy

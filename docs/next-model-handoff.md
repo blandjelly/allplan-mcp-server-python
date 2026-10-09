@@ -47,8 +47,14 @@ old two-target fixture. No generic/standard/selected native writes are added.
 before-context validation, selected Apply refusal and read-only owner launcher.
 Old lost-reply, crash/disk, source/replay checks remain passing. Frozen sync and
 wheel/sdist build pass. Dependencies unchanged; local uv.lock version only.
-New package has **M3 Standards Preview.cmd**. Exact 0.9.0 artifact source/hashes
-are recorded in its delivery manifest/README; never rebuild accepted versions.
+New package has **M3 Standards Preview.cmd**. Exact 0.9.0 artifacts are under
+[`evaluation-packages/0.9.0`](../evaluation-packages/0.9.0/README.md).
+Clean source **61c7579645d497a9df1e3ff0cb5640861225b56c**;
+ZIP **624503 bytes**, SHA-256
+**c4cf31d6b08c651c10e4020062d5c0d0dba6d5ea0380b748c16b6c8f9d349e33**.
+Exact extracted integrity, recursive registration of 22 bridge files and clean
+source deterministic rebuild verify. Publication docs do not rebuild this ZIP.
+Never rebuild accepted versions.
 All existing archives/logs remain unchanged. CI results belong to their exact
 commits; do not transfer old six-job results to 0.9.0 or later documentation.
 
