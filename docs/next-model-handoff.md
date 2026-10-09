@@ -12,8 +12,11 @@ archive/evidence remain unchanged; M0–M2 acceptance is preserved.
 Read [execution contract](m3-execution-contract.md),
 [portable checks](test-results/m3-execution-portable-0.8.0.md) and
 [Polish write/Undo card](m3-apply-batch.md). New-version artifacts are under
-`evaluation-packages/0.8.0`; the delivery manifest records their exact source
-commit and SHA-256. Never rebuild under an accepted artifact's version.
+[`evaluation-packages/0.8.0`](../evaluation-packages/0.8.0/README.md); the delivery
+manifest records clean source **d1b406318a24b52792cacc8560745e4a596cd1f3**.
+Windows ZIP SHA-256 **e21fe594372dde28d88d2fece2842fa8263d023f8410592c1239a7c052f8278c**.
+Never rebuild under an accepted artifact's version. Artifact/documentation
+commits preserve this exact ZIP and do not change its embedded clean-source handoff.
 
 Implemented bounded native ChangeLayer/ChangeAttributes evaluation apply for
 exactly the retained C05/S05 layer and C06/S06 status repairs in foreground
