@@ -25,8 +25,11 @@ transport errors remain conservatively unknown. No automatic retry/Undo added.
 149 portable tests PASS on Linux Python 3.12.14, including native-style
 IsInMacro=true Column roots, macro/unknown ancestor rejection, real MCP/HTTP
 explicit rejection and no recovery replay; previous crash/disk/lost-reply checks
-remain. New exact artifacts are delivered under `evaluation-packages/0.8.1`;
-delivery manifest records clean source/hash. All previous archives are unchanged.
+remain. New exact artifacts are delivered under
+[`evaluation-packages/0.8.1`](../evaluation-packages/0.8.1/README.md).
+Clean source **8074905536ff5c95e20de4a59a70d513f8694314**;
+Windows ZIP SHA-256 **b31909379244cc085168cc1b5283fa08284954f19334261779ea766fbbf36c47**.
+Delivery manifest records all sizes/hashes. All previous archives are unchanged.
 CI must be checked separately for the newly published commit.
 
 **Next owner action:** install **0.8.1** and run [the write card](m3-apply-batch.md)
