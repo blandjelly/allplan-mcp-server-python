@@ -3,7 +3,11 @@ from __future__ import annotations
 
 import json
 import logging
+import time
+import traceback
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
 from threading import Event, Lock, Thread
 from uuid import uuid4
 
@@ -14,14 +18,35 @@ class BridgeError(Exception):
         self.code, self.status = code, status
 
 
+def configure_bridge_logging(path):
+    """Keep one bounded persistent log per Local folder, including host restarts."""
+    logger = logging.getLogger("allplan.bridge")
+    try:
+        path = Path(path).resolve()
+        if not any(getattr(h, "bridge_log_path", None) == path for h in logger.handlers):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            handler = RotatingFileHandler(path, maxBytes=1024 * 1024, backupCount=2, encoding="utf-8")
+            handler.bridge_log_path = path
+            formatter = logging.Formatter("%(asctime)s.%(msecs)03dZ %(levelname)s %(message)s", datefmt="%Y-%m-%dT%H:%M:%S")
+            formatter.converter = time.gmtime
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
+        logger.setLevel(logging.INFO)
+    except (OSError, ValueError):
+        # A diagnostic file failure must not escape a native UI entry point.
+        logger.warning("Persistent bridge log unavailable", exc_info=True)
+    return logger
+
+
 class BridgeServer(ThreadingHTTPServer):
     allow_reuse_address = True
     daemon_threads = True
     block_on_close = False
 
-    def __init__(self, address, handler, dispatch):
+    def __init__(self, address, handler, dispatch, log_path=None):
         self.handler, self.dispatch = handler, dispatch
         self.session_id = str(uuid4())
+        self.logger = configure_bridge_logging(log_path) if log_path is not None else logging.getLogger("allplan.bridge")
         self.active = Event()
         self.active.set()
         self.stopped = Event()
@@ -31,6 +56,7 @@ class BridgeServer(ThreadingHTTPServer):
 
     def start(self):
         self.thread.start()
+        self.logger.info("host_started host_session_id=%s", self.session_id)
 
     def _serve(self):
         try:
@@ -47,19 +73,38 @@ class BridgeServer(ThreadingHTTPServer):
             self.server_close()
             # shutdown() waits for the accept loop, so it must not run on UI.
             Thread(target=self.shutdown, name="allplan-http-stop", daemon=True).start()
+            self.logger.info("host_stopped host_session_id=%s", self.session_id)
 
-    def execute(self, path, payload):
+    def execute(self, path, payload, request_id=None):
         def on_ui():
-            # A queued request must not use the previous document after cancellation.
-            if not self.active.is_set():
-                raise BridgeError("session_unavailable", "The host was stopped. Restart StartPythonHost in the current project.", 503)
-            return self.handler.handle(path, payload)
-        return self.dispatch(on_ui)
+            # Do not let a Python exception cross Func[Object] into WPF's UI
+            # exception handling. Marshal only results or primitive error data;
+            # raise the HTTP-facing error after dispatch returns to its worker.
+            try:
+                if not self.active.is_set():
+                    raise BridgeError("session_unavailable", "The host was stopped. Restart StartPythonHost in the current project.", 503)
+                return {"result": self.handler.handle(path, payload), "error": None}
+            except BridgeError as exc:
+                return {"result": None, "error": {"code": exc.code, "message": str(exc), "status": exc.status}}
+            except BaseException:
+                # SystemExit/KeyboardInterrupt from development code must also
+                # stay inside this managed callback. Native fatal faults still
+                # require native crash evidence; this is not process isolation.
+                return {"result": None, "error": {"code": "host_error", "status": 500,
+                        "message": "The Allplan operation failed. Keep this request ID and run Diagnostics."},
+                        "traceback": traceback.format_exc()}
+        outcome = self.dispatch(on_ui)
+        if outcome["error"] is not None:
+            error = outcome["error"]
+            if outcome.get("traceback"):
+                self.logger.error("host_handler_failed request_id=%s path=%s\n%s", request_id, path, outcome["traceback"])
+            raise BridgeError(error["code"], error["message"], error["status"])
+        return outcome["result"]
 
 
 class WebRequestHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
-        logging.getLogger("allplan.bridge").info(format, *args)
+        self.server.logger.info(format, *args)
 
     def do_POST(self):
         request_id = self.headers.get("X-Request-ID") or str(uuid4())
@@ -81,13 +126,19 @@ class WebRequestHandler(BaseHTTPRequestHandler):
                 raise BridgeError("invalid_payload", "Request body must be valid JSON.")
             if not isinstance(payload, dict):
                 raise BridgeError("invalid_payload", "Request body must be a JSON object.")
-            result = self.server.execute(self.path, payload)
+            self.server.logger.info("request_started request_id=%s path=%s host_session_id=%s", request_id, self.path, self.server.session_id)
+            result = self.server.execute(self.path, payload, request_id)
             result = result if result is not None else {"ok": True}
             result = {**result, "request_id": request_id, "host_session_id": self.server.session_id}
+            if self.path in {"/get-allplan-version", "/get-runtime-info"}:
+                # This marker comes from the loaded transport, not metadata on
+                # disk that may have been replaced while old modules are live.
+                result["ui_dispatch_exception_boundary"] = "contained_result_error_v1"
             json.dumps(result, allow_nan=False)
         except BridgeError as exc:
             status = exc.status
             result = {"ok": False, "error": {"code": exc.code, "message": str(exc)}, "request_id": request_id}
+            self.server.logger.info("request_rejected request_id=%s code=%s status=%s", request_id, exc.code, status)
         except Exception:
             status = 500
             logging.getLogger("allplan.bridge").exception("Host failure request_id=%s", request_id)
@@ -101,5 +152,6 @@ class WebRequestHandler(BaseHTTPRequestHandler):
             self.send_header("X-Request-ID", request_id)
             self.end_headers()
             self.wfile.write(data)
+            self.server.logger.info("response_sent request_id=%s status=%s", request_id, status)
         except (OSError, TimeoutError):
             logging.getLogger("allplan.bridge").warning("Response lost request_id=%s; do not retry a write without inspecting the model", request_id)

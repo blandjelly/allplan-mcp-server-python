@@ -5,3 +5,7 @@ import json
 
 def load_demo_profile():
     return json.loads(files("allplan_mcp").joinpath("profiles/native-model-qa.demo.json").read_text(encoding="utf-8"))
+
+
+def load_audit_profile():
+    return json.loads(files("allplan_mcp").joinpath("profiles/native-model-qa.audit.json").read_text(encoding="utf-8"))

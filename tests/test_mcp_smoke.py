@@ -10,7 +10,7 @@ import unittest
 from pathlib import Path
 
 from fastmcp import Client
-from allplan_mcp.diagnostics import collect_diagnostics
+from allplan_mcp.diagnostics import collect_diagnostics, collect_m2_stability
 from test_transport import stop_test_server, transport
 
 
@@ -20,7 +20,9 @@ class FakeBridge:
     def handle(self, path, payload):
         self.calls.append((path, payload))
         if path == "/get-allplan-version":
+            from allplan_mcp import __version__
             return {"version": "2026.fake", "embedded_python": {"version": "fake"},
+                    "bridge_package": {"version": __version__}, "installed_bridge_integrity": {"status": "verified"},
                     "compatibility": {"major_matches": True, "runtime_verified": False}}
         if path == "/get-all-object-names":
             return {"names": ["Fake column"]}
@@ -32,10 +34,158 @@ class FakeBridge:
         if path == "/model-query":
             return {"schema_version": "m1-query-1", "read_only": True, "request": payload,
                     "selection_id": "a" * 32, "source_fingerprint": "fake-only"}
+        if path == "/model-audit":
+            return {"schema_version": "m2-audit-1", "read_only": True, "request": payload,
+                    "report_text": "Fake audit transport only.", "findings": []}
         raise transport.BridgeError("unknown_route", "Unknown route", 404)
 
 
 class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
+    async def test_model_audit_full_host_contract_transport_and_cli_reports(self):
+        from test_model_audit import AuditTests
+        from allplan_mcp.demo_profile import load_audit_profile
+        native = AuditTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        native.fixture()
+        original = self.bridge_handler.handle
+        def handle(path, payload):
+            if path == "/model-audit":
+                self.bridge_handler.calls.append((path, payload))
+                return native.handler.handle(path, payload)
+            return original(path, payload)
+        self.bridge_handler.handle = handle
+        request = {"scope": {"drawing_files": [101], "include_passive": False, "visibility": "api_select_all"},
+                   "profile_id": "native-model-qa-demo"}
+        report = await collect_diagnostics(self.host_url, self.url, audit_request=request)
+        audit = report["mcp"]["model_audit"]
+        self.assertEqual(audit["counts"]["findings"], 5)
+        self.assertEqual(audit["counts"]["affected_elements"], 5)
+        self.assertTrue(audit["coverage"]["audit_complete"])
+        self.assertTrue(audit["read_only"])
+        self.assertEqual(report["allplan_acceptance"], "not_run")
+        self.assertFalse(any(path == "/create-box" for path, _ in self.bridge_handler.calls))
+        async with Client(self.url, timeout=5) as client:
+            profile_resource = await client.read_resource("allplan://profiles/native-model-qa-demo/audit")
+            self.assertEqual(json.loads(profile_resource[0].text), load_audit_profile())
+            before = len(self.bridge_handler.calls)
+            for bad in ({"scope": request["scope"]}, {**request, "profile": load_audit_profile()},
+                        {**request, "max_adapters": True}, {**request, "rule_ids": []},
+                        {**request, "scope": {**request["scope"], "drawing_files": [101,102], "include_passive": True}}):
+                result = await client.call_tool("model_audit", {"request": bad}, raise_on_error=False)
+                self.assertTrue(result.is_error)
+            self.assertEqual(len(self.bridge_handler.calls), before)
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "audit.json"
+            request_path = Path(directory) / "request.json"
+            request_path.write_text(json.dumps(request), encoding="utf-8")
+            env = os.environ.copy()
+            env.update({"ALLPLAN_HOST_URL": self.host_url, "MCP_URL": self.url, "NO_PROXY": "127.0.0.1,localhost"})
+            result = await asyncio.to_thread(subprocess.run, [sys.executable, "-m", "allplan_mcp.diagnostics",
+                "--audit-request", str(request_path), "--output", str(output)], env=env, capture_output=True, text=True, timeout=30)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            saved = json.loads(output.read_text(encoding="utf-8"))
+            self.assertEqual(saved["mcp"]["model_audit"]["counts"]["findings"], 5)
+            self.assertIn("5 findings on 5 elements", output.with_suffix(".txt").read_text(encoding="utf-8"))
+
+    async def test_stability_cli_runs_two_reads_and_protected_host_rejection_then_health(self):
+        from test_model_audit import AuditTests
+        native = AuditTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        native.fixture()
+        original = self.bridge_handler.handle
+        def handle(path, payload):
+            if path == '/model-audit':
+                self.bridge_handler.calls.append((path,payload))
+                try:
+                    return native.handler.handle(path,payload)
+                except native.module.BridgeError as exc:
+                    raise transport.BridgeError(exc.code,str(exc),exc.status) from exc
+            return original(path,payload)
+        self.bridge_handler.handle=handle
+        with tempfile.TemporaryDirectory() as directory:
+            output=Path(directory)/'stability.json'
+            env=os.environ.copy()
+            env.update({'ALLPLAN_HOST_URL':self.host_url,'MCP_URL':self.url,'NO_PROXY':'127.0.0.1,localhost'})
+            result=await asyncio.to_thread(subprocess.run,[sys.executable,'-m','allplan_mcp.diagnostics',
+                '--m2-stability','--output',str(output)],env=env,capture_output=True,text=True,timeout=30)
+            self.assertEqual(result.returncode,0,result.stderr)
+            report=json.loads(output.read_text(encoding='utf-8'))
+            steps=report['m2_stability']['steps']
+            self.assertTrue(report['m2_stability']['checks_complete'])
+            self.assertTrue(all(step['ok'] for step in steps))
+            self.assertEqual(steps[2]['response']['counts']['findings'],5)
+            self.assertEqual(steps[4]['code'],'invalid_payload')
+            self.assertIn('Stability checks complete: True',output.with_suffix('.txt').read_text(encoding='utf-8'))
+        audits=[payload for path,payload in self.bridge_handler.calls if path=='/model-audit']
+        self.assertEqual(len(audits),3)  # two valid reads and one direct host rejection
+        self.assertEqual([p['scope']['drawing_files'] for p in audits],[[101],[101],[101,102]])
+        self.assertFalse(any(path=='/create-box' for path,_ in self.bridge_handler.calls))
+
+    async def test_stability_stops_after_second_read_failure_and_never_retries(self):
+        original=self.bridge_handler.handle
+        calls=[]
+        def handle(path,payload):
+            if path=='/model-audit':
+                calls.append(payload)
+                if len(calls)==2:
+                    raise transport.BridgeError('query_read_failed','Fake read failed.',503)
+            return original(path,payload)
+        self.bridge_handler.handle=handle
+        report=await collect_m2_stability(self.host_url,self.url)
+        self.assertFalse(report['m2_stability']['checks_complete'])
+        self.assertEqual(len(calls),2)
+        self.assertEqual([s['name'] for s in report['m2_stability']['steps']],['host_boundary_preflight','audit_1','audit_2'])
+        self.assertIn('no automatic retry',report['m2_stability']['stopped_reason'])
+
+    async def test_stability_requires_loaded_boundary_and_matching_install_before_model_reads(self):
+        original=self.bridge_handler.handle
+        for defect in ('version','integrity','boundary'):
+            def handle(path,payload):
+                response=original(path,payload)
+                if path=='/get-allplan-version':
+                    if defect=='version':response['bridge_package']['version']='0.6.0'
+                    if defect=='integrity':response['installed_bridge_integrity']['status']='mismatch'
+                return response
+            self.bridge_handler.handle=handle
+            # The boundary marker is injected by the loaded WebRequestHandler;
+            # removing it on the HTTP client models an older loaded transport.
+            if defect=='boundary':
+                from unittest.mock import patch
+                from allplan_mcp.allplan_client import AllplanHostClient
+                original_post=AllplanHostClient.post
+                def post(client,path,*args,**kwargs):
+                    response=original_post(client,path,*args,**kwargs)
+                    response.pop('ui_dispatch_exception_boundary',None)
+                    return response
+                with patch.object(AllplanHostClient,'post',post):
+                    report=await collect_m2_stability(self.host_url,self.url)
+            else:
+                report=await collect_m2_stability(self.host_url,self.url)
+            self.assertFalse(report['m2_stability']['checks_complete'])
+            self.assertEqual(len(report['m2_stability']['steps']),1)
+        self.assertFalse(any(path in ('/model-audit','/get-model-context') for path,_ in self.bridge_handler.calls))
+
+    async def test_model_audit_errors_are_captured_and_invalid_inputs_do_not_connect(self):
+        request = {"scope": {"drawing_files": [101], "include_passive": False, "visibility": "api_select_all"},
+                   "profile_id": "native-model-qa-demo"}
+        before = len(self.bridge_handler.calls)
+        with self.assertRaises(ValueError):
+            await collect_diagnostics(self.host_url, self.url, audit_request={**request, "max_adapters": True})
+        with self.assertRaises(ValueError):
+            await collect_diagnostics(self.host_url, self.url, query_request={"action": "profile", "profile_id": "native-model-qa-demo"}, audit_request=request)
+        self.assertEqual(len(self.bridge_handler.calls), before)
+        original = self.bridge_handler.handle
+        def fail(path, payload):
+            if path == "/model-audit":
+                raise transport.BridgeError("profile_unbound", "Fake missing resources.", 409)
+            return original(path, payload)
+        self.bridge_handler.handle = fail
+        report = await collect_diagnostics(self.host_url, self.url, audit_request=request)
+        self.assertFalse(report["mcp"]["model_audit"]["ok"])
+        self.assertIn("profile_unbound", report["mcp"]["model_audit"]["message"])
+
     async def test_final_batch_transports_geometry_profile_and_saves_summaries(self):
         from allplan_mcp.demo_profile import load_demo_profile
         request = {"action": "query", "scope": {"drawing_files": [101], "include_passive": False, "visibility": "api_select_all"},
@@ -140,7 +290,7 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
     async def test_discovery_health_version_names_box_and_diagnostic_bundle(self):
         async with Client(self.url, timeout=5) as client:
             names = {t.name for t in await client.list_tools()}
-            self.assertEqual(names, {"allplan_health", "get_allplan_version", "get_all_object_names", "create_cube", "create_box", "get_model_context", "model_query"})
+            self.assertEqual(names, {"allplan_health", "get_allplan_version", "get_all_object_names", "create_cube", "create_box", "get_model_context", "model_query", "model_audit"})
             resources = await client.list_resources()
             self.assertIn("allplan://skills", {str(r.uri) for r in resources})
             health = (await client.call_tool("allplan_health")).data

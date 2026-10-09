@@ -1,0 +1,20 @@
+Audit native-model-qa-demo 2.0.0: fail.
+6 elements; 5 findings on 5 elements; 0 unchecked checks.
+Requested scope complete: True; audit complete: True.
+QA-001 (error): fail {'pass': 5, 'fail': 1, 'not_checked': 0, 'not_applicable': 0}
+QA-002 (error): fail {'pass': 3, 'fail': 2, 'not_checked': 0, 'not_applicable': 1}
+QA-003 (warning): fail {'pass': 5, 'fail': 1, 'not_checked': 0, 'not_applicable': 0}
+QA-004 (warning): fail {'pass': 5, 'fail': 1, 'not_checked': 0, 'not_applicable': 0}
+QA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm (model_local): required_value_missing. Assign a reviewed, nonempty mark.
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.
+QA-002: file 101, mark 'S02', model 80211557-a3c1-4ccd-84d9-1274ec533776, center [6000.0, 0.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.
+QA-003: file 101, mark 'S05', model 51db6258-4f95-4fab-ac80-8948e13bfd21, center [6000.0, 6000.0, 1500.0] mm (model_local): unexpected_layer. Review the layer assignment; the profile expects SZ_OGÓ01.
+QA-004: file 101, mark 'S06', model d26a3d87-2981-4657-b592-65c894ce41ba, center [12000.0, 6000.0, 1500.0] mm (model_local): value_not_allowed. Review the status; allowed values are NEW and EXISTING.
+
+Stability checks complete: True
+host_boundary_preflight: OK
+audit_1: OK
+audit_2: OK
+mcp_scope_rejection: OK
+host_scope_rejection: OK
+host_health_after_rejection: OK

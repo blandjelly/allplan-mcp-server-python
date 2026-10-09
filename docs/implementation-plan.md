@@ -41,16 +41,26 @@ runtime_verified flags are not an acceptance registry. Durable references,
 write eligibility/Undo, native BWS, arbitrary framing families and nonzero Z
 offsets remain outside acceptance. No further M1 owner batch is requested.
 
-## M2 — Audits and profile foundations
+## M2 — Audits and profile foundations: closed; bounded UAT-04 PASS
+
+Package **0.6.1**, audit profile **2.0.0**. Native 0.6.0 report and owner UI checks
+match; a later invalid-scope request coincided with a managed-exception crash.
+[Callback containment fix](test-results/m2-dispatch-fix-0.6.1.md) is portable-tested;
+[native 0.6.1 acceptance](test-results/m2-acceptance-0.6.1.md) confirms two identical
+complete audits, public/host scope rejection and continued host/Allplan operation.
+The earlier crash's precise cause remains unproven. No repeated owner test is required.
+[Contract](m2-audit-contract.md),
+[portable evidence](test-results/m2-audit-portable-0.6.0.md) and
+[completed owner test card](m2-audit-batch.md). Acceptance is limited to the recorded fixture.
 
 - **M2.1** Versioned schema for typed attributes/layers, values, uniqueness and tolerances; validate bound resources.
 - **M2.2** `model_audit` with severity, evidence, distinct unchecked states and readable/structured reports.
-- **M2.3** Findings tied to stable references; supported highlight or marks/file/location for inspection.
+- **M2.3** Findings tied to session/project/document/model references and deterministic finding IDs; file/mark/model-local box and center for inspection. Durable references and native highlight remain unverified.
 
 **Exit gate (UAT-04):** demo returns exactly 5 findings on 5 columns, correct
 uniqueness scope, explicit unavailable data and locatable targets; no writes.
 
-## M3 — Controlled repairs and standards: first MVP
+## M3 — Controlled repairs and standards: planned, unimplemented
 
 - **M3.1** Shared preview/apply, stale checks, serialized writes, request identity, readback, partial outcomes and tested Undo limits.
 - **M3.2** `fix_model_issues` for writable attributes/layers; data marks and graphical labels stay distinct.

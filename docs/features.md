@@ -3,7 +3,10 @@
 The toolkit contains the following 13 workflow tools. Bounded
 `get_model_context` and `model_query` reads are implemented and accepted on
 Allplan 2026-1-7; see [acceptance and limits](test-results/m1-acceptance-0.5.3.md)
-and [read contracts](tool-reference.md). The remaining workflow tools are planned. M0 utilities are `allplan_health`,
+and [read contracts](tool-reference.md). `model_audit` is implemented and accepted
+within the retained fixture scope in 0.6.1, **UAT-04 PASS**; see
+[native evidence and limits](test-results/m2-acceptance-0.6.1.md) and the
+[audit contract](m2-audit-contract.md). Other workflow tools are planned. M0 utilities are `allplan_health`,
 `get_allplan_version`, `get_all_object_names`, `create_cube` and `create_box`.
 Names are display values; baseline boxes have no automatic readback/deduplication.
 
@@ -64,10 +67,10 @@ raw adapters/representations must not inflate component counts. Add one column
 marked S02 in passive file 102 and another column in unloaded file 103.
 The accepted roots include SkeletonBeam and MultiSlab with Slab tiers.
 The original zero-offset baseline is retained; no model repair is requested.
-C03 was observed as the literal `<niezdefiniowany>`; M2 must explicitly define
-its missing-value semantics rather than silently normalizing it.
+C03 was observed as the literal `<niezdefiniowany>`. M2 audit profile 2.0.0
+explicitly classifies it as missing while retaining the raw value in evidence.
 
-The future M2 audit should examine only the six file-101 columns: **QA-001** required mark → C03;
+The M2 audit examines only the six file-101 columns: **QA-001** required mark → C03;
 **QA-002** unique nonempty mark per file/family → C02/C04 (two findings, one group);
 **QA-003** required structure layer → C05; **QA-004** status NEW/EXISTING → C06.
 Expected: **5 findings on 5 columns**, C01 passes. Outside-scope columns do not

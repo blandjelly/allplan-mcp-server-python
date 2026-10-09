@@ -1,18 +1,81 @@
 # Next-model handoff
 
-## Current handoff — 2026-10-09, package 0.5.3
+## Current handoff — 2026-10-09, package 0.6.1
+
+## Checkout for the next chat
+
+Continue from GitHub branch **`codex/m2-audit-accepted`** in
+`blandjelly/allplan-mcp-server-python`. This branch contains the complete M2
+implementation, 0.6.1 callback correction, original UAT/crash evidence and bounded
+UAT-04 acceptance. In a fresh checkout:
+
+```sh
+git fetch origin
+git switch --track origin/codex/m2-audit-accepted
+```
+
+Read this handoff and [M2 acceptance](test-results/m2-acceptance-0.6.1.md) before
+continuing. The older `feature/m2-audit-foundations` branch is a separate early
+schema draft, not the accepted M2 implementation. The exact delivered Windows
+archives remain outside Git under ignored `dist/`; the owner retains the tested
+0.6.1 ZIP. Do not replace it with a rebuild using the same version. Future runtime
+changes require a new package version. The full 121-test suite passed again
+before this GitHub handoff commit.
+
+## Accepted implementation state
 
 **M0 and M1 are closed; UAT-00–UAT-03 PASS within the recorded scope** on
-Allplan 2026-1-7 / local Windows Codex. Completed M1 is on
-`codex/m1-scope-model-query` in [PR #1](https://github.com/blandjelly/allplan-mcp-server-python/pull/1),
-ready for review. Recheck PR/remote state before editing; use main only once it
-contains M1. The main documentation cleanup is integrated into this branch.
+Allplan 2026-1-7 / local Windows Codex. M1 is merged through
+[PR #1](https://github.com/blandjelly/allplan-mcp-server-python/pull/1): local
+baseline and freshly checked origin/main both point to `bc5137339f3a6fa2049b322d7c726e659b523279`.
+
+**M2.1–M2.3 are closed; UAT-04 PASS within the retained read-only fixture scope
+on package 0.6.1.** [Native evidence and limits](test-results/m2-acceptance-0.6.1.md).
+Package 0.6.1 exposes `model_audit` through `/model-audit`, versioned typed
+rules/string missing policies, fresh full snapshot evaluation, severity/raw
+findings, coverage and readable reports. File/mark/model-local box/center and
+session/project/document/model refs locate findings without native highlighting.
+References remain nondurable read evidence and cannot authorize writes.
 
 Read [architecture](architecture.md), [features](features.md),
-[implementation stages](implementation-plan.md), [read contracts](tool-reference.md)
-and [M1 acceptance](test-results/m1-acceptance-0.5.3.md).
-The packaged demo profile is schema m1-profile-1 / revision **1.0.2**. It binds
-actual named resources freshly for reads and remains inactive for writes.
+[implementation stages](implementation-plan.md), [M1 reads](tool-reference.md),
+[M2 contract](m2-audit-contract.md) and
+[portable evidence](test-results/m2-audit-portable-0.6.0.md).
+The M1 read profile remains schema m1-profile-1 / revision **1.0.2** unchanged;
+the separate audit profile is schema m2-profile-1 / revision **2.0.0**. Both bind
+resources freshly and remain inactive for writes.
+
+The [native 0.6.0 capture](test-results/m2-audit-runtime-0.6.0.md) reports
+six columns, five findings on five targets, one duplicate group, complete coverage
+and zero unchecked checks. The owner confirms UI correspondence and unchanged model.
+The [uploaded crash evidence and correction](test-results/m2-dispatch-fix-0.6.1.md)
+confirm a managed-exception crash at 12:50:12.737 Europe/Warsaw during a second
+request for [101,102]/include_passive=true, ID `101efe01-58e9-4296-aa93-e1a2c18b60b4`.
+That scope exceeds the demo profile's file-101 contract and should be rejected.
+No incident dump/managed stack/faulting module is available; causation is unproven.
+
+**0.6.1 contains a concrete dispatcher error-boundary fix:** callbacks return
+primitive result/error data, while HTTP workers raise errors after dispatch.
+Public and host preflight reject invalid audit scope before native reads;
+a bounded persistent bridge log retains request outcomes/exception traces.
+The original 0.6.0 artifact and evidence are preserved. Full local suite:
+**121 tests PASS**, including former callback escape, typed/generic errors,
+exact incident scope, logs and stop-on-failure diagnostic checks.
+
+The [0.6.1 targeted owner gate](m2-stability-batch.md) is completed: both full
+101-only audits, public/direct-host rejection of [101,102] and post-error health
+pass in the same host session. All 18 installed bridge hashes match the tested
+archive; the loaded boundary marker is present. The reports are identical apart
+from request IDs, and all per-element source hashes/raw evidence/locators match
+the earlier UI-confirmed capture. The owner now confirms Allplan and host remain
+running; the earlier unchanged-model/UI confirmation is not reattributed to this
+later statement. Static report acceptance flags remain unchanged.
+
+**No further M2 owner batch is required within this scope.** Preserve the tested
+0.6.1 archive. M3 is planned and unimplemented; do not infer authorization for
+repairs or native writes from M2 acceptance. Native longer-term stability,
+concurrent multi-chat requests and persistent log behavior remain unverified.
+The cloud workspace cannot execute Windows/Allplan tests.
 
 ## Verified baseline
 
@@ -38,6 +101,8 @@ Use a new package version for further runtime changes. Their recorded hashes are
 | `allplan-mcp-0.1.2-windows-evaluation.zip` | `d97b6761b13f8cd6e80c7954f1c91de513d4a813a5b236c6917b14b0882ac528` |
 | `allplan-mcp-0.2.1-windows-evaluation.zip` | `26ca92690be0365eca3d580b947c52b443e536cc8ee10d8b1ca7b1de594bc6e8` |
 | `allplan-mcp-0.5.3-windows-evaluation.zip` | `15262b1f029d818e5fea871a0b669603d90a5b6ca68e80d5355457b8656ed104` |
+| `allplan-mcp-0.6.0-windows-evaluation.zip` (native report verified; crash unresolved) | `6fc6e37fa4abd09ffec5b7a72d2b34a3a67c49a1ad2eef4cd480426428be2dd7` |
+| `allplan-mcp-0.6.1-windows-evaluation.zip` (bounded UAT-04 PASS) | `b47cba9ab08cce800f9e1900d03a232153c4441d054818f1bc116e8cc4a617f7` |
 
 The accepted 0.5.3 artifact uses clean source
 `4f685766e1577cddb681ee3726bbabd3f2b3d743`; documentation/test-only integration
@@ -98,16 +163,37 @@ Original diagnostic SHA-256 values, retained byte-for-byte:
 
 ## Next work and unresolved limits
 
-Next: **M2.1–M2.3 profile/audit contracts and read-only findings**, then only
-UAT-04 once runnable. Retain C03's literal `<niezdefiniowany>` as native evidence
-and explicitly define missing-value semantics. M2 audits and M3 repairs remain
-unimplemented/unrun. Do not begin native repairs or repeat accepted M1 batches.
+M2 work requested by the owner is complete; no further owner test is pending
+within the recorded scope. The next implementation stage is M3 when requested.
+Crash timing and second request arguments are established. A concrete UI
+callback exception defect is fixed and the native controlled error/recovery gate
+passes; its role in the actual CLR crash remains a hypothesis without the incident
+stack. UAT-04 is closed for the retained fixture, not for arbitrary native faults.
+
+The demo preserves C03's literal `<niezdefiniowany>` in raw evidence while its
+explicit QA policy classifies that literal, absence, null and empty/whitespace
+strings as missing. Unknown reads/types and passive API absence remain
+not_checked. The tested six-column audit has five findings and one duplicate
+group. A zero result cannot bypass incomplete coverage. Missing bindings reject
+the audit; remedies remain suggestions. M3 is unimplemented/unrun.
+
+Current portable verification: **121 tests PASS** on Linux Python **3.12.14**,
+including the real MCP/HTTP transport with a fake native host and JSON/TXT CLI
+output. Frozen sync, wheel/sdist build and Windows archive/integrity checks pass.
+This is separate from native acceptance and from the earlier 95-test CI result.
+No remote current M2 CI run is claimed. The 0.6.0 native report, crash collection
+and successful 0.6.1 native gate have separate original evidence. The latest
+JSON/TXT are preserved byte-for-byte; their hashes are in the acceptance record.
+Persistent bridge.log was not supplied and its native rotation/traceback behavior
+is not included in this acceptance.
+
 
 Baseline box tools lack automatic readback and durable write deduplication.
 Queued cancellation has portable simulated-dispatch evidence; closing the listener
 does not undo an already running write. Static diagnostics flags
 `runtime_verified=false` / `allplan_acceptance=not_run` are not a live acceptance
-registry. Audit/repair tools and Claude/cloud-to-Windows integration are not accepted.
+registry. Native M2 audit is accepted only for the recorded fixture/profile;
+all repair tools and Claude/cloud-to-Windows integration remain unaccepted.
 Neither inspected repository has a license; public redistribution remains
 unresolved and no release publication is recorded.
 

@@ -1,6 +1,8 @@
 import importlib.util
 import json
+import logging
 import queue
+import tempfile
 import threading
 import time
 import unittest
@@ -36,11 +38,96 @@ class TransportTests(unittest.TestCase):
                           headers={"Content-Type": "application/json", "X-Request-ID": "test-id"})
         return build_opener(ProxyHandler({})).open(request, timeout=2)
 
-    def server(self, handler=None, dispatch=lambda callback: callback()):
-        server = transport.BridgeServer(("127.0.0.1", 0), handler or Handler(), dispatch)
+    def server(self, handler=None, dispatch=lambda callback: callback(), log_path=None):
+        server = transport.BridgeServer(("127.0.0.1", 0), handler or Handler(), dispatch, log_path=log_path)
         server.start()
         self.addCleanup(stop_test_server, self, server)
         return server
+
+    def test_typed_errors_stay_inside_managed_callback_and_preserve_http_status(self):
+        class RejectingHandler(Handler):
+            def handle(self, path, payload):
+                if payload.get("reject"):
+                    raise transport.BridgeError("invalid_payload", "Scope exceeds profile.", 400)
+                return super().handle(path, payload)
+        escaped = []
+        def managed_dispatch(callback):
+            try:
+                outcome = callback()
+            except BaseException as exc:
+                escaped.append(type(exc).__name__)
+                raise RuntimeError("Unhandled managed UI delegate exception") from exc
+            # No exception or traceback objects cross the callback boundary.
+            json.dumps(outcome, allow_nan=False)
+            return outcome
+        server = self.server(RejectingHandler(), managed_dispatch)
+        with self.assertRaises(HTTPError) as error:
+            self.request(server, b'{"reject":true}')
+        self.assertEqual(error.exception.code, 400)
+        body = json.loads(error.exception.read())
+        self.assertEqual(body["error"], {"code": "invalid_payload", "message": "Scope exceeds profile."})
+        self.assertEqual(body["request_id"], "test-id")
+        self.assertEqual(escaped, [])
+        with self.request(server) as response:
+            self.assertEqual(response.status, 200)
+
+    def test_unexpected_and_exit_errors_are_marshaled_logged_and_do_not_escape_ui(self):
+        class FailingHandler(Handler):
+            def handle(self, path, payload):
+                if payload.get("fail") == "exit":
+                    raise SystemExit("fake exit")
+                if payload.get("fail"):
+                    raise RuntimeError("fake native failure")
+                return super().handle(path, payload)
+        escaped = []
+        def managed_dispatch(callback):
+            try:
+                result = callback()
+            except BaseException:
+                escaped.append(True)
+                raise
+            json.dumps(result)
+            return result
+        server = self.server(FailingHandler(), managed_dispatch)
+        for failure in ("runtime", "exit"):
+            with self.assertLogs("allplan.bridge", level="ERROR") as logs:
+                with self.assertRaises(HTTPError) as error:
+                    self.request(server, json.dumps({"fail": failure}).encode())
+                self.assertEqual(error.exception.code, 500)
+                body = json.loads(error.exception.read())
+            self.assertEqual(body["error"]["code"], "host_error")
+            self.assertNotIn("traceback", body)
+            self.assertNotIn("fake", body["error"]["message"])
+            self.assertIn("request_id=test-id", "\n".join(logs.output))
+        self.assertEqual(escaped, [])
+        with self.request(server) as response:
+            self.assertEqual(response.status, 200)
+
+    def test_persistent_log_is_bounded_shared_and_failure_to_open_does_not_prevent_service(self):
+        logger = logging.getLogger("allplan.bridge")
+        original_handlers, level = set(logger.handlers), logger.level
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "logs/bridge.log"
+            try:
+                first = transport.configure_bridge_logging(path)
+                second = transport.configure_bridge_logging(path)
+                handlers = [h for h in first.handlers if getattr(h, "bridge_log_path", None) == path.resolve()]
+                self.assertIs(first, second)
+                self.assertEqual(len(handlers), 1)
+                self.assertEqual(handlers[0].maxBytes, 1024 * 1024)
+                self.assertEqual(handlers[0].backupCount, 2)
+                first.info("request_started request_id=persistent-test path=/model-audit")
+                self.assertIn("request_id=persistent-test", path.read_text(encoding="utf-8"))
+                blocker = Path(directory) / "file"
+                blocker.write_text("not a directory")
+                with self.assertLogs("allplan.bridge", level="WARNING"):
+                    transport.configure_bridge_logging(blocker / "bridge.log")
+            finally:
+                for handler in list(logger.handlers):
+                    if handler not in original_handlers:
+                        logger.removeHandler(handler)
+                        handler.close()
+                logger.setLevel(level)
 
     def test_http_dispatch_and_request_id(self):
         pending = queue.Queue()
