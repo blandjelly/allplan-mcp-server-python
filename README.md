@@ -16,10 +16,12 @@ Read these files in order when continuing implementation:
 3. [Features](docs/features.md): the 13 tools and demonstration fixture.
 4. [Implementation stages](docs/implementation-plan.md): task IDs and exit gates.
 
-Current package: **0.2.1**. **M0 is accepted** on Allplan **2026-1-7** with local
-Windows Codex. The bounded **M1.1 context probe passed**; **full M1 is in progress**.
-The demo profile is unbound and inactive. Detailed current evidence is in the
-handoff; planned features are not accepted capabilities.
+Current package: **0.5.3**, demo profile **1.0.2**. **M0 and bounded M1 are
+accepted** on Allplan **2026-1-7** with local Windows Codex; UAT-00–UAT-03 PASS.
+The demo profile binds freshly for reads and remains inactive for writes.
+[Acceptance and limits](docs/test-results/m1-acceptance-0.5.3.md) cover the known
+fixture, display-unit invariance and nonzero XY offset. M2 audit is next;
+planned audit, repair and generation tools are not implemented.
 
 Repository documentation and API identifiers use English. Owner-facing
 walkthroughs may use Polish. The implementation model owns coding, diagnostics,
@@ -30,7 +32,7 @@ The owner does not edit Python/JSON or research API identifiers.
 
 Use a versioned evaluation ZIP on the Windows machine running Allplan and Codex.
 It requires external Python 3.11+ and internet access for locked dependencies;
-it does not bundle Allplan, Python or Codex.
+it does not bundle Allplan, Python or Codex. See the [Windows setup guide](docs/windows-setup.md).
 
 1. Extract the complete ZIP into a writable, versioned folder. Close Allplan.
 2. Run **Setup.cmd** and select the actual Allplan user `Local` folder, commonly

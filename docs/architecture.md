@@ -25,7 +25,8 @@ UI dispatcher; shutdown must not join a worker waiting on that dispatcher.
 | `python_host/PythonPartsScripts/PythonHost/StartPythonHost.py` | Interactor, listener lifecycle and UI dispatch. |
 | Host `transport.py`, `PythonHostHandler.py`, `runtime_info.py`, `model_context.py` | JSON transport, typed routes, runtime metadata and bounded context probe. |
 | `utils/`, `windows/` | Recursive registration, package integrity, launchers, Codex setup and restore. |
-| `profiles/`, `tests/` | Draft profiles and portable checks. |
+| Host `model_query.py`, `native_readers.py`, `model_metadata.py`, `query_contracts.py`, `spatial_contracts.py`, `profile_contracts.py` | Bounded model reads, geometry/hierarchy, metadata and validated read binding. |
+| `profiles/`, `tests/` | Versioned demo read profile and portable checks. |
 
 Add `contracts/`, `services/`, host `handlers/` and `adapters/` only when needed.
 Use versioned JSON contracts and validated profiles; do not assume external
@@ -38,7 +39,9 @@ resources in `src/allplan_mcp/allplan_skills/`. MCP exposes `allplan://skills`,
 
 ## Required contracts
 
-These are target contracts; the current context probe does not implement them all.
+M1 implements bounded context, scope, session-bound references/snapshots and
+read-only selections; [read contracts](tool-reference.md) define their limits.
+The table also includes future mutation, audit and registry contracts.
 
 | Contract | Required fields and behavior |
 | --- | --- |

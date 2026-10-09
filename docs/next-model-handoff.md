@@ -1,17 +1,18 @@
 # Next-model handoff
 
-## Latest runtime handoff — 2026-10-07, package 0.2.1
+## Current handoff — 2026-10-09, package 0.5.3
 
-**M0 is closed. The bounded M1.1 context/identity batch passed. Full M1 remains in
-progress.** This is the latest handoff after the M1 probe, not full M1 acceptance.
-No implementation/runtime acceptance changed during the 2026-10-09 documentation
-cleanup. Historical setup tasks and duplicate reports have been removed; current
-implementation facts and the latest original diagnostics remain here.
+**M0 and M1 are closed; UAT-00–UAT-03 PASS within the recorded scope** on
+Allplan 2026-1-7 / local Windows Codex. Completed M1 is on
+`codex/m1-scope-model-query` in [PR #1](https://github.com/blandjelly/allplan-mcp-server-python/pull/1),
+ready for review. Recheck PR/remote state before editing; use main only once it
+contains M1. The main documentation cleanup is integrated into this branch.
 
-Read [architecture](architecture.md), [features](features.md) and
-[stages](implementation-plan.md), then inspect the current working tree and code.
-The demo [profile](../profiles/examples/native-model-qa.demo.json) remains
-**unbound and inactive**; the server does not consume it.
+Read [architecture](architecture.md), [features](features.md),
+[implementation stages](implementation-plan.md), [read contracts](tool-reference.md)
+and [M1 acceptance](test-results/m1-acceptance-0.5.3.md).
+The packaged demo profile is schema m1-profile-1 / revision **1.0.2**. It binds
+actual named resources freshly for reads and remains inactive for writes.
 
 ## Verified baseline
 
@@ -23,9 +24,11 @@ The demo [profile](../profiles/examples/native-model-qa.demo.json) remains
   **16.1617.8659.814 / 2026.0.1.0**, embedded CPython **3.13.13**, external Python
   **3.14.8**. UI hotfix is owner-reported; executable metadata is not a hotfix mapping.
   Windows/Codex app versions remain unspecified.
-- Last recorded portable validation: **31 tests PASS**, Linux Python **3.12.14**,
-  FastMCP **3.2.4**, uv **0.12.19**. This is separate from Allplan runtime acceptance.
-  GitHub Actions matrix execution is not claimed.
+- Portable pre-merge validation: **95 tests PASS** locally on Linux Python
+  **3.12.14**; Windows/Ubuntu Python **3.11–3.13** matrix, wheel/sdist and Windows
+  ZIP checks [PASS for 99abad8](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/37859752410).
+  This is separate from Allplan acceptance and does not replace checks for later
+  commits. FastMCP **3.2.4** and uv **0.12.19** remain pinned.
 
 Keep the tested archives unchanged; do not overwrite them with rebuilt packages.
 Use a new package version for further runtime changes. Their recorded hashes are:
@@ -34,8 +37,38 @@ Use a new package version for further runtime changes. Their recorded hashes are
 | --- | --- |
 | `allplan-mcp-0.1.2-windows-evaluation.zip` | `d97b6761b13f8cd6e80c7954f1c91de513d4a813a5b236c6917b14b0882ac528` |
 | `allplan-mcp-0.2.1-windows-evaluation.zip` | `26ca92690be0365eca3d580b947c52b443e536cc8ee10d8b1ca7b1de594bc6e8` |
+| `allplan-mcp-0.5.3-windows-evaluation.zip` | `15262b1f029d818e5fea871a0b669603d90a5b6ca68e80d5355457b8656ed104` |
 
-## Latest M1 runtime evidence
+The accepted 0.5.3 artifact uses clean source
+`4f685766e1577cddb681ee3726bbabd3f2b3d743`; documentation/test-only integration
+does not rebuild or replace that artifact.
+
+## Accepted M1 reads
+
+M1.1–M1.4 implement explicit file scope, typed predicates, bounded geometry/
+hierarchy, metadata, full selections/pages/summaries and fresh profile binding.
+The [acceptance record](test-results/m1-acceptance-0.5.3.md) preserves exact
+scope and limits; the [completed fixture recipe](m1-final-batch.md) is reference,
+not a request to reinstall or repeat captures.
+
+Native A/B/C verify ten roots in 101 (six Column, two SkeletonBeam, Wall and
+MultiSlab), one reference in passive 102, and unloaded 103 omission. Filters
+column/S02/C01 return 6/2/1; six child representations are deduplicated. Resources
+resolve MCP_QA_MARK / MCP_QA_STATUS and SZ_OGÓ01 / SZ_OGÓ02. B verifies passive
+102 and C05/S05 on the review layer separately from display-unit invariance.
+C adds (100000,200000,0) mm to every global box exactly once; model-local geometry,
+dimensions and counts remain unchanged. Independent UI offset 100/200 m and C01
+base-section center 100/200/0 m agree. Owner confirms unchanged A/B/C appearance
+and retains the zero-offset baseline. Static runtime_verified flags remain
+unchanged; acceptance applies only to the recorded build/fixture.
+
+Changed-source staleness, TTL/eviction/restart and other predicate variants retain
+portable evidence. The demo is bound_for_read and active_for_write=false.
+Configured levels are not native BWS. Durable references, writable properties/
+Undo, arbitrary native trees, nonzero Z offsets and exact solid intersections
+remain outside acceptance.
+
+## Earlier context evidence — 0.2.1
 
 `get_model_context` is read-only: project, foreground/loaded file states, input
 unit enums, raw offset and optional **0–20 raw adapter** model/view UUID samples.
@@ -52,7 +85,8 @@ published name/host order returned -1/empty path on this build.
 The owner confirmed **“Nazwy projektu sie zgadzaja, model bez zmiany”** (names
 match, model unchanged). Each capture has a different host session ID;
 `document_id=0` is not project identity. Unit enums **3/1** and offset **[0,0,0]**
-were read, but UI unit comparison and nonzero-offset normalization were not tested.
+were read without UI unit comparison/nonzero-offset tests in these early captures.
+The accepted 0.5.3 captures supply that later separate evidence.
 
 Original diagnostic SHA-256 values, retained byte-for-byte:
 
@@ -64,22 +98,16 @@ Original diagnostic SHA-256 values, retained byte-for-byte:
 
 ## Next work and unresolved limits
 
-1. Finish **M1.1** explicit scope, unit/offset conversion and identity contracts.
-   Project key is a non-durable name/host/path fingerprint; copy/rename/move
-   semantics, levels, file write eligibility and full component coverage are unresolved.
-2. Implement **M1.2** read-only type/layer/attribute queries, then **M1.3** paging,
-   reusable selections, deduplication and stale-state checks. Adapter samples are
-   not component counts, selections or write targets.
-3. Complete **M1.4** metadata/profile binding and the exact UI fixture recipe.
-   Full UAT-02/UAT-03 and the M1 exit gate remain pending. No repeat of the passed
-   0.2.1 correction batch is needed without a relevant change or defect.
-4. Continue **M2–M3** for the first search/audit/cleanup MVP.
+Next: **M2.1–M2.3 profile/audit contracts and read-only findings**, then only
+UAT-04 once runnable. Retain C03's literal `<niezdefiniowany>` as native evidence
+and explicitly define missing-value semantics. M2 audits and M3 repairs remain
+unimplemented/unrun. Do not begin native repairs or repeat accepted M1 batches.
 
 Baseline box tools lack automatic readback and durable write deduplication.
 Queued cancellation has portable simulated-dispatch evidence; closing the listener
 does not undo an already running write. Static diagnostics flags
 `runtime_verified=false` / `allplan_acceptance=not_run` are not a live acceptance
-registry. No other workflow tools or Claude/cloud-to-Windows integration are accepted.
+registry. Audit/repair tools and Claude/cloud-to-Windows integration are not accepted.
 Neither inspected repository has a license; public redistribution remains
 unresolved and no release publication is recorded.
 

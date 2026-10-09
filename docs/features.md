@@ -1,8 +1,9 @@
 # Features to implement
 
-The toolkit contains the following 13 workflow tools. Only the bounded
-`get_model_context` probe exists today; its limits and verified behavior are in
-[the handoff](next-model-handoff.md). M0 utilities are `allplan_health`,
+The toolkit contains the following 13 workflow tools. Bounded
+`get_model_context` and `model_query` reads are implemented and accepted on
+Allplan 2026-1-7; see [acceptance and limits](test-results/m1-acceptance-0.5.3.md)
+and [read contracts](tool-reference.md). The remaining workflow tools are planned. M0 utilities are `allplan_health`,
 `get_allplan_version`, `get_all_object_names`, `create_cube` and `create_box`.
 Names are display values; baseline boxes have no automatic readback/deduplication.
 
@@ -32,9 +33,12 @@ manual-review evidence. Keep supplied, verified and uncheckable metadata distinc
 ## Demonstration fixture for M1–M3
 
 Profile: [native-model-qa.demo.json](../profiles/examples/native-model-qa.demo.json).
-It is illustrative, unbound and inactive. Reject unbound profiles. Resolve actual
-native-type, writable mark/status attribute and layer IDs, validate the schema,
-record the bound version/build and supply exact UI field names before owner tests.
+Revision 1.0.2 validates schema m1-profile-1 and resolves MCP_QA_MARK /
+MCP_QA_STATUS plus layer short names SZ_OGÓ01 / SZ_OGÓ02 freshly for reads.
+The accepted fixture is bound_for_read; active_for_write=false and native write
+eligibility remain not_checked. Missing/incompatible resources reject profile
+queries. The [completed owner recipe](m1-final-batch.md) records exact UI names;
+no repeated owner batch is requested.
 
 Use a disposable `MCP_QA_DEMO` project or copy. Reserve empty files **101**
 (active/editable), **102** (loaded passive) and **103** (unloaded); these are
@@ -46,27 +50,30 @@ center insertion, consistent sample material such as `C30/37`.
 
 | Fixture | Center X/Y (mm) | Mark | Layer | Demo status |
 | --- | --- | --- | --- | --- |
-| C01 | 0 / 0 | S01 | MCP_QA_STRUCTURE | NEW |
-| C02 | 6000 / 0 | S02 | MCP_QA_STRUCTURE | NEW |
-| C03 | 12000 / 0 | Empty | MCP_QA_STRUCTURE | NEW |
-| C04 | 0 / 6000 | S02 | MCP_QA_STRUCTURE | NEW |
-| C05 | 6000 / 6000 | S05 | MCP_QA_REVIEW | NEW |
-| C06 | 12000 / 6000 | S06 | MCP_QA_STRUCTURE | NWE |
+| C01 | 0 / 0 | S01 | SZ_OGÓ01 | NEW |
+| C02 | 6000 / 0 | S02 | SZ_OGÓ01 | NEW |
+| C03 | 12000 / 0 | Empty | SZ_OGÓ01 | NEW |
+| C04 | 0 / 6000 | S02 | SZ_OGÓ01 | NEW |
+| C05 | 6000 / 6000 | S05 | SZ_OGÓ02 | NEW |
+| C06 | 12000 / 6000 | S06 | SZ_OGÓ01 | NWE |
 
 Add two 300 × 500 mm native beams spanning C01–C02 and C02–C03 at a documented
 common elevation, one separate 200 × 4000 × 3000 mm single-layer wall, and one
 separate 4000 × 4000 × 200 mm slab. Expect **10 top-level components** in file 101;
 raw adapters/representations must not inflate component counts. Add one column
 marked S02 in passive file 102 and another column in unloaded file 103.
-Record actual UUIDs in a test manifest; save a clean copy before repairs.
+The accepted roots include SkeletonBeam and MultiSlab with Slab tiers.
+The original zero-offset baseline is retained; no model repair is requested.
+C03 was observed as the literal `<niezdefiniowany>`; M2 must explicitly define
+its missing-value semantics rather than silently normalizing it.
 
-Audit only the six file-101 columns: **QA-001** required mark → C03;
+The future M2 audit should examine only the six file-101 columns: **QA-001** required mark → C03;
 **QA-002** unique nonempty mark per file/family → C02/C04 (two findings, one group);
 **QA-003** required structure layer → C05; **QA-004** status NEW/EXISTING → C06.
 Expected: **5 findings on 5 columns**, C01 passes. Outside-scope columns do not
 create duplicates. Missing bindings/data produce `not_checked` or a profile error.
 
-First repair preview contains exactly two changes: C05 layer → MCP_QA_STRUCTURE
+The future M3 first repair preview should contain exactly two changes: C05 layer → SZ_OGÓ01
 and C06 status NWE → NEW. Leave marks unchanged; after apply/readback, **3 findings**
 remain. Repeating apply must not repeat writes. A later explicit reviewed plan
 assigning C03=S03 and C04=S04 gives zero findings. These values are fixture choices,

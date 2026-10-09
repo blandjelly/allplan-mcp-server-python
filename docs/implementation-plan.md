@@ -21,22 +21,25 @@ capabilities and API probes rather than a fixed completion promise.
 ESC/restart, minimize/restore and project switching. Evidence/limits are in the
 handoff. Continue from M1; retest M0 only for relevant changes or a new defect.
 
-## M1 — Context, identity, selections and query: in progress
+## M1 — Context, identity, selections and query: complete within the bounded read contract
 
-- **M1.1** Complete `ModelContext`, explicit scope, model references, capabilities,
-  normalized units/offset and file eligibility. Bounded 0.2.1 context probe passed;
-  durable identity and the full contracts remain pending.
-- **M1.2** Finish context and implement type/file/layer/attribute/dimension/spatial
-  queries. Define composition, missing/null data, case, tolerances and spatial rules.
-- **M1.3** Implement pagination, reusable selections, completeness and stale-state
-  behavior; scan only requested fields/scope and deduplicate model representations.
-- **M1.4** Bind/validate the demo profile against actual metadata, supply a localized
-  fixture recipe and verify the owner-built model through read-only inspection.
+**M1.1–M1.4 complete, 2026-10-09**, package 0.5.3, profile 1.0.2,
+Allplan 2026-1-7. [Acceptance and limits](test-results/m1-acceptance-0.5.3.md).
 
-**Exit gate (UAT-02/UAT-03):** expected units/offset and active/passive/unloaded
-coverage; 6 file-101 columns, 2 marked S02, 10 top-level components; complete pages
-and reusable selections without model changes. Portable checks cover conversion,
-filters, pagination and identity. Full M1 is not accepted yet.
+| Completed task | Delivered scope |
+| --- | --- |
+| M1.1 | Explicit session/project/file scope, model/view identity, canonical mm geometry and offset once; configured levels retain their provenance. |
+| M1.2 | Typed scalar/dimension/AABB predicates and six supported top-level root families, with child deduplication and wall/slab tier unions. |
+| M1.3 | Full cached selections, pages/summaries, relevant-source revalidation, TTL/eviction and restart invalidation. |
+| M1.4 | Validated demo profile, fresh named resource read binding, metadata inspection and the owner-built fixture. |
+
+**Exit gate met (UAT-02/UAT-03):** native A/B/C captures verify ten file-101
+roots, six columns, two S02 and one C01 spatial/height match, complete pages/
+summaries, display-unit invariance and offset (100000,200000,0) mm once.
+Owner UI dimensions/coordinates and unchanged appearance agree. Static
+runtime_verified flags are not an acceptance registry. Durable references,
+write eligibility/Undo, native BWS, arbitrary framing families and nonzero Z
+offsets remain outside acceptance. No further M1 owner batch is requested.
 
 ## M2 — Audits and profile foundations
 

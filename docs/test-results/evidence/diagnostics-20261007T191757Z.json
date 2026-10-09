@@ -1,0 +1,583 @@
+{
+  "schema_version": "m0-1",
+  "captured_at": "2026-10-07T19:17:53.047554+00:00",
+  "external_python": "3.14.8",
+  "platform": "Windows",
+  "package_version": "0.4.0",
+  "host_url": "http://127.0.0.1:5679",
+  "mcp_url": "http://127.0.0.1:8888/mcp",
+  "allplan_acceptance": "not_run",
+  "model_query_request": {
+    "action": "inspect",
+    "scope": {
+      "drawing_files": [
+        1,
+        2
+      ],
+      "include_passive": true,
+      "visibility": "api_select_all"
+    },
+    "attribute_ids": [
+      498
+    ],
+    "sample_limit": 10,
+    "max_adapters": 5000
+  },
+  "host": {
+    "version": "2026.1",
+    "allplan_release": {
+      "Version": "2026.1",
+      "MainReleaseName": "2026",
+      "SubReleaseName": "2026.1",
+      "WindowsReleaseName": ""
+    },
+    "executable_versions": {
+      "status": "observed",
+      "file_version": "16.1617.8659.814",
+      "product_version": "2026.0.1.0",
+      "source": "running_process_executable"
+    },
+    "hotfix": {
+      "status": "not_checked",
+      "value": null
+    },
+    "embedded_python": {
+      "version": "3.13.13",
+      "implementation": "CPython"
+    },
+    "bridge_package": {
+      "version": "0.4.0",
+      "source_commit": "0b0daf9f1a3cc03a881fcf5638b8176fc6f720a9",
+      "integrity": "sha256-verified",
+      "bridge_files": {
+        "Library/PythonHost/StartPythonHost.pyp": "b1aba49ed554eeefa9e44f4e9a6f06992e74d4f2916277ef451de11d72167813",
+        "PythonPartsScripts/PythonHost/model_context.py": "823dced144efa1c8c54b06857a362bdbac519023d1eb033e203963c0e62ba423",
+        "PythonPartsScripts/PythonHost/model_metadata.py": "4894683d6f0d0b5b45d507db67123f09402db0584c576b0d362a4b60ab2771b8",
+        "PythonPartsScripts/PythonHost/model_query.py": "08b3b67d27b18dbb577d1ce329957c3b4eb8c0645e97fdd2161d57bd4ecdc592",
+        "PythonPartsScripts/PythonHost/PythonHostHandler.py": "31e1442e834b0c061d81397ef54e26620c69f90589ad31b15d36d0522a84606d",
+        "PythonPartsScripts/PythonHost/query_contracts.py": "544dd7a7fc63e07f453a50a1ac6b7edfd5224f5d49062a46c5d6a5eec2169fbc",
+        "PythonPartsScripts/PythonHost/runtime_info.py": "6d46a44d0c8e8d3c1d757a22b4012a9919eb782bb8ea60577a1e229acfde91a2",
+        "PythonPartsScripts/PythonHost/sandbox/__init__.py": "b895513c191ba9ea7a8748f3aef1c6c9d74875b990d8ef41e10faf3904e0e586",
+        "PythonPartsScripts/PythonHost/sandbox/const.py": "168b93f376d54ddaf67ac62ffc5fb7e94570ab24e1f828d0732effa097e659d4",
+        "PythonPartsScripts/PythonHost/sandbox/executor.py": "c06f9810291a1c9e6f3deb7939d4b6615905d15c6662a6e69d7973b3fcbf0f6a",
+        "PythonPartsScripts/PythonHost/sandbox/validator.py": "5a4d3bf2bb6d2556512285a778083385c5c5049a398bc7a77cdaab9c5d8ddaec",
+        "PythonPartsScripts/PythonHost/StartPythonHost.py": "f56aa99f99ef5f0d5c5daec3d98b8140d7d78e94c67a9438ac8c8b5b37fbeb35",
+        "PythonPartsScripts/PythonHost/transport.py": "3e6b5acffee05494e0af8a4dca74ecd19c3a8d21325acdd5f67035f5663e2ed3"
+      }
+    },
+    "installed_bridge_integrity": {
+      "status": "verified",
+      "mismatches": []
+    },
+    "compatibility": {
+      "target_major": "2026",
+      "major_matches": true,
+      "runtime_verified": false
+    },
+    "request_id": "eabe9f01-1541-4929-822b-8bc124180a6c",
+    "host_session_id": "425154d2-4b65-4652-b55c-7d3917db52bf"
+  },
+  "mcp": {
+    "ok": true,
+    "discovered_tools": [
+      "allplan_health",
+      "get_allplan_version",
+      "get_model_context",
+      "model_query",
+      "get_all_object_names",
+      "create_cube",
+      "create_box"
+    ],
+    "allplan_health": {
+      "ok": true,
+      "allplan_version": "2026.1",
+      "runtime": {
+        "version": "2026.1",
+        "allplan_release": {
+          "Version": "2026.1",
+          "MainReleaseName": "2026",
+          "SubReleaseName": "2026.1",
+          "WindowsReleaseName": ""
+        },
+        "executable_versions": {
+          "status": "observed",
+          "file_version": "16.1617.8659.814",
+          "product_version": "2026.0.1.0",
+          "source": "running_process_executable"
+        },
+        "hotfix": {
+          "status": "not_checked",
+          "value": null
+        },
+        "embedded_python": {
+          "version": "3.13.13",
+          "implementation": "CPython"
+        },
+        "bridge_package": {
+          "version": "0.4.0",
+          "source_commit": "0b0daf9f1a3cc03a881fcf5638b8176fc6f720a9",
+          "integrity": "sha256-verified",
+          "bridge_files": {
+            "Library/PythonHost/StartPythonHost.pyp": "b1aba49ed554eeefa9e44f4e9a6f06992e74d4f2916277ef451de11d72167813",
+            "PythonPartsScripts/PythonHost/model_context.py": "823dced144efa1c8c54b06857a362bdbac519023d1eb033e203963c0e62ba423",
+            "PythonPartsScripts/PythonHost/model_metadata.py": "4894683d6f0d0b5b45d507db67123f09402db0584c576b0d362a4b60ab2771b8",
+            "PythonPartsScripts/PythonHost/model_query.py": "08b3b67d27b18dbb577d1ce329957c3b4eb8c0645e97fdd2161d57bd4ecdc592",
+            "PythonPartsScripts/PythonHost/PythonHostHandler.py": "31e1442e834b0c061d81397ef54e26620c69f90589ad31b15d36d0522a84606d",
+            "PythonPartsScripts/PythonHost/query_contracts.py": "544dd7a7fc63e07f453a50a1ac6b7edfd5224f5d49062a46c5d6a5eec2169fbc",
+            "PythonPartsScripts/PythonHost/runtime_info.py": "6d46a44d0c8e8d3c1d757a22b4012a9919eb782bb8ea60577a1e229acfde91a2",
+            "PythonPartsScripts/PythonHost/sandbox/__init__.py": "b895513c191ba9ea7a8748f3aef1c6c9d74875b990d8ef41e10faf3904e0e586",
+            "PythonPartsScripts/PythonHost/sandbox/const.py": "168b93f376d54ddaf67ac62ffc5fb7e94570ab24e1f828d0732effa097e659d4",
+            "PythonPartsScripts/PythonHost/sandbox/executor.py": "c06f9810291a1c9e6f3deb7939d4b6615905d15c6662a6e69d7973b3fcbf0f6a",
+            "PythonPartsScripts/PythonHost/sandbox/validator.py": "5a4d3bf2bb6d2556512285a778083385c5c5049a398bc7a77cdaab9c5d8ddaec",
+            "PythonPartsScripts/PythonHost/StartPythonHost.py": "f56aa99f99ef5f0d5c5daec3d98b8140d7d78e94c67a9438ac8c8b5b37fbeb35",
+            "PythonPartsScripts/PythonHost/transport.py": "3e6b5acffee05494e0af8a4dca74ecd19c3a8d21325acdd5f67035f5663e2ed3"
+          }
+        },
+        "installed_bridge_integrity": {
+          "status": "verified",
+          "mismatches": []
+        },
+        "compatibility": {
+          "target_major": "2026",
+          "major_matches": true,
+          "runtime_verified": false
+        },
+        "request_id": "bf21d793-6aa5-4b69-8c63-2c1652830ac0",
+        "host_session_id": "425154d2-4b65-4652-b55c-7d3917db52bf"
+      },
+      "external_python": "3.14.8",
+      "mcp_package_version": "0.4.0",
+      "request_id": "bf21d793-6aa5-4b69-8c63-2c1652830ac0",
+      "allplan_host_url": "http://127.0.0.1:5679"
+    },
+    "get_allplan_version": "2026.1",
+    "get_model_context": {
+      "schema_version": "m1-context-probe-1",
+      "read_only": true,
+      "runtime_verified": false,
+      "project": {
+        "status": "observed",
+        "value": {
+          "name": "Nowy projekt 1",
+          "host": "DESKTOP-H6NH5R7",
+          "key": "e495885371831631433709e5d681ef8328e296b84b6e293ddc1dd223caea2ea1",
+          "key_status": "observed",
+          "key_kind": "name_host_path_sha256",
+          "durable_identity_verified": false,
+          "path_lookup_attempts": [
+            {
+              "argument_order": "project_name_host_name",
+              "status": "observed",
+              "value": {
+                "error": -1,
+                "path": ""
+              }
+            },
+            {
+              "argument_order": "host_name_project_name",
+              "status": "observed",
+              "value": {
+                "error": 0,
+                "path": "D:\\Programy\\Allplan\\Data\\Prj\\Nowy projekt 1.prj"
+              }
+            }
+          ]
+        }
+      },
+      "document_id": {
+        "status": "observed",
+        "value": 0
+      },
+      "active_drawing_file": {
+        "status": "observed",
+        "value": 1
+      },
+      "loaded_drawing_files": {
+        "status": "observed",
+        "value": [
+          {
+            "number": 1,
+            "state": "active_foreground",
+            "name": {
+              "status": "observed",
+              "value": ""
+            },
+            "write_eligibility": "not_checked"
+          },
+          {
+            "number": 2,
+            "state": "passive_background",
+            "name": {
+              "status": "observed",
+              "value": ""
+            },
+            "write_eligibility": "not_checked"
+          }
+        ]
+      },
+      "units": {
+        "canonical_length": "mm",
+        "canonical_angle": "deg",
+        "input_length": {
+          "status": "observed",
+          "value": 3
+        },
+        "input_angle": {
+          "status": "observed",
+          "value": 1
+        },
+        "input_unit_encoding": "Allplan 2026 LengthUnits/AngleUnits enum",
+        "geometry_conversion": "not_checked"
+      },
+      "project_offset": {
+        "status": "observed",
+        "value": {
+          "xyz": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "unit": "api_native",
+          "conversion_to_mm": "not_checked",
+          "application_to_model_coordinates": "not_checked"
+        }
+      },
+      "levels": {
+        "status": "not_checked",
+        "value": null
+      },
+      "capabilities": {
+        "context": "probe_only",
+        "model_query": "implemented_runtime_pending",
+        "reusable_selections": "session_bound_read_only_runtime_pending",
+        "model_write": "not_supported_by_this_tool"
+      },
+      "coverage": {
+        "file_inventory": "loaded_only",
+        "unloaded_files": "not_enumerated",
+        "visibility": "API_selection_semantics_not_verified",
+        "native_component_counts": "not_checked"
+      },
+      "identity_sample": {
+        "requested": 10,
+        "items": [
+          {
+            "signed_drawing_file_number": {
+              "status": "observed",
+              "value": -2
+            },
+            "model_uuid": {
+              "status": "observed",
+              "value": "5be600e7-0ea6-477d-8ef2-b8257613c097"
+            },
+            "view_uuid": {
+              "status": "observed",
+              "value": "97ebf740-99ed-45cb-b272-95905029d1f0"
+            },
+            "display_name": {
+              "status": "observed",
+              "value": "Słup"
+            },
+            "in_active_document": {
+              "status": "observed",
+              "value": false
+            },
+            "usable_for_write": false
+          },
+          {
+            "signed_drawing_file_number": {
+              "status": "observed",
+              "value": 1
+            },
+            "model_uuid": {
+              "status": "observed",
+              "value": "5c7abf7c-10bd-477f-bd4c-e6becdcafe5c"
+            },
+            "view_uuid": {
+              "status": "observed",
+              "value": "8c4f3865-1689-4e5b-93a9-eb58da9447da"
+            },
+            "display_name": {
+              "status": "observed",
+              "value": "Słup"
+            },
+            "in_active_document": {
+              "status": "observed",
+              "value": true
+            },
+            "usable_for_write": false
+          }
+        ],
+        "coverage": "bounded_raw_adapters_not_component_count",
+        "status": "observed"
+      },
+      "runtime": {
+        "version": "2026.1",
+        "allplan_release": {
+          "Version": "2026.1",
+          "MainReleaseName": "2026",
+          "SubReleaseName": "2026.1",
+          "WindowsReleaseName": ""
+        },
+        "executable_versions": {
+          "status": "observed",
+          "file_version": "16.1617.8659.814",
+          "product_version": "2026.0.1.0",
+          "source": "running_process_executable"
+        },
+        "hotfix": {
+          "status": "not_checked",
+          "value": null
+        },
+        "embedded_python": {
+          "version": "3.13.13",
+          "implementation": "CPython"
+        },
+        "bridge_package": {
+          "version": "0.4.0",
+          "source_commit": "0b0daf9f1a3cc03a881fcf5638b8176fc6f720a9",
+          "integrity": "sha256-verified",
+          "bridge_files": {
+            "Library/PythonHost/StartPythonHost.pyp": "b1aba49ed554eeefa9e44f4e9a6f06992e74d4f2916277ef451de11d72167813",
+            "PythonPartsScripts/PythonHost/model_context.py": "823dced144efa1c8c54b06857a362bdbac519023d1eb033e203963c0e62ba423",
+            "PythonPartsScripts/PythonHost/model_metadata.py": "4894683d6f0d0b5b45d507db67123f09402db0584c576b0d362a4b60ab2771b8",
+            "PythonPartsScripts/PythonHost/model_query.py": "08b3b67d27b18dbb577d1ce329957c3b4eb8c0645e97fdd2161d57bd4ecdc592",
+            "PythonPartsScripts/PythonHost/PythonHostHandler.py": "31e1442e834b0c061d81397ef54e26620c69f90589ad31b15d36d0522a84606d",
+            "PythonPartsScripts/PythonHost/query_contracts.py": "544dd7a7fc63e07f453a50a1ac6b7edfd5224f5d49062a46c5d6a5eec2169fbc",
+            "PythonPartsScripts/PythonHost/runtime_info.py": "6d46a44d0c8e8d3c1d757a22b4012a9919eb782bb8ea60577a1e229acfde91a2",
+            "PythonPartsScripts/PythonHost/sandbox/__init__.py": "b895513c191ba9ea7a8748f3aef1c6c9d74875b990d8ef41e10faf3904e0e586",
+            "PythonPartsScripts/PythonHost/sandbox/const.py": "168b93f376d54ddaf67ac62ffc5fb7e94570ab24e1f828d0732effa097e659d4",
+            "PythonPartsScripts/PythonHost/sandbox/executor.py": "c06f9810291a1c9e6f3deb7939d4b6615905d15c6662a6e69d7973b3fcbf0f6a",
+            "PythonPartsScripts/PythonHost/sandbox/validator.py": "5a4d3bf2bb6d2556512285a778083385c5c5049a398bc7a77cdaab9c5d8ddaec",
+            "PythonPartsScripts/PythonHost/StartPythonHost.py": "f56aa99f99ef5f0d5c5daec3d98b8140d7d78e94c67a9438ac8c8b5b37fbeb35",
+            "PythonPartsScripts/PythonHost/transport.py": "3e6b5acffee05494e0af8a4dca74ecd19c3a8d21325acdd5f67035f5663e2ed3"
+          }
+        },
+        "installed_bridge_integrity": {
+          "status": "verified",
+          "mismatches": []
+        },
+        "compatibility": {
+          "target_major": "2026",
+          "major_matches": true,
+          "runtime_verified": false
+        }
+      },
+      "request_id": "2fcb745f-e454-4f75-ba3e-e51d73ac4e3e",
+      "host_session_id": "425154d2-4b65-4652-b55c-7d3917db52bf"
+    },
+    "model_query": {
+      "schema_version": "m1-query-1",
+      "action": "inspect",
+      "read_only": true,
+      "runtime_verified": false,
+      "usable_for_write": false,
+      "profile_binding": "not_checked",
+      "query_session_id": "554b137f867543d58561b2fd1c222229",
+      "document_id": {
+        "status": "observed",
+        "value": 0
+      },
+      "source_fingerprint": "005de1f4001041d027811ec350118137a144a49c9917de460bf425864cf977b1",
+      "scope": {
+        "requested": {
+          "drawing_files": [
+            1,
+            2
+          ],
+          "include_passive": true,
+          "visibility": "api_select_all"
+        },
+        "included_files": [
+          {
+            "drawing_file": 1,
+            "state": "active_foreground",
+            "write_eligibility": "not_checked"
+          },
+          {
+            "drawing_file": 2,
+            "state": "passive_background",
+            "write_eligibility": "not_checked"
+          }
+        ]
+      },
+      "counts": {
+        "raw_adapters_visited": 2,
+        "in_scope_adapters": 2,
+        "matched_model_identities": 2,
+        "nonmatching_model_identities": 0,
+        "predicate_not_checked": 0,
+        "identity_not_checked": 0,
+        "conflicting_model_identities": 0,
+        "duplicate_representations": 0,
+        "file_identity_not_checked": 0,
+        "file_state_conflicts": 0
+      },
+      "coverage": {
+        "scan_complete": true,
+        "requested_scope_complete": true,
+        "returned_fields_complete": true,
+        "returned_fields_not_checked": 0,
+        "whole_project": false,
+        "unloaded_files": "not_enumerated",
+        "visibility": "api_select_all_screen_and_occlusion_not_checked",
+        "count_kind": "unique_file_model_uuid_not_top_level_components",
+        "native_component_counts": "not_checked",
+        "geometry_units_offset": "not_checked",
+        "metadata_reads_complete": true,
+        "metadata_reads_not_checked": 0,
+        "layer_metadata_scope": "sampled_elements_only",
+        "attribute_native_presence": "not_checked",
+        "attribute_unit_conversion": "not_checked"
+      },
+      "omissions": [],
+      "not_checked_samples": [],
+      "sample": {
+        "limit": 10,
+        "returned": 2,
+        "is_full_selection": true,
+        "order": "drawing_file_then_model_uuid",
+        "elements": [
+          {
+            "ref": {
+              "query_session_id": "554b137f867543d58561b2fd1c222229",
+              "project_key": "e495885371831631433709e5d681ef8328e296b84b6e293ddc1dd223caea2ea1",
+              "document_id": 0,
+              "drawing_file": 1,
+              "model_uuid": "5c7abf7c-10bd-477f-bd4c-e6becdcafe5c",
+              "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+              "durable_identity_verified": false
+            },
+            "signed_drawing_file_numbers": [
+              1
+            ],
+            "view_uuids": [
+              "8c4f3865-1689-4e5b-93a9-eb58da9447da"
+            ],
+            "view_identity_not_checked": false,
+            "fields": {
+              "display_name": {
+                "status": "observed",
+                "value": "Słup"
+              },
+              "drawing_file": {
+                "status": "observed",
+                "value": 1
+              },
+              "file_state": {
+                "status": "observed",
+                "value": "active_foreground"
+              },
+              "layer_id": {
+                "status": "observed",
+                "value": 3736
+              },
+              "type_name": {
+                "status": "observed",
+                "value": "Column_TypeUUID"
+              },
+              "type_uuid": {
+                "status": "observed",
+                "value": "ac9415e3-4337-4860-8cd4-2f0d48596f12"
+              },
+              "attribute:498": {
+                "status": "observed",
+                "value": "Słup"
+              }
+            },
+            "source_fingerprint": "69e5d7c8ec702c0d0a285a0ef038ced5e8cf6e1a5792a67493eadfec4c9479b9",
+            "usable_for_write": false
+          },
+          {
+            "ref": {
+              "query_session_id": "554b137f867543d58561b2fd1c222229",
+              "project_key": "e495885371831631433709e5d681ef8328e296b84b6e293ddc1dd223caea2ea1",
+              "document_id": 0,
+              "drawing_file": 2,
+              "model_uuid": "5be600e7-0ea6-477d-8ef2-b8257613c097",
+              "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+              "durable_identity_verified": false
+            },
+            "signed_drawing_file_numbers": [
+              -2
+            ],
+            "view_uuids": [
+              "97ebf740-99ed-45cb-b272-95905029d1f0"
+            ],
+            "view_identity_not_checked": false,
+            "fields": {
+              "display_name": {
+                "status": "observed",
+                "value": "Słup"
+              },
+              "drawing_file": {
+                "status": "observed",
+                "value": 2
+              },
+              "file_state": {
+                "status": "observed",
+                "value": "passive_background"
+              },
+              "layer_id": {
+                "status": "observed",
+                "value": 3736
+              },
+              "type_name": {
+                "status": "observed",
+                "value": "Column_TypeUUID"
+              },
+              "type_uuid": {
+                "status": "observed",
+                "value": "ac9415e3-4337-4860-8cd4-2f0d48596f12"
+              },
+              "attribute:498": {
+                "status": "missing",
+                "value": null
+              }
+            },
+            "source_fingerprint": "e938102153407bef6a68f4ed0f96278d87a7137c08bd5597bf9d450f9d93ba81",
+            "usable_for_write": false
+          }
+        ]
+      },
+      "attribute_metadata": [
+        {
+          "attribute_id": 498,
+          "name": {
+            "status": "observed",
+            "value": "Nazwa obiektu"
+          },
+          "type_code": {
+            "status": "observed",
+            "value": 67
+          },
+          "unit_label": {
+            "status": "observed",
+            "value": ""
+          },
+          "control_type_code": {
+            "status": "observed",
+            "value": 69
+          }
+        }
+      ],
+      "layer_metadata": [
+        {
+          "layer_id": 3736,
+          "name": {
+            "status": "observed",
+            "value": "AR_SŁUP (Słupy)"
+          },
+          "short_name": {
+            "status": "observed",
+            "value": "AR_SŁUP"
+          }
+        }
+      ],
+      "raw_attribute_semantics": "missing means absent from GetAttributes(ReadAll) response; passive native absence is not established",
+      "probe_fingerprint": "8e77b1ef511a58de2d7d6310053b8d91587b333264facd220be41cb543235071",
+      "request_id": "a1819d28-e190-456c-a357-f2df01bddd42",
+      "host_session_id": "425154d2-4b65-4652-b55c-7d3917db52bf"
+    }
+  }
+}

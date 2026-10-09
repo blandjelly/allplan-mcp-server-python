@@ -14,6 +14,8 @@ from .sandbox import SandboxExecutor
 from .runtime_info import runtime_info
 from .transport import BridgeError
 from .model_context import context_probe
+from .model_query import ModelQueryService
+from .query_contracts import validate_request
 
 
 class RequestHandler:
@@ -25,6 +27,7 @@ class RequestHandler:
 
         self.coord_input = coord_input
         self.sandbox_executor = SandboxExecutor(coord_input)
+        self.model_queries = ModelQueryService()
 
     def handle(self, path: str, request : dict):
         """Route one bridge request"""
@@ -49,6 +52,10 @@ class RequestHandler:
                 context = context_probe(self.current_document(), AllplanBaseEle, AllplanSettings, request)
                 context["runtime"] = runtime_info(AllplanSettings.AllplanVersion)
                 return context
+
+            case "/model-query":
+                validate_request(request)
+                return self.model_queries.handle(self.current_document(), AllplanBaseEle, AllplanSettings, request)
 
             case "/create-box":
                 return self.handle_create_box(request)
