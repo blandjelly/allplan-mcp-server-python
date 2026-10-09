@@ -1,4 +1,4 @@
-# Windows setup — 0.5.3 evaluation
+# Windows setup — 0.6.1 evaluation
 
 This is a local evaluation package. M0 is accepted on the owner’s Allplan 2026-1-7 setup with local Windows Codex; see [the verified baseline](next-model-handoff.md#verified-baseline). Portable checks are separate evidence. The package does not install or include Allplan, Python, or Codex. Initial setup needs internet access for the pinned external-server dependencies.
 
@@ -6,16 +6,19 @@ This is a local evaluation package. M0 is accepted on the owner’s Allplan 2026
 Allplan 2026-1-7, package 0.5.3 and demo profile revision 1.0.2. Resource binding,
 native geometry/hierarchy, display-unit invariance and nonzero XY offset are
 accepted for the recorded fixture. See [acceptance, exact artifact and limits](test-results/m1-acceptance-0.5.3.md).
-Keep the installed accepted package and older archives unchanged; no reinstall
-or repeated owner batch is requested. The setup steps below are for a new
-installation. M2 audit and M3 repair remain unimplemented.
+Keep the accepted 0.5.3 archive unchanged; no repeated M1 owner batch is
+requested. **M2 / UAT-04 PASS** on the retained fixture with 0.6.1;
+[native evidence and limits](test-results/m2-acceptance-0.6.1.md).
+The setup steps below cover the accepted package. M2 read-only audit was implemented in 0.6.0; 0.6.1 contains callback exceptions
+and preflights invalid scope, with the targeted native recovery test passed;
+M3 repair remains unimplemented.
 
 ## Upgrade from 0.1.1 after a missing Library item
 
 Version 0.1.1 installed the PYP file into `Local\PythonParts\PythonHost`, which
 Allplan does not scan as its private library. Version 0.1.2 corrects this to
 `Local\Library\PythonHost`, following the [official 2026 file layout](https://pythonparts.allplan.com/2026/manual/key_components/#file-locations).
-Close Allplan, extract 0.5.3 into a new folder and run **Setup.cmd**, selecting the
+Close Allplan, extract 0.6.1 into a new folder and run **Setup.cmd**, selecting the
 same actual user `Local` folder. The installer backs up the previous library,
 scripts and legacy folder and removes the obsolete location. No manual file
 copying or prior uninstall is needed. Restore can recover the previous layout.
@@ -30,7 +33,7 @@ contains the exact installed path. Do not choose a different user folder by gues
 ## Install through Explorer
 
 1. On the Windows machine running Allplan, install the normal Windows distribution of [Python 3.11 or newer](https://www.python.org/downloads/windows/) if needed. Keep its Tcl/Tk and launcher components. This is the external MCP runtime; Allplan's embedded Python is detected independently. The local automated run used Python 3.12.14.
-2. Extract `allplan-mcp-0.5.3-windows-evaluation.zip` into a writable folder, for example `Documents\Allplan MCP\0.5.3`. Extract it completely; do not run scripts from inside the ZIP. Keep the resulting `allplan-mcp-0.5.3` folder intact.
+2. Extract `allplan-mcp-0.6.1-windows-evaluation.zip` into a writable folder, for example `Documents\Allplan MCP\0.6.1`. Extract it completely; do not run scripts from inside the ZIP. Keep the resulting `allplan-mcp-0.6.1` folder intact.
 3. Find your actual Allplan user **Local** folder using Allmenu's user-folder information / Windows Explorer. A common location is `Documents\Nemetschek\Allplan\2026\Usr\Local`; redirected Documents and custom paths are supported. Select the existing `Local` folder, not `Prg`, `Std`, or the project folder. The `2026` example is a target path, not evidence of your installed build.
 4. Close Allplan. Double-click **Setup.cmd**. It checks the package hashes, creates isolated external environments, installs the locked dependencies and opens a folder chooser for the actual `Local` folder. No administrator rights or manual module copying should be needed. Cancel the chooser to leave the bridge unchanged.
 5. Setup replaces `Library\PythonHost` and `PythonPartsScripts\PythonHost` and removes the old `PythonParts\PythonHost` installation after backing it up, copying their full contents, including `sandbox`. The previous contents and absence of either folder are recorded under `Local\.allplan-mcp\backups\<backup-id>`. Other PythonParts are preserved. Setup prints the installed package version and backup ID; `logs\installation.json` records them.
@@ -77,8 +80,12 @@ The [final owner card](m1-final-batch.md) retains the completed recipe for named
 demo resources, the 10-component fixture and display-unit/nonzero-offset captures.
 M1 Profile.cmd resolves resources without creating them; M1 Final.cmd captures
 the packaged query batch with summaries/pages. Restart StartPythonHost after
-normal UI setup/file-state commands that end it. Seven tools remain exposed.
+normal UI setup/file-state commands that end it. That accepted package exposes seven tools; 0.6.0 adds `model_audit`.
 Preflight and A/B/C captures are accepted; no further M1 owner test is requested.
 The demo is bound_for_read and inactive for writes. Configured levels are not
 native BWS; nonzero Z offsets, durable references and mutation/Undo are outside
-the accepted scope. M2 read-only audit is next.
+the accepted scope. The original [M2 UAT-04 capture](test-results/m2-audit-runtime-0.6.0.md)
+matched the fixture/UI, but a later invalid-scope request overlapped a crash.
+The 0.6.1 **M2 Stability.cmd** run passed; the [completed card](m2-stability-batch.md)
+retains its recipe. No repeated owner batch is required for this scope.
+The bridge now keeps bounded logs under Local\.allplan-mcp\logs.

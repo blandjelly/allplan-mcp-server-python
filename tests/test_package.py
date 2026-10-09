@@ -33,17 +33,19 @@ class PackageTests(unittest.TestCase):
             package = next((work / "extracted").iterdir())
             manifest = registration.verify_package(package)
             self.assertEqual(manifest["integrity"], "sha256-verified")
-            for name in ("Setup.cmd", "Launch Allplan MCP.cmd", "Connect Codex.cmd", "Diagnostics.cmd", "Restore bridge.cmd", "M1 Metadata.cmd", "M1 Final.cmd", "M1 Profile.cmd"):
+            for name in ("Setup.cmd", "Launch Allplan MCP.cmd", "Connect Codex.cmd", "Diagnostics.cmd", "Restore bridge.cmd", "M1 Metadata.cmd", "M1 Final.cmd", "M1 Profile.cmd", "M2 Audit.cmd", "M2 Stability.cmd"):
                 self.assertTrue((package / name).is_file())
             local = work / "Allplan Local"
             local.mkdir()
             registration.register(package, local)
             self.assertTrue((local / "PythonPartsScripts/PythonHost/sandbox/executor.py").is_file())
-            for name in ("model_context.py", "query_contracts.py", "model_query.py", "model_metadata.py", "native_readers.py", "spatial_contracts.py", "profile_contracts.py"):
+            for name in ("model_context.py", "query_contracts.py", "model_query.py", "model_metadata.py", "native_readers.py", "spatial_contracts.py", "profile_contracts.py", "model_audit.py", "audit_contracts.py"):
                 self.assertTrue((local / "PythonPartsScripts/PythonHost" / name).is_file())
             self.assertTrue((package / "src/allplan_mcp/query_models.py").is_file())
             self.assertEqual((package / "src/allplan_mcp/profiles/native-model-qa.demo.json").read_bytes(),
                              (package / "profiles/examples/native-model-qa.demo.json").read_bytes())
+            self.assertEqual((package / "src/allplan_mcp/profiles/native-model-qa.audit.json").read_bytes(),
+                             (package / "profiles/examples/native-model-qa.audit.json").read_bytes())
             (package / "python_host/PythonPartsScripts/PythonHost/sandbox/const.py").write_text("tampered")
             with self.assertRaisesRegex(ValueError, "integrity"):
                 registration.register(package, local)
@@ -87,3 +89,5 @@ class PackageTests(unittest.TestCase):
         locked = tomllib.loads((ROOT / "uv.lock").read_text())
         package = next(p for p in locked["package"] if p["name"] == project["name"])
         self.assertEqual(package["version"], project["version"])
+        from allplan_mcp import __version__
+        self.assertEqual(__version__, project["version"])

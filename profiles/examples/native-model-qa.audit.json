@@ -1,0 +1,154 @@
+{
+  "schema_version": "m2-profile-1",
+  "profile_id": "native-model-qa-demo",
+  "profile_version": "2.0.0",
+  "read_profile": {
+    "schema_version": "m1-profile-1",
+    "profile_id": "native-model-qa-demo",
+    "profile_version": "1.0.2",
+    "target": {
+      "allplan_major_version": 2026,
+      "native_type_name": "Column_TypeUUID",
+      "native_type_id": "ac9415e3-4337-4860-8cd4-2f0d48596f12"
+    },
+    "units": {
+      "length": "mm",
+      "angle": "deg",
+      "frame": "model_local"
+    },
+    "scope": {
+      "drawing_files": [
+        101
+      ],
+      "uniqueness_scope": [
+        "drawing_file",
+        "element_family"
+      ],
+      "floor_mapping": {
+        "101": "Ground",
+        "102": "Reference",
+        "103": "Excluded"
+      }
+    },
+    "bindings": {
+      "attributes": {
+        "mark": {
+          "name": "MCP_QA_MARK",
+          "data_type": "string",
+          "expected_type_code": 67
+        },
+        "status": {
+          "name": "MCP_QA_STATUS",
+          "data_type": "string",
+          "expected_type_code": 67
+        }
+      },
+      "layers": {
+        "structure": {
+          "short_name": "SZ_OGÓ01"
+        },
+        "review": {
+          "short_name": "SZ_OGÓ02"
+        }
+      }
+    },
+    "rules": [
+      {
+        "rule_id": "QA-001",
+        "kind": "required_attribute",
+        "attribute": "mark"
+      },
+      {
+        "rule_id": "QA-002",
+        "kind": "unique_attribute",
+        "attribute": "mark",
+        "ignore_missing": true
+      },
+      {
+        "rule_id": "QA-003",
+        "kind": "required_layer",
+        "expected_layer": "structure"
+      },
+      {
+        "rule_id": "QA-004",
+        "kind": "allowed_attribute_values",
+        "attribute": "status",
+        "allowed_values": [
+          "NEW",
+          "EXISTING"
+        ],
+        "repair_mapping": {
+          "NWE": "NEW"
+        }
+      }
+    ],
+    "numeric_tolerances": {
+      "length_mm": 1.0
+    }
+  },
+  "string_policies": {
+    "mark": {
+      "trim": true,
+      "case_sensitive": true,
+      "missing": {
+        "absent": true,
+        "null": true,
+        "empty": true,
+        "literals": [
+          "<niezdefiniowany>"
+        ]
+      }
+    },
+    "status": {
+      "trim": true,
+      "case_sensitive": true,
+      "missing": {
+        "absent": true,
+        "null": true,
+        "empty": true,
+        "literals": [
+          "<niezdefiniowany>"
+        ]
+      }
+    }
+  },
+  "rules": [
+    {
+      "rule_id": "QA-001",
+      "kind": "required_attribute",
+      "attribute": "mark",
+      "severity": "error",
+      "remedy": "Assign a reviewed, nonempty mark."
+    },
+    {
+      "rule_id": "QA-002",
+      "kind": "unique_attribute",
+      "attribute": "mark",
+      "ignore_missing": true,
+      "severity": "error",
+      "remedy": "Review the duplicate group and assign distinct marks within the drawing file and element family.",
+      "uniqueness_scope": [
+        "drawing_file",
+        "element_family"
+      ]
+    },
+    {
+      "rule_id": "QA-003",
+      "kind": "required_layer",
+      "expected_layer": "structure",
+      "severity": "warning",
+      "remedy": "Review the layer assignment; the profile expects SZ_OGÓ01."
+    },
+    {
+      "rule_id": "QA-004",
+      "kind": "allowed_attribute_values",
+      "attribute": "status",
+      "allowed_values": [
+        "NEW",
+        "EXISTING"
+      ],
+      "severity": "warning",
+      "remedy": "Review the status; allowed values are NEW and EXISTING."
+    }
+  ]
+}

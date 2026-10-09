@@ -11,7 +11,8 @@ from fastmcp import FastMCP
 from allplan_mcp.allplan_client import AllplanHostClient, AllplanHostError
 from allplan_mcp.skills import SkillsManager
 from allplan_mcp.query_models import QueryRequest
-from allplan_mcp.demo_profile import load_demo_profile
+from allplan_mcp.demo_profile import load_demo_profile, load_audit_profile
+from allplan_mcp.audit_models import AuditRequest
 
 
 DEFAULT_ALLPLAN_HOST_URL = "http://127.0.0.1:5679"
@@ -28,6 +29,13 @@ def native_model_qa_demo_profile() -> str:
     """Versioned demo rules/resource names; project IDs require action=profile."""
     import json
     return json.dumps(load_demo_profile(), ensure_ascii=False, indent=2)
+
+
+@mcp.resource("allplan://profiles/native-model-qa-demo/audit", mime_type="application/json")
+def native_model_qa_audit_profile() -> str:
+    """M2 rules with explicit missing/normalization policies; read-only remedies."""
+    import json
+    return json.dumps(load_audit_profile(), ensure_ascii=False, indent=2)
 
 
 def _allplan_client() -> AllplanHostClient:
@@ -172,6 +180,26 @@ def model_query(request: QueryRequest) -> dict[str, Any]:
         payload.pop("cursor", None)
     payload["schema_version"] = "m1-query-1"
     return _allplan_client().post("/model-query", payload)
+
+
+@mcp.tool
+def model_audit(request: AuditRequest) -> dict[str, Any]:
+    """Audit a fresh full explicit scope without changing or highlighting elements.
+
+    Supply profile_id=native-model-qa-demo or a complete m2-profile-1 profile.
+    The demo checks marks, per-file/family uniqueness, layers and allowed status.
+    Its literal <niezdefiniowany> means missing only by declared policy; raw
+    evidence is retained. Optional dimension_range checks axis-aligned mm extents.
+    Unknown reads stay not_checked; empty applicability stays not_applicable.
+    Report includes severity, raw evidence, session/snapshot refs and file/mark/
+    model_local locations. Missing resources reject the audit before enumeration.
+    Each call rereads the model; findings are read evidence and authorize no writes.
+    """
+    payload = request.model_dump(by_alias=True, exclude_unset=True, exclude_none=True)
+    if payload.pop("profile_id", None) is not None:
+        payload["profile"] = load_audit_profile()
+    payload["schema_version"] = "m2-audit-1"
+    return _allplan_client().post("/model-audit", payload)
 
 
 @mcp.tool

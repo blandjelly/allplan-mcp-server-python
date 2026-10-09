@@ -12,7 +12,9 @@ Local MCP client (Codex)
 ```
 
 All `NemAll_*` imports, live documents, adapters and writes stay inside the host.
-Read the current document per request. Keep rules, profiles, query semantics and
+UI callbacks contain exceptions and return result/error data; raise HTTP errors
+on the worker after dispatch returns. Persist bounded request/error logs under
+Local/.allplan-mcp/logs. Read the current document per request. Keep rules, profiles, query semantics and
 change planning portable and testable without Allplan. Exchange JSON snapshots,
 never live adapters or `repr()` strings as stable references. Keep the existing
 UI dispatcher; shutdown must not join a worker waiting on that dispatcher.
@@ -26,7 +28,8 @@ UI dispatcher; shutdown must not join a worker waiting on that dispatcher.
 | Host `transport.py`, `PythonHostHandler.py`, `runtime_info.py`, `model_context.py` | JSON transport, typed routes, runtime metadata and bounded context probe. |
 | `utils/`, `windows/` | Recursive registration, package integrity, launchers, Codex setup and restore. |
 | Host `model_query.py`, `native_readers.py`, `model_metadata.py`, `query_contracts.py`, `spatial_contracts.py`, `profile_contracts.py` | Bounded model reads, geometry/hierarchy, metadata and validated read binding. |
-| `profiles/`, `tests/` | Versioned demo read profile and portable checks. |
+| Host `audit_contracts.py`, `model_audit.py`; MCP `audit_models.py` | M2 profile validation, fresh full read-only audits and JSON/text findings; no writes. |
+| `profiles/`, `tests/` | Versioned demo read/audit profiles and portable checks. |
 
 Add `contracts/`, `services/`, host `handlers/` and `adapters/` only when needed.
 Use versioned JSON contracts and validated profiles; do not assume external

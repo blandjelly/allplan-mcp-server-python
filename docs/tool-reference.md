@@ -119,8 +119,8 @@ ownership is checked. Ordering is deterministic by file number/model UUID.
 Neither means the requested scope was complete: inspect `coverage` and omissions.
 
 `action: summary` reads **all** selected identities, independent of page size,
-and returns counts by drawing file and observed type name. There is no downstream
-audit/edit consumer yet. The cached selection contains the full result, not just
+and returns counts by drawing file and observed type name. The M2 audit reads a separate fresh full snapshot; it does not consume a cached
+selection or its displayed page. No edit consumer exists. The cached selection contains the full result, not just
 the page, but never authorizes a future write.
 
 Before every page or summary, the host resolves current context and repeats the
@@ -231,7 +231,9 @@ reused pages/summary. Budget failure creates no partial selection.
 The packaged allplan://profiles/native-model-qa-demo resource is schema
 m1-profile-1, version 1.0.2. It validates the four future QA rule references,
 explicit units/frame, family GUID, file scope, resource names/types and tolerance.
-No M2 audit or M3 repair is implemented by this read profile.
+The separate M2 audit profile wraps this unchanged read profile and adds explicit
+value policies and typed rules. See the [M2 audit contract](m2-audit-contract.md).
+No M3 repair is implemented.
 
 model_query action=profile, profile_id=native-model-qa-demo freshly resolves
 MCP_QA_MARK / MCP_QA_STATUS and layer short names SZ_OGÓ01 (structure) /

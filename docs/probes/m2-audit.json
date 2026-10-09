@@ -1,0 +1,4 @@
+{
+  "scope": {"drawing_files": [101], "include_passive": false, "visibility": "api_select_all"},
+  "profile_id": "native-model-qa-demo"
+}

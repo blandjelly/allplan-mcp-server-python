@@ -34,6 +34,9 @@ class RequestHandler:
 
         if not isinstance(request, dict):
             raise BridgeError("invalid_payload", "Request body must be a JSON object.")
+        if path == "/model-audit":
+            from .audit_contracts import validate_audit_request
+            validate_audit_request(request)
         if path not in {"/get-allplan-version", "/get-runtime-info"}:
             major = AllplanSettings.AllplanVersion.MainReleaseName()
             if str(major) != "2026":
@@ -56,6 +59,10 @@ class RequestHandler:
             case "/model-query":
                 validate_request(request)
                 return self.model_queries.handle(self.current_document(), AllplanBaseEle, AllplanSettings, request)
+
+            case "/model-audit":
+                from .model_audit import run_audit
+                return run_audit(self.model_queries, self.current_document(), AllplanBaseEle, AllplanSettings, request)
 
             case "/create-box":
                 return self.handle_create_box(request)

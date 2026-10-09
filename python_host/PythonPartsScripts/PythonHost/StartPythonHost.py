@@ -2,6 +2,7 @@ from __future__ import annotations
 import sys
 import os
 import clr
+from pathlib import Path
 
 from typing import List
 
@@ -131,7 +132,8 @@ class PythonHostInteractor():
         address = "127.0.0.1"
         port = 5679
         try:
-            self.server = BridgeServer((address, port), RequestHandler(self.coord_input), invoke_in_ui_thread)
+            log_path = Path(__file__).resolve().parents[2] / ".allplan-mcp" / "logs" / "bridge.log"
+            self.server = BridgeServer((address, port), RequestHandler(self.coord_input), invoke_in_ui_thread, log_path=log_path)
             self.server.start()
         except Exception:
             self.palette_service.close_palette()
