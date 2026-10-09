@@ -20,11 +20,11 @@ this acceptance documentation does not rebuild the tested package.
 
 | Gate | Evidence | Result |
 | --- | --- | --- |
-| Context/project/file identity and scope | Accepted [0.2.1 context batch](../next-model-handoff.md#earlier-context-evidence--021); A/B/C foreground 101, explicit unloaded 103 omission; B/C passive 102 | PASS |
-| Fresh demo read resources | Accepted [0.5.2 preflight](m1-profile-correction-0.5.2.md); A/B/C profile bound_for_read | PASS |
+| Context/project/file identity and scope | Accepted [0.2.1 context batch](../validation-and-history.md#archived-reports-and-logs); A/B/C foreground 101, explicit unloaded 103 omission; B/C passive 102 | PASS |
+| Fresh demo read resources | Accepted [0.5.2 preflight](https://github.com/blandjelly/allplan-mcp-server-python/blob/73b704fd3054b29c4e7c741a7891b8cc53e1b7cd/docs/test-results/m1-profile-correction-0.5.2.md); A/B/C profile bound_for_read | PASS |
 | Native roots and geometry | A diagnostics-20261008T223235Z.json: 10 components in 101, one reference in 102, 17 raw adapters, six child representations deduplicated | PASS |
 | Filters and complete read selections | A/B/C: six file-101 columns, two S02, one C01 spatial/height match; summaries/pages agree with queries | PASS |
-| Small-page traversal | Previously accepted [0.3.0 query batch](m1-query-runtime-0.3.0.md): distinct pages and full-selection summary | PASS; no repeat |
+| Small-page traversal | Previously accepted [0.3.0 query batch](https://github.com/blandjelly/allplan-mcp-server-python/blob/73b704fd3054b29c4e7c741a7891b8cc53e1b7cd/docs/test-results/m1-query-runtime-0.3.0.md): distinct pages and full-selection summary | PASS; no repeat |
 | Display units | B diagnostics-20261008T224141Z.json: input enum 0 to 3 (mm to metres), exactly equal canonical geometry and result identities across all five queries | PASS |
 | Corrected fixture setup | B/C: 102 passive, C05/S05 on review layer SZ_OGÓ02; these declared corrections are separate from display-unit invariance | PASS |
 | Nonzero XY offset | C diagnostics-20261008T225219Z.json plus owner UI offset X=100 m, Y=200 m; all ten global boxes equal local boxes plus (100000,200000,0) mm exactly once | PASS |
@@ -54,14 +54,14 @@ complete. No whole-project or screen-visibility coverage is inferred.
 
 ## Automated checks, recorded separately
 
-The original M1 completion slice has [56 targeted portable checks](m1-completion-portable-0.5.0.md).
-The observed-family correction has [14 targeted portable checks](m1-native-families-0.5.3.md),
+The original M1 completion slice has [56 targeted portable checks](https://github.com/blandjelly/allplan-mcp-server-python/blob/73b704fd3054b29c4e7c741a7891b8cc53e1b7cd/docs/test-results/m1-completion-portable-0.5.0.md).
+The observed-family correction has [14 targeted portable checks](https://github.com/blandjelly/allplan-mcp-server-python/blob/73b704fd3054b29c4e7c741a7891b8cc53e1b7cd/docs/test-results/m1-native-families-0.5.3.md),
 plus wheel/sdist and clean-source Windows package validation. These are Linux
 fake-native/contract/package checks, not owner Allplan tests or a Windows/CI run.
 No accepted automated suite or owner batch was repeated to close M1; A/B/C report
 comparison is analysis of native evidence. Runtime code and profiles are unchanged.
 
-## Acceptance limits and next work
+## Acceptance limits
 
 Acceptance covers the known fixture/build, six supported root type names,
 bounded session reads, AABB geometry, configured levels, demo resource binding
@@ -75,6 +75,8 @@ Static runtime_verified=false, geometry_conversion=not_checked and raw offset
 api_native annotations remain unchanged; dated acceptance is the build/fixture
 evidence registry, not a reason to globally mark every runtime verified.
 The demo is bound_for_read and inactive for writes. C03 retains the literal raw
-`<niezdefiniowany>` mark; M2 must define missing-value semantics explicitly rather
-than silently normalizing it. M2 audit/M3 repair and their acceptance tests remain
-unimplemented/unrun. Next: M2 profile/audit contracts and read-only findings.
+`<niezdefiniowany>` mark; the separately accepted M2 audit profile explicitly
+classifies it as missing while preserving raw evidence. See
+[M2 acceptance](m2-acceptance-0.6.1.md) and the
+[current handoff](../next-model-handoff.md) for subsequent work. This M1 record
+does not extend native acceptance to repairs or write eligibility.

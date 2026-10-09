@@ -123,7 +123,8 @@ Remedies are suggestions, never executable operations.
 The report includes `report_text`. **M2 Audit.cmd** supplies the prepared request
 and saves full `logs/diagnostics-*.json` plus matching `.txt`, including readable
 errors. Diagnostic `allplan_acceptance=not_run` is deliberately not an automatic
-UAT verdict. [Owner test card](m2-audit-batch.md) defines native acceptance.
+UAT verdict. [Native acceptance](test-results/m2-acceptance-0.6.1.md) records the owner verification;
+[diagnostic commands](diagnostics.md) describe reusable capture procedures.
 
 ## Dispatcher exception boundary (0.6.1)
 
@@ -131,4 +132,4 @@ Typed/unexpected host errors are contained inside the WPF callback and returned
 as primitive result/error data. HTTP errors are raised on the worker after UI
 dispatch returns; Python exception objects do not cross the delegate. Persistent
 request/error logs support native diagnosis. See [correction and causal limits](test-results/m2-dispatch-fix-0.6.1.md)
-and the [targeted native check](m2-stability-batch.md).
+and the [accepted native recovery gate](test-results/m2-acceptance-0.6.1.md).

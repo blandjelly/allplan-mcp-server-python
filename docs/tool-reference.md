@@ -1,17 +1,14 @@
-# M1 scope and model query contract — 0.5.3
+# M1 scope and model query contract
 
 Status: **M1 accepted on Allplan 2026-1-7 within the bounded read contract**.
 [Acceptance and limits](test-results/m1-acceptance-0.5.3.md). Schema
 `m1-query-1`, public MCP tool `model_query`, typed bridge route `/model-query`.
-0.5.0 completes the bounded M1.1–M1.4 read implementation with 56 portable
-checks; 0.5.3 adds the observed-family correction with 14 targeted checks.
-Native A/B/C geometry/hierarchy/demo/display-unit/nonzero XY offset gates PASS.
-[Final owner card](m1-final-batch.md). The accepted 0.2.1 context reader is reused;
-its raw units/offset and context probe schema retain their earlier meaning.
-[0.3.0 evidence and limits](test-results/m1-query-runtime-0.3.0.md) verify scope,
-metadata, two distinct pages/full summary and observed-value predicates on the
-owner's two-column scene. Other predicate variants, changed-source stale checks,
-TTL/restart and geometry do not gain runtime acceptance from that batch.
+The accepted M1 native implementation was delivered in 0.5.3 and is retained
+in main's 0.6.1 package. Context, metadata, selections and native A/B/C
+geometry/hierarchy/display-unit/nonzero XY offset gates have bounded acceptance.
+[Fixture setup](fixture-guide.md) defines the scene; [validation and history](validation-and-history.md)
+separates portable checks from native evidence. Changed-source staleness,
+TTL/eviction/restart and untested predicate variants retain portable evidence.
 
 ## Scope and identity
 
@@ -175,9 +172,9 @@ their observed raw values. No fallback read changes state or creates attributes.
 `runtime_verified=false`, `usable_for_write=false`, `profile_binding=not_checked`
 remain explicit. Units are metadata strings without conversion. The demo
 binding is not established by metadata inspection. The separate profile action
-freshly resolves resources for reads. [Owner card](m1-metadata-batch.md) has bounded PASS
-[Allplan evidence](test-results/m1-metadata-runtime-0.4.0.md); these static flags
-are not an acceptance registry.
+freshly resolves resources for reads. The historical metadata batch passed
+within its explicit files/attribute scope; [archived evidence](validation-and-history.md#archived-reports-and-logs)
+records that separately. Static flags are not an acceptance registry.
 
 ```json
 {"action":"inspect","scope":{"drawing_files":[1,2],"include_passive":true,"visibility":"api_select_all"},"attribute_ids":[498],"sample_limit":10}
@@ -193,7 +190,7 @@ retries a write or marks acceptance. Raw results require separate interpretation
 [AttributeService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/AttributeService/)
 uses a DocumentAdapter; [LayerService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/LayerService/)
 uses an integer document ID. This documentation evidence is separate from
-[portable checks](test-results/m1-metadata-portable-0.4.0.md) and Allplan verification.
+[portable validation](validation-and-history.md) and Allplan verification.
 
 ## Geometry, spatial scope and coordinate convention
 
@@ -229,7 +226,7 @@ reused pages/summary. Budget failure creates no partial selection.
 ## Validated demo profile and configured levels
 
 The packaged allplan://profiles/native-model-qa-demo resource is schema
-m1-profile-1, version 1.0.2. It validates the four future QA rule references,
+m1-profile-1, version 1.0.2. It validates the four demo QA rule references,
 explicit units/frame, family GUID, file scope, resource names/types and tolerance.
 The separate M2 audit profile wraps this unchanged read profile and adds explicit
 value policies and typed rules. See the [M2 audit contract](m2-audit-contract.md).
@@ -256,7 +253,7 @@ created. Actual project binding is recorded by the owner's preflight JSON.
 get_model_context accepts optional profile_id=native-model-qa-demo and then exposes
 its configured floor mapping, explicitly labeled profile_configuration_not_native_BWS.
 Absent profile leaves levels not_checked. User-created UI resources and a real
-fixture are prerequisites; the [final UI recipe](m1-final-batch.md) supplies them
+fixture are prerequisites; the [fixture setup](fixture-guide.md) supplies them
 without asking the owner to edit JSON or discover IDs.
 
 M1 Final.cmd uses a typed six-request JSON batch, adds summaries and follows each

@@ -5,6 +5,12 @@ description: Use this skill when the agent needs to write ALLPLAN PythonPart cod
 
 # ALLPLAN rebar
 
+This bundled resource is development guidance for PythonPart scripts, not a
+catalog of implemented MCP tools or native acceptance. The project targets
+Allplan 2026; verify each API signature against that release before use.
+Current workflow scope and acceptance are recorded in the repository's
+README and docs/next-model-handoff.md.
+
 Use this skill for bending shapes, bar placements, mesh placements, and bending schedule style outputs
 
 ## Executive summary
@@ -16,6 +22,10 @@ The API also includes helpers for standard bar and mesh catalogs through `Reinfo
 Use this skill when the agent needs to turn reinforcement intent into PythonPart code instead of only describing it
 
 ## Official references
+
+Some retained references describe 2023–2025 APIs. They are historical examples;
+use the [2026 reference](https://pythonparts.allplan.com/2026/) to verify the
+target-release signatures rather than assuming cross-version compatibility.
 
 - Reinforcement placement
   - <https://pythonparts.allplan.com/2025/manual/features/reinforcement/placement/>
@@ -188,9 +198,12 @@ The docs are enough for the contracts
 The docs are usually not enough for the full orchestration of a reinforced beam, pile cap, or pile cage in one page
 That orchestration still needs to be encoded in skill guidance or templates
 
-## Function map
+## Suggested helper contracts
 
-| Function | Purpose |
+These names describe possible script helpers; the MCP server does not export
+them as tools and the bundled template does not implement this whole map.
+
+| Suggested helper | Purpose |
 | --- | --- |
 | `create_bar_2d` | Build a bar from a 2D path and optional hooks |
 | `create_bar_3d` | Build a bar from explicit 3D points |

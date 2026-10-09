@@ -16,23 +16,21 @@ Read these files in order when continuing implementation:
 3. [Features](docs/features.md): the 13 tools and demonstration fixture.
 4. [Implementation stages](docs/implementation-plan.md): task IDs and exit gates.
 
-Current package: **0.6.1**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
-**M0 and bounded M1 are accepted** on Allplan **2026-1-7** with local Windows Codex; UAT-00–UAT-03 PASS.
-The demo profile binds freshly for reads and remains inactive for writes.
-[Acceptance and limits](docs/test-results/m1-acceptance-0.5.3.md) cover the known
-fixture, display-unit invariance and nonzero XY offset. **M2.1–M2.3 / UAT-04
-PASS within the retained read-only fixture scope**, package 0.6.1;
-[acceptance and evidence](docs/test-results/m2-acceptance-0.6.1.md).
-[Native 0.6.0 report/UI checks](docs/test-results/m2-audit-runtime-0.6.0.md) match
-the fixture. 0.6.1 contains UI callback exceptions and rejects invalid audit scope
-before contacting Allplan; [correction and limits](docs/test-results/m2-dispatch-fix-0.6.1.md).
-Both repeated audits, scope rejection through MCP/host and post-error health
-passed; the owner confirms Allplan and host remain running. The earlier crash's
-precise cause remains unproven. The [completed stability card](docs/m2-stability-batch.md)
-retains the test recipe; no further M2 owner batch is requested. `model_audit` returns read-only
-findings, coverage and file/mark/location evidence. The
-[UAT-04 card](docs/m2-audit-batch.md) records the original procedure.
-Repairs and generation remain planned.
+Current `main`: **0.6.1**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
+**M0–M2 / UAT-00–UAT-04 are accepted within the recorded Allplan 2026-1-7
+fixture scope**, using local Windows Codex. [M1 evidence and limits](docs/test-results/m1-acceptance-0.5.3.md)
+and [M2 evidence and limits](docs/test-results/m2-acceptance-0.6.1.md) define that scope.
+`model_audit` returns read-only findings, coverage and file/mark/location evidence.
+The demo binds freshly for reads and is inactive for writes. Repairs/generation
+remain outside main; [draft M3 PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2)
+contains the separate 0.7.0 read-only preview awaiting native owner verification.
+
+Use [Windows setup](docs/windows-setup.md), [fixture setup](docs/fixture-guide.md),
+[read contracts](docs/tool-reference.md), [audit contracts](docs/m2-audit-contract.md)
+and [diagnostic commands](docs/diagnostics.md) for daily work.
+[Validation and history](docs/validation-and-history.md) records current CI,
+tested artifact hashes and archived evidence. Raw logs and superseded test cards
+are available in Git history rather than the current documentation tree.
 
 Repository documentation and API identifiers use English. Owner-facing
 walkthroughs may use Polish. The implementation model owns coding, diagnostics,

@@ -19,7 +19,7 @@ capabilities and API probes rather than a fixed completion promise.
 
 **Exit gate met:** UAT-00/UAT-01 PASS for installation, one correctly sized box,
 ESC/restart, minimize/restore and project switching. Evidence/limits are in the
-handoff. Continue from M1; retest M0 only for relevant changes or a new defect.
+handoff. Retest M0 only for relevant changes or a new defect.
 
 ## M1 — Context, identity, selections and query: complete within the bounded read contract
 
@@ -50,8 +50,8 @@ match; a later invalid-scope request coincided with a managed-exception crash.
 complete audits, public/host scope rejection and continued host/Allplan operation.
 The earlier crash's precise cause remains unproven. No repeated owner test is required.
 [Contract](m2-audit-contract.md),
-[portable evidence](test-results/m2-audit-portable-0.6.0.md) and
-[completed owner test card](m2-audit-batch.md). Acceptance is limited to the recorded fixture.
+[portable validation](validation-and-history.md) and
+[diagnostic reference](diagnostics.md). Acceptance is limited to the recorded fixture.
 
 - **M2.1** Versioned schema for typed attributes/layers, values, uniqueness and tolerances; validate bound resources.
 - **M2.2** `model_audit` with severity, evidence, distinct unchecked states and readable/structured reports.
@@ -60,7 +60,12 @@ The earlier crash's precise cause remains unproven. No repeated owner test is re
 **Exit gate (UAT-04):** demo returns exactly 5 findings on 5 columns, correct
 uniqueness scope, explicit unavailable data and locatable targets; no writes.
 
-## M3 — Controlled repairs and standards: planned, unimplemented
+## M3 — Controlled repairs and standards: preview in a separate draft
+
+Main has no M3 repair tool. [Draft PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2)
+implements read-only preview and fresh revalidation in package 0.7.0;
+134 portable tests are reported and native owner testing is pending. Apply,
+readback and Undo remain unavailable. Continue that PR for the remaining scope.
 
 - **M3.1** Shared preview/apply, stale checks, serialized writes, request identity, readback, partial outcomes and tested Undo limits.
 - **M3.2** `fix_model_issues` for writable attributes/layers; data marks and graphical labels stay distinct.
