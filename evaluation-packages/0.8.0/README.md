@@ -1,5 +1,10 @@
 # Evaluation delivery — 0.8.0
 
+Historical delivery: the first native write gate was **BLOCKED before setters**
+by IsInMacro. [Original evidence and diagnosis](../../docs/test-results/m3-apply-rejection-0.8.0.md).
+Use [corrected package 0.8.1](../0.8.1/README.md) for the next fresh write gate;
+preserve this exact 0.8.0 archive. The original delivery description follows.
+
 Status **ready_for_owner_test**. Native writes/readback/Undo **not_run**.
 Download and completely extract
 [allplan-mcp-0.8.0-windows-evaluation.zip](allplan-mcp-0.8.0-windows-evaluation.zip).

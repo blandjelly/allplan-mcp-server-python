@@ -30,7 +30,10 @@ remain. New exact artifacts are delivered under
 Clean source **8074905536ff5c95e20de4a59a70d513f8694314**;
 Windows ZIP SHA-256 **b31909379244cc085168cc1b5283fa08284954f19334261779ea766fbbf36c47**.
 Delivery manifest records all sizes/hashes. All previous archives are unchanged.
-CI must be checked separately for the newly published commit.
+[CI run 37997427257](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/37997427257)
+passes all six Windows/Ubuntu Python 3.11–3.13 test/build/Windows-ZIP jobs for
+published artifact commit **25dc292cf72776663feea80cc5bbe13b975ceff5**.
+Later documentation-only CI is separate; the recorded 0.8.1 ZIP is unchanged.
 
 **Next owner action:** install **0.8.1** and run [the write card](m3-apply-batch.md)
 on the same unchanged disposable project copy. It creates a fresh plan/ID;

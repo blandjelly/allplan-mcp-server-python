@@ -27,5 +27,9 @@ Only known host codes that escape before the current request's setters are
 classified; no message-text parsing is used. Portable adapters do not prove native
 parent semantics, writability or mutation effects. Repeat only the corrected
 [write/restart/Undo card](../m3-apply-batch.md), using the unchanged disposable
-project copy and a fresh plan. Remote CI must be observed for the published
-commit before reporting a matrix pass.
+project copy and a fresh plan.
+
+[CI run 37997427257](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/37997427257)
+passes all six Windows/Ubuntu Python 3.11–3.13 test/build/Windows-ZIP jobs for
+published artifact commit **25dc292cf72776663feea80cc5bbe13b975ceff5**.
+This is separate from Allplan acceptance and later documentation-only CI.

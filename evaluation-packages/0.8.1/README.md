@@ -22,7 +22,10 @@ b31909379244cc085168cc1b5283fa08284954f19334261779ea766fbbf36c47
 ZIP, companion hash, wheel and sdist. The embedded handoff records the clean-source
 state; later publication/CI documentation does not rebuild this artifact.
 
-149 local tests PASS; frozen sync, build and deterministic Windows package/
+149 local tests PASS;
+[CI run 37997427257](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/37997427257)
+passes all six Windows/Ubuntu Python 3.11–3.13 jobs for artifact commit
+`25dc292cf72776663feea80cc5bbe13b975ceff5`. Frozen sync, build and deterministic Windows package/
 integrity/recursive registration checks pass. Portable tests and API reference
 do not establish native write effects or Undo. M3/UAT-05/UAT-06 remain open.
 No GitHub release or redistribution/license claim is made by this delivery.
