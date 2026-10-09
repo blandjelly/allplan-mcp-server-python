@@ -28,6 +28,8 @@ class RequestHandler:
         self.coord_input = coord_input
         self.sandbox_executor = SandboxExecutor(coord_input)
         self.model_queries = ModelQueryService()
+        from .model_repair import RepairPlanService
+        self.repair_plans = RepairPlanService(self.model_queries)
 
     def handle(self, path: str, request : dict):
         """Route one bridge request"""
@@ -37,6 +39,9 @@ class RequestHandler:
         if path == "/model-audit":
             from .audit_contracts import validate_audit_request
             validate_audit_request(request)
+        if path == "/fix-model-issues":
+            from .repair_contracts import validate_repair_request
+            validate_repair_request(request)
         if path not in {"/get-allplan-version", "/get-runtime-info"}:
             major = AllplanSettings.AllplanVersion.MainReleaseName()
             if str(major) != "2026":
@@ -63,6 +68,9 @@ class RequestHandler:
             case "/model-audit":
                 from .model_audit import run_audit
                 return run_audit(self.model_queries, self.current_document(), AllplanBaseEle, AllplanSettings, request)
+
+            case "/fix-model-issues":
+                return self.repair_plans.handle(self.current_document(), AllplanBaseEle, AllplanSettings, request)
 
             case "/create-box":
                 return self.handle_create_box(request)

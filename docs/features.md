@@ -6,7 +6,9 @@ Allplan 2026-1-7; see [acceptance and limits](test-results/m1-acceptance-0.5.3.m
 and [read contracts](tool-reference.md). `model_audit` is implemented and accepted
 within the retained fixture scope in 0.6.1, **UAT-04 PASS**; see
 [native evidence and limits](test-results/m2-acceptance-0.6.1.md) and the
-[audit contract](m2-audit-contract.md). Other workflow tools are planned. M0 utilities are `allplan_health`,
+[audit contract](m2-audit-contract.md). `fix_model_issues` preview/revalidation is
+implemented in 0.7.0, [ready for owner testing](m3-preview-batch.md); native apply
+remains unavailable. Other workflow tools are planned. M0 utilities are `allplan_health`,
 `get_allplan_version`, `get_all_object_names`, `create_cube` and `create_box`.
 Names are display values; baseline boxes have no automatic readback/deduplication.
 
@@ -76,8 +78,9 @@ The M2 audit examines only the six file-101 columns: **QA-001** required mark �
 Expected: **5 findings on 5 columns**, C01 passes. Outside-scope columns do not
 create duplicates. Missing bindings/data produce `not_checked` or a profile error.
 
-The future M3 first repair preview should contain exactly two changes: C05 layer → SZ_OGÓ01
-and C06 status NWE → NEW. Leave marks unchanged; after apply/readback, **3 findings**
+The 0.7.0 M3 repair preview contains exactly two proposed changes: C05 layer → SZ_OGÓ01
+and C06 status NWE → NEW. It leaves the model unchanged; its follow-up audit
+retains **5 findings**. Native acceptance is pending. After future apply/readback, **3 findings**
 remain. Repeating apply must not repeat writes. A later explicit reviewed plan
 assigning C03=S03 and C04=S04 gives zero findings. These values are fixture choices,
 not an inferred production office standard.

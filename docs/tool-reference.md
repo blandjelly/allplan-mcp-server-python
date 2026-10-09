@@ -233,7 +233,8 @@ m1-profile-1, version 1.0.2. It validates the four future QA rule references,
 explicit units/frame, family GUID, file scope, resource names/types and tolerance.
 The separate M2 audit profile wraps this unchanged read profile and adds explicit
 value policies and typed rules. See the [M2 audit contract](m2-audit-contract.md).
-No M3 repair is implemented.
+M3 0.7.0 adds `fix_model_issues` read-only preview/revalidation;
+[request, plan and limits](m3-repair-contract.md). Native apply remains unavailable.
 
 model_query action=profile, profile_id=native-model-qa-demo freshly resolves
 MCP_QA_MARK / MCP_QA_STATUS and layer short names SZ_OGÓ01 (structure) /

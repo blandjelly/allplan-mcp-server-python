@@ -10,7 +10,7 @@ import unittest
 from pathlib import Path
 
 from fastmcp import Client
-from allplan_mcp.diagnostics import collect_diagnostics, collect_m2_stability
+from allplan_mcp.diagnostics import collect_diagnostics, collect_m2_stability, collect_m3_preview
 from test_transport import stop_test_server, transport
 
 
@@ -41,6 +41,61 @@ class FakeBridge:
 
 
 class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
+    async def test_m3_preview_gate_real_transport_and_cli_preserve_two_changes_and_five_findings(self):
+        from test_model_repair import RepairTests
+        native = RepairTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        native.fixture()
+        original = self.bridge_handler.handle
+        def handle(path, payload):
+            if path in {'/fix-model-issues', '/model-audit'}:
+                self.bridge_handler.calls.append((path, payload))
+                try:
+                    return native.handler.handle(path, payload)
+                except native.module.BridgeError as exc:
+                    raise transport.BridgeError(exc.code, str(exc), exc.status) from exc
+            return original(path, payload)
+        self.bridge_handler.handle = handle
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / 'preview.json'
+            env = os.environ.copy()
+            env.update({'ALLPLAN_HOST_URL': self.host_url, 'MCP_URL': self.url, 'NO_PROXY': '127.0.0.1,localhost'})
+            result = await asyncio.to_thread(subprocess.run, [sys.executable, '-m', 'allplan_mcp.diagnostics',
+                '--m3-preview', '--output', str(output)], env=env, capture_output=True, text=True, timeout=30)
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            report = json.loads(output.read_text(encoding='utf-8'))
+            self.assertTrue(report['m3_preview']['checks_complete'])
+            self.assertEqual(report['mcp']['fix_model_issues']['counts']['changes'], 2)
+            self.assertEqual(report['mcp']['model_audit']['counts']['findings'], 5)
+            self.assertEqual(report['m3_preview']['steps'][2]['response']['state'], 'unchanged')
+            self.assertIn('M3 preview checks complete: True', output.with_suffix('.txt').read_text(encoding='utf-8'))
+            self.assertIn('NWE', output.with_suffix('.txt').read_text(encoding='utf-8'))
+        async with Client(self.url, timeout=5) as client:
+            before = len(self.bridge_handler.calls)
+            for request in ({'action': 'apply'}, {'action': 'revalidate', 'plan_id': 'bad', 'plan_hash': '0' * 64},
+                            {**report['m3_preview']['request'], 'repairs': [{'rule_id':'QA-004','value':'NWE'}]}):
+                response = await client.call_tool('fix_model_issues', {'request': request}, raise_on_error=False)
+                self.assertTrue(response.is_error)
+            self.assertEqual(len(self.bridge_handler.calls), before)
+        native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+        native.base.ElementsLayerService.ChangeLayer.assert_not_called()
+        self.assertFalse(any(path == '/create-box' for path, _ in self.bridge_handler.calls))
+
+    async def test_m3_preview_gate_stops_after_lost_response_without_retry_or_audit(self):
+        original = self.bridge_handler.handle
+        def handle(path, payload):
+            if path == '/fix-model-issues':
+                self.bridge_handler.calls.append((path, payload))
+                raise transport.BridgeError('query_read_failed', 'Fake unavailable preview', 503)
+            return original(path, payload)
+        self.bridge_handler.handle = handle
+        report = await collect_m3_preview(self.host_url, self.url)
+        self.assertFalse(report['m3_preview']['checks_complete'])
+        self.assertEqual([s['name'] for s in report['m3_preview']['steps']], ['host_boundary_preflight', 'preview'])
+        self.assertEqual(sum(path == '/fix-model-issues' for path, _ in self.bridge_handler.calls), 1)
+        self.assertFalse(any(path == '/model-audit' for path, _ in self.bridge_handler.calls))
+
     async def test_model_audit_full_host_contract_transport_and_cli_reports(self):
         from test_model_audit import AuditTests
         from allplan_mcp.demo_profile import load_audit_profile
@@ -290,7 +345,7 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
     async def test_discovery_health_version_names_box_and_diagnostic_bundle(self):
         async with Client(self.url, timeout=5) as client:
             names = {t.name for t in await client.list_tools()}
-            self.assertEqual(names, {"allplan_health", "get_allplan_version", "get_all_object_names", "create_cube", "create_box", "get_model_context", "model_query", "model_audit"})
+            self.assertEqual(names, {"allplan_health", "get_allplan_version", "get_all_object_names", "create_cube", "create_box", "get_model_context", "model_query", "model_audit", "fix_model_issues"})
             resources = await client.list_resources()
             self.assertIn("allplan://skills", {str(r.uri) for r in resources})
             health = (await client.call_tool("allplan_health")).data

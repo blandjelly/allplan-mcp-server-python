@@ -13,6 +13,7 @@ from allplan_mcp.skills import SkillsManager
 from allplan_mcp.query_models import QueryRequest
 from allplan_mcp.demo_profile import load_demo_profile, load_audit_profile
 from allplan_mcp.audit_models import AuditRequest
+from allplan_mcp.repair_models import RepairRequest
 
 
 DEFAULT_ALLPLAN_HOST_URL = "http://127.0.0.1:5679"
@@ -200,6 +201,27 @@ def model_audit(request: AuditRequest) -> dict[str, Any]:
         payload["profile"] = load_audit_profile()
     payload["schema_version"] = "m2-audit-1"
     return _allplan_client().post("/model-audit", payload)
+
+
+@mcp.tool
+def fix_model_issues(request: RepairRequest) -> dict[str, Any]:
+    """Preview explicit layer/status repairs or revalidate a session-local plan.
+
+    Preview takes a fresh audit request and explicit rule_id/value choices.
+    Optional finding_ids restrict targets to those exact fresh findings.
+    Returns old/new values, exclusions, locators, plan ID/hash and a five-minute
+    lifetime. Revalidate requires that exact ID/hash and rereads the full scope.
+    Changed evidence conflicts; restart/expiry/eviction require a new preview.
+    This first M3 slice is read-only: apply, writable refs and Undo are unavailable.
+    """
+    payload = request.model_dump(exclude_unset=True, exclude_none=True)
+    if payload["action"] == "preview":
+        audit = payload["audit"]
+        if audit.pop("profile_id", None) is not None:
+            audit["profile"] = load_audit_profile()
+        audit["schema_version"] = "m2-audit-1"
+    payload["schema_version"] = "m3-repair-1"
+    return _allplan_client().post("/fix-model-issues", payload)
 
 
 @mcp.tool

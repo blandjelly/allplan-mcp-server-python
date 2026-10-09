@@ -16,7 +16,7 @@ Read these files in order when continuing implementation:
 3. [Features](docs/features.md): the 13 tools and demonstration fixture.
 4. [Implementation stages](docs/implementation-plan.md): task IDs and exit gates.
 
-Current package: **0.6.1**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
+Current package: **0.7.0**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
 **M0 and bounded M1 are accepted** on Allplan **2026-1-7** with local Windows Codex; UAT-00–UAT-03 PASS.
 The demo profile binds freshly for reads and remains inactive for writes.
 [Acceptance and limits](docs/test-results/m1-acceptance-0.5.3.md) cover the known
@@ -32,7 +32,11 @@ precise cause remains unproven. The [completed stability card](docs/m2-stability
 retains the test recipe; no further M2 owner batch is requested. `model_audit` returns read-only
 findings, coverage and file/mark/location evidence. The
 [UAT-04 card](docs/m2-audit-batch.md) records the original procedure.
-Repairs and generation remain planned.
+The first M3 slice adds read-only `fix_model_issues` preview/revalidation for
+explicit layer/status choices, with exact old/new values, bounded plans and stale
+checks. **Ready for the [M3 owner preview gate](docs/m3-preview-batch.md)**;
+[contract](docs/m3-repair-contract.md). Native apply/readback/Undo and generation
+remain planned. M3 is not closed.
 
 Repository documentation and API identifiers use English. Owner-facing
 walkthroughs may use Polish. The implementation model owns coding, diagnostics,

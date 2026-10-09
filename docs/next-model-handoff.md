@@ -1,6 +1,48 @@
 # Next-model handoff
 
-## Current handoff — 2026-10-09, package 0.6.1
+## Current handoff — 2026-10-09, package 0.7.0
+
+Continue from **`codex/m3-repair-preview`**, based on accepted M2 commit
+`bedb264`. The owner requested continuation from M2 until native owner testing
+is required. The first read-only M3.1/M3.2 slice is now
+**ready_for_owner_test**: [contract](m3-repair-contract.md),
+[portable validation](test-results/m3-preview-portable-0.7.0.md),
+[Polish owner card](m3-preview-batch.md).
+
+Delivered: `fix_model_issues` explicit layer/status repair choices, fresh full
+audit preview, optional exact finding IDs, exact old/new values, locators,
+exclusions, immutable returned copies, session-local plan ID/hash, five-minute
+lifetime, eight-plan/8 MiB cache and full fresh revalidation. Manual changes,
+additions, resource/project/document/file-state changes conflict; hash mismatch,
+expiry, eviction and restart cannot reuse a plan. Multiple rules cannot propose
+two values for one property. API callable/docstring inspection does not invoke
+setters and does not claim writability or Undo.
+
+Current portable suite: **134 tests PASS** on Linux Python **3.12.14**, including
+real MCP/HTTP transport with fake native adapters and the new JSON/TXT owner CLI.
+Frozen sync, wheel/sdist build and Windows ZIP/integrity/registration checks are
+recorded separately from native acceptance. New package **0.7.0** preserves the
+accepted 0.6.1 archive; its source-only ZIP and SHA-256 companion are in ignored
+`dist/`. Use the delivered archive rather than rebuilding under an accepted
+version number. No Allplan 0.7.0 acceptance or current remote CI result is claimed.
+
+**Next action requires the owner's Windows/Allplan:** install 0.7.0 and run
+**M3 Preview.cmd** on the retained fixture. Expect exactly two proposals
+(C05 layer SZ_OGÓ02 → SZ_OGÓ01, C06 status NWE → NEW), immediate `unchanged`
+revalidation, an identical five-finding audit and continued host operation.
+Owner compares the two targets/values with UI and confirms the unchanged model,
+then supplies JSON/TXT. Optional manual-edit conflict test uses a disposable copy.
+Do not repeat accepted M1/M2 batches. No preview acceptance has been recorded yet.
+
+M3 remains incomplete: `apply` is unavailable/rejected before native context
+lookup. No write adapter, apply readback, serialized mutation journal, durable
+request deduplication, unknown-outcome recovery or tested Undo exists. M3.3 and
+M3.4 are pending. All references/profiles remain inactive for writes. After the
+preview gate, implement and probe the dedicated 2026 `ChangeAttributes` /
+`ChangeLayer` adapter on a disposable copy with explicit target/value limits,
+readback and Undo observations; symbol presence alone cannot authorize it.
+
+## Accepted M2 handoff — package 0.6.1 (historical baseline)
 
 ## Checkout for the next chat
 
@@ -72,7 +114,7 @@ running; the earlier unchanged-model/UI confirmation is not reattributed to this
 later statement. Static report acceptance flags remain unchanged.
 
 **No further M2 owner batch is required within this scope.** Preserve the tested
-0.6.1 archive. M3 is planned and unimplemented; do not infer authorization for
+0.6.1 archive. At that handoff M3 was planned and unimplemented; do not infer authorization for
 repairs or native writes from M2 acceptance. Native longer-term stability,
 concurrent multi-chat requests and persistent log behavior remain unverified.
 The cloud workspace cannot execute Windows/Allplan tests.
@@ -164,7 +206,8 @@ Original diagnostic SHA-256 values, retained byte-for-byte:
 ## Next work and unresolved limits
 
 M2 work requested by the owner is complete; no further owner test is pending
-within the recorded scope. The next implementation stage is M3 when requested.
+within the recorded scope. The first requested M3 slice is now delivered above;
+native preview acceptance and subsequent mutation implementation are pending.
 Crash timing and second request arguments are established. A concrete UI
 callback exception defect is fixed and the native controlled error/recovery gate
 passes; its role in the actual CLR crash remains a hypothesis without the incident
@@ -175,7 +218,8 @@ explicit QA policy classifies that literal, absence, null and empty/whitespace
 strings as missing. Unknown reads/types and passive API absence remain
 not_checked. The tested six-column audit has five findings and one duplicate
 group. A zero result cannot bypass incomplete coverage. Missing bindings reject
-the audit; remedies remain suggestions. M3 is unimplemented/unrun.
+the audit; remedies remain suggestions. M3 native apply is unimplemented/unrun;
+the new read-only preview contract is separate from accepted M2 evidence.
 
 Current portable verification: **121 tests PASS** on Linux Python **3.12.14**,
 including the real MCP/HTTP transport with a fake native host and JSON/TXT CLI

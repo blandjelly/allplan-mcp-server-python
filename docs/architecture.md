@@ -67,6 +67,12 @@ inclusion. Report omitted/unloaded/read-only scope explicitly.
 
 ## Shared mutation lifecycle
 
+The first M3 slice in 0.7.0 implements only explicit preview and fresh evidence
+revalidation: host `repair_contracts.py` / `model_repair.py`, public
+`repair_models.py` and `fix_model_issues`. Its bounded session-local cache stores
+immutable returned-plan copies with ID/hash and expiry; no apply/writability,
+durable mutation journal or Undo is claimed. See [contract](m3-repair-contract.md).
+
 1. Resolve explicit scope and supported operations.
 2. Produce a side-effect-free preview with targets, values, exclusions and counts.
 3. Bind apply to the reviewed plan ID/hash and current user authorization.

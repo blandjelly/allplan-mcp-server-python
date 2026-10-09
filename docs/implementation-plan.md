@@ -60,7 +60,17 @@ The earlier crash's precise cause remains unproven. No repeated owner test is re
 **Exit gate (UAT-04):** demo returns exactly 5 findings on 5 columns, correct
 uniqueness scope, explicit unavailable data and locatable targets; no writes.
 
-## M3 — Controlled repairs and standards: planned, unimplemented
+## M3 — Controlled repairs and standards: preview slice ready for owner testing
+
+Package **0.7.0** implements the first read-only M3.1/M3.2 slice:
+`fix_model_issues` explicit layer/status preview and plan revalidation, full fresh
+audit evidence, exact values/locators/exclusions, plan ID/hash, bounded cache and
+stale/expiry/restart controls. [Contract](m3-repair-contract.md),
+[portable checks](test-results/m3-preview-portable-0.7.0.md),
+[next owner gate](m3-preview-batch.md). No native apply or setter invocation is
+implemented. UAT-05/UAT-06 are not closed. M3.1's mutation/Undo lifecycle,
+M3.2 apply/readback, M3.3 and M3.4 remain pending; the portable read-only cache
+does not establish durable write identity or retry deduplication.
 
 - **M3.1** Shared preview/apply, stale checks, serialized writes, request identity, readback, partial outcomes and tested Undo limits.
 - **M3.2** `fix_model_issues` for writable attributes/layers; data marks and graphical labels stay distinct.
