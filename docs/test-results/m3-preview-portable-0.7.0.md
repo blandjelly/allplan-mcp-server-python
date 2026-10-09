@@ -3,8 +3,10 @@
 Date **2026-10-09**, Linux external Python **3.12.14**, FastMCP **3.2.4**,
 uv **0.12.19**. Baseline accepted M2 commit `bedb264`; working branch
 `codex/m3-repair-preview`. **Ready for owner testing, not native acceptance.**
-The branch is local pending owner approval for the GitHub push; automatic
-approval review rejected publication. No remote M3 CI or PR is claimed.
+The initial GitHub push was blocked by automatic approval review. The owner
+then explicitly approved publishing all prepared work. Exact delivery artifacts
+are retained under `evaluation-packages/0.7.0`; the Windows ZIP was not rebuilt.
+This record describes the local test run and does not claim remote CI results.
 
 The baseline full suite passed **121 tests** before changes. The updated suite
 passes **134 tests**, including 11 new host/public planning checks and two new

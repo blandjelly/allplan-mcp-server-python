@@ -3,11 +3,15 @@
 ## Current handoff — 2026-10-09, package 0.7.0
 
 Continue from **`codex/m3-repair-preview`**, based on accepted M2 commit
-`bedb264`. This branch is currently local: automatic approval review rejected
-the outbound push because continuation was not treated as authorization to
-publish the source/documentation. Obtain the owner's approval before pushing
-this branch to the same GitHub repository; no remote PR was created. The
-delivered ZIP contains the complete runtime source and documentation.
+`bedb264`. The owner explicitly approved publishing all prepared work to GitHub
+and will perform the native tests. The delivered evaluation artifacts are in
+[`evaluation-packages/0.7.0`](../evaluation-packages/0.7.0/README.md).
+The exact Windows ZIP remains unchanged from the local delivery: source commit
+`22f18db27faf5e0873de18c1e079d1217da736fb`, SHA-256
+`e47a103b8a280bf786877f22bab8faf8bfd183f4de9531d8918305bd87cf56c6`.
+The archive's embedded handoff records the earlier publication block; this
+GitHub handoff supersedes that publication status. No native acceptance has
+been added. The source/documentation update does not rebuild that ZIP.
 The owner requested continuation from M2 until native owner testing
 is required. The first read-only M3.1/M3.2 slice is now
 **ready_for_owner_test**: [contract](m3-repair-contract.md),
@@ -28,7 +32,8 @@ real MCP/HTTP transport with fake native adapters and the new JSON/TXT owner CLI
 Frozen sync, wheel/sdist build and Windows ZIP/integrity/registration checks are
 recorded separately from native acceptance. New package **0.7.0** preserves the
 accepted 0.6.1 archive; its source-only ZIP and SHA-256 companion are in ignored
-`dist/`. Use the delivered archive rather than rebuilding under an accepted
+`dist/`, with exact copies committed under `evaluation-packages/0.7.0`.
+Use the delivered archive rather than rebuilding under an accepted
 version number. No Allplan 0.7.0 acceptance or current remote CI result is claimed.
 
 **Next action requires the owner's Windows/Allplan:** install 0.7.0 and run
