@@ -88,7 +88,8 @@ class RepairExecutor:
     @staticmethod
     def evaluation_scope(plan):
         changes = plan["changes"]
-        return (plan["state"] == "preview_ready" and len(changes) == 2
+        return ("selection" not in plan and "workflow" not in plan
+                and plan["state"] == "preview_ready" and len(changes) == 2
                 and plan["counts"] == {"changes": 2, "excluded_findings": 3, "audit_findings": 5}
                 and all(c["ref"]["drawing_file"] == 101 and c["ref"]["type_uuid"] == "ac9415e3-4337-4860-8cd4-2f0d48596f12" for c in changes)
                 and sum(c["operation"] == "set_layer" and c["locator"]["mark"].get("value") == "S05"

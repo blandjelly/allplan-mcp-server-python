@@ -1,0 +1,20 @@
+Allplan stale-plan apply rejection test
+Date: 2026-10-10 (Europe/Warsaw)
+Package: MCP 0.8.1; host bridge 0.8.1
+Source commit: 8074905536ff5c95e20de4a59a70d513f8694314
+Execution ID: 62c9e25cb67027df3c5126057a4d2cbe
+Plan ID: 500b57e169df4a6d99e982d413282542
+Plan hash: 8687e394b90923fd99ca666fdc3f3ee588fe92dec7b5effdd483e16268dfa420
+Host session: 3ccecb6b-5695-44b6-b44b-3329acafa0cd
+Apply state: rejected
+Read only: true
+Native setters started: false
+Error code: plan_expired
+Audit complete before/after: true/true; elements 6/6
+Source fingerprint identical: true
+Report fingerprint identical: true
+Same host session throughout: true
+S05 layer before/after: 3700/3700
+S06 status before/after: NEW/NEW
+Health after: true
+Full original health/audit/apply responses, exact request and comparison are in allplan_stale_apply_rejection.json.

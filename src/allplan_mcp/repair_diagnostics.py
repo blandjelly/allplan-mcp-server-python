@@ -50,7 +50,7 @@ async def apply_gate(host_url, mcp_url, path, confirm=input):
             return report
         print(plan["report_text"])
         print("Sprawdz cele w UI: C05/S05 warstwa SZ_OGÓ02 -> SZ_OGÓ01; C06/S06 status NWE -> NEW.")
-        print("Tylko jednorazowa kopia projektu, plik 101 na pierwszym planie. Undo nie jest jeszcze zweryfikowane.")
+        print("Tylko jednorazowa kopia projektu, plik 101 na pierwszym planie. Undo dwoch napraw wymaga dwoch osobnych krokow w UI.")
         if confirm("Wpisz NAPRAW KOPIE po sprawdzeniu dwoch zmian i kopii projektu: ").strip() != "NAPRAW KOPIE":
             report.update(state="cancelled", message="Owner did not start apply. No mutation requested.")
             return report

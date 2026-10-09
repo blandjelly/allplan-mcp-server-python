@@ -2,7 +2,7 @@
 import re
 
 from .audit_contracts import bounded_string, normalized, selected_rules, validate_audit_request
-from .query_contracts import invalid, keys
+from .query_contracts import invalid, keys, predicate_fields
 from .transport import BridgeError
 
 SCHEMA = "m3-repair-1"
@@ -28,11 +28,43 @@ def validate_repair_request(request):
             invalid("Apply requires acknowledgement of the reviewed repairs on a disposable project copy.")
     elif action == "preview":
         required = {"schema_version", "action", "audit", "repairs"}
-        keys(request, required | {"finding_ids"}, required)
+        keys(request, required | {"finding_ids", "selection", "workflow"}, required)
         validate_audit_request(request["audit"])
         scope = request["audit"]["scope"]
         if scope["include_passive"] or len(scope["drawing_files"]) != 1:
             invalid("Repair preview requires one explicit drawing file and include_passive=false.")
+        if "selection" in request:
+            selection = request["selection"]
+            keys(selection, {"where", "exclude_model_uuids"}, {"where"})
+            if not isinstance(selection["where"], dict):
+                invalid("Repair selection requires an explicit predicate.")
+            fields = predicate_fields(selection["where"])
+            allowed = {"mark", "status", "layer_id", "file_state"}
+            allowed.update(r["field"] for r in selected_rules(request["audit"]) if r["kind"] == "dimension_range")
+            if not fields <= allowed:
+                invalid("Repair selection may use only mark/status/layer_id/file_state and selected audit dimension fields.")
+            ids = selection.get("exclude_model_uuids", [])
+            if (not isinstance(ids, list) or len(ids) > 100
+                    or any(not isinstance(v, str) or not re.fullmatch(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}", v) for v in ids)
+                    or len(set(ids)) != len(ids)):
+                invalid("Exceptions must contain at most 100 distinct canonical model UUIDs.")
+        if "workflow" in request:
+            workflow = request["workflow"]
+            if not isinstance(workflow, dict):
+                invalid("workflow must be an object.")
+            if workflow.get("kind") == "office_standard_preview":
+                keys(workflow, {"kind", "standard_id", "standard_version", "standard_fingerprint"},
+                     {"kind", "standard_id", "standard_version", "standard_fingerprint"})
+                bounded_string(workflow["standard_id"], 64, "Standard ID")
+                bounded_string(workflow["standard_version"], 32, "Standard version")
+                if not isinstance(workflow["standard_fingerprint"], str) or not re.fullmatch(r"[0-9a-f]{64}", workflow["standard_fingerprint"]):
+                    invalid("Invalid standard fingerprint.")
+            elif workflow.get("kind") == "rule_based_edit_preview":
+                keys(workflow, {"kind"}, {"kind"})
+                if "selection" not in request:
+                    invalid("Rule-based preview requires selection.")
+            else:
+                invalid("Unknown preview workflow.")
         choices = request["repairs"]
         if not isinstance(choices, list) or not 1 <= len(choices) <= 32:
             invalid("repairs must contain 1..32 explicit choices.")

@@ -5,7 +5,7 @@ from collections import OrderedDict
 from uuid import uuid4
 
 from .model_audit import run_audit
-from .query_contracts import fingerprint
+from .query_contracts import evaluate, fingerprint
 from .repair_contracts import SCHEMA, capability_probe, validate_repair_request
 from .transport import BridgeError
 
@@ -33,7 +33,28 @@ class RepairPlanService:
                 del self.plans[ident]
         if request["action"] == "revalidate":
             return self._revalidate(doc, base, settings, request)
-        report = run_audit(self.queries, doc, base, settings, request["audit"])
+        decisions, selection_result = {}, None
+        if "selection" in request:
+            report, snapshot = run_audit(self.queries, doc, base, settings, request["audit"], with_snapshot=True)
+            selection = request["selection"]
+            exceptions = set(selection.get("exclude_model_uuids", []))
+            if not exceptions <= {e["ref"]["model_uuid"] for e in snapshot["elements"]}:
+                raise BridgeError("finding_stale", "An exception is absent from the full audited scope. Review the current model UUIDs.", 409)
+            selection_result = {"selected_elements": 0, "predicate_false": 0,
+                                "excluded_elements": 0, "predicate_not_checked": 0}
+            selection_started = self.queries.clock()
+            for element in snapshot["elements"]:
+                if self.queries.clock() - selection_started >= self.queries.SCAN_SECONDS:
+                    raise BridgeError("scan_limit_exceeded", "Repair selection exceeded its time budget; no plan was stored.", 409)
+                if element["ref"]["model_uuid"] in exceptions:
+                    decision = "excluded_elements"
+                else:
+                    value = evaluate(selection["where"], element["fields"])
+                    decision = "selected_elements" if value is True else "predicate_false" if value is False else "predicate_not_checked"
+                decisions[fingerprint(element["ref"])] = decision
+                selection_result[decision] += 1
+        else:
+            report = run_audit(self.queries, doc, base, settings, request["audit"])
         choices = {c["rule_id"]: c["value"] for c in request["repairs"]}
         rules = {r["rule_id"]: r for r in request["audit"]["profile"]["rules"]}
         ids = request.get("finding_ids")
@@ -48,6 +69,9 @@ class RepairPlanService:
             rule_id = finding["rule_id"]
             reason = ("rule_not_selected" if rule_id not in choices else
                       "finding_not_selected" if ids is not None and finding["finding_id"] not in ids else
+                      "selection_exception" if decisions.get(fingerprint(finding["ref"])) == "excluded_elements" else
+                      "selection_predicate_false" if decisions.get(fingerprint(finding["ref"])) == "predicate_false" else
+                      "selection_not_checked" if decisions.get(fingerprint(finding["ref"])) == "predicate_not_checked" else
                       "audit_incomplete" if not complete else
                       "file_not_active" if finding["ref"]["drawing_file"] not in active else
                       "old_value_unavailable" if finding["evidence"]["raw"]["status"] != "observed" else None)
@@ -76,7 +100,8 @@ class RepairPlanService:
                             "old_value": copy.deepcopy(finding["evidence"]["raw"]), "new_value": new_value,
                             "source_fingerprint": finding["source_fingerprint"], "write_eligibility": "not_checked"})
         changes.sort(key=lambda c: (c["ref"]["drawing_file"], c["ref"]["model_uuid"], c["field"]))
-        plan_complete = complete and not any(e["reason"] in {"file_not_active", "old_value_unavailable"} for e in exclusions)
+        plan_complete = (complete and not any(e["reason"] in {"file_not_active", "old_value_unavailable"} for e in exclusions)
+                         and not (selection_result and selection_result["predicate_not_checked"]))
         created = self.queries.clock()
         plan = {"schema_version": SCHEMA, "action": "preview", "read_only": True,
                 "state": "preview_ready" if plan_complete else "not_checked", "plan_id": uuid4().hex,
@@ -91,8 +116,21 @@ class RepairPlanService:
                 "expires_after_seconds": self.TTL_SECONDS,
                 "reference_lifetime": "host_session_project_document_snapshot; no persistence or authorization",
                 "report_text": self._text(changes, exclusions, complete)}
+        if selection_result is not None:
+            plan["selection"] = copy.deepcopy(request["selection"])
+            plan["selection_result"] = selection_result
+            plan["report_text"] += (f"\nSelection: {selection_result['selected_elements']} selected; "
+                                    f"{selection_result['excluded_elements']} explicit exceptions; "
+                                    f"{selection_result['predicate_not_checked']} unchecked predicates.")
+        if "workflow" in request:
+            plan["workflow"] = copy.deepcopy(request["workflow"])
+            workflow = request["workflow"]
+            if workflow["kind"] == "office_standard_preview":
+                plan["report_text"] += f"\nStandard: {workflow['standard_id']} {workflow['standard_version']}. Preview only."
         plan["evaluation_apply_available"] = self.executor.evaluation_scope(plan)
         plan["evaluation_apply_limit"] = "disposable_copy_reviewed_two_repairs; native acceptance pending"
+        if "selection" in plan or "workflow" in plan:
+            plan["evaluation_apply_limit"] = "Selected/standard workflows are preview-only; no native apply authorization."
         plan["plan_hash"] = fingerprint({"plan": plan, "request": request})
         entry = {"created": created, "request": copy.deepcopy(request), "plan": plan}
         size = len(json.dumps(entry, ensure_ascii=False, allow_nan=False).encode())

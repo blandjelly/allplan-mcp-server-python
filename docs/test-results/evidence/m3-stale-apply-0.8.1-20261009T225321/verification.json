@@ -1,0 +1,16 @@
+{
+  "decision": "native_stale_apply_rejection_pass",
+  "execution_id": "62c9e25cb67027df3c5126057a4d2cbe",
+  "host_session": "3ccecb6b-5695-44b6-b44b-3329acafa0cd",
+  "saved_request_matches_capture": true,
+  "audit_report_hash_recomputed_from_original_mcp_text": "251071b962416d7e7ade3c32e5d87500d518ba4f42151e6dce80ee2d4973e074",
+  "source_fingerprint_identical": "8339836f7441cbdb1ba1b76ae4aa8ea8a1fdd90a8e75a2da2bb2ce0a6c49c0b7",
+  "bridge_files_verified_in_each_health": 22,
+  "archive_sha256": "b31909379244cc085168cc1b5283fa08284954f19334261779ea766fbbf36c47",
+  "targets_before_after": {
+    "s05_layer": 3700,
+    "s06_status": "NEW"
+  },
+  "native_setters_started": false,
+  "owner_observation": "values and appearance unchanged"
+}

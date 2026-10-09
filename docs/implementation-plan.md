@@ -76,8 +76,9 @@ The [write/Undo gate](m3-apply-batch.md) is complete for this fixture; no repeat
 Apply is requested. The manual-edit card's UI action interrupted the host;
 [native old-plan revalidation after restart PASS](test-results/m3-plan-restart-acceptance-0.8.1.md).
 Native same-session conflicts remain blocked; no repeat on this build is requested.
-The [next card](m3-stale-apply-batch.md) tests mutation-entry-point rejection of
-that stale plan with unchanged audits. Undo grouping and M3 closure remain
+The [stale Apply card](m3-stale-apply-batch.md) now has
+[native PASS](test-results/m3-stale-apply-acceptance-0.8.1.md), explicit pre-setter
+rejection and identical complete audits/unchanged UI. Undo grouping and M3 closure remain
 unclaimed. [Execution limits](m3-execution-contract.md).
 
 Package **0.7.0** implements the first read-only M3.1/M3.2 slice:
@@ -92,9 +93,19 @@ native revalidation/follow-up audit retain identical audited source. No repeated
 preview batch is required. Manual-edit native conflicts remain unverified.
 The 0.7.0 package invokes no setters. The 0.8.1 bounded M3.1/M3.2/M3.4
 implementation has the native observations above. UAT-05/UAT-06 remain open
-for native stale-Apply evidence and broader required behavior;
-unknown-outcome recovery, broader mutation/registry guarantees and M3.3 remain
+for broader required behavior. Native stale Apply rejection is accepted;
+unknown-outcome recovery and broader mutation/registry guarantees remain
 unaccepted. Current recovery evidence concerns a completed saved execution.
+
+Package **0.9.0** implements the first M3.3 **preview-only** slice:
+versioned demo layer/status `apply_office_standard` and predicate/UUID-exception
+`rule_based_edit` over one shared full audit snapshot. Excluded-element edits
+still conflict on full revalidation; unknown predicates block readiness.
+Standard/selected plans cannot use native Apply, including through fix_model_issues.
+[Contract](m3-standards-contract.md), [155 portable tests](test-results/m3-standards-portable-0.9.0.md),
+[next read-only owner gate](m3-standards-preview-batch.md).
+Native new-tool previews are not_run; mark numbering, broader standards and
+selected native writes remain deferred. No old owner batch is repeated.
 
 - **M3.1** Shared preview/apply, stale checks, serialized writes, request identity, readback, partial outcomes and tested Undo limits.
 - **M3.2** `fix_model_issues` for writable attributes/layers; data marks and graphical labels stay distinct.

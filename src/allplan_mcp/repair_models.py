@@ -4,7 +4,18 @@ from typing import Annotated, Literal
 from pydantic import Field, model_validator
 
 from .audit_models import AuditRequest
-from .query_models import ContractModel
+from .query_models import ContractModel, Predicate
+
+
+class RepairSelection(ContractModel):
+    where: Predicate
+    exclude_model_uuids: list[Annotated[str, Field(pattern=r"^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$")]] = Field(default_factory=list, max_length=100)
+
+    @model_validator(mode="after")
+    def distinct_exceptions(self):
+        if len(set(self.exclude_model_uuids)) != len(self.exclude_model_uuids):
+            raise ValueError("Duplicate exception model UUIDs are not allowed.")
+        return self
 
 
 class RepairChoice(ContractModel):
@@ -16,6 +27,7 @@ class RepairPreview(ContractModel):
     action: Literal["preview"]
     audit: AuditRequest
     repairs: list[RepairChoice] = Field(min_length=1, max_length=32)
+    selection: RepairSelection | None = None
     finding_ids: list[Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]] | None = Field(
         default=None, min_length=1, max_length=100)
 

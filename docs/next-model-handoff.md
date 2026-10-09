@@ -1,6 +1,74 @@
 # Next-model handoff
 
-## Current handoff — 2026-10-10 Europe/Warsaw, 0.8.1 restart invalidation PASS
+## Current handoff — 2026-10-10 Europe/Warsaw, 0.9.0 M3.3 preview ready
+
+Continue **`codex/m3-repair-preview`**, draft [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2).
+The owner requests continued M3 work until native testing is required and
+explicitly instructs **commit/push everything prepared to GitHub**. Authorization
+persists; no main/PR merge or release is performed.
+
+**New 0.8.1 owner gate PASS:** [stale Apply rejection and originals](test-results/m3-stale-apply-acceptance-0.8.1.md).
+Three byte-identical uploads preserved with manifest/verification under
+`test-results/evidence/m3-stale-apply-0.8.1-20261009T225321`.
+Execution **62c9e25cb67027df3c5126057a4d2cbe** uses old plan
+**500b57e169df4a6d99e982d413282542** and its exact hash. In host session
+**3ccecb6b-5695-44b6-b44b-3329acafa0cd**, Apply returns
+**rejected/native_setters_started=false/read_only=true/error.code=plan_expired**.
+Before/after complete six-column audits have identical source/report hashes;
+S05 layer remains **3700/SZ_OGÓ01**, S06 status **NEW**. Same-session health
+and all 22 bridge hashes in each health capture match the unchanged 0.8.1 ZIP.
+Owner confirms **values and appearance unchanged**. Saved request matches the
+embedded request. Audit hashes independently recompute from original MCP text;
+structuredContent has some float-to-integer normalization and alone does not
+reproduce the float-preserving host hash. Preserve original text blocks.
+No Undo/Recover/repeated test is required. Earlier write/Undo/Redo/recovery and
+restart invalidation remain PASS. Same-session manual-edit conflict remains
+blocked by UI host cancellation; do not repeat it on this lifecycle/build.
+
+**Delivered next slice 0.9.0: ready_for_owner_test.**
+[M3.3 contract](m3-standards-contract.md),
+[155 portable tests PASS](test-results/m3-standards-portable-0.9.0.md),
+[Polish next card](m3-standards-preview-batch.md).
+`apply_office_standard` takes preview only, explicit preset
+native-model-qa-demo-layer-status **1.0.0**, active scope and optional selection.
+Its versioned resource defines layer/status remedies, not marks/numbering.
+`rule_based_edit` takes preview only, typed audit/explicit repair choices and
+required predicate/model-UUID exceptions. Both compose the shared planner.
+Selection and findings use one full fresh audit snapshot; exceptions/false/
+unknown predicates retain separate reasons and counters. Unknown under negation
+blocks readiness. Predicate fields are bounded to audited mark/status/layer/
+file state/explicit dimension fields; invalid inputs reject before context;
+absent exception UUIDs reject. Full audit/revalidation includes excluded elements.
+Immutable workflow/selection/standard metadata enters the plan hash. Native
+executor refuses all selection/workflow plans even if the changes match the
+old two-target fixture. No generic/standard/selected native writes are added.
+
+155 tests PASS on Linux Python 3.12.14; real MCP/HTTP checks prove wrappers,
+before-context validation, selected Apply refusal and read-only owner launcher.
+Old lost-reply, crash/disk, source/replay checks remain passing. Frozen sync and
+wheel/sdist build pass. Dependencies unchanged; local uv.lock version only.
+New package has **M3 Standards Preview.cmd**. Exact 0.9.0 artifact source/hashes
+are recorded in its delivery manifest/README; never rebuild accepted versions.
+All existing archives/logs remain unchanged. CI results belong to their exact
+commits; do not transfer old six-job results to 0.9.0 or later documentation.
+
+**Next action requires owner Allplan:** install the exact 0.9.0 ZIP into a new
+folder/Setup.cmd with the same Local, keep 0.8.1/archive/journal, open the same
+repaired disposable copy (S05 SZ_OGÓ01, S06 NEW, 3 mark findings). Start host/MCP
+and **M3 Standards Preview.cmd**, without UI editing during reads. Expected:
+standard zero proposals; layer-3700 selection excluding S06 selects 5/excepts 1;
+opposite layer predicate selects 0; all three revalidations unchanged;
+identical full before/after audit and same-session health. Return original
+JSON/TXT plus unchanged-value/appearance and host UI observations. No Apply,
+Recover, Undo, fixture rebuild or repeated earlier owner gate.
+
+M3/UAT-05/UAT-06 remain open. New M3.3 native preview is not_run;
+marks/numbering/file moves, selected writes, wider types/scopes, unknown native
+outcomes, grouped Undo, full OS/application restart and crash/power-loss behavior
+remain deferred/unaccepted. Recheck main/base documentation reconciliation and
+remote state before eventual integration.
+
+## Prior handoff — 2026-10-10 Europe/Warsaw, 0.8.1 restart invalidation PASS
 
 Continue **`codex/m3-repair-preview`**, draft [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2).
 The owner supplied four original local-Codex read-only preview/revalidation

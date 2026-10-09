@@ -41,6 +41,85 @@ class FakeBridge:
 
 
 class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
+    async def test_standard_owner_gate_is_read_only_over_real_transport_and_keeps_full_audit(self):
+        from test_repair_execution import ExecutionTests
+        from allplan_mcp.standard_diagnostics import collect_standard_preview
+        from allplan_mcp import __version__
+        native = ExecutionTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        elements = native.writable_fixture()
+        elements[4].GetCommonProperties.return_value.Layer = 7
+        elements[5].GetAttributes.return_value = [(20001, 'S06'), (20002, 'NEW')]
+        original = self.bridge_handler.handle
+        def handle(path, payload):
+            if path in {'/fix-model-issues', '/model-audit'}:
+                self.bridge_handler.calls.append((path, payload))
+                return native.handler.handle(path, payload)
+            if path == '/get-allplan-version':
+                result = original(path, payload)
+                result['host_session_id'] = 'native-fake-session'
+                result['bridge_package']['version'] = __version__
+                return result
+            return original(path, payload)
+        self.bridge_handler.handle = handle
+        with tempfile.TemporaryDirectory() as directory:
+            report = await collect_standard_preview(self.url, Path(directory) / 'standards.json')
+            self.assertEqual(report['state'], 'ready_for_ui_observation', report.get('message'))
+            self.assertTrue(all(s['ok'] for s in report['steps']))
+            self.assertEqual(len(report['steps']), 10)
+            calls = [p.get('action') for route, p in self.bridge_handler.calls if route == '/fix-model-issues']
+            self.assertEqual(calls, ['preview', 'revalidate'] * 3)
+            self.assertTrue((Path(directory) / 'standards.txt').exists())
+        native.base.ElementsLayerService.ChangeLayer.assert_not_called()
+        native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+    async def test_standard_and_rule_previews_share_native_plans_and_reject_selected_apply(self):
+        from test_repair_execution import ExecutionTests
+        from uuid import uuid4
+        native = ExecutionTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        elements = native.writable_fixture()
+        original = self.bridge_handler.handle
+        def handle(path, payload):
+            if path == '/fix-model-issues':
+                self.bridge_handler.calls.append((path, payload))
+                try:
+                    return native.handler.handle(path, payload)
+                except native.module.BridgeError as exc:
+                    raise transport.BridgeError(exc.code, str(exc), exc.status) from exc
+            return original(path, payload)
+        self.bridge_handler.handle = handle
+        scope = {'drawing_files': [101], 'include_passive': False, 'visibility': 'api_select_all'}
+        async with Client(self.url) as client:
+            standard = (await client.call_tool('apply_office_standard', {'request': {
+                'action': 'preview', 'standard_id': 'native-model-qa-demo-layer-status',
+                'standard_version': '1.0.0', 'scope': scope}})).data
+            self.assertEqual(standard['workflow']['standard_version'], '1.0.0')
+            self.assertFalse(standard['evaluation_apply_available'])
+            self.assertEqual(len(standard['changes']), 2)
+            request = {'action': 'preview', 'audit': {'profile_id': 'native-model-qa-demo', 'scope': scope},
+                       'repairs': [{'rule_id': 'QA-003', 'value': 'structure'}, {'rule_id': 'QA-004', 'value': 'NEW'}],
+                       'selection': {'where': {'not': {'field': 'status', 'op': 'eq', 'value': 'NEW'}},
+                                     'exclude_model_uuids': [str(elements[4].GetModelElementUUID())]}}
+            selected = (await client.call_tool('rule_based_edit', {'request': request})).data
+            self.assertEqual([c['locator']['mark']['value'] for c in selected['changes']], ['S06'])
+            check = (await client.call_tool('fix_model_issues', {'request': {
+                'action': 'revalidate', 'plan_id': selected['plan_id'], 'plan_hash': selected['plan_hash']}})).data
+            self.assertEqual(check['state'], 'unchanged')
+            rejected = (await client.call_tool('fix_model_issues', {'request': {
+                'action': 'apply', 'plan_id': selected['plan_id'], 'plan_hash': selected['plan_hash'],
+                'execution_id': uuid4().hex, 'acknowledgement': 'disposable_copy_reviewed_two_repairs'}})).data
+            self.assertEqual(rejected['error']['code'], 'repair_scope_unavailable')
+            self.assertFalse(rejected['native_setters_started'])
+            invalid = await client.call_tool('apply_office_standard', {'request': {
+                'action': 'apply', 'standard_id': 'native-model-qa-demo-layer-status',
+                'standard_version': '1.0.0', 'scope': scope}}, raise_on_error=False)
+            self.assertTrue(invalid.is_error)
+        native.base.ElementsLayerService.ChangeLayer.assert_not_called()
+        native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
     async def test_explicit_apply_rejection_is_not_unknown_and_recovery_never_replays_it(self):
         from test_repair_execution import ExecutionTests
         from allplan_mcp.repair_diagnostics import apply_gate, recovery_gate
@@ -446,7 +525,7 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
     async def test_discovery_health_version_names_box_and_diagnostic_bundle(self):
         async with Client(self.url, timeout=5) as client:
             names = {t.name for t in await client.list_tools()}
-            self.assertEqual(names, {"allplan_health", "get_allplan_version", "get_all_object_names", "create_cube", "create_box", "get_model_context", "model_query", "model_audit", "fix_model_issues"})
+            self.assertEqual(names, {"allplan_health", "get_allplan_version", "get_all_object_names", "create_cube", "create_box", "get_model_context", "model_query", "model_audit", "fix_model_issues", "apply_office_standard", "rule_based_edit"})
             resources = await client.list_resources()
             self.assertIn("allplan://skills", {str(r.uri) for r in resources})
             health = (await client.call_tool("allplan_health")).data

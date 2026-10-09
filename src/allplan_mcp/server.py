@@ -14,6 +14,8 @@ from allplan_mcp.query_models import QueryRequest
 from allplan_mcp.demo_profile import load_demo_profile, load_audit_profile
 from allplan_mcp.audit_models import AuditRequest
 from allplan_mcp.repair_models import RepairRequest
+from allplan_mcp.standard_models import OfficeStandardPreview, RuleBasedPreview
+from allplan_mcp.office_standard import load_office_standard
 
 
 DEFAULT_ALLPLAN_HOST_URL = "http://127.0.0.1:5679"
@@ -37,6 +39,13 @@ def native_model_qa_audit_profile() -> str:
     """M2 rules with explicit missing/normalization policies; read-only remedies."""
     import json
     return json.dumps(load_audit_profile(), ensure_ascii=False, indent=2)
+
+
+@mcp.resource("allplan://standards/native-model-qa-demo-layer-status", mime_type="application/json")
+def native_office_standard() -> str:
+    """Versioned evaluation layer/status preset; numbering and mark writes deferred."""
+    import json
+    return json.dumps(load_office_standard(), ensure_ascii=False, indent=2)
 
 
 def _allplan_client() -> AllplanHostClient:
@@ -217,9 +226,50 @@ def fix_model_issues(request: RepairRequest) -> dict[str, Any]:
     disposable_copy_reviewed_two_repairs. It checks native eligibility, stops on
     failure and reads back results. Repeated execution IDs never repeat setters.
     Recover reads persisted execution/current values without resuming writes.
-    General apply and native Undo acceptance remain unavailable.
+    General/selected-standard apply remain unavailable. Native UI Undo requires
+    two separate steps for the accepted retained fixture; no automatic rollback.
     """
-    payload = request.model_dump(exclude_unset=True, exclude_none=True)
+    payload = request.model_dump(exclude_unset=True, exclude_none=True, by_alias=True)
+    if getattr(request, "selection", None) is not None:
+        payload["selection"] = request.selection.model_dump(exclude_unset=True, by_alias=True)
+    return _send_repair(payload)
+
+
+@mcp.tool
+def apply_office_standard(request: OfficeStandardPreview) -> dict[str, Any]:
+    """Preview the explicit versioned demo layer/status standard; never apply.
+
+    Requires standard ID/version and one active drawing file. Optional query
+    predicate/model-UUID exceptions filter fresh audit findings on the same scan.
+    Full audit/source revalidation is shared with fix_model_issues. Mark assignment,
+    numbering, file moves, and standard/selected-plan apply remain unavailable.
+    """
+    standard = load_office_standard()
+    payload = {"action": "preview", "audit": {"profile_id": standard["audit_profile_id"],
+               "scope": request.scope.model_dump()}, "repairs": standard["repairs"],
+               "workflow": {k: standard[k] for k in ("standard_id", "standard_version", "standard_fingerprint")}}
+    payload["workflow"]["kind"] = "office_standard_preview"
+    if request.selection is not None:
+        payload["selection"] = request.selection.model_dump(exclude_unset=True, by_alias=True)
+    return _send_repair(payload)
+
+
+@mcp.tool
+def rule_based_edit(request: RuleBasedPreview) -> dict[str, Any]:
+    """Preview selected layer/status repairs with explicit query/UUID exceptions.
+
+    Selection uses audited mark/status/layer_id/file_state or selected dimension
+    fields from one full fresh scan. Unknown predicates block readiness. Excluded
+    elements still participate in full source revalidation. No setters or Apply
+    authorization are available for this workflow.
+    """
+    payload = request.model_dump(exclude_unset=True, exclude_none=True, by_alias=True)
+    payload["selection"] = request.selection.model_dump(exclude_unset=True, by_alias=True)
+    payload["workflow"] = {"kind": "rule_based_edit_preview"}
+    return _send_repair(payload)
+
+
+def _send_repair(payload: dict[str, Any]) -> dict[str, Any]:
     if payload["action"] == "preview":
         audit = payload["audit"]
         if audit.pop("profile_id", None) is not None:

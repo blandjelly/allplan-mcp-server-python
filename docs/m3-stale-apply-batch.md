@@ -1,6 +1,13 @@
 # M3 — odrzucenie starego Apply po restarcie, pakiet 0.8.1
 
-Status: **ready_for_owner_test**. [Poprzedni test](test-results/m3-plan-restart-acceptance-0.8.1.md)
+Status: **native gate PASS**, 10 października 2026.
+[Oryginalne logi i akceptacja](test-results/m3-stale-apply-acceptance-0.8.1.md)
+potwierdzają `rejected`, `native_setters_started=false`, `plan_expired`,
+identyczne kompletne audyty, warstwę S05 3700 i status S06 NEW przed/po.
+Właściciel potwierdza niezmienione wartości i wygląd. Nie powtarzaj tego testu.
+Kolejny test to [odczytowy podgląd M3.3 w pakiecie 0.9.0](m3-standards-preview-batch.md).
+
+Poniżej zachowano używaną procedurę. [Poprzedni test](test-results/m3-plan-restart-acceptance-0.8.1.md)
 potwierdził odrzucenie starego podglądu przez `plan_expired` po restarcie.
 Kliknięcie w UI zakończyło hosta, dlatego nie powtarzamy testu konfliktu w tej
 samej sesji. Teraz sprawdzamy odrzucenie przez wejście **Apply**, z audytem

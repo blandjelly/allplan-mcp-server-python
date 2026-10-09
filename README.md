@@ -16,7 +16,7 @@ Read these files in order when continuing implementation:
 3. [Features](docs/features.md): the 13 tools and demonstration fixture.
 4. [Implementation stages](docs/implementation-plan.md): task IDs and exit gates.
 
-Current package: **0.8.1**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
+Current package: **0.9.0**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
 **M0 and bounded M1 are accepted** on Allplan **2026-1-7** with local Windows Codex; UAT-00–UAT-03 PASS.
 The demo profile binds freshly for reads and remains inactive for writes.
 [Acceptance and limits](docs/test-results/m1-acceptance-0.5.3.md) cover the known
@@ -51,9 +51,15 @@ Undo steps, and recovery after owner-confirmed Redo;
 The UI interrupted the host in the subsequent manual-edit scenario;
 [native old-plan rejection after restart PASS](docs/test-results/m3-plan-restart-acceptance-0.8.1.md).
 Same-session manual-edit conflict is blocked in that observed lifecycle and
-is not claimed as accepted. Next is the
-[stale Apply rejection test](docs/m3-stale-apply-batch.md) using installed 0.8.1
-without UI editing or a new preview. Broader repairs and generation remain pending.
+is not claimed as accepted.
+[Native stale Apply rejection PASS](docs/test-results/m3-stale-apply-acceptance-0.8.1.md)
+with identical complete before/after audits and unchanged owner-observed values/appearance.
+Package **0.9.0** adds the first M3.3 read-only `apply_office_standard` and
+predicate/exception `rule_based_edit` previews using the shared audit/planner.
+[Contract](docs/m3-standards-contract.md),
+[portable validation](docs/test-results/m3-standards-portable-0.9.0.md),
+[next read-only owner card](docs/m3-standards-preview-batch.md).
+New workflows authorize no writes; broader repairs and generation remain pending.
 M3 is not closed.
 
 Repository documentation and API identifiers use English. Owner-facing
