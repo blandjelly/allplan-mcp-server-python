@@ -37,3 +37,10 @@ Exact clean-source artifact identity and any GitHub CI results are recorded in
 the 0.9.0 delivery manifest/README after publication. CI-generated archives do
 not replace the exact owner-delivery ZIP. No test result for a later commit is
 inferred from an earlier CI run.
+
+[CI run 38002888441](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38002888441)
+passes all six Windows/Ubuntu Python 3.11–3.13 test/build/Windows-ZIP jobs for
+clean source **61c7579645d497a9df1e3ff0cb5640861225b56c**. Exact artifacts are
+[delivered under 0.9.0](../../evaluation-packages/0.9.0/README.md), publication
+commit **65ac8ef032d36226b7af3d294e51a664f722fd5d**. Later artifact/documentation
+commits have separate CI state; the delivered ZIP is not rebuilt.

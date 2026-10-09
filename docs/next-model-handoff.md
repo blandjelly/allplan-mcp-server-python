@@ -55,6 +55,11 @@ ZIP **624503 bytes**, SHA-256
 Exact extracted integrity, recursive registration of 22 bridge files and clean
 source deterministic rebuild verify. Publication docs do not rebuild this ZIP.
 Never rebuild accepted versions.
+[CI run 38002888441](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38002888441)
+passes all six Windows/Ubuntu Python 3.11–3.13 test/build/Windows-ZIP jobs for
+clean source **61c7579645d497a9df1e3ff0cb5640861225b56c**. Exact artifact
+publication is commit **65ac8ef032d36226b7af3d294e51a664f722fd5d**; later
+artifact/documentation CI is separate. The owner ZIP is unchanged.
 All existing archives/logs remain unchanged. CI results belong to their exact
 commits; do not transfer old six-job results to 0.9.0 or later documentation.
 

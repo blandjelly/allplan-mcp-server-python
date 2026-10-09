@@ -8,6 +8,10 @@ pass. Do not repeat Apply; use the installed package and repaired copy for the
 [next stale-Apply rejection card](../../docs/m3-stale-apply-batch.md).
 The subsequent UI action interrupted the host; native same-session conflict
 is blocked, while [old-plan rejection after restart passes](../../docs/test-results/m3-plan-restart-acceptance-0.8.1.md).
+The [stale Apply rejection gate also passes](../../docs/test-results/m3-stale-apply-acceptance-0.8.1.md),
+with identical complete before/after audits and unchanged UI values/appearance.
+Do not repeat these accepted gates. The next M3.3 read-only preview test uses
+the separately versioned [0.9.0 package](../0.9.0/README.md).
 The delivery manifest and embedded archive record the original pre-test state;
 this document supersedes that acceptance status without changing the artifacts.
 The 0.8.0 request was rejected before setters by an overly broad IsInMacro check.

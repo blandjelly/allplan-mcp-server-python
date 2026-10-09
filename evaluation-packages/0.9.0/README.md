@@ -27,7 +27,12 @@ are byte-identical. Exact extracted-package integrity and recursive registration
 pass with all 22 bridge files. Publication documentation does not rebuild it.
 
 [155 local tests PASS](../../docs/test-results/m3-standards-portable-0.9.0.md),
-frozen sync and wheel/sdist build pass. GitHub CI status is recorded separately
-for its exact commit/run. Portable evidence is not native new-tool acceptance.
+frozen sync and wheel/sdist build pass.
+[CI run 38002888441](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38002888441)
+passes all six Windows/Ubuntu Python 3.11–3.13 test/build/Windows-ZIP jobs for
+clean source **61c7579645d497a9df1e3ff0cb5640861225b56c**. Artifact publication
+commit **65ac8ef032d36226b7af3d294e51a664f722fd5d** and later documentation have
+separate CI state; this exact delivered ZIP is unchanged.
+Portable evidence is not native new-tool acceptance.
 M3/UAT-05/UAT-06, marks/numbering and selected native writes remain open.
 No GitHub release or redistribution/license claim is made by this delivery.
