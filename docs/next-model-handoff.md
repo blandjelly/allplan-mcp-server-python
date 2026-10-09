@@ -48,8 +48,11 @@ pending. M3 and UAT-05/UAT-06 are not closed. Cloud cannot run Windows/Allplan.
 Portable validation: **146 tests PASS**, Linux Python 3.12.14; frozen sync,
 wheel/sdist build, deterministic source-only Windows ZIP, integrity and recursive
 registration. Real MCP/HTTP tests include lost completed response with saved ID
-and no automatic retry. Remote CI is separate and must be checked for the
-published commit. Main's independent documentation cleanup remains outside this
+and no automatic retry. [CI run 37937853438](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/37937853438)
+passes all six Windows/Ubuntu Python 3.11–3.13 test/build/Windows-ZIP jobs for
+published artifact commit **24b65eaaab9e6e1100cbd7c4bce0726d512c575b**.
+Later documentation-only CI state is separate; the recorded ZIP is unchanged.
+Main's independent documentation cleanup remains outside this
 M3 slice; no main/PR merge is performed. Recheck remote state before integration.
 
 ## Prior handoff — 2026-10-09, package 0.7.0 (historical)

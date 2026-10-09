@@ -20,7 +20,11 @@ publication and later CI observations. Updated repository documentation may
 record those observations without rebuilding/replacing this ZIP.
 
 146 local portable tests pass, including real MCP/HTTP with stateful fake native
-adapters and mutation/recovery/failure cases. Portable checks do not establish
+adapters and mutation/recovery/failure cases.
+[CI run 37937853438](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/37937853438)
+passes all six Windows/Ubuntu Python 3.11–3.13 jobs for published artifact commit
+`24b65eaaab9e6e1100cbd7c4bce0726d512c575b`.
+Portable checks do not establish
 Allplan writability, API effects, model appearance, restart persistence or Undo.
 Keep the tested 0.7.0 and earlier archives unchanged. Preserve execution records
 in the real Allplan `Local/.allplan-mcp/repairs` and package `logs` across restart.

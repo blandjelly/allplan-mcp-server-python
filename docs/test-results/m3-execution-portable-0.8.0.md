@@ -32,5 +32,8 @@ any HTTP mutation call. The Windows launchers require no Python/JSON editing.
 Portable tests do not prove native eligibility semantics, setters, persistent
 storage on the Windows host, one/two-step Undo or model appearance. Neither
 power-loss durability nor identity across project copies/machines is accepted.
-Remote CI must be checked for the published commit separately; no unobserved
-CI result is inferred here. [Contract and limits](../m3-execution-contract.md).
+[CI run 37937853438](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/37937853438)
+passes all six Windows/Ubuntu Python 3.11–3.13 test/build/Windows-ZIP jobs for
+published commit **24b65eaaab9e6e1100cbd7c4bce0726d512c575b**. These jobs are
+separate from Allplan acceptance and later documentation-only CI state.
+[Contract and limits](../m3-execution-contract.md).
