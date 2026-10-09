@@ -20,6 +20,7 @@ SHA-256 ZIP: `e47a103b8a280bf786877f22bab8faf8bfd183f4de9531d8918305bd87cf56c6`.
 Rozmiar: **382353 bajty**. Obok znajdują się plik `.sha256`, zweryfikowane
 wheel/sdist i opis dostawy `delivery-0.7.0.json`.
 
-**134 testy lokalne PASS**. Testy Allplan 0.7.0 oczekują na wykonanie.
+**134 testy lokalne PASS**, CI Windows/Ubuntu Python 3.11–3.13 PASS.
+[Test podglądu Allplan 0.7.0 zakończony PASS w ograniczonym zakresie](../../docs/test-results/m3-preview-acceptance-0.7.0.md).
 Pakiet udostępnia wyłącznie podgląd i kontrolę planu dla M3; stosowanie napraw,
 odczyt po zapisie i Undo nie są jeszcze wdrożone.

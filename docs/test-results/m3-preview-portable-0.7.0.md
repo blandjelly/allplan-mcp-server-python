@@ -2,7 +2,10 @@
 
 Date **2026-10-09**, Linux external Python **3.12.14**, FastMCP **3.2.4**,
 uv **0.12.19**. Baseline accepted M2 commit `bedb264`; working branch
-`codex/m3-repair-preview`. **Ready for owner testing, not native acceptance.**
+`codex/m3-repair-preview`. At this portable run the slice was
+**ready for owner testing, not native acceptance**. The later
+[bounded native preview acceptance](m3-preview-acceptance-0.7.0.md) is separate
+evidence; this portable record does not establish native behavior.
 The initial GitHub push was blocked by automatic approval review. The owner
 then explicitly approved publishing all prepared work. Exact delivery artifacts
 are retained under `evaluation-packages/0.7.0`; the Windows ZIP was not rebuilt.
@@ -36,7 +39,7 @@ both new host modules. The delivered archive's exact hash is in its companion
 `.zip.sha256` file. No previously accepted archive was rebuilt or overwritten.
 
 The [contract](../m3-repair-contract.md) defines boundaries and the
-[owner card](../m3-preview-batch.md) provides the pending native test. No native
+[owner card](../m3-preview-batch.md) retains the subsequently completed native test. No native
 0.7.0 targets/value correspondence, unchanged UI, setter behavior, Undo,
 readback, long-term stability, durability or repair acceptance is inferred from
 portable mocks. M3.1/M3.2 are partial; M3.3/M3.4 and UAT-05/UAT-06 remain open.

@@ -34,7 +34,9 @@ findings, coverage and file/mark/location evidence. The
 [UAT-04 card](docs/m2-audit-batch.md) records the original procedure.
 The first M3 slice adds read-only `fix_model_issues` preview/revalidation for
 explicit layer/status choices, with exact old/new values, bounded plans and stale
-checks. **Ready for the [M3 owner preview gate](docs/m3-preview-batch.md)**;
+checks. **Bounded M3 preview gate PASS**;
+[native evidence and limits](docs/test-results/m3-preview-acceptance-0.7.0.md),
+[completed owner card](docs/m3-preview-batch.md);
 [contract](docs/m3-repair-contract.md). Native apply/readback/Undo and generation
 remain planned. M3 is not closed.
 

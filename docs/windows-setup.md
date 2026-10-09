@@ -11,8 +11,10 @@ requested. **M2 / UAT-04 PASS** on the retained fixture with 0.6.1;
 [native evidence and limits](test-results/m2-acceptance-0.6.1.md).
 The setup steps below cover the current evaluation package. M2 read-only audit was implemented in 0.6.0; 0.6.1 contains callback exceptions
 and preflights invalid scope, with the targeted native recovery test passed;
-0.7.0 adds M3 read-only repair preview/revalidation, ready for the
-[owner gate](m3-preview-batch.md). Native apply is unavailable.
+0.7.0 adds M3 read-only repair preview/revalidation; the
+[bounded owner gate passes](test-results/m3-preview-acceptance-0.7.0.md).
+The [completed card](m3-preview-batch.md) retains its procedure.
+Native apply is unavailable.
 
 ## Upgrade from 0.1.1 after a missing Library item
 

@@ -1,6 +1,8 @@
 # M3 repair preview contract — 0.7.0
 
-First M3.1/M3.2 slice: **ready_for_owner_test**, read-only. Tool
+First M3.1/M3.2 slice: **accepted_on_build within the retained read-only preview
+scope**, package 0.7.0 on the previously owner-identified Allplan 2026-1-7 fixture;
+[native evidence and limits](test-results/m3-preview-acceptance-0.7.0.md). Tool
 `fix_model_issues`, bridge `/fix-model-issues`, request/plan schema `m3-repair-1`.
 M3 apply/readback/Undo and UAT-05/UAT-06 remain incomplete. Accepted M1/M2
 profiles and evidence are unchanged. [Owner gate](m3-preview-batch.md).
@@ -101,8 +103,10 @@ containment. Writes, serialized execution, per-target readback, partial outcomes
 Undo limits, durable request identity/deduplication and restart recovery are
 still to be implemented and proven before closing M3.1/M3.4. M3.3 remains planned.
 
-The next owner gate verifies native target/value correspondence, stable repeated
-read evidence and continued host operation. Optional native manual-edit conflict
-checking is described on the owner card. After that evidence, implement the
+The completed owner gate verifies native target/value correspondence, stable
+audited-source evidence and continued host operation within the retained fixture;
+see the acceptance record for the separately attributed UI statement and limits.
+Optional native manual-edit conflict checking was not supplied and remains
+described on the owner card. Next, implement the
 small attribute/layer mutation adapter and a disposable-copy write/readback/Undo
 gate; do not enable writes merely because this read-only gate passed.

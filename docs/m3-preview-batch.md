@@ -1,6 +1,12 @@
 # M3 — test podglądu napraw, pakiet 0.7.0
 
-Status: **ready_for_owner_test**. Pierwszy krok M3.1/M3.2; to jeszcze nie
+Status: **PASS w udokumentowanym zakresie podglądu**, 2026-10-09.
+[Wynik, logi i granice akceptacji](test-results/m3-preview-acceptance-0.7.0.md).
+Właściciel potwierdził działanie Allplana/hosta oraz zgodność wskazań i wartości.
+Odczyty dowodzą niezmienionych danych audytu; nie przypisujemy tej wypowiedzi
+potwierdzenia każdego aspektu całego modelu. Nie trzeba powtarzać tej serii.
+Poniżej zachowano wykonaną procedurę; opcjonalny test ręcznego konfliktu nie
+został dostarczony. Pierwszy krok M3.1/M3.2; to jeszcze nie
 zamknięcie UAT-05/UAT-06. Test jest tylko do odczytu i nie stosuje napraw.
 Nie trzeba powtarzać zaakceptowanych testów M1/M2 ani tworzyć modelu od nowa.
 Wymagana jest kontrola w Allplanie: chmura nie może potwierdzić wskazanych

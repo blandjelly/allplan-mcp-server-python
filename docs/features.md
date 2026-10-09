@@ -7,7 +7,7 @@ and [read contracts](tool-reference.md). `model_audit` is implemented and accept
 within the retained fixture scope in 0.6.1, **UAT-04 PASS**; see
 [native evidence and limits](test-results/m2-acceptance-0.6.1.md) and the
 [audit contract](m2-audit-contract.md). `fix_model_issues` preview/revalidation is
-implemented in 0.7.0, [ready for owner testing](m3-preview-batch.md); native apply
+implemented in 0.7.0, [bounded native preview gate PASS](test-results/m3-preview-acceptance-0.7.0.md); native apply
 remains unavailable. Other workflow tools are planned. M0 utilities are `allplan_health`,
 `get_allplan_version`, `get_all_object_names`, `create_cube` and `create_box`.
 Names are display values; baseline boxes have no automatic readback/deduplication.
@@ -80,7 +80,8 @@ create duplicates. Missing bindings/data produce `not_checked` or a profile erro
 
 The 0.7.0 M3 repair preview contains exactly two proposed changes: C05 layer → SZ_OGÓ01
 and C06 status NWE → NEW. It leaves the model unchanged; its follow-up audit
-retains **5 findings**. Native acceptance is pending. After future apply/readback, **3 findings**
+retains **5 findings**. The bounded native preview gate passes; native apply
+acceptance is pending. After future apply/readback, **3 findings**
 remain. Repeating apply must not repeat writes. A later explicit reviewed plan
 assigning C03=S03 and C04=S04 gives zero findings. These values are fixture choices,
 not an inferred production office standard.

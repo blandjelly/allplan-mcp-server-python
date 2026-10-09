@@ -4,19 +4,20 @@
 
 Continue from **`codex/m3-repair-preview`**, based on accepted M2 commit
 `bedb264`. The owner explicitly approved publishing all prepared work to GitHub
-and will perform the native tests. The delivered evaluation artifacts are in
+and has supplied the completed read-only preview test. The delivered evaluation artifacts are in
 [`evaluation-packages/0.7.0`](../evaluation-packages/0.7.0/README.md).
 The exact Windows ZIP remains unchanged from the local delivery: source commit
 `22f18db27faf5e0873de18c1e079d1217da736fb`, SHA-256
 `e47a103b8a280bf786877f22bab8faf8bfd183f4de9531d8918305bd87cf56c6`.
 The archive's embedded handoff records the earlier publication block; this
-GitHub handoff supersedes that publication status. No native acceptance has
-been added. The source/documentation update does not rebuild that ZIP.
+GitHub handoff supersedes that publication status. The bounded preview acceptance
+below supersedes its pending native gate. The documentation update does not rebuild that ZIP.
 The owner requested continuation from M2 until native owner testing
-is required. The first read-only M3.1/M3.2 slice is now
-**ready_for_owner_test**: [contract](m3-repair-contract.md),
+is required. The first read-only M3.1/M3.2 slice now has
+**bounded native preview gate PASS**: [acceptance and original evidence](test-results/m3-preview-acceptance-0.7.0.md),
+[contract](m3-repair-contract.md),
 [portable validation](test-results/m3-preview-portable-0.7.0.md),
-[Polish owner card](m3-preview-batch.md).
+[completed Polish owner card](m3-preview-batch.md).
 
 Delivered: `fix_model_issues` explicit layer/status repair choices, fresh full
 audit preview, optional exact finding IDs, exact old/new values, locators,
@@ -34,16 +35,26 @@ recorded separately from native acceptance. New package **0.7.0** preserves the
 accepted 0.6.1 archive; its source-only ZIP and SHA-256 companion are in ignored
 `dist/`, with exact copies committed under `evaluation-packages/0.7.0`.
 Use the delivered archive rather than rebuilding under an accepted
-version number. No Allplan 0.7.0 acceptance or current remote CI result is claimed.
+version number. [CI run 37929065543](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/37929065543)
+passes all six Windows/Ubuntu Python 3.11–3.13 jobs for published commit
+`433a83b`, including tests and builds; later documentation commits have separate
+CI state. Freshly checked main is `75e80bd` (M2 and documentation cleanup merged);
+PR #2 remains open/draft against `codex/m2-audit-accepted`. Recheck refs and main
+documentation changes before integration; no merge is performed by this update.
 
-**Next action requires the owner's Windows/Allplan:** install 0.7.0 and run
-**M3 Preview.cmd** on the retained fixture. Expect exactly two proposals
-(C05 layer SZ_OGÓ02 → SZ_OGÓ01, C06 status NWE → NEW), immediate `unchanged`
-revalidation, an identical five-finding audit and continued host operation.
-Owner compares the two targets/values with UI and confirms the unchanged model,
-then supplies JSON/TXT. Optional manual-edit conflict test uses a disposable copy.
-Do not repeat accepted M1/M2 batches. No preview acceptance has been recorded yet.
+**Completed owner gate — 15:01 Europe/Warsaw, 2026-10-09:** original JSON/TXT
+`diagnostics-20261009T130124Z` verify all 20 installed bridge hashes, matching
+0.7.0 MCP/host, exactly two proposals (C05 layer 3701/SZ_OGÓ02 → 3700/SZ_OGÓ01,
+C06 attribute 5002/MCP_QA_STATUS NWE → NEW), immediate `unchanged` revalidation,
+identical complete five-finding audit and same-session health. Plan/report hashes
+independently recompute and TXT agrees. Owner states Allplan/host run and targets/
+values agree with UI. That statement does not separately claim whole-model
+unchanged UI; evidence establishes unchanged audited fields. Acceptance is
+bounded accordingly. Native manual-edit conflict was not supplied.
+**No repeated M1/M2/M3 preview batch is requested.**
 
+**Next work:** implement the controlled native apply/readback/recovery slice,
+then prepare a new-version disposable-copy write/Undo owner gate.
 M3 remains incomplete: `apply` is unavailable/rejected before native context
 lookup. No write adapter, apply readback, serialized mutation journal, durable
 request deduplication, unknown-outcome recovery or tested Undo exists. M3.3 and

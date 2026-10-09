@@ -1,0 +1,4711 @@
+{
+  "schema_version": "m0-1",
+  "captured_at": "2026-10-09T13:01:19.598628+00:00",
+  "external_python": "3.14.8",
+  "platform": "Windows",
+  "package_version": "0.7.0",
+  "host_url": "http://127.0.0.1:5679",
+  "mcp_url": "http://127.0.0.1:8888/mcp",
+  "allplan_acceptance": "not_run",
+  "host": {
+    "version": "2026.1",
+    "allplan_release": {
+      "Version": "2026.1",
+      "MainReleaseName": "2026",
+      "SubReleaseName": "2026.1",
+      "WindowsReleaseName": ""
+    },
+    "executable_versions": {
+      "status": "observed",
+      "file_version": "16.1617.8659.814",
+      "product_version": "2026.0.1.0",
+      "source": "running_process_executable"
+    },
+    "hotfix": {
+      "status": "not_checked",
+      "value": null
+    },
+    "embedded_python": {
+      "version": "3.13.13",
+      "implementation": "CPython"
+    },
+    "bridge_package": {
+      "version": "0.7.0",
+      "source_commit": "22f18db27faf5e0873de18c1e079d1217da736fb",
+      "integrity": "sha256-verified",
+      "bridge_files": {
+        "Library/PythonHost/StartPythonHost.pyp": "b1aba49ed554eeefa9e44f4e9a6f06992e74d4f2916277ef451de11d72167813",
+        "PythonPartsScripts/PythonHost/audit_contracts.py": "155b10200982c879f3bd0226ea8f26c00e15118f8b5f3df532c7937ac3e8f035",
+        "PythonPartsScripts/PythonHost/model_audit.py": "07ac2f7d0856d5cd3018f57f819743b5dc2e46b152c7e4a7f0ee4364a4c478b3",
+        "PythonPartsScripts/PythonHost/model_context.py": "ecb8288192490215baa8bd7475ed4dffcd9b4acaf4d46a281686ff220269840b",
+        "PythonPartsScripts/PythonHost/model_metadata.py": "c1339766382fd52de47fb66e11d87106942b67cf5dc743088739473738802d4a",
+        "PythonPartsScripts/PythonHost/model_query.py": "875a4981f7dce2dacea47ee8019472fb320842b436c3f33a25db3d6d78bccc74",
+        "PythonPartsScripts/PythonHost/model_repair.py": "6b2de13bd2db8acb3a3df576de3a7c0ddaf7d25410c7684c02a4c30b8bf09f8b",
+        "PythonPartsScripts/PythonHost/native_readers.py": "15c62a3c295bbeda4722bc54a6d36a4ada04fba866f0f1eb7aacd3a7f6c48cd0",
+        "PythonPartsScripts/PythonHost/profile_contracts.py": "bed1c0099c2dfdc5fc48374cd78c16ea1ea0a6df3309deb919322b060d7a46b6",
+        "PythonPartsScripts/PythonHost/PythonHostHandler.py": "fcb5d217fd41af6e662a27d9a397d5bce3877f03ef8d92efd8ad8e56b3dc584f",
+        "PythonPartsScripts/PythonHost/query_contracts.py": "685ebd73e89a43381d2e81f59d6365be575c0edbded78440453dd8ab4115fe16",
+        "PythonPartsScripts/PythonHost/repair_contracts.py": "527bb149a7f37770d516c0d4fcdc1e242fc8292331b7d42efd933018aea58702",
+        "PythonPartsScripts/PythonHost/runtime_info.py": "6d46a44d0c8e8d3c1d757a22b4012a9919eb782bb8ea60577a1e229acfde91a2",
+        "PythonPartsScripts/PythonHost/sandbox/__init__.py": "b895513c191ba9ea7a8748f3aef1c6c9d74875b990d8ef41e10faf3904e0e586",
+        "PythonPartsScripts/PythonHost/sandbox/const.py": "168b93f376d54ddaf67ac62ffc5fb7e94570ab24e1f828d0732effa097e659d4",
+        "PythonPartsScripts/PythonHost/sandbox/executor.py": "c06f9810291a1c9e6f3deb7939d4b6615905d15c6662a6e69d7973b3fcbf0f6a",
+        "PythonPartsScripts/PythonHost/sandbox/validator.py": "5a4d3bf2bb6d2556512285a778083385c5c5049a398bc7a77cdaab9c5d8ddaec",
+        "PythonPartsScripts/PythonHost/spatial_contracts.py": "40820192b5500782cab4fb3fe837244989283861c143079b245f8f2e223ee086",
+        "PythonPartsScripts/PythonHost/StartPythonHost.py": "6962786bd8dfa3f7de555856a0c64a1943b09612f314bef74d51f572c58fe6ba",
+        "PythonPartsScripts/PythonHost/transport.py": "a7c700a368538ada76f32360f1962d2d3f483966ea6030eae254732fa1f44fbe"
+      }
+    },
+    "installed_bridge_integrity": {
+      "status": "verified",
+      "mismatches": []
+    },
+    "compatibility": {
+      "target_major": "2026",
+      "major_matches": true,
+      "runtime_verified": false
+    },
+    "request_id": "1aa764ac-cff1-48f5-830a-6b3f02313c88",
+    "host_session_id": "e088efb4-0747-4de4-811e-3f75f54c43bb",
+    "ui_dispatch_exception_boundary": "contained_result_error_v1"
+  },
+  "mcp": {
+    "ok": true,
+    "discovered_tools": [
+      "allplan_health",
+      "get_allplan_version",
+      "get_model_context",
+      "model_query",
+      "model_audit",
+      "fix_model_issues",
+      "get_all_object_names",
+      "create_cube",
+      "create_box"
+    ],
+    "allplan_health": {
+      "ok": true,
+      "allplan_version": "2026.1",
+      "runtime": {
+        "version": "2026.1",
+        "allplan_release": {
+          "Version": "2026.1",
+          "MainReleaseName": "2026",
+          "SubReleaseName": "2026.1",
+          "WindowsReleaseName": ""
+        },
+        "executable_versions": {
+          "status": "observed",
+          "file_version": "16.1617.8659.814",
+          "product_version": "2026.0.1.0",
+          "source": "running_process_executable"
+        },
+        "hotfix": {
+          "status": "not_checked",
+          "value": null
+        },
+        "embedded_python": {
+          "version": "3.13.13",
+          "implementation": "CPython"
+        },
+        "bridge_package": {
+          "version": "0.7.0",
+          "source_commit": "22f18db27faf5e0873de18c1e079d1217da736fb",
+          "integrity": "sha256-verified",
+          "bridge_files": {
+            "Library/PythonHost/StartPythonHost.pyp": "b1aba49ed554eeefa9e44f4e9a6f06992e74d4f2916277ef451de11d72167813",
+            "PythonPartsScripts/PythonHost/audit_contracts.py": "155b10200982c879f3bd0226ea8f26c00e15118f8b5f3df532c7937ac3e8f035",
+            "PythonPartsScripts/PythonHost/model_audit.py": "07ac2f7d0856d5cd3018f57f819743b5dc2e46b152c7e4a7f0ee4364a4c478b3",
+            "PythonPartsScripts/PythonHost/model_context.py": "ecb8288192490215baa8bd7475ed4dffcd9b4acaf4d46a281686ff220269840b",
+            "PythonPartsScripts/PythonHost/model_metadata.py": "c1339766382fd52de47fb66e11d87106942b67cf5dc743088739473738802d4a",
+            "PythonPartsScripts/PythonHost/model_query.py": "875a4981f7dce2dacea47ee8019472fb320842b436c3f33a25db3d6d78bccc74",
+            "PythonPartsScripts/PythonHost/model_repair.py": "6b2de13bd2db8acb3a3df576de3a7c0ddaf7d25410c7684c02a4c30b8bf09f8b",
+            "PythonPartsScripts/PythonHost/native_readers.py": "15c62a3c295bbeda4722bc54a6d36a4ada04fba866f0f1eb7aacd3a7f6c48cd0",
+            "PythonPartsScripts/PythonHost/profile_contracts.py": "bed1c0099c2dfdc5fc48374cd78c16ea1ea0a6df3309deb919322b060d7a46b6",
+            "PythonPartsScripts/PythonHost/PythonHostHandler.py": "fcb5d217fd41af6e662a27d9a397d5bce3877f03ef8d92efd8ad8e56b3dc584f",
+            "PythonPartsScripts/PythonHost/query_contracts.py": "685ebd73e89a43381d2e81f59d6365be575c0edbded78440453dd8ab4115fe16",
+            "PythonPartsScripts/PythonHost/repair_contracts.py": "527bb149a7f37770d516c0d4fcdc1e242fc8292331b7d42efd933018aea58702",
+            "PythonPartsScripts/PythonHost/runtime_info.py": "6d46a44d0c8e8d3c1d757a22b4012a9919eb782bb8ea60577a1e229acfde91a2",
+            "PythonPartsScripts/PythonHost/sandbox/__init__.py": "b895513c191ba9ea7a8748f3aef1c6c9d74875b990d8ef41e10faf3904e0e586",
+            "PythonPartsScripts/PythonHost/sandbox/const.py": "168b93f376d54ddaf67ac62ffc5fb7e94570ab24e1f828d0732effa097e659d4",
+            "PythonPartsScripts/PythonHost/sandbox/executor.py": "c06f9810291a1c9e6f3deb7939d4b6615905d15c6662a6e69d7973b3fcbf0f6a",
+            "PythonPartsScripts/PythonHost/sandbox/validator.py": "5a4d3bf2bb6d2556512285a778083385c5c5049a398bc7a77cdaab9c5d8ddaec",
+            "PythonPartsScripts/PythonHost/spatial_contracts.py": "40820192b5500782cab4fb3fe837244989283861c143079b245f8f2e223ee086",
+            "PythonPartsScripts/PythonHost/StartPythonHost.py": "6962786bd8dfa3f7de555856a0c64a1943b09612f314bef74d51f572c58fe6ba",
+            "PythonPartsScripts/PythonHost/transport.py": "a7c700a368538ada76f32360f1962d2d3f483966ea6030eae254732fa1f44fbe"
+          }
+        },
+        "installed_bridge_integrity": {
+          "status": "verified",
+          "mismatches": []
+        },
+        "compatibility": {
+          "target_major": "2026",
+          "major_matches": true,
+          "runtime_verified": false
+        },
+        "request_id": "825166e3-054e-4afe-b721-9485cef79ad7",
+        "host_session_id": "e088efb4-0747-4de4-811e-3f75f54c43bb",
+        "ui_dispatch_exception_boundary": "contained_result_error_v1"
+      },
+      "external_python": "3.14.8",
+      "mcp_package_version": "0.7.0",
+      "request_id": "825166e3-054e-4afe-b721-9485cef79ad7",
+      "allplan_host_url": "http://127.0.0.1:5679"
+    },
+    "get_allplan_version": "2026.1",
+    "fix_model_issues": {
+      "schema_version": "m3-repair-1",
+      "action": "preview",
+      "read_only": true,
+      "state": "preview_ready",
+      "plan_id": "af6d9e4c16704c3a90c8925eefbc9b98",
+      "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+      "profile_id": "native-model-qa-demo",
+      "profile_version": "2.0.0",
+      "profile_fingerprint": "ec2b81ca093d42c8026010b5b93b977bfca146e1e70fcd1570dd5a2065ab87be",
+      "source_fingerprint": "52d0849293b2c8645d392b1484f197cbf09947f55a70738b603715f1464f3f1e",
+      "audit_report_fingerprint": "9fdbd2b408a809adced51a3efaf62fc074251fbf76cff271199076123527447a",
+      "scope": {
+        "requested": {
+          "drawing_files": [
+            101
+          ],
+          "include_passive": false,
+          "visibility": "api_select_all"
+        },
+        "included_files": [
+          {
+            "drawing_file": 101,
+            "state": "active_foreground",
+            "write_eligibility": "not_checked"
+          }
+        ]
+      },
+      "coverage": {
+        "scan_complete": true,
+        "requested_scope_complete": true,
+        "returned_fields_complete": true,
+        "returned_fields_not_checked": 0,
+        "whole_project": false,
+        "unloaded_files": "not_enumerated",
+        "visibility": "api_select_all_screen_and_occlusion_not_checked",
+        "count_kind": "supported_native_top_level_components",
+        "native_component_counts": "implemented_runtime_pending",
+        "supported_component_types": [
+          "Beam_TypeUUID",
+          "Column_TypeUUID",
+          "MultiSlab_TypeUUID",
+          "SkeletonBeam_TypeUUID",
+          "Slab_TypeUUID",
+          "Wall_TypeUUID"
+        ],
+        "geometry_units_offset": "implemented_runtime_pending",
+        "rule_inputs_complete": true,
+        "audit_complete": true,
+        "uses_full_snapshot": true,
+        "durable_identity_verified": false
+      },
+      "changes": [
+        {
+          "finding_id": "12eff77ed426c85397d81f2abe0c865b54acd1d70d9c79e0f0a1ffa3fac89ef9",
+          "rule_id": "QA-003",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "locator": {
+            "method": "drawing_file_mark_location",
+            "drawing_file": 101,
+            "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+            "mark": {
+              "status": "observed",
+              "value": "S05"
+            },
+            "layer_id": {
+              "status": "observed",
+              "value": 3701
+            },
+            "bounding_box_mm": {
+              "status": "observed",
+              "value": {
+                "min": [
+                  5800.0,
+                  5800.0,
+                  9.0951551845464e-15
+                ],
+                "max": [
+                  6200.0,
+                  6200.0,
+                  3000.0
+                ],
+                "unit": "mm",
+                "frame": "model_local",
+                "source_api": "GetModelGeometry/CalcMinMax",
+                "source_frame": "model_local",
+                "offset_mm": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "offset_applied": false,
+                "runtime_verified": false
+              }
+            },
+            "center_mm": {
+              "status": "observed",
+              "value": [
+                6000.0,
+                6000.0,
+                1500.0
+              ],
+              "frame": "model_local"
+            },
+            "highlight": "not_requested",
+            "usable_for_write": false
+          },
+          "operation": "set_layer",
+          "field": "layer_id",
+          "resource": {
+            "layer_id": 3700,
+            "short_name": "SZ_OGÓ01",
+            "name": "SZ_OGÓ01 (Ogólne01)",
+            "write_eligibility": "not_checked"
+          },
+          "old_value": {
+            "status": "observed",
+            "value": 3701
+          },
+          "new_value": 3700,
+          "source_fingerprint": "961cf979544c424b48d955f75906f2897a03d20d765cc6c7d57a167280b20266",
+          "write_eligibility": "not_checked"
+        },
+        {
+          "finding_id": "2ec8ecd4e0ea93aaadf746ad52e7a38bbac5157a8a778c2a39f21cd3dcb5b36f",
+          "rule_id": "QA-004",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "locator": {
+            "method": "drawing_file_mark_location",
+            "drawing_file": 101,
+            "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+            "mark": {
+              "status": "observed",
+              "value": "S06"
+            },
+            "layer_id": {
+              "status": "observed",
+              "value": 3700
+            },
+            "bounding_box_mm": {
+              "status": "observed",
+              "value": {
+                "min": [
+                  11800.0,
+                  5800.0,
+                  9.0951551845464e-15
+                ],
+                "max": [
+                  12200.0,
+                  6200.0,
+                  3000.0
+                ],
+                "unit": "mm",
+                "frame": "model_local",
+                "source_api": "GetModelGeometry/CalcMinMax",
+                "source_frame": "model_local",
+                "offset_mm": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "offset_applied": false,
+                "runtime_verified": false
+              }
+            },
+            "center_mm": {
+              "status": "observed",
+              "value": [
+                12000.0,
+                6000.0,
+                1500.0
+              ],
+              "frame": "model_local"
+            },
+            "highlight": "not_requested",
+            "usable_for_write": false
+          },
+          "operation": "set_attribute",
+          "field": "attribute:5002",
+          "resource": {
+            "attribute_id": 5002,
+            "name": "MCP_QA_STATUS",
+            "type_code": 67,
+            "data_type": "string",
+            "write_eligibility": "not_checked"
+          },
+          "old_value": {
+            "status": "observed",
+            "value": "NWE"
+          },
+          "new_value": "NEW",
+          "source_fingerprint": "1b54a3a00f3868fa8ed09ba0c97375897e04599ab8d5adfd97e13f4ecd5c5dbb",
+          "write_eligibility": "not_checked"
+        }
+      ],
+      "exclusions": [
+        {
+          "finding_id": "302182a17667934d314275a1c383d818a89d88f1320ed9f85e7c908f835a500b",
+          "rule_id": "QA-001",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "reason": "rule_not_selected"
+        },
+        {
+          "finding_id": "fad5717f603b675cdf64dce2fdd5aabe76caf0aa35fd6b3aaedff4c160a54189",
+          "rule_id": "QA-002",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "reason": "rule_not_selected"
+        },
+        {
+          "finding_id": "866651170c5705f4bf614a0c886150f4e678e347a96acbfd3f6e0f29f63243d1",
+          "rule_id": "QA-002",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "reason": "rule_not_selected"
+        }
+      ],
+      "counts": {
+        "changes": 2,
+        "excluded_findings": 3,
+        "audit_findings": 5
+      },
+      "capabilities": {
+        "method": "symbol_inspection_without_invocation",
+        "symbols": {
+          "ElementsAttributeService.ChangeAttributes": {
+            "status": "observed",
+            "callable": true,
+            "doc": "\nChangeAttributes( (list)attributeDataList, (BaseElementAdapterList)elements [, (bool)setUndefAttrib=False [, (bool)setDeleteAttrib=False]]) -> BaseElementAdapterList :\n    Change an attribute\n    \n    Parameter: attributeDataList   List with the attribute data as tuple(number, value)\n               elements            Elements as BaseElementAdapterList\n               setUndefAttrib      Set Attribute undefined (optional)\n               setDeleteAttrib     Delete Attribute (optional)\n    \n    Return:  Modified elements"
+          },
+          "ElementsLayerService.ChangeLayer": {
+            "status": "observed",
+            "callable": true,
+            "doc": "\nChangeLayer( (BaseElementAdapterList)elements, (wstring)newValue) -> BaseElementAdapterList :\n    Change the Layer\n    \n    Parameter: elements           Elements to change\n               newValue           New value\n    \n    Return:  List with the modified elements"
+          }
+        },
+        "per_element_writability": "not_checked",
+        "native_write_readback": "not_checked",
+        "undo": "not_checked",
+        "durable_retry_deduplication": "not_implemented",
+        "apply_available": false
+      },
+      "apply_available": false,
+      "usable_for_write": false,
+      "allplan_acceptance": "not_run",
+      "runtime_verified": false,
+      "expires_after_seconds": 300,
+      "reference_lifetime": "host_session_project_document_snapshot; no persistence or authorization",
+      "report_text": "Repair preview: 2 proposed changes; 3 excluded findings.\nAudit complete: True. Read-only; native apply unavailable.\nQA-003: file 101, mark 'S05', model 51db6258-4f95-4fab-ac80-8948e13bfd21, center [6000.0, 6000.0, 1500.0] mm: layer_id 3701 -> 3700.\nQA-004: file 101, mark 'S06', model d26a3d87-2981-4657-b592-65c894ce41ba, center [12000.0, 6000.0, 1500.0] mm: attribute:5002 'NWE' -> 'NEW'.",
+      "plan_hash": "dce2f1115124cc417784a070802f2c3a9373a76272e6f216bde804188d46a1d2",
+      "request_id": "f92d66a5-40bd-4e1e-8e26-c046f95b65a7",
+      "host_session_id": "e088efb4-0747-4de4-811e-3f75f54c43bb"
+    },
+    "model_audit": {
+      "schema_version": "m2-audit-1",
+      "read_only": true,
+      "runtime_verified": false,
+      "allplan_acceptance": "not_run",
+      "state": "fail",
+      "profile_id": "native-model-qa-demo",
+      "profile_version": "2.0.0",
+      "profile_fingerprint": "ec2b81ca093d42c8026010b5b93b977bfca146e1e70fcd1570dd5a2065ab87be",
+      "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+      "source_fingerprint": "52d0849293b2c8645d392b1484f197cbf09947f55a70738b603715f1464f3f1e",
+      "profile_binding": {
+        "schema_version": "m1-profile-binding-1",
+        "profile_id": "native-model-qa-demo",
+        "profile_version": "1.0.2",
+        "profile": {
+          "schema_version": "m1-profile-1",
+          "profile_id": "native-model-qa-demo",
+          "profile_version": "1.0.2",
+          "target": {
+            "allplan_major_version": 2026,
+            "native_type_name": "Column_TypeUUID",
+            "native_type_id": "ac9415e3-4337-4860-8cd4-2f0d48596f12"
+          },
+          "units": {
+            "length": "mm",
+            "angle": "deg",
+            "frame": "model_local"
+          },
+          "scope": {
+            "drawing_files": [
+              101
+            ],
+            "uniqueness_scope": [
+              "drawing_file",
+              "element_family"
+            ],
+            "floor_mapping": {
+              "101": "Ground",
+              "102": "Reference",
+              "103": "Excluded"
+            }
+          },
+          "bindings": {
+            "attributes": {
+              "mark": {
+                "name": "MCP_QA_MARK",
+                "data_type": "string",
+                "expected_type_code": 67
+              },
+              "status": {
+                "name": "MCP_QA_STATUS",
+                "data_type": "string",
+                "expected_type_code": 67
+              }
+            },
+            "layers": {
+              "structure": {
+                "short_name": "SZ_OGÓ01"
+              },
+              "review": {
+                "short_name": "SZ_OGÓ02"
+              }
+            }
+          },
+          "rules": [
+            {
+              "rule_id": "QA-001",
+              "kind": "required_attribute",
+              "attribute": "mark"
+            },
+            {
+              "rule_id": "QA-002",
+              "kind": "unique_attribute",
+              "attribute": "mark",
+              "ignore_missing": true
+            },
+            {
+              "rule_id": "QA-003",
+              "kind": "required_layer",
+              "expected_layer": "structure"
+            },
+            {
+              "rule_id": "QA-004",
+              "kind": "allowed_attribute_values",
+              "attribute": "status",
+              "allowed_values": [
+                "NEW",
+                "EXISTING"
+              ],
+              "repair_mapping": {
+                "NWE": "NEW"
+              }
+            }
+          ],
+          "numeric_tolerances": {
+            "length_mm": 1.0
+          }
+        },
+        "status": "bound_for_read",
+        "read_only": true,
+        "attributes": {
+          "mark": {
+            "status": "observed",
+            "value": {
+              "attribute_id": 5001,
+              "name": "MCP_QA_MARK",
+              "type_code": 67,
+              "data_type": "string",
+              "write_eligibility": "not_checked"
+            }
+          },
+          "status": {
+            "status": "observed",
+            "value": {
+              "attribute_id": 5002,
+              "name": "MCP_QA_STATUS",
+              "type_code": 67,
+              "data_type": "string",
+              "write_eligibility": "not_checked"
+            }
+          }
+        },
+        "layers": {
+          "structure": {
+            "status": "observed",
+            "value": {
+              "layer_id": 3700,
+              "short_name": "SZ_OGÓ01",
+              "name": "SZ_OGÓ01 (Ogólne01)",
+              "write_eligibility": "not_checked"
+            }
+          },
+          "review": {
+            "status": "observed",
+            "value": {
+              "layer_id": 3701,
+              "short_name": "SZ_OGÓ02",
+              "name": "SZ_OGÓ02 (Ogólne02)",
+              "write_eligibility": "not_checked"
+            }
+          }
+        },
+        "project": {
+          "status": "observed",
+          "value": {
+            "name": "MCP_QA_DEMO",
+            "host": "localhost",
+            "key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "key_status": "observed",
+            "key_kind": "name_host_path_sha256",
+            "durable_identity_verified": false,
+            "path_lookup_attempts": [
+              {
+                "argument_order": "project_name_host_name",
+                "status": "observed",
+                "value": {
+                  "error": -1,
+                  "path": ""
+                }
+              },
+              {
+                "argument_order": "host_name_project_name",
+                "status": "observed",
+                "value": {
+                  "error": 0,
+                  "path": "C:\\Users\\dawid\\Documents\\rok IV\\Praktyki\\MCP_QA_DEMO.prj"
+                }
+              }
+            ]
+          }
+        },
+        "document_id": {
+          "status": "observed",
+          "value": 0
+        },
+        "levels": {
+          "status": "observed",
+          "source": "profile_configuration_not_native_BWS",
+          "value": {
+            "101": "Ground",
+            "102": "Reference",
+            "103": "Excluded"
+          }
+        },
+        "runtime_verified": false,
+        "active_for_write": false,
+        "write_eligibility": "not_checked",
+        "binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf"
+      },
+      "scope": {
+        "requested": {
+          "drawing_files": [
+            101
+          ],
+          "include_passive": false,
+          "visibility": "api_select_all"
+        },
+        "included_files": [
+          {
+            "drawing_file": 101,
+            "state": "active_foreground",
+            "write_eligibility": "not_checked"
+          }
+        ]
+      },
+      "coverage": {
+        "scan_complete": true,
+        "requested_scope_complete": true,
+        "returned_fields_complete": true,
+        "returned_fields_not_checked": 0,
+        "whole_project": false,
+        "unloaded_files": "not_enumerated",
+        "visibility": "api_select_all_screen_and_occlusion_not_checked",
+        "count_kind": "supported_native_top_level_components",
+        "native_component_counts": "implemented_runtime_pending",
+        "supported_component_types": [
+          "Beam_TypeUUID",
+          "Column_TypeUUID",
+          "MultiSlab_TypeUUID",
+          "SkeletonBeam_TypeUUID",
+          "Slab_TypeUUID",
+          "Wall_TypeUUID"
+        ],
+        "geometry_units_offset": "implemented_runtime_pending",
+        "rule_inputs_complete": true,
+        "audit_complete": true,
+        "uses_full_snapshot": true,
+        "durable_identity_verified": false
+      },
+      "scan_counts": {
+        "raw_adapters_visited": 16,
+        "in_scope_adapters": 16,
+        "matched_model_identities": 6,
+        "nonmatching_model_identities": 4,
+        "predicate_not_checked": 0,
+        "identity_not_checked": 0,
+        "conflicting_model_identities": 0,
+        "duplicate_representations": 6,
+        "file_identity_not_checked": 0,
+        "file_state_conflicts": 0,
+        "hierarchy_not_checked": 0,
+        "non_component_adapters": 0
+      },
+      "omissions": [],
+      "not_checked_samples": [],
+      "counts": {
+        "pass": 18,
+        "fail": 5,
+        "not_checked": 0,
+        "not_applicable": 1,
+        "elements": 6,
+        "rules": 4,
+        "findings": 5,
+        "affected_elements": 5,
+        "duplicate_groups": 1,
+        "severity": {
+          "error": 3,
+          "warning": 2
+        }
+      },
+      "rules": [
+        {
+          "rule_id": "QA-001",
+          "kind": "required_attribute",
+          "severity": "error",
+          "state": "fail",
+          "counts": {
+            "pass": 5,
+            "fail": 1,
+            "not_checked": 0,
+            "not_applicable": 0
+          },
+          "scope_complete": true,
+          "reason": "rule_evaluated"
+        },
+        {
+          "rule_id": "QA-002",
+          "kind": "unique_attribute",
+          "severity": "error",
+          "state": "fail",
+          "counts": {
+            "pass": 3,
+            "fail": 2,
+            "not_checked": 0,
+            "not_applicable": 1
+          },
+          "scope_complete": true,
+          "reason": "rule_evaluated"
+        },
+        {
+          "rule_id": "QA-003",
+          "kind": "required_layer",
+          "severity": "warning",
+          "state": "fail",
+          "counts": {
+            "pass": 5,
+            "fail": 1,
+            "not_checked": 0,
+            "not_applicable": 0
+          },
+          "scope_complete": true,
+          "reason": "rule_evaluated"
+        },
+        {
+          "rule_id": "QA-004",
+          "kind": "allowed_attribute_values",
+          "severity": "warning",
+          "state": "fail",
+          "counts": {
+            "pass": 5,
+            "fail": 1,
+            "not_checked": 0,
+            "not_applicable": 0
+          },
+          "scope_complete": true,
+          "reason": "rule_evaluated"
+        }
+      ],
+      "checks": [
+        {
+          "rule_id": "QA-001",
+          "severity": "error",
+          "state": "pass",
+          "reason": "value_present",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "mark",
+            "raw": {
+              "status": "observed",
+              "value": "S02"
+            },
+            "value_state": "present",
+            "normalized_value": "S02",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            }
+          },
+          "source_fingerprint": "47cbf1c5ed8876f953c1dfe1f3f91c24c2f0fb74b44eefe2bc5cc504f015b464",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-001",
+          "severity": "error",
+          "state": "pass",
+          "reason": "value_present",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "mark",
+            "raw": {
+              "status": "observed",
+              "value": "S05"
+            },
+            "value_state": "present",
+            "normalized_value": "S05",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            }
+          },
+          "source_fingerprint": "961cf979544c424b48d955f75906f2897a03d20d765cc6c7d57a167280b20266",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-001",
+          "severity": "error",
+          "state": "fail",
+          "reason": "required_value_missing",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "mark",
+            "raw": {
+              "status": "observed",
+              "value": "<niezdefiniowany>"
+            },
+            "value_state": "missing",
+            "normalized_value": null,
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            }
+          },
+          "source_fingerprint": "069d4b2fe9cdb31b5bd6f8c833e47e4237b7b66d24f1b6e3421d849275c7ceab",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-001",
+          "severity": "error",
+          "state": "pass",
+          "reason": "value_present",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "mark",
+            "raw": {
+              "status": "observed",
+              "value": "S02"
+            },
+            "value_state": "present",
+            "normalized_value": "S02",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            }
+          },
+          "source_fingerprint": "565cc5d93ac863e31605651fb60bdd69e05c2f98e1956187d9bc25545e903ee6",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-001",
+          "severity": "error",
+          "state": "pass",
+          "reason": "value_present",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "mark",
+            "raw": {
+              "status": "observed",
+              "value": "S06"
+            },
+            "value_state": "present",
+            "normalized_value": "S06",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            }
+          },
+          "source_fingerprint": "1b54a3a00f3868fa8ed09ba0c97375897e04599ab8d5adfd97e13f4ecd5c5dbb",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-001",
+          "severity": "error",
+          "state": "pass",
+          "reason": "value_present",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "eb88c850-0cac-408a-8091-f118872d74c2",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "mark",
+            "raw": {
+              "status": "observed",
+              "value": "S01"
+            },
+            "value_state": "present",
+            "normalized_value": "S01",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            }
+          },
+          "source_fingerprint": "ce88ebaae501aee38b8d53bb602efd1b43469117bc8b894f980fc0e261da956e",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-002",
+          "severity": "error",
+          "state": "fail",
+          "reason": "duplicate_value",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "mark",
+            "raw": {
+              "status": "observed",
+              "value": "S02"
+            },
+            "value_state": "present",
+            "normalized_value": "S02",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            },
+            "uniqueness_scope": [
+              "drawing_file",
+              "element_family"
+            ],
+            "observed_group_size": 2,
+            "members": [
+              {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              }
+            ],
+            "group_id": "839c4f5d0bac424cd93f314ca9a05dc010e7863ee579981a352778069072ccc5",
+            "scope_complete": true
+          },
+          "source_fingerprint": "47cbf1c5ed8876f953c1dfe1f3f91c24c2f0fb74b44eefe2bc5cc504f015b464",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-002",
+          "severity": "error",
+          "state": "pass",
+          "reason": "unique_value",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "mark",
+            "raw": {
+              "status": "observed",
+              "value": "S05"
+            },
+            "value_state": "present",
+            "normalized_value": "S05",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            },
+            "uniqueness_scope": [
+              "drawing_file",
+              "element_family"
+            ],
+            "observed_group_size": 1,
+            "members": [
+              {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              }
+            ],
+            "group_id": "7dd2e0221ef9a49a8a811c2bccede618888127a973cd72aa3b25876945113d97",
+            "scope_complete": true
+          },
+          "source_fingerprint": "961cf979544c424b48d955f75906f2897a03d20d765cc6c7d57a167280b20266",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-002",
+          "severity": "error",
+          "state": "not_applicable",
+          "reason": "missing_value_ignored",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "mark",
+            "raw": {
+              "status": "observed",
+              "value": "<niezdefiniowany>"
+            },
+            "value_state": "missing",
+            "normalized_value": null,
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            }
+          },
+          "source_fingerprint": "069d4b2fe9cdb31b5bd6f8c833e47e4237b7b66d24f1b6e3421d849275c7ceab",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-002",
+          "severity": "error",
+          "state": "fail",
+          "reason": "duplicate_value",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "mark",
+            "raw": {
+              "status": "observed",
+              "value": "S02"
+            },
+            "value_state": "present",
+            "normalized_value": "S02",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            },
+            "uniqueness_scope": [
+              "drawing_file",
+              "element_family"
+            ],
+            "observed_group_size": 2,
+            "members": [
+              {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              }
+            ],
+            "group_id": "839c4f5d0bac424cd93f314ca9a05dc010e7863ee579981a352778069072ccc5",
+            "scope_complete": true
+          },
+          "source_fingerprint": "565cc5d93ac863e31605651fb60bdd69e05c2f98e1956187d9bc25545e903ee6",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-002",
+          "severity": "error",
+          "state": "pass",
+          "reason": "unique_value",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "mark",
+            "raw": {
+              "status": "observed",
+              "value": "S06"
+            },
+            "value_state": "present",
+            "normalized_value": "S06",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            },
+            "uniqueness_scope": [
+              "drawing_file",
+              "element_family"
+            ],
+            "observed_group_size": 1,
+            "members": [
+              {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              }
+            ],
+            "group_id": "2fa93f072353dcd72471969bc7614ca7ab6cbdbfde6a3768cd2817b67f50fafb",
+            "scope_complete": true
+          },
+          "source_fingerprint": "1b54a3a00f3868fa8ed09ba0c97375897e04599ab8d5adfd97e13f4ecd5c5dbb",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-002",
+          "severity": "error",
+          "state": "pass",
+          "reason": "unique_value",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "eb88c850-0cac-408a-8091-f118872d74c2",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "mark",
+            "raw": {
+              "status": "observed",
+              "value": "S01"
+            },
+            "value_state": "present",
+            "normalized_value": "S01",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            },
+            "uniqueness_scope": [
+              "drawing_file",
+              "element_family"
+            ],
+            "observed_group_size": 1,
+            "members": [
+              {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "eb88c850-0cac-408a-8091-f118872d74c2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              }
+            ],
+            "group_id": "3119ffa029ad51fca74321b20d635d1f6c994f25d36c1468f3fa34c42a365354",
+            "scope_complete": true
+          },
+          "source_fingerprint": "ce88ebaae501aee38b8d53bb602efd1b43469117bc8b894f980fc0e261da956e",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-003",
+          "severity": "warning",
+          "state": "pass",
+          "reason": "expected_layer",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "layer_id",
+            "raw": {
+              "status": "observed",
+              "value": 3700
+            },
+            "expected": {
+              "layer_id": 3700,
+              "short_name": "SZ_OGÓ01",
+              "name": "SZ_OGÓ01 (Ogólne01)",
+              "write_eligibility": "not_checked"
+            }
+          },
+          "source_fingerprint": "47cbf1c5ed8876f953c1dfe1f3f91c24c2f0fb74b44eefe2bc5cc504f015b464",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-003",
+          "severity": "warning",
+          "state": "fail",
+          "reason": "unexpected_layer",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "layer_id",
+            "raw": {
+              "status": "observed",
+              "value": 3701
+            },
+            "expected": {
+              "layer_id": 3700,
+              "short_name": "SZ_OGÓ01",
+              "name": "SZ_OGÓ01 (Ogólne01)",
+              "write_eligibility": "not_checked"
+            }
+          },
+          "source_fingerprint": "961cf979544c424b48d955f75906f2897a03d20d765cc6c7d57a167280b20266",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-003",
+          "severity": "warning",
+          "state": "pass",
+          "reason": "expected_layer",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "layer_id",
+            "raw": {
+              "status": "observed",
+              "value": 3700
+            },
+            "expected": {
+              "layer_id": 3700,
+              "short_name": "SZ_OGÓ01",
+              "name": "SZ_OGÓ01 (Ogólne01)",
+              "write_eligibility": "not_checked"
+            }
+          },
+          "source_fingerprint": "069d4b2fe9cdb31b5bd6f8c833e47e4237b7b66d24f1b6e3421d849275c7ceab",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-003",
+          "severity": "warning",
+          "state": "pass",
+          "reason": "expected_layer",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "layer_id",
+            "raw": {
+              "status": "observed",
+              "value": 3700
+            },
+            "expected": {
+              "layer_id": 3700,
+              "short_name": "SZ_OGÓ01",
+              "name": "SZ_OGÓ01 (Ogólne01)",
+              "write_eligibility": "not_checked"
+            }
+          },
+          "source_fingerprint": "565cc5d93ac863e31605651fb60bdd69e05c2f98e1956187d9bc25545e903ee6",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-003",
+          "severity": "warning",
+          "state": "pass",
+          "reason": "expected_layer",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "layer_id",
+            "raw": {
+              "status": "observed",
+              "value": 3700
+            },
+            "expected": {
+              "layer_id": 3700,
+              "short_name": "SZ_OGÓ01",
+              "name": "SZ_OGÓ01 (Ogólne01)",
+              "write_eligibility": "not_checked"
+            }
+          },
+          "source_fingerprint": "1b54a3a00f3868fa8ed09ba0c97375897e04599ab8d5adfd97e13f4ecd5c5dbb",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-003",
+          "severity": "warning",
+          "state": "pass",
+          "reason": "expected_layer",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "eb88c850-0cac-408a-8091-f118872d74c2",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "layer_id",
+            "raw": {
+              "status": "observed",
+              "value": 3700
+            },
+            "expected": {
+              "layer_id": 3700,
+              "short_name": "SZ_OGÓ01",
+              "name": "SZ_OGÓ01 (Ogólne01)",
+              "write_eligibility": "not_checked"
+            }
+          },
+          "source_fingerprint": "ce88ebaae501aee38b8d53bb602efd1b43469117bc8b894f980fc0e261da956e",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-004",
+          "severity": "warning",
+          "state": "pass",
+          "reason": "allowed_value",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "status",
+            "raw": {
+              "status": "observed",
+              "value": "NEW"
+            },
+            "value_state": "present",
+            "normalized_value": "NEW",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            },
+            "allowed_values": [
+              "NEW",
+              "EXISTING"
+            ]
+          },
+          "source_fingerprint": "47cbf1c5ed8876f953c1dfe1f3f91c24c2f0fb74b44eefe2bc5cc504f015b464",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-004",
+          "severity": "warning",
+          "state": "pass",
+          "reason": "allowed_value",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "status",
+            "raw": {
+              "status": "observed",
+              "value": "NEW"
+            },
+            "value_state": "present",
+            "normalized_value": "NEW",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            },
+            "allowed_values": [
+              "NEW",
+              "EXISTING"
+            ]
+          },
+          "source_fingerprint": "961cf979544c424b48d955f75906f2897a03d20d765cc6c7d57a167280b20266",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-004",
+          "severity": "warning",
+          "state": "pass",
+          "reason": "allowed_value",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "status",
+            "raw": {
+              "status": "observed",
+              "value": "NEW"
+            },
+            "value_state": "present",
+            "normalized_value": "NEW",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            },
+            "allowed_values": [
+              "NEW",
+              "EXISTING"
+            ]
+          },
+          "source_fingerprint": "069d4b2fe9cdb31b5bd6f8c833e47e4237b7b66d24f1b6e3421d849275c7ceab",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-004",
+          "severity": "warning",
+          "state": "pass",
+          "reason": "allowed_value",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "status",
+            "raw": {
+              "status": "observed",
+              "value": "NEW"
+            },
+            "value_state": "present",
+            "normalized_value": "NEW",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            },
+            "allowed_values": [
+              "NEW",
+              "EXISTING"
+            ]
+          },
+          "source_fingerprint": "565cc5d93ac863e31605651fb60bdd69e05c2f98e1956187d9bc25545e903ee6",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-004",
+          "severity": "warning",
+          "state": "fail",
+          "reason": "value_not_allowed",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "status",
+            "raw": {
+              "status": "observed",
+              "value": "NWE"
+            },
+            "value_state": "present",
+            "normalized_value": "NWE",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            },
+            "allowed_values": [
+              "NEW",
+              "EXISTING"
+            ]
+          },
+          "source_fingerprint": "1b54a3a00f3868fa8ed09ba0c97375897e04599ab8d5adfd97e13f4ecd5c5dbb",
+          "usable_for_write": false
+        },
+        {
+          "rule_id": "QA-004",
+          "severity": "warning",
+          "state": "pass",
+          "reason": "allowed_value",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "eb88c850-0cac-408a-8091-f118872d74c2",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "status",
+            "raw": {
+              "status": "observed",
+              "value": "NEW"
+            },
+            "value_state": "present",
+            "normalized_value": "NEW",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            },
+            "allowed_values": [
+              "NEW",
+              "EXISTING"
+            ]
+          },
+          "source_fingerprint": "ce88ebaae501aee38b8d53bb602efd1b43469117bc8b894f980fc0e261da956e",
+          "usable_for_write": false
+        }
+      ],
+      "findings": [
+        {
+          "rule_id": "QA-001",
+          "severity": "error",
+          "state": "fail",
+          "reason": "required_value_missing",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "mark",
+            "raw": {
+              "status": "observed",
+              "value": "<niezdefiniowany>"
+            },
+            "value_state": "missing",
+            "normalized_value": null,
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            }
+          },
+          "source_fingerprint": "069d4b2fe9cdb31b5bd6f8c833e47e4237b7b66d24f1b6e3421d849275c7ceab",
+          "usable_for_write": false,
+          "finding_id": "302182a17667934d314275a1c383d818a89d88f1320ed9f85e7c908f835a500b",
+          "locator": {
+            "method": "drawing_file_mark_location",
+            "drawing_file": 101,
+            "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+            "mark": {
+              "status": "observed",
+              "value": "<niezdefiniowany>"
+            },
+            "layer_id": {
+              "status": "observed",
+              "value": 3700
+            },
+            "bounding_box_mm": {
+              "status": "observed",
+              "value": {
+                "min": [
+                  11800.0,
+                  -200.0,
+                  9.0951551845464e-15
+                ],
+                "max": [
+                  12200.0,
+                  200.0,
+                  3000.0
+                ],
+                "unit": "mm",
+                "frame": "model_local",
+                "source_api": "GetModelGeometry/CalcMinMax",
+                "source_frame": "model_local",
+                "offset_mm": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "offset_applied": false,
+                "runtime_verified": false
+              }
+            },
+            "center_mm": {
+              "status": "observed",
+              "value": [
+                12000.0,
+                0.0,
+                1500.0
+              ],
+              "frame": "model_local"
+            },
+            "highlight": "not_requested",
+            "usable_for_write": false
+          },
+          "remedy": "Assign a reviewed, nonempty mark.",
+          "remedy_applied": false
+        },
+        {
+          "rule_id": "QA-002",
+          "severity": "error",
+          "state": "fail",
+          "reason": "duplicate_value",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "mark",
+            "raw": {
+              "status": "observed",
+              "value": "S02"
+            },
+            "value_state": "present",
+            "normalized_value": "S02",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            },
+            "uniqueness_scope": [
+              "drawing_file",
+              "element_family"
+            ],
+            "observed_group_size": 2,
+            "members": [
+              {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              }
+            ],
+            "group_id": "839c4f5d0bac424cd93f314ca9a05dc010e7863ee579981a352778069072ccc5",
+            "scope_complete": true
+          },
+          "source_fingerprint": "47cbf1c5ed8876f953c1dfe1f3f91c24c2f0fb74b44eefe2bc5cc504f015b464",
+          "usable_for_write": false,
+          "finding_id": "fad5717f603b675cdf64dce2fdd5aabe76caf0aa35fd6b3aaedff4c160a54189",
+          "locator": {
+            "method": "drawing_file_mark_location",
+            "drawing_file": 101,
+            "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+            "mark": {
+              "status": "observed",
+              "value": "S02"
+            },
+            "layer_id": {
+              "status": "observed",
+              "value": 3700
+            },
+            "bounding_box_mm": {
+              "status": "observed",
+              "value": {
+                "min": [
+                  -200.00000000000017,
+                  5800.0,
+                  9.0951551845464e-15
+                ],
+                "max": [
+                  200.00000000000017,
+                  6200.0,
+                  3000.0
+                ],
+                "unit": "mm",
+                "frame": "model_local",
+                "source_api": "GetModelGeometry/CalcMinMax",
+                "source_frame": "model_local",
+                "offset_mm": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "offset_applied": false,
+                "runtime_verified": false
+              }
+            },
+            "center_mm": {
+              "status": "observed",
+              "value": [
+                0.0,
+                6000.0,
+                1500.0
+              ],
+              "frame": "model_local"
+            },
+            "highlight": "not_requested",
+            "usable_for_write": false
+          },
+          "remedy": "Review the duplicate group and assign distinct marks within the drawing file and element family.",
+          "remedy_applied": false
+        },
+        {
+          "rule_id": "QA-002",
+          "severity": "error",
+          "state": "fail",
+          "reason": "duplicate_value",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "mark",
+            "raw": {
+              "status": "observed",
+              "value": "S02"
+            },
+            "value_state": "present",
+            "normalized_value": "S02",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            },
+            "uniqueness_scope": [
+              "drawing_file",
+              "element_family"
+            ],
+            "observed_group_size": 2,
+            "members": [
+              {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              }
+            ],
+            "group_id": "839c4f5d0bac424cd93f314ca9a05dc010e7863ee579981a352778069072ccc5",
+            "scope_complete": true
+          },
+          "source_fingerprint": "565cc5d93ac863e31605651fb60bdd69e05c2f98e1956187d9bc25545e903ee6",
+          "usable_for_write": false,
+          "finding_id": "866651170c5705f4bf614a0c886150f4e678e347a96acbfd3f6e0f29f63243d1",
+          "locator": {
+            "method": "drawing_file_mark_location",
+            "drawing_file": 101,
+            "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+            "mark": {
+              "status": "observed",
+              "value": "S02"
+            },
+            "layer_id": {
+              "status": "observed",
+              "value": 3700
+            },
+            "bounding_box_mm": {
+              "status": "observed",
+              "value": {
+                "min": [
+                  5800.0,
+                  -200.0,
+                  9.0951551845464e-15
+                ],
+                "max": [
+                  6200.0,
+                  200.0,
+                  3000.0
+                ],
+                "unit": "mm",
+                "frame": "model_local",
+                "source_api": "GetModelGeometry/CalcMinMax",
+                "source_frame": "model_local",
+                "offset_mm": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "offset_applied": false,
+                "runtime_verified": false
+              }
+            },
+            "center_mm": {
+              "status": "observed",
+              "value": [
+                6000.0,
+                0.0,
+                1500.0
+              ],
+              "frame": "model_local"
+            },
+            "highlight": "not_requested",
+            "usable_for_write": false
+          },
+          "remedy": "Review the duplicate group and assign distinct marks within the drawing file and element family.",
+          "remedy_applied": false
+        },
+        {
+          "rule_id": "QA-003",
+          "severity": "warning",
+          "state": "fail",
+          "reason": "unexpected_layer",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "layer_id",
+            "raw": {
+              "status": "observed",
+              "value": 3701
+            },
+            "expected": {
+              "layer_id": 3700,
+              "short_name": "SZ_OGÓ01",
+              "name": "SZ_OGÓ01 (Ogólne01)",
+              "write_eligibility": "not_checked"
+            }
+          },
+          "source_fingerprint": "961cf979544c424b48d955f75906f2897a03d20d765cc6c7d57a167280b20266",
+          "usable_for_write": false,
+          "finding_id": "12eff77ed426c85397d81f2abe0c865b54acd1d70d9c79e0f0a1ffa3fac89ef9",
+          "locator": {
+            "method": "drawing_file_mark_location",
+            "drawing_file": 101,
+            "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+            "mark": {
+              "status": "observed",
+              "value": "S05"
+            },
+            "layer_id": {
+              "status": "observed",
+              "value": 3701
+            },
+            "bounding_box_mm": {
+              "status": "observed",
+              "value": {
+                "min": [
+                  5800.0,
+                  5800.0,
+                  9.0951551845464e-15
+                ],
+                "max": [
+                  6200.0,
+                  6200.0,
+                  3000.0
+                ],
+                "unit": "mm",
+                "frame": "model_local",
+                "source_api": "GetModelGeometry/CalcMinMax",
+                "source_frame": "model_local",
+                "offset_mm": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "offset_applied": false,
+                "runtime_verified": false
+              }
+            },
+            "center_mm": {
+              "status": "observed",
+              "value": [
+                6000.0,
+                6000.0,
+                1500.0
+              ],
+              "frame": "model_local"
+            },
+            "highlight": "not_requested",
+            "usable_for_write": false
+          },
+          "remedy": "Review the layer assignment; the profile expects SZ_OGÓ01.",
+          "remedy_applied": false
+        },
+        {
+          "rule_id": "QA-004",
+          "severity": "warning",
+          "state": "fail",
+          "reason": "value_not_allowed",
+          "ref": {
+            "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+            "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+            "document_id": 0,
+            "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+            "drawing_file": 101,
+            "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "durable_identity_verified": false,
+            "component_kind": "top_level_component"
+          },
+          "evidence": {
+            "field": "status",
+            "raw": {
+              "status": "observed",
+              "value": "NWE"
+            },
+            "value_state": "present",
+            "normalized_value": "NWE",
+            "policy": {
+              "trim": true,
+              "case_sensitive": true,
+              "missing": {
+                "absent": true,
+                "null": true,
+                "empty": true,
+                "literals": [
+                  "<niezdefiniowany>"
+                ]
+              }
+            },
+            "allowed_values": [
+              "NEW",
+              "EXISTING"
+            ]
+          },
+          "source_fingerprint": "1b54a3a00f3868fa8ed09ba0c97375897e04599ab8d5adfd97e13f4ecd5c5dbb",
+          "usable_for_write": false,
+          "finding_id": "2ec8ecd4e0ea93aaadf746ad52e7a38bbac5157a8a778c2a39f21cd3dcb5b36f",
+          "locator": {
+            "method": "drawing_file_mark_location",
+            "drawing_file": 101,
+            "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+            "mark": {
+              "status": "observed",
+              "value": "S06"
+            },
+            "layer_id": {
+              "status": "observed",
+              "value": 3700
+            },
+            "bounding_box_mm": {
+              "status": "observed",
+              "value": {
+                "min": [
+                  11800.0,
+                  5800.0,
+                  9.0951551845464e-15
+                ],
+                "max": [
+                  12200.0,
+                  6200.0,
+                  3000.0
+                ],
+                "unit": "mm",
+                "frame": "model_local",
+                "source_api": "GetModelGeometry/CalcMinMax",
+                "source_frame": "model_local",
+                "offset_mm": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "offset_applied": false,
+                "runtime_verified": false
+              }
+            },
+            "center_mm": {
+              "status": "observed",
+              "value": [
+                12000.0,
+                6000.0,
+                1500.0
+              ],
+              "frame": "model_local"
+            },
+            "highlight": "not_requested",
+            "usable_for_write": false
+          },
+          "remedy": "Review the status; allowed values are NEW and EXISTING.",
+          "remedy_applied": false
+        }
+      ],
+      "report_text": "Audit native-model-qa-demo 2.0.0: fail.\n6 elements; 5 findings on 5 elements; 0 unchecked checks.\nRequested scope complete: True; audit complete: True.\nQA-001 (error): fail {'pass': 5, 'fail': 1, 'not_checked': 0, 'not_applicable': 0}\nQA-002 (error): fail {'pass': 3, 'fail': 2, 'not_checked': 0, 'not_applicable': 1}\nQA-003 (warning): fail {'pass': 5, 'fail': 1, 'not_checked': 0, 'not_applicable': 0}\nQA-004 (warning): fail {'pass': 5, 'fail': 1, 'not_checked': 0, 'not_applicable': 0}\nQA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm (model_local): required_value_missing. Assign a reviewed, nonempty mark.\nQA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.\nQA-002: file 101, mark 'S02', model 80211557-a3c1-4ccd-84d9-1274ec533776, center [6000.0, 0.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.\nQA-003: file 101, mark 'S05', model 51db6258-4f95-4fab-ac80-8948e13bfd21, center [6000.0, 6000.0, 1500.0] mm (model_local): unexpected_layer. Review the layer assignment; the profile expects SZ_OGÓ01.\nQA-004: file 101, mark 'S06', model d26a3d87-2981-4657-b592-65c894ce41ba, center [12000.0, 6000.0, 1500.0] mm (model_local): value_not_allowed. Review the status; allowed values are NEW and EXISTING.",
+      "usable_for_write": false,
+      "reference_lifetime": "host_session_project_document_snapshot; rerun after model changes or restart",
+      "report_fingerprint": "9fdbd2b408a809adced51a3efaf62fc074251fbf76cff271199076123527447a",
+      "request_id": "31aa582a-2b69-4772-8b24-c38e0401ab81",
+      "host_session_id": "e088efb4-0747-4de4-811e-3f75f54c43bb"
+    }
+  },
+  "m3_preview": {
+    "checks_complete": true,
+    "steps": [
+      {
+        "name": "host_boundary_preflight",
+        "ok": true,
+        "expected_package_version": "0.7.0"
+      },
+      {
+        "name": "preview",
+        "ok": true,
+        "response": {
+          "schema_version": "m3-repair-1",
+          "action": "preview",
+          "read_only": true,
+          "state": "preview_ready",
+          "plan_id": "af6d9e4c16704c3a90c8925eefbc9b98",
+          "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+          "profile_id": "native-model-qa-demo",
+          "profile_version": "2.0.0",
+          "profile_fingerprint": "ec2b81ca093d42c8026010b5b93b977bfca146e1e70fcd1570dd5a2065ab87be",
+          "source_fingerprint": "52d0849293b2c8645d392b1484f197cbf09947f55a70738b603715f1464f3f1e",
+          "audit_report_fingerprint": "9fdbd2b408a809adced51a3efaf62fc074251fbf76cff271199076123527447a",
+          "scope": {
+            "requested": {
+              "drawing_files": [
+                101
+              ],
+              "include_passive": false,
+              "visibility": "api_select_all"
+            },
+            "included_files": [
+              {
+                "drawing_file": 101,
+                "state": "active_foreground",
+                "write_eligibility": "not_checked"
+              }
+            ]
+          },
+          "coverage": {
+            "scan_complete": true,
+            "requested_scope_complete": true,
+            "returned_fields_complete": true,
+            "returned_fields_not_checked": 0,
+            "whole_project": false,
+            "unloaded_files": "not_enumerated",
+            "visibility": "api_select_all_screen_and_occlusion_not_checked",
+            "count_kind": "supported_native_top_level_components",
+            "native_component_counts": "implemented_runtime_pending",
+            "supported_component_types": [
+              "Beam_TypeUUID",
+              "Column_TypeUUID",
+              "MultiSlab_TypeUUID",
+              "SkeletonBeam_TypeUUID",
+              "Slab_TypeUUID",
+              "Wall_TypeUUID"
+            ],
+            "geometry_units_offset": "implemented_runtime_pending",
+            "rule_inputs_complete": true,
+            "audit_complete": true,
+            "uses_full_snapshot": true,
+            "durable_identity_verified": false
+          },
+          "changes": [
+            {
+              "finding_id": "12eff77ed426c85397d81f2abe0c865b54acd1d70d9c79e0f0a1ffa3fac89ef9",
+              "rule_id": "QA-003",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "locator": {
+                "method": "drawing_file_mark_location",
+                "drawing_file": 101,
+                "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+                "mark": {
+                  "status": "observed",
+                  "value": "S05"
+                },
+                "layer_id": {
+                  "status": "observed",
+                  "value": 3701
+                },
+                "bounding_box_mm": {
+                  "status": "observed",
+                  "value": {
+                    "min": [
+                      5800.0,
+                      5800.0,
+                      9.0951551845464e-15
+                    ],
+                    "max": [
+                      6200.0,
+                      6200.0,
+                      3000.0
+                    ],
+                    "unit": "mm",
+                    "frame": "model_local",
+                    "source_api": "GetModelGeometry/CalcMinMax",
+                    "source_frame": "model_local",
+                    "offset_mm": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "offset_applied": false,
+                    "runtime_verified": false
+                  }
+                },
+                "center_mm": {
+                  "status": "observed",
+                  "value": [
+                    6000.0,
+                    6000.0,
+                    1500.0
+                  ],
+                  "frame": "model_local"
+                },
+                "highlight": "not_requested",
+                "usable_for_write": false
+              },
+              "operation": "set_layer",
+              "field": "layer_id",
+              "resource": {
+                "layer_id": 3700,
+                "short_name": "SZ_OGÓ01",
+                "name": "SZ_OGÓ01 (Ogólne01)",
+                "write_eligibility": "not_checked"
+              },
+              "old_value": {
+                "status": "observed",
+                "value": 3701
+              },
+              "new_value": 3700,
+              "source_fingerprint": "961cf979544c424b48d955f75906f2897a03d20d765cc6c7d57a167280b20266",
+              "write_eligibility": "not_checked"
+            },
+            {
+              "finding_id": "2ec8ecd4e0ea93aaadf746ad52e7a38bbac5157a8a778c2a39f21cd3dcb5b36f",
+              "rule_id": "QA-004",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "locator": {
+                "method": "drawing_file_mark_location",
+                "drawing_file": 101,
+                "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+                "mark": {
+                  "status": "observed",
+                  "value": "S06"
+                },
+                "layer_id": {
+                  "status": "observed",
+                  "value": 3700
+                },
+                "bounding_box_mm": {
+                  "status": "observed",
+                  "value": {
+                    "min": [
+                      11800.0,
+                      5800.0,
+                      9.0951551845464e-15
+                    ],
+                    "max": [
+                      12200.0,
+                      6200.0,
+                      3000.0
+                    ],
+                    "unit": "mm",
+                    "frame": "model_local",
+                    "source_api": "GetModelGeometry/CalcMinMax",
+                    "source_frame": "model_local",
+                    "offset_mm": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "offset_applied": false,
+                    "runtime_verified": false
+                  }
+                },
+                "center_mm": {
+                  "status": "observed",
+                  "value": [
+                    12000.0,
+                    6000.0,
+                    1500.0
+                  ],
+                  "frame": "model_local"
+                },
+                "highlight": "not_requested",
+                "usable_for_write": false
+              },
+              "operation": "set_attribute",
+              "field": "attribute:5002",
+              "resource": {
+                "attribute_id": 5002,
+                "name": "MCP_QA_STATUS",
+                "type_code": 67,
+                "data_type": "string",
+                "write_eligibility": "not_checked"
+              },
+              "old_value": {
+                "status": "observed",
+                "value": "NWE"
+              },
+              "new_value": "NEW",
+              "source_fingerprint": "1b54a3a00f3868fa8ed09ba0c97375897e04599ab8d5adfd97e13f4ecd5c5dbb",
+              "write_eligibility": "not_checked"
+            }
+          ],
+          "exclusions": [
+            {
+              "finding_id": "302182a17667934d314275a1c383d818a89d88f1320ed9f85e7c908f835a500b",
+              "rule_id": "QA-001",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "reason": "rule_not_selected"
+            },
+            {
+              "finding_id": "fad5717f603b675cdf64dce2fdd5aabe76caf0aa35fd6b3aaedff4c160a54189",
+              "rule_id": "QA-002",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "reason": "rule_not_selected"
+            },
+            {
+              "finding_id": "866651170c5705f4bf614a0c886150f4e678e347a96acbfd3f6e0f29f63243d1",
+              "rule_id": "QA-002",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "reason": "rule_not_selected"
+            }
+          ],
+          "counts": {
+            "changes": 2,
+            "excluded_findings": 3,
+            "audit_findings": 5
+          },
+          "capabilities": {
+            "method": "symbol_inspection_without_invocation",
+            "symbols": {
+              "ElementsAttributeService.ChangeAttributes": {
+                "status": "observed",
+                "callable": true,
+                "doc": "\nChangeAttributes( (list)attributeDataList, (BaseElementAdapterList)elements [, (bool)setUndefAttrib=False [, (bool)setDeleteAttrib=False]]) -> BaseElementAdapterList :\n    Change an attribute\n    \n    Parameter: attributeDataList   List with the attribute data as tuple(number, value)\n               elements            Elements as BaseElementAdapterList\n               setUndefAttrib      Set Attribute undefined (optional)\n               setDeleteAttrib     Delete Attribute (optional)\n    \n    Return:  Modified elements"
+              },
+              "ElementsLayerService.ChangeLayer": {
+                "status": "observed",
+                "callable": true,
+                "doc": "\nChangeLayer( (BaseElementAdapterList)elements, (wstring)newValue) -> BaseElementAdapterList :\n    Change the Layer\n    \n    Parameter: elements           Elements to change\n               newValue           New value\n    \n    Return:  List with the modified elements"
+              }
+            },
+            "per_element_writability": "not_checked",
+            "native_write_readback": "not_checked",
+            "undo": "not_checked",
+            "durable_retry_deduplication": "not_implemented",
+            "apply_available": false
+          },
+          "apply_available": false,
+          "usable_for_write": false,
+          "allplan_acceptance": "not_run",
+          "runtime_verified": false,
+          "expires_after_seconds": 300,
+          "reference_lifetime": "host_session_project_document_snapshot; no persistence or authorization",
+          "report_text": "Repair preview: 2 proposed changes; 3 excluded findings.\nAudit complete: True. Read-only; native apply unavailable.\nQA-003: file 101, mark 'S05', model 51db6258-4f95-4fab-ac80-8948e13bfd21, center [6000.0, 6000.0, 1500.0] mm: layer_id 3701 -> 3700.\nQA-004: file 101, mark 'S06', model d26a3d87-2981-4657-b592-65c894ce41ba, center [12000.0, 6000.0, 1500.0] mm: attribute:5002 'NWE' -> 'NEW'.",
+          "plan_hash": "dce2f1115124cc417784a070802f2c3a9373a76272e6f216bde804188d46a1d2",
+          "request_id": "f92d66a5-40bd-4e1e-8e26-c046f95b65a7",
+          "host_session_id": "e088efb4-0747-4de4-811e-3f75f54c43bb"
+        }
+      },
+      {
+        "name": "revalidate",
+        "ok": true,
+        "response": {
+          "schema_version": "m3-repair-1",
+          "action": "revalidate",
+          "read_only": true,
+          "plan_id": "af6d9e4c16704c3a90c8925eefbc9b98",
+          "plan_hash": "dce2f1115124cc417784a070802f2c3a9373a76272e6f216bde804188d46a1d2",
+          "state": "unchanged",
+          "source_unchanged": true,
+          "current_source_fingerprint": "52d0849293b2c8645d392b1484f197cbf09947f55a70738b603715f1464f3f1e",
+          "current_audit_report_fingerprint": "9fdbd2b408a809adced51a3efaf62fc074251fbf76cff271199076123527447a",
+          "expires_in_seconds": 299,
+          "apply_available": false,
+          "usable_for_write": false,
+          "report_text": "Plan evidence unchanged; apply remains unavailable.",
+          "request_id": "ec530234-8391-40c3-b354-a66cc0efa2a8",
+          "host_session_id": "e088efb4-0747-4de4-811e-3f75f54c43bb"
+        }
+      },
+      {
+        "name": "audit_after_preview",
+        "ok": true,
+        "response": {
+          "schema_version": "m2-audit-1",
+          "read_only": true,
+          "runtime_verified": false,
+          "allplan_acceptance": "not_run",
+          "state": "fail",
+          "profile_id": "native-model-qa-demo",
+          "profile_version": "2.0.0",
+          "profile_fingerprint": "ec2b81ca093d42c8026010b5b93b977bfca146e1e70fcd1570dd5a2065ab87be",
+          "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+          "source_fingerprint": "52d0849293b2c8645d392b1484f197cbf09947f55a70738b603715f1464f3f1e",
+          "profile_binding": {
+            "schema_version": "m1-profile-binding-1",
+            "profile_id": "native-model-qa-demo",
+            "profile_version": "1.0.2",
+            "profile": {
+              "schema_version": "m1-profile-1",
+              "profile_id": "native-model-qa-demo",
+              "profile_version": "1.0.2",
+              "target": {
+                "allplan_major_version": 2026,
+                "native_type_name": "Column_TypeUUID",
+                "native_type_id": "ac9415e3-4337-4860-8cd4-2f0d48596f12"
+              },
+              "units": {
+                "length": "mm",
+                "angle": "deg",
+                "frame": "model_local"
+              },
+              "scope": {
+                "drawing_files": [
+                  101
+                ],
+                "uniqueness_scope": [
+                  "drawing_file",
+                  "element_family"
+                ],
+                "floor_mapping": {
+                  "101": "Ground",
+                  "102": "Reference",
+                  "103": "Excluded"
+                }
+              },
+              "bindings": {
+                "attributes": {
+                  "mark": {
+                    "name": "MCP_QA_MARK",
+                    "data_type": "string",
+                    "expected_type_code": 67
+                  },
+                  "status": {
+                    "name": "MCP_QA_STATUS",
+                    "data_type": "string",
+                    "expected_type_code": 67
+                  }
+                },
+                "layers": {
+                  "structure": {
+                    "short_name": "SZ_OGÓ01"
+                  },
+                  "review": {
+                    "short_name": "SZ_OGÓ02"
+                  }
+                }
+              },
+              "rules": [
+                {
+                  "rule_id": "QA-001",
+                  "kind": "required_attribute",
+                  "attribute": "mark"
+                },
+                {
+                  "rule_id": "QA-002",
+                  "kind": "unique_attribute",
+                  "attribute": "mark",
+                  "ignore_missing": true
+                },
+                {
+                  "rule_id": "QA-003",
+                  "kind": "required_layer",
+                  "expected_layer": "structure"
+                },
+                {
+                  "rule_id": "QA-004",
+                  "kind": "allowed_attribute_values",
+                  "attribute": "status",
+                  "allowed_values": [
+                    "NEW",
+                    "EXISTING"
+                  ],
+                  "repair_mapping": {
+                    "NWE": "NEW"
+                  }
+                }
+              ],
+              "numeric_tolerances": {
+                "length_mm": 1.0
+              }
+            },
+            "status": "bound_for_read",
+            "read_only": true,
+            "attributes": {
+              "mark": {
+                "status": "observed",
+                "value": {
+                  "attribute_id": 5001,
+                  "name": "MCP_QA_MARK",
+                  "type_code": 67,
+                  "data_type": "string",
+                  "write_eligibility": "not_checked"
+                }
+              },
+              "status": {
+                "status": "observed",
+                "value": {
+                  "attribute_id": 5002,
+                  "name": "MCP_QA_STATUS",
+                  "type_code": 67,
+                  "data_type": "string",
+                  "write_eligibility": "not_checked"
+                }
+              }
+            },
+            "layers": {
+              "structure": {
+                "status": "observed",
+                "value": {
+                  "layer_id": 3700,
+                  "short_name": "SZ_OGÓ01",
+                  "name": "SZ_OGÓ01 (Ogólne01)",
+                  "write_eligibility": "not_checked"
+                }
+              },
+              "review": {
+                "status": "observed",
+                "value": {
+                  "layer_id": 3701,
+                  "short_name": "SZ_OGÓ02",
+                  "name": "SZ_OGÓ02 (Ogólne02)",
+                  "write_eligibility": "not_checked"
+                }
+              }
+            },
+            "project": {
+              "status": "observed",
+              "value": {
+                "name": "MCP_QA_DEMO",
+                "host": "localhost",
+                "key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "key_status": "observed",
+                "key_kind": "name_host_path_sha256",
+                "durable_identity_verified": false,
+                "path_lookup_attempts": [
+                  {
+                    "argument_order": "project_name_host_name",
+                    "status": "observed",
+                    "value": {
+                      "error": -1,
+                      "path": ""
+                    }
+                  },
+                  {
+                    "argument_order": "host_name_project_name",
+                    "status": "observed",
+                    "value": {
+                      "error": 0,
+                      "path": "C:\\Users\\dawid\\Documents\\rok IV\\Praktyki\\MCP_QA_DEMO.prj"
+                    }
+                  }
+                ]
+              }
+            },
+            "document_id": {
+              "status": "observed",
+              "value": 0
+            },
+            "levels": {
+              "status": "observed",
+              "source": "profile_configuration_not_native_BWS",
+              "value": {
+                "101": "Ground",
+                "102": "Reference",
+                "103": "Excluded"
+              }
+            },
+            "runtime_verified": false,
+            "active_for_write": false,
+            "write_eligibility": "not_checked",
+            "binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf"
+          },
+          "scope": {
+            "requested": {
+              "drawing_files": [
+                101
+              ],
+              "include_passive": false,
+              "visibility": "api_select_all"
+            },
+            "included_files": [
+              {
+                "drawing_file": 101,
+                "state": "active_foreground",
+                "write_eligibility": "not_checked"
+              }
+            ]
+          },
+          "coverage": {
+            "scan_complete": true,
+            "requested_scope_complete": true,
+            "returned_fields_complete": true,
+            "returned_fields_not_checked": 0,
+            "whole_project": false,
+            "unloaded_files": "not_enumerated",
+            "visibility": "api_select_all_screen_and_occlusion_not_checked",
+            "count_kind": "supported_native_top_level_components",
+            "native_component_counts": "implemented_runtime_pending",
+            "supported_component_types": [
+              "Beam_TypeUUID",
+              "Column_TypeUUID",
+              "MultiSlab_TypeUUID",
+              "SkeletonBeam_TypeUUID",
+              "Slab_TypeUUID",
+              "Wall_TypeUUID"
+            ],
+            "geometry_units_offset": "implemented_runtime_pending",
+            "rule_inputs_complete": true,
+            "audit_complete": true,
+            "uses_full_snapshot": true,
+            "durable_identity_verified": false
+          },
+          "scan_counts": {
+            "raw_adapters_visited": 16,
+            "in_scope_adapters": 16,
+            "matched_model_identities": 6,
+            "nonmatching_model_identities": 4,
+            "predicate_not_checked": 0,
+            "identity_not_checked": 0,
+            "conflicting_model_identities": 0,
+            "duplicate_representations": 6,
+            "file_identity_not_checked": 0,
+            "file_state_conflicts": 0,
+            "hierarchy_not_checked": 0,
+            "non_component_adapters": 0
+          },
+          "omissions": [],
+          "not_checked_samples": [],
+          "counts": {
+            "pass": 18,
+            "fail": 5,
+            "not_checked": 0,
+            "not_applicable": 1,
+            "elements": 6,
+            "rules": 4,
+            "findings": 5,
+            "affected_elements": 5,
+            "duplicate_groups": 1,
+            "severity": {
+              "error": 3,
+              "warning": 2
+            }
+          },
+          "rules": [
+            {
+              "rule_id": "QA-001",
+              "kind": "required_attribute",
+              "severity": "error",
+              "state": "fail",
+              "counts": {
+                "pass": 5,
+                "fail": 1,
+                "not_checked": 0,
+                "not_applicable": 0
+              },
+              "scope_complete": true,
+              "reason": "rule_evaluated"
+            },
+            {
+              "rule_id": "QA-002",
+              "kind": "unique_attribute",
+              "severity": "error",
+              "state": "fail",
+              "counts": {
+                "pass": 3,
+                "fail": 2,
+                "not_checked": 0,
+                "not_applicable": 1
+              },
+              "scope_complete": true,
+              "reason": "rule_evaluated"
+            },
+            {
+              "rule_id": "QA-003",
+              "kind": "required_layer",
+              "severity": "warning",
+              "state": "fail",
+              "counts": {
+                "pass": 5,
+                "fail": 1,
+                "not_checked": 0,
+                "not_applicable": 0
+              },
+              "scope_complete": true,
+              "reason": "rule_evaluated"
+            },
+            {
+              "rule_id": "QA-004",
+              "kind": "allowed_attribute_values",
+              "severity": "warning",
+              "state": "fail",
+              "counts": {
+                "pass": 5,
+                "fail": 1,
+                "not_checked": 0,
+                "not_applicable": 0
+              },
+              "scope_complete": true,
+              "reason": "rule_evaluated"
+            }
+          ],
+          "checks": [
+            {
+              "rule_id": "QA-001",
+              "severity": "error",
+              "state": "pass",
+              "reason": "value_present",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "mark",
+                "raw": {
+                  "status": "observed",
+                  "value": "S02"
+                },
+                "value_state": "present",
+                "normalized_value": "S02",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                }
+              },
+              "source_fingerprint": "47cbf1c5ed8876f953c1dfe1f3f91c24c2f0fb74b44eefe2bc5cc504f015b464",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-001",
+              "severity": "error",
+              "state": "pass",
+              "reason": "value_present",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "mark",
+                "raw": {
+                  "status": "observed",
+                  "value": "S05"
+                },
+                "value_state": "present",
+                "normalized_value": "S05",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                }
+              },
+              "source_fingerprint": "961cf979544c424b48d955f75906f2897a03d20d765cc6c7d57a167280b20266",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-001",
+              "severity": "error",
+              "state": "fail",
+              "reason": "required_value_missing",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "mark",
+                "raw": {
+                  "status": "observed",
+                  "value": "<niezdefiniowany>"
+                },
+                "value_state": "missing",
+                "normalized_value": null,
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                }
+              },
+              "source_fingerprint": "069d4b2fe9cdb31b5bd6f8c833e47e4237b7b66d24f1b6e3421d849275c7ceab",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-001",
+              "severity": "error",
+              "state": "pass",
+              "reason": "value_present",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "mark",
+                "raw": {
+                  "status": "observed",
+                  "value": "S02"
+                },
+                "value_state": "present",
+                "normalized_value": "S02",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                }
+              },
+              "source_fingerprint": "565cc5d93ac863e31605651fb60bdd69e05c2f98e1956187d9bc25545e903ee6",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-001",
+              "severity": "error",
+              "state": "pass",
+              "reason": "value_present",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "mark",
+                "raw": {
+                  "status": "observed",
+                  "value": "S06"
+                },
+                "value_state": "present",
+                "normalized_value": "S06",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                }
+              },
+              "source_fingerprint": "1b54a3a00f3868fa8ed09ba0c97375897e04599ab8d5adfd97e13f4ecd5c5dbb",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-001",
+              "severity": "error",
+              "state": "pass",
+              "reason": "value_present",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "eb88c850-0cac-408a-8091-f118872d74c2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "mark",
+                "raw": {
+                  "status": "observed",
+                  "value": "S01"
+                },
+                "value_state": "present",
+                "normalized_value": "S01",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                }
+              },
+              "source_fingerprint": "ce88ebaae501aee38b8d53bb602efd1b43469117bc8b894f980fc0e261da956e",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-002",
+              "severity": "error",
+              "state": "fail",
+              "reason": "duplicate_value",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "mark",
+                "raw": {
+                  "status": "observed",
+                  "value": "S02"
+                },
+                "value_state": "present",
+                "normalized_value": "S02",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                },
+                "uniqueness_scope": [
+                  "drawing_file",
+                  "element_family"
+                ],
+                "observed_group_size": 2,
+                "members": [
+                  {
+                    "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                    "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                    "document_id": 0,
+                    "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                    "drawing_file": 101,
+                    "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+                    "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                    "durable_identity_verified": false,
+                    "component_kind": "top_level_component"
+                  },
+                  {
+                    "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                    "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                    "document_id": 0,
+                    "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                    "drawing_file": 101,
+                    "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+                    "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                    "durable_identity_verified": false,
+                    "component_kind": "top_level_component"
+                  }
+                ],
+                "group_id": "839c4f5d0bac424cd93f314ca9a05dc010e7863ee579981a352778069072ccc5",
+                "scope_complete": true
+              },
+              "source_fingerprint": "47cbf1c5ed8876f953c1dfe1f3f91c24c2f0fb74b44eefe2bc5cc504f015b464",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-002",
+              "severity": "error",
+              "state": "pass",
+              "reason": "unique_value",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "mark",
+                "raw": {
+                  "status": "observed",
+                  "value": "S05"
+                },
+                "value_state": "present",
+                "normalized_value": "S05",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                },
+                "uniqueness_scope": [
+                  "drawing_file",
+                  "element_family"
+                ],
+                "observed_group_size": 1,
+                "members": [
+                  {
+                    "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                    "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                    "document_id": 0,
+                    "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                    "drawing_file": 101,
+                    "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+                    "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                    "durable_identity_verified": false,
+                    "component_kind": "top_level_component"
+                  }
+                ],
+                "group_id": "7dd2e0221ef9a49a8a811c2bccede618888127a973cd72aa3b25876945113d97",
+                "scope_complete": true
+              },
+              "source_fingerprint": "961cf979544c424b48d955f75906f2897a03d20d765cc6c7d57a167280b20266",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-002",
+              "severity": "error",
+              "state": "not_applicable",
+              "reason": "missing_value_ignored",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "mark",
+                "raw": {
+                  "status": "observed",
+                  "value": "<niezdefiniowany>"
+                },
+                "value_state": "missing",
+                "normalized_value": null,
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                }
+              },
+              "source_fingerprint": "069d4b2fe9cdb31b5bd6f8c833e47e4237b7b66d24f1b6e3421d849275c7ceab",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-002",
+              "severity": "error",
+              "state": "fail",
+              "reason": "duplicate_value",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "mark",
+                "raw": {
+                  "status": "observed",
+                  "value": "S02"
+                },
+                "value_state": "present",
+                "normalized_value": "S02",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                },
+                "uniqueness_scope": [
+                  "drawing_file",
+                  "element_family"
+                ],
+                "observed_group_size": 2,
+                "members": [
+                  {
+                    "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                    "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                    "document_id": 0,
+                    "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                    "drawing_file": 101,
+                    "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+                    "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                    "durable_identity_verified": false,
+                    "component_kind": "top_level_component"
+                  },
+                  {
+                    "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                    "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                    "document_id": 0,
+                    "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                    "drawing_file": 101,
+                    "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+                    "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                    "durable_identity_verified": false,
+                    "component_kind": "top_level_component"
+                  }
+                ],
+                "group_id": "839c4f5d0bac424cd93f314ca9a05dc010e7863ee579981a352778069072ccc5",
+                "scope_complete": true
+              },
+              "source_fingerprint": "565cc5d93ac863e31605651fb60bdd69e05c2f98e1956187d9bc25545e903ee6",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-002",
+              "severity": "error",
+              "state": "pass",
+              "reason": "unique_value",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "mark",
+                "raw": {
+                  "status": "observed",
+                  "value": "S06"
+                },
+                "value_state": "present",
+                "normalized_value": "S06",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                },
+                "uniqueness_scope": [
+                  "drawing_file",
+                  "element_family"
+                ],
+                "observed_group_size": 1,
+                "members": [
+                  {
+                    "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                    "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                    "document_id": 0,
+                    "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                    "drawing_file": 101,
+                    "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+                    "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                    "durable_identity_verified": false,
+                    "component_kind": "top_level_component"
+                  }
+                ],
+                "group_id": "2fa93f072353dcd72471969bc7614ca7ab6cbdbfde6a3768cd2817b67f50fafb",
+                "scope_complete": true
+              },
+              "source_fingerprint": "1b54a3a00f3868fa8ed09ba0c97375897e04599ab8d5adfd97e13f4ecd5c5dbb",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-002",
+              "severity": "error",
+              "state": "pass",
+              "reason": "unique_value",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "eb88c850-0cac-408a-8091-f118872d74c2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "mark",
+                "raw": {
+                  "status": "observed",
+                  "value": "S01"
+                },
+                "value_state": "present",
+                "normalized_value": "S01",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                },
+                "uniqueness_scope": [
+                  "drawing_file",
+                  "element_family"
+                ],
+                "observed_group_size": 1,
+                "members": [
+                  {
+                    "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                    "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                    "document_id": 0,
+                    "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                    "drawing_file": 101,
+                    "model_uuid": "eb88c850-0cac-408a-8091-f118872d74c2",
+                    "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                    "durable_identity_verified": false,
+                    "component_kind": "top_level_component"
+                  }
+                ],
+                "group_id": "3119ffa029ad51fca74321b20d635d1f6c994f25d36c1468f3fa34c42a365354",
+                "scope_complete": true
+              },
+              "source_fingerprint": "ce88ebaae501aee38b8d53bb602efd1b43469117bc8b894f980fc0e261da956e",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-003",
+              "severity": "warning",
+              "state": "pass",
+              "reason": "expected_layer",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "layer_id",
+                "raw": {
+                  "status": "observed",
+                  "value": 3700
+                },
+                "expected": {
+                  "layer_id": 3700,
+                  "short_name": "SZ_OGÓ01",
+                  "name": "SZ_OGÓ01 (Ogólne01)",
+                  "write_eligibility": "not_checked"
+                }
+              },
+              "source_fingerprint": "47cbf1c5ed8876f953c1dfe1f3f91c24c2f0fb74b44eefe2bc5cc504f015b464",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-003",
+              "severity": "warning",
+              "state": "fail",
+              "reason": "unexpected_layer",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "layer_id",
+                "raw": {
+                  "status": "observed",
+                  "value": 3701
+                },
+                "expected": {
+                  "layer_id": 3700,
+                  "short_name": "SZ_OGÓ01",
+                  "name": "SZ_OGÓ01 (Ogólne01)",
+                  "write_eligibility": "not_checked"
+                }
+              },
+              "source_fingerprint": "961cf979544c424b48d955f75906f2897a03d20d765cc6c7d57a167280b20266",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-003",
+              "severity": "warning",
+              "state": "pass",
+              "reason": "expected_layer",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "layer_id",
+                "raw": {
+                  "status": "observed",
+                  "value": 3700
+                },
+                "expected": {
+                  "layer_id": 3700,
+                  "short_name": "SZ_OGÓ01",
+                  "name": "SZ_OGÓ01 (Ogólne01)",
+                  "write_eligibility": "not_checked"
+                }
+              },
+              "source_fingerprint": "069d4b2fe9cdb31b5bd6f8c833e47e4237b7b66d24f1b6e3421d849275c7ceab",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-003",
+              "severity": "warning",
+              "state": "pass",
+              "reason": "expected_layer",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "layer_id",
+                "raw": {
+                  "status": "observed",
+                  "value": 3700
+                },
+                "expected": {
+                  "layer_id": 3700,
+                  "short_name": "SZ_OGÓ01",
+                  "name": "SZ_OGÓ01 (Ogólne01)",
+                  "write_eligibility": "not_checked"
+                }
+              },
+              "source_fingerprint": "565cc5d93ac863e31605651fb60bdd69e05c2f98e1956187d9bc25545e903ee6",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-003",
+              "severity": "warning",
+              "state": "pass",
+              "reason": "expected_layer",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "layer_id",
+                "raw": {
+                  "status": "observed",
+                  "value": 3700
+                },
+                "expected": {
+                  "layer_id": 3700,
+                  "short_name": "SZ_OGÓ01",
+                  "name": "SZ_OGÓ01 (Ogólne01)",
+                  "write_eligibility": "not_checked"
+                }
+              },
+              "source_fingerprint": "1b54a3a00f3868fa8ed09ba0c97375897e04599ab8d5adfd97e13f4ecd5c5dbb",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-003",
+              "severity": "warning",
+              "state": "pass",
+              "reason": "expected_layer",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "eb88c850-0cac-408a-8091-f118872d74c2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "layer_id",
+                "raw": {
+                  "status": "observed",
+                  "value": 3700
+                },
+                "expected": {
+                  "layer_id": 3700,
+                  "short_name": "SZ_OGÓ01",
+                  "name": "SZ_OGÓ01 (Ogólne01)",
+                  "write_eligibility": "not_checked"
+                }
+              },
+              "source_fingerprint": "ce88ebaae501aee38b8d53bb602efd1b43469117bc8b894f980fc0e261da956e",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-004",
+              "severity": "warning",
+              "state": "pass",
+              "reason": "allowed_value",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "status",
+                "raw": {
+                  "status": "observed",
+                  "value": "NEW"
+                },
+                "value_state": "present",
+                "normalized_value": "NEW",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                },
+                "allowed_values": [
+                  "NEW",
+                  "EXISTING"
+                ]
+              },
+              "source_fingerprint": "47cbf1c5ed8876f953c1dfe1f3f91c24c2f0fb74b44eefe2bc5cc504f015b464",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-004",
+              "severity": "warning",
+              "state": "pass",
+              "reason": "allowed_value",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "status",
+                "raw": {
+                  "status": "observed",
+                  "value": "NEW"
+                },
+                "value_state": "present",
+                "normalized_value": "NEW",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                },
+                "allowed_values": [
+                  "NEW",
+                  "EXISTING"
+                ]
+              },
+              "source_fingerprint": "961cf979544c424b48d955f75906f2897a03d20d765cc6c7d57a167280b20266",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-004",
+              "severity": "warning",
+              "state": "pass",
+              "reason": "allowed_value",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "status",
+                "raw": {
+                  "status": "observed",
+                  "value": "NEW"
+                },
+                "value_state": "present",
+                "normalized_value": "NEW",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                },
+                "allowed_values": [
+                  "NEW",
+                  "EXISTING"
+                ]
+              },
+              "source_fingerprint": "069d4b2fe9cdb31b5bd6f8c833e47e4237b7b66d24f1b6e3421d849275c7ceab",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-004",
+              "severity": "warning",
+              "state": "pass",
+              "reason": "allowed_value",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "status",
+                "raw": {
+                  "status": "observed",
+                  "value": "NEW"
+                },
+                "value_state": "present",
+                "normalized_value": "NEW",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                },
+                "allowed_values": [
+                  "NEW",
+                  "EXISTING"
+                ]
+              },
+              "source_fingerprint": "565cc5d93ac863e31605651fb60bdd69e05c2f98e1956187d9bc25545e903ee6",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-004",
+              "severity": "warning",
+              "state": "fail",
+              "reason": "value_not_allowed",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "status",
+                "raw": {
+                  "status": "observed",
+                  "value": "NWE"
+                },
+                "value_state": "present",
+                "normalized_value": "NWE",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                },
+                "allowed_values": [
+                  "NEW",
+                  "EXISTING"
+                ]
+              },
+              "source_fingerprint": "1b54a3a00f3868fa8ed09ba0c97375897e04599ab8d5adfd97e13f4ecd5c5dbb",
+              "usable_for_write": false
+            },
+            {
+              "rule_id": "QA-004",
+              "severity": "warning",
+              "state": "pass",
+              "reason": "allowed_value",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "eb88c850-0cac-408a-8091-f118872d74c2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "status",
+                "raw": {
+                  "status": "observed",
+                  "value": "NEW"
+                },
+                "value_state": "present",
+                "normalized_value": "NEW",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                },
+                "allowed_values": [
+                  "NEW",
+                  "EXISTING"
+                ]
+              },
+              "source_fingerprint": "ce88ebaae501aee38b8d53bb602efd1b43469117bc8b894f980fc0e261da956e",
+              "usable_for_write": false
+            }
+          ],
+          "findings": [
+            {
+              "rule_id": "QA-001",
+              "severity": "error",
+              "state": "fail",
+              "reason": "required_value_missing",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "mark",
+                "raw": {
+                  "status": "observed",
+                  "value": "<niezdefiniowany>"
+                },
+                "value_state": "missing",
+                "normalized_value": null,
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                }
+              },
+              "source_fingerprint": "069d4b2fe9cdb31b5bd6f8c833e47e4237b7b66d24f1b6e3421d849275c7ceab",
+              "usable_for_write": false,
+              "finding_id": "302182a17667934d314275a1c383d818a89d88f1320ed9f85e7c908f835a500b",
+              "locator": {
+                "method": "drawing_file_mark_location",
+                "drawing_file": 101,
+                "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+                "mark": {
+                  "status": "observed",
+                  "value": "<niezdefiniowany>"
+                },
+                "layer_id": {
+                  "status": "observed",
+                  "value": 3700
+                },
+                "bounding_box_mm": {
+                  "status": "observed",
+                  "value": {
+                    "min": [
+                      11800.0,
+                      -200.0,
+                      9.0951551845464e-15
+                    ],
+                    "max": [
+                      12200.0,
+                      200.0,
+                      3000.0
+                    ],
+                    "unit": "mm",
+                    "frame": "model_local",
+                    "source_api": "GetModelGeometry/CalcMinMax",
+                    "source_frame": "model_local",
+                    "offset_mm": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "offset_applied": false,
+                    "runtime_verified": false
+                  }
+                },
+                "center_mm": {
+                  "status": "observed",
+                  "value": [
+                    12000.0,
+                    0.0,
+                    1500.0
+                  ],
+                  "frame": "model_local"
+                },
+                "highlight": "not_requested",
+                "usable_for_write": false
+              },
+              "remedy": "Assign a reviewed, nonempty mark.",
+              "remedy_applied": false
+            },
+            {
+              "rule_id": "QA-002",
+              "severity": "error",
+              "state": "fail",
+              "reason": "duplicate_value",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "mark",
+                "raw": {
+                  "status": "observed",
+                  "value": "S02"
+                },
+                "value_state": "present",
+                "normalized_value": "S02",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                },
+                "uniqueness_scope": [
+                  "drawing_file",
+                  "element_family"
+                ],
+                "observed_group_size": 2,
+                "members": [
+                  {
+                    "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                    "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                    "document_id": 0,
+                    "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                    "drawing_file": 101,
+                    "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+                    "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                    "durable_identity_verified": false,
+                    "component_kind": "top_level_component"
+                  },
+                  {
+                    "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                    "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                    "document_id": 0,
+                    "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                    "drawing_file": 101,
+                    "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+                    "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                    "durable_identity_verified": false,
+                    "component_kind": "top_level_component"
+                  }
+                ],
+                "group_id": "839c4f5d0bac424cd93f314ca9a05dc010e7863ee579981a352778069072ccc5",
+                "scope_complete": true
+              },
+              "source_fingerprint": "47cbf1c5ed8876f953c1dfe1f3f91c24c2f0fb74b44eefe2bc5cc504f015b464",
+              "usable_for_write": false,
+              "finding_id": "fad5717f603b675cdf64dce2fdd5aabe76caf0aa35fd6b3aaedff4c160a54189",
+              "locator": {
+                "method": "drawing_file_mark_location",
+                "drawing_file": 101,
+                "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+                "mark": {
+                  "status": "observed",
+                  "value": "S02"
+                },
+                "layer_id": {
+                  "status": "observed",
+                  "value": 3700
+                },
+                "bounding_box_mm": {
+                  "status": "observed",
+                  "value": {
+                    "min": [
+                      -200.00000000000017,
+                      5800.0,
+                      9.0951551845464e-15
+                    ],
+                    "max": [
+                      200.00000000000017,
+                      6200.0,
+                      3000.0
+                    ],
+                    "unit": "mm",
+                    "frame": "model_local",
+                    "source_api": "GetModelGeometry/CalcMinMax",
+                    "source_frame": "model_local",
+                    "offset_mm": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "offset_applied": false,
+                    "runtime_verified": false
+                  }
+                },
+                "center_mm": {
+                  "status": "observed",
+                  "value": [
+                    0.0,
+                    6000.0,
+                    1500.0
+                  ],
+                  "frame": "model_local"
+                },
+                "highlight": "not_requested",
+                "usable_for_write": false
+              },
+              "remedy": "Review the duplicate group and assign distinct marks within the drawing file and element family.",
+              "remedy_applied": false
+            },
+            {
+              "rule_id": "QA-002",
+              "severity": "error",
+              "state": "fail",
+              "reason": "duplicate_value",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "mark",
+                "raw": {
+                  "status": "observed",
+                  "value": "S02"
+                },
+                "value_state": "present",
+                "normalized_value": "S02",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                },
+                "uniqueness_scope": [
+                  "drawing_file",
+                  "element_family"
+                ],
+                "observed_group_size": 2,
+                "members": [
+                  {
+                    "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                    "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                    "document_id": 0,
+                    "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                    "drawing_file": 101,
+                    "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+                    "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                    "durable_identity_verified": false,
+                    "component_kind": "top_level_component"
+                  },
+                  {
+                    "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                    "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                    "document_id": 0,
+                    "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                    "drawing_file": 101,
+                    "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+                    "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                    "durable_identity_verified": false,
+                    "component_kind": "top_level_component"
+                  }
+                ],
+                "group_id": "839c4f5d0bac424cd93f314ca9a05dc010e7863ee579981a352778069072ccc5",
+                "scope_complete": true
+              },
+              "source_fingerprint": "565cc5d93ac863e31605651fb60bdd69e05c2f98e1956187d9bc25545e903ee6",
+              "usable_for_write": false,
+              "finding_id": "866651170c5705f4bf614a0c886150f4e678e347a96acbfd3f6e0f29f63243d1",
+              "locator": {
+                "method": "drawing_file_mark_location",
+                "drawing_file": 101,
+                "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+                "mark": {
+                  "status": "observed",
+                  "value": "S02"
+                },
+                "layer_id": {
+                  "status": "observed",
+                  "value": 3700
+                },
+                "bounding_box_mm": {
+                  "status": "observed",
+                  "value": {
+                    "min": [
+                      5800.0,
+                      -200.0,
+                      9.0951551845464e-15
+                    ],
+                    "max": [
+                      6200.0,
+                      200.0,
+                      3000.0
+                    ],
+                    "unit": "mm",
+                    "frame": "model_local",
+                    "source_api": "GetModelGeometry/CalcMinMax",
+                    "source_frame": "model_local",
+                    "offset_mm": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "offset_applied": false,
+                    "runtime_verified": false
+                  }
+                },
+                "center_mm": {
+                  "status": "observed",
+                  "value": [
+                    6000.0,
+                    0.0,
+                    1500.0
+                  ],
+                  "frame": "model_local"
+                },
+                "highlight": "not_requested",
+                "usable_for_write": false
+              },
+              "remedy": "Review the duplicate group and assign distinct marks within the drawing file and element family.",
+              "remedy_applied": false
+            },
+            {
+              "rule_id": "QA-003",
+              "severity": "warning",
+              "state": "fail",
+              "reason": "unexpected_layer",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "layer_id",
+                "raw": {
+                  "status": "observed",
+                  "value": 3701
+                },
+                "expected": {
+                  "layer_id": 3700,
+                  "short_name": "SZ_OGÓ01",
+                  "name": "SZ_OGÓ01 (Ogólne01)",
+                  "write_eligibility": "not_checked"
+                }
+              },
+              "source_fingerprint": "961cf979544c424b48d955f75906f2897a03d20d765cc6c7d57a167280b20266",
+              "usable_for_write": false,
+              "finding_id": "12eff77ed426c85397d81f2abe0c865b54acd1d70d9c79e0f0a1ffa3fac89ef9",
+              "locator": {
+                "method": "drawing_file_mark_location",
+                "drawing_file": 101,
+                "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+                "mark": {
+                  "status": "observed",
+                  "value": "S05"
+                },
+                "layer_id": {
+                  "status": "observed",
+                  "value": 3701
+                },
+                "bounding_box_mm": {
+                  "status": "observed",
+                  "value": {
+                    "min": [
+                      5800.0,
+                      5800.0,
+                      9.0951551845464e-15
+                    ],
+                    "max": [
+                      6200.0,
+                      6200.0,
+                      3000.0
+                    ],
+                    "unit": "mm",
+                    "frame": "model_local",
+                    "source_api": "GetModelGeometry/CalcMinMax",
+                    "source_frame": "model_local",
+                    "offset_mm": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "offset_applied": false,
+                    "runtime_verified": false
+                  }
+                },
+                "center_mm": {
+                  "status": "observed",
+                  "value": [
+                    6000.0,
+                    6000.0,
+                    1500.0
+                  ],
+                  "frame": "model_local"
+                },
+                "highlight": "not_requested",
+                "usable_for_write": false
+              },
+              "remedy": "Review the layer assignment; the profile expects SZ_OGÓ01.",
+              "remedy_applied": false
+            },
+            {
+              "rule_id": "QA-004",
+              "severity": "warning",
+              "state": "fail",
+              "reason": "value_not_allowed",
+              "ref": {
+                "query_session_id": "ab03affd2b184fbfb8a140d6e7d4bccd",
+                "project_key": "707431a9ec673ec7166782a87872dc0ead7ae9ef14bdf21a5d75cac3e0028575",
+                "document_id": 0,
+                "profile_binding_fingerprint": "b2c5b36e21715b28b03420b13d9a9d0824e9feb4ad0c5b8cd70fb01b1c569cbf",
+                "drawing_file": 101,
+                "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "evidence": {
+                "field": "status",
+                "raw": {
+                  "status": "observed",
+                  "value": "NWE"
+                },
+                "value_state": "present",
+                "normalized_value": "NWE",
+                "policy": {
+                  "trim": true,
+                  "case_sensitive": true,
+                  "missing": {
+                    "absent": true,
+                    "null": true,
+                    "empty": true,
+                    "literals": [
+                      "<niezdefiniowany>"
+                    ]
+                  }
+                },
+                "allowed_values": [
+                  "NEW",
+                  "EXISTING"
+                ]
+              },
+              "source_fingerprint": "1b54a3a00f3868fa8ed09ba0c97375897e04599ab8d5adfd97e13f4ecd5c5dbb",
+              "usable_for_write": false,
+              "finding_id": "2ec8ecd4e0ea93aaadf746ad52e7a38bbac5157a8a778c2a39f21cd3dcb5b36f",
+              "locator": {
+                "method": "drawing_file_mark_location",
+                "drawing_file": 101,
+                "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+                "mark": {
+                  "status": "observed",
+                  "value": "S06"
+                },
+                "layer_id": {
+                  "status": "observed",
+                  "value": 3700
+                },
+                "bounding_box_mm": {
+                  "status": "observed",
+                  "value": {
+                    "min": [
+                      11800.0,
+                      5800.0,
+                      9.0951551845464e-15
+                    ],
+                    "max": [
+                      12200.0,
+                      6200.0,
+                      3000.0
+                    ],
+                    "unit": "mm",
+                    "frame": "model_local",
+                    "source_api": "GetModelGeometry/CalcMinMax",
+                    "source_frame": "model_local",
+                    "offset_mm": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "offset_applied": false,
+                    "runtime_verified": false
+                  }
+                },
+                "center_mm": {
+                  "status": "observed",
+                  "value": [
+                    12000.0,
+                    6000.0,
+                    1500.0
+                  ],
+                  "frame": "model_local"
+                },
+                "highlight": "not_requested",
+                "usable_for_write": false
+              },
+              "remedy": "Review the status; allowed values are NEW and EXISTING.",
+              "remedy_applied": false
+            }
+          ],
+          "report_text": "Audit native-model-qa-demo 2.0.0: fail.\n6 elements; 5 findings on 5 elements; 0 unchecked checks.\nRequested scope complete: True; audit complete: True.\nQA-001 (error): fail {'pass': 5, 'fail': 1, 'not_checked': 0, 'not_applicable': 0}\nQA-002 (error): fail {'pass': 3, 'fail': 2, 'not_checked': 0, 'not_applicable': 1}\nQA-003 (warning): fail {'pass': 5, 'fail': 1, 'not_checked': 0, 'not_applicable': 0}\nQA-004 (warning): fail {'pass': 5, 'fail': 1, 'not_checked': 0, 'not_applicable': 0}\nQA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm (model_local): required_value_missing. Assign a reviewed, nonempty mark.\nQA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.\nQA-002: file 101, mark 'S02', model 80211557-a3c1-4ccd-84d9-1274ec533776, center [6000.0, 0.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.\nQA-003: file 101, mark 'S05', model 51db6258-4f95-4fab-ac80-8948e13bfd21, center [6000.0, 6000.0, 1500.0] mm (model_local): unexpected_layer. Review the layer assignment; the profile expects SZ_OGÓ01.\nQA-004: file 101, mark 'S06', model d26a3d87-2981-4657-b592-65c894ce41ba, center [12000.0, 6000.0, 1500.0] mm (model_local): value_not_allowed. Review the status; allowed values are NEW and EXISTING.",
+          "usable_for_write": false,
+          "reference_lifetime": "host_session_project_document_snapshot; rerun after model changes or restart",
+          "report_fingerprint": "9fdbd2b408a809adced51a3efaf62fc074251fbf76cff271199076123527447a",
+          "request_id": "31aa582a-2b69-4772-8b24-c38e0401ab81",
+          "host_session_id": "e088efb4-0747-4de4-811e-3f75f54c43bb"
+        }
+      },
+      {
+        "name": "host_health_after_preview",
+        "ok": true,
+        "response": {
+          "version": "2026.1",
+          "allplan_release": {
+            "Version": "2026.1",
+            "MainReleaseName": "2026",
+            "SubReleaseName": "2026.1",
+            "WindowsReleaseName": ""
+          },
+          "executable_versions": {
+            "status": "observed",
+            "file_version": "16.1617.8659.814",
+            "product_version": "2026.0.1.0",
+            "source": "running_process_executable"
+          },
+          "hotfix": {
+            "status": "not_checked",
+            "value": null
+          },
+          "embedded_python": {
+            "version": "3.13.13",
+            "implementation": "CPython"
+          },
+          "bridge_package": {
+            "version": "0.7.0",
+            "source_commit": "22f18db27faf5e0873de18c1e079d1217da736fb",
+            "integrity": "sha256-verified",
+            "bridge_files": {
+              "Library/PythonHost/StartPythonHost.pyp": "b1aba49ed554eeefa9e44f4e9a6f06992e74d4f2916277ef451de11d72167813",
+              "PythonPartsScripts/PythonHost/audit_contracts.py": "155b10200982c879f3bd0226ea8f26c00e15118f8b5f3df532c7937ac3e8f035",
+              "PythonPartsScripts/PythonHost/model_audit.py": "07ac2f7d0856d5cd3018f57f819743b5dc2e46b152c7e4a7f0ee4364a4c478b3",
+              "PythonPartsScripts/PythonHost/model_context.py": "ecb8288192490215baa8bd7475ed4dffcd9b4acaf4d46a281686ff220269840b",
+              "PythonPartsScripts/PythonHost/model_metadata.py": "c1339766382fd52de47fb66e11d87106942b67cf5dc743088739473738802d4a",
+              "PythonPartsScripts/PythonHost/model_query.py": "875a4981f7dce2dacea47ee8019472fb320842b436c3f33a25db3d6d78bccc74",
+              "PythonPartsScripts/PythonHost/model_repair.py": "6b2de13bd2db8acb3a3df576de3a7c0ddaf7d25410c7684c02a4c30b8bf09f8b",
+              "PythonPartsScripts/PythonHost/native_readers.py": "15c62a3c295bbeda4722bc54a6d36a4ada04fba866f0f1eb7aacd3a7f6c48cd0",
+              "PythonPartsScripts/PythonHost/profile_contracts.py": "bed1c0099c2dfdc5fc48374cd78c16ea1ea0a6df3309deb919322b060d7a46b6",
+              "PythonPartsScripts/PythonHost/PythonHostHandler.py": "fcb5d217fd41af6e662a27d9a397d5bce3877f03ef8d92efd8ad8e56b3dc584f",
+              "PythonPartsScripts/PythonHost/query_contracts.py": "685ebd73e89a43381d2e81f59d6365be575c0edbded78440453dd8ab4115fe16",
+              "PythonPartsScripts/PythonHost/repair_contracts.py": "527bb149a7f37770d516c0d4fcdc1e242fc8292331b7d42efd933018aea58702",
+              "PythonPartsScripts/PythonHost/runtime_info.py": "6d46a44d0c8e8d3c1d757a22b4012a9919eb782bb8ea60577a1e229acfde91a2",
+              "PythonPartsScripts/PythonHost/sandbox/__init__.py": "b895513c191ba9ea7a8748f3aef1c6c9d74875b990d8ef41e10faf3904e0e586",
+              "PythonPartsScripts/PythonHost/sandbox/const.py": "168b93f376d54ddaf67ac62ffc5fb7e94570ab24e1f828d0732effa097e659d4",
+              "PythonPartsScripts/PythonHost/sandbox/executor.py": "c06f9810291a1c9e6f3deb7939d4b6615905d15c6662a6e69d7973b3fcbf0f6a",
+              "PythonPartsScripts/PythonHost/sandbox/validator.py": "5a4d3bf2bb6d2556512285a778083385c5c5049a398bc7a77cdaab9c5d8ddaec",
+              "PythonPartsScripts/PythonHost/spatial_contracts.py": "40820192b5500782cab4fb3fe837244989283861c143079b245f8f2e223ee086",
+              "PythonPartsScripts/PythonHost/StartPythonHost.py": "6962786bd8dfa3f7de555856a0c64a1943b09612f314bef74d51f572c58fe6ba",
+              "PythonPartsScripts/PythonHost/transport.py": "a7c700a368538ada76f32360f1962d2d3f483966ea6030eae254732fa1f44fbe"
+            }
+          },
+          "installed_bridge_integrity": {
+            "status": "verified",
+            "mismatches": []
+          },
+          "compatibility": {
+            "target_major": "2026",
+            "major_matches": true,
+            "runtime_verified": false
+          },
+          "request_id": "c1956b9a-6fb6-478b-8e48-284ee637e0f5",
+          "host_session_id": "e088efb4-0747-4de4-811e-3f75f54c43bb",
+          "ui_dispatch_exception_boundary": "contained_result_error_v1"
+        }
+      }
+    ],
+    "allplan_acceptance": "not_run",
+    "read_only": true,
+    "request": {
+      "action": "preview",
+      "audit": {
+        "scope": {
+          "drawing_files": [
+            101
+          ],
+          "include_passive": false,
+          "visibility": "api_select_all"
+        },
+        "profile_id": "native-model-qa-demo"
+      },
+      "repairs": [
+        {
+          "rule_id": "QA-003",
+          "value": "structure"
+        },
+        {
+          "rule_id": "QA-004",
+          "value": "NEW"
+        }
+      ]
+    }
+  }
+}
