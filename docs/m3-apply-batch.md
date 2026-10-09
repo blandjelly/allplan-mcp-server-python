@@ -1,6 +1,16 @@
 # M3 — zapis i Undo na kopii projektu, pakiet 0.8.1
 
-Status: **ready_for_owner_test**. Natywny zapis i Undo nie są jeszcze zaliczone.
+Status: **bounded native gate PASS**, wynik z **10 października 2026**.
+[Akceptacja i sześć oryginalnych logów](test-results/m3-execution-acceptance-0.8.1.md):
+S05 i S06 zmieniły się poprawnie, cofnięcie wymagało **dwóch osobnych Undo**.
+Check Undo odczytał obie stare wartości i audyt 5; po potwierdzonym **Redo**
+Recover w nowej sesji odczytał obie nowe wartości i audyt 3. Powtórzenia tego
+samego żądania zwracały zapisane wyniki odczytowo. To poprawny przebieg mimo
+innej kolejności niż w instrukcji poniżej; nie trzeba powtarzać testu.
+Wspólna grupa Undo nie jest obsługiwana. Kolejny, odczytowy test to
+[konflikt po ręcznej edycji](m3-conflict-batch.md) na bieżącej naprawionej kopii.
+
+Poniżej zachowano procedurę używaną do zaliczonego testu.
 Test 0.8.0 zatrzymał się przed pierwszym zapisem na błędnej kontroli IsInMacro.
 [Diagnoza i oryginalne logi](test-results/m3-apply-rejection-0.8.0.md).
 Allplan i serwer pozostały uruchomione; właściciel nie widzi zmian.
@@ -73,5 +83,5 @@ Brak zapisu w dzienniku może oznaczać odrzucenie przed pierwszym setterem;
 nie zgaduj wyniku. Kopii nie włączaj do projektu produkcyjnego.
 
 Natywny konflikt po ręcznej edycji, szersze typy/zapisy, odporność na awarię
-zasilania i wspólna grupa Undo pozostają poza zaliczonym zakresem. Kolejny etap
-zależy od tego testu. [Kontrakt i granice](m3-execution-contract.md).
+zasilania i wspólna grupa Undo pozostają poza zaliczonym zakresem.
+[Kontrakt i granice](m3-execution-contract.md).

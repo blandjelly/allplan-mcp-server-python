@@ -1,5 +1,9 @@
 # M3 0.8.0 native apply — rejected before setters
 
+Historical failed gate. The corrected 0.8.1 two-write/Undo/recovery test now has
+[bounded native acceptance](m3-execution-acceptance-0.8.1.md); this record and
+the original failed logs remain unchanged in substance.
+
 Status **BLOCKED**, not write/Undo acceptance. Capture: 2026-10-09 **23:54
 Europe/Warsaw** (filename 21:54 UTC). Owner reports that the tool did not work,
 Allplan and server remain running, and no model changes are visible. The batch

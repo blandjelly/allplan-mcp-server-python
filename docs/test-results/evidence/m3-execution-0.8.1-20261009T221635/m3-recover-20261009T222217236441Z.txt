@@ -1,0 +1,6 @@
+M3 disposable-copy gate: ready_for_ui_observation. Execution: 82ce52f62acb4590b1e62765612f219e.
+recover_read_only: OK
+Repair execution completed: applied, applied. No automatic rollback or retry.
+persisted_execution_replay: OK
+Repair execution completed: applied, applied. No automatic rollback or retry.
+health: OK

@@ -60,17 +60,22 @@ The earlier crash's precise cause remains unproven. No repeated owner test is re
 **Exit gate (UAT-04):** demo returns exactly 5 findings on 5 columns, correct
 uniqueness scope, explicit unavailable data and locatable targets; no writes.
 
-## M3 — Controlled repairs and standards: preview PASS, execution ready for owner test
+## M3 — Controlled repairs and standards: bounded preview and execution PASS
 
 Package **0.8.1** corrects 0.8.0's overly broad IsInMacro preflight rejection;
 [original failed native gate and correction](test-results/m3-apply-rejection-0.8.0.md).
-The rejected request called no setters; new native write/Undo acceptance is pending.
+The rejected request called no setters. The corrected 0.8.1 gate now has
+[bounded native acceptance](test-results/m3-execution-acceptance-0.8.1.md):
+two native repairs/readbacks, verified audited fields, exact-ID replay across
+host sessions, **two separate Undo steps**, and recovery after confirmed Redo.
 The package retains bounded disposable-copy native layer/status apply,
 fresh resolution/eligibility, per-target readback, collateral audited-field checks,
 persistent execution identity and read-only recovery. Portable evidence is
-[recorded separately](test-results/m3-execution-portable-0.8.0.md).
-The [new write/Undo gate](m3-apply-batch.md) is pending; no native acceptance,
-Undo grouping or M3 closure is claimed. [Execution limits](m3-execution-contract.md).
+[recorded separately](test-results/m3-execution-portable-0.8.1.md).
+The [write/Undo gate](m3-apply-batch.md) is complete for this fixture; no repeated
+Apply is requested. Native manual-edit conflicts require the
+[next read-only card](m3-conflict-batch.md). Undo grouping and M3 closure remain
+unclaimed. [Execution limits](m3-execution-contract.md).
 
 Package **0.7.0** implements the first read-only M3.1/M3.2 slice:
 `fix_model_issues` explicit layer/status preview and plan revalidation, full fresh
@@ -82,9 +87,11 @@ stale/expiry/restart controls. [Contract](m3-repair-contract.md),
 Owner confirms target/value correspondence and continued host/Allplan operation;
 native revalidation/follow-up audit retain identical audited source. No repeated
 preview batch is required. Manual-edit native conflicts remain unverified.
-The 0.7.0 package invokes no setters. In 0.8.0, M3.1/M3.2/M3.4 have a bounded
-implementation awaiting native write/readback/restart/Undo observations.
-UAT-05/UAT-06, broader mutation/registry guarantees and M3.3 remain pending.
+The 0.7.0 package invokes no setters. The 0.8.1 bounded M3.1/M3.2/M3.4
+implementation has the native observations above. UAT-05/UAT-06 remain open
+for native manual-edit/stale-plan evidence and broader required behavior;
+unknown-outcome recovery, broader mutation/registry guarantees and M3.3 remain
+unaccepted. Current recovery evidence concerns a completed saved execution.
 
 - **M3.1** Shared preview/apply, stale checks, serialized writes, request identity, readback, partial outcomes and tested Undo limits.
 - **M3.2** `fix_model_issues` for writable attributes/layers; data marks and graphical labels stay distinct.

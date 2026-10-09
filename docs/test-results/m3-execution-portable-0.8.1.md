@@ -1,6 +1,8 @@
 # M3 0.8.1 regression validation
 
-Status **ready_for_owner_test**, native corrected write/readback/Undo **not_run**.
+This report records the pre-owner-test portable validation. The subsequent
+**bounded native execution gate PASS** on 2026-10-10 Europe/Warsaw is recorded
+[separately with six original logs](m3-execution-acceptance-0.8.1.md).
 [Native 0.8.0 rejection](m3-apply-rejection-0.8.0.md) and original uploaded files
 are preserved; previous archives remain unchanged.
 
@@ -25,9 +27,10 @@ Added regressions establish:
 
 Only known host codes that escape before the current request's setters are
 classified; no message-text parsing is used. Portable adapters do not prove native
-parent semantics, writability or mutation effects. Repeat only the corrected
-[write/restart/Undo card](../m3-apply-batch.md), using the unchanged disposable
-project copy and a fresh plan.
+parent semantics, writability or mutation effects. The corrected
+[write/restart/Undo card](../m3-apply-batch.md) is complete for the retained
+fixture; do not repeat that test. The next native evidence is the
+[read-only manual-edit conflict card](../m3-conflict-batch.md).
 
 [CI run 37997427257](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/37997427257)
 passes all six Windows/Ubuntu Python 3.11–3.13 test/build/Windows-ZIP jobs for

@@ -1,6 +1,55 @@
 # Next-model handoff
 
-## Current handoff — 2026-10-09, package 0.8.1
+## Current handoff — 2026-10-10 Europe/Warsaw, 0.8.1 execution gate PASS
+
+Continue **`codex/m3-repair-preview`**, draft [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2).
+The owner supplied six original Apply/Check Undo/Recover logs and confirms both
+native repairs worked, with **two separate Undo steps**. A clarification confirms
+**Redo restored both repairs before Recover**. This explains the differing
+current observations; do not misread historical applied outcomes as new setters.
+
+[Native acceptance and original evidence](test-results/m3-execution-acceptance-0.8.1.md)
+establish **bounded execution gate PASS**: completed/applied-applied,
+audited_fields_match_plan=true, full audit 3, same-ID read-only replay; Check Undo
+old-old/audit 5; later Recover new-new/audit 3. Three distinct host sessions
+retain the exact execution/request and replay it read-only. Current observations
+are separate from historical outcomes. Health after both read-only batches passes.
+All **22 installed bridge hashes**, plan and request hashes, four distinct audit
+hashes and TXT/JSON agreement independently verify. The six originals remain
+byte-identical under `test-results/evidence/m3-execution-0.8.1-20261009T221635`.
+Execution **82ce52f62acb4590b1e62765612f219e**; sessions are listed in the record.
+Both native targets have IsInMacro=true and pass the corrected root eligibility.
+
+The exact installed **0.8.1 ZIP remains unchanged**: clean source
+**8074905536ff5c95e20de4a59a70d513f8694314**, SHA-256
+**b31909379244cc085168cc1b5283fa08284954f19334261779ea766fbbf36c47**.
+Original delivery manifest/embedded handoff/raw flags describe the pre-test state;
+this acceptance supersedes it without rebuilding or rewriting those artifacts.
+149 portable tests and six-job CI run 37997427257 remain separate evidence for
+artifact commit 25dc292cf72776663feea80cc5bbe13b975ceff5; do not claim that run
+tested later evidence/documentation commits. This update changes no runtime code.
+
+**Next owner boundary:** [focused read-only manual-edit conflict card](m3-conflict-batch.md).
+Use installed 0.8.1 and the current repaired disposable copy after Redo;
+do not repeat Apply/M1/M2, reinstall, rebuild columns or reintroduce both defects.
+Local Windows Codex prepares a fresh preview (zero proposals on the repaired
+fixture is valid) and immediate unchanged revalidation. Owner manually changes
+S06 status NEW → EXISTING; revalidate the exact retained plan in the same host
+session within five minutes, expecting conflict. Restore NEW manually and return
+original responses plus host-survival/model UI observations. If UI ends the host,
+plan_expired after restart is separate protection, not native same-session
+conflict acceptance. Cloud cannot perform this owner-native step.
+
+M3/UAT-05/UAT-06 remain open for native manual-edit/stale-plan evidence and
+broader required behavior. M3.3 office-standard/rule-based services and generic
+writable registry behavior are still unimplemented. Unknown-outcome recovery,
+whole-model UI collateral verification, grouped Undo, full application/OS restart,
+crash/power-loss persistence and arbitrary types/scopes remain unaccepted.
+The owner only attested the two target changes/Undo/Redo, not every model property.
+GitHub authorization persists. No main/PR merge or release is performed; recheck
+remote/base/main documentation reconciliation before future integration.
+
+## Prior handoff — 2026-10-09, package 0.8.1 (historical, before native retest)
 
 Continue **`codex/m3-repair-preview`**, draft [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2).
 The owner supplied four original write-gate logs and reports that the tool did

@@ -7,7 +7,13 @@ required native hierarchy must terminate at the reviewed Column root. Explicit
 known pre-setter apply errors become `rejected`, not `unknown`; transport,
 unexpected and journal errors retain conservative unknown handling.
 
-Status **ready_for_owner_test**, native apply/readback/Undo **not_run**.
+Status **bounded native execution gate PASS**, 2026-10-10 Europe/Warsaw:
+[original evidence and decision](test-results/m3-execution-acceptance-0.8.1.md).
+The two retained Column repairs, audited-field verification, exact-ID read-only
+replay across host sessions, manual **two-step Undo**, and recovery after
+owner-confirmed Redo pass. Grouped Undo is unavailable. Native manual-edit
+conflicts and broader execution remain pending;
+[next focused owner card](m3-conflict-batch.md).
 The accepted [0.7.0 preview](test-results/m3-preview-acceptance-0.7.0.md)
 and its unchanged archive remain separate. [Polish owner gate](m3-apply-batch.md).
 This slice advances M3.1/M3.2/M3.4; M3 and UAT-05/UAT-06 remain open.
@@ -34,8 +40,9 @@ classified as pre-write safety because they may happen after a setter.
 side-effect-free preview/revalidate actions. General `apply_available` and
 `usable_for_write` remain false. A preview additionally advertises
 `evaluation_apply_available` when it matches the bounded fixture gate.
-This is an experimental execution route, not native acceptance or a writable
-profile/reference registry. Generic profiles remain inactive for writes.
+This experimental execution route has bounded native acceptance for the retained
+fixture; it does not provide a generic writable profile/reference registry.
+Generic profiles remain inactive for writes.
 
 ```json
 {
@@ -132,7 +139,10 @@ The owner observes whether Undo needs one or two steps; no grouping API or
 transaction/automatic rollback is claimed. Loss of reply never triggers retry.
 
 Portable fake adapters and real HTTP/MCP checks are separate from Allplan
-acceptance. Native writability, setter behavior, session restart persistence,
-readback, collateral UI changes and Undo require the new owner gate. M3.3
-office-standard/rule-based services and broader mutation/registry guarantees
-remain pending until that gate establishes the adapter behavior.
+acceptance. Native writability, setter readback, audited collateral verification,
+exact-ID persistence across the observed host sessions and two-step Undo pass
+for the retained fixture. Whole-model collateral UI verification, native
+manual-edit conflicts, unknown-outcome recovery and crash/power-loss persistence
+remain outside that acceptance. M3.3 office-standard/rule-based services and
+broader mutation/registry guarantees remain pending. No repeated two-write gate
+is required; the next card inspects native manual-edit conflicts read-only.

@@ -1,0 +1,48 @@
+{
+  "original_files": {
+    "m3-check-undo-20261009T222007660555Z.json": {
+      "bytes": 352952,
+      "sha256": "991cbba97da9a21c4b6a5e063bc231f60b11f3d50e630c33f7d4615ae3b5f3a0"
+    },
+    "m3-check-undo-20261009T222007660555Z.txt": {
+      "bytes": 318,
+      "sha256": "43da7b3c8d5676b7d7efe5633074447900ae62b72b77c9454e5de27c3b1a5ecf"
+    },
+    "m3-apply-20261009T221635402173Z.txt": {
+      "bytes": 430,
+      "sha256": "3b957a21ad6381c93afea8aeebb7df3c72030c746e3c84ce179b859923f6fb37"
+    },
+    "m3-recover-20261009T222217236441Z.json": {
+      "bytes": 337202,
+      "sha256": "fd8191e5a825a1742793b7d6df5d42fc6a97eb0a705accbcc267d948786e16b2"
+    },
+    "m3-apply-20261009T221635402173Z.json": {
+      "bytes": 384471,
+      "sha256": "09491f5bbd2cf76f26b4080ffb01228f2a23ca40cbbfb56d5cbfd7d058d29f2c"
+    },
+    "m3-recover-20261009T222217236441Z.txt": {
+      "bytes": 322,
+      "sha256": "a183550362dca7eb3b75a5bb5702b66859535810c17cda10a9c596806e5f8cd5"
+    }
+  },
+  "archive_sha256": "b31909379244cc085168cc1b5283fa08284954f19334261779ea766fbbf36c47",
+  "bridge_files_verified": 22,
+  "distinct_audit_hashes_verified": 4,
+  "plan_hash_verified": "4eb6ae8f12143e9985c612f5d77c0d588bc285ad54f181f0cee4afd8324be26a",
+  "request_hash_verified": "18b340095203c7705096652e810c0a1f1f33fef974579bd7c8dbfeb8d1cde0b9",
+  "execution_id": "82ce52f62acb4590b1e62765612f219e",
+  "host_sessions": [
+    "75199ff8-9924-4c3a-83a0-bb7b4d072d1c",
+    "dbc129b9-db32-4f74-bfe5-f5c8b30cb511",
+    "0aa79834-c9cd-4372-9cd0-ca15487bfd81"
+  ],
+  "sequence": [
+    "apply: applied/applied, audit 3",
+    "undo: old/old, audit 5",
+    "owner-confirmed Redo",
+    "recover: new/new, audit 3"
+  ],
+  "txt_matches_json": true,
+  "decision": "bounded_execution_gate_pass",
+  "native_manual_edit_conflict": "not_run"
+}

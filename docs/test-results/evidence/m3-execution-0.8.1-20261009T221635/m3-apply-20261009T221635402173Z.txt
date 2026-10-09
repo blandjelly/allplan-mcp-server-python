@@ -1,0 +1,7 @@
+M3 disposable-copy gate: ready_for_ui_observation. Execution: 82ce52f62acb4590b1e62765612f219e.
+preview_preflight: OK
+apply_readback: OK
+Repair execution completed: applied, applied. No automatic rollback or retry.
+same_execution_replay: OK
+Repair execution completed: applied, applied. No automatic rollback or retry.
+Compare both values and unchanged other elements in UI, then perform native Undo and run M3 Check Undo.

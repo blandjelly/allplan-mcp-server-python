@@ -38,13 +38,19 @@ checks. **Bounded M3 preview gate PASS**;
 [native evidence and limits](docs/test-results/m3-preview-acceptance-0.7.0.md),
 [completed owner card](docs/m3-preview-batch.md);
 [contract](docs/m3-repair-contract.md). Package 0.8.0 adds bounded disposable-copy
-apply/readback, a durable execution journal and read-only recovery, **ready for
-owner testing**. The first 0.8.0 native write was rejected before setters by
+apply/readback, a durable execution journal and read-only recovery.
+The first 0.8.0 native write was rejected before setters by
 an overly broad IsInMacro check; [original evidence and correction](docs/test-results/m3-apply-rejection-0.8.0.md).
 0.8.1 uses verified root hierarchy and reports explicit pre-write rejections.
 [Execution contract](docs/m3-execution-contract.md),
-[write/Undo owner card](docs/m3-apply-batch.md). Native writes/Undo remain
-unaccepted, broader repairs and generation pending. M3 is not closed.
+[completed write/Undo owner card](docs/m3-apply-batch.md).
+**Bounded 0.8.1 execution gate PASS**: both native repairs/readbacks, audited
+collateral verification, exact-ID replay across host sessions, two separate
+Undo steps, and recovery after owner-confirmed Redo;
+[evidence and limits](docs/test-results/m3-execution-acceptance-0.8.1.md).
+Next is the [read-only manual-edit conflict test](docs/m3-conflict-batch.md)
+using the installed 0.8.1. Broader repairs and generation remain pending.
+M3 is not closed.
 
 Repository documentation and API identifiers use English. Owner-facing
 walkthroughs may use Polish. The implementation model owns coding, diagnostics,
