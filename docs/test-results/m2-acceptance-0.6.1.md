@@ -8,11 +8,12 @@ Allplan **2026-1-7**, local Windows MCP/host package **0.6.1**, audit profile
 
 ## Original evidence and artifact identity
 
-Uploaded evidence is retained byte-for-byte, including Windows TXT line endings:
+Original evidence is available byte-for-byte in Git history, including Windows
+TXT line endings; raw logs are excluded from the current documentation tree:
 
-- [JSON](evidence/diagnostics-20261009T113712Z.json), **246528 bytes**,
+- [JSON](https://github.com/blandjelly/allplan-mcp-server-python/blob/73b704fd3054b29c4e7c741a7891b8cc53e1b7cd/docs/test-results/evidence/diagnostics-20261009T113712Z.json), **246528 bytes**,
   SHA-256 `d12c893fbc624eaf577f4953504207b5da4438a57599ba395c0a5a39c4a8a9f3`.
-- [TXT](evidence/diagnostics-20261009T113712Z.txt), **1740 bytes**,
+- [TXT](https://github.com/blandjelly/allplan-mcp-server-python/blob/73b704fd3054b29c4e7c741a7891b8cc53e1b7cd/docs/test-results/evidence/diagnostics-20261009T113712Z.txt), **1740 bytes**,
   SHA-256 `aeda6cd78e0531d587ea79bdc9817e59779438aced697d64940b091889dff2ec`.
 - Tested `allplan-mcp-0.6.1-windows-evaluation.zip`, **340007 bytes**,
   SHA-256 `b47cba9ab08cce800f9e1900d03a232153c4441d054818f1bc116e8cc4a617f7`.
@@ -43,12 +44,6 @@ independently identify the UI hotfix.
 | host_scope_rejection | Direct host rejects the same invalid scope with `invalid_payload` and a request ID |
 | host_health_after_rejection | Same host session responds with Allplan version, verified bridge 0.6.1 and loaded marker |
 
-Host session: `b81388b2-8c3a-44f3-b940-951a83043e1d`.
-Audit request IDs: `a0fd1e0a-1143-4f4b-92de-df88df1884e0` and
-`ca3b65bf-4974-45d7-9c1c-b55ca7a63067`.
-Direct rejection: `b38b6eb6-0e46-45b3-a2a5-523e66694cf3`.
-Post-rejection health: `ad24825a-34e7-49d4-991e-7304895c9de2`.
-
 Both rejection paths report **Requested audit files exceed the explicit profile
 scope.** This is the scope involved in the earlier incident; it remains invalid,
 and no passive-file audit or scope expansion is accepted.
@@ -65,7 +60,7 @@ QA-001 identifies C03's raw `<niezdefiniowany>` mark; QA-002 identifies the
 C02/C04 S02 duplicate pair; QA-003 identifies C05's review layer; QA-004
 identifies C06's NWE status. C01 passes all rules. All six model UUIDs and
 per-element source fingerprints match the
-[previous native capture](m2-audit-runtime-0.6.0.md). All 24 checks and five
+[previous native capture](https://github.com/blandjelly/allplan-mcp-server-python/blob/73b704fd3054b29c4e7c741a7891b8cc53e1b7cd/docs/test-results/m2-audit-runtime-0.6.0.md). All 24 checks and five
 findings match after removing session-derived IDs; raw evidence, geometry,
 locators and binding are unchanged. This comparison establishes equality of
 the audited data, not a whole-project or post-test mutation trace.
@@ -99,8 +94,9 @@ traceback persistence are not claimed from this capture.
 Static report fields `runtime_verified=false`, `allplan_acceptance=not_run` and
 `implemented_runtime_pending` are preserved; they are not an acceptance registry.
 This record combines observed native results with explicitly attributed owner
-observations. Portable **121-test PASS** remains separate evidence; no new remote
-CI run is claimed. Acceptance does not extend to additional profiles/files,
+observations. Portable **121-test PASS** remains separate evidence. Later Windows/Ubuntu
+CI results are recorded in [validation and history](../validation-and-history.md). Acceptance does not extend to additional profiles/files,
 dimension-range or unavailable-input native cases, native highlighting, durable
 references, writable resources, repair/apply/readback/Undo, or cloud-to-Windows
-connectivity. **M3 remains unimplemented and outside the requested M2 work.**
+connectivity. M3 preview exists separately in [draft PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2);
+it is not part of this acceptance or main. Native repairs remain unaccepted.

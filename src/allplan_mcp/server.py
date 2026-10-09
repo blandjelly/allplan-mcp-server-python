@@ -135,7 +135,8 @@ def get_model_context(identity_sample_size: int = 0, profile_id: str | None = No
 
     Optional 0–20 raw adapters expose model/view UUIDs separately. This sample
     is not a component count, reusable selection or write target. Unavailable
-    fields are not_checked; units/offset conversion still needs runtime checks.
+    fields are not_checked; units/offset here remain raw observations. Canonical
+    query geometry has bounded Allplan 2026-1-7 fixture acceptance.
     """
     if isinstance(identity_sample_size, bool) or not isinstance(identity_sample_size, int) or not 0 <= identity_sample_size <= 20:
         raise ValueError("identity_sample_size must be from 0 to 20.")
@@ -161,7 +162,8 @@ def model_query(request: QueryRequest) -> dict[str, Any]:
     columns/beams/walls/slabs. Geometry uses mm, model_local or project_global
     (local plus project offset once), with size_*_mm axis-aligned extents.
     spatial_box is a declared inclusive/exclusive AABB intersects/contained test,
-    not exact solid intersection. These new native readers need Allplan acceptance.
+    not exact solid intersection. Native fixture reads have bounded acceptance on
+    Allplan 2026-1-7; arbitrary scenes/builds remain outside that acceptance.
     Inspect requires explicit scope and attribute_ids (up to 32), returns a
     bounded sample (1..20), raw values and project attribute/layer metadata.
     A missing passive attribute is an API omission, not proof of native absence.
