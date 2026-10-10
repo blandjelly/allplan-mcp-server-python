@@ -50,8 +50,16 @@ excluded duplicate keepers and normalized reservations, pre-context policy
 rejection, missing/unknown mark boundaries, fresh source conflicts, explicit
 mark readback, durable replay after restart/Undo, stopped partial writes and
 read-only recovery after a lost HTTP reply. These fakes do not execute Allplan.
-Source CI, wheel/sdist and exact extracted package checks are recorded with
-the new delivery; old 0.11.0 evidence below remains unchanged.
+Wheel/sdist build and exact extracted package/23 bridge hashes PASS;
+Setup/Restore preserved the journal and restored the prior bridge in the fixture.
+[0.12.0 delivery](../evaluation-packages/0.12.0/README.md) records the exact source,
+artifact identity and six-configuration source CI. Old 0.11.0 evidence below
+remains unchanged; no archives are rebuilt for publication.
+Source **fd78700378eceb6f217e4ca30a83b88004b73a57**, source_modified=false;
+[CI 38075847420](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38075847420)
+**6/6 PASS** on Windows/Ubuntu Python 3.11–3.13, including tests, wheel/sdist and
+Windows package builds. This code update exercises the revised PR/full-matrix
+selection schedule; documentation publication runs no new checks/builds.
 
 Delivered 0.11.0 source **26d70b27bd06e2916cda74213cb8995aa9f0f19a** has
 **178 portable tests PASS**, frozen sync, wheel/sdist builds, deterministic ZIP

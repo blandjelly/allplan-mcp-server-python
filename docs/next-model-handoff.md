@@ -62,8 +62,11 @@ extensions. They do not enlarge mandatory M3 closure scope.
 ## Resume safely
 
 Local final-candidate verification: 187 portable tests PASS, frozen dependency
-sync PASS; follow [testing-policy](testing-policy.md). The new package/delivery
-records the exact source, build/integrity checks and required six-job source CI.
+sync, wheel/sdist and exact extracted installation/23 bridge hashes PASS;
+Setup/Restore preserved the journal. Source **fd78700378eceb6f217e4ca30a83b88004b73a57**,
+[CI 38075847420](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38075847420)
+**6/6 PASS**, Windows/Ubuntu Python 3.11–3.13. Follow [testing-policy](testing-policy.md).
+The delivery retains exact archive identity and source CI job/step observations.
 Do not repeat the full suite or prior native batches for documentation publication.
 
 The owner did not specify whether the model was left repaired, undone or redone
@@ -79,8 +82,10 @@ protection against repeated execution. See [recovery guidance](diagnostics.md)
 and [journal limits](m3-workflow-execution-contract.md#journal-lifecycle-and-the-128-record-limit).
 
 Use [Windows setup](windows-setup.md) and [fixture definition](fixture-guide.md)
-when needed. Delivered [0.11.0 artifacts](../evaluation-packages/0.11.0/README.md)
-remain unchanged. Future runtime changes need a new package version.
+when needed. New [0.12.0 artifacts](../evaluation-packages/0.12.0/README.md)
+identify the clean tested source and exact package. Delivered
+[0.11.0 artifacts](../evaluation-packages/0.11.0/README.md) remain unchanged.
+Future runtime changes need a new package version.
 Historical test counts and CI results belong to their recorded source.
 
 Repository documentation and API identifiers use English; owner walkthroughs
