@@ -21,7 +21,7 @@ recompute after removing unhashed request_id/host_session_id transport metadata.
 All 22 bridge hashes in each health capture match the exact unchanged 0.9.0 ZIP
 (clean source 61c7579645d497a9df1e3ff0cb5640861225b56c). Host session
 **3bec3644-20ac-42ef-b33e-0c2322fea12a** stays the same. Owner confirms
-**model unchanged and host uninterrupted**. S05 layer3700, S06 statusNEW remain.
+**model unchanged and host uninterrupted**. S05 layer 3700, S06 status NEW remain.
 No repeat, Undo or recovery is needed. Static original acceptance flags remain
 unchanged. Earlier 0.8.1 write/Undo/Redo/recovery/restart/stale-Apply gates remain
 accepted within their distinct scope. Same-session UI edit conflict remains
@@ -32,7 +32,7 @@ blocked by the earlier host cancellation; do not repeat on that lifecycle.
 [Polish next card](m3-marks-preview-batch.md).
 fix_model_issues and preview-only rule_based_edit accept selected required/unique
 mark rule choices with exact canonical model_uuid and explicit nonmissing string.
-Both mark rules must participate; distinct assignments per element, max32choices.
+Both mark rules must participate; distinct assignments per element, maximum 32 choices.
 Invalid choices reject before context; absent/compliant/wrong-rule targets are
 finding_stale. Same full audit snapshot generates findings, selection and final
 mark simulation. Excluded/unchosen peers retain current marks; full normalized
@@ -44,33 +44,36 @@ plan, including when filtering leaves only the former two layer/status changes.
 No mark setter/numbering/graphical label/write authorization is introduced.
 Existing office standard 1.0.0 definition and dependencies remain unchanged.
 
-165 local tests PASS on Linux CPython3.12.14, FastMCP3.2.4, uv0.12.19; frozen
+165 local tests PASS on Linux CPython 3.12.14, FastMCP 3.2.4, uv 0.12.19; frozen
 sync and wheel/sdist build pass. Ten new tests cover explicit positive proposals,
 normalization, proposed/excluded-peer collisions, same-scan/stale/unknown inputs,
 pre-context validation, apply bypass refusal, full real MCP/HTTP owner collector
 and stop-on-wrong-fixture. M3 Marks Preview.cmd is packaged at the root. New
 collector retains original MCP text as well as decoded responses.
-Exact delivery identity is recorded under [0.10.0 artifacts](../evaluation-packages/0.10.0/README.md)
-after a clean source commit; accepted older ZIPs/evidence are never rebuilt.
+Exact [0.10.0 delivery](../evaluation-packages/0.10.0/README.md): clean source
+**ebf2c752440a0f72b538527f35175668322395a4**, source_modified=false; ZIP **660447 bytes**,
+SHA-256 **5a3e2ba0d75ebd798204922cf44da70d602bc2e41b8cdbe2f2f7f5c3b3c67888**. Two builds are byte-identical;
+exact extracted integrity and recursive 22-file registration pass.
+Accepted older ZIPs/evidence are never rebuilt.
 Later CI belongs to its exact commit; earlier 0.9.0 six-job result does not
 validate the new mark code.
 
 **Next action requires owner Allplan:** install exact 0.10.0 into a new folder,
 Setup.cmd with the same Local, keep old archives/logs/journal. Use the **same
-repaired disposable six-column copy in file101**, S05 SZ_OGÓ01 and S06 NEW,
+repaired disposable six-column copy in file 101**, S05 SZ_OGÓ01 and S06 NEW,
 with the three mark findings still present. Start host/MCP and run **M3 Marks
 Preview.cmd**, no model edits during reads. Expected ten OK steps:
-C03 missing→S03 and C04 duplicateS02→S04: 2proposals/no final duplicates or missing;
-C04 exception: 1proposal/one remaining duplicate group;
-C03→S06 with existingS06 excepted: expected conflict/one collision group with both
-exact UUIDs. All three revalidations unchanged, full before/after audit3 identical,
+C03 missing→S03 and C04 duplicate S02→S04: 2 proposals/no final duplicates or missing;
+C04 exception: 1 proposal/one remaining duplicate group;
+C03→S06 with existing S06 excepted: expected conflict/one collision group with both
+exact UUIDs. All three revalidations unchanged, full before/after audit (3 findings) identical,
 same-session health. Return original logs/m3-marks-preview-*.json/TXT and unchanged
 values/appearance/host observation. Do not Apply, Recover, Undo, rebuild the
 fixture or repeat an accepted old gate.
 
 M3/UAT-05/UAT-06 remain open. Native new positive mark proposals/collisions are
 not_run; mark/selected writes, numbering, labels/filemoves, wider standards/types,
-unknown native outcomes, grouped Undo, full app/OSrestart and crash/power-loss
+unknown native outcomes, grouped Undo, full app/OS restart and crash/power-loss
 behavior remain deferred. Base/main documentation reconciliation and integration
 remain separate. Preserve every raw evidence byte and archive version identity.
 
