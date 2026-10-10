@@ -1,15 +1,23 @@
 # Evaluation delivery — 0.10.0
 
-Status **ready_for_owner_test**, native explicit mark proposal/collision gate
-**not_run**. The [0.9.0 native read-only standard/selection gate passes](../../docs/test-results/m3-standards-acceptance-0.9.0.md),
+Current native status: **bounded explicit marks-preview gate PASS** on
+2026-10-10. [Acceptance, original uploads and verification](../../docs/test-results/m3-marks-acceptance-0.10.0.md)
+record all ten steps, positive proposals, exception, excluded-peer collision,
+unchanged revalidation/audits and owner-confirmed unchanged model/uninterrupted
+host. No repetition is requested. The original delivery manifest and embedded
+package documents retain their historical ready_for_owner_test/not_run flags;
+this acceptance update does not rewrite them or rebuild any archive.
+The [0.9.0 native read-only standard/selection gate passes](../../docs/test-results/m3-standards-acceptance-0.9.0.md),
 including unchanged model and uninterrupted host. Its exact archive and original
 uploads remain unchanged. M3/UAT-05/UAT-06 remain open.
 
-Download and completely extract
-[allplan-mcp-0.10.0-windows-evaluation.zip](allplan-mcp-0.10.0-windows-evaluation.zip),
-then follow [the read-only mark owner card](../../docs/m3-marks-preview-batch.md).
-Use the same repaired disposable six-column copy in file101, S05 SZ_OGÓ01 and
-S06 NEW, keeping the existing mark defects. **M3 Marks Preview.cmd** checks two
+Original owner-test archive:
+[allplan-mcp-0.10.0-windows-evaluation.zip](allplan-mcp-0.10.0-windows-evaluation.zip).
+The [completed read-only mark owner card](../../docs/m3-marks-preview-batch.md)
+retains the procedure for reference.
+The recorded test uses the repaired disposable six-column copy in file 101,
+S05 SZ_OGÓ01 and S06 NEW, keeping the existing mark defects.
+**M3 Marks Preview.cmd** checks two
 explicit mark proposals, a UUID exception, an expected collision with an excluded
 peer, three exact-plan revalidations, complete before/after audit and same-session
 health. It retains original MCP text and decoded responses and invokes no

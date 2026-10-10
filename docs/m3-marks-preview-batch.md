@@ -1,6 +1,14 @@
 # M3 — podgląd dwóch oznaczeń i kontrola kolizji, pakiet 0.10.0
 
-Status **ready_for_owner_test**. Test standardów 0.9.0 jest
+Status **bounded native gate PASS**, **10 października 2026**.
+[Wynik, oryginalne logi i weryfikacja](test-results/m3-marks-acceptance-0.10.0.md):
+wszystkie 10 kroków OK, dwie propozycje S03/S04, prawidłowy wyjątek C04
+oraz oczekiwana kolizja S06 z elementem wyłączonym z edycji. Trzy plany
+rewalidują się jako unchanged; audyty są identyczne poza ID żądania.
+Właściciel potwierdza model bez zmian i nieprzerwany host. Nie powtarzaj testu;
+nie uruchamiaj Apply, Recover ani Undo. Poniżej zachowano zaliczoną procedurę.
+
+Test standardów 0.9.0 jest
 [zaliczony](test-results/m3-standards-acceptance-0.9.0.md); nie powtarzaj go.
 Nowy test tylko odczytuje model i pokazuje propozycje. Nie zapisuje oznaczeń.
 [Pakiet i suma kontrolna](../evaluation-packages/0.10.0/README.md).

@@ -112,9 +112,12 @@ mark rules and same-snapshot full-scope collision simulation. Unknown evidence
 blocks readiness; excluded peers still participate. Mark metadata refuses Apply
 even when filtering leaves the old layer/status pair.
 [Contract](m3-marks-contract.md), [portable evidence](test-results/m3-marks-portable-0.10.0.md),
-[next read-only owner gate](m3-marks-preview-batch.md).
-Native positive mark proposals are not_run; numbering, labels, wider standards
-and selected/mark native writes remain deferred. M3 is open.
+[completed read-only owner gate](m3-marks-preview-batch.md),
+[native marks-preview PASS](test-results/m3-marks-acceptance-0.10.0.md).
+Two explicit proposals, a selection exception, collision against an excluded peer,
+three unchanged revalidations and identical audits pass; owner confirms unchanged
+model and uninterrupted host. No repetition is required. Numbering, labels, wider
+standards and selected/mark native writes remain deferred. M3 is open.
 
 - **M3.1** Shared preview/apply, stale checks, serialized writes, request identity, readback, partial outcomes and tested Undo limits.
 - **M3.2** `fix_model_issues` for writable attributes/layers; data marks and graphical labels stay distinct.

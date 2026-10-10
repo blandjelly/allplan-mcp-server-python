@@ -62,7 +62,11 @@ predicate/exception `rule_based_edit` previews using the shared audit/planner.
 Package **0.10.0** adds exact-target mark repair previews and whole-scope
 collision simulation, including excluded peers. Mark plans cannot use Apply.
 [Mark contract](docs/m3-marks-contract.md),
-[next read-only owner card](docs/m3-marks-preview-batch.md).
+[native marks-preview PASS](docs/test-results/m3-marks-acceptance-0.10.0.md),
+[completed read-only owner card](docs/m3-marks-preview-batch.md).
+All ten steps, positive proposals, selection exception, excluded-peer collision
+and unchanged revalidations pass; owner confirms model unchanged and host
+uninterrupted. No repeat is required.
 New workflows authorize no writes; broader repairs and generation remain pending.
 M3 is not closed.
 

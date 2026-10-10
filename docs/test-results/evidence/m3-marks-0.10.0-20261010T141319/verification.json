@@ -1,0 +1,252 @@
+{
+  "decision": "native_explicit_marks_preview_pass",
+  "steps_ok": 10,
+  "host_session": "6856cef1-a336-4ef5-a51a-e6663545492d",
+  "query_session": "9d99fd6dad294feab4df3002ae650bc0",
+  "audit_before_after_equal_except_request_id": true,
+  "audit_report_hashes_independently_recomputed": true,
+  "source_fingerprint_identical": "8055a1b63bae34a3c0dcf379a4e2c8b2439d22dccf746874de4643ce21077799",
+  "returned_audit_report_fingerprint": "6f2bfd929ec01cca512e430517057666fdae69a79e494676ecadeee4dd8cb658",
+  "bridge_files_verified_in_each_health_against_clean_source": 22,
+  "bridge_source_provenance": {
+    "clean_source": "ebf2c752440a0f72b538527f35175668322395a4",
+    "inspected_head": "742f0ebf51ee17caf554595bec49670ea3226d2d",
+    "files": [
+      {
+        "installed_path": "Library/PythonHost/StartPythonHost.pyp",
+        "repository_path": "python_host/Library/PythonParts/StartPythonHost.pyp",
+        "git_blob_sha": "78c062cc06fae1565567438d9fd865c06ae7f55e"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/audit_contracts.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/audit_contracts.py",
+        "git_blob_sha": "9a595fcf545d256425fcd0e6acd356971e7ff2a9"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/model_audit.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/model_audit.py",
+        "git_blob_sha": "7b8ddea9ccd174fcb53562555885127f2bc6509b"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/model_context.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/model_context.py",
+        "git_blob_sha": "bb25da3385130c349174aff1b94ee0e5d377b065"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/model_metadata.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/model_metadata.py",
+        "git_blob_sha": "7a41668f509b6cb5c79477861f5abe89d40fe0ed"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/model_query.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/model_query.py",
+        "git_blob_sha": "f45ebeb995fa8ebb1d675f0b0a38534259f50fa9"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/model_repair.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/model_repair.py",
+        "git_blob_sha": "674ba5e535d510032f618b7952a62d51febc3d57"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/native_readers.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/native_readers.py",
+        "git_blob_sha": "05a49c7d3d93cccc4ac3b553b600a48df64d1b53"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/native_repairs.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/native_repairs.py",
+        "git_blob_sha": "cc35d932176090a47a25879e98d64d708460da84"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/profile_contracts.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/profile_contracts.py",
+        "git_blob_sha": "934bb149cb1fb1a53bf7b9e1a19af8e07b6d1c79"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/PythonHostHandler.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/PythonHostHandler.py",
+        "git_blob_sha": "fbbd1b773e82a322c9e5a98f8d3eb8c232941641"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/query_contracts.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/query_contracts.py",
+        "git_blob_sha": "442b7535818140a7330ffc7530ae793982d6b379"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/repair_contracts.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/repair_contracts.py",
+        "git_blob_sha": "ee76a4f821af91d7298b7e26b649f87771f1bc70"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/repair_execution.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/repair_execution.py",
+        "git_blob_sha": "3272fc08bc966b8a9e414e55daea986d94b7feae"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/runtime_info.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/runtime_info.py",
+        "git_blob_sha": "ad4f2b81361e72c4ca05001ea1cc91a718226e9b"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/sandbox/__init__.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/sandbox/__init__.py",
+        "git_blob_sha": "c0f36fd1a94794652229ca98a4e8c65a19ec72e3"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/sandbox/const.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/sandbox/const.py",
+        "git_blob_sha": "f4c397c4530e9708a54484cb357e71b5eba1afb4"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/sandbox/executor.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/sandbox/executor.py",
+        "git_blob_sha": "9c644f8dbda29e52c77cd65f4202aa431d3ed44a"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/sandbox/validator.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/sandbox/validator.py",
+        "git_blob_sha": "c019a8b6b5022ee1ce26f5bf734fa59444830409"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/spatial_contracts.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/spatial_contracts.py",
+        "git_blob_sha": "a0318963b3e09e5ba60cdbc5b6a85bbd71b25f81"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/StartPythonHost.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/StartPythonHost.py",
+        "git_blob_sha": "5a59080d061fed3795db3628d7635e2f73217aa9"
+      },
+      {
+        "installed_path": "PythonPartsScripts/PythonHost/transport.py",
+        "repository_path": "python_host/PythonPartsScripts/PythonHost/transport.py",
+        "git_blob_sha": "4302ad36422df0a23877bfc00f0582ad012fba93"
+      }
+    ]
+  },
+  "archive_sha256_recorded_in_delivery": "5a3e2ba0d75ebd798204922cf44da70d602bc2e41b8cdbe2f2f7f5c3b3c67888",
+  "archive_binary_independently_verified_in_this_analysis": false,
+  "plans": [
+    {
+      "scenario": "explicit_marks",
+      "plan_id": "21d675f6c8bf496e974aef0dad745c60",
+      "plan_hash": "74eb332a265cd7ec2a7fb7e3a8eb6601d8ef80d9ba1b9de3f99f23a61ef3ebf6",
+      "recomputed": true,
+      "changes": 2,
+      "selection_result": null,
+      "mark_validation": {
+        "state": "validated",
+        "checked_elements": 6,
+        "not_checked_elements": 0,
+        "proposed_marks": 2,
+        "collision_groups": 0,
+        "collisions": [],
+        "remaining_duplicate_groups": 0,
+        "remaining_missing_marks": 0,
+        "uniqueness_scope": [
+          "drawing_file",
+          "element_family"
+        ],
+        "uses_full_snapshot": true,
+        "read_only": true
+      }
+    },
+    {
+      "scenario": "mark_exception",
+      "plan_id": "a2f78f2430d646d3b62a19083aaa0f19",
+      "plan_hash": "4ed035f16791228a33780fa2895ccc604756312fb8414046f0f83a72adcbe5e1",
+      "recomputed": true,
+      "changes": 1,
+      "selection_result": {
+        "selected_elements": 5,
+        "predicate_false": 0,
+        "excluded_elements": 1,
+        "predicate_not_checked": 0
+      },
+      "mark_validation": {
+        "state": "validated",
+        "checked_elements": 6,
+        "not_checked_elements": 0,
+        "proposed_marks": 1,
+        "collision_groups": 0,
+        "collisions": [],
+        "remaining_duplicate_groups": 1,
+        "remaining_missing_marks": 0,
+        "uniqueness_scope": [
+          "drawing_file",
+          "element_family"
+        ],
+        "uses_full_snapshot": true,
+        "read_only": true
+      }
+    },
+    {
+      "scenario": "excluded_peer_collision",
+      "plan_id": "cc4142062824419ab818f712ea044a02",
+      "plan_hash": "c533a30e4f6e9c47850ca5bb4eb37da801c879083a9efc1e7e1059b8b279a66b",
+      "recomputed": true,
+      "changes": 2,
+      "selection_result": {
+        "selected_elements": 5,
+        "predicate_false": 0,
+        "excluded_elements": 1,
+        "predicate_not_checked": 0
+      },
+      "mark_validation": {
+        "state": "conflict",
+        "checked_elements": 6,
+        "not_checked_elements": 0,
+        "proposed_marks": 2,
+        "collision_groups": 1,
+        "collisions": [
+          {
+            "drawing_file": 101,
+            "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+            "normalized_value": "S06",
+            "refs": [
+              {
+                "query_session_id": "9d99fd6dad294feab4df3002ae650bc0",
+                "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+                "document_id": 0,
+                "profile_binding_fingerprint": "471be0c017f1ba24a4a1bcce85e8eda40dcd46c86f97b02b6df25a0516f8712f",
+                "drawing_file": 101,
+                "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              {
+                "query_session_id": "9d99fd6dad294feab4df3002ae650bc0",
+                "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+                "document_id": 0,
+                "profile_binding_fingerprint": "471be0c017f1ba24a4a1bcce85e8eda40dcd46c86f97b02b6df25a0516f8712f",
+                "drawing_file": 101,
+                "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              }
+            ]
+          }
+        ],
+        "remaining_duplicate_groups": 1,
+        "remaining_missing_marks": 0,
+        "uniqueness_scope": [
+          "drawing_file",
+          "element_family"
+        ],
+        "uses_full_snapshot": true,
+        "read_only": true
+      }
+    }
+  ],
+  "mcp_text_and_decoded_responses_agree": true,
+  "txt_json_agree_after_newline_normalization": true,
+  "owner_observation": "wykonalem test wersji 0.10.0, wysylam logi, model w allplan bez zmian, host nieprzerwany",
+  "limits": [
+    "read-only retained six-column fixture in file 101",
+    "no mark or selected writes tested",
+    "earlier layer/status execution and Undo acceptance remains separate",
+    "M3/UAT-05/UAT-06 remain open"
+  ]
+}

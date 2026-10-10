@@ -1,6 +1,51 @@
 # Next-model handoff
 
-## Current handoff — 2026-10-10 Europe/Warsaw, 0.9.0 native PASS / 0.10.0 marks ready
+## Current handoff — 2026-10-10 Europe/Warsaw, 0.10.0 native marks-preview PASS
+
+Continue **codex/m3-repair-preview**, draft [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2).
+The owner supplied original 0.10.0 JSON/TXT and confirmed **model unchanged,
+host uninterrupted**. [Bounded acceptance](test-results/m3-marks-acceptance-0.10.0.md)
+closes the [marks-preview owner card](m3-marks-preview-batch.md); no repetition,
+Apply, Recover or Undo is requested.
+
+All ten native steps pass on the retained repaired six-column file-101 fixture:
+C03 missing mark → S03 and C04 S02 → S04 give two proposals/no final defects;
+the C04 exception leaves only S03 and the existing S02 duplicate group;
+C03 → S06 detects the expected collision with the existing excluded S06 peer.
+All three exact plans revalidate unchanged. Both complete audits match except
+transport request IDs: 24 checks, 20 pass, 3 fail, 1 not_applicable, 0 not_checked.
+One host session **6856cef1-a336-4ef5-a51a-e6663545492d** spans all ten responses.
+Source fingerprint **8055a1b63bae34a3c0dcf379a4e2c8b2439d22dccf746874de4643ce21077799**;
+report fingerprint **6f2bfd929ec01cca512e430517057666fdae69a79e494676ecadeee4dd8cb658**.
+Both audit hashes and all three expanded-request plan hashes independently
+recompute; original MCP text/decoded responses and TXT agree.
+
+Original upload bytes, size/hash manifest and independent verification are
+under [evidence/m3-marks-0.10.0-20261010T141319](test-results/evidence/m3-marks-0.10.0-20261010T141319/).
+All 22 installed bridge hashes in each health capture independently match
+clean source **ebf2c752440a0f72b538527f35175668322395a4**; the same source blobs
+remain on inspected M3 head **742f0ebf51ee17caf554595bec49670ea3226d2d**.
+The delivered ZIP and publication manifest remain unchanged; binary archive
+comparison was unavailable through the text-only connector in this analysis.
+Recorded delivery SHA-256 remains
+**5a3e2ba0d75ebd798204922cf44da70d602bc2e41b8cdbe2f2f7f5c3b3c67888**.
+Existing 165-test/six-job CI evidence concerns its original commits; no runtime
+code, package version or archive was changed by this acceptance update.
+Static original flags remain historical and unedited.
+
+**Next action:** continue M3 implementation from this accepted preview baseline,
+reviewing the remaining execution/standards requirements before defining a new
+bounded slice. No new owner test is requested by this documentation update.
+M3/UAT-05/UAT-06 remain open: mark/selected writes, numbering, graphical labels,
+wider standards/types, native unknown outcomes, grouped Undo and crash/power-loss
+guarantees remain unaccepted. Earlier 0.8.1 layer/status execution, separate Undo,
+Redo/recovery, restart and stale-Apply gates and the 0.9.0 preview gate retain
+their separate acceptance. Same-session UI-edit conflict stays blocked in the
+observed interactive-host lifecycle; do not repeat it there.
+Main/base reconciliation, integration and release remain separate. Preserve
+original uploads and delivery artifacts; continue on M3 without rebuilding them.
+
+## Prior handoff — 2026-10-10 Europe/Warsaw, 0.9.0 native PASS / 0.10.0 marks ready
 
 Continue **codex/m3-repair-preview**, draft [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2), base codex/m2-audit-accepted.
 The owner requests continued M3 work until native testing is required and
