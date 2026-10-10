@@ -1,6 +1,9 @@
 # Validation status and limits
 
-Current package **0.11.0**; status recorded **2026-10-10 Europe/Warsaw**.
+Current package **0.12.0**; status recorded **2026-10-10 Europe/Warsaw**.
+Mark assignment and deterministic numbering are implemented, **ready_for_owner_test**;
+[new native gate](m3-numbering-owner-test.md). Native acceptance below remains
+scoped to its original packages; no 0.12.0 Allplan observation is claimed.
 Native acceptance concerns the retained disposable fixture and observed Allplan
 **2026-1-7** setup with local Windows Codex. It is separate from portable tests.
 M3/UAT-05/UAT-06 and the first MVP remain open.
@@ -39,6 +42,16 @@ recovery, crash/power-loss durability and cross-copy identity remain open.
 No unchanged accepted owner gate needs repetition.
 
 ## Portable verification and delivery
+
+0.12.0 final implementation candidate: **187 portable tests PASS** on Linux
+CPython 3.12; one full run after focused repair/mark and 26 HTTP/MCP checks.
+Frozen dependency sync PASS. Coverage includes deterministic order/no-op,
+excluded duplicate keepers and normalized reservations, pre-context policy
+rejection, missing/unknown mark boundaries, fresh source conflicts, explicit
+mark readback, durable replay after restart/Undo, stopped partial writes and
+read-only recovery after a lost HTTP reply. These fakes do not execute Allplan.
+Source CI, wheel/sdist and exact extracted package checks are recorded with
+the new delivery; old 0.11.0 evidence below remains unchanged.
 
 Delivered 0.11.0 source **26d70b27bd06e2916cda74213cb8995aa9f0f19a** has
 **178 portable tests PASS**, frozen sync, wheel/sdist builds, deterministic ZIP

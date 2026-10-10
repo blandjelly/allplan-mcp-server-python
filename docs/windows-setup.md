@@ -1,4 +1,4 @@
-# Windows setup — 0.11.0 evaluation
+# Windows setup — 0.12.0 evaluation
 
 Use the versioned package on the Windows machine running Allplan and Codex.
 It requires external Python 3.11+ and internet access for locked dependencies;
@@ -8,13 +8,14 @@ Allplan, Python and Codex are not bundled. Acceptance is scoped to the
 For ongoing M3 work use the existing disposable project, establish its current
 values before planning and preserve Local/.allplan-mcp/repairs and package logs.
 See [fixture](fixture-guide.md) and [journal lifecycle](m3-workflow-execution-contract.md#journal-lifecycle-and-the-128-record-limit).
-Delivered archives retain original launchers; new source packages retain only
-setup/connection/diagnostics/restore and read-only repair recovery launchers.
+Delivered archives retain original launchers; new source packages retain
+setup/connection/diagnostics/restore, read-only recovery and the new
+[mark numbering gate](m3-numbering-owner-test.md) launchers.
 
 ## Install through Explorer
 
 1. On the Windows machine running Allplan, install the normal Windows distribution of [Python 3.11 or newer](https://www.python.org/downloads/windows/) if needed. Keep its Tcl/Tk and launcher components. This is the external MCP runtime; Allplan's embedded Python is detected independently. The local automated run used Python 3.12.14.
-2. Extract `allplan-mcp-0.11.0-windows-evaluation.zip` into a writable folder, for example `Documents\Allplan MCP\0.11.0`. Extract it completely; do not run scripts from inside the ZIP. Keep the resulting `allplan-mcp-0.11.0` folder intact.
+2. Extract `allplan-mcp-0.12.0-windows-evaluation.zip` into a writable folder, for example `Documents\Allplan MCP\0.12.0`. Extract it completely; do not run scripts from inside the ZIP. Keep the resulting `allplan-mcp-0.12.0` folder intact.
 3. Find your actual Allplan user **Local** folder using Allmenu's user-folder information / Windows Explorer. A common location is `Documents\Nemetschek\Allplan\2026\Usr\Local`; redirected Documents and custom paths are supported. Select the existing `Local` folder, not `Prg`, `Std`, or the project folder. The `2026` example is a target path, not evidence of your installed build.
 4. Close Allplan. Double-click **Setup.cmd**. It checks the package hashes, creates isolated external environments, installs the locked dependencies and opens a folder chooser for the actual `Local` folder. No administrator rights or manual module copying should be needed. Cancel the chooser to leave the bridge unchanged.
 5. Setup replaces `Library\PythonHost` and `PythonPartsScripts\PythonHost` and removes the old `PythonParts\PythonHost` installation after backing it up, copying their full contents, including `sandbox`. The previous contents and absence of either folder are recorded under `Local\.allplan-mcp\backups\<backup-id>`. Other PythonParts are preserved. Setup prints the installed package version and backup ID; `logs\installation.json` records them.

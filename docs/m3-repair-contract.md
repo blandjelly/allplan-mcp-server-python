@@ -4,7 +4,7 @@ Public tool fix_model_issues, bridge /fix-model-issues, request/plan schema
 m3-repair-1. Preview/revalidation are side-effect-free. Layer/status preview
 has [bounded native acceptance](validation-status.md); explicit mark proposals
 are described in the [mark contract](m3-marks-contract.md).
-Package **0.11.0** executes eligible reviewed layer/status plans through the
+Package **0.12.0** executes eligible reviewed existing-string mark/status and layer plans through the
 [shared executor](m3-execution-contract.md) and
 [workflow contract](m3-workflow-execution-contract.md).
 M3/UAT-05/UAT-06 remain open.
@@ -37,10 +37,9 @@ Supported choices are `required_layer` → that rule's expected named layer role
 and `allowed_attribute_values` on **status** → an explicitly supplied allowed
 value. String comparison uses the audit's trim/case policy; the exact supplied
 string is retained as the proposed value. Explicit per-model mark choices use
-the [mark contract](m3-marks-contract.md) and always remain preview-only.
-No default value, numbering, mark
-assignment, duplicate resolution, graphical label or native-property edit is
-inferred. Optional `finding_ids` contains 1–100 distinct hashes and restricts
+the [mark contract](m3-marks-contract.md) and require validated full-scope collisions before evaluation Apply.
+The separately selected [numbering standard](m3-numbering-contract.md) expands exact
+mark choices from the same snapshot. No graphical label or native-property edit is inferred. Optional `finding_ids` contains 1–100 distinct hashes and restricts
 the chosen rules to those exact current findings. Absent/stale/unselected IDs
 reject with `finding_stale`. Omitting IDs selects all current failing findings
 for the explicitly chosen repair rules.
@@ -100,7 +99,7 @@ Symbol presence proves neither target writability nor mutation/Undo behavior.
 
 Preview/revalidation return read_only=true, apply_available=false and
 usable_for_write=false. Eligible layer/status plans separately advertise
-evaluation_apply_available for the bounded executor. Mark plans always refuse
-Apply. General writable profiles and durable references remain unimplemented.
+evaluation_apply_available for the bounded executor. Existing-string mark plans require validated collision evidence;
+mark Apply awaits native acceptance. General writable profiles and durable references remain unimplemented.
 The plan service invokes no setters; native Apply belongs to the shared executor.
 See [accepted limits and remaining work](validation-status.md).

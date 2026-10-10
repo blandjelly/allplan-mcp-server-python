@@ -88,14 +88,15 @@ class RepairExecutor:
 
     @staticmethod
     def evaluation_scope(plan):
-        """Bounded existing string-status/layer writes, independent of demo counts.
-
-        Mark plans remain read-only until their setter gate is implemented.
-        Native adapter support remains Column roots in one foreground file.
-        """
+        """Existing string mark/status and layer writes in one foreground file."""
         changes = plan["changes"]
         files = plan["scope"]["included_files"]
-        if ("mark_validation" in plan or plan["state"] != "preview_ready"
+        validation = plan.get("mark_validation")
+        if ((validation is not None and (validation.get("state") != "validated"
+                                        or validation.get("uses_full_snapshot") is not True
+                                        or validation.get("collision_groups") != 0
+                                        or validation.get("not_checked_elements") != 0))
+                or plan["state"] != "preview_ready"
                 or not 1 <= len(changes) <= RepairExecutor.MAX_CHANGES
                 or len(files) != 1 or files[0]["state"] != "active_foreground"
                 or not all(plan["coverage"].get(key) is True for key in
@@ -122,7 +123,8 @@ class RepairExecutor:
                         or not isinstance(resource.get("short_name"), str) or not resource["short_name"]):
                     return False
             elif change["operation"] == "set_attribute":
-                if (change.get("property_role") != "status" or resource.get("data_type") != "string"
+                if (change.get("property_role") not in {"status", "mark"} or resource.get("data_type") != "string"
+                        or (change.get("property_role") == "mark" and validation is None)
                         or type(resource.get("attribute_id")) is not int
                         or change["field"] != f"attribute:{resource['attribute_id']}"
                         or not isinstance(change["old_value"].get("value"), str)
@@ -180,7 +182,7 @@ class RepairExecutor:
                 or (expected_workflow is not None and plan.get("workflow", {}).get("kind") != expected_workflow)
                 or (request["acknowledgement"] == "disposable_copy_reviewed_two_repairs"
                     and not self.legacy_evaluation_scope(plan))):
-            raise BridgeError("repair_scope_unavailable", "Apply requires a reviewed supported Column layer/status plan in one foreground file; new plans require disposable_copy_reviewed_plan.", 409)
+            raise BridgeError("repair_scope_unavailable", "Apply requires a reviewed supported Column mark/status/layer plan in one foreground file; new plans require disposable_copy_reviewed_plan.", 409)
         before = self.plans.queries._scan(doc, base, settings, query_request(entry["request"]["audit"]))
         if before["source_fingerprint"] != plan["source_fingerprint"]:
             raise BridgeError("repair_conflict", "Audited source changed during preflight.", 409)
@@ -188,8 +190,9 @@ class RepairExecutor:
         for change in plan["changes"]:
             fields = expected[change["ref"]["model_uuid"]]
             fields[change["field"]] = {"status": "observed", "value": change["new_value"]}
-            if change.get("property_role") == "status" and "status" in fields:
-                fields["status"] = copy.deepcopy(fields[change["field"]])
+            role = change.get("property_role")
+            if role in {"status", "mark"} and role in fields:
+                fields[role] = copy.deepcopy(fields[change["field"]])
         # Resolve and check every target before recording or invoking any setter.
         target_preflight = []
         for change in plan["changes"]:

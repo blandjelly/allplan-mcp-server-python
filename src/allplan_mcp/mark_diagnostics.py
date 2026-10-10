@@ -83,7 +83,8 @@ async def collect_mark_preview(mcp_url, path):
                 is_collision = step == 'excluded_peer_collision'
                 ok = (plan.get('state') == ('conflict' if is_collision else 'preview_ready')
                       and plan.get('read_only') is True and all(plan.get(k) is False
-                          for k in ('apply_available', 'evaluation_apply_available', 'usable_for_write'))
+                          for k in ('apply_available', 'usable_for_write'))
+                      and plan.get('evaluation_apply_available') is (not is_collision)
                       and actual_assignments == expected_assignments and len(plan['changes']) == len(expected_assignments)
                       and all(c['operation'] == 'set_attribute' and c['resource'] == mark_resource
                               and c['field'] == f"attribute:{mark_resource['attribute_id']}" for c in plan['changes'])
@@ -110,7 +111,7 @@ async def collect_mark_preview(mcp_url, path):
                 request = {'action': 'revalidate', 'plan_id': plan['plan_id'], 'plan_hash': plan['plan_hash']}
                 check, content = await call('fix_model_issues', request)
                 ok = (check.get('state') == 'unchanged' and check.get('source_unchanged') is True
-                      and check.get('read_only') is True and check.get('evaluation_apply_available') is False
+                      and check.get('read_only') is True and check.get('evaluation_apply_available') is (not is_collision)
                       and check['current_source_fingerprint'] == before['source_fingerprint']
                       and check['current_audit_report_fingerprint'] == before['report_fingerprint'])
                 record(step, ok, check, content, request)
@@ -140,12 +141,17 @@ async def collect_mark_preview(mcp_url, path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--numbering-apply', action='store_true', help='Review then apply the new numbering gate on a disposable copy.')
     args = parser.parse_args()
     path = args.output or Path('logs') / ('m3-marks-preview-' + datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ') + '.json')
-    report = asyncio.run(collect_mark_preview('http://127.0.0.1:8888/mcp', path))
+    if args.numbering_apply:
+        from .numbering_diagnostics import collect_numbering_apply
+        report = asyncio.run(collect_numbering_apply('http://127.0.0.1:8888/mcp', path))
+    else:
+        report = asyncio.run(collect_mark_preview('http://127.0.0.1:8888/mcp', path))
     print(f"M3 marks: {report['state']}. JSON/TXT: {path.resolve()}")
     print(report.get('message', ''))
-    if report['state'] != 'ready_for_ui_observation':
+    if report['state'] not in {'ready_for_ui_observation', 'cancelled', 'rejected'}:
         raise SystemExit(1)
 
 

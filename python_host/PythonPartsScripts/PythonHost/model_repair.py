@@ -35,7 +35,7 @@ class RepairPlanService:
         if request["action"] == "revalidate":
             return self._revalidate(doc, base, settings, request)
         decisions, selection_result = {}, None
-        mark_requested = any("model_uuid" in choice for choice in request["repairs"])
+        mark_requested = "numbering" in request or any("model_uuid" in choice for choice in request["repairs"])
         snapshot = None
         if "selection" in request or mark_requested:
             report, snapshot = run_audit(self.queries, doc, base, settings, request["audit"], with_snapshot=True)
@@ -59,7 +59,17 @@ class RepairPlanService:
                     decision = "selected_elements" if value is True else "predicate_false" if value is False else "predicate_not_checked"
                 decisions[fingerprint(element["ref"])] = decision
                 selection_result[decision] += 1
-        choices = {(c["rule_id"], c.get("model_uuid")): c["value"] for c in request["repairs"]}
+        effective_choices = copy.deepcopy(request["repairs"])
+        numbering_result = None
+        if "numbering" in request:
+            from .mark_numbering import number_marks
+            started = self.queries.clock()
+            def check_budget():
+                if self.queries.clock() - started >= self.queries.SCAN_SECONDS:
+                    raise BridgeError("scan_limit_exceeded", "Numbering exceeded its time budget; no plan was stored.", 409)
+            generated, numbering_result = number_marks(snapshot, report, request, decisions, check_budget)
+            effective_choices.extend(generated)
+        choices = {(c["rule_id"], c.get("model_uuid")): c["value"] for c in effective_choices}
         rules = {r["rule_id"]: r for r in request["audit"]["profile"]["rules"]}
         def chosen(finding):
             key = (finding["rule_id"], finding["ref"]["model_uuid"])
@@ -144,19 +154,22 @@ class RepairPlanService:
             plan["report_text"] += (f"\nMark validation: {validation['state']}; "
                                     f"{validation['collision_groups']} proposed collision groups; "
                                     f"{validation['remaining_duplicate_groups']} remaining duplicate groups; "
-                                    f"{validation['remaining_missing_marks']} remaining missing marks. Preview only.")
+                                    f"{validation['remaining_missing_marks']} remaining missing marks.")
             for collision in validation["collisions"]:
                 plan["report_text"] += (f"\nMark collision {collision['normalized_value']!r}: "
                                         + ", ".join(ref["model_uuid"] for ref in collision["refs"]) + ".")
+        if numbering_result is not None:
+            plan["numbering"] = numbering_result
+            if numbering_result["state"] != "validated":
+                plan["state"] = "not_checked"
+            plan["report_text"] += f"\nNumbering preserve-valid-fill-gaps 1.0.0: {len(numbering_result['assignments'])} exact assignments."
         if "workflow" in request:
             plan["workflow"] = copy.deepcopy(request["workflow"])
             workflow = request["workflow"]
             if workflow["kind"] == "office_standard_preview":
                 plan["report_text"] += f"\nStandard: {workflow['standard_id']} {workflow['standard_version']}. Reviewed apply is a separate action."
         plan["evaluation_apply_available"] = self.executor.evaluation_scope(plan)
-        plan["evaluation_apply_limit"] = "disposable_copy_reviewed_plan; 1..32 existing status/layer changes on Column roots in one foreground file; expanded native acceptance pending"
-        if mark_requested:
-            plan["evaluation_apply_limit"] = "Mark previews have no native apply authorization."
+        plan["evaluation_apply_limit"] = "disposable_copy_reviewed_plan; 1..32 existing string mark/status or layer changes on Column roots in one foreground file; new mark/numbering native acceptance pending"
         if not plan["evaluation_apply_available"]:
             plan["report_text"] = plan["report_text"].replace(
                 "Preview requests no writes; evaluation apply requires a reviewed disposable copy.",

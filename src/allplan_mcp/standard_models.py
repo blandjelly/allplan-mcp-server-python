@@ -9,7 +9,7 @@ from .repair_models import RepairApply, RepairPreview, RepairRecover, RepairReva
 
 class OfficeStandardPreview(ContractModel):
     action: Literal["preview"]
-    standard_id: Literal["native-model-qa-demo-layer-status"]
+    standard_id: Literal["native-model-qa-demo-layer-status", "native-model-qa-demo-mark-numbering"]
     standard_version: Literal["1.0.0"]
     scope: QueryScope
     selection: RepairSelection | None = None

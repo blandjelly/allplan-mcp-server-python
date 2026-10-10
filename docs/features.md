@@ -2,10 +2,11 @@
 
 The toolkit plans 13 workflow tools. Bounded context/query reads and native
 model audits are accepted within the [recorded fixture scope](validation-status.md).
-Package **0.11.0** supports reviewed layer/status execution through
+Package **0.12.0** supports reviewed existing-string mark/status and layer execution through
 fix_model_issues, apply_office_standard and rule_based_edit; its native acceptance
 covers two separately reviewed single-target workflow writes. Mark previews have
-collision-aware native acceptance; mark writes and numbering remain open.
+collision-aware native acceptance; mark writes and deterministic numbering are implemented and
+[await native acceptance](m3-numbering-owner-test.md).
 Other workflow tools are planned. M0 utilities are allplan_health,
 get_allplan_version, get_all_object_names, create_cube and create_box.
 Baseline boxes have no automatic readback/deduplication.

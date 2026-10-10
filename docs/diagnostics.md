@@ -15,6 +15,12 @@ Unknown/incomplete data remains not_checked.
 
 ## Lost replies and recovery
 
+**M3 Numbering.cmd** runs only the new reviewed mark gate in 0.12.0. See
+[owner instructions](m3-numbering-owner-test.md). It persists the execution ID
+before Apply; it never resumes or rolls back a failed write. The separate
+**M3 Numbering Recover.cmd** reads logs/m3-last-numbering-execution.json and
+uses read-only recovery, including after UI Undo/host restart.
+
 Do not send a new Apply after a lost reply or partial/unknown result. Preserve
 the original request/execution ID, project, package logs and installed journal
 **Local/.allplan-mcp/repairs**. New IDs can bypass historical deduplication.

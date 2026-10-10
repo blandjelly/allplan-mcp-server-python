@@ -1,6 +1,6 @@
 # M3 office standards and selected repairs
 
-Current **0.11.0** tools apply_office_standard and rule_based_edit share the
+Current **0.12.0** tools apply_office_standard and rule_based_edit share the
 repair planner/executor. They accept preview, revalidate, apply and recover.
 [Native boundaries](validation-status.md) distinguish the earlier no-op previews
 from the latest two separately reviewed single-target writes.
@@ -14,11 +14,12 @@ version **1.0.0**, explicit scope and include_passive=false. The packaged resour
 allplan://standards/native-model-qa-demo-layer-status uses schema m3-standard-1.
 It chooses QA-003 → structure layer and QA-004 → NEW for invalid existing string
 status. Already allowed EXISTING is compliant and is not overwritten.
-Mark assignment/numbering remain unimplemented; labels/file moves are conditional.
+A separate [versioned numbering standard](m3-numbering-contract.md) now assigns marks;
+its native gate is pending. Labels/file moves remain conditional.
 
 Rule preview uses the typed audit and explicit layer/status choices from
 [repair preview](m3-repair-contract.md), plus required selection. It also accepts
-[explicit mark choices](m3-marks-contract.md), which always remain preview-only.
+[explicit mark choices](m3-marks-contract.md), which require full-scope collision validation for evaluation Apply.
 Optional finding_ids narrow proposals to exact current findings. Office previews
 optionally accept selection. Example rule preview:
 
@@ -56,8 +57,8 @@ TTL/eviction/restart require a fresh preview; an old authorization is not renewe
 ## Execution boundary
 
 Previews retain read_only=true, apply_available=false and usable_for_write=false.
-Eligible layer/status plans advertise evaluation_apply_available; mark plans
-never do. Apply requires reviewed ID/hash, saved new execution ID and current
+Eligible existing-string mark/status and layer plans advertise evaluation_apply_available.
+Mark plans require validated full-scope collision evidence and await native acceptance. Apply requires reviewed ID/hash, saved new execution ID and current
 explicit authorization. Standard/rule Apply checks matching workflow provenance;
 generic fix_model_issues can execute an eligible workflow plan.
 Recover observes the saved execution without setters, resume or Undo.

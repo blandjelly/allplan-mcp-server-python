@@ -41,6 +41,64 @@ class FakeBridge:
 
 
 class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
+    def numbering_native_bridge(self, **options):
+        native, elements = self.workflow_native_bridge(**options)
+        def attribute(data, targets, undefined, deleted):
+            self.assertFalse(undefined)
+            self.assertFalse(deleted)
+            values = dict(targets[0].GetAttributes.return_value)
+            self.assertIn(data[0][0], values)
+            values.update(data)
+            targets[0].GetAttributes.return_value = list(values.items())
+        native.base.ElementsAttributeService.ChangeAttributes.side_effect = attribute
+        return native, elements
+
+    async def test_numbering_gate_over_real_http_applies_exact_marks_and_then_noops(self):
+        from allplan_mcp.numbering_diagnostics import collect_numbering_apply
+        native, elements = self.numbering_native_bridge()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report = await collect_numbering_apply(self.url, root / 'numbering.json', confirm=lambda _: 'NUMERUJ KOPIE')
+            self.assertEqual(report['state'], 'ready_for_ui_observation', report.get('message'))
+            self.assertEqual(len(report['steps']), 10)
+            self.assertTrue(all(s['ok'] for s in report['steps']))
+            pointer = json.loads((root / 'm3-last-numbering-execution.json').read_text())
+            self.assertEqual(pointer['state'], 'completed')
+            self.assertEqual(pointer['execution_id'], report['execution_id'])
+            self.assertTrue((root / ('m3-numbering-execution-' + report['execution_id'] + '.json')).is_file())
+        self.assertEqual(dict(elements[2].GetAttributes.return_value)[20001], 'S03')
+        self.assertEqual(dict(elements[3].GetAttributes.return_value)[20001], 'S04')
+        self.assertEqual(native.base.ElementsAttributeService.ChangeAttributes.call_count, 2)
+        native.base.ElementsLayerService.ChangeLayer.assert_not_called()
+
+    async def test_numbering_lost_reply_recovers_without_replaying_apply(self):
+        from allplan_mcp.numbering_diagnostics import collect_numbering_apply
+        from allplan_mcp.workflow_diagnostics import recover_workflow
+        native, _ = self.numbering_native_bridge(lose_reply=True)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report = await collect_numbering_apply(self.url, root / 'numbering.json', confirm=lambda _: 'NUMERUJ KOPIE')
+            self.assertEqual(report['state'], 'unknown', report.get('message'))
+            pointer = json.loads((root / 'm3-last-numbering-execution.json').read_text())
+            previous = len(self.bridge_handler.calls)
+            recovered = await recover_workflow(self.url, root / 'recover.json', pointer)
+            self.assertEqual(recovered['state'], 'ready_for_ui_observation')
+            self.assertEqual([p.get('action') for _, p in self.bridge_handler.calls[previous:]], ['recover'])
+        self.assertEqual(native.base.ElementsAttributeService.ChangeAttributes.call_count, 2)
+
+    async def test_numbering_cancellation_and_changed_marks_do_not_send_apply(self):
+        from allplan_mcp.numbering_diagnostics import collect_numbering_apply
+        native, elements = self.numbering_native_bridge()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report = await collect_numbering_apply(self.url, root / 'cancel.json', confirm=lambda _: 'STOP')
+            self.assertEqual(report['state'], 'cancelled')
+            self.assertFalse((root / 'm3-last-numbering-execution.json').exists())
+            elements[2].GetAttributes.return_value = [(20001, 'MANUAL'), (20002, 'NEW')]
+            report = await collect_numbering_apply(self.url, root / 'wrong.json', confirm=lambda _: self.fail('Wrong fixture'))
+            self.assertEqual(report['state'], 'blocked')
+        native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
     def workflow_native_bridge(self, lose_reply=False, reject=False):
         from test_repair_execution import ExecutionTests
         native = ExecutionTests()

@@ -1,4 +1,4 @@
-"""Explicit mark proposals, whole-scope collision checks and immutable write refusal."""
+"""Explicit mark proposals, whole-scope collision checks and reviewed eligibility."""
 import copy
 import tempfile
 import unittest
@@ -37,7 +37,7 @@ class MarkPreviewTests(unittest.TestCase):
         self.assertEqual([(c['field'], c['old_value']['value'], c['new_value']) for c in plan['changes']],
                          [('attribute:20001', '<niezdefiniowany>', 'S03'), ('attribute:20001', 'S02', 'S04')])
         self.assertEqual(plan['state'], 'preview_ready')
-        self.assertFalse(plan['evaluation_apply_available'])
+        self.assertTrue(plan['evaluation_apply_available'])
         self.assertEqual(plan['mark_validation']['state'], 'validated')
         self.assertEqual(plan['mark_validation']['checked_elements'], 6)
         self.assertEqual(plan['mark_validation']['remaining_duplicate_groups'], 0)
@@ -130,7 +130,7 @@ class MarkPreviewTests(unittest.TestCase):
         self.assertGreater(blocked['mark_validation']['not_checked_elements'], 0)
         self.assertFalse(blocked['evaluation_apply_available'])
 
-    def test_mark_metadata_blocks_apply_even_when_only_old_layer_status_proposals_remain(self):
+    def test_mark_metadata_keeps_legacy_ack_blocked_when_only_layer_status_proposals_remain(self):
         elements = self.fixture()
         audit = self.handler.handle('/model-audit', self.request()['audit'])
         ids = [f['finding_id'] for f in audit['findings'] if f['rule_id'] in {'QA-003', 'QA-004'}]
@@ -139,7 +139,7 @@ class MarkPreviewTests(unittest.TestCase):
             self.handler.repair_plans.executor.path = Path(directory)
             plan = self.preview(repairs=repairs, finding_ids=ids)
             self.assertEqual(plan['counts'], {'changes': 2, 'excluded_findings': 3, 'audit_findings': 5})
-            self.assertFalse(plan['evaluation_apply_available'])
+            self.assertTrue(plan['evaluation_apply_available'])
             self.assert_code('repair_scope_unavailable', lambda: self.handler.handle('/fix-model-issues', {
                 'schema_version': 'm3-repair-1', 'action': 'apply', 'plan_id': plan['plan_id'],
                 'plan_hash': plan['plan_hash'], 'execution_id': uuid4().hex,

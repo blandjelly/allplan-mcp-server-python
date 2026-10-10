@@ -18,13 +18,15 @@ Read these files in order when continuing implementation:
 5. [Validation schedule](docs/testing-policy.md): focused local work, publication
    checks, CI matrix and retained hash protections.
 
-Current package: **0.11.0**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
+Current package: **0.12.0**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
 **M0–M2 / UAT-00–UAT-04 are accepted within the recorded Allplan 2026-1-7 fixture scope**
 with local Windows Codex. M3 has accepted layer/status preview and bounded writes,
 standard/selection workflows and read-only mark collision previews.
 The latest native workflow gate passed two single-target writes, exact readback,
 read-only replay, complete audits **5 → 4 → 3** and owner-confirmed two-step Undo.
-**M3/UAT-05/UAT-06 remain open**: mark assignment/numbering, native same-session
+0.12.0 implements reviewed mark assignment and a deterministic versioned numbering
+standard; their [new native gate](docs/m3-numbering-owner-test.md) is pending.
+**M3/UAT-05/UAT-06 remain open**: mark/numbering acceptance, native same-session
 conflicts and controlled partial/unknown recovery are next.
 [Validation status](docs/validation-status.md) defines the accepted boundaries.
 

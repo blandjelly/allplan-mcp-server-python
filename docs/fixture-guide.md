@@ -58,6 +58,8 @@ mark (two findings, one group); QA-003 C05 review layer; QA-004 C06 NWE status.
 Baseline: **5 findings on 5 columns**, complete coverage; C01 passes.
 Repairing C05 layer then C06 status leaves **4 then 3 findings**; remaining issues
 concern marks. Explicit C03=S03/C04=S04 preview simulates zero findings;
-mark setters and automatic numbering remain unimplemented.
+0.12.0 implements mark setters and deterministic numbering; native testing
+is pending. Numbering leaves two findings in the original five-finding fixture
+or zero in the repaired three-finding fixture. See [the new gate](m3-numbering-owner-test.md).
 
 See [validation limits](validation-status.md) and [current handoff](next-model-handoff.md).

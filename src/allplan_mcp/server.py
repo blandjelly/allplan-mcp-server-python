@@ -43,9 +43,16 @@ def native_model_qa_audit_profile() -> str:
 
 @mcp.resource("allplan://standards/native-model-qa-demo-layer-status", mime_type="application/json")
 def native_office_standard() -> str:
-    """Versioned evaluation layer/status preset; numbering and mark writes deferred."""
+    """Versioned evaluation layer/status preset."""
     import json
     return json.dumps(load_office_standard(), ensure_ascii=False, indent=2)
+
+
+@mcp.resource("allplan://standards/native-model-qa-demo-mark-numbering", mime_type="application/json")
+def native_mark_standard() -> str:
+    """Versioned preserve-valid-fill-gaps mark numbering; native gate pending."""
+    import json
+    return json.dumps(load_office_standard("native-model-qa-demo-mark-numbering"), ensure_ascii=False, indent=2)
 
 
 def _allplan_client() -> AllplanHostClient:
@@ -218,19 +225,19 @@ def fix_model_issues(request: RepairRequest) -> dict[str, Any]:
 
     Preview takes a fresh audit request and explicit rule_id/value choices.
     Mark choices additionally require exact model_uuid targets; their final
-    values are collision-checked in the full scope and remain preview-only.
+    values are collision-checked in the full scope before evaluation Apply.
     Optional finding_ids restrict targets to those exact fresh findings.
     Returns old/new values, exclusions, locators, plan ID/hash and a five-minute
     lifetime. Revalidate requires that exact ID/hash and rereads the full scope.
     Changed evidence conflicts; restart/expiry/eviction require a new preview.
-    Evaluation apply supports 1..32 reviewed existing status/layer changes on
+    Evaluation apply supports 1..32 reviewed existing string mark/status or layer changes on
     Column roots in one foreground file, including selected/standard plans,
     with exact plan ID/hash, persistent execution_id and acknowledgement
     disposable_copy_reviewed_plan. The old two-repair acknowledgement is retained
     only for its accepted fixture. It checks native eligibility, stops on
     failure and reads back results. Repeated execution IDs never repeat setters.
     Recover reads persisted execution/current values without resuming writes.
-    Mark and other native-property writes remain unavailable. Native UI Undo requires
+    Mark assignment native acceptance is pending. Other native-property writes remain unavailable. Native UI Undo requires
     two separate steps for the accepted retained fixture; no automatic rollback.
     """
     payload = request.model_dump(exclude_unset=True, exclude_none=True, by_alias=True)
@@ -241,25 +248,30 @@ def fix_model_issues(request: RepairRequest) -> dict[str, Any]:
 
 @mcp.tool
 def apply_office_standard(request: OfficeStandardRequest) -> dict[str, Any]:
-    """Preview and execute the explicit versioned layer/status standard.
+    """Preview and execute an explicit versioned layer/status or numbering standard.
 
     Requires standard ID/version and one active drawing file. Optional query
     predicate/model-UUID exceptions filter fresh audit findings on the same scan.
     Apply requires exact reviewed plan ID/hash, a saved execution ID and
     disposable_copy_reviewed_plan. It must reference an office-standard plan.
-    Revalidate/recover reuse the shared service. Mark assignment, numbering and
-    file moves remain unavailable. Expanded native acceptance is pending.
+    The mark-numbering standard preserves valid marks, retains a deterministic
+    duplicate keeper and fills free S numbers in center Y/X/Z/UUID order.
+    Excluded peers retain their marks and reserve numbers. Revalidate/recover
+    reuse the shared service. Mark writes await native acceptance; file moves
+    remain unavailable.
     """
     if request.action != "preview":
         payload = request.model_dump(exclude_unset=True, exclude_none=True, by_alias=True)
         if request.action == "apply":
             payload["workflow_kind"] = "office_standard_preview"
         return _send_repair(payload)
-    standard = load_office_standard()
+    standard = load_office_standard(request.standard_id)
     payload = {"action": "preview", "audit": {"profile_id": standard["audit_profile_id"],
                "scope": request.scope.model_dump()}, "repairs": standard["repairs"],
                "workflow": {k: standard[k] for k in ("standard_id", "standard_version", "standard_fingerprint")}}
     payload["workflow"]["kind"] = "office_standard_preview"
+    if "numbering" in standard:
+        payload["numbering"] = standard["numbering"]
     if request.selection is not None:
         payload["selection"] = request.selection.model_dump(exclude_unset=True, by_alias=True)
     return _send_repair(payload)
@@ -267,7 +279,7 @@ def apply_office_standard(request: OfficeStandardRequest) -> dict[str, Any]:
 
 @mcp.tool
 def rule_based_edit(request: RuleBasedRequest) -> dict[str, Any]:
-    """Preview and execute selected layer/status repairs with query/UUID exceptions.
+    """Preview and execute selected mark/status/layer repairs with query/UUID exceptions.
 
     Selection uses audited mark/status/layer_id/file_state or selected dimension
     fields from one full fresh scan. Unknown predicates block readiness. Excluded
@@ -276,7 +288,8 @@ def rule_based_edit(request: RuleBasedRequest) -> dict[str, Any]:
     it must reference a rule-based plan. Mark choices require exact
     model_uuid targets and selected required/unique mark rules; final mark values
     are checked for collisions against the full scope, including excluded peers,
-    and remain preview-only. Revalidate/recover reuse the shared service.
+    before evaluation Apply. Mark writes await native acceptance.
+    Revalidate/recover reuse the shared service.
     """
     if request.action != "preview":
         payload = request.model_dump(exclude_unset=True, exclude_none=True, by_alias=True)

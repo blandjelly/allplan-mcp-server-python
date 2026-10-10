@@ -1,8 +1,8 @@
 # M3 execution, native guards and recovery
 
-Package **0.11.0** shares this executor across fix_model_issues,
+Package **0.12.0** shares this executor across fix_model_issues,
 apply_office_standard and rule_based_edit. [Current eligibility/workflow metadata](m3-workflow-execution-contract.md)
-cover 1–32 existing string-status/layer changes on Column roots in one foreground
+cover 1–32 existing string mark/status and layer changes on Column roots in one foreground
 file. [Native acceptance](validation-status.md) remains narrower: the earlier
 two-target gate and latest two separately reviewed single-target workflows.
 Two separate Undo steps are accepted; grouped Undo, native same-session conflicts
@@ -45,13 +45,14 @@ Generic profiles remain inactive for writes.
 ```
 
 The host preflights the full typed request before native document access.
-Apply supports 1–32 native Column layer/existing-string-status changes in one
+Apply supports 1–32 native Column layer/existing-string mark/status changes in one
 active_foreground file with complete evidence and current native capabilities.
 The demo profile remains bounded to file 101; other scopes require validated
 explicit profiles. The legacy acknowledgement disposable_copy_reviewed_two_repairs
 is accepted only for its original exact unselected/unwrapped two-target gate:
 S05 layer → SZ_OGÓ01 and S06 status NWE → NEW, 2 changes/3 exclusions/5 findings.
-It cannot authorize expanded plans. No mark assignment, attribute append/delete,
+It cannot authorize expanded plans. Mark assignment is implemented in 0.12.0 with collision validation;
+no attribute append/delete,
 label, component replacement or passive/background write is inferred.
 
 Under an OS writer lock per `Local/.allplan-mcp/repairs`, apply reruns the full
@@ -139,5 +140,5 @@ verification, exact-ID replay, separate Undo and completed recovery after Redo.
 Restart invalidation and stale Apply rejection also pass. Native same-session
 conflicts, controlled partial/unknown recovery, broader scope/identity and
 crash/power-loss persistence remain open. Do not repeat the UI-edit scenario
-known to cancel the host. Next implement mark assignment/numbering, then obtain
+known to cancel the host. Mark assignment/numbering now await their new native gate; then obtain
 the missing native evidence; see [handoff](next-model-handoff.md).

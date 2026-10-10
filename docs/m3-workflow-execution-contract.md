@@ -1,4 +1,4 @@
-# M3 shared layer/status execution — 0.11.0
+# M3 shared mark/status/layer execution — 0.12.0
 
 Status **bounded native workflow-write gate PASS**, 2026-10-10 Europe/Warsaw.
 [Validation status](validation-status.md):
@@ -27,10 +27,14 @@ The supplied demo profile/preset remains bounded; another scope requires a
 separately validated profile. Broad eligibility is not native acceptance of
 every possible profile/value/target.
 
+0.12.0 additionally replaces existing string marks under validated full-scope
+collision evidence; [numbering definition](m3-numbering-contract.md). Native
+mark/numbering acceptance is pending.
+
 Attribute roles are explicit plan metadata and participate in the immutable
 plan hash. There is no append/delete/undefined attribute assignment. Duplicate
 target/field changes, non-Column types, passive/background files, incomplete
-coverage and every plan carrying mark_validation are rejected before setters.
+coverage and invalid/incomplete mark_validation are rejected before setters.
 No universal native-property setter is introduced. The old acknowledgement
 `disposable_copy_reviewed_two_repairs` is retained only for its original exact
 unselected/unwrapped two-target gate; it cannot authorize expanded plans.
@@ -92,8 +96,8 @@ not establish authenticated history or sudden power-loss durability.
 
 ## Remaining M3 work
 
-Implement actual mark assignment and deterministic numbering under an explicit
-versioned standard, preserving full-scope collision/source checks. Then obtain
+Actual mark assignment and deterministic versioned-standard numbering are
+implemented in 0.12.0 and await [the new native gate](m3-numbering-owner-test.md). Then obtain
 native same-session conflict evidence in a supported lifecycle and controlled
 partial/unknown-result recovery. The accepted two-workflow gate needs no repeat.
 Do not repeat UI editing known to cancel the host. Broader journal maintenance,

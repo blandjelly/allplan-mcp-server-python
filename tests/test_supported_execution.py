@@ -112,13 +112,13 @@ class SupportedExecutionTests(unittest.TestCase):
         self.base.ElementsLayerService.ChangeLayer.assert_not_called()
         self.assertFalse(list(Path(self.directory.name).glob('*.json')))
 
-    def test_old_acknowledgement_does_not_expand_and_mark_metadata_stays_blocked(self):
+    def test_old_acknowledgement_does_not_expand_to_single_status_or_mark_plans(self):
         elements = self.writable_fixture()
         plan = self.preview(repairs=[{'rule_id': 'QA-004', 'value': 'NEW'}])
         self.assert_code('repair_scope_unavailable', lambda: self.call(self.apply_request(plan)))
         marks = [{'rule_id': 'QA-001', 'model_uuid': str(elements[2].GetModelElementUUID()), 'value': 'S03'}]
         plan = self.preview(repairs=marks)
-        self.assert_code('repair_scope_unavailable', lambda: self.call(self.apply(plan)))
+        self.assert_code('repair_scope_unavailable', lambda: self.call(self.apply_request(plan)))
         self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
 
     def test_public_workflow_actions_require_reviewed_identity_and_host_rejects_bad_ack_before_reads(self):

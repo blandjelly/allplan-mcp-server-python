@@ -1,9 +1,10 @@
-# M3 explicit mark repair preview — 0.10.0
+# M3 explicit mark repair and collision validation — 0.12.0
 
 Explicit mark previews have [bounded native acceptance](validation-status.md).
 The owner confirms unchanged model and uninterrupted host. They reuse audit,
-planner, selection, hashing and revalidation; writes and deterministic numbering
-remain required open M3 work.
+planner, selection, hashing and revalidation. 0.12.0 implements existing-string
+mark writes and [deterministic numbering](m3-numbering-contract.md); their
+new native gate remains pending.
 
 ## Explicit rule and target, no automatic numbering
 
@@ -32,8 +33,9 @@ Optional finding_ids, predicate and UUID exceptions still narrow proposals,
 with explicit `mark_target_not_selected` and existing exclusion reasons.
 Read-only mark proposals use the freshly resolved mark attribute resource and
 retain exact raw old values, new values, identity, source hash and location.
-This changes attribute data only in a **hypothetical plan**; graphical labels,
-automatic numbering/renumbering and office mark presets are not implemented.
+Preview changes no attribute data. Explicit mark Apply replaces only existing
+strings; graphical labels remain outside scope. Automatic numbering is available
+only through the separate versioned [standard](m3-numbering-contract.md).
 
 ## Collision simulation includes all peers
 
@@ -61,15 +63,17 @@ caller mutation cannot modify the stored reviewed plan.
 
 ## Native write boundary
 
-Every plan containing mark-validation metadata is **preview-only**, including
-when filtering leaves zero mark proposals and only the formerly accepted
-layer/status pair. The executor refuses such plans before setters/journaling;
-using generic fix_model_issues Apply cannot bypass this boundary. No new native
-setter, graphical operation or write capability is introduced. Package 0.11.0 separately enables reviewed selected/standard layer/status writes;
-[expanded execution boundary](m3-workflow-execution-contract.md). Mark plans
-remain read-only in 0.11.0.
+0.12.0 permits evaluation Apply for complete plans whose mark-validation metadata
+is validated with zero proposed collisions/unchecked peers. Mark replacements
+require existing string attributes and the new disposable_copy_reviewed_plan
+acknowledgement. The legacy acknowledgement remains restricted to layer/status.
+Conflicting or unchecked mark plans reject before setters/journaling. Generic
+fix_model_issues uses the same guards. The native ChangeAttributes setter,
+fresh source checks, readback, audited mark alias verification and durable IDs
+are shared with status repairs. No graphical operation is introduced.
+See [execution](m3-workflow-execution-contract.md) and [new gate](m3-numbering-owner-test.md).
 
 Native acceptance covers positive C03/C04 proposals, a selection exception,
 collision against an excluded peer and unchanged revalidations/full audits.
-No repeat of that completed gate is required. Next implement actual mark
-assignment and deterministic numbering with these full-scope safeguards.
+No repeat of that completed gate is required. New native mark assignment and
+numbering acceptance is pending; portable implementation does not establish it.

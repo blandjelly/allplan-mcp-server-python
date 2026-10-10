@@ -34,7 +34,7 @@ def validate_repair_request(request):
                 invalid("Unknown apply workflow.")
     elif action == "preview":
         required = {"schema_version", "action", "audit", "repairs"}
-        keys(request, required | {"finding_ids", "selection", "workflow"}, required)
+        keys(request, required | {"finding_ids", "selection", "workflow", "numbering"}, required)
         validate_audit_request(request["audit"])
         scope = request["audit"]["scope"]
         if scope["include_passive"] or len(scope["drawing_files"]) != 1:
@@ -72,7 +72,21 @@ def validate_repair_request(request):
             else:
                 invalid("Unknown preview workflow.")
         choices = request["repairs"]
-        if not isinstance(choices, list) or not 1 <= len(choices) <= 32:
+        if "numbering" in request:
+            from .mark_numbering import NUMBERING
+            workflow = request.get("workflow", {})
+            rules = {r["rule_id"]: r for r in selected_rules(request["audit"])}
+            if (not isinstance(request["numbering"], dict) or request["numbering"] != NUMBERING
+                    or type(request["numbering"].get("start")) is not int
+                    or type(request["numbering"].get("width")) is not int
+                    or workflow.get("kind") != "office_standard_preview"
+                    or workflow.get("standard_id") != "native-model-qa-demo-mark-numbering"
+                    or workflow.get("standard_version") != "1.0.0"
+                    or rules.get("QA-001", {}).get("kind") != "required_attribute"
+                    or rules.get("QA-002", {}).get("kind") != "unique_attribute"
+                    or any(rules.get(k, {}).get("attribute") != "mark" for k in ("QA-001", "QA-002"))):
+                invalid("Numbering requires the exact versioned mark standard and both mark rules.")
+        if not isinstance(choices, list) or not (0 if "numbering" in request else 1) <= len(choices) <= 32:
             invalid("repairs must contain 1..32 explicit choices.")
         rules = {r["rule_id"]: r for r in selected_rules(request["audit"])}
         seen, mark_targets = set(), set()
@@ -88,6 +102,8 @@ def validate_repair_request(request):
             bounded_string(choice["value"], 128, "Repair value")
             rule = rules[ident]
             if rule["kind"] in {"required_attribute", "unique_attribute"} and rule["attribute"] == "mark":
+                if "numbering" in request:
+                    invalid("Automatic numbering cannot be mixed with explicit mark choices.")
                 if target is None or target in mark_targets:
                     invalid("Each mark repair requires one distinct explicit model UUID.")
                 mark_targets.add(target)

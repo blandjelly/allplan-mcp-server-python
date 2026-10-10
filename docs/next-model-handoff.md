@@ -2,7 +2,7 @@
 
 ## Current state
 
-Continue **codex/m3-repair-preview**, package **0.11.0**, draft
+Continue **codex/m3-repair-preview**, package **0.12.0**, draft
 [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2).
 M0–M2 / UAT-00–UAT-04 are accepted within the recorded Allplan **2026-1-7**
 fixture scope. **M3/UAT-05/UAT-06 and the first MVP remain open**.
@@ -13,6 +13,7 @@ Read [architecture](architecture.md), [features](features.md),
 and [testing policy](testing-policy.md). Details: [read tools](tool-reference.md),
 [audit](m2-audit-contract.md), [repair preview](m3-repair-contract.md),
 [standard/selection](m3-standards-contract.md), [marks](m3-marks-contract.md),
+[numbering](m3-numbering-contract.md), [new owner gate](m3-numbering-owner-test.md),
 [execution](m3-execution-contract.md) and
 [workflow execution/journal lifecycle](m3-workflow-execution-contract.md).
 
@@ -22,7 +23,7 @@ and [testing policy](testing-policy.md). Details: [read tools](tool-reference.md
   the demo remains bound_for_read, active_for_write=false.
 - Native reads, six-column audits, explicit layer/status previews, selected
   standard previews and collision-aware mark previews have bounded acceptance.
-- The shared executor supports **1–32 existing string-status/layer changes**
+- The shared executor supports **1–32 existing string mark/status or layer changes**
   on native Column roots in one explicit foreground file. Typed
   fix_model_issues, apply_office_standard and rule_based_edit reuse it.
   This implementation scope exceeds native acceptance.
@@ -32,14 +33,21 @@ and [testing policy](testing-policy.md). Details: [read tools](tool-reference.md
   exact-ID replay and complete six-column audits **5 → 4 → 3** passed.
   Owner confirmed host survival, unchanged other elements and two separate Undo
   operations. No repeat of these completed gates is required.
-- Every mark plan remains preview-only. Mark assignment and automatic numbering
-  are unimplemented. Grouped Undo and automatic rollback are unavailable.
+- 0.12.0 implements explicit mark assignment and standard
+  native-model-qa-demo-mark-numbering 1.0.0, preserving valid marks and assigning
+  free S numbers in canonical center Y/X/Z/UUID order. Full-scope normalized
+  collisions, excluded peers, immutable plans, fresh source/readback and durable
+  execution identities are retained. **Native mark/numbering acceptance is pending.**
+  Grouped Undo and automatic rollback are unavailable.
 
 ## Next implementation
 
-1. Implement actual mark assignment and deterministic numbering under an explicit
-   versioned standard. Retain whole-scope collision checks including excluded
-   peers, fresh source checks, reviewed plans, readback and durable execution IDs.
+1. Run only the new [0.12.0 owner gate](m3-numbering-owner-test.md) through
+   M3 Numbering.cmd, then M3 Numbering Recover.cmd after UI observation/Undo.
+   It reads actual fixture values before preview, verifies C03→S03/C04→S04,
+   deterministic unchanged previews, exact-ID read-only replay and subsequent no-op.
+   Record owner evidence before extending native acceptance. Work stops here
+   because this cloud environment cannot run Allplan.
 2. Design native same-session source-conflict checks in a supported host lifecycle,
    then controlled partial/unknown outcomes and read-only recovery. The observed
    manual UI edit cancelled StartPythonHost; repeating that scenario unchanged
@@ -52,6 +60,11 @@ Graphical labels, file moves and universal native setters are conditional
 extensions. They do not enlarge mandatory M3 closure scope.
 
 ## Resume safely
+
+Local final-candidate verification: 187 portable tests PASS, frozen dependency
+sync PASS; follow [testing-policy](testing-policy.md). The new package/delivery
+records the exact source, build/integrity checks and required six-job source CI.
+Do not repeat the full suite or prior native batches for documentation publication.
 
 The owner did not specify whether the model was left repaired, undone or redone
 following the latest Undo observation. Start with current health/context and a

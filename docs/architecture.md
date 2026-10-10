@@ -75,13 +75,14 @@ resolution/eligibility, write-ahead Local journal, serialized writes, readback,
 full audited-field verification and read-only recovery. Exact-ID replay returns
 saved outcomes without setters. [Execution guards](m3-execution-contract.md) and
 [current workflow scope/journal lifecycle](m3-workflow-execution-contract.md)
-define eligible 1–32-change Column layer/status plans. [Native acceptance](validation-status.md)
+define eligible 1–32-change Column existing-string mark/status or layer plans. [Native acceptance](validation-status.md)
 is bounded to the recorded fixture writes and two-step Undo.
 
 Preview/revalidation use host repair_contracts.py / model_repair.py and public
 repair_models.py. The session-local cache stores immutable plans with ID/hash,
-expiry and full source evidence. Preview invokes no setters; mark plans remain
-preview-only. See [preview](m3-repair-contract.md) and [marks](m3-marks-contract.md).
+expiry and full source evidence. Preview invokes no setters. Mark Apply requires validated full-scope collision evidence;
+host mark_numbering.py expands the versioned [numbering standard](m3-numbering-contract.md)
+from the same fresh scan. See [preview](m3-repair-contract.md) and [marks](m3-marks-contract.md).
 
 1. Resolve explicit scope and supported operations.
 2. Produce a side-effect-free preview with targets, values, exclusions and counts.
