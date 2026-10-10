@@ -74,8 +74,11 @@ executor and supports 1–32 existing string-status/layer changes on Column root
 in one foreground file. It retains full source checks, exceptions, durable
 deduplication and readback, with no fixed demo finding count.
 [Execution contract and journal lifecycle](docs/m3-workflow-execution-contract.md),
-[next owner test](docs/m3-workflow-apply-batch.md). Expanded native execution is
-**not_run**. Mark writes/numbering, native same-session conflicts and unknown
+[completed owner test](docs/m3-workflow-apply-batch.md).
+**Bounded native workflow-write gate PASS**: ten steps, separately reviewed
+standard/selected writes, readback, read-only replay and full audits 5 → 4 → 3.
+Owner confirms host survived, other elements unchanged and two-step Undo;
+[original logs and acceptance limits](docs/test-results/m3-workflow-acceptance-0.11.0.md). Mark writes/numbering, native same-session conflicts and unknown
 recovery remain required open work; M3/UAT-05/UAT-06 are not closed.
 
 Repository documentation and API identifiers use English. Owner-facing

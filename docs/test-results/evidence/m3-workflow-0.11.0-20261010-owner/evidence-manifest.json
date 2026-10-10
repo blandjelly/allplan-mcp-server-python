@@ -1,0 +1,27 @@
+{
+  "schema_version": "m3-owner-evidence-1",
+  "recorded_date": "2026-10-10",
+  "timezone": "Europe/Warsaw",
+  "files": {
+    "m3-last-workflow-execution.json": {
+      "bytes": 460,
+      "sha256": "58922839ce03e9644104a42987681f59fa3c8d9cd4fecced378b1cb36747c3c0"
+    },
+    "m3-last-workflow-execution.txt": {
+      "bytes": 82,
+      "sha256": "f20c4facbb0a7eb19ad37ff38bbe09038322e266ce8ac4584f378bd5f4012d67"
+    },
+    "m3-workflow-apply-20261010T161351828559Z.txt": {
+      "bytes": 4270,
+      "sha256": "f8d4b5aa37c065eeed7180e1c67a57df65434a27b96be47cd37bac4bb5d1f9fa"
+    },
+    "m3-workflow-apply-20261010T161351828559Z.json": {
+      "bytes": 851890,
+      "sha256": "80772560e5be3335cb7ddc96ed1db8262222355ae565d5d32d4223e8acf24e6c"
+    }
+  },
+  "owner_statement": "zmiany zostaly wprowadzone w modelu, host przetrwal, reszta elementow bez zmian. Aby cofnąć obie zmiany trzeba uzyc undo 2 razy.",
+  "upload_kind": "full_workflow_report_and_last_pointer",
+  "full_workflow_report_supplied": true,
+  "capture_timestamp_from_filename": "2026-10-10T16:13:51.828559Z"
+}

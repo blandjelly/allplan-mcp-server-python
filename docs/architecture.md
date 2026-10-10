@@ -75,7 +75,9 @@ writes remain bounded. Native 0.8.1 two-target writes and separate Undo are
 accepted; see [execution contract](m3-execution-contract.md). Package 0.11.0
 uses that shared executor for 1–32 existing status/layer changes and reviewed
 standard/selection plans. [Expanded scope and journal lifecycle](m3-workflow-execution-contract.md)
-are ready for native observation, not yet accepted.
+have [bounded native workflow acceptance](test-results/m3-workflow-acceptance-0.11.0.md):
+separate single-target writes, full audited verification, exact-ID read-only
+replay and owner-observed two-step Undo. Wider supported scopes remain unaccepted.
 
 The earlier M3 slice in 0.7.0 implements only explicit preview and fresh evidence
 revalidation: host `repair_contracts.py` / `model_repair.py`, public

@@ -7,14 +7,16 @@ The owner requested implementation through the next necessary native test.
 
 | Review priority | Implemented now | Remaining work |
 | --- | --- | --- |
-| Generalize supported executor and connect standard/selection | 1–32 existing string-status/layer changes, any validated foreground file, Column roots; shared typed workflow Apply/Revalidate/Recover, hash/source/exceptions/dedup/readback retained | Expanded native observation using two separately reviewed single-target workflows |
-| Mark assignment and numbering | Existing accepted collision-aware previews retained; all mark plans still refuse Apply | Implement native mark write and deterministic versioned-standard numbering after the new execution gate; baseline scope has not been reduced |
+| Generalize supported executor and connect standard/selection | 1–32 existing string-status/layer changes, any validated foreground file, Column roots; shared typed workflow Apply/Revalidate/Recover, hash/source/exceptions/dedup/readback retained | Bounded native two-workflow gate PASS: writes/readback/replay/audits/host and owner-confirmed two-step Undo; broader scopes remain unaccepted |
+| Mark assignment and numbering | Existing accepted collision-aware previews retained; all mark plans still refuse Apply | Implement native mark write and deterministic versioned-standard numbering next after the accepted execution gate; baseline scope has not been reduced |
 | Same-session conflicts and partial/unknown recovery | Existing executor guards retained; added actual HTTP lost-reply test and read-only recovery without Apply replay | Design controlled native tests in a supported lifecycle after this gate; do not repeat UI editing known to cancel the host |
 | Current documentation/journal/integration | Corrected current mark/execution statuses and links, added journal capacity/update/copy/restore policy and current handoff | No pruning/rollover implemented; broader identity/power-loss acceptance, final UAT and main integration remain open |
 
 [178 portable tests PASS](../test-results/m3-workflow-portable-0.11.0.md), frozen
-sync and wheel/sdist build pass. Native acceptance for expanded execution is
-not_run. [Next concrete owner action](../m3-workflow-apply-batch.md).
+sync and wheel/sdist build pass for their recorded source.
+[Bounded native 0.11.0 workflow gate PASS](../test-results/m3-workflow-acceptance-0.11.0.md);
+no repeat is requested. Next implementation is mark assignment/numbering.
+No new tests/builds ran for this documentation update.
 M3 remains partially implemented. Two-step Undo is still the accepted earlier
 limit; graphic labels, file moves and universal native setters do not become
 mandatory M3 closure requirements.

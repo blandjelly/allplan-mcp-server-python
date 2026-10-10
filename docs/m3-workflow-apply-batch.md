@@ -1,6 +1,11 @@
 # M3 — zapis standardu i reguły z wyjątkami, pakiet 0.11.0
 
-Status **ready_for_owner_test**; nowy zapis natywny **not_run**.
+Status **ograniczony odbiór natywny PASS**, 2026-10-10 Europe/Warsaw.
+[Wynik i cztery oryginalne pliki](test-results/m3-workflow-acceptance-0.11.0.md):
+10/10 kroków, obie naprawy, odczyty po zapisie, odczytowy replay, audyty 5 → 4 → 3
+i ta sama sesja hosta. Użytkownik potwierdza zmiany w modelu, nieprzerwany host,
+pozostałe elementy bez zmian i dwa kroki Undo. Nie powtarzaj tej próby.
+Poniżej zachowano wykonaną procedurę; surowych flag/logów nie zmieniono.
 To następny krok po audycie kompletności: dwa osobno zatwierdzone plany po jednej
 zmianie przez apply_office_standard i rule_based_edit. Nie powtarzaj starego
 M3 Apply.cmd, testu Undo ani ręcznej edycji podczas działania hosta.

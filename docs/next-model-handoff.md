@@ -1,6 +1,61 @@
 # Next-model handoff
 
-## Current handoff — 2026-10-10, 0.11.0 workflow writes ready for owner test
+## Current handoff — 2026-10-10 Europe/Warsaw, 0.11.0 native workflow-write PASS
+
+Continue **codex/m3-repair-preview**, draft [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2).
+The owner will resume in another chat. This turn is **documentation/evidence
+only**; no new implementation, tests, builds or native operations. Commit skips CI.
+Follow the [shorter validation schedule](testing-policy.md); CI changes from
+1e36945 remain untested. Earlier 178-test/6-job PASS belongs to source 26d70b2.
+The earlier instruction to postpone assistant-run tests remains recorded;
+resume testing when authorized by the owner.
+
+**New native gate PASS:** [decision and four originals](test-results/m3-workflow-acceptance-0.11.0.md).
+All ten steps: standard single-target S05 layer 3701 → 3700 / SZ_OGÓ01 with S06
+excepted; selected single-target S06 status attribute 5002 NWE → NEW with S05
+excepted; both exact readbacks, audited-fields-match-plan, exact-ID read-only
+replays, complete six-column audits **5 → 4 → 3**, 0 unchecked. Final findings
+QA-001/QA-002/QA-002 remain. Owner confirms both changes applied, host survived,
+other elements unchanged and **two separate Undo operations** for both changes.
+No repeat of this gate, older write/Undo or stale-Apply batches is requested.
+
+Host session **8e702add-3178-469c-9fb3-af276f79533a** spans all ten responses;
+MCP/bridge 0.11.0, installed integrity verified. All 22 reported bridge hashes
+match the existing exact package manifest. Both plan/Apply request hashes and
+four audit report hashes recompute; original MCP text/decoded results and TXT
+agree. Both execution IDs differ; last-pointer uploads equal the second saved
+execution. Original flags remain unchanged; the separate decision records PASS.
+
+| Workflow | Execution ID | Plan ID |
+| --- | --- | --- |
+| apply_office_standard | 750655bf38ee458792b375dcb413f24d | db8cdfe9ad2b43e0b469286051b46f20 |
+| rule_based_edit | 69326f48d8724ae7abb6105f3263ba23 | 038e1f21b36743d8ab0b4ef94b6f58ab |
+
+Original JSON/TXT pointers and full workflow report are preserved byte-exact under
+`test-results/evidence/m3-workflow-0.11.0-20261010-owner/` with manifest/inspection.
+[Delivery](../evaluation-packages/0.11.0/README.md): source
+26d70b27bd06e2916cda74213cb8995aa9f0f19a, publication daabd57,
+ZIP 719947 bytes / recorded SHA-256
+29fcfaed0a10108b630892da3710da3cdf05701c2d25a08a014ff4ab177ee031.
+All archives/delivery manifests, runtime/version and previous raw evidence remain
+unchanged; no old archive checks/builds were repeated.
+
+**Next implementation in the new chat:** actual mark assignment and deterministic
+numbering under an explicit versioned standard, preserving full-scope collision
+and source checks. Then design supported-lifecycle same-session native conflicts
+and controlled partial/unknown outcomes plus read-only recovery. Do not repeat
+UI edits known to cancel the host. Wider 1–32-change/file scope, grouped Undo,
+crash/power-loss and copy identity remain outside acceptance. M3/UAT-05/UAT-06,
+final integration with main and release remain open. Labels/file moves/universal
+setters are conditional extensions, not additional mandatory M3 closure work.
+
+**Model on resume:** owner confirmed the two-step Undo requirement but did not
+specify whether the final model was left repaired, undone or redone. A current
+read must establish that before another preview. Completed/replay history does
+not describe current values after UI Undo; do not reuse old execution IDs for a
+new repair or remove the original Local journal.
+
+## Prior handoff — 2026-10-10, 0.11.0 workflow writes ready for owner test
 
 **Owner steering:** adopt the [shorter validation cycle](testing-policy.md).
 Use focused M3/affected-module checks during iteration, one full suite for the

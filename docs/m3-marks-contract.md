@@ -79,5 +79,6 @@ revalidates; full audit before/after and same-session health must match. The
 launcher preserves original MCP text blocks along with decoded responses.
 It invokes no Apply, Recover or Undo. Positive proposals, the selection exception, collision and unchanged
 revalidations have native acceptance; no repeat is requested. Actual mark writes
-and deterministic numbering remain required open M3 work. The next observation
-is the [0.11.0 layer/status workflow-write card](m3-workflow-apply-batch.md).
+and deterministic numbering remain required open M3 work. The subsequent
+[0.11.0 workflow-write gate passes](test-results/m3-workflow-acceptance-0.11.0.md).
+No repeat is requested; next implementation is actual mark assignment/numbering.

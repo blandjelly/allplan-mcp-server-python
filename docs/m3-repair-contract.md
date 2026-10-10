@@ -4,7 +4,8 @@ This document preserves the accepted 0.7.0 read-only behavior. Package **0.8.0**
 adds a separate [bounded disposable-copy execution contract](m3-execution-contract.md)
 with an [accepted owner gate](test-results/m3-execution-acceptance-0.8.1.md).
 Package 0.11.0 expands reviewed layer/status execution and workflow Apply;
-[current contract and pending new gate](m3-workflow-execution-contract.md).
+[current contract](m3-workflow-execution-contract.md),
+[bounded native workflow gate PASS](test-results/m3-workflow-acceptance-0.11.0.md).
 
 First M3.1/M3.2 slice: **accepted_on_build within the retained read-only preview
 scope**, package 0.7.0 on the previously owner-identified Allplan 2026-1-7 fixture;

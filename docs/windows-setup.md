@@ -23,7 +23,9 @@ apply/readback and persistent execution recovery; its
 0.10.0 adds explicit mark repair previews and full-scope collision checks;
 [native marks-preview PASS](test-results/m3-marks-acceptance-0.10.0.md).
 0.11.0 adds shared layer/status Apply for reviewed standard/selection plans;
-[next native card](m3-workflow-apply-batch.md), expanded writes not yet accepted.
+[bounded native workflow gate PASS](test-results/m3-workflow-acceptance-0.11.0.md),
+including owner-confirmed host survival, unchanged other elements and two-step
+Undo. The [completed card](m3-workflow-apply-batch.md) requires no repetition.
 [Journal preservation/capacity](m3-workflow-execution-contract.md#journal-lifecycle-and-the-128-record-limit)
 applies across Setup/Restore; keep Local/.allplan-mcp/repairs and package logs.
 Use the existing

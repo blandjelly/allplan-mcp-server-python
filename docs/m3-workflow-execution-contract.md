@@ -1,10 +1,15 @@
 # M3 shared layer/status execution — 0.11.0
 
-Status **ready_for_owner_test**; expanded native execution **not_run**.
+Status **bounded native workflow-write gate PASS**, 2026-10-10 Europe/Warsaw.
+[Original reports and decision](test-results/m3-workflow-acceptance-0.11.0.md):
+ten steps, both separately reviewed changes/readbacks, exact-ID read-only replay,
+complete audits 5 → 4 → 3 and same-session verified 0.11.0. Owner confirms both
+changes, host survival, unchanged other elements and two-step Undo. Acceptance
+covers the retained workflow pair, not every eligible 1–32-change plan/file.
 This implements the first step of the owner's completeness review: remove the
 exact two-demo-target gate and execute reviewed standard/selection plans through
 the existing executor. [Review response](reviews/m3-completeness-response-0.11.0.md),
-[178 portable tests PASS](test-results/m3-workflow-portable-0.11.0.md). [Next native card](m3-workflow-apply-batch.md).
+[178 portable tests PASS](test-results/m3-workflow-portable-0.11.0.md). [Completed native card](m3-workflow-apply-batch.md).
 M3/UAT-05/UAT-06 and the first MVP remain open.
 
 ## Supported operations and typed actions
@@ -60,7 +65,8 @@ historical saved outcomes without setters. Recover reads current observations
 in the original disposable project/document; it does not prove write causality.
 Native accepted recovery remains the earlier completed execution after Redo,
 not unknown-outcome recovery. Two separate Undo steps remain the tested limit
-of the earlier two-write gate; expanded Undo behavior is unaccepted.
+of the earlier two-write gate. Two-step Undo is also owner-confirmed for the
+0.11.0 workflow pair; grouped and broader-scope Undo remain unaccepted.
 
 ## Journal lifecycle and the 128-record limit
 
@@ -90,13 +96,14 @@ not establish authenticated history or sudden power-loss durability.
 
 ## Next native evidence and remaining M3 work
 
-The next card uses two **separately reviewed single-target** writes: office
+The completed card uses two **separately reviewed single-target** writes: office
 standard with S06 excepted, then rule selection with S05 excepted. Complete
 audits must progress 5 → 4 → 3, both exact-ID replays must be read-only and
 the host session/integrity must remain unchanged. It tests the new route rather
-than repeating the accepted 0.8.1 pair or asking for another Undo cycle.
+than repeating the accepted 0.8.1 pair or asking for another Undo cycle. All
+required observations now pass; no repeated batch is requested.
 
-After that observation, implement actual mark assignment and deterministic
+Next, implement actual mark assignment and deterministic
 numbering under an explicit versioned standard, retaining full-scope collision
 checks. These are required open M3 scope, not removed by calling them deferred.
 Then design supported-lifecycle same-session source conflicts and controlled

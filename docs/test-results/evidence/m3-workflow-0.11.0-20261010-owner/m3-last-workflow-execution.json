@@ -1,0 +1,14 @@
+{
+  "state": "completed",
+  "execution_id": "69326f48d8724ae7abb6105f3263ba23",
+  "tool": "rule_based_edit",
+  "apply_request": {
+    "action": "apply",
+    "plan_id": "038e1f21b36743d8ab0b4ef94b6f58ab",
+    "plan_hash": "9c8737dcc57a39415a11ee778f68357e2920810d97324ae3d5a6595783fad5b9",
+    "execution_id": "69326f48d8724ae7abb6105f3263ba23",
+    "acknowledgement": "disposable_copy_reviewed_plan"
+  },
+  "expected_changes": 1,
+  "steps": []
+}

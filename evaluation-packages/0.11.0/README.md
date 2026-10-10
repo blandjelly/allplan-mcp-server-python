@@ -1,6 +1,13 @@
 # Evaluation delivery — 0.11.0
 
-Status **ready_for_owner_test**; expanded native workflow execution **not_run**.
+Current status: **bounded native workflow-write gate PASS**, 2026-10-10.
+[Original four uploads and acceptance](../../docs/test-results/m3-workflow-acceptance-0.11.0.md)
+record all ten steps, standard/selected single-target writes/readbacks, exact-ID
+read-only replay, complete audits 5 → 4 → 3 and same-session verified 0.11.0.
+Owner confirms both changes, host survival, other elements unchanged and two-step
+Undo. No repeat is requested. Original embedded docs/delivery manifest retain
+pre-test flags; this documentation update rewrites no original capture/manifest
+and rebuilds no archive.
 This delivers the first implementation priority from the M3 completeness audit:
 shared execution of 1–32 existing string-status/layer changes on native Column
 roots in one validated foreground file, including standard/selection plans.
@@ -9,7 +16,8 @@ verification, durable execution IDs and read-only recovery remain required.
 Mark plans still refuse Apply; numbering remains required open M3 work.
 
 Download [allplan-mcp-0.11.0-windows-evaluation.zip](allplan-mcp-0.11.0-windows-evaluation.zip)
-and follow the [Polish workflow-write card](../../docs/m3-workflow-apply-batch.md).
+and see the [completed Polish procedure](../../docs/m3-workflow-apply-batch.md).
+The following preserves the original test recipe; no repeat is requested.
 Use the **original disposable six-column copy**, restore only S05's review
 layer and S06's NWE status **before** starting the host, then run
 **M3 Workflow Apply.cmd**. The two separate prompts are NAPRAW STANDARD and

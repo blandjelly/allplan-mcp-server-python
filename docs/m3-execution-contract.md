@@ -158,9 +158,11 @@ exact-ID persistence across the observed host sessions and two-step Undo pass
 for the retained fixture. Whole-model collateral UI verification, native
 manual-edit conflicts, unknown-outcome recovery and crash/power-loss persistence
 remain outside that acceptance. M3.3 office-standard/rule-based execution is
-implemented in 0.11.0 with native acceptance pending; broader mutation/registry
+implemented in 0.11.0 with
+[bounded native workflow acceptance](test-results/m3-workflow-acceptance-0.11.0.md),
+including two-step Undo confirmed by the owner. Broader mutation/registry
 guarantees remain unaccepted. No repeated two-write gate
 is required. The same-session manual-edit card was blocked by UI host
 cancellation, with restart invalidation correctly observed; do not repeat that
-scenario on this build. Stale Apply rejection is already accepted. The next card
-is [two separately reviewed workflow writes](m3-workflow-apply-batch.md).
+scenario on this build. Stale Apply rejection is already accepted. The completed
+[two-workflow card](m3-workflow-apply-batch.md) also passes; no repeat is requested.

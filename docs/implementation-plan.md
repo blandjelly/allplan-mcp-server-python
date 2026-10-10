@@ -73,10 +73,14 @@ foreground file, without the exact file-101/two-target/finding-count gate.
 Office-standard and rule-based tools now accept typed Apply/Revalidate/Recover
 through the same executor, retaining full-source/exception checks, durable
 deduplication and audited readback. [Current contract](m3-workflow-execution-contract.md),
-[next owner card](m3-workflow-apply-batch.md). Expanded native execution is
-**not_run**; prior native acceptance remains scoped to its original packages.
+[completed owner card](m3-workflow-apply-batch.md).
+[Bounded native workflow-write gate PASS](test-results/m3-workflow-acceptance-0.11.0.md):
+ten steps, standard/selected single-target writes/readbacks, read-only replay,
+audits 5 → 4 → 3 and same-session verified 0.11.0. Owner confirms changes,
+host survival, unchanged other elements and two-step Undo. No repeat is requested;
+the broader 1–32-change/file scope remains outside this acceptance.
 
-After this new gate, implement mark writes and deterministic numbering in a
+Next, implement mark writes and deterministic numbering in a
 versioned standard; these remain required baseline M3 work. Then prepare native
 same-session conflicts in a supported host lifecycle and controlled partial/unknown
 outcome plus read-only recovery. The known UI-host-cancellation scenario must not
@@ -142,7 +146,8 @@ even when filtering leaves the old layer/status pair.
 Two explicit proposals, a selection exception, collision against an excluded peer,
 three unchanged revalidations and identical audits pass; owner confirms unchanged
 model and uninterrupted host. No repetition is required. 0.11.0 implements
-selected/standard layer/status writes pending native acceptance. Mark writes and
+selected/standard layer/status writes with bounded native acceptance for the
+retained two-workflow gate. Mark writes and
 numbering remain required open work; M3 is open.
 
 - **M3.1** Shared preview/apply, stale checks, serialized writes, request identity, readback, partial outcomes and tested Undo limits.

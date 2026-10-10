@@ -40,6 +40,10 @@ sizes, hashes and exact extracted registration are recorded separately in the
 [0.11.0 delivery](../../evaluation-packages/0.11.0/README.md).
 Original earlier archives and native evidence remain unchanged.
 
-Next required observation: [native workflow-write card](../m3-workflow-apply-batch.md).
+Subsequent [native two-workflow gate PASS](m3-workflow-acceptance-0.11.0.md),
+including original full JSON/TXT, both writes/readbacks/replays, audits and
+owner-confirmed host/UI result plus two-step Undo.
+The [completed card](../m3-workflow-apply-batch.md) needs no repetition.
+This does not change the historical pre-native flags/results above.
 Actual mark writes/numbering, native same-session conflict and partial/unknown
 recovery, storage/copy identity guarantees and final integration remain open.
