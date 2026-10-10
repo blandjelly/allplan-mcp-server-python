@@ -232,6 +232,8 @@ M3 0.7.0 adds `fix_model_issues` read-only preview/revalidation;
 0.12.0 adds [existing-string mark writes and deterministic numbering](m3-numbering-contract.md),
 with [bounded two-target native acceptance](m3-numbering-acceptance-0.12.0.md). 0.11.0 added [shared standard/selection execution](m3-workflow-execution-contract.md),
 with bounded native acceptance for the retained two-workflow gate.
+0.13.0 adds [one read-only comparison of invalidated-plan evidence](m3-conflict-contract.md);
+Apply cannot use that evidence. The new native same-session gate awaits owner tests.
 
 model_query action=profile, profile_id=native-model-qa-demo freshly resolves
 MCP_QA_MARK / MCP_QA_STATUS and layer short names SZ_OGÓ01 (structure) /

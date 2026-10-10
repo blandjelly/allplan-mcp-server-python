@@ -29,6 +29,8 @@ def payload_files(repo: Path) -> dict[str, bytes]:
                          "M3 Workflow Recover.cmd": "m3-workflow-recover",
                          "M3 Numbering.cmd": "m3-numbering",
                          "M3 Numbering Recover.cmd": "m3-numbering-recover",
+                         "M3 Conflict.cmd": "m3-conflict",
+                         "M3 Conflict Recover.cmd": "m3-conflict-recover",
                          "M3 Recover.cmd": "m3-recover",
                          "Restore bridge.cmd": "restore"}.items():
         files[name] = (repo / "windows" / f"{action}.cmd").read_bytes()

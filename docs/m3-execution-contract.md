@@ -1,6 +1,6 @@
 # M3 execution, native guards and recovery
 
-Package **0.12.0** shares this executor across fix_model_issues,
+Package **0.13.0** shares this executor across fix_model_issues,
 apply_office_standard and rule_based_edit. [Current eligibility/workflow metadata](m3-workflow-execution-contract.md)
 cover 1–32 existing string mark/status and layer changes on Column roots in one foreground
 file. [Native acceptance](validation-status.md) remains narrower: the earlier
@@ -78,7 +78,11 @@ There is a 20-second boundary before starting each setter, 5-second individual
 read budgets and 10,000-adapter resolution limits; an executing native setter
 cannot be forcibly interrupted. HTTP timeout may therefore have an unknown result.
 
-All plans/selections are invalidated when execution starts. Full post-audit
+All plans/selections are invalidated when execution starts. In 0.13.0 invalidated
+plan evidence can be compared once through read-only revalidate, within the
+original shared cache/TTL limits; it cannot authorize Apply again.
+[Inspection contract and new native gate](m3-conflict-contract.md).
+Full post-audit
 verification compares the entire audited snapshot to the original plus only
 reviewed field/alias changes, including excluded peers, marks and geometry.
 It does not cover every native property or out-of-scope element. Readbacks alone

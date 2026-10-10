@@ -4,7 +4,7 @@ Public tool fix_model_issues, bridge /fix-model-issues, request/plan schema
 m3-repair-1. Preview/revalidation are side-effect-free. Layer/status preview
 has [bounded native acceptance](validation-status.md); explicit mark proposals
 are described in the [mark contract](m3-marks-contract.md).
-Package **0.12.0** executes eligible reviewed existing-string mark/status and layer plans through the
+Package **0.13.0** executes eligible reviewed existing-string mark/status and layer plans through the
 [shared executor](m3-execution-contract.md) and
 [workflow contract](m3-workflow-execution-contract.md).
 M3/UAT-05/UAT-06 remain open.
@@ -66,6 +66,9 @@ Restart, expiry and eviction require a new preview. Returned objects are copies,
 so client changes cannot modify a stored plan. The plan hash binds its ID,
 session, profile, scope, fingerprints, changes, exclusions and explicit request.
 Transport request/host IDs are added outside that hash.
+0.13.0 also retains execution-invalidated evidence for one read-only comparison,
+sharing the same cache/TTL budgets; [inspection contract](m3-conflict-contract.md).
+These plans remain unavailable to Apply even when source values match again.
 
 ```json
 {"action": "revalidate", "plan_id": "<32 hex characters>", "plan_hash": "<64 hex characters>"}

@@ -41,6 +41,93 @@ class FakeBridge:
 
 
 class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
+    async def test_conflict_gate_over_real_http_checks_excluded_peer_without_second_write(self):
+        from allplan_mcp.conflict_diagnostics import collect_conflict
+        from allplan_mcp.workflow_diagnostics import recover_workflow
+        native, elements = self.numbering_native_bridge()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report = await collect_conflict(self.url, root / 'conflict.json', confirm=lambda _: 'SPRAWDZ KONFLIKT')
+            self.assertEqual(report['state'], 'ready_for_ui_observation', report.get('message'))
+            self.assertEqual(len(report['steps']), 12)
+            self.assertTrue(all(s['ok'] for s in report['steps']))
+            pointer = json.loads((root / 'm3-last-conflict-execution.json').read_text())
+            saved = json.loads((root / ('m3-conflict-execution-' + report['execution_id'] + '.json')).read_text())
+            self.assertEqual(pointer, saved)
+            self.assertEqual(pointer['state'], 'completed')
+            self.assertNotEqual(report['execution_id'], report['stale_apply_request']['execution_id'])
+            recovered = await recover_workflow(self.url, root / 'recover.json', pointer)
+            self.assertEqual(recovered['state'], 'ready_for_ui_observation')
+            self.assertEqual(recovered['steps'][0]['response']['recovery']['observations'][0]['state'], 'new_value_observed')
+        self.assertEqual(dict(elements[2].GetAttributes.return_value)[20001], 'S03')
+        self.assertEqual(dict(elements[3].GetAttributes.return_value)[20001], 'S02')
+        native.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+        native.base.ElementsLayerService.ChangeLayer.assert_not_called()
+
+    async def test_conflict_gate_lost_reply_preserves_identity_and_recovers_without_new_apply(self):
+        from allplan_mcp.conflict_diagnostics import collect_conflict
+        from allplan_mcp.workflow_diagnostics import recover_workflow
+        native, _ = self.numbering_native_bridge(lose_reply=True)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report = await collect_conflict(self.url, root / 'conflict.json', confirm=lambda _: 'SPRAWDZ KONFLIKT')
+            self.assertEqual(report['state'], 'unknown', report.get('message'))
+            pointer = json.loads((root / 'm3-last-conflict-execution.json').read_text())
+            self.assertEqual(pointer['state'], 'unknown')
+            blocked = await collect_conflict(self.url, root / 'blocked.json', confirm=lambda _: self.fail('Unresolved write'))
+            self.assertEqual(blocked['state'], 'blocked')
+            self.assertEqual(json.loads((root / 'm3-last-conflict-execution.json').read_text()), pointer)
+            previous = len(self.bridge_handler.calls)
+            recovered = await recover_workflow(self.url, root / 'recover.json', pointer)
+            self.assertEqual(recovered['state'], 'ready_for_ui_observation')
+            self.assertEqual([p.get('action') for _, p in self.bridge_handler.calls[previous:]], ['recover'])
+        native.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+
+    async def test_conflict_gate_cancel_or_changed_source_during_review_never_writes(self):
+        from allplan_mcp.conflict_diagnostics import collect_conflict
+        native, elements = self.numbering_native_bridge()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report = await collect_conflict(self.url, root / 'cancel.json', confirm=lambda _: 'STOP')
+            self.assertEqual(report['state'], 'cancelled')
+            self.assertFalse((root / 'm3-last-conflict-execution.json').exists())
+            def confirm(_):
+                elements[2].GetAttributes.return_value = [(20001, 'MANUAL'), (20002, 'NEW')]
+                return 'SPRAWDZ KONFLIKT'
+            report = await collect_conflict(self.url, root / 'changed.json', confirm=confirm)
+            self.assertEqual(report['state'], 'blocked')
+            self.assertFalse((root / 'm3-last-conflict-execution.json').exists())
+        native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+    async def test_conflict_stale_rejection_lost_reply_retains_both_identities_and_blocks_rerun(self):
+        from allplan_mcp.conflict_diagnostics import collect_conflict
+        native, _ = self.numbering_native_bridge()
+        original = self.bridge_handler.handle
+        apply_calls = [0]
+        def lose_stale(path, payload):
+            if payload.get('action') == 'apply':
+                apply_calls[0] += 1
+                if apply_calls[0] == 2:
+                    try:
+                        original(path, payload)
+                    except transport.BridgeError as exc:
+                        self.assertEqual(exc.code, 'plan_expired')
+                    raise transport.BridgeError('execution_unknown', 'Lost stale rejection reply', 503)
+            return original(path, payload)
+        self.bridge_handler.handle = lose_stale
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report = await collect_conflict(self.url, root / 'conflict.json', confirm=lambda _: 'SPRAWDZ KONFLIKT')
+            self.assertEqual(report['state'], 'unknown')
+            pointer = json.loads((root / 'm3-last-conflict-execution.json').read_text())
+            self.assertEqual(pointer['state'], 'completed')
+            self.assertEqual(pointer['execution_id'], report['execution_id'])
+            self.assertEqual(pointer['uncertain_stale_execution_id'], report['stale_apply_request']['execution_id'])
+            blocked = await collect_conflict(self.url, root / 'blocked.json', confirm=lambda _: self.fail('Unresolved stale probe'))
+            self.assertEqual(blocked['state'], 'blocked')
+        self.assertEqual(apply_calls[0], 2)
+        native.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+
     def numbering_native_bridge(self, **options):
         native, elements = self.workflow_native_bridge(**options)
         def attribute(data, targets, undefined, deleted):

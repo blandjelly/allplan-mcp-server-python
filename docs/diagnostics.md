@@ -15,11 +15,20 @@ Unknown/incomplete data remains not_checked.
 
 ## Lost replies and recovery
 
-**M3 Numbering.cmd** runs only the new reviewed mark gate in 0.12.0. See
+**M3 Conflict.cmd** runs the new 0.13.0 same-session source-conflict gate,
+with one separately reviewed C03 write. [Owner instructions](m3-conflict-owner-test.md).
+**M3 Conflict Recover.cmd** reads `logs/m3-last-conflict-execution.json` and
+observes only that C03 execution without Apply replay or resume. An uncertain
+stale C04 probe has a separate saved identity; inspect it separately with local
+Codex and a fresh audit before any further write. The launcher blocks a rerun
+while its pointer records an unresolved execution/probe.
+
+**M3 Numbering.cmd** retains the completed reviewed mark gate from 0.12.0. See
 [owner instructions](m3-numbering-owner-test.md). It persists the execution ID
 before Apply; it never resumes or rolls back a failed write. The separate
 **M3 Numbering Recover.cmd** reads logs/m3-last-numbering-execution.json and
 uses read-only recovery, including after UI Undo/host restart.
+This accepted batch needs no repeat.
 
 Do not send a new Apply after a lost reply or partial/unknown result. Preserve
 the original request/execution ID, project, package logs and installed journal

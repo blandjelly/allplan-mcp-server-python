@@ -20,6 +20,9 @@ class RepairPlanService:
     def __init__(self, queries, journal_path=None):
         self.queries = queries
         self.plans = OrderedDict()
+        # Invalidated evidence is inspectable once, never executable. Both caches
+        # share the existing count/byte/TTL limits and disappear on host restart.
+        self.invalidated_plans = OrderedDict()
         from pathlib import Path
         from .repair_execution import RepairExecutor
         self.executor = RepairExecutor(self, journal_path or Path(__file__).resolve().parents[2] / ".allplan-mcp" / "repairs")
@@ -29,9 +32,10 @@ class RepairPlanService:
         if request["action"] in {"apply", "recover"}:
             return self.executor.handle(doc, base, settings, request)
         now = self.queries.clock()
-        for ident, entry in list(self.plans.items()):
-            if now - entry["created"] >= self.TTL_SECONDS:
-                del self.plans[ident]
+        for cache in (self.plans, self.invalidated_plans):
+            for ident, entry in list(cache.items()):
+                if now - entry["created"] >= self.TTL_SECONDS:
+                    del cache[ident]
         if request["action"] == "revalidate":
             return self._revalidate(doc, base, settings, request)
         decisions, selection_result = {}, None
@@ -180,8 +184,12 @@ class RepairPlanService:
         if size > self.MAX_PLAN_BYTES:
             raise BridgeError("scan_limit_exceeded", "Repair plan exceeds the 4 MiB budget; no plan was stored.", 409)
         entry["size"] = size
-        while self.plans and (len(self.plans) >= self.MAX_PLANS or sum(e["size"] for e in self.plans.values()) + size > self.MAX_CACHE_BYTES):
-            self.plans.popitem(last=False)
+        while (len(self.plans) + len(self.invalidated_plans) >= self.MAX_PLANS
+               or sum(e["size"] for cache in (self.plans, self.invalidated_plans)
+                      for e in cache.values()) + size > self.MAX_CACHE_BYTES):
+            oldest_cache = min((cache for cache in (self.plans, self.invalidated_plans) if cache),
+                               key=lambda cache: next(iter(cache.values()))["created"])
+            oldest_cache.popitem(last=False)
         self.plans[plan["plan_id"]] = entry
         return copy.deepcopy(plan)
 
@@ -220,8 +228,14 @@ class RepairPlanService:
                 "uniqueness_scope": ["drawing_file", "element_family"], "uses_full_snapshot": True,
                 "read_only": True}
 
+    def invalidate_for_execution(self):
+        self.invalidated_plans.update(self.plans)
+        self.plans.clear()
+
     def _revalidate(self, doc, base, settings, request):
-        entry = self.plans.get(request["plan_id"])
+        invalidated = request["plan_id"] not in self.plans
+        cache = self.invalidated_plans if invalidated else self.plans
+        entry = cache.get(request["plan_id"])
         if entry is None:
             raise BridgeError("plan_expired", "Plan expired, was evicted or belongs to another host session. Preview again.", 409)
         plan = entry["plan"]
@@ -230,22 +244,25 @@ class RepairPlanService:
         report = run_audit(self.queries, doc, base, settings, entry["request"]["audit"])
         # A blocked native read may finish after the plan's lifetime.
         if self.queries.clock() - entry["created"] >= self.TTL_SECONDS:
-            del self.plans[request["plan_id"]]
+            del cache[request["plan_id"]]
             raise BridgeError("plan_expired", "Plan expired during revalidation. Preview again.", 409)
         valid = (report["source_fingerprint"] == plan["source_fingerprint"]
                  and report["report_fingerprint"] == plan["audit_report_fingerprint"])
-        if not valid:
-            del self.plans[request["plan_id"]]
+        if not valid or invalidated:
+            del cache[request["plan_id"]]
         return {"schema_version": SCHEMA, "action": "revalidate", "read_only": True,
                 "plan_id": request["plan_id"], "plan_hash": plan["plan_hash"],
-                "state": "unchanged" if valid else "conflict", "source_unchanged": valid,
+                "state": "unchanged" if valid and not invalidated else "conflict", "source_unchanged": valid,
+                "plan_invalidated": invalidated,
+                "invalidation_reason": "execution_started" if invalidated else None,
                 "current_source_fingerprint": report["source_fingerprint"],
                 "current_audit_report_fingerprint": report["report_fingerprint"],
                 "expires_in_seconds": max(0, int(self.TTL_SECONDS - (self.queries.clock() - entry["created"]))),
                 "apply_available": False, "usable_for_write": False,
-                "evaluation_apply_available": valid and plan["evaluation_apply_available"],
+                "evaluation_apply_available": valid and not invalidated and plan["evaluation_apply_available"],
                 "report_text": ("Plan evidence unchanged; this plan is preview-only." if not plan["evaluation_apply_available"] else
-                                "Plan evidence unchanged; bounded disposable-copy evaluation apply requires explicit acknowledgement.") if valid else
+                                "Plan evidence unchanged; bounded disposable-copy evaluation apply requires explicit acknowledgement.") if valid and not invalidated else
+                               "Execution invalidated this plan. Source comparison is read-only; preview again." if invalidated and valid else
                                "Plan conflict: identity, resources, scope or audited source changed. Preview again."}
 
     @staticmethod

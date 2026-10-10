@@ -80,9 +80,14 @@ is bounded to the recorded fixture writes and two-step Undo.
 
 Preview/revalidation use host repair_contracts.py / model_repair.py and public
 repair_models.py. The session-local cache stores immutable plans with ID/hash,
-expiry and full source evidence. Preview invokes no setters. Mark Apply requires validated full-scope collision evidence;
-host mark_numbering.py expands the versioned [numbering standard](m3-numbering-contract.md)
-from the same fresh scan. See [preview](m3-repair-contract.md) and [marks](m3-marks-contract.md).
+expiry and full source evidence. Preview invokes no setters. Mark Apply requires
+validated full-scope collision evidence; host mark_numbering.py expands the
+versioned [numbering standard](m3-numbering-contract.md) from the same fresh scan.
+See [preview](m3-repair-contract.md) and [marks](m3-marks-contract.md).
+
+0.13.0 preserves invalidated evidence for one read-only comparison within the
+same TTL/count/byte limits; it cannot restore write authorization.
+[Contract and new native gate](m3-conflict-contract.md).
 
 1. Resolve explicit scope and supported operations.
 2. Produce a side-effect-free preview with targets, values, exclusions and counts.

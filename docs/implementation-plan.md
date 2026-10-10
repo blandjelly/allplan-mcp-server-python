@@ -62,7 +62,7 @@ uniqueness scope, explicit unavailable data and locatable targets; no writes.
 
 ## M3 — Controlled repairs and standards: partially implemented, M3 open
 
-Package **0.12.0** supports 1–32 reviewed existing string mark/status or layer changes on
+Package **0.13.0** supports 1–32 reviewed existing string mark/status or layer changes on
 Column roots in one explicit foreground file. Office-standard and rule-based
 Apply/Revalidate/Recover reuse the executor, full-source/exception checks,
 durable deduplication and audited readback.
@@ -75,6 +75,8 @@ scope remains outside this gate. Layer/status preview, earlier two-target
 execution/Redo recovery, restart invalidation/stale Apply rejection,
 standard/selection no-op previews and explicit collision-aware mark previews
 have separate bounded acceptance. Unchanged completed gates need no repetition.
+0.13.0 adds bounded read-only inspection of invalidated evidence;
+[same-session native conflict gate](m3-conflict-owner-test.md) is ready for owner testing.
 
 Mark assignment and deterministic versioned-standard numbering are implemented;
 [their bounded two-target native gate](m3-numbering-acceptance-0.12.0.md) passed

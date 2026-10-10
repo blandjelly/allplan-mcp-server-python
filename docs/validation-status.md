@@ -1,6 +1,10 @@
 # Validation status and limits
 
-Current package **0.12.0**; status recorded **2026-10-10 Europe/Warsaw**.
+Current package **0.13.0**; status recorded **2026-10-10 Europe/Warsaw**.
+Its [same-session conflict gate](m3-conflict-owner-test.md) is
+**ready_for_owner_test** and has no native acceptance yet. It preserves invalidated
+plans for one read-only source comparison, never restoring authorization.
+Partial/unknown native recovery remains a separate subsequent gate.
 Mark assignment and deterministic numbering have **bounded two-target native PASS**;
 [0.12.0 acceptance/evidence](m3-numbering-acceptance-0.12.0.md). Native acceptance
 below remains scoped to its recorded packages, fixture and supported behaviors.

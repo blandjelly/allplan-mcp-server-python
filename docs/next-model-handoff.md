@@ -2,7 +2,7 @@
 
 ## Current state
 
-Continue **codex/m3-repair-preview**, package **0.12.0**, draft
+Continue **codex/m3-repair-preview**, package **0.13.0**, draft
 [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2).
 M0–M2 / UAT-00–UAT-04 are accepted within the recorded Allplan **2026-1-7**
 fixture scope. **M3/UAT-05/UAT-06 and the first MVP remain open**.
@@ -13,7 +13,8 @@ Read [architecture](architecture.md), [features](features.md),
 and [testing policy](testing-policy.md). Details: [read tools](tool-reference.md),
 [audit](m2-audit-contract.md), [repair preview](m3-repair-contract.md),
 [standard/selection](m3-standards-contract.md), [marks](m3-marks-contract.md),
-[numbering](m3-numbering-contract.md), [new owner gate](m3-numbering-owner-test.md),
+[numbering](m3-numbering-contract.md), [invalidated-plan inspection](m3-conflict-contract.md),
+[new owner gate](m3-conflict-owner-test.md),
 [execution](m3-execution-contract.md) and
 [workflow execution/journal lifecycle](m3-workflow-execution-contract.md).
 
@@ -43,14 +44,22 @@ and [testing policy](testing-policy.md). Details: [read tools](tool-reference.md
   two-step Undo; Recover observed both old values after Undo.
   [Evidence](m3-numbering-acceptance-0.12.0.md). Wider mark request scope remains open.
   Grouped Undo and automatic rollback are unavailable.
+- 0.13.0 retains execution-invalidated plan evidence for one fresh read-only
+  comparison within the original shared cache/TTL limits. Apply stays blocked
+  even if source values return to the old state. Its native gate is
+  **ready_for_owner_test**, not accepted: two selected previews, one C03 write,
+  rejected stale C04 Apply and a real excluded-peer source/report conflict in
+  the same host session. [Owner instructions](m3-conflict-owner-test.md).
 
 ## Next implementation
 
-1. Design native same-session source-conflict checks in a supported host lifecycle,
-   then controlled partial/unknown outcomes and read-only recovery. The observed
-   manual UI edit cancelled StartPythonHost; repeating that scenario unchanged
-   cannot establish a same-session conflict. Restart invalidation and stale Apply
-   rejection already pass.
+1. Obtain the new 0.13.0 same-session conflict gate in the original disposable
+   copy, with one C03 write and one Undo. The launcher uses a separately reviewed
+   typed write instead of the UI edit known to cancel the host. It distinguishes
+   execution invalidation from actual fresh source/report differences; it does
+   not accept manual UI conflicts or partial/unknown outcomes by inference.
+   Use that lifecycle evidence to prepare the separate controlled partial/unknown
+   recovery gate next. No repeated 0.12.0 numbering or layer/status gate is requested.
 2. Resolve remaining acceptance for the declared scope, journal maintenance and
    identity limits; integrate with main and complete UAT-05/UAT-06.
 
@@ -59,7 +68,7 @@ extensions. They do not enlarge mandatory M3 closure scope.
 
 ## Resume safely
 
-Local final-candidate verification: 187 portable tests PASS, frozen dependency
+Previous 0.12.0 final-candidate verification: 187 portable tests PASS, frozen dependency
 sync, wheel/sdist and exact extracted installation/23 bridge hashes PASS;
 Setup/Restore preserved the journal. Source **fd78700378eceb6f217e4ca30a83b88004b73a57**,
 [CI 38075847420](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38075847420)
@@ -70,8 +79,8 @@ Do not repeat the full suite or prior native batches for documentation publicati
 The owner left the original disposable copy after **two Undo operations**:
 C03 mark `<niezdefiniowany>`, C04=S02, C02=S02; C05 structure/C06 NEW remain.
 Read-only Recover confirmed both old mark values and a complete audit with three
-mark findings. **Leave/save this state; no Redo or new Apply is requested.**
-Start future work with fresh health/context and a full audit in that same copy.
+mark findings. **Leave/save this state until the new reviewed 0.13.0 gate; no Redo.**
+The new launcher starts with fresh health/context and a full audit in that same copy.
 Historical completed/replay outcomes do not establish current values after Undo.
 Never reuse an old execution ID for a new repair.
 
@@ -82,7 +91,7 @@ protection against repeated execution. See [recovery guidance](diagnostics.md)
 and [journal limits](m3-workflow-execution-contract.md#journal-lifecycle-and-the-128-record-limit).
 
 Use [Windows setup](windows-setup.md) and [fixture definition](fixture-guide.md)
-when needed. New [0.12.0 artifacts](../evaluation-packages/0.12.0/README.md)
+when needed. Delivered [0.12.0 artifacts](../evaluation-packages/0.12.0/README.md)
 identify the clean tested source and exact package. Delivered
 [0.11.0 artifacts](../evaluation-packages/0.11.0/README.md) remain unchanged.
 Future runtime changes need a new package version.

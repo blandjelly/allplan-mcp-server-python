@@ -1,6 +1,6 @@
 # M3 office standards and selected repairs
 
-Current **0.12.0** tools apply_office_standard and rule_based_edit share the
+Current **0.13.0** tools apply_office_standard and rule_based_edit share the
 repair planner/executor. They accept preview, revalidate, apply and recover.
 [Native boundaries](validation-status.md) distinguish the earlier no-op previews
 from the latest two separately reviewed single-target writes.

@@ -43,6 +43,95 @@ class MarkExecutionTests(unittest.TestCase):
             'kind': 'office_standard_preview', **{k: standard[k] for k in
                 ('standard_id', 'standard_version', 'standard_fingerprint')}}, **overrides)
 
+    def inspect(self, plan, **overrides):
+        return self.call({'schema_version': 'm3-repair-1', 'action': 'revalidate',
+                          'plan_id': plan['plan_id'], 'plan_hash': plan['plan_hash'], **overrides})
+
+    def test_same_session_write_invalidates_peer_plan_but_preserves_read_only_source_conflict(self):
+        elements = self.marks_fixture()
+        c03, c04 = [str(e.GetModelElementUUID()) for e in elements[2:4]]
+        older = self.call(self.numbering_request(selection={'where': {'field': 'layer_id', 'op': 'exists'},
+            'exclude_model_uuids': [str(e.GetModelElementUUID()) for e in elements[:6] if e is not elements[3]]}))
+        self.assertEqual([(c['ref']['model_uuid'], c['new_value']) for c in older['changes']], [(c04, 'S03')])
+        write = self.preview(repairs=[{'rule_id': 'QA-001', 'model_uuid': c03, 'value': 'S03'}])
+        self.assertEqual(self.call(self.apply(write))['state'], 'completed')
+        self.assertEqual(self.handler.repair_plans.plans, {})
+        self.base.ElementsSelectService.SelectAllElements.reset_mock()
+        self.assert_code('plan_expired', lambda: self.call(self.apply(older)))
+        self.base.ElementsSelectService.SelectAllElements.assert_not_called()
+        self.assert_code('plan_hash_mismatch', lambda: self.inspect(older, plan_hash='0' * 64))
+        conflict = self.inspect(older)
+        self.assertEqual(conflict['state'], 'conflict')
+        self.assertFalse(conflict['source_unchanged'])
+        self.assertTrue(conflict['plan_invalidated'])
+        self.assertEqual(conflict['invalidation_reason'], 'execution_started')
+        self.assertFalse(conflict['evaluation_apply_available'])
+        self.assertNotEqual(conflict['current_source_fingerprint'], older['source_fingerprint'])
+        self.assert_code('plan_expired', lambda: self.inspect(older))
+        self.assertEqual(dict(elements[3].GetAttributes.return_value)[20001], 'S02')
+        self.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+
+    def test_invalidated_unchanged_source_cannot_renew_authorization_even_after_undo(self):
+        elements = self.marks_fixture()
+        plan = self.call(self.numbering_request())
+        original = [copy.deepcopy(e.GetAttributes.return_value) for e in elements]
+        self.call(self.apply(plan))
+        for element, attrs in zip(elements, original):
+            element.GetAttributes.return_value = attrs
+        check = self.inspect(plan)
+        self.assertTrue(check['source_unchanged'])
+        self.assertEqual(check['state'], 'conflict')
+        self.assertTrue(check['plan_invalidated'])
+        self.assertFalse(check['evaluation_apply_available'])
+        self.assert_code('plan_expired', lambda: self.call(self.apply(plan)))
+        self.assertEqual(self.base.ElementsAttributeService.ChangeAttributes.call_count, 2)
+
+    def test_active_and_invalidated_evidence_share_capacity_ttl_and_restart_limits(self):
+        self.marks_fixture()
+        now = [0]
+        self.handler.model_queries.clock = lambda: now[0]
+        service = self.handler.repair_plans
+        plans = [self.call(self.numbering_request()) for _ in range(8)]
+        self.call(self.apply(plans[-1]))
+        self.assertEqual(len(service.invalidated_plans), 8)
+        self.call(self.numbering_request())
+        self.assertEqual(len(service.plans) + len(service.invalidated_plans), 8)
+        self.assert_code('plan_expired', lambda: self.inspect(plans[0]))
+        now[0] = 300
+        self.base.ElementsSelectService.SelectAllElements.reset_mock()
+        self.assert_code('plan_expired', lambda: self.inspect(plans[-1]))
+        self.base.ElementsSelectService.SelectAllElements.assert_not_called()
+        self.assertFalse(service.invalidated_plans)
+        now[0] = 0
+        plan = self.call(self.numbering_request())
+        service.invalidate_for_execution()
+        service_type = type(service)
+        self.handler.repair_plans = service_type(self.handler.model_queries, self.directory.name)
+        self.assert_code('plan_expired', lambda: self.inspect(plan))
+
+    def test_invalidated_evidence_keeps_original_lifetime_and_byte_budget(self):
+        elements = self.marks_fixture()
+        now = [0]
+        self.handler.model_queries.clock = lambda: now[0]
+        service = self.handler.repair_plans
+        older = self.call(self.numbering_request())
+        size = next(iter(service.plans.values()))['size']
+        service.MAX_CACHE_BYTES = size * 2
+        now[0] = 299
+        service.invalidate_for_execution()
+        self.call(self.numbering_request())
+        self.call(self.numbering_request())
+        self.assertLessEqual(sum(e['size'] for cache in (service.plans, service.invalidated_plans)
+                                 for e in cache.values()), service.MAX_CACHE_BYTES)
+        self.assert_code('plan_expired', lambda: self.inspect(older))
+        # Expiry during a native read must also remove retained evidence.
+        plan = self.call(self.numbering_request())
+        now[0] = 598
+        service.invalidate_for_execution()
+        elements[0].GetAttributes.side_effect = lambda mode: (now.__setitem__(0, 599) or [(20001, 'S01'), (20002, 'NEW')])
+        self.assert_code('plan_expired', lambda: self.inspect(plan))
+        self.assertNotIn(plan['plan_id'], service.invalidated_plans)
+
     def test_numbering_is_stable_across_adapter_order_preserves_valid_and_applies_once(self):
         elements = self.marks_fixture()
         self.base.ElementsSelectService.SelectAllElements.reset_mock()

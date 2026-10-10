@@ -172,6 +172,10 @@ class RepairExecutor:
 
     def apply(self, doc, base, settings, request):
         started = self.plans.queries.clock()
+        # Retained invalidated evidence is exclusively for read-only inspection.
+        # Reject before scanning and leave it available for a revalidate request.
+        if request["plan_id"] not in self.plans.plans:
+            raise BridgeError("plan_expired", "Plan expired or was invalidated by execution. Preview again.", 409)
         check = self.plans._revalidate(doc, base, settings, request)
         if check["state"] != "unchanged":
             raise BridgeError("repair_conflict", "Reviewed source changed; preview again.", 409)
@@ -210,7 +214,7 @@ class RepairExecutor:
                   "target_preflight": target_preflight,
                   "outcomes": [{"state": "skipped", "reason": "not_attempted"} for _ in plan["changes"]]}
         self.save(record)
-        self.plans.plans.clear()
+        self.plans.invalidate_for_execution()
         self.plans.queries.selections.clear()
         for index, change in enumerate(record["changes"]):
             outcome = record["outcomes"][index]

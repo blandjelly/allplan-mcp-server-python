@@ -35,12 +35,15 @@ class PackageTests(unittest.TestCase):
             self.assertEqual(manifest["integrity"], "sha256-verified")
             for name in ("Setup.cmd", "Launch Allplan MCP.cmd", "Connect Codex.cmd",
                          "Diagnostics.cmd", "Restore bridge.cmd", "M3 Recover.cmd",
-                         "M3 Workflow Recover.cmd", "M3 Numbering.cmd", "M3 Numbering Recover.cmd"):
+                         "M3 Workflow Recover.cmd", "M3 Numbering.cmd", "M3 Numbering Recover.cmd",
+                         "M3 Conflict.cmd", "M3 Conflict Recover.cmd"):
                 self.assertTrue((package / name).is_file())
             self.assertEqual({p.name for p in package.glob("M*.cmd")},
-                             {"M3 Recover.cmd", "M3 Workflow Recover.cmd", "M3 Numbering.cmd", "M3 Numbering Recover.cmd"})
+                             {"M3 Recover.cmd", "M3 Workflow Recover.cmd", "M3 Numbering.cmd", "M3 Numbering Recover.cmd",
+                              "M3 Conflict.cmd", "M3 Conflict Recover.cmd"})
             self.assertEqual({p.name for p in (package / "windows").glob("m*.cmd")},
-                             {"m3-recover.cmd", "m3-workflow-recover.cmd", "m3-numbering.cmd", "m3-numbering-recover.cmd"})
+                             {"m3-recover.cmd", "m3-workflow-recover.cmd", "m3-numbering.cmd", "m3-numbering-recover.cmd",
+                              "m3-conflict.cmd", "m3-conflict-recover.cmd"})
             for retired in ("test-results", "probes", "reviews"):
                 self.assertFalse((package / "docs" / retired).exists())
             local = work / "Allplan Local"

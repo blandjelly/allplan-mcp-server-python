@@ -1,4 +1,4 @@
-# M3 shared mark/status/layer execution — 0.12.0
+# M3 shared mark/status/layer execution — 0.13.0
 
 Status **bounded native workflow-write gate PASS**, 2026-10-10 Europe/Warsaw.
 [Validation status](validation-status.md):
@@ -52,7 +52,10 @@ full source/report revalidation, expiry/hash, native hierarchy and writability,
 all-target preflight, immediate per-target old-value checks, OS serialization,
 write-ahead unknown markers, readback, stop after failure and durable exact-ID
 replay. Selection changes proposals only; excluded peers remain in the source
-fingerprint and full post-write verification.
+fingerprint and full post-write verification. Invalidated plans remain blocked
+from Apply. 0.13.0 preserves their evidence for one read-only source comparison
+within shared original TTL/cache budgets;
+[new same-session conflict gate](m3-conflict-contract.md) awaits owner observation.
 
 Completed requires all proposed writes to read back correctly, a complete
 post-audit and an exact comparison of the entire audited snapshot against the
