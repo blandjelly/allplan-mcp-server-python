@@ -15,24 +15,32 @@ Read these files in order when continuing implementation:
 2. [Architecture](docs/architecture.md): runtime boundary and shared contracts.
 3. [Features](docs/features.md): the 13 tools and demonstration fixture.
 4. [Implementation stages](docs/implementation-plan.md): task IDs and exit gates.
+5. [Validation schedule](docs/testing-policy.md): focused local work, publication
+   checks, CI matrix and retained hash protections.
 
-Current package: **0.6.1**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
-**M0 and bounded M1 are accepted** on Allplan **2026-1-7** with local Windows Codex; UAT-00–UAT-03 PASS.
-The demo profile binds freshly for reads and remains inactive for writes.
-[Acceptance and limits](docs/test-results/m1-acceptance-0.5.3.md) cover the known
-fixture, display-unit invariance and nonzero XY offset. **M2.1–M2.3 / UAT-04
-PASS within the retained read-only fixture scope**, package 0.6.1;
-[acceptance and evidence](docs/test-results/m2-acceptance-0.6.1.md).
-[Native 0.6.0 report/UI checks](docs/test-results/m2-audit-runtime-0.6.0.md) match
-the fixture. 0.6.1 contains UI callback exceptions and rejects invalid audit scope
-before contacting Allplan; [correction and limits](docs/test-results/m2-dispatch-fix-0.6.1.md).
-Both repeated audits, scope rejection through MCP/host and post-error health
-passed; the owner confirms Allplan and host remain running. The earlier crash's
-precise cause remains unproven. The [completed stability card](docs/m2-stability-batch.md)
-retains the test recipe; no further M2 owner batch is requested. `model_audit` returns read-only
-findings, coverage and file/mark/location evidence. The
-[UAT-04 card](docs/m2-audit-batch.md) records the original procedure.
-Repairs and generation remain planned.
+Current package: **0.13.0**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
+**M0–M2 / UAT-00–UAT-04 are accepted within the recorded Allplan 2026-1-7 fixture scope**
+with local Windows Codex. M3 has accepted layer/status preview and bounded writes,
+standard/selection workflows and read-only mark collision previews.
+The latest native workflow gate passed two single-target writes, exact readback,
+read-only replay, complete audits **5 → 4 → 3** and owner-confirmed two-step Undo.
+0.12.0 implements reviewed mark assignment and a deterministic versioned numbering
+standard; the [bounded two-target native gate](docs/m3-numbering-acceptance-0.12.0.md)
+passed writes, readback, replay/no-op and two-step Undo/recovery.
+**M3/UAT-05/UAT-06 remain open**: remaining scope acceptance, native same-session
+conflicts and controlled partial/unknown recovery are next.
+0.13.0 retains invalidated plans for one bounded read-only source comparison;
+they remain unavailable to Apply. The new [same-session conflict gate](docs/m3-conflict-owner-test.md)
+is ready for owner testing and requires one C03 write and one Undo.
+[Validation status](docs/validation-status.md) defines the accepted boundaries.
+
+Use [Windows setup](docs/windows-setup.md), [fixture definition](docs/fixture-guide.md),
+[read tools](docs/tool-reference.md), [audit contract](docs/m2-audit-contract.md),
+[workflow execution](docs/m3-workflow-execution-contract.md) and
+[diagnostics/recovery](docs/diagnostics.md) for ongoing work.
+Completed test cards, logs and previous handoffs are available in Git history.
+Delivered archives retain their original contents; new source packages omit
+completed test launchers and include current documentation.
 
 Repository documentation and API identifiers use English. Owner-facing
 walkthroughs may use Polish. The implementation model owns coding, diagnostics,

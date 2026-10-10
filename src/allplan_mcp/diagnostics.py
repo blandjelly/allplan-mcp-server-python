@@ -176,6 +176,81 @@ async def collect_m2_stability(host_url: str, mcp_url: str) -> dict:
     return report
 
 
+async def collect_m3_preview(host_url: str, mcp_url: str) -> dict:
+    """Bounded read-only owner gate: preview, revalidate, unchanged audit, health."""
+    from fastmcp import Client
+    report = await collect_diagnostics(host_url, mcp_url, include_model_context=False)
+    steps = []
+    gate = {"checks_complete": False, "steps": steps, "allplan_acceptance": "not_run", "read_only": True}
+    report["m3_preview"] = gate
+    runtime = report.get("host", {})
+    health = report.get("mcp", {}).get("allplan_health", {})
+    expected = version("allplan-mcp-server")
+    preflight = (runtime.get("bridge_package", {}).get("version") == expected
+                 and runtime.get("installed_bridge_integrity", {}).get("status") == "verified"
+                 and runtime.get("ui_dispatch_exception_boundary") == "contained_result_error_v1"
+                 and health.get("mcp_package_version") == expected
+                 and "fix_model_issues" in report.get("mcp", {}).get("discovered_tools", []))
+    steps.append({"name": "host_boundary_preflight", "ok": preflight, "expected_package_version": expected})
+    if not preflight:
+        gate["stopped_reason"] = "Package/integrity/loaded boundary/tool preflight failed; no model reads requested."
+        return report
+    audit = {"scope": {"drawing_files": [101], "include_passive": False, "visibility": "api_select_all"},
+             "profile_id": "native-model-qa-demo"}
+    request = {"action": "preview", "audit": audit,
+               "repairs": [{"rule_id": "QA-003", "value": "structure"}, {"rule_id": "QA-004", "value": "NEW"}]}
+    gate["request"] = request
+    step = "preview"
+    try:
+        async with Client(mcp_url, timeout=30) as client:
+            plan = (await client.call_tool("fix_model_issues", {"request": request})).data
+            report["mcp"]["fix_model_issues"] = plan
+            changes = plan.get("changes", [])
+            expected_changes = (len(changes) == 2 and {c["rule_id"] for c in changes} == {"QA-003", "QA-004"}
+                                and all(c["ref"]["drawing_file"] == 101 for c in changes)
+                                and any(c["rule_id"] == "QA-004" and c["old_value"].get("value") == "NWE"
+                                        and c["new_value"] == "NEW" for c in changes)
+                                and any(c["rule_id"] == "QA-003" and c["resource"].get("short_name") == "SZ_OGÓ01"
+                                        and c["old_value"].get("value") != c["new_value"] for c in changes))
+            ok = (plan.get("schema_version") == "m3-repair-1" and plan.get("read_only") is True
+                  and plan.get("apply_available") is False and plan.get("usable_for_write") is False
+                  and plan.get("state") == "preview_ready" and plan.get("coverage", {}).get("audit_complete") is True
+                  and plan.get("counts") == {"changes": 2, "excluded_findings": 3, "audit_findings": 5}
+                  and expected_changes)
+            steps.append({"name": step, "ok": ok, "response": plan})
+            if not ok:
+                gate["stopped_reason"] = "Preview differs from the retained fixture gate; no further reads requested."
+                return report
+            step = "revalidate"
+            response = (await client.call_tool("fix_model_issues", {"request": {
+                "action": "revalidate", "plan_id": plan["plan_id"], "plan_hash": plan["plan_hash"]}})).data
+            steps.append({"name": step, "ok": response.get("state") == "unchanged" and response.get("source_unchanged") is True
+                          and response.get("read_only") is True and response.get("apply_available") is False,
+                          "response": response})
+            if not steps[-1]["ok"]:
+                gate["stopped_reason"] = "Plan revalidation failed; no further reads requested."
+                return report
+            step = "audit_after_preview"
+            response = (await client.call_tool("model_audit", {"request": audit})).data
+            report["mcp"]["model_audit"] = response
+            steps.append({"name": step, "ok": response.get("report_fingerprint") == plan["audit_report_fingerprint"]
+                          and response.get("source_fingerprint") == plan["source_fingerprint"]
+                          and response.get("counts", {}).get("findings") == 5,
+                          "response": response})
+            if not steps[-1]["ok"]:
+                gate["stopped_reason"] = "Audited evidence changed during the read-only batch; stop and inspect the model."
+                return report
+            step = "host_health_after_preview"
+            response = await asyncio.to_thread(AllplanHostClient(host_url, timeout=5).post, "/get-allplan-version")
+            steps.append({"name": step, "ok": bool(response.get("version"))
+                          and response.get("host_session_id") == runtime.get("host_session_id"), "response": response})
+            gate["checks_complete"] = all(s["ok"] for s in steps)
+    except Exception as exc:
+        steps.append({"name": step, "ok": False, "message": str(exc)})
+        gate["stopped_reason"] = "A check failed; no automatic retry was requested."
+    return report
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Collect read-only bridge and MCP diagnostics.")
     parser.add_argument("--output", type=Path)
@@ -184,18 +259,34 @@ def main() -> None:
     inputs.add_argument("--query-batch", type=Path, help="JSON list of 1..8 typed read-only requests; captures summaries and bounded pages.")
     inputs.add_argument("--audit-request", type=Path, help="Typed model_audit request; saves full JSON and a readable text report.")
     inputs.add_argument("--m2-stability", action="store_true", help="Two demo reads, public/host scope rejection and host health; stops on failure.")
+    inputs.add_argument("--m3-preview", action="store_true", help="Read-only demo repair preview, revalidation, unchanged audit and health.")
     args = parser.parse_args()
     query_request = json.loads(args.query_request.read_text(encoding="utf-8")) if args.query_request else None
     query_batch = json.loads(args.query_batch.read_text(encoding="utf-8")) if args.query_batch else None
     audit_request = json.loads(args.audit_request.read_text(encoding="utf-8")) if args.audit_request else None
     host_url = os.getenv("ALLPLAN_HOST_URL", "http://127.0.0.1:5679")
     mcp_url = os.getenv("MCP_URL", "http://127.0.0.1:8888/mcp")
-    report = asyncio.run(collect_m2_stability(host_url, mcp_url) if args.m2_stability else
+    report = asyncio.run(collect_m3_preview(host_url, mcp_url) if args.m3_preview else
+                         collect_m2_stability(host_url, mcp_url) if args.m2_stability else
                          collect_diagnostics(host_url, mcp_url, query_request, query_batch, audit_request))
     path = args.output or Path("logs") / ("diagnostics-" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + ".json")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"Diagnostics saved to {path.resolve()}. No model changes were requested.")
+    if args.m3_preview:
+        gate = report["m3_preview"]
+        plan = report.get("mcp", {}).get("fix_model_issues", {})
+        content = plan.get("report_text", "Repair preview unavailable; preserve the JSON.")
+        content += "\n\nM3 preview checks complete: " + str(gate["checks_complete"])
+        for item in gate["steps"]:
+            content += f"\n{item['name']}: {'OK' if item['ok'] else 'FAILED'}"
+        if "stopped_reason" in gate:
+            content += "\n" + gate["stopped_reason"]
+        path.with_suffix(".txt").write_text(content + "\n", encoding="utf-8")
+        print(content)
+        print("Owner must compare the two proposed targets/values in Allplan and confirm the unchanged model.")
+        if not gate["checks_complete"]:
+            raise SystemExit(1)
     if audit_request is not None or args.m2_stability:
         audit = report.get("mcp", {}).get("model_audit", {})
         text_path = path.with_suffix(".txt")

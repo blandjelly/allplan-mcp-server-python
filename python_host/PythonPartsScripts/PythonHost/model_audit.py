@@ -112,7 +112,7 @@ def evaluate_rule(rule, elements, binding, profile, complete, check_budget):
                        "source_fingerprint": element["source_fingerprint"], "usable_for_write": False}
 
 
-def run_audit(queries, doc, base, settings, request):
+def run_audit(queries, doc, base, settings, request, *, with_snapshot=False):
     validate_audit_request(request)
     started = queries.clock()
     def check_budget():
@@ -181,4 +181,4 @@ def run_audit(queries, doc, base, settings, request):
     if len(json.dumps(report, ensure_ascii=False, allow_nan=False).encode()) > queries.MAX_SNAPSHOT_BYTES:
         raise BridgeError("scan_limit_exceeded", "Audit exceeds the 4 MiB report budget; no partial report is returned.", 409)
     check_budget()
-    return report
+    return (report, snapshot) if with_snapshot else report

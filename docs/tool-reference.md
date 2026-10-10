@@ -1,17 +1,12 @@
 # M1 scope and model query contract — 0.5.3
 
 Status: **M1 accepted on Allplan 2026-1-7 within the bounded read contract**.
-[Acceptance and limits](test-results/m1-acceptance-0.5.3.md). Schema
+[Acceptance and limits](validation-status.md). Schema
 `m1-query-1`, public MCP tool `model_query`, typed bridge route `/model-query`.
-0.5.0 completes the bounded M1.1–M1.4 read implementation with 56 portable
-checks; 0.5.3 adds the observed-family correction with 14 targeted checks.
-Native A/B/C geometry/hierarchy/demo/display-unit/nonzero XY offset gates PASS.
-[Final owner card](m1-final-batch.md). The accepted 0.2.1 context reader is reused;
-its raw units/offset and context probe schema retain their earlier meaning.
-[0.3.0 evidence and limits](test-results/m1-query-runtime-0.3.0.md) verify scope,
-metadata, two distinct pages/full summary and observed-value predicates on the
-owner's two-column scene. Other predicate variants, changed-source stale checks,
-TTL/restart and geometry do not gain runtime acceptance from that batch.
+Native geometry/hierarchy, demo resources, display-unit invariance and
+nonzero XY offset have bounded acceptance. Other predicate variants, changed-source
+staleness and TTL/eviction remain backed by portable checks; do not infer wider
+native support. The context probe preserves raw units/offset provenance.
 
 ## Scope and identity
 
@@ -143,7 +138,7 @@ The timer cannot interrupt a blocking native API call. Paging reduces response
 size; revalidation still scans the bounded candidate set. Runtime performance
 remains unmeasured.
 
-## Metadata inspection (0.4.0; bounded Allplan batch PASS)
+## Metadata inspection
 
 `action=inspect` requires the same explicit `scope` and an explicit
 `attribute_ids` list (0–32 distinct positive IDs). `sample_limit` is 1–20,
@@ -175,17 +170,14 @@ their observed raw values. No fallback read changes state or creates attributes.
 `runtime_verified=false`, `usable_for_write=false`, `profile_binding=not_checked`
 remain explicit. Units are metadata strings without conversion. The demo
 binding is not established by metadata inspection. The separate profile action
-freshly resolves resources for reads. [Owner card](m1-metadata-batch.md) has bounded PASS
-[Allplan evidence](test-results/m1-metadata-runtime-0.4.0.md); these static flags
-are not an acceptance registry.
+freshly resolves resources for reads. See [native limits](validation-status.md);
+static flags are not an acceptance registry.
 
 ```json
 {"action":"inspect","scope":{"drawing_files":[1,2],"include_passive":true,"visibility":"api_select_all"},"attribute_ids":[498],"sample_limit":10}
 ```
 
-**M1 Metadata.cmd** captures this packaged request and its full MCP response
-in `logs/diagnostics-*.json`. Ordinary **Diagnostics.cmd** retains basic
-health/version/context behavior. Developer CLI `--query-request <JSON path>`
+**Diagnostics.cmd** captures basic health/version/context. Developer CLI `--query-request <JSON path>`
 can capture another typed read-only request; it never automatically pages,
 retries a write or marks acceptance. Raw results require separate interpretation.
 
@@ -193,7 +185,7 @@ retries a write or marks acceptance. Raw results require separate interpretation
 [AttributeService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/AttributeService/)
 uses a DocumentAdapter; [LayerService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/LayerService/)
 uses an integer document ID. This documentation evidence is separate from
-[portable checks](test-results/m1-metadata-portable-0.4.0.md) and Allplan verification.
+[portable checks](validation-status.md) and Allplan verification.
 
 ## Geometry, spatial scope and coordinate convention
 
@@ -211,7 +203,7 @@ convention; display units are not used as a scaling factor. Conversion metadata
 preserves source API, source frame, offset, applied flag and runtime_verified=false.
 The explicit arithmetic has portable evidence. The native source convention,
 display-unit invariance and nonzero XY offset passed A/B/C plus independent
-owner UI observations on Allplan 2026-1-7; see [acceptance and limits](test-results/m1-acceptance-0.5.3.md).
+owner UI observations on Allplan 2026-1-7; see [acceptance and limits](validation-status.md).
 Nonzero Z offsets remain untested. The static runtime_verified annotation is
 unchanged; acceptance applies to the recorded build/fixture. ModelContext
 retains raw offset/input-unit observations; geometry queries supply the canonical
@@ -233,7 +225,15 @@ m1-profile-1, version 1.0.2. It validates the four future QA rule references,
 explicit units/frame, family GUID, file scope, resource names/types and tolerance.
 The separate M2 audit profile wraps this unchanged read profile and adds explicit
 value policies and typed rules. See the [M2 audit contract](m2-audit-contract.md).
-No M3 repair is implemented.
+M3 0.7.0 adds `fix_model_issues` read-only preview/revalidation;
+[request, plan and limits](m3-repair-contract.md). 0.8.0 adds a separate
+[bounded evaluation apply/recovery contract](m3-execution-contract.md);
+[native 0.8.1 write/Undo gate PASS](validation-status.md).
+0.12.0 adds [existing-string mark writes and deterministic numbering](m3-numbering-contract.md),
+with [bounded two-target native acceptance](m3-numbering-acceptance-0.12.0.md). 0.11.0 added [shared standard/selection execution](m3-workflow-execution-contract.md),
+with bounded native acceptance for the retained two-workflow gate.
+0.13.0 adds [one read-only comparison of invalidated-plan evidence](m3-conflict-contract.md);
+Apply cannot use that evidence. The new native same-session gate awaits owner tests.
 
 model_query action=profile, profile_id=native-model-qa-demo freshly resolves
 MCP_QA_MARK / MCP_QA_STATUS and layer short names SZ_OGÓ01 (structure) /
@@ -256,14 +256,8 @@ created. Actual project binding is recorded by the owner's preflight JSON.
 get_model_context accepts optional profile_id=native-model-qa-demo and then exposes
 its configured floor mapping, explicitly labeled profile_configuration_not_native_BWS.
 Absent profile leaves levels not_checked. User-created UI resources and a real
-fixture are prerequisites; the [final UI recipe](m1-final-batch.md) supplies them
+fixture are prerequisites; the [fixture definition](fixture-guide.md) supplies them
 without asking the owner to edit JSON or discover IDs.
-
-M1 Final.cmd uses a typed six-request JSON batch, adds summaries and follows each
-returned cursor with a 50-page cap, records errors and preserves earlier pages.
-All inputs are validated before the diagnostic's network work. The normal
-single-request diagnostic behavior stays unchanged. This is read-only evidence
-capture, not a write retry or automatic acceptance registry.
 
 ## Examples
 

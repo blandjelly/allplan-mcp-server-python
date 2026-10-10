@@ -29,6 +29,9 @@ UI dispatcher; shutdown must not join a worker waiting on that dispatcher.
 | `utils/`, `windows/` | Recursive registration, package integrity, launchers, Codex setup and restore. |
 | Host `model_query.py`, `native_readers.py`, `model_metadata.py`, `query_contracts.py`, `spatial_contracts.py`, `profile_contracts.py` | Bounded model reads, geometry/hierarchy, metadata and validated read binding. |
 | Host `audit_contracts.py`, `model_audit.py`; MCP `audit_models.py` | M2 profile validation, fresh full read-only audits and JSON/text findings; no writes. |
+| Host `repair_contracts.py`, `model_repair.py`; MCP `repair_models.py` | Shared repair planning, immutable cache, source revalidation and collision simulation. |
+| Host `native_repairs.py`, `repair_execution.py` | Native eligibility/setters, serialization, durable journal, readback and read-only recovery. |
+| MCP `office_standard.py`, `standard_models.py`, `server.py` | Versioned standard, typed workflow actions, selection/exception contracts and shared execution. |
 | `profiles/`, `tests/` | Versioned demo read/audit profiles and portable checks. |
 
 Add `contracts/`, `services/`, host `handlers/` and `adapters/` only when needed.
@@ -66,6 +69,25 @@ Fingerprint the fields relevant to the operation. Visibility differs from screen
 inclusion. Report omitted/unloaded/read-only scope explicitly.
 
 ## Shared mutation lifecycle
+
+The shared executor repair_execution.py and native_repairs.py implement fresh
+resolution/eligibility, write-ahead Local journal, serialized writes, readback,
+full audited-field verification and read-only recovery. Exact-ID replay returns
+saved outcomes without setters. [Execution guards](m3-execution-contract.md) and
+[current workflow scope/journal lifecycle](m3-workflow-execution-contract.md)
+define eligible 1–32-change Column existing-string mark/status or layer plans. [Native acceptance](validation-status.md)
+is bounded to the recorded fixture writes and two-step Undo.
+
+Preview/revalidation use host repair_contracts.py / model_repair.py and public
+repair_models.py. The session-local cache stores immutable plans with ID/hash,
+expiry and full source evidence. Preview invokes no setters. Mark Apply requires
+validated full-scope collision evidence; host mark_numbering.py expands the
+versioned [numbering standard](m3-numbering-contract.md) from the same fresh scan.
+See [preview](m3-repair-contract.md) and [marks](m3-marks-contract.md).
+
+0.13.0 preserves invalidated evidence for one read-only comparison within the
+same TTL/count/byte limits; it cannot restore write authorization.
+[Contract and new native gate](m3-conflict-contract.md).
 
 1. Resolve explicit scope and supported operations.
 2. Produce a side-effect-free preview with targets, values, exclusions and counts.

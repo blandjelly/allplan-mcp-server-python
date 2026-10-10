@@ -1,5 +1,10 @@
 # Implementation stages
 
+Validation follows the [shorter M3 test schedule](testing-policy.md): focused
+checks during implementation, one full final-candidate run, change-dependent
+CI and native checks for new/materially affected behavior. Explicit owner pauses
+on testing take precedence; historic acceptance evidence remains unchanged.
+
 Current state and next action: [handoff](next-model-handoff.md).
 Tool scope: [features](features.md). Shared contracts: [architecture](architecture.md).
 Work in small, reviewable slices; task IDs remain stable. Dates depend on accepted
@@ -24,7 +29,7 @@ handoff. Continue from M1; retest M0 only for relevant changes or a new defect.
 ## M1 — Context, identity, selections and query: complete within the bounded read contract
 
 **M1.1–M1.4 complete, 2026-10-09**, package 0.5.3, profile 1.0.2,
-Allplan 2026-1-7. [Acceptance and limits](test-results/m1-acceptance-0.5.3.md).
+Allplan 2026-1-7. [Acceptance and limits](validation-status.md).
 
 | Completed task | Delivered scope |
 | --- | --- |
@@ -43,15 +48,10 @@ offsets remain outside acceptance. No further M1 owner batch is requested.
 
 ## M2 — Audits and profile foundations: closed; bounded UAT-04 PASS
 
-Package **0.6.1**, audit profile **2.0.0**. Native 0.6.0 report and owner UI checks
-match; a later invalid-scope request coincided with a managed-exception crash.
-[Callback containment fix](test-results/m2-dispatch-fix-0.6.1.md) is portable-tested;
-[native 0.6.1 acceptance](test-results/m2-acceptance-0.6.1.md) confirms two identical
-complete audits, public/host scope rejection and continued host/Allplan operation.
-The earlier crash's precise cause remains unproven. No repeated owner test is required.
-[Contract](m2-audit-contract.md),
-[portable evidence](test-results/m2-audit-portable-0.6.0.md) and
-[completed owner test card](m2-audit-batch.md). Acceptance is limited to the recorded fixture.
+Package **0.6.1**, audit profile **2.0.0**; [acceptance limits](validation-status.md).
+The native fixture audit, public/host scope rejection and continued operation
+pass. The dispatcher contains callback exceptions; the precise earlier CLR
+crash cause remains unproven. [Audit contract](m2-audit-contract.md).
 
 - **M2.1** Versioned schema for typed attributes/layers, values, uniqueness and tolerances; validate bound resources.
 - **M2.2** `model_audit` with severity, evidence, distinct unchecked states and readable/structured reports.
@@ -60,7 +60,31 @@ The earlier crash's precise cause remains unproven. No repeated owner test is re
 **Exit gate (UAT-04):** demo returns exactly 5 findings on 5 columns, correct
 uniqueness scope, explicit unavailable data and locatable targets; no writes.
 
-## M3 — Controlled repairs and standards: planned, unimplemented
+## M3 — Controlled repairs and standards: partially implemented, M3 open
+
+Package **0.13.0** supports 1–32 reviewed existing string mark/status or layer changes on
+Column roots in one explicit foreground file. Office-standard and rule-based
+Apply/Revalidate/Recover reuse the executor, full-source/exception checks,
+durable deduplication and audited readback.
+[Current execution contract](m3-workflow-execution-contract.md).
+
+[Bounded native acceptance](validation-status.md) covers the two single-target
+workflow writes/readbacks, read-only replays, complete audits 5 → 4 → 3,
+host survival, unchanged other elements and two-step Undo. Broader eligible
+scope remains outside this gate. Layer/status preview, earlier two-target
+execution/Redo recovery, restart invalidation/stale Apply rejection,
+standard/selection no-op previews and explicit collision-aware mark previews
+have separate bounded acceptance. Unchanged completed gates need no repetition.
+0.13.0 adds bounded read-only inspection of invalidated evidence;
+[same-session native conflict gate](m3-conflict-owner-test.md) is ready for owner testing.
+
+Mark assignment and deterministic versioned-standard numbering are implemented;
+[their bounded two-target native gate](m3-numbering-acceptance-0.12.0.md) passed
+complete audits 3 → 0 → 3, readback, replay/no-op and two-step Undo/recovery. Required next work: native same-session conflicts in a supported lifecycle and
+controlled partial/unknown outcomes with read-only recovery. Known UI editing
+cancelled the host and must not be repeated unchanged. Journal maintenance and
+identity limits, final UAT and main integration remain open. Graphical labels,
+file moves and universal native properties are conditional extensions.
 
 - **M3.1** Shared preview/apply, stale checks, serialized writes, request identity, readback, partial outcomes and tested Undo limits.
 - **M3.2** `fix_model_issues` for writable attributes/layers; data marks and graphical labels stay distinct.

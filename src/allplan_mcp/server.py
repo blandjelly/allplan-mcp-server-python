@@ -13,6 +13,9 @@ from allplan_mcp.skills import SkillsManager
 from allplan_mcp.query_models import QueryRequest
 from allplan_mcp.demo_profile import load_demo_profile, load_audit_profile
 from allplan_mcp.audit_models import AuditRequest
+from allplan_mcp.repair_models import RepairRequest
+from allplan_mcp.standard_models import OfficeStandardRequest, RuleBasedRequest
+from allplan_mcp.office_standard import load_office_standard
 
 
 DEFAULT_ALLPLAN_HOST_URL = "http://127.0.0.1:5679"
@@ -36,6 +39,20 @@ def native_model_qa_audit_profile() -> str:
     """M2 rules with explicit missing/normalization policies; read-only remedies."""
     import json
     return json.dumps(load_audit_profile(), ensure_ascii=False, indent=2)
+
+
+@mcp.resource("allplan://standards/native-model-qa-demo-layer-status", mime_type="application/json")
+def native_office_standard() -> str:
+    """Versioned evaluation layer/status preset."""
+    import json
+    return json.dumps(load_office_standard(), ensure_ascii=False, indent=2)
+
+
+@mcp.resource("allplan://standards/native-model-qa-demo-mark-numbering", mime_type="application/json")
+def native_mark_standard() -> str:
+    """Versioned preserve-valid-fill-gaps mark numbering; native gate pending."""
+    import json
+    return json.dumps(load_office_standard("native-model-qa-demo-mark-numbering"), ensure_ascii=False, indent=2)
 
 
 def _allplan_client() -> AllplanHostClient:
@@ -200,6 +217,114 @@ def model_audit(request: AuditRequest) -> dict[str, Any]:
         payload["profile"] = load_audit_profile()
     payload["schema_version"] = "m2-audit-1"
     return _allplan_client().post("/model-audit", payload)
+
+
+@mcp.tool
+def fix_model_issues(request: RepairRequest) -> dict[str, Any]:
+    """Preview/revalidate repairs, apply the bounded disposable-copy gate, or recover.
+
+    Preview takes a fresh audit request and explicit rule_id/value choices.
+    Mark choices additionally require exact model_uuid targets; their final
+    values are collision-checked in the full scope before evaluation Apply.
+    Optional finding_ids restrict targets to those exact fresh findings.
+    Returns old/new values, exclusions, locators, plan ID/hash and a five-minute
+    lifetime. Revalidate requires that exact ID/hash and rereads the full scope.
+    Changed evidence conflicts; restart/expiry/eviction require a new preview.
+    Evaluation apply supports 1..32 reviewed existing string mark/status or layer changes on
+    Column roots in one foreground file, including selected/standard plans,
+    with exact plan ID/hash, persistent execution_id and acknowledgement
+    disposable_copy_reviewed_plan. The old two-repair acknowledgement is retained
+    only for its accepted fixture. It checks native eligibility, stops on
+    failure and reads back results. Repeated execution IDs never repeat setters.
+    Recover reads persisted execution/current values without resuming writes.
+    Mark assignment native acceptance is pending. Other native-property writes remain unavailable. Native UI Undo requires
+    two separate steps for the accepted retained fixture; no automatic rollback.
+    """
+    payload = request.model_dump(exclude_unset=True, exclude_none=True, by_alias=True)
+    if getattr(request, "selection", None) is not None:
+        payload["selection"] = request.selection.model_dump(exclude_unset=True, by_alias=True)
+    return _send_repair(payload)
+
+
+@mcp.tool
+def apply_office_standard(request: OfficeStandardRequest) -> dict[str, Any]:
+    """Preview and execute an explicit versioned layer/status or numbering standard.
+
+    Requires standard ID/version and one active drawing file. Optional query
+    predicate/model-UUID exceptions filter fresh audit findings on the same scan.
+    Apply requires exact reviewed plan ID/hash, a saved execution ID and
+    disposable_copy_reviewed_plan. It must reference an office-standard plan.
+    The mark-numbering standard preserves valid marks, retains a deterministic
+    duplicate keeper and fills free S numbers in center Y/X/Z/UUID order.
+    Excluded peers retain their marks and reserve numbers. Revalidate/recover
+    reuse the shared service. Mark writes await native acceptance; file moves
+    remain unavailable.
+    """
+    if request.action != "preview":
+        payload = request.model_dump(exclude_unset=True, exclude_none=True, by_alias=True)
+        if request.action == "apply":
+            payload["workflow_kind"] = "office_standard_preview"
+        return _send_repair(payload)
+    standard = load_office_standard(request.standard_id)
+    payload = {"action": "preview", "audit": {"profile_id": standard["audit_profile_id"],
+               "scope": request.scope.model_dump()}, "repairs": standard["repairs"],
+               "workflow": {k: standard[k] for k in ("standard_id", "standard_version", "standard_fingerprint")}}
+    payload["workflow"]["kind"] = "office_standard_preview"
+    if "numbering" in standard:
+        payload["numbering"] = standard["numbering"]
+    if request.selection is not None:
+        payload["selection"] = request.selection.model_dump(exclude_unset=True, by_alias=True)
+    return _send_repair(payload)
+
+
+@mcp.tool
+def rule_based_edit(request: RuleBasedRequest) -> dict[str, Any]:
+    """Preview and execute selected mark/status/layer repairs with query/UUID exceptions.
+
+    Selection uses audited mark/status/layer_id/file_state or selected dimension
+    fields from one full fresh scan. Unknown predicates block readiness. Excluded
+    elements still participate in full source revalidation. Apply requires exact
+    reviewed plan ID/hash, saved execution ID and disposable_copy_reviewed_plan;
+    it must reference a rule-based plan. Mark choices require exact
+    model_uuid targets and selected required/unique mark rules; final mark values
+    are checked for collisions against the full scope, including excluded peers,
+    before evaluation Apply. Mark writes await native acceptance.
+    Revalidate/recover reuse the shared service.
+    """
+    if request.action != "preview":
+        payload = request.model_dump(exclude_unset=True, exclude_none=True, by_alias=True)
+        if request.action == "apply":
+            payload["workflow_kind"] = "rule_based_edit_preview"
+        return _send_repair(payload)
+    payload = request.model_dump(exclude_unset=True, exclude_none=True, by_alias=True)
+    payload["selection"] = request.selection.model_dump(exclude_unset=True, by_alias=True)
+    payload["workflow"] = {"kind": "rule_based_edit_preview"}
+    return _send_repair(payload)
+
+
+def _send_repair(payload: dict[str, Any]) -> dict[str, Any]:
+    if payload["action"] == "preview":
+        audit = payload["audit"]
+        if audit.pop("profile_id", None) is not None:
+            audit["profile"] = load_audit_profile()
+        audit["schema_version"] = "m2-audit-1"
+    payload["schema_version"] = "m3-repair-1"
+    try:
+        return _allplan_client().post("/fix-model-issues", payload)
+    except AllplanHostError as exc:
+        # These apply errors originate before any setter in the current request.
+        # Journal/transport/unexpected failures may occur after a write and must
+        # remain errors with unknown outcomes; never infer safety from text.
+        before_write = {"target_not_writable", "plan_expired", "plan_hash_mismatch",
+                        "repair_scope_unavailable", "repair_conflict", "repair_journal_full",
+                        "execution_id_conflict", "repair_recovery_required"}
+        if payload["action"] != "apply" or exc.code not in before_write:
+            raise
+        return {"schema_version": "m3-execution-1", "action": "apply", "state": "rejected",
+                "read_only": True, "native_setters_started": False,
+                "execution_id": payload["execution_id"], "request_id": exc.request_id,
+                "error": {"code": exc.code, "message": str(exc)},
+                "report_text": "Apply rejected before native setters: " + str(exc)}
 
 
 @mcp.tool
