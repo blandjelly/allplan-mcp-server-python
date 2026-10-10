@@ -19,7 +19,15 @@ host session/integrity and final UI observation. Preserve Local journal, old
 packages and original JSON/TXT. No repeated old two-target/Undo/stale-Apply gate.
 No native writes are performed from cloud. Expanded acceptance is not_run.
 [178 portable tests PASS](test-results/m3-workflow-portable-0.11.0.md), frozen sync
-and wheel/sdist build pass. [Review response](reviews/m3-completeness-response-0.11.0.md).
+and wheel/sdist build pass. [0.11.0 delivery](../evaluation-packages/0.11.0/README.md):
+clean source 26d70b27bd06e2916cda74213cb8995aa9f0f19a, publication
+daabd57f8ecbc24ba5dae62d0cb79fb04e6b30bb, ZIP 719947 bytes / SHA-256
+29fcfaed0a10108b630892da3710da3cdf05701c2d25a08a014ff4ab177ee031.
+Two builds are byte-identical; extracted integrity/all 22 registered bridge
+hashes and journal preservation by Setup/Restore pass.
+[Source CI 38063710029](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38063710029)
+is **6/6 PASS**, Windows/Ubuntu Python 3.11–3.13 test/build/ZIP jobs.
+Later artifact/documentation CI is separate; the archive is not rebuilt. [Review response](reviews/m3-completeness-response-0.11.0.md).
 
 M3/UAT-05/UAT-06 stay open. Next implementation after this observation: mark
 assignment and deterministic numbering in a versioned standard, then supported

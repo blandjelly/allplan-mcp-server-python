@@ -7,7 +7,12 @@ The full suite passed **178 tests** on Linux/Python 3.12.14 using the frozen
 lock (FastMCP 3.2.4, Pydantic 2.13.4). Real local HTTP/MCP tests ran with the
 environment's explicit network permission; ordinary sandbox socket denial is
 not a product result. Frozen offline sync and wheel/sdist build also pass.
-These observations do not constitute Windows/Allplan runtime acceptance.
+[Source CI run 38063710029](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38063710029)
+passes all **6/6** Windows/Ubuntu Python 3.11–3.13 test/build/ZIP jobs for clean
+source 26d70b27bd06e2916cda74213cb8995aa9f0f19a;
+[job/step observation](../../evaluation-packages/0.11.0/source-ci-0.11.0.json).
+Later publication/documentation CI is separate.
+These observations do not constitute native Windows/Allplan runtime acceptance.
 
 New supported-execution cases cover one status write leaving four findings,
 one selected layer write with an exception, three changes with full snapshot
