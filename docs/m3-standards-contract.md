@@ -1,93 +1,64 @@
-# M3.3 standard and selected repair previews — 0.9.0
+# M3 office standards and selected repairs
 
-Status **native read-only owner gate PASS** for the repaired fixture;
-[acceptance and originals](test-results/m3-standards-acceptance-0.9.0.md).
-This document records the historical **0.9.0 preview-only contract**.
-**0.11.0 adds typed apply/revalidate/recover** for reviewed standard/selection
-layer/status plans; [current execution contract](m3-workflow-execution-contract.md).
-The preview-only restrictions below describe 0.9.0. 0.10.0 separately adds
-[explicit mark previews](m3-marks-contract.md).
-Accepted 0.8.1 [writes/Undo/recovery](test-results/m3-execution-acceptance-0.8.1.md),
-[restart invalidation](test-results/m3-plan-restart-acceptance-0.8.1.md) and
-[stale Apply rejection](test-results/m3-stale-apply-acceptance-0.8.1.md) remain
-separate. Their archives and original logs are unchanged. This is the first
-M3.3 slice; M3/UAT-05/UAT-06 remain open.
+Current **0.11.0** tools apply_office_standard and rule_based_edit share the
+repair planner/executor. They accept preview, revalidate, apply and recover.
+[Native boundaries](validation-status.md) distinguish the earlier no-op previews
+from the latest two separately reviewed single-target writes.
+[Workflow execution](m3-workflow-execution-contract.md) defines Apply eligibility
+and journal/recovery limits. M3/UAT-05/UAT-06 remain open.
 
-## Public entry points and versioned preset
+## Versioned preset and public requests
 
-`apply_office_standard` accepts **action=preview only**, explicit standard ID
-`native-model-qa-demo-layer-status`, version **1.0.0** and one active drawing-file
-scope with include_passive=false. Its packaged resource is
-`allplan://standards/native-model-qa-demo-layer-status`, schema `m3-standard-1`.
-The preset uses native-model-qa-demo audit rules and explicit choices:
-QA-003 → structure layer role, QA-004 → NEW for invalid existing string status.
-An already allowed status such as EXISTING is compliant and is not overwritten.
-Mark assignment, numbering, graphical labels and file moves are deferred.
+Office preview requires standard ID **native-model-qa-demo-layer-status**,
+version **1.0.0**, explicit scope and include_passive=false. The packaged resource
+allplan://standards/native-model-qa-demo-layer-status uses schema m3-standard-1.
+It chooses QA-003 → structure layer and QA-004 → NEW for invalid existing string
+status. Already allowed EXISTING is compliant and is not overwritten.
+Mark assignment/numbering remain unimplemented; labels/file moves are conditional.
 
-`rule_based_edit` accepts **action=preview only**, the same typed audit and
-explicit layer/status repair choices as fix_model_issues, plus a required
-`selection`. Optional exact finding_ids further narrow targets. No general
-attribute/native-property assignment or family conversion is added.
+Rule preview uses the typed audit and explicit layer/status choices from
+[repair preview](m3-repair-contract.md), plus required selection. It also accepts
+[explicit mark choices](m3-marks-contract.md), which always remain preview-only.
+Optional finding_ids narrow proposals to exact current findings. Office previews
+optionally accept selection. Example rule preview:
 
 ```json
 {
-  "action": "preview",
-  "audit": {"profile_id":"native-model-qa-demo","scope":{
+  "action":"preview",
+  "audit":{"profile_id":"native-model-qa-demo","scope":{
     "drawing_files":[101],"include_passive":false,"visibility":"api_select_all"}},
-  "repairs": [{"rule_id":"QA-003","value":"structure"},{"rule_id":"QA-004","value":"NEW"}],
-  "selection": {"where":{"field":"layer_id","op":"eq","value":3700},
-    "exclude_model_uuids":["<exact canonical model UUID from the fresh audit>"]}
+  "repairs":[{"rule_id":"QA-003","value":"structure"},{"rule_id":"QA-004","value":"NEW"}],
+  "selection":{"where":{"field":"layer_id","op":"eq","value":3700},
+    "exclude_model_uuids":["<canonical UUID from the fresh audit>"]}
 }
 ```
 
-The example exception placeholder is descriptive; actual requests require a
-canonical lowercase UUID. Office previews optionally accept the same selection.
-The returned plan carries immutable workflow metadata; standard ID/version and
-definition fingerprint are included in the native plan hash. This metadata
-describes the preset and authorizes no write.
+The UUID placeholder is descriptive; actual requests require a lowercase UUID.
+Workflow metadata, selection, standard ID/version and definition fingerprint
+participate in the immutable plan hash. Preview alone authorizes no write.
 
-## One full snapshot, selected findings and exceptions
+## Full snapshot, predicates and exceptions
 
-Both tools use the shared `/fix-model-issues` planner. For selection, the audit
-returns its internal full snapshot to the planner within the same call; no
-second scan, selection cache, retained native adapter or separate external query
-can introduce a race between selection and finding creation.
+Both tools plan from the full fresh audit snapshot in the same call. No second
+scan, external page, cached selection or retained adapter narrows source evidence.
+where uses three-valued all/any/not predicates, at most 64 nodes/depth 8, over
+mark/status/layer_id/file_state and dimensions explicitly covered by selected
+rules. Other fields reject before native lookup. At most 100 distinct UUID
+exceptions are allowed; each must exist unambiguously in the complete scope.
 
-`where` uses the existing bounded three-valued predicate contract: all/any/not,
-at most 64 nodes and depth 8. It can reference audited mark/status/layer_id/
-file_state and dimension fields explicitly included by selected audit rules.
-Other fields reject before native context lookup. Exact model UUID exceptions
-are bounded to 100 distinct entries and must exist in the complete audited scope.
-Unknown/ambiguous exception identity is not silently ignored.
+Predicates classify selected/false/not_checked; exceptions run before predicates.
+Unknown remains unknown under negation and blocks readiness/evaluation Apply.
+Selection counts and exact criteria enter the plan. Excluded findings retain
+reasons; all peers remain in uniqueness/source validation and post-write checks.
+Any audited change, including an excluded element, invalidates revalidation.
+TTL/eviction/restart require a fresh preview; an old authorization is not renewed.
 
-Predicates classify elements as selected, false or not_checked; explicit
-exceptions exclude an element before predicate evaluation. Unknown survives
-negation and blocks plan readiness/evaluation apply. The plan returns
-`selection_result` counts and retains exact selection criteria. Findings outside
-the choices, predicate or exceptions retain distinct exclusion reasons. The full
-audit still includes every element; selection never changes uniqueness scope
-or hides the excluded elements from source revalidation.
+## Execution boundary
 
-Fresh fix_model_issues action=revalidate uses the exact plan ID/hash and full
-original audit request. Any audited change, including an excluded element,
-invalidates the plan. Restart creates a new plan cache; the accepted restart
-protection is preserved. No old plan is resumed after a UI cancellation.
-
-## Write boundary and remaining work
-
-All standard/selected previews return read_only=true, apply_available=false,
-usable_for_write=false and **evaluation_apply_available=false**. The native
-executor also rejects workflow/selection plans even if their proposed changes
-happen to equal the previously accepted two-column fixture. Calling generic
-fix_model_issues Apply with that plan cannot bypass the preview-only boundary.
-The old bounded unselected/unwrapped evaluation route and durable execution
-journal are preserved; new tools add no setter or replay route.
-
-Portable verification covers fresh same-scan selection, exception source
-conflicts, unknown predicates, pre-context validation, immutable metadata,
-native executor refusal and real MCP/HTTP tools plus the owner CLI.
-[Owner gate](m3-standards-preview-batch.md) checks three read-only scenarios on
-the current repaired copy: standard preview, selection excluding S06, and empty
-selection, each revalidated with identical complete before/after audit.
-Broader office standards/numbering and selected native writes require future
-implementation and a separate owner gate.
+Previews retain read_only=true, apply_available=false and usable_for_write=false.
+Eligible layer/status plans advertise evaluation_apply_available; mark plans
+never do. Apply requires reviewed ID/hash, saved new execution ID and current
+explicit authorization. Standard/rule Apply checks matching workflow provenance;
+generic fix_model_issues can execute an eligible workflow plan.
+Recover observes the saved execution without setters, resume or Undo.
+See [execution contract](m3-workflow-execution-contract.md).

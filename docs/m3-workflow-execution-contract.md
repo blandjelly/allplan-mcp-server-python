@@ -1,15 +1,11 @@
 # M3 shared layer/status execution — 0.11.0
 
 Status **bounded native workflow-write gate PASS**, 2026-10-10 Europe/Warsaw.
-[Original reports and decision](test-results/m3-workflow-acceptance-0.11.0.md):
+[Validation status](validation-status.md):
 ten steps, both separately reviewed changes/readbacks, exact-ID read-only replay,
 complete audits 5 → 4 → 3 and same-session verified 0.11.0. Owner confirms both
 changes, host survival, unchanged other elements and two-step Undo. Acceptance
 covers the retained workflow pair, not every eligible 1–32-change plan/file.
-This implements the first step of the owner's completeness review: remove the
-exact two-demo-target gate and execute reviewed standard/selection plans through
-the existing executor. [Review response](reviews/m3-completeness-response-0.11.0.md),
-[178 portable tests PASS](test-results/m3-workflow-portable-0.11.0.md). [Completed native card](m3-workflow-apply-batch.md).
 M3/UAT-05/UAT-06 and the first MVP remain open.
 
 ## Supported operations and typed actions
@@ -94,20 +90,12 @@ older Local backup may remove newer records: inspect model/logs and do not retry
 their writes. Atomic writes/content hashes detect some storage failures but do
 not establish authenticated history or sudden power-loss durability.
 
-## Next native evidence and remaining M3 work
+## Remaining M3 work
 
-The completed card uses two **separately reviewed single-target** writes: office
-standard with S06 excepted, then rule selection with S05 excepted. Complete
-audits must progress 5 → 4 → 3, both exact-ID replays must be read-only and
-the host session/integrity must remain unchanged. It tests the new route rather
-than repeating the accepted 0.8.1 pair or asking for another Undo cycle. All
-required observations now pass; no repeated batch is requested.
-
-Next, implement actual mark assignment and deterministic
-numbering under an explicit versioned standard, retaining full-scope collision
-checks. These are required open M3 scope, not removed by calling them deferred.
-Then design supported-lifecycle same-session source conflicts and controlled
-native partial/unknown-result recovery. Do not repeat UI editing that is known
-to cancel the host. Broader journal maintenance/identity guarantees and final
-UAT/main integration remain separate work. Graphic labels, file moves and
-universal native properties are conditional extensions, not new closure gates.
+Implement actual mark assignment and deterministic numbering under an explicit
+versioned standard, preserving full-scope collision/source checks. Then obtain
+native same-session conflict evidence in a supported lifecycle and controlled
+partial/unknown-result recovery. The accepted two-workflow gate needs no repeat.
+Do not repeat UI editing known to cancel the host. Broader journal maintenance,
+identity guarantees and final UAT/main integration remain open. Graphic labels,
+file moves and universal native properties are conditional extensions.

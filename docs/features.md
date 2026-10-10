@@ -1,21 +1,14 @@
 # Features to implement
 
-The toolkit contains the following 13 workflow tools. Bounded
-`get_model_context` and `model_query` reads are implemented and accepted on
-Allplan 2026-1-7; see [acceptance and limits](test-results/m1-acceptance-0.5.3.md)
-and [read contracts](tool-reference.md). `model_audit` is implemented and accepted
-within the retained fixture scope in 0.6.1, **UAT-04 PASS**; see
-[native evidence and limits](test-results/m2-acceptance-0.6.1.md) and the
-[audit contract](m2-audit-contract.md). `fix_model_issues` preview/revalidation is
-implemented in 0.7.0, [bounded native preview gate PASS](test-results/m3-preview-acceptance-0.7.0.md).
-0.8.1 has [bounded native execution/Undo/recovery PASS](test-results/m3-execution-acceptance-0.8.1.md).
-Standard/selection and mark previews have native PASS in 0.9.0/0.10.0.
-0.11.0 adds reviewed single/multi-target layer/status execution through
-fix_model_issues, apply_office_standard and rule_based_edit;
-[current limits and pending native gate](m3-workflow-execution-contract.md).
-Mark writes/numbering remain open M3 scope. Other workflow tools are planned. M0 utilities are `allplan_health`,
-`get_allplan_version`, `get_all_object_names`, `create_cube` and `create_box`.
-Names are display values; baseline boxes have no automatic readback/deduplication.
+The toolkit plans 13 workflow tools. Bounded context/query reads and native
+model audits are accepted within the [recorded fixture scope](validation-status.md).
+Package **0.11.0** supports reviewed layer/status execution through
+fix_model_issues, apply_office_standard and rule_based_edit; its native acceptance
+covers two separately reviewed single-target workflow writes. Mark previews have
+collision-aware native acceptance; mark writes and numbering remain open.
+Other workflow tools are planned. M0 utilities are allplan_health,
+get_allplan_version, get_all_object_names, create_cube and create_box.
+Baseline boxes have no automatic readback/deduplication.
 
 ## Workflow scope
 
@@ -42,52 +35,7 @@ manual-review evidence. Keep supplied, verified and uncheckable metadata distinc
 
 ## Demonstration fixture for M1–M3
 
-Profile: [native-model-qa.demo.json](../profiles/examples/native-model-qa.demo.json).
-Revision 1.0.2 validates schema m1-profile-1 and resolves MCP_QA_MARK /
-MCP_QA_STATUS plus layer short names SZ_OGÓ01 / SZ_OGÓ02 freshly for reads.
-The accepted fixture is bound_for_read; active_for_write=false and native write
-eligibility remain not_checked. Missing/incompatible resources reject profile
-queries. The [completed owner recipe](m1-final-batch.md) records exact UI names;
-no repeated owner batch is requested.
-
-Use a disposable `MCP_QA_DEMO` project or copy. Reserve empty files **101**
-(active/editable), **102** (loaded passive) and **103** (unloaded); these are
-examples, not permission to overwrite contents. Initial units: mm, zero offset,
-visible relevant layers. Later tests use changed display units/nonzero offset.
-
-File 101 contains six ordinary columns: **400 × 400 × 3000 mm**, bottom 0,
-center insertion, consistent sample material such as `C30/37`.
-
-| Fixture | Center X/Y (mm) | Mark | Layer | Demo status |
-| --- | --- | --- | --- | --- |
-| C01 | 0 / 0 | S01 | SZ_OGÓ01 | NEW |
-| C02 | 6000 / 0 | S02 | SZ_OGÓ01 | NEW |
-| C03 | 12000 / 0 | Empty | SZ_OGÓ01 | NEW |
-| C04 | 0 / 6000 | S02 | SZ_OGÓ01 | NEW |
-| C05 | 6000 / 6000 | S05 | SZ_OGÓ02 | NEW |
-| C06 | 12000 / 6000 | S06 | SZ_OGÓ01 | NWE |
-
-Add two 300 × 500 mm native beams spanning C01–C02 and C02–C03 at a documented
-common elevation, one separate 200 × 4000 × 3000 mm single-layer wall, and one
-separate 4000 × 4000 × 200 mm slab. Expect **10 top-level components** in file 101;
-raw adapters/representations must not inflate component counts. Add one column
-marked S02 in passive file 102 and another column in unloaded file 103.
-The accepted roots include SkeletonBeam and MultiSlab with Slab tiers.
-The original zero-offset baseline is retained; no model repair is requested.
-C03 was observed as the literal `<niezdefiniowany>`. M2 audit profile 2.0.0
-explicitly classifies it as missing while retaining the raw value in evidence.
-
-The M2 audit examines only the six file-101 columns: **QA-001** required mark → C03;
-**QA-002** unique nonempty mark per file/family → C02/C04 (two findings, one group);
-**QA-003** required structure layer → C05; **QA-004** status NEW/EXISTING → C06.
-Expected: **5 findings on 5 columns**, C01 passes. Outside-scope columns do not
-create duplicates. Missing bindings/data produce `not_checked` or a profile error.
-
-The 0.7.0 M3 repair preview contains exactly two proposed changes: C05 layer → SZ_OGÓ01
-and C06 status NWE → NEW. It leaves the model unchanged; its follow-up audit
-retains **5 findings**. The bounded native preview gate passes. Accepted
-0.8.1 evaluation apply/readback leaves **3 findings**. In the next 0.11.0
-workflow gate, separately reviewed layer then status writes must leave 4 then 3. Repeating apply must not repeat writes. An explicit reviewed preview
-assigning C03=S03 and C04=S04 simulates zero findings; mark setters are not yet
-implemented or accepted. These values are fixture choices,
-not an inferred production office standard.
+[Fixture definition](fixture-guide.md) holds resource names, file scope,
+geometry, initial values and expected audit findings. Read profile **1.0.2**
+and audit profile **2.0.0** bind resources freshly; the demo remains inactive
+for general writes. Observe the current model before resuming after Undo/Redo.

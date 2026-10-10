@@ -29,7 +29,7 @@ handoff. Continue from M1; retest M0 only for relevant changes or a new defect.
 ## M1 — Context, identity, selections and query: complete within the bounded read contract
 
 **M1.1–M1.4 complete, 2026-10-09**, package 0.5.3, profile 1.0.2,
-Allplan 2026-1-7. [Acceptance and limits](test-results/m1-acceptance-0.5.3.md).
+Allplan 2026-1-7. [Acceptance and limits](validation-status.md).
 
 | Completed task | Delivered scope |
 | --- | --- |
@@ -48,15 +48,10 @@ offsets remain outside acceptance. No further M1 owner batch is requested.
 
 ## M2 — Audits and profile foundations: closed; bounded UAT-04 PASS
 
-Package **0.6.1**, audit profile **2.0.0**. Native 0.6.0 report and owner UI checks
-match; a later invalid-scope request coincided with a managed-exception crash.
-[Callback containment fix](test-results/m2-dispatch-fix-0.6.1.md) is portable-tested;
-[native 0.6.1 acceptance](test-results/m2-acceptance-0.6.1.md) confirms two identical
-complete audits, public/host scope rejection and continued host/Allplan operation.
-The earlier crash's precise cause remains unproven. No repeated owner test is required.
-[Contract](m2-audit-contract.md),
-[portable evidence](test-results/m2-audit-portable-0.6.0.md) and
-[completed owner test card](m2-audit-batch.md). Acceptance is limited to the recorded fixture.
+Package **0.6.1**, audit profile **2.0.0**; [acceptance limits](validation-status.md).
+The native fixture audit, public/host scope rejection and continued operation
+pass. The dispatcher contains callback exceptions; the precise earlier CLR
+crash cause remains unproven. [Audit contract](m2-audit-contract.md).
 
 - **M2.1** Versioned schema for typed attributes/layers, values, uniqueness and tolerances; validate bound resources.
 - **M2.2** `model_audit` with severity, evidence, distinct unchecked states and readable/structured reports.
@@ -67,88 +62,26 @@ uniqueness scope, explicit unavailable data and locatable targets; no writes.
 
 ## M3 — Controlled repairs and standards: partially implemented, M3 open
 
-Package **0.11.0** implements the first priority of the completeness review:
-1–32 reviewed existing status/layer changes on Column roots in one explicit
-foreground file, without the exact file-101/two-target/finding-count gate.
-Office-standard and rule-based tools now accept typed Apply/Revalidate/Recover
-through the same executor, retaining full-source/exception checks, durable
-deduplication and audited readback. [Current contract](m3-workflow-execution-contract.md),
-[completed owner card](m3-workflow-apply-batch.md).
-[Bounded native workflow-write gate PASS](test-results/m3-workflow-acceptance-0.11.0.md):
-ten steps, standard/selected single-target writes/readbacks, read-only replay,
-audits 5 → 4 → 3 and same-session verified 0.11.0. Owner confirms changes,
-host survival, unchanged other elements and two-step Undo. No repeat is requested;
-the broader 1–32-change/file scope remains outside this acceptance.
+Package **0.11.0** supports 1–32 reviewed existing status/layer changes on
+Column roots in one explicit foreground file. Office-standard and rule-based
+Apply/Revalidate/Recover reuse the executor, full-source/exception checks,
+durable deduplication and audited readback.
+[Current execution contract](m3-workflow-execution-contract.md).
 
-Next, implement mark writes and deterministic numbering in a
-versioned standard; these remain required baseline M3 work. Then prepare native
-same-session conflicts in a supported host lifecycle and controlled partial/unknown
-outcome plus read-only recovery. The known UI-host-cancellation scenario must not
-be repeated unchanged. Journal capacity/update/copy/restore limits are documented;
-maintenance/identity guarantees, final UAT-05/UAT-06 and main integration remain
-open. Graphic labels, file moves and universal native properties are conditional
-extensions, not additional mandatory M3 closure work.
+[Bounded native acceptance](validation-status.md) covers the two single-target
+workflow writes/readbacks, read-only replays, complete audits 5 → 4 → 3,
+host survival, unchanged other elements and two-step Undo. Broader eligible
+scope remains outside this gate. Layer/status preview, earlier two-target
+execution/Redo recovery, restart invalidation/stale Apply rejection,
+standard/selection no-op previews and explicit collision-aware mark previews
+have separate bounded acceptance. Unchanged completed gates need no repetition.
 
-The following sections retain the accepted historical slices:
-
-Package **0.8.1** corrects 0.8.0's overly broad IsInMacro preflight rejection;
-[original failed native gate and correction](test-results/m3-apply-rejection-0.8.0.md).
-The rejected request called no setters. The corrected 0.8.1 gate now has
-[bounded native acceptance](test-results/m3-execution-acceptance-0.8.1.md):
-two native repairs/readbacks, verified audited fields, exact-ID replay across
-host sessions, **two separate Undo steps**, and recovery after confirmed Redo.
-The package retains bounded disposable-copy native layer/status apply,
-fresh resolution/eligibility, per-target readback, collateral audited-field checks,
-persistent execution identity and read-only recovery. Portable evidence is
-[recorded separately](test-results/m3-execution-portable-0.8.1.md).
-The [write/Undo gate](m3-apply-batch.md) is complete for this fixture; no repeated
-Apply is requested. The manual-edit card's UI action interrupted the host;
-[native old-plan revalidation after restart PASS](test-results/m3-plan-restart-acceptance-0.8.1.md).
-Native same-session conflicts remain blocked; no repeat on this build is requested.
-The [stale Apply card](m3-stale-apply-batch.md) now has
-[native PASS](test-results/m3-stale-apply-acceptance-0.8.1.md), explicit pre-setter
-rejection and identical complete audits/unchanged UI. Undo grouping and M3 closure remain
-unclaimed. [Execution limits](m3-execution-contract.md).
-
-Package **0.7.0** implements the first read-only M3.1/M3.2 slice:
-`fix_model_issues` explicit layer/status preview and plan revalidation, full fresh
-audit evidence, exact values/locators/exclusions, plan ID/hash, bounded cache and
-stale/expiry/restart controls. [Contract](m3-repair-contract.md),
-[portable checks](test-results/m3-preview-portable-0.7.0.md),
-[completed owner gate](m3-preview-batch.md),
-[native acceptance and limits](test-results/m3-preview-acceptance-0.7.0.md).
-Owner confirms target/value correspondence and continued host/Allplan operation;
-native revalidation/follow-up audit retain identical audited source. No repeated
-preview batch is required. Manual-edit native conflicts remain unverified.
-The 0.7.0 package invokes no setters. The 0.8.1 bounded M3.1/M3.2/M3.4
-implementation has the native observations above. UAT-05/UAT-06 remain open
-for broader required behavior. Native stale Apply rejection is accepted;
-unknown-outcome recovery and broader mutation/registry guarantees remain
-unaccepted. Current recovery evidence concerns a completed saved execution.
-
-Package **0.9.0** implements the first M3.3 **preview-only** slice:
-versioned demo layer/status `apply_office_standard` and predicate/UUID-exception
-`rule_based_edit` over one shared full audit snapshot. Excluded-element edits
-still conflict on full revalidation; unknown predicates block readiness.
-Standard/selected plans cannot use native Apply, including through fix_model_issues.
-[Contract](m3-standards-contract.md), [155 portable tests](test-results/m3-standards-portable-0.9.0.md),
-[native new-tool preview PASS](test-results/m3-standards-acceptance-0.9.0.md).
-All three zero-proposal plans, full before/after audits, revalidations and host
-continuity pass; no repeat is needed.
-
-Package **0.10.0** adds explicit per-model mark proposals under required/unique
-mark rules and same-snapshot full-scope collision simulation. Unknown evidence
-blocks readiness; excluded peers still participate. Mark metadata refuses Apply
-even when filtering leaves the old layer/status pair.
-[Contract](m3-marks-contract.md), [portable evidence](test-results/m3-marks-portable-0.10.0.md),
-[completed read-only owner gate](m3-marks-preview-batch.md),
-[native marks-preview PASS](test-results/m3-marks-acceptance-0.10.0.md).
-Two explicit proposals, a selection exception, collision against an excluded peer,
-three unchanged revalidations and identical audits pass; owner confirms unchanged
-model and uninterrupted host. No repetition is required. 0.11.0 implements
-selected/standard layer/status writes with bounded native acceptance for the
-retained two-workflow gate. Mark writes and
-numbering remain required open work; M3 is open.
+Required next work: mark assignment and deterministic versioned-standard
+numbering, then native same-session conflicts in a supported lifecycle and
+controlled partial/unknown outcomes with read-only recovery. Known UI editing
+cancelled the host and must not be repeated unchanged. Journal maintenance and
+identity limits, final UAT and main integration remain open. Graphical labels,
+file moves and universal native properties are conditional extensions.
 
 - **M3.1** Shared preview/apply, stale checks, serialized writes, request identity, readback, partial outcomes and tested Undo limits.
 - **M3.2** `fix_model_issues` for writable attributes/layers; data marks and graphical labels stay distinct.

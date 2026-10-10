@@ -1,52 +1,15 @@
 # Windows setup — 0.11.0 evaluation
 
-This is a local evaluation package. M0 is accepted on the owner’s Allplan 2026-1-7 setup with local Windows Codex; see [the verified baseline](next-model-handoff.md#verified-baseline). Portable checks are separate evidence. The package does not install or include Allplan, Python, or Codex. Initial setup needs internet access for the pinned external-server dependencies.
+Use the versioned package on the Windows machine running Allplan and Codex.
+It requires external Python 3.11+ and internet access for locked dependencies;
+Allplan, Python and Codex are not bundled. Acceptance is scoped to the
+[recorded fixture/build](validation-status.md). M3 remains open.
 
-**M1 is closed; UAT-02/UAT-03 PASS within the bounded read contract** on
-Allplan 2026-1-7, package 0.5.3 and demo profile revision 1.0.2. Resource binding,
-native geometry/hierarchy, display-unit invariance and nonzero XY offset are
-accepted for the recorded fixture. See [acceptance, exact artifact and limits](test-results/m1-acceptance-0.5.3.md).
-Keep the accepted 0.5.3 archive unchanged; no repeated M1 owner batch is
-requested. **M2 / UAT-04 PASS** on the retained fixture with 0.6.1;
-[native evidence and limits](test-results/m2-acceptance-0.6.1.md).
-The setup steps below cover the current evaluation package. M2 read-only audit was implemented in 0.6.0; 0.6.1 contains callback exceptions
-and preflights invalid scope, with the targeted native recovery test passed;
-0.7.0 adds M3 read-only repair preview/revalidation; the
-[bounded owner gate passes](test-results/m3-preview-acceptance-0.7.0.md).
-The [completed card](m3-preview-batch.md) retains its procedure.
-0.8.1 corrects the 0.8.0 IsInMacro pre-write rejection and retains bounded
-apply/readback and persistent execution recovery; its
-[disposable-copy write/Undo owner gate](m3-apply-batch.md) and
-[stale Apply rejection](test-results/m3-stale-apply-acceptance-0.8.1.md) pass.
-0.9.0 adds read-only standard and predicate/exception previews;
-[native preview PASS](test-results/m3-standards-acceptance-0.9.0.md).
-0.10.0 adds explicit mark repair previews and full-scope collision checks;
-[native marks-preview PASS](test-results/m3-marks-acceptance-0.10.0.md).
-0.11.0 adds shared layer/status Apply for reviewed standard/selection plans;
-[bounded native workflow gate PASS](test-results/m3-workflow-acceptance-0.11.0.md),
-including owner-confirmed host survival, unchanged other elements and two-step
-Undo. The [completed card](m3-workflow-apply-batch.md) requires no repetition.
-[Journal preservation/capacity](m3-workflow-execution-contract.md#journal-lifecycle-and-the-128-record-limit)
-applies across Setup/Restore; keep Local/.allplan-mcp/repairs and package logs.
-Use the existing
-six-column project copy for M3; the generic empty-file setup below is for M0.
-
-## Upgrade from 0.1.1 after a missing Library item
-
-Version 0.1.1 installed the PYP file into `Local\PythonParts\PythonHost`, which
-Allplan does not scan as its private library. Version 0.1.2 corrects this to
-`Local\Library\PythonHost`, following the [official 2026 file layout](https://pythonparts.allplan.com/2026/manual/key_components/#file-locations).
-Close Allplan, extract 0.11.0 into a new folder and run **Setup.cmd**, selecting the
-same actual user `Local` folder. The installer backs up the previous library,
-scripts and legacy folder and removes the obsolete location. No manual file
-copying or prior uninstall is needed. Restore can recover the previous layout.
-
-Reopen Allplan. In the Library palette return to its root, then open **Private**
-(the user library), **PythonHost**, **StartPythonHost**. Clear any library filter
-that hides PythonParts. If needed, the installed `StartPythonHost.pyp` can also
-be dragged from Explorer into the Allplan drawing area, as documented by Allplan.
-If it remains missing, send `logs\installation.json` from the new package; it
-contains the exact installed path. Do not choose a different user folder by guess.
+For ongoing M3 work use the existing disposable project, establish its current
+values before planning and preserve Local/.allplan-mcp/repairs and package logs.
+See [fixture](fixture-guide.md) and [journal lifecycle](m3-workflow-execution-contract.md#journal-lifecycle-and-the-128-record-limit).
+Delivered archives retain original launchers; new source packages retain only
+setup/connection/diagnostics/restore and read-only repair recovery launchers.
 
 ## Install through Explorer
 
@@ -55,10 +18,10 @@ contains the exact installed path. Do not choose a different user folder by gues
 3. Find your actual Allplan user **Local** folder using Allmenu's user-folder information / Windows Explorer. A common location is `Documents\Nemetschek\Allplan\2026\Usr\Local`; redirected Documents and custom paths are supported. Select the existing `Local` folder, not `Prg`, `Std`, or the project folder. The `2026` example is a target path, not evidence of your installed build.
 4. Close Allplan. Double-click **Setup.cmd**. It checks the package hashes, creates isolated external environments, installs the locked dependencies and opens a folder chooser for the actual `Local` folder. No administrator rights or manual module copying should be needed. Cancel the chooser to leave the bridge unchanged.
 5. Setup replaces `Library\PythonHost` and `PythonPartsScripts\PythonHost` and removes the old `PythonParts\PythonHost` installation after backing it up, copying their full contents, including `sandbox`. The previous contents and absence of either folder are recorded under `Local\.allplan-mcp\backups\<backup-id>`. Other PythonParts are preserved. Setup prints the installed package version and backup ID; `logs\installation.json` records them.
-6. Open Allplan and a disposable empty test drawing file. In the **Library** palette, open **Private** (the user library), then **PythonHost** and start **StartPythonHost**. Its palette shows that the Python host is started. Keep the interactor running. An ordinary command may end it; restart from Library when necessary.
+6. Open Allplan and the intended disposable project/file. In the **Library** palette, open **Private** (the user library), then **PythonHost** and start **StartPythonHost**. Its palette shows that the Python host is started. Keep the interactor running. An ordinary command may end it; restart from Library when necessary.
 7. Double-click **Launch Allplan MCP.cmd** and keep the console open. It starts Streamable HTTP at `http://127.0.0.1:8888/mcp`, with the Allplan bridge at `http://127.0.0.1:5679`. `execute_python` is disabled in the evaluation launcher.
 8. Double-click **Connect Codex.cmd** on the same Windows machine. It adds the `allplan_m0` server to the standard user `.codex\config.toml`, preserving existing settings and saving a timestamped backup. Restart Codex and use a **local Windows chat**. A conflicting pre-existing server entry produces a readable error and is left intact. The Codex application itself can be running on Windows while the selected chat executes in the cloud. Choose local execution for a Windows folder; a chat whose working directory is `/workspace` is not this local Windows setup.
-9. Double-click **Diagnostics.cmd** with both windows/hosts running. It saves a read-only JSON report in `logs`, containing tool discovery, bridge session/request IDs, package version, external/embedded Python, release strings and executable version resources. It does not create a box or retry a mutation. **M1 Metadata.cmd** retains the explicit files 1/2 and attribute 498 probe; its [two-capture card](m1-metadata-batch.md) records the already accepted bounded verification.
+9. Double-click **Diagnostics.cmd** with both windows/hosts running. It saves a read-only JSON report in `logs`, containing tool discovery, bridge session/request IDs, package version, external/embedded Python, release strings and executable version resources. It does not create a box or retry a mutation.
 
 Codex's documented [Streamable HTTP configuration](https://developers.openai.com/codex/mcp/) uses this table, which the connection script supplies automatically:
 
@@ -67,7 +30,7 @@ Codex's documented [Streamable HTTP configuration](https://developers.openai.com
 url = "http://127.0.0.1:8888/mcp"
 ```
 
-If Codex uses a custom configuration location, report that location so the implementation model can configure it; the supplied helper targets the standard user configuration. Do not copy this URL into a cloud chat expecting it to reach your Windows computer. Each machine has its own localhost. No tunnel, shared service or remote deployment is part of this batch.
+If Codex uses a custom configuration location, report that location so the implementation model can configure it; the supplied helper targets the standard user configuration. Do not copy this URL into a cloud chat expecting it to reach your Windows computer. Each machine has its own localhost. No tunnel, shared service or remote deployment is part of this setup.
 
 ## Update and restore
 
@@ -75,7 +38,7 @@ Close Allplan and the MCP console before an update. Extract the next package int
 
 To revert this installation, close Allplan and the MCP console, then double-click **Restore bridge.cmd** in this package. It uses this package's recorded backup ID, validates the backup, restores both previous trees (or removes them if previously absent) and makes a safety backup of the current bridge. Open Allplan again. For a full previous-version setup, start the previous version's launcher. Restoration does not modify Allplan models or remove test geometry. To undo the Codex connection, restore the config backup named in `logs\connect-result.json`; the model can perform that step in a local Windows chat.
 
-Backups live outside the extracted package. Keep them until this batch is accepted. A missing/corrupt backup is rejected before replacing the current bridge. An interrupted machine shutdown during copying is not an atomic filesystem transaction; the retained backup is the recovery source.
+Backups live outside the extracted package. Retain backups needed for rollback. A missing/corrupt backup is rejected before replacing the current bridge. An interrupted machine shutdown during copying is not an atomic filesystem transaction; the retained backup is the recovery source.
 
 ## Readable failures and recovery
 
@@ -92,18 +55,15 @@ Backups live outside the extracted package. Keep them until this batch is accept
 
 The [2026 AllplanVersion API](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_AllplanSettings/AllplanVersion/) provides release strings; these alone do not establish a full build/hotfix. The diagnostics also reads version resources from the running process executable on Windows. If the hotfix remains unavailable, include the value visible in Allplan's About / version dialog with your result. Do not infer it from a folder name or a Python version.
 
-## Accepted M1 read package 0.5.3
+## Missing Library item
 
-The [final owner card](m1-final-batch.md) retains the completed recipe for named
-demo resources, the 10-component fixture and display-unit/nonzero-offset captures.
-M1 Profile.cmd resolves resources without creating them; M1 Final.cmd captures
-the packaged query batch with summaries/pages. Restart StartPythonHost after
-normal UI setup/file-state commands that end it. That accepted package exposes seven tools; 0.6.0 adds `model_audit`.
-Preflight and A/B/C captures are accepted; no further M1 owner test is requested.
-The demo is bound_for_read and inactive for writes. Configured levels are not
-native BWS; nonzero Z offsets, durable references and mutation/Undo are outside
-the accepted scope. The original [M2 UAT-04 capture](test-results/m2-audit-runtime-0.6.0.md)
-matched the fixture/UI, but a later invalid-scope request overlapped a crash.
-The 0.6.1 **M2 Stability.cmd** run passed; the [completed card](m2-stability-batch.md)
-retains its recipe. No repeated owner batch is required for this scope.
-The bridge now keeps bounded logs under Local\.allplan-mcp\logs.
+Check Library → Private → PythonHost → StartPythonHost and clear library filters.
+The installed library belongs in Local/Library/PythonHost; Setup migrates the
+legacy Local/PythonParts/PythonHost layout with a backup. If needed, drag the
+installed StartPythonHost.pyp from Explorer into the drawing area. If it is still
+missing, inspect logs/installation.json for the selected Local and installed paths;
+do not choose another user folder by guess.
+
+The bridge keeps bounded request/error logs in Local/.allplan-mcp/logs.
+For uncertain repair outcomes use [read-only recovery](diagnostics.md);
+do not send a new Apply or remove the Local journal.

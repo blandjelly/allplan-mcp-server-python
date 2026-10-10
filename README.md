@@ -19,67 +19,22 @@ Read these files in order when continuing implementation:
    checks, CI matrix and retained hash protections.
 
 Current package: **0.11.0**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
-**M0 and bounded M1 are accepted** on Allplan **2026-1-7** with local Windows Codex; UAT-00–UAT-03 PASS.
-The demo profile binds freshly for reads and remains inactive for writes.
-[Acceptance and limits](docs/test-results/m1-acceptance-0.5.3.md) cover the known
-fixture, display-unit invariance and nonzero XY offset. **M2.1–M2.3 / UAT-04
-PASS within the retained read-only fixture scope**, package 0.6.1;
-[acceptance and evidence](docs/test-results/m2-acceptance-0.6.1.md).
-[Native 0.6.0 report/UI checks](docs/test-results/m2-audit-runtime-0.6.0.md) match
-the fixture. 0.6.1 contains UI callback exceptions and rejects invalid audit scope
-before contacting Allplan; [correction and limits](docs/test-results/m2-dispatch-fix-0.6.1.md).
-Both repeated audits, scope rejection through MCP/host and post-error health
-passed; the owner confirms Allplan and host remain running. The earlier crash's
-precise cause remains unproven. The [completed stability card](docs/m2-stability-batch.md)
-retains the test recipe; no further M2 owner batch is requested. `model_audit` returns read-only
-findings, coverage and file/mark/location evidence. The
-[UAT-04 card](docs/m2-audit-batch.md) records the original procedure.
-The first M3 slice adds read-only `fix_model_issues` preview/revalidation for
-explicit layer/status choices, with exact old/new values, bounded plans and stale
-checks. **Bounded M3 preview gate PASS**;
-[native evidence and limits](docs/test-results/m3-preview-acceptance-0.7.0.md),
-[completed owner card](docs/m3-preview-batch.md);
-[contract](docs/m3-repair-contract.md). Package 0.8.0 adds bounded disposable-copy
-apply/readback, a durable execution journal and read-only recovery.
-The first 0.8.0 native write was rejected before setters by
-an overly broad IsInMacro check; [original evidence and correction](docs/test-results/m3-apply-rejection-0.8.0.md).
-0.8.1 uses verified root hierarchy and reports explicit pre-write rejections.
-[Execution contract](docs/m3-execution-contract.md),
-[completed write/Undo owner card](docs/m3-apply-batch.md).
-**Bounded 0.8.1 execution gate PASS**: both native repairs/readbacks, audited
-collateral verification, exact-ID replay across host sessions, two separate
-Undo steps, and recovery after owner-confirmed Redo;
-[evidence and limits](docs/test-results/m3-execution-acceptance-0.8.1.md).
-The UI interrupted the host in the subsequent manual-edit scenario;
-[native old-plan rejection after restart PASS](docs/test-results/m3-plan-restart-acceptance-0.8.1.md).
-Same-session manual-edit conflict is blocked in that observed lifecycle and
-is not claimed as accepted.
-[Native stale Apply rejection PASS](docs/test-results/m3-stale-apply-acceptance-0.8.1.md)
-with identical complete before/after audits and unchanged owner-observed values/appearance.
-Package **0.9.0** adds the first M3.3 read-only `apply_office_standard` and
-predicate/exception `rule_based_edit` previews using the shared audit/planner.
-[Contract](docs/m3-standards-contract.md),
-[portable validation](docs/test-results/m3-standards-portable-0.9.0.md),
-[native standard/selection preview PASS](docs/test-results/m3-standards-acceptance-0.9.0.md).
-Package **0.10.0** adds exact-target mark repair previews and whole-scope
-collision simulation, including excluded peers. Mark plans cannot use Apply.
-[Mark contract](docs/m3-marks-contract.md),
-[native marks-preview PASS](docs/test-results/m3-marks-acceptance-0.10.0.md),
-[completed read-only owner card](docs/m3-marks-preview-batch.md).
-All ten steps, positive proposals, selection exception, excluded-peer collision
-and unchanged revalidations pass; owner confirms model unchanged and host
-uninterrupted. No repeat is required.
-Package **0.11.0** connects reviewed standard/selection plans to the shared
-executor and supports 1–32 existing string-status/layer changes on Column roots
-in one foreground file. It retains full source checks, exceptions, durable
-deduplication and readback, with no fixed demo finding count.
-[Execution contract and journal lifecycle](docs/m3-workflow-execution-contract.md),
-[completed owner test](docs/m3-workflow-apply-batch.md).
-**Bounded native workflow-write gate PASS**: ten steps, separately reviewed
-standard/selected writes, readback, read-only replay and full audits 5 → 4 → 3.
-Owner confirms host survived, other elements unchanged and two-step Undo;
-[original logs and acceptance limits](docs/test-results/m3-workflow-acceptance-0.11.0.md). Mark writes/numbering, native same-session conflicts and unknown
-recovery remain required open work; M3/UAT-05/UAT-06 are not closed.
+**M0–M2 / UAT-00–UAT-04 are accepted within the recorded Allplan 2026-1-7 fixture scope**
+with local Windows Codex. M3 has accepted layer/status preview and bounded writes,
+standard/selection workflows and read-only mark collision previews.
+The latest native workflow gate passed two single-target writes, exact readback,
+read-only replay, complete audits **5 → 4 → 3** and owner-confirmed two-step Undo.
+**M3/UAT-05/UAT-06 remain open**: mark assignment/numbering, native same-session
+conflicts and controlled partial/unknown recovery are next.
+[Validation status](docs/validation-status.md) defines the accepted boundaries.
+
+Use [Windows setup](docs/windows-setup.md), [fixture definition](docs/fixture-guide.md),
+[read tools](docs/tool-reference.md), [audit contract](docs/m2-audit-contract.md),
+[workflow execution](docs/m3-workflow-execution-contract.md) and
+[diagnostics/recovery](docs/diagnostics.md) for ongoing work.
+Completed test cards, logs and previous handoffs are available in Git history.
+Delivered archives retain their original contents; new source packages omit
+completed test launchers and include current documentation.
 
 Repository documentation and API identifiers use English. Owner-facing
 walkthroughs may use Polish. The implementation model owns coding, diagnostics,

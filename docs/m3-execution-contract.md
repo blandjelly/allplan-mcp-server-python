@@ -1,30 +1,12 @@
-# M3 bounded execution contract — accepted 0.8.1 baseline
+# M3 execution, native guards and recovery
 
-This records the original exact-two-target gate. Package 0.11.0 extends eligible
-layer/status plans and standard/selection execution while retaining the journal
-and native adapter guards; [current contract and lifecycle](m3-workflow-execution-contract.md).
-The older native acceptance below does not accept that expanded scope.
-
-The first 0.8.0 native write gate was **BLOCKED before setters**,
-[evidence and correction](test-results/m3-apply-rejection-0.8.0.md).
-0.8.1 records the broad IsInMacro parent-object flag as diagnostic evidence;
-required native hierarchy must terminate at the reviewed Column root. Explicit
-known pre-setter apply errors become `rejected`, not `unknown`; transport,
-unexpected and journal errors retain conservative unknown handling.
-
-Status **bounded native execution gate PASS**, 2026-10-10 Europe/Warsaw:
-[original evidence and decision](test-results/m3-execution-acceptance-0.8.1.md).
-The two retained Column repairs, audited-field verification, exact-ID read-only
-replay across host sessions, manual **two-step Undo**, and recovery after
-owner-confirmed Redo pass. Grouped Undo is unavailable. Native manual-edit
-conflicts and broader execution remain pending. The owner-observed UI action
-cancelled the host; [old-plan revalidation after restart passes](test-results/m3-plan-restart-acceptance-0.8.1.md),
-while native same-session conflict is blocked in that lifecycle.
-[Native stale Apply rejection PASS](test-results/m3-stale-apply-acceptance-0.8.1.md);
-no repeat of that completed card is requested.
-The accepted [0.7.0 preview](test-results/m3-preview-acceptance-0.7.0.md)
-and its unchanged archive remain separate. [Polish owner gate](m3-apply-batch.md).
-This slice advances M3.1/M3.2/M3.4; M3 and UAT-05/UAT-06 remain open.
+Package **0.11.0** shares this executor across fix_model_issues,
+apply_office_standard and rule_based_edit. [Current eligibility/workflow metadata](m3-workflow-execution-contract.md)
+cover 1–32 existing string-status/layer changes on Column roots in one foreground
+file. [Native acceptance](validation-status.md) remains narrower: the earlier
+two-target gate and latest two separately reviewed single-target workflows.
+Two separate Undo steps are accepted; grouped Undo, native same-session conflicts
+and unknown-outcome recovery remain open.
 
 ## Eligibility correction and rejected requests
 
@@ -47,7 +29,7 @@ classified as pre-write safety because they may happen after a setter.
 `fix_model_issues` / `/fix-model-issues` retains schema `m3-repair-1` and the
 side-effect-free preview/revalidate actions. General `apply_available` and
 `usable_for_write` remain false. A preview additionally advertises
-`evaluation_apply_available` when it matches the bounded fixture gate.
+`evaluation_apply_available` when it matches current bounded execution eligibility.
 This experimental execution route has bounded native acceptance for the retained
 fixture; it does not provide a generic writable profile/reference registry.
 Generic profiles remain inactive for writes.
@@ -58,17 +40,19 @@ Generic profiles remain inactive for writes.
   "plan_id": "<exact reviewed 32-hex ID>",
   "plan_hash": "<exact reviewed 64-hex hash>",
   "execution_id": "<new 32-hex ID saved before sending>",
-  "acknowledgement": "disposable_copy_reviewed_two_repairs"
+  "acknowledgement": "disposable_copy_reviewed_plan"
 }
 ```
 
 The host preflights the full typed request before native document access.
-Apply supports exactly two native Column roots in foreground file **101**:
-S05's layer to freshly bound `SZ_OGÓ01` and S06's existing named string
-`MCP_QA_STATUS` from `NWE` to `NEW`. The plan must contain 2 changes,
-3 exclusions and 5 complete audit findings. Other preview scopes remain read-only.
-No attribute append, mark assignment, graphical label, component replacement,
-passive/background write, or repair choice is inferred.
+Apply supports 1–32 native Column layer/existing-string-status changes in one
+active_foreground file with complete evidence and current native capabilities.
+The demo profile remains bounded to file 101; other scopes require validated
+explicit profiles. The legacy acknowledgement disposable_copy_reviewed_two_repairs
+is accepted only for its original exact unselected/unwrapped two-target gate:
+S05 layer → SZ_OGÓ01 and S06 status NWE → NEW, 2 changes/3 exclusions/5 findings.
+It cannot authorize expanded plans. No mark assignment, attribute append/delete,
+label, component replacement or passive/background write is inferred.
 
 Under an OS writer lock per `Local/.allplan-mcp/repairs`, apply reruns the full
 audit and compares source/report hashes, expiry and exact reviewed hash.
@@ -84,7 +68,8 @@ The [2026 ChangeAttributes API](https://pythonparts.allplan.com/2026/api_referen
 receives one `(attribute ID, exact value)` pair, one BaseElementAdapterList and
 both undef/delete flags false. The
 [2026 layer guide](https://pythonparts.allplan.com/2026/manual/features/format_properties/)
-requires a short layer name; ChangeLayer receives `SZ_OGÓ01`, never its ID.
+requires a short layer name; ChangeLayer receives the freshly resolved short
+name (for example `SZ_OGÓ01`), never its ID.
 Returned adapters/return values do not establish success. Fresh resolution and
 typed field readback determine applied/failed/unknown. A mismatch, exception,
 conflict or time budget stops later writes. No automatic retry or rollback runs.
@@ -92,13 +77,13 @@ There is a 20-second boundary before starting each setter, 5-second individual
 read budgets and 10,000-adapter resolution limits; an executing native setter
 cannot be forcibly interrupted. HTTP timeout may therefore have an unknown result.
 
-All plans/selections are invalidated when an execution starts. A full re-audit
-and snapshot compare all six returned elements' audited fields with the original
-snapshot plus only the two authorized values; this includes mark and geometry
-observations, but not every native property or out-of-scope model data. Two
-readbacks alone cannot report completed if that verification fails. Successful
-fixture execution leaves three mark findings; collateral changes or unreadable
-verification produce `verification_failed` rather than acceptance.
+All plans/selections are invalidated when execution starts. Full post-audit
+verification compares the entire audited snapshot to the original plus only
+reviewed field/alias changes, including excluded peers, marks and geometry.
+It does not cover every native property or out-of-scope element. Readbacks alone
+cannot report completed if that verification fails. The old two-target fixture
+leaves three findings; general execution has no fixed finding-count requirement.
+Collateral changes/unreadable verification produce verification_failed.
 
 ## Durable execution identity and recovery
 
@@ -123,8 +108,8 @@ Up to 128 records and 1 MiB per record are stored; they are never automatically
 evicted. A full/corrupt/unwritable journal or competing writer blocks new writes.
 Unresolved running/unknown records require recovery before new execution.
 The lock covers this repair route; unrelated baseline box/development operations
-do not acquire it. The UI dispatcher serializes native callbacks, and the owner
-gate forbids concurrent model operations.
+do not acquire it. The UI dispatcher serializes native callbacks; avoid concurrent
+model operations during these bounded writes.
 
 ```json
 {"action": "recover", "execution_id": "<saved 32-hex ID>"}
@@ -142,27 +127,17 @@ no cross-machine guarantee when the Local journal is removed/copied or storage
 rolls back. Windows atomic replace/fsync is implemented, but native persistence
 and sudden power loss are unaccepted. Preserve the journal with the package logs.
 
-## Owner CLI and remaining gates
+## Recovery tools and remaining work
 
-`M3 Apply.cmd` displays the plan and requires `NAPRAW KOPIE`. It saves the
-execution request before contacting the host, tests readback and exact-ID replay,
-and records JSON/TXT. `M3 Recover.cmd` verifies persisted replay/current values;
-`M3 Check Undo.cmd` observes both original values and five findings after manual
-native UI Undo. None of the recovery/check commands requests a new write.
-The owner observes whether Undo needs one or two steps; no grouping API or
-transaction/automatic rollback is claimed. Loss of reply never triggers retry.
+[M3 Recover.cmd and M3 Workflow Recover.cmd](diagnostics.md) retain access to
+saved local executions. Recovery sends no new write, automatic retry, resume,
+rollback or Undo. Exact-ID replay returns saved outcomes; it does not establish
+current state after UI Undo.
 
-Portable fake adapters and real HTTP/MCP checks are separate from Allplan
-acceptance. Native writability, setter readback, audited collateral verification,
-exact-ID persistence across the observed host sessions and two-step Undo pass
-for the retained fixture. Whole-model collateral UI verification, native
-manual-edit conflicts, unknown-outcome recovery and crash/power-loss persistence
-remain outside that acceptance. M3.3 office-standard/rule-based execution is
-implemented in 0.11.0 with
-[bounded native workflow acceptance](test-results/m3-workflow-acceptance-0.11.0.md),
-including two-step Undo confirmed by the owner. Broader mutation/registry
-guarantees remain unaccepted. No repeated two-write gate
-is required. The same-session manual-edit card was blocked by UI host
-cancellation, with restart invalidation correctly observed; do not repeat that
-scenario on this build. Stale Apply rejection is already accepted. The completed
-[two-workflow card](m3-workflow-apply-batch.md) also passes; no repeat is requested.
+Native acceptance covers the recorded layer/status writes/readbacks, audited-field
+verification, exact-ID replay, separate Undo and completed recovery after Redo.
+Restart invalidation and stale Apply rejection also pass. Native same-session
+conflicts, controlled partial/unknown recovery, broader scope/identity and
+crash/power-loss persistence remain open. Do not repeat the UI-edit scenario
+known to cancel the host. Next implement mark assignment/numbering, then obtain
+the missing native evidence; see [handoff](next-model-handoff.md).

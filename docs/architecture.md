@@ -29,6 +29,9 @@ UI dispatcher; shutdown must not join a worker waiting on that dispatcher.
 | `utils/`, `windows/` | Recursive registration, package integrity, launchers, Codex setup and restore. |
 | Host `model_query.py`, `native_readers.py`, `model_metadata.py`, `query_contracts.py`, `spatial_contracts.py`, `profile_contracts.py` | Bounded model reads, geometry/hierarchy, metadata and validated read binding. |
 | Host `audit_contracts.py`, `model_audit.py`; MCP `audit_models.py` | M2 profile validation, fresh full read-only audits and JSON/text findings; no writes. |
+| Host `repair_contracts.py`, `model_repair.py`; MCP `repair_models.py` | Shared repair planning, immutable cache, source revalidation and collision simulation. |
+| Host `native_repairs.py`, `repair_execution.py` | Native eligibility/setters, serialization, durable journal, readback and read-only recovery. |
+| MCP `office_standard.py`, `standard_models.py`, `server.py` | Versioned standard, typed workflow actions, selection/exception contracts and shared execution. |
 | `profiles/`, `tests/` | Versioned demo read/audit profiles and portable checks. |
 
 Add `contracts/`, `services/`, host `handlers/` and `adapters/` only when needed.
@@ -67,23 +70,18 @@ inclusion. Report omitted/unloaded/read-only scope explicitly.
 
 ## Shared mutation lifecycle
 
-Package **0.8.0** adds the bounded evaluation executor `repair_execution.py`
-and 2026 `native_repairs.py`: fresh target/eligibility checks, write-ahead Local
-journal, serialized execution, readback/full audited-field verification and
-read-only recovery. Exact execution-ID replay never repeats setters. General
-writes remain bounded. Native 0.8.1 two-target writes and separate Undo are
-accepted; see [execution contract](m3-execution-contract.md). Package 0.11.0
-uses that shared executor for 1–32 existing status/layer changes and reviewed
-standard/selection plans. [Expanded scope and journal lifecycle](m3-workflow-execution-contract.md)
-have [bounded native workflow acceptance](test-results/m3-workflow-acceptance-0.11.0.md):
-separate single-target writes, full audited verification, exact-ID read-only
-replay and owner-observed two-step Undo. Wider supported scopes remain unaccepted.
+The shared executor repair_execution.py and native_repairs.py implement fresh
+resolution/eligibility, write-ahead Local journal, serialized writes, readback,
+full audited-field verification and read-only recovery. Exact-ID replay returns
+saved outcomes without setters. [Execution guards](m3-execution-contract.md) and
+[current workflow scope/journal lifecycle](m3-workflow-execution-contract.md)
+define eligible 1–32-change Column layer/status plans. [Native acceptance](validation-status.md)
+is bounded to the recorded fixture writes and two-step Undo.
 
-The earlier M3 slice in 0.7.0 implements only explicit preview and fresh evidence
-revalidation: host `repair_contracts.py` / `model_repair.py`, public
-`repair_models.py` and `fix_model_issues`. Its bounded session-local cache stores
-immutable returned-plan copies with ID/hash and expiry; no apply/writability,
-durable mutation journal or Undo is claimed. See [contract](m3-repair-contract.md).
+Preview/revalidation use host repair_contracts.py / model_repair.py and public
+repair_models.py. The session-local cache stores immutable plans with ID/hash,
+expiry and full source evidence. Preview invokes no setters; mark plans remain
+preview-only. See [preview](m3-repair-contract.md) and [marks](m3-marks-contract.md).
 
 1. Resolve explicit scope and supported operations.
 2. Produce a side-effect-free preview with targets, values, exclusions and counts.

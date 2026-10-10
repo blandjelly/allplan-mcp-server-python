@@ -1,11 +1,9 @@
 # M3 explicit mark repair preview — 0.10.0
 
-Status **native marks-preview PASS**, 2026-10-10;
-[original evidence and limits](test-results/m3-marks-acceptance-0.10.0.md).
-The owner confirms the model unchanged and host uninterrupted. This extends
-M3.2/M3.3 using the same audit, planner, selection, hashing and revalidation.
-[0.9.0 native standard/selection preview PASS](test-results/m3-standards-acceptance-0.9.0.md)
-and all earlier accepted archives/evidence remain unchanged.
+Explicit mark previews have [bounded native acceptance](validation-status.md).
+The owner confirms unchanged model and uninterrupted host. They reuse audit,
+planner, selection, hashing and revalidation; writes and deterministic numbering
+remain required open M3 work.
 
 ## Explicit rule and target, no automatic numbering
 
@@ -61,7 +59,7 @@ The unchanged TTL, eviction and host-restart invalidation rules apply. The
 assignment request, validation result and all plan metadata enter the plan hash;
 caller mutation cannot modify the stored reviewed plan.
 
-## Native write boundary and next observation
+## Native write boundary
 
 Every plan containing mark-validation metadata is **preview-only**, including
 when filtering leaves zero mark proposals and only the formerly accepted
@@ -71,14 +69,7 @@ setter, graphical operation or write capability is introduced. Package 0.11.0 se
 [expanded execution boundary](m3-workflow-execution-contract.md). Mark plans
 remain read-only in 0.11.0.
 
-[M3 Marks Preview.cmd](m3-marks-preview-batch.md) requests two explicit fixture
-proposals (C03 missing mark → S03, C04 duplicate S02 → S04), repeats selection
-with C04 excepted, then deliberately proposes S06 on C03 while S06 is excluded.
-The last case must return conflict with both exact collision members. Each plan
-revalidates; full audit before/after and same-session health must match. The
-launcher preserves original MCP text blocks along with decoded responses.
-It invokes no Apply, Recover or Undo. Positive proposals, the selection exception, collision and unchanged
-revalidations have native acceptance; no repeat is requested. Actual mark writes
-and deterministic numbering remain required open M3 work. The subsequent
-[0.11.0 workflow-write gate passes](test-results/m3-workflow-acceptance-0.11.0.md).
-No repeat is requested; next implementation is actual mark assignment/numbering.
+Native acceptance covers positive C03/C04 proposals, a selection exception,
+collision against an excluded peer and unchanged revalidations/full audits.
+No repeat of that completed gate is required. Next implement actual mark
+assignment and deterministic numbering with these full-scope safeguards.

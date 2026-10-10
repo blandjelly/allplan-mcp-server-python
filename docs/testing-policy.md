@@ -4,7 +4,6 @@ Adopted by the owner on 2026-10-10. Preserve meaningful regression tests;
 choose when to run them according to the change. A request to postpone tests
 overrides this default schedule: do not run local tests, builds used as checks,
 native owner gates or manually dispatch CI until testing is authorized again.
-This policy update itself runs no tests and changes no acceptance result.
 
 ## Local work and publication
 
@@ -15,29 +14,13 @@ This policy update itself runs no tests and changes no acceptance result.
 | New owner-test package | Run the full portable suite once for the final code candidate, frozen dependency sync, wheel/sdist build and exact package/installation checks. Use source CI as evidence for its tested commit. |
 | Dependency, installer, package builder or workflow change | Full portable suite and the six-configuration compatibility matrix. |
 | Release/main integration | Full portable suite and six-configuration compatibility matrix for the final candidate; required native acceptance remains separate. |
-| Native Allplan observation | Test new behavior or a materially affected accepted behavior. Do not repeat unchanged accepted gates; preserve their original evidence and scope. |
+| Native Allplan observation | Test new behavior or a materially affected accepted behavior. Do not repeat unchanged accepted gates; record their evidence and scope; completed logs remain in Git history. |
 
-The 0.11.0 baseline has 178 automated tests. Its focused M3 set has 44 tests;
-these are baseline counts, not permanent gates. New implementation may add tests.
-Recorded Linux timings: full suite 47.607 seconds, focused set 3.215 seconds,
-23 HTTP/MCP tests 40.598 seconds. These are existing measurements, not guarantees
-for another machine. A module selection cannot replace dependent read/audit tests
-when those contracts change.
-
-Focused command, for future use from the repository root:
-
-```bash
-PYTHONPATH=tests .venv/bin/python -m unittest test_model_repair test_repair_execution test_standard_preview test_mark_preview test_supported_execution
-```
-
-On Windows PowerShell, set `$env:PYTHONPATH = "tests"` and invoke the same module
-list using `.venv\Scripts\python.exe`. Restore the previous environment value
-afterward. This document does not request execution of either command now.
-
-Run one full suite after the final implementation changes, rather than after
-each edit or documentation/artifact commit. Repeat only when a new relevant
-change, failure or unresolved concern justifies it. Record which checks actually
-ran, their commit/package and result; do not describe a focused run as full PASS.
+Run one full suite for the final implementation candidate; repeat only for
+new relevant changes, failures or unresolved concerns. Select affected modules
+for focused iteration, including dependent read/audit/HTTP checks when contracts
+change. [README](../README.md#source-development) holds current development
+commands. Record actual checks/source/results; focused PASS is not full PASS.
 
 ## CI schedule
 
@@ -65,9 +48,8 @@ ran, their commit/package and result; do not describe a focused run as full PASS
 - New updates cancel superseded runs for the same PR/ref. A cancelled run is
   not PASS. A configuration job chooses the matrix; it runs no product tests.
 
-The policy/configuration commit is marked `[skip ci]` to honor the owner's
-request to run no tests now. Historical six-job results remain scoped to their
-original commits; this revised workflow has not been exercised by this update.
+Historical CI results remain scoped to their original commits; see
+[validation status](validation-status.md#portable-verification-and-delivery).
 
 ## Hashes and package checks
 

@@ -1,18 +1,13 @@
-# M3 repair preview contract — 0.7.0
+# M3 repair preview contract
 
-This document preserves the accepted 0.7.0 read-only behavior. Package **0.8.0**
-adds a separate [bounded disposable-copy execution contract](m3-execution-contract.md)
-with an [accepted owner gate](test-results/m3-execution-acceptance-0.8.1.md).
-Package 0.11.0 expands reviewed layer/status execution and workflow Apply;
-[current contract](m3-workflow-execution-contract.md),
-[bounded native workflow gate PASS](test-results/m3-workflow-acceptance-0.11.0.md).
-
-First M3.1/M3.2 slice: **accepted_on_build within the retained read-only preview
-scope**, package 0.7.0 on the previously owner-identified Allplan 2026-1-7 fixture;
-[native evidence and limits](test-results/m3-preview-acceptance-0.7.0.md). Tool
-`fix_model_issues`, bridge `/fix-model-issues`, request/plan schema `m3-repair-1`.
-M3 apply/readback/Undo and UAT-05/UAT-06 remain incomplete. Accepted M1/M2
-profiles and evidence are unchanged. [Owner gate](m3-preview-batch.md).
+Public tool fix_model_issues, bridge /fix-model-issues, request/plan schema
+m3-repair-1. Preview/revalidation are side-effect-free. Layer/status preview
+has [bounded native acceptance](validation-status.md); explicit mark proposals
+are described in the [mark contract](m3-marks-contract.md).
+Package **0.11.0** executes eligible reviewed layer/status plans through the
+[shared executor](m3-execution-contract.md) and
+[workflow contract](m3-workflow-execution-contract.md).
+M3/UAT-05/UAT-06 remain open.
 
 ## Explicit preview
 
@@ -41,7 +36,9 @@ There must be 1–32 distinct explicit repair choices for selected audit rules.
 Supported choices are `required_layer` → that rule's expected named layer role,
 and `allowed_attribute_values` on **status** → an explicitly supplied allowed
 value. String comparison uses the audit's trim/case policy; the exact supplied
-string is retained as the proposed value. No default value, numbering, mark
+string is retained as the proposed value. Explicit per-model mark choices use
+the [mark contract](m3-marks-contract.md) and always remain preview-only.
+No default value, numbering, mark
 assignment, duplicate resolution, graphical label or native-property edit is
 inferred. Optional `finding_ids` contains 1–100 distinct hashes and restricts
 the chosen rules to those exact current findings. Absent/stale/unselected IDs
@@ -59,8 +56,7 @@ no implicit last-writer policy. Passing rules generate no operations.
 
 For the retained fixture, the preview contains **two** proposed changes:
 C05/S05 layer SZ_OGÓ02 → SZ_OGÓ01, and C06/S06 status NWE → NEW.
-Three mark findings remain excluded. The subsequent audit must still have
-**five** findings because this package performs no repairs.
+Three mark findings remain excluded. An audit after preview alone retains **five** findings; preview performs no writes.
 
 ## Plan lifetime and revalidation
 
@@ -88,8 +84,8 @@ resource/project/document/file-state changes, selection limits and restart.
 These fingerprints concern the **audited source fields**, not every native
 property of the whole model. References still have
 `durable_identity_verified=false`; revalidation is read evidence, not native
-write re-resolution or per-element writability. Apply must perform those checks
-again in the future mutation boundary.
+write re-resolution or per-element writability. Apply performs those checks
+again at the execution boundary.
 
 ## Native API preparation and remaining gate
 
@@ -102,18 +98,9 @@ The layer path uses the dedicated `ChangeLayer` API rather than an assumed
 universal common-properties setter. Missing symbols remain `not_checked`.
 Symbol presence proves neither target writability nor mutation/Undo behavior.
 
-All new responses have `read_only=true`, `apply_available=false` and
-`usable_for_write=false`. Native apply is rejected by the public schema and by
-host `repair_apply_unavailable` before native context lookup. There are no
-native setters in the plan service. The UI dispatcher retains 0.6.1 exception
-containment. Writes, serialized execution, per-target readback, partial outcomes,
-Undo limits, durable request identity/deduplication and restart recovery are
-still to be implemented and proven before closing M3.1/M3.4. M3.3 remains planned.
-
-The completed owner gate verifies native target/value correspondence, stable
-audited-source evidence and continued host operation within the retained fixture;
-see the acceptance record for the separately attributed UI statement and limits.
-Optional native manual-edit conflict checking was not supplied and remains
-described on the owner card. Next, implement the
-small attribute/layer mutation adapter and a disposable-copy write/readback/Undo
-gate; do not enable writes merely because this read-only gate passed.
+Preview/revalidation return read_only=true, apply_available=false and
+usable_for_write=false. Eligible layer/status plans separately advertise
+evaluation_apply_available for the bounded executor. Mark plans always refuse
+Apply. General writable profiles and durable references remain unimplemented.
+The plan service invokes no setters; native Apply belongs to the shared executor.
+See [accepted limits and remaining work](validation-status.md).
