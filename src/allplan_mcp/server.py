@@ -14,7 +14,7 @@ from allplan_mcp.query_models import QueryRequest
 from allplan_mcp.demo_profile import load_demo_profile, load_audit_profile
 from allplan_mcp.audit_models import AuditRequest
 from allplan_mcp.repair_models import RepairRequest
-from allplan_mcp.standard_models import OfficeStandardPreview, RuleBasedPreview
+from allplan_mcp.standard_models import OfficeStandardRequest, RuleBasedRequest
 from allplan_mcp.office_standard import load_office_standard
 
 
@@ -223,12 +223,14 @@ def fix_model_issues(request: RepairRequest) -> dict[str, Any]:
     Returns old/new values, exclusions, locators, plan ID/hash and a five-minute
     lifetime. Revalidate requires that exact ID/hash and rereads the full scope.
     Changed evidence conflicts; restart/expiry/eviction require a new preview.
-    Evaluation apply supports only the two retained file-101 Column repairs,
+    Evaluation apply supports 1..32 reviewed existing status/layer changes on
+    Column roots in one foreground file, including selected/standard plans,
     with exact plan ID/hash, persistent execution_id and acknowledgement
-    disposable_copy_reviewed_two_repairs. It checks native eligibility, stops on
+    disposable_copy_reviewed_plan. The old two-repair acknowledgement is retained
+    only for its accepted fixture. It checks native eligibility, stops on
     failure and reads back results. Repeated execution IDs never repeat setters.
     Recover reads persisted execution/current values without resuming writes.
-    General/mark/selected-standard apply remain unavailable. Native UI Undo requires
+    Mark and other native-property writes remain unavailable. Native UI Undo requires
     two separate steps for the accepted retained fixture; no automatic rollback.
     """
     payload = request.model_dump(exclude_unset=True, exclude_none=True, by_alias=True)
@@ -238,14 +240,21 @@ def fix_model_issues(request: RepairRequest) -> dict[str, Any]:
 
 
 @mcp.tool
-def apply_office_standard(request: OfficeStandardPreview) -> dict[str, Any]:
-    """Preview the explicit versioned demo layer/status standard; never apply.
+def apply_office_standard(request: OfficeStandardRequest) -> dict[str, Any]:
+    """Preview and execute the explicit versioned layer/status standard.
 
     Requires standard ID/version and one active drawing file. Optional query
     predicate/model-UUID exceptions filter fresh audit findings on the same scan.
-    Full audit/source revalidation is shared with fix_model_issues. Mark assignment,
-    numbering, file moves, and standard/selected-plan apply remain unavailable.
+    Apply requires exact reviewed plan ID/hash, a saved execution ID and
+    disposable_copy_reviewed_plan. It must reference an office-standard plan.
+    Revalidate/recover reuse the shared service. Mark assignment, numbering and
+    file moves remain unavailable. Expanded native acceptance is pending.
     """
+    if request.action != "preview":
+        payload = request.model_dump(exclude_unset=True, exclude_none=True, by_alias=True)
+        if request.action == "apply":
+            payload["workflow_kind"] = "office_standard_preview"
+        return _send_repair(payload)
     standard = load_office_standard()
     payload = {"action": "preview", "audit": {"profile_id": standard["audit_profile_id"],
                "scope": request.scope.model_dump()}, "repairs": standard["repairs"],
@@ -257,16 +266,23 @@ def apply_office_standard(request: OfficeStandardPreview) -> dict[str, Any]:
 
 
 @mcp.tool
-def rule_based_edit(request: RuleBasedPreview) -> dict[str, Any]:
-    """Preview selected layer/status or explicit mark repairs with query/UUID exceptions.
+def rule_based_edit(request: RuleBasedRequest) -> dict[str, Any]:
+    """Preview and execute selected layer/status repairs with query/UUID exceptions.
 
     Selection uses audited mark/status/layer_id/file_state or selected dimension
     fields from one full fresh scan. Unknown predicates block readiness. Excluded
-    elements still participate in full source revalidation. No setters or Apply
-    authorization are available for this workflow. Mark choices require exact
+    elements still participate in full source revalidation. Apply requires exact
+    reviewed plan ID/hash, saved execution ID and disposable_copy_reviewed_plan;
+    it must reference a rule-based plan. Mark choices require exact
     model_uuid targets and selected required/unique mark rules; final mark values
-    are checked for collisions against the full scope, including excluded peers.
+    are checked for collisions against the full scope, including excluded peers,
+    and remain preview-only. Revalidate/recover reuse the shared service.
     """
+    if request.action != "preview":
+        payload = request.model_dump(exclude_unset=True, exclude_none=True, by_alias=True)
+        if request.action == "apply":
+            payload["workflow_kind"] = "rule_based_edit_preview"
+        return _send_repair(payload)
     payload = request.model_dump(exclude_unset=True, exclude_none=True, by_alias=True)
     payload["selection"] = request.selection.model_dump(exclude_unset=True, by_alias=True)
     payload["workflow"] = {"kind": "rule_based_edit_preview"}

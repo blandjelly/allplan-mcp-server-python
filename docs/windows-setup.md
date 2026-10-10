@@ -1,4 +1,4 @@
-# Windows setup — 0.10.0 evaluation
+# Windows setup — 0.11.0 evaluation
 
 This is a local evaluation package. M0 is accepted on the owner’s Allplan 2026-1-7 setup with local Windows Codex; see [the verified baseline](next-model-handoff.md#verified-baseline). Portable checks are separate evidence. The package does not install or include Allplan, Python, or Codex. Initial setup needs internet access for the pinned external-server dependencies.
 
@@ -21,7 +21,12 @@ apply/readback and persistent execution recovery; its
 0.9.0 adds read-only standard and predicate/exception previews;
 [native preview PASS](test-results/m3-standards-acceptance-0.9.0.md).
 0.10.0 adds explicit mark repair previews and full-scope collision checks;
-[new read-only owner card](m3-marks-preview-batch.md). Use the existing
+[native marks-preview PASS](test-results/m3-marks-acceptance-0.10.0.md).
+0.11.0 adds shared layer/status Apply for reviewed standard/selection plans;
+[next native card](m3-workflow-apply-batch.md), expanded writes not yet accepted.
+[Journal preservation/capacity](m3-workflow-execution-contract.md#journal-lifecycle-and-the-128-record-limit)
+applies across Setup/Restore; keep Local/.allplan-mcp/repairs and package logs.
+Use the existing
 six-column project copy for M3; the generic empty-file setup below is for M0.
 
 ## Upgrade from 0.1.1 after a missing Library item
@@ -29,7 +34,7 @@ six-column project copy for M3; the generic empty-file setup below is for M0.
 Version 0.1.1 installed the PYP file into `Local\PythonParts\PythonHost`, which
 Allplan does not scan as its private library. Version 0.1.2 corrects this to
 `Local\Library\PythonHost`, following the [official 2026 file layout](https://pythonparts.allplan.com/2026/manual/key_components/#file-locations).
-Close Allplan, extract 0.10.0 into a new folder and run **Setup.cmd**, selecting the
+Close Allplan, extract 0.11.0 into a new folder and run **Setup.cmd**, selecting the
 same actual user `Local` folder. The installer backs up the previous library,
 scripts and legacy folder and removes the obsolete location. No manual file
 copying or prior uninstall is needed. Restore can recover the previous layout.
@@ -44,7 +49,7 @@ contains the exact installed path. Do not choose a different user folder by gues
 ## Install through Explorer
 
 1. On the Windows machine running Allplan, install the normal Windows distribution of [Python 3.11 or newer](https://www.python.org/downloads/windows/) if needed. Keep its Tcl/Tk and launcher components. This is the external MCP runtime; Allplan's embedded Python is detected independently. The local automated run used Python 3.12.14.
-2. Extract `allplan-mcp-0.10.0-windows-evaluation.zip` into a writable folder, for example `Documents\Allplan MCP\0.10.0`. Extract it completely; do not run scripts from inside the ZIP. Keep the resulting `allplan-mcp-0.10.0` folder intact.
+2. Extract `allplan-mcp-0.11.0-windows-evaluation.zip` into a writable folder, for example `Documents\Allplan MCP\0.11.0`. Extract it completely; do not run scripts from inside the ZIP. Keep the resulting `allplan-mcp-0.11.0` folder intact.
 3. Find your actual Allplan user **Local** folder using Allmenu's user-folder information / Windows Explorer. A common location is `Documents\Nemetschek\Allplan\2026\Usr\Local`; redirected Documents and custom paths are supported. Select the existing `Local` folder, not `Prg`, `Std`, or the project folder. The `2026` example is a target path, not evidence of your installed build.
 4. Close Allplan. Double-click **Setup.cmd**. It checks the package hashes, creates isolated external environments, installs the locked dependencies and opens a folder chooser for the actual `Local` folder. No administrator rights or manual module copying should be needed. Cancel the chooser to leave the bridge unchanged.
 5. Setup replaces `Library\PythonHost` and `PythonPartsScripts\PythonHost` and removes the old `PythonParts\PythonHost` installation after backing it up, copying their full contents, including `sandbox`. The previous contents and absence of either folder are recorded under `Local\.allplan-mcp\backups\<backup-id>`. Other PythonParts are preserved. Setup prints the installed package version and backup ID; `logs\installation.json` records them.

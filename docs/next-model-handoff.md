@@ -1,6 +1,35 @@
 # Next-model handoff
 
-## Current handoff — 2026-10-10 Europe/Warsaw, 0.10.0 native marks-preview PASS
+## Current handoff — 2026-10-10, 0.11.0 workflow writes ready for owner test
+
+The owner supplied a completeness audit of ad146f6 and requested work through
+the next necessary native test. First priority implemented: shared executor
+accepts 1–32 existing status/layer changes on native Column roots in one
+foreground file, independent of demo IDs/counts. Typed office-standard/rule-based
+Apply/Revalidate/Recover now reuse it. Full-source hashes, selection exceptions,
+native preflight/readback, journal/write-ahead state and exact-ID deduplication
+remain. Legacy acknowledgement is restricted to its original gate; mark plans
+still refuse Apply. [Contract/lifecycle](m3-workflow-execution-contract.md).
+
+**Next owner action:** [0.11.0 workflow card](m3-workflow-apply-batch.md). Restore
+S05 review-layer and S06 NWE on the original disposable copy before starting the
+host, then use M3 Workflow Apply.cmd. Two separately confirmed one-target
+standard/selected plans, audits 5 → 4 → 3, exact-ID read-only replay, unchanged
+host session/integrity and final UI observation. Preserve Local journal, old
+packages and original JSON/TXT. No repeated old two-target/Undo/stale-Apply gate.
+No native writes are performed from cloud. Expanded acceptance is not_run.
+[178 portable tests PASS](test-results/m3-workflow-portable-0.11.0.md), frozen sync
+and wheel/sdist build pass. [Review response](reviews/m3-completeness-response-0.11.0.md).
+
+M3/UAT-05/UAT-06 stay open. Next implementation after this observation: mark
+assignment and deterministic numbering in a versioned standard, then supported
+native same-session conflicts and controlled partial/unknown-result recovery.
+Native completed recovery after Redo does not accept unknown recovery. Journal
+capacity/copy/restore limits are documented; final UAT/main integration remain.
+Do not count labels/file moves/universal setters as newly required M3 scope.
+Old archives/raw evidence remain byte-exact.
+
+## Prior handoff — 2026-10-10 Europe/Warsaw, 0.10.0 native marks-preview PASS
 
 Continue **codex/m3-repair-preview**, draft [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2).
 The owner supplied original 0.10.0 JSON/TXT and confirmed **model unchanged,

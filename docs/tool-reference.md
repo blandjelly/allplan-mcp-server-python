@@ -236,7 +236,9 @@ value policies and typed rules. See the [M2 audit contract](m2-audit-contract.md
 M3 0.7.0 adds `fix_model_issues` read-only preview/revalidation;
 [request, plan and limits](m3-repair-contract.md). 0.8.0 adds a separate
 [bounded evaluation apply/recovery contract](m3-execution-contract.md);
-[native write/Undo gate](m3-apply-batch.md) remains pending.
+[native 0.8.1 write/Undo gate PASS](test-results/m3-execution-acceptance-0.8.1.md).
+0.11.0 adds [shared standard/selection execution](m3-workflow-execution-contract.md),
+with its expanded native gate pending.
 
 model_query action=profile, profile_id=native-model-qa-demo freshly resolves
 MCP_QA_MARK / MCP_QA_STATUS and layer short names SZ_OGÓ01 (structure) /

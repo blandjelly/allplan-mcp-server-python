@@ -16,7 +16,7 @@ Read these files in order when continuing implementation:
 3. [Features](docs/features.md): the 13 tools and demonstration fixture.
 4. [Implementation stages](docs/implementation-plan.md): task IDs and exit gates.
 
-Current package: **0.10.0**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
+Current package: **0.11.0**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
 **M0 and bounded M1 are accepted** on Allplan **2026-1-7** with local Windows Codex; UAT-00–UAT-03 PASS.
 The demo profile binds freshly for reads and remains inactive for writes.
 [Acceptance and limits](docs/test-results/m1-acceptance-0.5.3.md) cover the known
@@ -67,8 +67,14 @@ collision simulation, including excluded peers. Mark plans cannot use Apply.
 All ten steps, positive proposals, selection exception, excluded-peer collision
 and unchanged revalidations pass; owner confirms model unchanged and host
 uninterrupted. No repeat is required.
-New workflows authorize no writes; broader repairs and generation remain pending.
-M3 is not closed.
+Package **0.11.0** connects reviewed standard/selection plans to the shared
+executor and supports 1–32 existing string-status/layer changes on Column roots
+in one foreground file. It retains full source checks, exceptions, durable
+deduplication and readback, with no fixed demo finding count.
+[Execution contract and journal lifecycle](docs/m3-workflow-execution-contract.md),
+[next owner test](docs/m3-workflow-apply-batch.md). Expanded native execution is
+**not_run**. Mark writes/numbering, native same-session conflicts and unknown
+recovery remain required open work; M3/UAT-05/UAT-06 are not closed.
 
 Repository documentation and API identifiers use English. Owner-facing
 walkthroughs may use Polish. The implementation model owns coding, diagnostics,

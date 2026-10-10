@@ -1,6 +1,6 @@
 [project]
 name = "allplan-mcp-server"
-version = "0.10.0"
+version = "0.11.0"
 description = "FastMCP bridge for controlling an Allplan Python host."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -14,6 +14,7 @@ allplan-mcp-diagnostics = "allplan_mcp.diagnostics:main"
 allplan-mcp-repairs = "allplan_mcp.repair_diagnostics:main"
 allplan-mcp-standards = "allplan_mcp.standard_diagnostics:main"
 allplan-mcp-marks = "allplan_mcp.mark_diagnostics:main"
+allplan-mcp-workflows = "allplan_mcp.workflow_diagnostics:main"
 
 [tool.uv]
 package = true

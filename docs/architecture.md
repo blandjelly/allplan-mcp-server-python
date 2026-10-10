@@ -71,7 +71,11 @@ Package **0.8.0** adds the bounded evaluation executor `repair_execution.py`
 and 2026 `native_repairs.py`: fresh target/eligibility checks, write-ahead Local
 journal, serialized execution, readback/full audited-field verification and
 read-only recovery. Exact execution-ID replay never repeats setters. General
-writes and native Undo remain unaccepted; see [execution contract](m3-execution-contract.md).
+writes remain bounded. Native 0.8.1 two-target writes and separate Undo are
+accepted; see [execution contract](m3-execution-contract.md). Package 0.11.0
+uses that shared executor for 1–32 existing status/layer changes and reviewed
+standard/selection plans. [Expanded scope and journal lifecycle](m3-workflow-execution-contract.md)
+are ready for native observation, not yet accepted.
 
 The earlier M3 slice in 0.7.0 implements only explicit preview and fresh evidence
 revalidation: host `repair_contracts.py` / `model_repair.py`, public

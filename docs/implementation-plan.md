@@ -60,7 +60,27 @@ The earlier crash's precise cause remains unproven. No repeated owner test is re
 **Exit gate (UAT-04):** demo returns exactly 5 findings on 5 columns, correct
 uniqueness scope, explicit unavailable data and locatable targets; no writes.
 
-## M3 — Controlled repairs and standards: bounded preview and execution PASS
+## M3 — Controlled repairs and standards: partially implemented, M3 open
+
+Package **0.11.0** implements the first priority of the completeness review:
+1–32 reviewed existing status/layer changes on Column roots in one explicit
+foreground file, without the exact file-101/two-target/finding-count gate.
+Office-standard and rule-based tools now accept typed Apply/Revalidate/Recover
+through the same executor, retaining full-source/exception checks, durable
+deduplication and audited readback. [Current contract](m3-workflow-execution-contract.md),
+[next owner card](m3-workflow-apply-batch.md). Expanded native execution is
+**not_run**; prior native acceptance remains scoped to its original packages.
+
+After this new gate, implement mark writes and deterministic numbering in a
+versioned standard; these remain required baseline M3 work. Then prepare native
+same-session conflicts in a supported host lifecycle and controlled partial/unknown
+outcome plus read-only recovery. The known UI-host-cancellation scenario must not
+be repeated unchanged. Journal capacity/update/copy/restore limits are documented;
+maintenance/identity guarantees, final UAT-05/UAT-06 and main integration remain
+open. Graphic labels, file moves and universal native properties are conditional
+extensions, not additional mandatory M3 closure work.
+
+The following sections retain the accepted historical slices:
 
 Package **0.8.1** corrects 0.8.0's overly broad IsInMacro preflight rejection;
 [original failed native gate and correction](test-results/m3-apply-rejection-0.8.0.md).
@@ -116,8 +136,9 @@ even when filtering leaves the old layer/status pair.
 [native marks-preview PASS](test-results/m3-marks-acceptance-0.10.0.md).
 Two explicit proposals, a selection exception, collision against an excluded peer,
 three unchanged revalidations and identical audits pass; owner confirms unchanged
-model and uninterrupted host. No repetition is required. Numbering, labels, wider
-standards and selected/mark native writes remain deferred. M3 is open.
+model and uninterrupted host. No repetition is required. 0.11.0 implements
+selected/standard layer/status writes pending native acceptance. Mark writes and
+numbering remain required open work; M3 is open.
 
 - **M3.1** Shared preview/apply, stale checks, serialized writes, request identity, readback, partial outcomes and tested Undo limits.
 - **M3.2** `fix_model_issues` for writable attributes/layers; data marks and graphical labels stay distinct.

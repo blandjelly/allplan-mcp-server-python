@@ -2,7 +2,10 @@
 
 Status **native read-only owner gate PASS** for the repaired fixture;
 [acceptance and originals](test-results/m3-standards-acceptance-0.9.0.md).
-This document records the 0.9.0 contract; 0.10.0 separately adds
+This document records the historical **0.9.0 preview-only contract**.
+**0.11.0 adds typed apply/revalidate/recover** for reviewed standard/selection
+layer/status plans; [current execution contract](m3-workflow-execution-contract.md).
+The preview-only restrictions below describe 0.9.0. 0.10.0 separately adds
 [explicit mark previews](m3-marks-contract.md).
 Accepted 0.8.1 [writes/Undo/recovery](test-results/m3-execution-acceptance-0.8.1.md),
 [restart invalidation](test-results/m3-plan-restart-acceptance-0.8.1.md) and

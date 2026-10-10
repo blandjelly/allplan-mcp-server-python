@@ -110,6 +110,7 @@ class RepairPlanService:
             changes.append({"finding_id": finding["finding_id"], "rule_id": rule_id,
                             "ref": copy.deepcopy(finding["ref"]), "locator": copy.deepcopy(finding["locator"]),
                             "operation": operation, "field": field, "resource": resource,
+                            "property_role": "layer" if operation == "set_layer" else role,
                             "old_value": copy.deepcopy(finding["evidence"]["raw"]), "new_value": new_value,
                             "source_fingerprint": finding["source_fingerprint"], "write_eligibility": "not_checked"})
         changes.sort(key=lambda c: (c["ref"]["drawing_file"], c["ref"]["model_uuid"], c["field"]))
@@ -151,11 +152,11 @@ class RepairPlanService:
             plan["workflow"] = copy.deepcopy(request["workflow"])
             workflow = request["workflow"]
             if workflow["kind"] == "office_standard_preview":
-                plan["report_text"] += f"\nStandard: {workflow['standard_id']} {workflow['standard_version']}. Preview only."
+                plan["report_text"] += f"\nStandard: {workflow['standard_id']} {workflow['standard_version']}. Reviewed apply is a separate action."
         plan["evaluation_apply_available"] = self.executor.evaluation_scope(plan)
-        plan["evaluation_apply_limit"] = "disposable_copy_reviewed_two_repairs; native acceptance pending"
-        if "selection" in plan or "workflow" in plan or mark_requested:
-            plan["evaluation_apply_limit"] = "Mark/selected/standard previews have no native apply authorization."
+        plan["evaluation_apply_limit"] = "disposable_copy_reviewed_plan; 1..32 existing status/layer changes on Column roots in one foreground file; expanded native acceptance pending"
+        if mark_requested:
+            plan["evaluation_apply_limit"] = "Mark previews have no native apply authorization."
         if not plan["evaluation_apply_available"]:
             plan["report_text"] = plan["report_text"].replace(
                 "Preview requests no writes; evaluation apply requires a reviewed disposable copy.",

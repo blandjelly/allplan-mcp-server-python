@@ -41,6 +41,109 @@ class FakeBridge:
 
 
 class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
+    def workflow_native_bridge(self, lose_reply=False, reject=False):
+        from test_repair_execution import ExecutionTests
+        native = ExecutionTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        elements = native.writable_fixture()
+        original = self.bridge_handler.handle
+        lost = [False]
+        def handle(path, payload):
+            if path in {'/fix-model-issues', '/model-audit'}:
+                self.bridge_handler.calls.append((path, payload))
+                if reject and payload.get('action') == 'apply':
+                    elements[4].IsInActiveLayer.return_value = False
+                try:
+                    result = native.handler.handle(path, payload)
+                except native.module.BridgeError as exc:
+                    raise transport.BridgeError(exc.code, str(exc), exc.status) from exc
+                if lose_reply and payload.get('action') == 'apply' and not lost[0]:
+                    lost[0] = True
+                    raise transport.BridgeError('execution_unknown', 'Lost first completed workflow reply', 503)
+                return result
+            if path == '/get-allplan-version':
+                result = original(path, payload)
+                result['host_session_id'] = 'workflow-fake-session'
+                return result
+            return original(path, payload)
+        self.bridge_handler.handle = handle
+        return native, elements
+
+    async def test_workflow_owner_gate_writes_two_separate_single_targets_and_deduplicates(self):
+        from allplan_mcp.workflow_diagnostics import collect_workflow_apply
+        native, elements = self.workflow_native_bridge()
+        approvals = iter(['NAPRAW STANDARD', 'NAPRAW REGULE'])
+        with tempfile.TemporaryDirectory() as directory:
+            report = await collect_workflow_apply(self.url, Path(directory) / 'workflows.json',
+                                                  confirm=lambda prompt: next(approvals))
+            self.assertEqual(report['state'], 'ready_for_ui_observation', report.get('message'))
+            self.assertEqual(len(report['steps']), 10)
+            self.assertTrue(all(s['ok'] for s in report['steps']))
+            self.assertEqual(len(report['executions']), 2)
+            self.assertNotEqual(*[e['execution_id'] for e in report['executions']])
+            for execution in report['executions']:
+                saved = json.loads((Path(directory) / ('m3-workflow-execution-' + execution['execution_id'] + '.json')).read_text())
+                self.assertEqual(saved['apply_request'], execution['apply_request'])
+                self.assertEqual(saved['state'], 'completed')
+            calls = [p for route, p in self.bridge_handler.calls if p.get('action') == 'apply']
+            self.assertEqual([p['workflow_kind'] for p in calls],
+                             ['office_standard_preview'] * 2 + ['rule_based_edit_preview'] * 2)
+        native.base.ElementsLayerService.ChangeLayer.assert_called_once()
+        native.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+        self.assertEqual(elements[4].GetCommonProperties.return_value.Layer, 7)
+        self.assertEqual(elements[5].GetAttributes.return_value[-1], (20002, 'NEW'))
+
+    async def test_lost_workflow_reply_preserves_identity_and_recovery_does_not_apply(self):
+        from allplan_mcp.workflow_diagnostics import collect_workflow_apply, recover_workflow
+        native, elements = self.workflow_native_bridge(lose_reply=True)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report = await collect_workflow_apply(self.url, root / 'lost.json', confirm=lambda prompt: 'NAPRAW STANDARD')
+            self.assertEqual(report['state'], 'unknown')
+            pointer = json.loads((root / 'm3-last-workflow-execution.json').read_text())
+            self.assertEqual(pointer['execution_id'], report['executions'][0]['execution_id'])
+            before = len(self.bridge_handler.calls)
+            recovered = await recover_workflow(self.url, root / 'recover.json', pointer)
+            self.assertEqual(recovered['state'], 'ready_for_ui_observation', recovered.get('message'))
+            self.assertEqual([p.get('action') for route, p in self.bridge_handler.calls[before:]], ['recover'])
+        self.assertEqual(elements[5].GetAttributes.return_value[-1], (20002, 'NWE'))
+        native.base.ElementsLayerService.ChangeLayer.assert_called_once()
+        native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+    async def test_workflow_rejection_is_explicit_and_sends_no_recovery(self):
+        from allplan_mcp.workflow_diagnostics import collect_workflow_apply, recover_workflow
+        native, elements = self.workflow_native_bridge(reject=True)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report = await collect_workflow_apply(self.url, root / 'rejected.json', confirm=lambda prompt: 'NAPRAW STANDARD')
+            self.assertEqual(report['state'], 'rejected')
+            pointer = json.loads((root / 'm3-last-workflow-execution.json').read_text())
+            self.assertFalse(pointer['native_setters_started'])
+            before = len(self.bridge_handler.calls)
+            recovered = await recover_workflow(self.url, root / 'recover.json', pointer)
+            self.assertEqual(recovered['state'], 'rejected')
+            self.assertEqual(len(self.bridge_handler.calls), before)
+        native.base.ElementsLayerService.ChangeLayer.assert_not_called()
+        native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+    async def test_workflow_gate_stops_on_wrong_fixture_and_second_write_needs_separate_confirmation(self):
+        from allplan_mcp.workflow_diagnostics import collect_workflow_apply
+        native, elements = self.workflow_native_bridge()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            elements[5].GetAttributes.return_value = [(20001, 'S06'), (20002, 'NEW')]
+            blocked = await collect_workflow_apply(self.url, root / 'wrong.json', confirm=lambda prompt: self.fail('No confirmation on wrong fixture'))
+            self.assertEqual(blocked['state'], 'blocked')
+            native.base.ElementsLayerService.ChangeLayer.assert_not_called()
+            elements[5].GetAttributes.return_value = [(20001, 'S06'), (20002, 'NWE')]
+            approvals = iter(['NAPRAW STANDARD', 'STOP'])
+            stopped = await collect_workflow_apply(self.url, root / 'stop.json', confirm=lambda prompt: next(approvals))
+            self.assertEqual(stopped['state'], 'stopped')
+            self.assertEqual(len(stopped['executions']), 1)
+        native.base.ElementsLayerService.ChangeLayer.assert_called_once()
+        native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
     async def test_mark_owner_gate_reports_expected_collision_without_any_write_over_real_transport(self):
         from test_repair_execution import ExecutionTests
         from allplan_mcp.mark_diagnostics import collect_mark_preview
@@ -155,7 +258,7 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
         native.base.ElementsLayerService.ChangeLayer.assert_not_called()
         native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
 
-    async def test_standard_and_rule_previews_share_native_plans_and_reject_selected_apply(self):
+    async def test_standard_and_rule_previews_share_native_plans_and_reject_legacy_apply(self):
         from test_repair_execution import ExecutionTests
         from uuid import uuid4
         native = ExecutionTests()
@@ -178,7 +281,7 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
                 'action': 'preview', 'standard_id': 'native-model-qa-demo-layer-status',
                 'standard_version': '1.0.0', 'scope': scope}})).data
             self.assertEqual(standard['workflow']['standard_version'], '1.0.0')
-            self.assertFalse(standard['evaluation_apply_available'])
+            self.assertTrue(standard['evaluation_apply_available'])
             self.assertEqual(len(standard['changes']), 2)
             request = {'action': 'preview', 'audit': {'profile_id': 'native-model-qa-demo', 'scope': scope},
                        'repairs': [{'rule_id': 'QA-003', 'value': 'structure'}, {'rule_id': 'QA-004', 'value': 'NEW'}],

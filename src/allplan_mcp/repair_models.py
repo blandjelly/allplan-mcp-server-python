@@ -91,7 +91,7 @@ class RepairRevalidate(ContractModel):
 class RepairApply(RepairRevalidate):
     action: Literal["apply"]
     execution_id: str = Field(pattern=r"^[0-9a-f]{32}$")
-    acknowledgement: Literal["disposable_copy_reviewed_two_repairs"]
+    acknowledgement: Literal["disposable_copy_reviewed_two_repairs", "disposable_copy_reviewed_plan"]
 
 
 class RepairRecover(ContractModel):

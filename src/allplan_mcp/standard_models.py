@@ -1,10 +1,10 @@
-"""Read-only entry points over the shared versioned repair planner."""
-from typing import Literal
+"""Versioned previews and reviewed execution over the shared repair service."""
+from typing import Annotated, Literal
 
 from pydantic import Field
 
 from .query_models import ContractModel, QueryScope
-from .repair_models import RepairPreview, RepairSelection
+from .repair_models import RepairApply, RepairPreview, RepairRecover, RepairRevalidate, RepairSelection
 
 
 class OfficeStandardPreview(ContractModel):
@@ -17,3 +17,7 @@ class OfficeStandardPreview(ContractModel):
 
 class RuleBasedPreview(RepairPreview):
     selection: RepairSelection = Field()
+
+
+OfficeStandardRequest = Annotated[OfficeStandardPreview | RepairRevalidate | RepairApply | RepairRecover, Field(discriminator="action")]
+RuleBasedRequest = Annotated[RuleBasedPreview | RepairRevalidate | RepairApply | RepairRecover, Field(discriminator="action")]

@@ -8,9 +8,12 @@ within the retained fixture scope in 0.6.1, **UAT-04 PASS**; see
 [native evidence and limits](test-results/m2-acceptance-0.6.1.md) and the
 [audit contract](m2-audit-contract.md). `fix_model_issues` preview/revalidation is
 implemented in 0.7.0, [bounded native preview gate PASS](test-results/m3-preview-acceptance-0.7.0.md).
-0.8.0 adds [bounded disposable-copy execution/recovery](m3-execution-contract.md),
-ready for the [write/Undo owner gate](m3-apply-batch.md); native apply acceptance
-is pending. Other workflow tools are planned. M0 utilities are `allplan_health`,
+0.8.1 has [bounded native execution/Undo/recovery PASS](test-results/m3-execution-acceptance-0.8.1.md).
+Standard/selection and mark previews have native PASS in 0.9.0/0.10.0.
+0.11.0 adds reviewed single/multi-target layer/status execution through
+fix_model_issues, apply_office_standard and rule_based_edit;
+[current limits and pending native gate](m3-workflow-execution-contract.md).
+Mark writes/numbering remain open M3 scope. Other workflow tools are planned. M0 utilities are `allplan_health`,
 `get_allplan_version`, `get_all_object_names`, `create_cube` and `create_box`.
 Names are display values; baseline boxes have no automatic readback/deduplication.
 
@@ -82,8 +85,9 @@ create duplicates. Missing bindings/data produce `not_checked` or a profile erro
 
 The 0.7.0 M3 repair preview contains exactly two proposed changes: C05 layer → SZ_OGÓ01
 and C06 status NWE → NEW. It leaves the model unchanged; its follow-up audit
-retains **5 findings**. The bounded native preview gate passes; native apply
-acceptance is pending. After the 0.8.0 bounded evaluation apply/readback, **3 findings**
-remain. Repeating apply must not repeat writes. A later explicit reviewed plan
-assigning C03=S03 and C04=S04 gives zero findings. These values are fixture choices,
+retains **5 findings**. The bounded native preview gate passes. Accepted
+0.8.1 evaluation apply/readback leaves **3 findings**. In the next 0.11.0
+workflow gate, separately reviewed layer then status writes must leave 4 then 3. Repeating apply must not repeat writes. An explicit reviewed preview
+assigning C03=S03 and C04=S04 simulates zero findings; mark setters are not yet
+implemented or accepted. These values are fixture choices,
 not an inferred production office standard.

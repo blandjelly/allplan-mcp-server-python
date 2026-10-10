@@ -33,6 +33,8 @@ class PackageTests(unittest.TestCase):
             package = next((work / "extracted").iterdir())
             manifest = registration.verify_package(package)
             self.assertEqual(manifest["integrity"], "sha256-verified")
+            for name in ("M3 Workflow Apply.cmd", "M3 Workflow Recover.cmd"):
+                self.assertTrue((package / name).is_file())
             for name in ("Setup.cmd", "Launch Allplan MCP.cmd", "Connect Codex.cmd", "Diagnostics.cmd", "Restore bridge.cmd", "M1 Metadata.cmd", "M1 Final.cmd", "M1 Profile.cmd", "M2 Audit.cmd", "M2 Stability.cmd", "M3 Preview.cmd", "M3 Standards Preview.cmd", "M3 Marks Preview.cmd", "M3 Apply.cmd", "M3 Recover.cmd", "M3 Check Undo.cmd"):
                 self.assertTrue((package / name).is_file())
             local = work / "Allplan Local"

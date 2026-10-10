@@ -29,7 +29,7 @@ class StandardSelectionTests(unittest.TestCase):
         self.assertEqual([c['locator']['mark']['value'] for c in plan['changes']], ['S06'])
         self.assertIn('selection_predicate_false', [e['reason'] for e in plan['exclusions']])
         self.assertEqual(plan['selection_result']['selected_elements'], 1)
-        self.assertFalse(plan['evaluation_apply_available'])
+        self.assertTrue(plan['evaluation_apply_available'])
         excluded = str(elements[5].GetModelElementUUID())
         plan = self.preview(selection={"where": {"field": "layer_id", "op": "exists"},
                                        "exclude_model_uuids": [excluded]})
@@ -64,7 +64,7 @@ class StandardSelectionTests(unittest.TestCase):
             'where': {'field': 'layer_id', 'op': 'exists'}, 'exclude_model_uuids': [str(uuid4())]}))
         self.assertFalse(self.handler.repair_plans.plans)
 
-    def test_workflow_metadata_is_hashed_immutable_and_cannot_authorize_apply(self):
+    def test_workflow_metadata_is_hashed_immutable_and_cannot_use_legacy_acknowledgement(self):
         self.fixture()
         with tempfile.TemporaryDirectory() as directory:
             self.handler.repair_plans.executor.path = Path(directory)
@@ -72,7 +72,7 @@ class StandardSelectionTests(unittest.TestCase):
                         'standard_version': '1.0.0', 'standard_fingerprint': 'a' * 64}
             plan = self.preview(workflow=workflow)
             self.assertEqual(len(plan['changes']), 2)
-            self.assertFalse(plan['evaluation_apply_available'])
+            self.assertTrue(plan['evaluation_apply_available'])
             plan['workflow']['standard_version'] = '2.0.0'
             saved = self.handler.repair_plans.plans[plan['plan_id']]['plan']
             self.assertEqual(saved['workflow']['standard_version'], '1.0.0')

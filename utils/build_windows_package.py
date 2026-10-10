@@ -33,6 +33,8 @@ def payload_files(repo: Path) -> dict[str, bytes]:
                          "M3 Preview.cmd": "m3-preview",
                          "M3 Standards Preview.cmd": "m3-standards-preview",
                          "M3 Marks Preview.cmd": "m3-marks-preview",
+                         "M3 Workflow Apply.cmd": "m3-workflow-apply",
+                         "M3 Workflow Recover.cmd": "m3-workflow-recover",
                          "M3 Apply.cmd": "m3-apply", "M3 Recover.cmd": "m3-recover",
                          "M3 Check Undo.cmd": "m3-check-undo",
                          "Restore bridge.cmd": "restore"}.items():

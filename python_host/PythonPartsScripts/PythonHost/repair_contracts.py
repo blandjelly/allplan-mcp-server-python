@@ -18,14 +18,20 @@ def validate_repair_request(request):
             required = {"schema_version", "action", "execution_id"}
         elif action == "apply":
             required |= {"execution_id", "acknowledgement"}
-        keys(request, required, required)
+        optional = {"workflow_kind"} if action == "apply" else set()
+        keys(request, required | optional, required)
         for key, size in (("plan_id", 32), ("plan_hash", 64), ("execution_id", 32)):
             if key not in required:
                 continue
             if not isinstance(request[key], str) or not re.fullmatch(r"[0-9a-f]{" + str(size) + "}", request[key]):
                 invalid(f"Invalid {key}.")
-        if action == "apply" and request["acknowledgement"] != "disposable_copy_reviewed_two_repairs":
-            invalid("Apply requires acknowledgement of the reviewed repairs on a disposable project copy.")
+        if action == "apply":
+            if (not isinstance(request["acknowledgement"], str)
+                    or request["acknowledgement"] not in {"disposable_copy_reviewed_two_repairs", "disposable_copy_reviewed_plan"}):
+                invalid("Apply requires acknowledgement of the reviewed repairs on a disposable project copy.")
+            if "workflow_kind" in request and (not isinstance(request["workflow_kind"], str)
+                    or request["workflow_kind"] not in {"office_standard_preview", "rule_based_edit_preview"}):
+                invalid("Unknown apply workflow.")
     elif action == "preview":
         required = {"schema_version", "action", "audit", "repairs"}
         keys(request, required | {"finding_ids", "selection", "workflow"}, required)

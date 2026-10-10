@@ -1,4 +1,9 @@
-# M3 bounded execution contract — 0.8.1
+# M3 bounded execution contract — accepted 0.8.1 baseline
+
+This records the original exact-two-target gate. Package 0.11.0 extends eligible
+layer/status plans and standard/selection execution while retaining the journal
+and native adapter guards; [current contract and lifecycle](m3-workflow-execution-contract.md).
+The older native acceptance below does not accept that expanded scope.
 
 The first 0.8.0 native write gate was **BLOCKED before setters**,
 [evidence and correction](test-results/m3-apply-rejection-0.8.0.md).
@@ -15,7 +20,8 @@ owner-confirmed Redo pass. Grouped Undo is unavailable. Native manual-edit
 conflicts and broader execution remain pending. The owner-observed UI action
 cancelled the host; [old-plan revalidation after restart passes](test-results/m3-plan-restart-acceptance-0.8.1.md),
 while native same-session conflict is blocked in that lifecycle.
-[Next supported-lifecycle owner card](m3-stale-apply-batch.md).
+[Native stale Apply rejection PASS](test-results/m3-stale-apply-acceptance-0.8.1.md);
+no repeat of that completed card is requested.
 The accepted [0.7.0 preview](test-results/m3-preview-acceptance-0.7.0.md)
 and its unchanged archive remain separate. [Polish owner gate](m3-apply-batch.md).
 This slice advances M3.1/M3.2/M3.4; M3 and UAT-05/UAT-06 remain open.
@@ -151,9 +157,10 @@ acceptance. Native writability, setter readback, audited collateral verification
 exact-ID persistence across the observed host sessions and two-step Undo pass
 for the retained fixture. Whole-model collateral UI verification, native
 manual-edit conflicts, unknown-outcome recovery and crash/power-loss persistence
-remain outside that acceptance. M3.3 office-standard/rule-based services and
-broader mutation/registry guarantees remain pending. No repeated two-write gate
+remain outside that acceptance. M3.3 office-standard/rule-based execution is
+implemented in 0.11.0 with native acceptance pending; broader mutation/registry
+guarantees remain unaccepted. No repeated two-write gate
 is required. The same-session manual-edit card was blocked by UI host
 cancellation, with restart invalidation correctly observed; do not repeat that
-scenario on this build. The next card tests a single stale Apply rejection after
-restart with before/after audits, without UI editing or a fresh preview.
+scenario on this build. Stale Apply rejection is already accepted. The next card
+is [two separately reviewed workflow writes](m3-workflow-apply-batch.md).

@@ -1,13 +1,15 @@
 # M3 explicit mark repair preview — 0.10.0
 
-Status **ready_for_owner_test**; native mark preview **not_run**. This extends
+Status **native marks-preview PASS**, 2026-10-10;
+[original evidence and limits](test-results/m3-marks-acceptance-0.10.0.md).
+The owner confirms the model unchanged and host uninterrupted. This extends
 M3.2/M3.3 using the same audit, planner, selection, hashing and revalidation.
 [0.9.0 native standard/selection preview PASS](test-results/m3-standards-acceptance-0.9.0.md)
 and all earlier accepted archives/evidence remain unchanged.
 
 ## Explicit rule and target, no automatic numbering
 
-`fix_model_issues` preview and preview-only `rule_based_edit` now accept mark
+`fix_model_issues` preview and `rule_based_edit` preview accept mark
 choices alongside the existing layer/status choices. Each mark choice names a
 selected required_attribute/unique_attribute **mark** rule, an exact canonical
 lowercase `model_uuid` and the explicit proposed string:
@@ -65,8 +67,9 @@ Every plan containing mark-validation metadata is **preview-only**, including
 when filtering leaves zero mark proposals and only the formerly accepted
 layer/status pair. The executor refuses such plans before setters/journaling;
 using generic fix_model_issues Apply cannot bypass this boundary. No new native
-setter, graphical operation or write capability is introduced. The earlier
-unwrapped/unselected two-target evaluation route remains bounded and unchanged.
+setter, graphical operation or write capability is introduced. Package 0.11.0 separately enables reviewed selected/standard layer/status writes;
+[expanded execution boundary](m3-workflow-execution-contract.md). Mark plans
+remain read-only in 0.11.0.
 
 [M3 Marks Preview.cmd](m3-marks-preview-batch.md) requests two explicit fixture
 proposals (C03 missing mark → S03, C04 duplicate S02 → S04), repeats selection
@@ -74,6 +77,7 @@ with C04 excepted, then deliberately proposes S06 on C03 while S06 is excluded.
 The last case must return conflict with both exact collision members. Each plan
 revalidates; full audit before/after and same-session health must match. The
 launcher preserves original MCP text blocks along with decoded responses.
-It invokes no Apply, Recover or Undo. Positive proposals and the collision need
-native owner observation before mark preview acceptance; mark writes and broader
-M3/UAT-05/UAT-06 closure remain outside this slice.
+It invokes no Apply, Recover or Undo. Positive proposals, the selection exception, collision and unchanged
+revalidations have native acceptance; no repeat is requested. Actual mark writes
+and deterministic numbering remain required open M3 work. The next observation
+is the [0.11.0 layer/status workflow-write card](m3-workflow-apply-batch.md).
