@@ -1,0 +1,74 @@
+{
+  "version": "0.13.0",
+  "source_commit": "752e54795a1cfa676217b5ffba0ce5d301383269",
+  "source_modified": false,
+  "status": "ready_for_owner_test",
+  "native_gate_status": "ready_for_owner_test",
+  "date": "2026-10-10 Europe/Warsaw",
+  "native_acceptance": "not_run",
+  "portable_checks": {
+    "python": "3.12.14",
+    "platform": "Linux",
+    "full_suite": {
+      "tests": 195,
+      "result": "PASS",
+      "runs": 1
+    },
+    "frozen_sync": "PASS",
+    "wheel_sdist_build": "PASS",
+    "deterministic_package_test": "PASS"
+  },
+  "exact_package_verification": {
+    "extracted_package_integrity": "sha256-verified",
+    "bridge_hashes_verified": 23,
+    "source_modified": false,
+    "registration_restore_preserves_journal": true,
+    "restored_previous_bridge_fixture": true,
+    "new_launchers_and_embedded_owner_instructions": "PASS",
+    "platform": "Linux",
+    "native_allplan": "not_run"
+  },
+  "source_ci": {
+    "status": "PASS",
+    "run_id": 38079063575,
+    "url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38079063575",
+    "portable_jobs_passed": 6,
+    "observations": "source-ci-0.13.0.json"
+  },
+  "artifacts": {
+    "TEST-ALLPLAN-0.13.0.md": {
+      "bytes": 5176,
+      "sha256": "f7e2e603bbb8fac053d863ea87f6000fd9007411d3eeb17309a6e645ac03f9af"
+    },
+    "TEST-ALLPLAN-0.13.0.txt": {
+      "bytes": 5176,
+      "sha256": "f7e2e603bbb8fac053d863ea87f6000fd9007411d3eeb17309a6e645ac03f9af"
+    },
+    "allplan-mcp-0.13.0-windows-evaluation.zip": {
+      "bytes": 277253,
+      "sha256": "7a7fceab96a1979e71009b327dacf77b3fc4665a3b3a41a8d2de665254bd0180"
+    },
+    "allplan-mcp-0.13.0-windows-evaluation.zip.sha256": {
+      "bytes": 108,
+      "sha256": "3e720663d3db6b89bfab83d7f2805bab242411eb27f8c02800298f9102b6dfa3"
+    },
+    "allplan_mcp_server-0.13.0-py3-none-any.whl": {
+      "bytes": 64267,
+      "sha256": "43e951ad80472c16e97bf1a5c8470107e59247b9b05cf74963ee2498c9c05d6d"
+    },
+    "build.log": {
+      "bytes": 199,
+      "sha256": "958e13c75ca97a8eb9307e245ec6395e1ecb6582264c99e8397023df041c8517"
+    },
+    "portable-tests.log": {
+      "bytes": 48411,
+      "sha256": "b0b538968a59b62beaa420fca9be8be74c31ad09f7c9e45e912dbec13e01e440"
+    }
+  },
+  "local_sdist": {
+    "path": "dist/allplan_mcp_server-0.13.0.tar.gz",
+    "bytes": 101881938,
+    "sha256": "b84afeaf4fac5a195ff889724c8e6327e275e192250be69c425c9101042992f9",
+    "repository_delivery": "omitted; nested historical delivery archives make the sdist approximately 98 MiB"
+  }
+}

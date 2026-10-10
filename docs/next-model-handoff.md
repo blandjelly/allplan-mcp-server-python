@@ -68,6 +68,17 @@ extensions. They do not enlarge mandatory M3 closure scope.
 
 ## Resume safely
 
+Current 0.13.0 final-candidate verification: **195 portable tests PASS** on
+Linux CPython 3.12.14, frozen sync and wheel/sdist build PASS. The exact clean-source
+ZIP passes extracted integrity and 23 installed bridge hashes; registration/restore
+preserve the journal and restore the prior bridge fixture. Source
+**752e54795a1cfa676217b5ffba0ce5d301383269**;
+[delivery and source CI](../evaluation-packages/0.13.0/README.md).
+Documentation publication repeats no tests/builds and preserves archives.
+Source [CI 38079063575](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38079063575)
+**6/6 PASS**, Windows/Ubuntu Python 3.11–3.13, including tests and builds.
+Native gate remains ready_for_owner_test, not accepted.
+
 Previous 0.12.0 final-candidate verification: 187 portable tests PASS, frozen dependency
 sync, wheel/sdist and exact extracted installation/23 bridge hashes PASS;
 Setup/Restore preserved the journal. Source **fd78700378eceb6f217e4ca30a83b88004b73a57**,

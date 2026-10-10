@@ -48,6 +48,22 @@ No unchanged accepted owner gate needs repetition.
 
 ## Portable verification and delivery
 
+0.13.0 source **752e54795a1cfa676217b5ffba0ce5d301383269**: one full
+**195-test PASS** on Linux CPython 3.12.14 after focused plan/HTTP checks.
+Frozen sync and wheel/sdist build PASS. Exact extracted registration/restore
+fixture PASS: all 23 bridge hashes match, the journal sentinel is preserved and
+the previous bridge fixture is restored. Native Allplan and Windows Setup UI
+were not run locally. [Exact 0.13.0 delivery](../evaluation-packages/0.13.0/README.md)
+retains source/artifact identity and separate source-CI observations.
+Invalidated evidence is covered for actual excluded-peer changes, old-value
+restoration without renewed authorization, shared TTL/byte/count limits and
+restart; HTTP checks cover cancellation, stale rejection, lost write/probe
+replies, identity preservation and read-only recovery. Native acceptance is pending.
+Source [CI 38079063575](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38079063575)
+**6/6 PASS** on Windows/Ubuntu Python 3.11–3.13, including tests and builds;
+[original job/step observations](../evaluation-packages/0.13.0/source-ci-0.13.0.json).
+
+
 0.12.0 final implementation candidate: **187 portable tests PASS** on Linux
 CPython 3.12; one full run after focused repair/mark and 26 HTTP/MCP checks.
 Frozen dependency sync PASS. Coverage includes deterministic order/no-op,
