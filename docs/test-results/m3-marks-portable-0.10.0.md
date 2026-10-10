@@ -39,3 +39,9 @@ Exact clean-source artifact hashes and later CI results belong to the
 Never infer results for this commit from a prior version's CI; no old archive is
 rebuilt. M3/UAT-05/UAT-06 remain open; mark/selected writes, automatic numbering,
 labels, wider scopes and native unknown-outcome/crash recovery remain deferred.
+
+[CI run 38049405544](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38049405544)
+passes all six Windows/Ubuntu Python 3.11–3.13 test/build/Windows-ZIP jobs for
+clean source **ebf2c752440a0f72b538527f35175668322395a4**. Exact artifact publication is
+commit **44776b7123f384802dec4d293e542f4de9236c17**; later artifact/documentation CI
+is separate. This exact delivered ZIP is unchanged.

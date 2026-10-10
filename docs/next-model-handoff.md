@@ -55,8 +55,12 @@ Exact [0.10.0 delivery](../evaluation-packages/0.10.0/README.md): clean source
 SHA-256 **5a3e2ba0d75ebd798204922cf44da70d602bc2e41b8cdbe2f2f7f5c3b3c67888**. Two builds are byte-identical;
 exact extracted integrity and recursive 22-file registration pass.
 Accepted older ZIPs/evidence are never rebuilt.
-Later CI belongs to its exact commit; earlier 0.9.0 six-job result does not
-validate the new mark code.
+[CI run 38049405544](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38049405544)
+passes all six Windows/Ubuntu Python 3.11–3.13 test/build/Windows-ZIP jobs for
+clean source **ebf2c752440a0f72b538527f35175668322395a4**. Exact artifact publication is
+commit **44776b7123f384802dec4d293e542f4de9236c17**; later artifact/documentation CI
+is separate. This exact delivered ZIP is unchanged.
+Earlier 0.9.0 CI remains separate.
 
 **Next action requires owner Allplan:** install exact 0.10.0 into a new folder,
 Setup.cmd with the same Local, keep old archives/logs/journal. Use the **same

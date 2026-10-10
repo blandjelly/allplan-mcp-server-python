@@ -33,6 +33,11 @@ and recursive registration pass for all 22 bridge files. Publication documentati
 does not rebuild this archive or replace earlier accepted versions.
 
 [165 local tests PASS](../../docs/test-results/m3-marks-portable-0.10.0.md),
-frozen sync and wheel/sdist build pass. GitHub CI belongs to its exact source
-commit and is recorded separately after completion. This is portable verification,
-not native mark-preview acceptance. No merge or GitHub release is performed.
+frozen sync and wheel/sdist build pass.
+[CI run 38049405544](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38049405544)
+passes all six Windows/Ubuntu Python 3.11–3.13 test/build/Windows-ZIP jobs for
+clean source **ebf2c752440a0f72b538527f35175668322395a4**. Exact artifact publication is
+commit **44776b7123f384802dec4d293e542f4de9236c17**; later artifact/documentation CI
+is separate. This exact delivered ZIP is unchanged.
+This is portable verification, not native mark-preview acceptance.
+No merge or GitHub release is performed.
