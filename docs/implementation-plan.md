@@ -1,5 +1,10 @@
 # Implementation stages
 
+Validation follows the [shorter M3 test schedule](testing-policy.md): focused
+checks during implementation, one full final-candidate run, change-dependent
+CI and native checks for new/materially affected behavior. Explicit owner pauses
+on testing take precedence; historic acceptance evidence remains unchanged.
+
 Current state and next action: [handoff](next-model-handoff.md).
 Tool scope: [features](features.md). Shared contracts: [architecture](architecture.md).
 Work in small, reviewable slices; task IDs remain stable. Dates depend on accepted

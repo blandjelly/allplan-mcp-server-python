@@ -15,6 +15,8 @@ Read these files in order when continuing implementation:
 2. [Architecture](docs/architecture.md): runtime boundary and shared contracts.
 3. [Features](docs/features.md): the 13 tools and demonstration fixture.
 4. [Implementation stages](docs/implementation-plan.md): task IDs and exit gates.
+5. [Validation schedule](docs/testing-policy.md): focused local work, publication
+   checks, CI matrix and retained hash protections.
 
 Current package: **0.11.0**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
 **M0 and bounded M1 are accepted** on Allplan **2026-1-7** with local Windows Codex; UAT-00–UAT-03 PASS.

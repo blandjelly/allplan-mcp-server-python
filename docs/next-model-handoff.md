@@ -2,6 +2,18 @@
 
 ## Current handoff — 2026-10-10, 0.11.0 workflow writes ready for owner test
 
+**Owner steering:** adopt the [shorter validation cycle](testing-policy.md).
+Use focused M3/affected-module checks during iteration, one full suite for the
+final package candidate, and no runtime tests/builds for documentation-only edits.
+CI uses one PR trigger, two routine OS/Python jobs, and six configurations for
+dependency/install/workflow changes or a requested full run. Preserve plan/source,
+journal and installation integrity checks; reference recorded delivery hashes
+instead of repeatedly checking unchanged archives. The owner explicitly requested
+**no tests now**. This policy/workflow documentation update runs no local/native
+tests or builds and its commit skips CI; the revised workflow is untested.
+The owner received a standalone local copy of the current native test card.
+The existing 0.11.0 ZIP, version and historical acceptance are unchanged.
+
 The owner supplied a completeness audit of ad146f6 and requested work through
 the next necessary native test. First priority implemented: shared executor
 accepts 1–32 existing status/layer changes on native Column roots in one
