@@ -1,7 +1,7 @@
 """Dependency-free M3 plan validation; run before accessing native context."""
 import re
 
-from .audit_contracts import bounded_string, normalized, selected_rules, validate_audit_request
+from .audit_contracts import bounded_string, is_missing_string, normalized, selected_rules, validate_audit_request
 from .query_contracts import invalid, keys, predicate_fields
 from .transport import BridgeError
 
@@ -69,16 +69,33 @@ def validate_repair_request(request):
         if not isinstance(choices, list) or not 1 <= len(choices) <= 32:
             invalid("repairs must contain 1..32 explicit choices.")
         rules = {r["rule_id"]: r for r in selected_rules(request["audit"])}
-        seen = set()
+        seen, mark_targets = set(), set()
         for choice in choices:
-            keys(choice, {"rule_id", "value"}, {"rule_id", "value"})
+            keys(choice, {"rule_id", "value", "model_uuid"}, {"rule_id", "value"})
             ident = choice["rule_id"]
-            if not isinstance(ident, str) or ident not in rules or ident in seen:
-                invalid("Repair choices must reference distinct selected rule IDs.")
-            seen.add(ident)
+            target = choice.get("model_uuid")
+            if target is not None and (not isinstance(target, str) or not re.fullmatch(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}", target)):
+                invalid("Mark targets require canonical model UUIDs.")
+            if not isinstance(ident, str) or ident not in rules or (ident, target) in seen:
+                invalid("Repair choices must reference distinct selected rule/target pairs.")
+            seen.add((ident, target))
             bounded_string(choice["value"], 128, "Repair value")
             rule = rules[ident]
-            if rule["kind"] == "required_layer":
+            if rule["kind"] in {"required_attribute", "unique_attribute"} and rule["attribute"] == "mark":
+                if target is None or target in mark_targets:
+                    invalid("Each mark repair requires one distinct explicit model UUID.")
+                mark_targets.add(target)
+                if not {"required_attribute", "unique_attribute"} <= {
+                        r["kind"] for r in rules.values() if r.get("attribute") == "mark"}:
+                    invalid("Mark repairs require selected required-mark and unique-mark rules.")
+                policy = request["audit"]["profile"]["string_policies"]["mark"]
+                value = choice["value"]
+                if (not value.strip() or is_missing_string(value, policy)
+                        or any(ord(c) < 32 or ord(c) == 127 for c in value)):
+                    invalid("Mark repairs require a nonmissing string without control characters.")
+            elif "model_uuid" in choice:
+                invalid("Explicit model UUID choices are supported only for mark repairs.")
+            elif rule["kind"] == "required_layer":
                 if choice["value"] != rule["expected_layer"]:
                     invalid("Layer repair must use the rule's explicit expected layer role.")
             elif rule["kind"] == "allowed_attribute_values" and rule["attribute"] == "status":
@@ -86,7 +103,7 @@ def validate_repair_request(request):
                 if normalized(choice["value"], policy) not in {normalized(v, policy) for v in rule["allowed_values"]}:
                     invalid("Status repair value must satisfy the selected rule.")
             else:
-                invalid("This slice supports required-layer and allowed-status repair previews only.")
+                invalid("Supported previews are required-layer, allowed-status and explicit mark repairs.")
         if "finding_ids" in request:
             ids = request["finding_ids"]
             if (not isinstance(ids, list) or not 1 <= len(ids) <= 100

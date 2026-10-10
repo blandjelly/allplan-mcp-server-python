@@ -36,3 +36,10 @@ separate CI state; this exact delivered ZIP is unchanged.
 Portable evidence is not native new-tool acceptance.
 M3/UAT-05/UAT-06, marks/numbering and selected native writes remain open.
 No GitHub release or redistribution/license claim is made by this delivery.
+
+## Later owner observation
+
+The exact archive above now has [native read-only standard/selection preview PASS](../../docs/test-results/m3-standards-acceptance-0.9.0.md).
+All three zero-proposal scenarios, revalidations, identical audits and uninterrupted
+host pass on the repaired copy. The delivery manifest describes its original
+publication state and is unchanged. The next mark-preview package is 0.10.0.

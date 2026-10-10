@@ -21,6 +21,7 @@ class RepairSelection(ContractModel):
 class RepairChoice(ContractModel):
     rule_id: str = Field(pattern=r"^[A-Z][A-Z0-9-]{0,31}$")
     value: str = Field(min_length=1, max_length=128)
+    model_uuid: Annotated[str, Field(pattern=r"^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$")] | None = None
 
 
 class RepairPreview(ContractModel):
@@ -40,11 +41,29 @@ class RepairPreview(ContractModel):
         rules = {r["rule_id"]: r for r in profile["rules"]
                  if self.audit.rule_ids is None or r["rule_id"] in self.audit.rule_ids}
         ids = [r.rule_id for r in self.repairs]
-        if len(set(ids)) != len(ids) or not set(ids) <= set(rules):
-            raise ValueError("Repair choices must reference distinct selected rule IDs.")
+        keys = [(r.rule_id, r.model_uuid) for r in self.repairs]
+        if len(set(keys)) != len(keys) or not set(ids) <= set(rules):
+            raise ValueError("Repair choices must reference distinct selected rule/target pairs.")
+        mark_targets = set()
         for choice in self.repairs:
             rule = rules[choice.rule_id]
-            if rule["kind"] == "required_layer":
+            if rule["kind"] in {"required_attribute", "unique_attribute"} and rule["attribute"] == "mark":
+                if choice.model_uuid is None or choice.model_uuid in mark_targets:
+                    raise ValueError("Each mark repair requires one distinct explicit model UUID.")
+                mark_targets.add(choice.model_uuid)
+                if not {"required_attribute", "unique_attribute"} <= {
+                        r["kind"] for r in rules.values() if r.get("attribute") == "mark"}:
+                    raise ValueError("Mark repairs require selected required-mark and unique-mark rules.")
+                policy = profile["string_policies"]["mark"]
+                value = choice.value.strip() if policy["trim"] else choice.value
+                norm = lambda v: v if policy["case_sensitive"] else v.casefold()
+                missing = policy["missing"]
+                if (not value.strip() or any(ord(c) < 32 or ord(c) == 127 for c in choice.value)
+                        or norm(value) in {norm(v.strip() if policy["trim"] else v) for v in missing["literals"]}):
+                    raise ValueError("Mark repairs require a nonmissing string without control characters.")
+            elif "model_uuid" in choice.model_fields_set:
+                raise ValueError("Explicit model UUID choices are supported only for mark repairs.")
+            elif rule["kind"] == "required_layer":
                 if choice.value != rule["expected_layer"]:
                     raise ValueError("Layer repair must use the rule's explicit expected layer role.")
             elif rule["kind"] == "allowed_attribute_values" and rule["attribute"] == "status":
@@ -57,7 +76,7 @@ class RepairPreview(ContractModel):
                 if normalized(choice.value) not in {normalized(v) for v in rule["allowed_values"]}:
                     raise ValueError("Status repair value must satisfy the selected rule.")
             else:
-                raise ValueError("This slice supports required-layer and allowed-status repair previews only.")
+                raise ValueError("Supported previews are required-layer, allowed-status and explicit mark repairs.")
         if self.finding_ids is not None and len(set(self.finding_ids)) != len(self.finding_ids):
             raise ValueError("Duplicate finding IDs are not allowed.")
         return self

@@ -217,6 +217,8 @@ def fix_model_issues(request: RepairRequest) -> dict[str, Any]:
     """Preview/revalidate repairs, apply the bounded disposable-copy gate, or recover.
 
     Preview takes a fresh audit request and explicit rule_id/value choices.
+    Mark choices additionally require exact model_uuid targets; their final
+    values are collision-checked in the full scope and remain preview-only.
     Optional finding_ids restrict targets to those exact fresh findings.
     Returns old/new values, exclusions, locators, plan ID/hash and a five-minute
     lifetime. Revalidate requires that exact ID/hash and rereads the full scope.
@@ -226,7 +228,7 @@ def fix_model_issues(request: RepairRequest) -> dict[str, Any]:
     disposable_copy_reviewed_two_repairs. It checks native eligibility, stops on
     failure and reads back results. Repeated execution IDs never repeat setters.
     Recover reads persisted execution/current values without resuming writes.
-    General/selected-standard apply remain unavailable. Native UI Undo requires
+    General/mark/selected-standard apply remain unavailable. Native UI Undo requires
     two separate steps for the accepted retained fixture; no automatic rollback.
     """
     payload = request.model_dump(exclude_unset=True, exclude_none=True, by_alias=True)
@@ -256,12 +258,14 @@ def apply_office_standard(request: OfficeStandardPreview) -> dict[str, Any]:
 
 @mcp.tool
 def rule_based_edit(request: RuleBasedPreview) -> dict[str, Any]:
-    """Preview selected layer/status repairs with explicit query/UUID exceptions.
+    """Preview selected layer/status or explicit mark repairs with query/UUID exceptions.
 
     Selection uses audited mark/status/layer_id/file_state or selected dimension
     fields from one full fresh scan. Unknown predicates block readiness. Excluded
     elements still participate in full source revalidation. No setters or Apply
-    authorization are available for this workflow.
+    authorization are available for this workflow. Mark choices require exact
+    model_uuid targets and selected required/unique mark rules; final mark values
+    are checked for collisions against the full scope, including excluded peers.
     """
     payload = request.model_dump(exclude_unset=True, exclude_none=True, by_alias=True)
     payload["selection"] = request.selection.model_dump(exclude_unset=True, by_alias=True)

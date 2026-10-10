@@ -1,6 +1,8 @@
 # M3.3 — podgląd standardu i wybór z wyjątkami, pakiet 0.9.0
 
-Status: **ready_for_owner_test**. Odrzucenie starego Apply w 0.8.1 jest
+Status: **PASS** — [wynik i oryginalne logi](test-results/m3-standards-acceptance-0.9.0.md).
+Poniższa procedura jest zachowana jako dowód; nie powtarzaj jej.
+Kolejny test: [podgląd oznaczeń 0.10.0](m3-marks-preview-batch.md). Odrzucenie starego Apply w 0.8.1 jest
 [zaliczone](test-results/m3-stale-apply-acceptance-0.8.1.md); nie powtarzaj go.
 Nowy test sprawdza dwa nowe narzędzia i wybór elementów. Wykonuje tylko odczyty.
 [Dokładny pakiet i suma kontrolna](../evaluation-packages/0.9.0/README.md).

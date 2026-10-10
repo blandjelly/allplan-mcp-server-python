@@ -1,6 +1,9 @@
 # M3.3 standard and selected repair previews — 0.9.0
 
-Status **ready_for_owner_test**, native new-workflow preview **not_run**.
+Status **native read-only owner gate PASS** for the repaired fixture;
+[acceptance and originals](test-results/m3-standards-acceptance-0.9.0.md).
+This document records the 0.9.0 contract; 0.10.0 separately adds
+[explicit mark previews](m3-marks-contract.md).
 Accepted 0.8.1 [writes/Undo/recovery](test-results/m3-execution-acceptance-0.8.1.md),
 [restart invalidation](test-results/m3-plan-restart-acceptance-0.8.1.md) and
 [stale Apply rejection](test-results/m3-stale-apply-acceptance-0.8.1.md) remain

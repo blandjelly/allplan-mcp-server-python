@@ -1,6 +1,80 @@
 # Next-model handoff
 
-## Current handoff — 2026-10-10 Europe/Warsaw, 0.9.0 M3.3 preview ready
+## Current handoff — 2026-10-10 Europe/Warsaw, 0.9.0 native PASS / 0.10.0 marks ready
+
+Continue **codex/m3-repair-preview**, draft [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2), base codex/m2-audit-accepted.
+The owner requests continued M3 work until native testing is required and
+explicitly instructs **commit/push everything to GitHub**. Authorization persists;
+no merge or release is performed.
+
+**New native gate PASS:** [0.9.0 standard/selection preview acceptance](test-results/m3-standards-acceptance-0.9.0.md).
+Two original uploads are byte-identical under evidence/m3-standards-0.9.0-20261010T112517,
+with size/SHA-256 manifest and independent verification. Capture 13:25:17.193
+Europe/Warsaw. All ten steps pass: versioned standard zero proposals, layer-3700
+selection excluding S06 selects 5/excludes 1, opposite predicate selects 0;
+all three exact plans revalidate unchanged. Complete six-column before/after
+audits match except request IDs, with 3 mark findings/zero unchecked checks.
+Source **3b23bc810ba9b39b7f365dae48f4f2781ad0b146d45a3d495ff5f876e0b25547**,
+report **852027bc3ad4b210cd98f7dcd8098ba7cfbad712a9be1f90dc5d28fd004a1e7f**.
+Both audit hashes and all three expanded-wrapper plan hashes independently
+recompute after removing unhashed request_id/host_session_id transport metadata.
+All 22 bridge hashes in each health capture match the exact unchanged 0.9.0 ZIP
+(clean source 61c7579645d497a9df1e3ff0cb5640861225b56c). Host session
+**3bec3644-20ac-42ef-b33e-0c2322fea12a** stays the same. Owner confirms
+**model unchanged and host uninterrupted**. S05 layer3700, S06 statusNEW remain.
+No repeat, Undo or recovery is needed. Static original acceptance flags remain
+unchanged. Earlier 0.8.1 write/Undo/Redo/recovery/restart/stale-Apply gates remain
+accepted within their distinct scope. Same-session UI edit conflict remains
+blocked by the earlier host cancellation; do not repeat on that lifecycle.
+
+**Next implementation: 0.10.0 explicit mark previews, ready_for_owner_test.**
+[Contract](m3-marks-contract.md), [165 portable tests](test-results/m3-marks-portable-0.10.0.md),
+[Polish next card](m3-marks-preview-batch.md).
+fix_model_issues and preview-only rule_based_edit accept selected required/unique
+mark rule choices with exact canonical model_uuid and explicit nonmissing string.
+Both mark rules must participate; distinct assignments per element, max32choices.
+Invalid choices reject before context; absent/compliant/wrong-rule targets are
+finding_stale. Same full audit snapshot generates findings, selection and final
+mark simulation. Excluded/unchosen peers retain current marks; full normalized
+file/family uniqueness detects proposed collisions and marks conflict, unknown
+reads block readiness. Reported remaining defects describe hypothetical values.
+Assignment/validation metadata enters immutable plan hash; full revalidation,
+TTL/restart/cache protections remain. Native executor refuses every mark-metadata
+plan, including when filtering leaves only the former two layer/status changes.
+No mark setter/numbering/graphical label/write authorization is introduced.
+Existing office standard 1.0.0 definition and dependencies remain unchanged.
+
+165 local tests PASS on Linux CPython3.12.14, FastMCP3.2.4, uv0.12.19; frozen
+sync and wheel/sdist build pass. Ten new tests cover explicit positive proposals,
+normalization, proposed/excluded-peer collisions, same-scan/stale/unknown inputs,
+pre-context validation, apply bypass refusal, full real MCP/HTTP owner collector
+and stop-on-wrong-fixture. M3 Marks Preview.cmd is packaged at the root. New
+collector retains original MCP text as well as decoded responses.
+Exact delivery identity is recorded under [0.10.0 artifacts](../evaluation-packages/0.10.0/README.md)
+after a clean source commit; accepted older ZIPs/evidence are never rebuilt.
+Later CI belongs to its exact commit; earlier 0.9.0 six-job result does not
+validate the new mark code.
+
+**Next action requires owner Allplan:** install exact 0.10.0 into a new folder,
+Setup.cmd with the same Local, keep old archives/logs/journal. Use the **same
+repaired disposable six-column copy in file101**, S05 SZ_OGÓ01 and S06 NEW,
+with the three mark findings still present. Start host/MCP and run **M3 Marks
+Preview.cmd**, no model edits during reads. Expected ten OK steps:
+C03 missing→S03 and C04 duplicateS02→S04: 2proposals/no final duplicates or missing;
+C04 exception: 1proposal/one remaining duplicate group;
+C03→S06 with existingS06 excepted: expected conflict/one collision group with both
+exact UUIDs. All three revalidations unchanged, full before/after audit3 identical,
+same-session health. Return original logs/m3-marks-preview-*.json/TXT and unchanged
+values/appearance/host observation. Do not Apply, Recover, Undo, rebuild the
+fixture or repeat an accepted old gate.
+
+M3/UAT-05/UAT-06 remain open. Native new positive mark proposals/collisions are
+not_run; mark/selected writes, numbering, labels/filemoves, wider standards/types,
+unknown native outcomes, grouped Undo, full app/OSrestart and crash/power-loss
+behavior remain deferred. Base/main documentation reconciliation and integration
+remain separate. Preserve every raw evidence byte and archive version identity.
+
+## Prior handoff — 2026-10-10 Europe/Warsaw, 0.9.0 M3.3 preview ready
 
 Continue **`codex/m3-repair-preview`**, draft [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2).
 The owner requests continued M3 work until native testing is required and

@@ -41,6 +41,87 @@ class FakeBridge:
 
 
 class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
+    async def test_mark_owner_gate_reports_expected_collision_without_any_write_over_real_transport(self):
+        from test_repair_execution import ExecutionTests
+        from allplan_mcp.mark_diagnostics import collect_mark_preview
+        from allplan_mcp import __version__
+        native = ExecutionTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        elements = native.writable_fixture()
+        elements[4].GetCommonProperties.return_value.Layer = 7
+        elements[5].GetAttributes.return_value = [(20001, 'S06'), (20002, 'NEW')]
+        original = self.bridge_handler.handle
+        def handle(path, payload):
+            if path in {'/fix-model-issues', '/model-audit'}:
+                self.bridge_handler.calls.append((path, payload))
+                return native.handler.handle(path, payload)
+            if path == '/get-allplan-version':
+                result = original(path, payload)
+                result['host_session_id'] = 'native-fake-session'
+                result['bridge_package']['version'] = __version__
+                return result
+            return original(path, payload)
+        self.bridge_handler.handle = handle
+        with tempfile.TemporaryDirectory() as directory:
+            report = await collect_mark_preview(self.url, Path(directory) / 'marks.json')
+            self.assertEqual(report['state'], 'ready_for_ui_observation', report.get('message'))
+            self.assertTrue(all(s['ok'] for s in report['steps']))
+            self.assertEqual(len(report['steps']), 10)
+            calls = [p.get('action') for route, p in self.bridge_handler.calls if route == '/fix-model-issues']
+            self.assertEqual(calls, ['preview', 'revalidate'] * 3)
+            self.assertTrue((Path(directory) / 'marks.txt').exists())
+            self.assertTrue(all(s['mcp_content'] for s in report['steps']))
+            collision = next(s['response'] for s in report['steps'] if s['name'] == 'excluded_peer_collision')
+            self.assertEqual(collision['state'], 'conflict')
+            # A restored fixture differs: stop before issuing any mark proposal.
+            elements[4].GetCommonProperties.return_value.Layer = 8
+            self.bridge_handler.calls.clear()
+            blocked = await collect_mark_preview(self.url, Path(directory) / 'wrong-fixture.json')
+            self.assertEqual(blocked['state'], 'blocked')
+            self.assertFalse(any(route == '/fix-model-issues' for route, _ in self.bridge_handler.calls))
+        native.base.ElementsLayerService.ChangeLayer.assert_not_called()
+        native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+    async def test_mark_public_rule_preview_uses_exact_targets_and_cannot_bypass_apply(self):
+        from test_repair_execution import ExecutionTests
+        from uuid import uuid4
+        native = ExecutionTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        elements = native.writable_fixture()
+        original = self.bridge_handler.handle
+        def handle(path, payload):
+            if path == '/fix-model-issues':
+                self.bridge_handler.calls.append((path, payload))
+                try:
+                    return native.handler.handle(path, payload)
+                except native.module.BridgeError as exc:
+                    raise transport.BridgeError(exc.code, str(exc), exc.status) from exc
+            return original(path, payload)
+        self.bridge_handler.handle = handle
+        request = {'action': 'preview', 'audit': {'profile_id': 'native-model-qa-demo',
+            'scope': {'drawing_files': [101], 'include_passive': False, 'visibility': 'api_select_all'}},
+            'repairs': [{'rule_id': 'QA-001', 'model_uuid': str(elements[2].GetModelElementUUID()), 'value': 'S03'},
+                        {'rule_id': 'QA-002', 'model_uuid': str(elements[3].GetModelElementUUID()), 'value': 'S04'}],
+            'selection': {'where': {'field': 'layer_id', 'op': 'exists'}}}
+        async with Client(self.url) as client:
+            plan = (await client.call_tool('rule_based_edit', {'request': request})).data
+            self.assertEqual(plan['mark_validation']['state'], 'validated')
+            self.assertEqual({c['new_value'] for c in plan['changes']}, {'S03', 'S04'})
+            rejected = (await client.call_tool('fix_model_issues', {'request': {
+                'action': 'apply', 'plan_id': plan['plan_id'], 'plan_hash': plan['plan_hash'],
+                'execution_id': uuid4().hex, 'acknowledgement': 'disposable_copy_reviewed_two_repairs'}})).data
+            self.assertEqual(rejected['error']['code'], 'repair_scope_unavailable')
+            self.assertFalse(rejected['native_setters_started'])
+            request['repairs'][0]['value'] = ' '
+            native.coord.GetInputViewDocument.reset_mock()
+            invalid = await client.call_tool('rule_based_edit', {'request': request}, raise_on_error=False)
+            self.assertTrue(invalid.is_error)
+            native.coord.GetInputViewDocument.assert_not_called()
+        native.base.ElementsLayerService.ChangeLayer.assert_not_called()
+        native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
     async def test_standard_owner_gate_is_read_only_over_real_transport_and_keeps_full_audit(self):
         from test_repair_execution import ExecutionTests
         from allplan_mcp.standard_diagnostics import collect_standard_preview

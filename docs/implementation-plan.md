@@ -103,9 +103,18 @@ versioned demo layer/status `apply_office_standard` and predicate/UUID-exception
 still conflict on full revalidation; unknown predicates block readiness.
 Standard/selected plans cannot use native Apply, including through fix_model_issues.
 [Contract](m3-standards-contract.md), [155 portable tests](test-results/m3-standards-portable-0.9.0.md),
-[next read-only owner gate](m3-standards-preview-batch.md).
-Native new-tool previews are not_run; mark numbering, broader standards and
-selected native writes remain deferred. No old owner batch is repeated.
+[native new-tool preview PASS](test-results/m3-standards-acceptance-0.9.0.md).
+All three zero-proposal plans, full before/after audits, revalidations and host
+continuity pass; no repeat is needed.
+
+Package **0.10.0** adds explicit per-model mark proposals under required/unique
+mark rules and same-snapshot full-scope collision simulation. Unknown evidence
+blocks readiness; excluded peers still participate. Mark metadata refuses Apply
+even when filtering leaves the old layer/status pair.
+[Contract](m3-marks-contract.md), [portable evidence](test-results/m3-marks-portable-0.10.0.md),
+[next read-only owner gate](m3-marks-preview-batch.md).
+Native positive mark proposals are not_run; numbering, labels, wider standards
+and selected/mark native writes remain deferred. M3 is open.
 
 - **M3.1** Shared preview/apply, stale checks, serialized writes, request identity, readback, partial outcomes and tested Undo limits.
 - **M3.2** `fix_model_issues` for writable attributes/layers; data marks and graphical labels stay distinct.
