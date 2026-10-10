@@ -1,6 +1,7 @@
 # M3 mark assignment and deterministic numbering — 0.12.0
 
-Status: **ready_for_owner_test**, native acceptance pending. Earlier layer/status
+Status: **bounded native mark-numbering gate PASS**; [evidence](m3-numbering-acceptance-0.12.0.md).
+Acceptance covers the retained two-target fixture, not every eligible mark plan. Earlier layer/status
 and read-only mark evidence remains scoped to its original source/package.
 The shared executor now accepts reviewed **existing string mark** replacements
 on native Column roots, with the same one-foreground-file, 1–32-change boundary.
@@ -63,9 +64,9 @@ conflict; restart/expiry require a new preview. Repeated execution IDs return th
 durable historical result without setters, even after Undo. Recover only observes
 current values in the original project copy.
 
-## New native gate
+## Completed bounded native gate
 
-[Owner test](m3-numbering-owner-test.md) uses the current retained fixture state.
+The completed [owner test](m3-numbering-owner-test.md) used the current retained fixture state.
 With C03 missing and C02/C04 duplicate S02, numbering preserves C02 and proposes
 C03 → S03 / C04 → S04. Preview is unchanged and deterministic; Apply must read
 back both values, verify all audited fields, remove exactly three mark findings,

@@ -1,0 +1,4 @@
+M3 disposable-copy gate: ready_for_ui_observation. Execution: a5595bfb9bed4d9c9f848526177ec8b8.
+recover_read_only: OK
+Repair execution completed: applied, applied. No automatic rollback or retry.
+Recovery reads current values only. It does not replay Apply, resume skipped writes or request Undo.

@@ -100,6 +100,7 @@ Symbol presence proves neither target writability nor mutation/Undo behavior.
 Preview/revalidation return read_only=true, apply_available=false and
 usable_for_write=false. Eligible layer/status plans separately advertise
 evaluation_apply_available for the bounded executor. Existing-string mark plans require validated collision evidence;
-mark Apply awaits native acceptance. General writable profiles and durable references remain unimplemented.
+The [bounded numbered mark Apply gate](m3-numbering-acceptance-0.12.0.md) passed;
+wider mark request acceptance remains open. General writable profiles and durable references remain unimplemented.
 The plan service invokes no setters; native Apply belongs to the shared executor.
 See [accepted limits and remaining work](validation-status.md).

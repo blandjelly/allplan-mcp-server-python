@@ -1,0 +1,37 @@
+{
+  "files": {
+    "m3-last-numbering-execution.json": {
+      "bytes": 466,
+      "sha256": "e03b63c4d612817b9d75fb5937cfe3d738efb86a23d54819aa3a22a62a5e26d8"
+    },
+    "m3-last-numbering-execution.txt": {
+      "bytes": 82,
+      "sha256": "d23578cc512dbeb6e061d27151bfcada4cf492427493402a458bebc04a10d75e"
+    },
+    "m3-marks-preview-20261010T183908393072Z.json": {
+      "bytes": 548863,
+      "sha256": "d9356543e43d99dd0ded5744e3fefb73d94a6006da8d98e144980a1ce8992e15"
+    },
+    "m3-marks-preview-20261010T183908393072Z.txt": {
+      "bytes": 4982,
+      "sha256": "5d74033757f2989983637e2bcee1627779294bee6bb9cdb526f51c7c9f6ad4bd"
+    },
+    "m3-numbering-execution-a5595bfb9bed4d9c9f848526177ec8b8.json": {
+      "bytes": 470,
+      "sha256": "f19f9a436c3836491ff678934d6071ae0dae4ffb092d8fc147100ba6cebfa280"
+    },
+    "m3-numbering-execution-a5595bfb9bed4d9c9f848526177ec8b8.txt": {
+      "bytes": 86,
+      "sha256": "67dc7cccd831aa071105f3a96fcd2b0d25f8bb4b14eb2f5fc885a9d9c915a654"
+    },
+    "m3-workflow-recover-20261010T184824120632Z.json": {
+      "bytes": 239829,
+      "sha256": "bba4d1444de3be9c00b4b71b0273cf270171789f9361ce620a57c79983d02463"
+    },
+    "m3-workflow-recover-20261010T184824120632Z.txt": {
+      "bytes": 301,
+      "sha256": "da435505857931f90a7843fbe12c51b139ec6ef897d1a9c2f8f15cb3bfe016c4"
+    }
+  },
+  "preservation": "original uploaded bytes; no normalization"
+}

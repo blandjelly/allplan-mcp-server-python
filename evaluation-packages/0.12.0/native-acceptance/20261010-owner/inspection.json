@@ -1,0 +1,57 @@
+{
+  "result": "PASS",
+  "scope": "bounded 0.12.0 mark-numbering gate on retained six-column fixture",
+  "source_commit": "fd78700378eceb6f217e4ca30a83b88004b73a57",
+  "execution_id": "a5595bfb9bed4d9c9f848526177ec8b8",
+  "steps_passed": 10,
+  "mcp_text_matches_structured_responses": true,
+  "human_readable_report_matches": true,
+  "plan_hashes_recomputed": {
+    "numbering_preview": "f58e1716c07b61211a1559f93f7ed829669e9ec3d5b586074aebe987cae09283",
+    "deterministic_preview": "e36710f6a31d38a66f034db5690cf2491143ba2a415f0c120f798503f7f94987",
+    "numbering_noop_after": "5f83a55ecc9ee63b8c55bd32555529a8c5ee85c27f3f99e01ad2f080a331bd7e"
+  },
+  "apply_request_hash_recomputed": "242051fea21f021e358be0c1da2af11d3ee510cd2073cc84f228edf16c836359",
+  "audit_hashes_recomputed": {
+    "before": "c99774849abfd35880e4791650aad64ee746cd7bc5fba9dc143b85f97c0c7655",
+    "after_preview": "c99774849abfd35880e4791650aad64ee746cd7bc5fba9dc143b85f97c0c7655",
+    "after_apply": "14f463e7a1d986ae78bed8c0c5a6714c2857f453fc2073cea7443c2b5f249318",
+    "after_undo": "a534d885fc87452a139cae2d8a22dc534e2d2f5c4c90db37cf2b3e9e412f139b"
+  },
+  "reported_bridge_hashes_match_existing_manifest": 23,
+  "same_host_session_during_gate": "46818eaa-91eb-446b-9762-bb4bbab88e95",
+  "recovery_host_session": "b8573f81-b40b-4951-85b7-e10f264836c5",
+  "audit_findings_before_after_apply_after_undo": [
+    3,
+    0,
+    3
+  ],
+  "post_apply_audited_fields_match_plan": true,
+  "read_only_exact_id_replay": true,
+  "subsequent_numbering_noop": true,
+  "read_only_recovery_after_undo": [
+    "old_value_observed",
+    "old_value_observed"
+  ],
+  "audited_checks_after_undo_match_before": true,
+  "owner_observations": {
+    "host_survived": true,
+    "marks_applied_correctly": true,
+    "other_elements_unchanged": true,
+    "after_first_undo": {
+      "C03": "<niezdefiniowany>",
+      "C04": "S04"
+    },
+    "after_second_undo": {
+      "C03": "<niezdefiniowany>",
+      "C04": "S02"
+    }
+  },
+  "project_instruction": "Keep original disposable copy after two Undo operations; preserve Local journal and logs; no Redo or new Apply requested.",
+  "limits": [
+    "completed-execution recovery, not unknown-outcome native recovery",
+    "original six-column fixture and mark attribute 5001 only",
+    "supported-lifecycle same-session conflicts remain open",
+    "full M3/UAT-05/UAT-06 remain open"
+  ]
+}

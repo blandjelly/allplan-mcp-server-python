@@ -1,6 +1,8 @@
 # 0.12.0 mark assignment and numbering evaluation
 
-Status: **ready_for_owner_test**. Native mark/numbering acceptance is pending;
+Status: **bounded native mark-numbering gate PASS**, 2026-10-10;
+[acceptance](../../docs/m3-numbering-acceptance-0.12.0.md),
+[original uploads and inspection](native-acceptance/20261010-owner/).
 M3/UAT-05/UAT-06 remain open. The new implementation replaces existing string
 mark attributes through the shared reviewed executor and introduces versioned
 native-model-qa-demo-mark-numbering 1.0.0. Valid marks remain; missing marks and
@@ -30,7 +32,13 @@ Source CI **6/6 PASS**: [run 38075847420](https://github.com/blandjelly/allplan-
 Windows/Ubuntu Python 3.11–3.13; final observations are retained in
 source-ci-0.12.0.json and delivery-0.12.0.json. Portable checks do not run Allplan.
 
-Owner instructions are standalone [Markdown](TEST-ALLPLAN-0.12.0.md) and
+The completed gate requires no repeat. Leave the original disposable project
+after two Undo operations: C03 missing, C04=S02; C05 structure/C06 NEW remain.
+Preserve journal/logs and request no Redo/new Apply. The original delivery record
+and embedded package docs retain their publication-time ready_for_owner_test
+status; no archive or original MD/TXT instruction is rewritten.
+
+Original owner instructions are standalone [Markdown](TEST-ALLPLAN-0.12.0.md) and
 [text](TEST-ALLPLAN-0.12.0.txt), also inside the package's docs directory.
 Install through Setup.cmd, start the host/MCP and run **M3 Numbering.cmd**.
 Review C03→S03/C04→S04, then enter **NUMERUJ KOPIE** to authorize that exact plan.

@@ -15,7 +15,7 @@ allplan://standards/native-model-qa-demo-layer-status uses schema m3-standard-1.
 It chooses QA-003 → structure layer and QA-004 → NEW for invalid existing string
 status. Already allowed EXISTING is compliant and is not overwritten.
 A separate [versioned numbering standard](m3-numbering-contract.md) now assigns marks;
-its native gate is pending. Labels/file moves remain conditional.
+[its bounded two-target native gate passed](m3-numbering-acceptance-0.12.0.md). Labels/file moves remain conditional.
 
 Rule preview uses the typed audit and explicit layer/status choices from
 [repair preview](m3-repair-contract.md), plus required selection. It also accepts
@@ -58,7 +58,8 @@ TTL/eviction/restart require a fresh preview; an old authorization is not renewe
 
 Previews retain read_only=true, apply_available=false and usable_for_write=false.
 Eligible existing-string mark/status and layer plans advertise evaluation_apply_available.
-Mark plans require validated full-scope collision evidence and await native acceptance. Apply requires reviewed ID/hash, saved new execution ID and current
+Mark plans require validated full-scope collision evidence; the numbered
+two-target native gate passed, while wider mark request scope remains unaccepted. Apply requires reviewed ID/hash, saved new execution ID and current
 explicit authorization. Standard/rule Apply checks matching workflow provenance;
 generic fix_model_issues can execute an eligible workflow plan.
 Recover observes the saved execution without setters, resume or Undo.

@@ -4,7 +4,8 @@ Explicit mark previews have [bounded native acceptance](validation-status.md).
 The owner confirms unchanged model and uninterrupted host. They reuse audit,
 planner, selection, hashing and revalidation. 0.12.0 implements existing-string
 mark writes and [deterministic numbering](m3-numbering-contract.md); their
-new native gate remains pending.
+[bounded two-target native numbering gate passed](m3-numbering-acceptance-0.12.0.md);
+wider explicit-request/workflow scope remains outside native acceptance.
 
 ## Explicit rule and target, no automatic numbering
 
@@ -75,5 +76,5 @@ See [execution](m3-workflow-execution-contract.md) and [new gate](m3-numbering-o
 
 Native acceptance covers positive C03/C04 proposals, a selection exception,
 collision against an excluded peer and unchanged revalidations/full audits.
-No repeat of that completed gate is required. New native mark assignment and
-numbering acceptance is pending; portable implementation does not establish it.
+No repeat of that completed gate is required. The numbered two-target native write/readback/replay/no-op and Undo/recovery
+gate passed separately; wider mark requests still require scoped evidence.

@@ -25,8 +25,9 @@ standard/selection workflows and read-only mark collision previews.
 The latest native workflow gate passed two single-target writes, exact readback,
 read-only replay, complete audits **5 → 4 → 3** and owner-confirmed two-step Undo.
 0.12.0 implements reviewed mark assignment and a deterministic versioned numbering
-standard; their [new native gate](docs/m3-numbering-owner-test.md) is pending.
-**M3/UAT-05/UAT-06 remain open**: mark/numbering acceptance, native same-session
+standard; the [bounded two-target native gate](docs/m3-numbering-acceptance-0.12.0.md)
+passed writes, readback, replay/no-op and two-step Undo/recovery.
+**M3/UAT-05/UAT-06 remain open**: remaining scope acceptance, native same-session
 conflicts and controlled partial/unknown recovery are next.
 [Validation status](docs/validation-status.md) defines the accepted boundaries.
 

@@ -140,5 +140,6 @@ verification, exact-ID replay, separate Undo and completed recovery after Redo.
 Restart invalidation and stale Apply rejection also pass. Native same-session
 conflicts, controlled partial/unknown recovery, broader scope/identity and
 crash/power-loss persistence remain open. Do not repeat the UI-edit scenario
-known to cancel the host. Mark assignment/numbering now await their new native gate; then obtain
+known to cancel the host. The bounded 0.12.0 mark-numbering gate passed writes/readback/replay/no-op
+and two-step Undo/recovery; [evidence](m3-numbering-acceptance-0.12.0.md). Next obtain
 the missing native evidence; see [handoff](next-model-handoff.md).

@@ -29,7 +29,8 @@ every possible profile/value/target.
 
 0.12.0 additionally replaces existing string marks under validated full-scope
 collision evidence; [numbering definition](m3-numbering-contract.md). Native
-mark/numbering acceptance is pending.
+[bounded two-target mark/numbering acceptance passed](m3-numbering-acceptance-0.12.0.md),
+including complete audits 3 → 0 → 3, exact-ID replay/no-op and two-step Undo/recovery.
 
 Attribute roles are explicit plan metadata and participate in the immutable
 plan hash. There is no append/delete/undefined attribute assignment. Duplicate
@@ -97,7 +98,8 @@ not establish authenticated history or sudden power-loss durability.
 ## Remaining M3 work
 
 Actual mark assignment and deterministic versioned-standard numbering are
-implemented in 0.12.0 and await [the new native gate](m3-numbering-owner-test.md). Then obtain
+implemented in 0.12.0; [the bounded two-target native gate](m3-numbering-acceptance-0.12.0.md)
+passed. No repeat is requested. Next obtain
 native same-session conflict evidence in a supported lifecycle and controlled
 partial/unknown-result recovery. The accepted two-workflow gate needs no repeat.
 Do not repeat UI editing known to cancel the host. Broader journal maintenance,

@@ -37,23 +37,21 @@ and [testing policy](testing-policy.md). Details: [read tools](tool-reference.md
   native-model-qa-demo-mark-numbering 1.0.0, preserving valid marks and assigning
   free S numbers in canonical center Y/X/Z/UUID order. Full-scope normalized
   collisions, excluded peers, immutable plans, fresh source/readback and durable
-  execution identities are retained. **Native mark/numbering acceptance is pending.**
+  execution identities are retained. **Bounded native two-target numbering gate PASS**: unchanged/deterministic
+  previews, both writes/readbacks, audited verification, read-only replay/no-op,
+  audits 3 → 0 → 3, owner-confirmed host survival/unchanged other elements and
+  two-step Undo; Recover observed both old values after Undo.
+  [Evidence](m3-numbering-acceptance-0.12.0.md). Wider mark request scope remains open.
   Grouped Undo and automatic rollback are unavailable.
 
 ## Next implementation
 
-1. Run only the new [0.12.0 owner gate](m3-numbering-owner-test.md) through
-   M3 Numbering.cmd, then M3 Numbering Recover.cmd after UI observation/Undo.
-   It reads actual fixture values before preview, verifies C03→S03/C04→S04,
-   deterministic unchanged previews, exact-ID read-only replay and subsequent no-op.
-   Record owner evidence before extending native acceptance. Work stops here
-   because this cloud environment cannot run Allplan.
-2. Design native same-session source-conflict checks in a supported host lifecycle,
+1. Design native same-session source-conflict checks in a supported host lifecycle,
    then controlled partial/unknown outcomes and read-only recovery. The observed
    manual UI edit cancelled StartPythonHost; repeating that scenario unchanged
    cannot establish a same-session conflict. Restart invalidation and stale Apply
    rejection already pass.
-3. Resolve remaining acceptance for the declared scope, journal maintenance and
+2. Resolve remaining acceptance for the declared scope, journal maintenance and
    identity limits; integrate with main and complete UAT-05/UAT-06.
 
 Graphical labels, file moves and universal native setters are conditional
@@ -69,9 +67,11 @@ Setup/Restore preserved the journal. Source **fd78700378eceb6f217e4ca30a83b88004
 The delivery retains exact archive identity and source CI job/step observations.
 Do not repeat the full suite or prior native batches for documentation publication.
 
-The owner did not specify whether the model was left repaired, undone or redone
-following the latest Undo observation. Start with current health/context and a
-fresh full audit of the original disposable copy before another preview.
+The owner left the original disposable copy after **two Undo operations**:
+C03 mark `<niezdefiniowany>`, C04=S02, C02=S02; C05 structure/C06 NEW remain.
+Read-only Recover confirmed both old mark values and a complete audit with three
+mark findings. **Leave/save this state; no Redo or new Apply is requested.**
+Start future work with fresh health/context and a full audit in that same copy.
 Historical completed/replay outcomes do not establish current values after Undo.
 Never reuse an old execution ID for a new repair.
 

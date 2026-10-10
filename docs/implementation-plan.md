@@ -77,7 +77,8 @@ standard/selection no-op previews and explicit collision-aware mark previews
 have separate bounded acceptance. Unchanged completed gates need no repetition.
 
 Mark assignment and deterministic versioned-standard numbering are implemented;
-[their native gate](m3-numbering-owner-test.md) is pending. Required next work: native same-session conflicts in a supported lifecycle and
+[their bounded two-target native gate](m3-numbering-acceptance-0.12.0.md) passed
+complete audits 3 → 0 → 3, readback, replay/no-op and two-step Undo/recovery. Required next work: native same-session conflicts in a supported lifecycle and
 controlled partial/unknown outcomes with read-only recovery. Known UI editing
 cancelled the host and must not be repeated unchanged. Journal maintenance and
 identity limits, final UAT and main integration remain open. Graphical labels,

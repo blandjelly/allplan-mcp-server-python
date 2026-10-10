@@ -230,7 +230,7 @@ M3 0.7.0 adds `fix_model_issues` read-only preview/revalidation;
 [bounded evaluation apply/recovery contract](m3-execution-contract.md);
 [native 0.8.1 write/Undo gate PASS](validation-status.md).
 0.12.0 adds [existing-string mark writes and deterministic numbering](m3-numbering-contract.md),
-with a new native gate pending. 0.11.0 added [shared standard/selection execution](m3-workflow-execution-contract.md),
+with [bounded two-target native acceptance](m3-numbering-acceptance-0.12.0.md). 0.11.0 added [shared standard/selection execution](m3-workflow-execution-contract.md),
 with bounded native acceptance for the retained two-workflow gate.
 
 model_query action=profile, profile_id=native-model-qa-demo freshly resolves

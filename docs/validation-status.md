@@ -1,9 +1,9 @@
 # Validation status and limits
 
 Current package **0.12.0**; status recorded **2026-10-10 Europe/Warsaw**.
-Mark assignment and deterministic numbering are implemented, **ready_for_owner_test**;
-[new native gate](m3-numbering-owner-test.md). Native acceptance below remains
-scoped to its original packages; no 0.12.0 Allplan observation is claimed.
+Mark assignment and deterministic numbering have **bounded two-target native PASS**;
+[0.12.0 acceptance/evidence](m3-numbering-acceptance-0.12.0.md). Native acceptance
+below remains scoped to its recorded packages, fixture and supported behaviors.
 Native acceptance concerns the retained disposable fixture and observed Allplan
 **2026-1-7** setup with local Windows Codex. It is separate from portable tests.
 M3/UAT-05/UAT-06 and the first MVP remain open.
@@ -34,6 +34,7 @@ not a live acceptance registry.
 | 0.9.0 | Three no-op standard/selection previews, exceptions, revalidations and identical full audits | Zero-proposal observations do not establish positive writes. |
 | 0.10.0 | C03 → S03 / C04 → S04 mark proposals, selection exception, collision with excluded S06 peer, unchanged revalidations/audits; owner confirms unchanged model and uninterrupted host | All mark plans refuse Apply. Assignment, numbering and graphical labels are unimplemented. |
 | 0.11.0 | Ten steps: two separately reviewed single-target standard/selected writes, exact readbacks, audited fields match plan, exact-ID read-only replays, complete six-column audits 5 → 4 → 3 in one verified host session | Owner confirms both changes, host survival, other elements unchanged and two-step Undo. Broader 1–32-change/other-file execution is unaccepted. Final repaired/undone/redone state was unspecified. |
+| 0.12.0 | Two numbered mark writes on existing string attribute 5001, exact readback/audited verification, same-session unchanged deterministic previews, read-only replay and subsequent no-op; complete audits 3 → 0 → 3 after Undo/recovery | Owner confirms correct marks, unchanged other elements, host survival and two-step Undo. Recovery observes old values after a changed host session; it concerns completed execution, not unknown-outcome recovery. Broader mark/workflow scope is unaccepted. |
 
 Final 0.11.0 findings: **QA-001 / QA-002 / QA-002**, with 24 checks:
 20 pass, 3 fail, 1 not_applicable, 0 not_checked. Failure is expected because

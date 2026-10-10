@@ -1,6 +1,10 @@
 # Nowy test Allplana — oznaczenia i numeracja 0.12.0
 
-Status: **ready_for_owner_test**. Wykonaj tylko tę nową partię na Allplanie
+Status: **PASS — wykonano 2026-10-10**; [wynik](m3-numbering-acceptance-0.12.0.md).
+Nie powtarzaj zakończonej partii. Zostaw i zapisz jednorazową kopię po dwóch Undo:
+C03 niezdefiniowany, C04=S02; bez Redo. Poniższe kroki opisują wykonaną partię.
+
+Pierwotny zakres: Wykonaj tylko tę nową partię na Allplanie
 2026-1-7, w lokalnym środowisku Windows. Nie powtarzaj zaakceptowanych testów
 warstwy/statusu. Test zapisze dane oznaczeń dwóch słupów na jednorazowej kopii.
 

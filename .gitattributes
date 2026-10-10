@@ -3,3 +3,5 @@ docs/test-results/evidence/**/*.json -text whitespace=blank-at-eol,blank-at-eof,
 docs/test-results/evidence/allplan-model-query-results-0.3.0.md -text -whitespace
 docs/test-results/evidence/**/*.txt -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 docs/test-results/evidence/diagnostics-crash-20261009.md -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+evaluation-packages/**/native-acceptance/**/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+evaluation-packages/**/native-acceptance/**/*.txt -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
