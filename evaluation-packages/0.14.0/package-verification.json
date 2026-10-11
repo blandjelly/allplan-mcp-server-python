@@ -1,0 +1,12 @@
+{
+  "version": "0.14.0",
+  "source_commit": "7ead0e9798c6c93a843fbfc8e9b5e33a58763fdd",
+  "source_modified": false,
+  "extracted_package_integrity": "sha256-verified",
+  "bridge_hashes_verified": 23,
+  "registration_restore_preserves_journal": true,
+  "restored_previous_bridge_fixture": true,
+  "new_launchers_and_embedded_owner_instructions": "PASS",
+  "platform": "Linux",
+  "native_allplan": "not_run"
+}

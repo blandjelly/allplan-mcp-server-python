@@ -1,0 +1,580 @@
+{
+  "run_id": 38175934542,
+  "url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38175934542",
+  "event": "pull_request",
+  "head_sha": "7ead0e9798c6c93a843fbfc8e9b5e33a58763fdd",
+  "status": "completed",
+  "conclusion": "success",
+  "created_at": "2026-10-11T21:20:11Z",
+  "updated_at": "2026-10-11T21:24:22Z",
+  "portable_jobs_passed": 6,
+  "jobs": [
+    {
+      "id": 114578214197,
+      "name": "configuration",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-11T21:20:13Z",
+      "completed_at": "2026-10-11T21:20:17Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:14Z",
+          "completed_at": "2026-10-11T21:20:14Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:14Z",
+          "completed_at": "2026-10-11T21:20:16Z"
+        },
+        {
+          "name": "Select compatibility matrix",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:16Z",
+          "completed_at": "2026-10-11T21:20:16Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:16Z",
+          "completed_at": "2026-10-11T21:20:16Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:16Z",
+          "completed_at": "2026-10-11T21:20:16Z"
+        }
+      ]
+    },
+    {
+      "id": 114578238049,
+      "name": "portable (ubuntu-latest, 3.11)",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-11T21:20:19Z",
+      "completed_at": "2026-10-11T21:21:30Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:20Z",
+          "completed_at": "2026-10-11T21:20:21Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:21Z",
+          "completed_at": "2026-10-11T21:20:24Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:24Z",
+          "completed_at": "2026-10-11T21:20:24Z"
+        },
+        {
+          "name": "Run python -m pip install uv==0.12.19",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:24Z",
+          "completed_at": "2026-10-11T21:20:25Z"
+        },
+        {
+          "name": "Run uv sync --frozen",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:25Z",
+          "completed_at": "2026-10-11T21:20:26Z"
+        },
+        {
+          "name": "Run uv run --frozen python -m unittest discover -s tests -v",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:26Z",
+          "completed_at": "2026-10-11T21:21:26Z"
+        },
+        {
+          "name": "Run uv build",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:21:26Z",
+          "completed_at": "2026-10-11T21:21:28Z"
+        },
+        {
+          "name": "Run uv run --frozen python utils/build_windows_package.py",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:21:28Z",
+          "completed_at": "2026-10-11T21:21:28Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:21:28Z",
+          "completed_at": "2026-10-11T21:21:28Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:21:28Z",
+          "completed_at": "2026-10-11T21:21:28Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:21:28Z",
+          "completed_at": "2026-10-11T21:21:28Z"
+        }
+      ]
+    },
+    {
+      "id": 114578238052,
+      "name": "portable (ubuntu-latest, 3.13)",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-11T21:20:20Z",
+      "completed_at": "2026-10-11T21:21:51Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:21Z",
+          "completed_at": "2026-10-11T21:20:22Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:22Z",
+          "completed_at": "2026-10-11T21:20:25Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:25Z",
+          "completed_at": "2026-10-11T21:20:25Z"
+        },
+        {
+          "name": "Run python -m pip install uv==0.12.19",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:25Z",
+          "completed_at": "2026-10-11T21:20:27Z"
+        },
+        {
+          "name": "Run uv sync --frozen",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:27Z",
+          "completed_at": "2026-10-11T21:20:28Z"
+        },
+        {
+          "name": "Run uv run --frozen python -m unittest discover -s tests -v",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:28Z",
+          "completed_at": "2026-10-11T21:21:45Z"
+        },
+        {
+          "name": "Run uv build",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:21:45Z",
+          "completed_at": "2026-10-11T21:21:48Z"
+        },
+        {
+          "name": "Run uv run --frozen python utils/build_windows_package.py",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:21:48Z",
+          "completed_at": "2026-10-11T21:21:48Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:21:48Z",
+          "completed_at": "2026-10-11T21:21:48Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:21:48Z",
+          "completed_at": "2026-10-11T21:21:49Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:21:49Z",
+          "completed_at": "2026-10-11T21:21:49Z"
+        }
+      ]
+    },
+    {
+      "id": 114578238054,
+      "name": "portable (ubuntu-latest, 3.12)",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-11T21:20:19Z",
+      "completed_at": "2026-10-11T21:22:06Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:20Z",
+          "completed_at": "2026-10-11T21:20:21Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:21Z",
+          "completed_at": "2026-10-11T21:20:23Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:23Z",
+          "completed_at": "2026-10-11T21:20:23Z"
+        },
+        {
+          "name": "Run python -m pip install uv==0.12.19",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:23Z",
+          "completed_at": "2026-10-11T21:20:25Z"
+        },
+        {
+          "name": "Run uv sync --frozen",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:25Z",
+          "completed_at": "2026-10-11T21:20:26Z"
+        },
+        {
+          "name": "Run uv run --frozen python -m unittest discover -s tests -v",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:26Z",
+          "completed_at": "2026-10-11T21:22:01Z"
+        },
+        {
+          "name": "Run uv build",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:22:01Z",
+          "completed_at": "2026-10-11T21:22:04Z"
+        },
+        {
+          "name": "Run uv run --frozen python utils/build_windows_package.py",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:22:04Z",
+          "completed_at": "2026-10-11T21:22:04Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:22:04Z",
+          "completed_at": "2026-10-11T21:22:04Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:22:04Z",
+          "completed_at": "2026-10-11T21:22:04Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:22:04Z",
+          "completed_at": "2026-10-11T21:22:04Z"
+        }
+      ]
+    },
+    {
+      "id": 114578238071,
+      "name": "portable (windows-latest, 3.12)",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-11T21:20:20Z",
+      "completed_at": "2026-10-11T21:23:12Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:20Z",
+          "completed_at": "2026-10-11T21:20:21Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:21Z",
+          "completed_at": "2026-10-11T21:20:27Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:27Z",
+          "completed_at": "2026-10-11T21:20:27Z"
+        },
+        {
+          "name": "Run python -m pip install uv==0.12.19",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:27Z",
+          "completed_at": "2026-10-11T21:20:33Z"
+        },
+        {
+          "name": "Run uv sync --frozen",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:33Z",
+          "completed_at": "2026-10-11T21:20:47Z"
+        },
+        {
+          "name": "Run uv run --frozen python -m unittest discover -s tests -v",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:47Z",
+          "completed_at": "2026-10-11T21:23:02Z"
+        },
+        {
+          "name": "Run uv build",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:23:02Z",
+          "completed_at": "2026-10-11T21:23:08Z"
+        },
+        {
+          "name": "Run uv run --frozen python utils/build_windows_package.py",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:23:08Z",
+          "completed_at": "2026-10-11T21:23:09Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:23:09Z",
+          "completed_at": "2026-10-11T21:23:09Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:23:09Z",
+          "completed_at": "2026-10-11T21:23:10Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:23:10Z",
+          "completed_at": "2026-10-11T21:23:10Z"
+        }
+      ]
+    },
+    {
+      "id": 114578238106,
+      "name": "portable (windows-latest, 3.13)",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-11T21:20:20Z",
+      "completed_at": "2026-10-11T21:24:21Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:21Z",
+          "completed_at": "2026-10-11T21:20:22Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:22Z",
+          "completed_at": "2026-10-11T21:20:36Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:36Z",
+          "completed_at": "2026-10-11T21:20:36Z"
+        },
+        {
+          "name": "Run python -m pip install uv==0.12.19",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:36Z",
+          "completed_at": "2026-10-11T21:20:44Z"
+        },
+        {
+          "name": "Run uv sync --frozen",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:44Z",
+          "completed_at": "2026-10-11T21:20:53Z"
+        },
+        {
+          "name": "Run uv run --frozen python -m unittest discover -s tests -v",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:53Z",
+          "completed_at": "2026-10-11T21:24:09Z"
+        },
+        {
+          "name": "Run uv build",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:24:09Z",
+          "completed_at": "2026-10-11T21:24:16Z"
+        },
+        {
+          "name": "Run uv run --frozen python utils/build_windows_package.py",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:24:16Z",
+          "completed_at": "2026-10-11T21:24:17Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:24:17Z",
+          "completed_at": "2026-10-11T21:24:17Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:24:17Z",
+          "completed_at": "2026-10-11T21:24:19Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:24:19Z",
+          "completed_at": "2026-10-11T21:24:19Z"
+        }
+      ]
+    },
+    {
+      "id": 114578238138,
+      "name": "portable (windows-latest, 3.11)",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-11T21:20:19Z",
+      "completed_at": "2026-10-11T21:22:34Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:20Z",
+          "completed_at": "2026-10-11T21:20:21Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:21Z",
+          "completed_at": "2026-10-11T21:20:27Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:27Z",
+          "completed_at": "2026-10-11T21:20:28Z"
+        },
+        {
+          "name": "Run python -m pip install uv==0.12.19",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:28Z",
+          "completed_at": "2026-10-11T21:20:34Z"
+        },
+        {
+          "name": "Run uv sync --frozen",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:34Z",
+          "completed_at": "2026-10-11T21:20:47Z"
+        },
+        {
+          "name": "Run uv run --frozen python -m unittest discover -s tests -v",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:20:47Z",
+          "completed_at": "2026-10-11T21:22:28Z"
+        },
+        {
+          "name": "Run uv build",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:22:28Z",
+          "completed_at": "2026-10-11T21:22:32Z"
+        },
+        {
+          "name": "Run uv run --frozen python utils/build_windows_package.py",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:22:32Z",
+          "completed_at": "2026-10-11T21:22:32Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:22:32Z",
+          "completed_at": "2026-10-11T21:22:32Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:22:32Z",
+          "completed_at": "2026-10-11T21:22:33Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-11T21:22:33Z",
+          "completed_at": "2026-10-11T21:22:33Z"
+        }
+      ]
+    }
+  ]
+}

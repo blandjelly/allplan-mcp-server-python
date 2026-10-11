@@ -121,3 +121,18 @@ Repository documentation and API identifiers use English; owner walkthroughs
 may use Polish. The implementation model owns code, checks and ready-to-use
 packages; the owner observes Allplan through local Windows Codex and the UI.
 The owner does not edit Python/JSON or discover API identifiers.
+
+## Delivered 0.14.0 source and next owner action
+
+Clean source **7ead0e9798c6c93a843fbfc8e9b5e33a58763fdd** has final 205-test
+portable PASS, frozen sync and wheel/sdist builds. The exact extracted ZIP verifies
+23 installed bridge hashes, journal preservation and prior bridge restoration.
+Source [CI 38175934542](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38175934542)
+**6/6 PASS**, Windows/Ubuntu Python 3.11–3.13, tests/builds included.
+[Delivery/artifact identities](../evaluation-packages/0.14.0/README.md) retain
+original logs, CI steps, instructions and package. Documentation publication
+repeats no tests/builds and leaves archives unchanged. Main ancestry was reconciled
+in the M3 branch; PR #2 stays draft into main, without merge/release.
+Only the [new controlled recovery owner gate](m3-recovery-owner-test.md) remains
+requested now, in the same original project after the accepted 0.13.0 Undo.
+Native status is ready_for_owner_test; M3/UAT-05/UAT-06 remain open.
