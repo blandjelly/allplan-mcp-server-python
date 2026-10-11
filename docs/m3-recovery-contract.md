@@ -1,9 +1,11 @@
 # Controlled unknown-result inspection — 0.14.1
 
-Status **ready_for_owner_test**. Native partial/unknown-result recovery has no
-acceptance yet. Previous [0.13.0 conflict acceptance](m3-conflict-acceptance-0.13.0.md)
+Status **bounded native controlled-recovery PASS / accepted_on_build**,
+2026-10-12 Europe/Warsaw. [Evidence and limits](m3-recovery-acceptance-0.14.1.md):
+13/13 + 6/6 + 6/6 steps, owner UI/no-other-changes/Undo confirmation.
+Previous [0.13.0 conflict acceptance](m3-conflict-acceptance-0.13.0.md)
 and [0.12.0 numbering acceptance](m3-numbering-acceptance-0.12.0.md) remain scoped
-and need no repeat. [Owner walkthrough](m3-recovery-owner-test.md).
+and need no repeat. [Completed owner walkthrough](m3-recovery-owner-test.md); no repeat required.
 
 ## Correction after the 0.14.0 owner preflight
 

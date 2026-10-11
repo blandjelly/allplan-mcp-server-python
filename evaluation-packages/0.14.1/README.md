@@ -5,7 +5,13 @@ UUID order placed C04 ahead of C03. No execution ID or native write was reached.
 [Diagnosis](../../docs/m3-recovery-blocked-0.14.0.md). 0.14.1 preserves generated
 spatial numbering assignment order before hashing the reviewed plan. Exact
 CLI/host C03-first guards remain enforced; inspection/replay never resume C04.
-Native recovery remains **ready_for_owner_test**, with no acceptance yet.
+Native gate: **bounded PASS / accepted_on_build, 2026-10-12**,
+13/13 + 6/6 + 6/6 and owner UI/no-other-changes/Undo confirmation.
+[Acceptance and limits](../../docs/m3-recovery-acceptance-0.14.1.md),
+[original owner uploads](native-acceptance/20261012-owner/) and
+[inspection](native-acceptance/20261012-owner/inspection.json). Do not repeat.
+Original delivery records, archives, logs and embedded instructions retain their
+historical pre-test status unchanged.
 
 [Windows ZIP](allplan-mcp-0.14.1-windows-evaluation.zip),
 [checksum](allplan-mcp-0.14.1-windows-evaluation.zip.sha256),
@@ -33,7 +39,12 @@ These local fakes/HTTP checks execute no native Allplan.
 **6/6 PASS**, Windows/Ubuntu Python 3.11–3.13, including tests/builds.
 [Job/step observations](source-ci-0.14.1.json) are separate from local checks. The approximately 98-MiB sdist stays local.
 
-For this confirmed pre-Apply block, leave the original project unchanged:
+## Historical installation/retry guidance
+
+The following installation/retry guidance is historical; the corrected gate
+has now passed. Leave/save the copy after its completed Undo.
+
+For the earlier confirmed pre-Apply block, leave the original project unchanged:
 **no Undo**. Preserve 0.14.0 logs and Local/.allplan-mcp/repairs. Close Allplan/MCP,
 extract the new ZIP into its own folder and run Setup.cmd against the same Local.
 Repeat only the uncompleted recovery gate on the same retained disposable copy:

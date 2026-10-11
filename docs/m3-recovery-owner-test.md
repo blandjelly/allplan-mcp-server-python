@@ -1,8 +1,11 @@
-# Nowy test Allplana — odzyskiwanie po przerwanym zapisie, 0.14.1
+# Zakończony test Allplana — odzyskiwanie po przerwanym zapisie, 0.14.1
 
-Status: **ready_for_owner_test**, bez akceptacji natywnej. Wykonaj tylko tę
-nową partię na zachowanej kopii w Allplanie 2026-1-7. Poprzednich testów
-konfliktu, numeracji i warstwy/statusu nie trzeba powtarzać.
+Status: **PASS / accepted_on_build, 2026-10-12**, 13/13 + 6/6 + 6/6 OK.
+[Wynik i zakres akceptacji](m3-recovery-acceptance-0.14.1.md). Właściciel
+potwierdził zgodność UI, brak innych zmian i Undo. **Nie powtarzaj tego testu.**
+Zostaw i zapisz tę samą kopię po Undo; zachowaj logi oraz dziennik Local.
+Poniżej zachowano instrukcję zakończonej próby. Oryginalna instrukcja w paczce
+0.14.1 pozostaje bez zmian.
 
 Test zapisze **tylko C03: niezdefiniowany → S03** i celowo zatrzyma dalszą
 część wykonania. **C04 pozostanie S02**. Potem sprawdzimy odzyskiwanie po

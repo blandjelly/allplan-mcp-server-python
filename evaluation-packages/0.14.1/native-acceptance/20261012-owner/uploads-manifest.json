@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-12 Europe/Warsaw",
+  "files": {
+    "m3-last-recovery-execution.json": {
+      "bytes": 35222,
+      "sha256": "582248be1321c2a8771856184f51e901f3480a5b8c9245329e6d41f3b11bbd91"
+    },
+    "m3-last-recovery-execution.txt": {
+      "bytes": 85,
+      "sha256": "925d665b27e2c8f8133eb3aaf70913f3285acfed19e9936566c09cca6abf6d54"
+    },
+    "m3-recovery-check-20261011T221919932637Z.json": {
+      "bytes": 574183,
+      "sha256": "a1c01774eef69dc0df12a4b0653a060e2b4e9fa1fb111e918a50a5bbbae5903a"
+    },
+    "m3-recovery-check-20261011T221919932637Z.txt": {
+      "bytes": 4999,
+      "sha256": "379d32698b714f7bb8eb0c76522a7057814d74ce48a8214e99a6c837358bd4b1"
+    },
+    "m3-recovery-execution-d8a1baca4f7e487395af40119a386586.json": {
+      "bytes": 35222,
+      "sha256": "582248be1321c2a8771856184f51e901f3480a5b8c9245329e6d41f3b11bbd91"
+    },
+    "m3-recovery-execution-d8a1baca4f7e487395af40119a386586.txt": {
+      "bytes": 85,
+      "sha256": "925d665b27e2c8f8133eb3aaf70913f3285acfed19e9936566c09cca6abf6d54"
+    },
+    "m3-recovery-recover-20261011T222041250630Z.json": {
+      "bytes": 459842,
+      "sha256": "b6057876efa3dea382c87f1a87dc62745b41f5ee4d3e93aad1c571c43bc45cc8"
+    },
+    "m3-recovery-recover-20261011T222041250630Z.txt": {
+      "bytes": 1519,
+      "sha256": "1a03851bf0b50274c3f258a6e2fab9df6215fdbb0565c5b7082d69dabfe1be57"
+    },
+    "m3-recovery-undo-check-20261011T222253972790Z.json": {
+      "bytes": 472891,
+      "sha256": "7a1bdf3f75b390e72e6f2faceace42429e22429d8a5454907a9698721d33aa3f"
+    },
+    "m3-recovery-undo-check-20261011T222253972790Z.txt": {
+      "bytes": 1686,
+      "sha256": "e933b2665b8450465f5b7e988bccc3d9a557f898c04a7b389aabb69530493f16"
+    }
+  }
+}

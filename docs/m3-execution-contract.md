@@ -1,12 +1,13 @@
 # M3 execution, native guards and recovery
 
-Package **0.14.0** shares this executor across fix_model_issues,
+Package **0.14.1** shares this executor across fix_model_issues,
 apply_office_standard and rule_based_edit. [Current eligibility/workflow metadata](m3-workflow-execution-contract.md)
 cover 1–32 existing string mark/status and layer changes on Column roots in one foreground
 file. [Native acceptance](validation-status.md) remains narrower: the earlier
 two-target gate and latest two separately reviewed single-target workflows.
-Two separate Undo steps are accepted; grouped Undo, manual UI active-plan conflicts
-and unknown-outcome recovery remain open. The [bounded same-session typed conflict
+Two separate Undo steps are accepted; grouped Undo and manual UI active-plan
+conflicts remain open. [Controlled unknown-outcome recovery](m3-recovery-acceptance-0.14.1.md)
+has bounded native acceptance after one C03 setter. The [bounded same-session typed conflict
 gate](m3-conflict-acceptance-0.13.0.md) passed one write and Undo/recovery.
 
 ## Eligibility correction and rejected requests
@@ -143,17 +144,20 @@ current state after UI Undo.
 Native acceptance covers the recorded layer/status writes/readbacks, audited-field
 verification, exact-ID replay, separate Undo and completed recovery after Redo.
 Restart invalidation and stale Apply rejection also pass. Native manual UI active-plan
-conflicts, controlled partial/unknown recovery, broader scope/identity and
+conflicts, broader scope/identity and
 crash/power-loss persistence remain open. Do not repeat the UI-edit scenario
 known to cancel the host. The bounded 0.12.0 mark-numbering gate passed writes/readback/replay/no-op
 and two-step Undo/recovery; [evidence](m3-numbering-acceptance-0.12.0.md). Next obtain
 the missing native evidence; see [handoff](next-model-handoff.md).
 
-## Controlled recovery evaluation — 0.14.0
+## Controlled recovery evaluation — 0.14.1
 
 The [explicit diagnostic stop](m3-recovery-contract.md) uses the normal durable
 write-ahead marker after the first C03 setter, before readback or C04. It requires
 a separate typed acknowledgement and the retained two-mark numbering fixture.
-Normal Apply is unchanged; Recover/exact-ID replay never resume skipped targets.
-The [new owner gate](m3-recovery-owner-test.md) requires a host restart, inspection
-and one Undo; status ready_for_owner_test, no native acceptance yet.
+Ordinary Apply retains its guards; generated numbering writes follow spatial
+assignment order. Recover/exact-ID replay never resume skipped targets.
+The [bounded native gate](m3-recovery-acceptance-0.14.1.md) passed
+13/13 + 6/6 + 6/6: controlled C03-only interruption, restart/reconciliation,
+read-only replay/no-resume and owner Undo, with audits 3 → 2 → 3.
+No repeat is required; broader crash/identity/scope guarantees remain open.

@@ -1,4 +1,4 @@
-# M3 shared mark/status/layer execution — 0.14.0
+# M3 shared mark/status/layer execution — 0.14.1
 
 Status **bounded native workflow-write gate PASS**, 2026-10-10 Europe/Warsaw.
 [Validation status](validation-status.md):
@@ -68,8 +68,9 @@ fields within the requested scope, not every native property in the project.
 No automatic retry, rollback, Undo or resume occurs. Exact-ID replay returns
 historical saved outcomes without setters. Recover reads current observations
 in the original disposable project/document; it does not prove write causality.
-Native accepted recovery remains the earlier completed execution after Redo,
-not unknown-outcome recovery. Two separate Undo steps remain the tested limit
+Native recovery additionally covers the [0.14.1 controlled unknown outcome](m3-recovery-acceptance-0.14.1.md)
+after one C03 setter and host restart; crash/power-loss recovery remains unaccepted.
+Two separate Undo steps remain the tested limit
 of the earlier two-write gate. Two-step Undo is also owner-confirmed for the
 0.11.0 workflow pair; grouped and broader-scope Undo remain unaccepted.
 
@@ -104,17 +105,20 @@ not establish authenticated history or sudden power-loss durability.
 Actual mark assignment and deterministic versioned-standard numbering are
 implemented in 0.12.0; [the bounded two-target native gate](m3-numbering-acceptance-0.12.0.md)
 passed. The [bounded same-session conflict gate](m3-conflict-acceptance-0.13.0.md)
-also passed. No repeat is requested. Next prepare controlled
-partial/unknown-result recovery. The accepted two-workflow gate needs no repeat.
+also passed. The [0.14.1 controlled recovery gate](m3-recovery-acceptance-0.14.1.md)
+passed restart/reconciliation, no-resume replay and Undo. No completed gate needs repeat.
 Do not repeat UI editing known to cancel the host. Broader journal maintenance,
 identity guarantees and final UAT/main integration remain open. Graphic labels,
 file moves and universal native properties are conditional extensions.
 
-## Controlled recovery evaluation — 0.14.0
+## Controlled recovery evaluation — 0.14.1
 
 The [explicit diagnostic stop](m3-recovery-contract.md) uses the normal durable
 write-ahead marker after the first C03 setter, before readback or C04. It requires
 a separate typed acknowledgement and the retained two-mark numbering fixture.
-Normal Apply is unchanged; Recover/exact-ID replay never resume skipped targets.
-The [new owner gate](m3-recovery-owner-test.md) requires a host restart, inspection
-and one Undo; status ready_for_owner_test, no native acceptance yet.
+Ordinary Apply retains its guards; generated numbering writes follow spatial
+assignment order. Recover/exact-ID replay never resume skipped targets.
+The [bounded native gate](m3-recovery-acceptance-0.14.1.md) passed
+13/13 + 6/6 + 6/6: controlled C03-only interruption, restart/reconciliation,
+read-only replay/no-resume and owner Undo, with audits 3 → 2 → 3.
+No repeat is required; broader crash/identity/scope guarantees remain open.

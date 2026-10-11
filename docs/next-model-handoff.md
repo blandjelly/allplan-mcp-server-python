@@ -54,15 +54,21 @@ and [testing policy](testing-policy.md). Details: [read tools](tool-reference.md
   observes the old value and audits 3 → 2 → 3.
   [Evidence and boundaries](m3-conflict-acceptance-0.13.0.md).
 
+- 0.14.1 [bounded controlled recovery gate](m3-recovery-acceptance-0.14.1.md)
+  **PASS (2026-10-12)**: 13/13 + 6/6 + 6/6, one C03 setter leaves actual
+  running/unknown and skipped C04; new-ID rejection before setters, host
+  restart/reconciliation and exact-ID replay without resume. Owner confirms UI,
+  no other changes and Undo; final complete snapshot matches baseline, audits
+  3 → 2 → 3. Final pointer undo_checked. Host sessions remain consistent within
+  each phase; Part C uses another session with unspecified cause. No repeat.
+
 ## Next implementation
 
-1. Obtain only the corrected 0.14.1 [controlled unknown-result/restart inspection gate](m3-recovery-owner-test.md).
-   The diagnostic stop leaves the actual running write-ahead marker after one C03 setter,
-   before readback/C04. After host restart, Recover/replay inspect and never resume.
-   One owner Undo plus final inspection returns the original retained fixture.
-   Status is ready_for_owner_test, not native accepted. No repeat of completed gates.
-2. Resolve remaining acceptance for the declared scope, journal maintenance and
-   identity limits; integrate with main and complete UAT-05/UAT-06.
+1. Resolve remaining declared-scope acceptance and journal/identity limits.
+   Do not repeat completed gates or the manual UI editing known to cancel the
+   host unchanged. Crash/power-loss, cross-copy identity and grouped Undo remain
+   outside accepted scope. No owner rerun is requested for the completed recovery gate.
+2. Complete final UAT/main integration separately; PR #2 remains draft into main.
 
 Graphical labels, file moves and universal native setters are conditional
 extensions. They do not enlarge mandatory M3 closure scope.
@@ -74,8 +80,8 @@ health, audit and full snapshot passed. UUID order put C04 ahead of C03;
 [diagnosis](m3-recovery-blocked-0.14.0.md). No native write or Undo occurred
 in that attempt. 0.14.1 preserves generated spatial assignment order before
 plan hashing, retains exact CLI/host guards and labels pre-Apply failures
-explicitly. Install the new version and repeat only this uncompleted gate
-on the same unchanged copy; old journals and packages remain preserved.
+explicitly. The corrected gate has now passed; preserve old journals/packages
+and the same original project after its 0.14.1 Undo. Do not repeat the writing gate.
 Final **207 portable tests PASS**, one full run on Linux CPython 3.12.14;
 focused control/mark/HTTP checks, frozen sync and wheel/sdist builds PASS.
 [0.14.1 delivery](../evaluation-packages/0.14.1/README.md) records the exact
@@ -86,7 +92,8 @@ on Linux CPython 3.12.14 after focused executor/real-HTTP checks. Frozen sync PA
 The new runtime package, clean-source identity, builds, installation checks and
 source CI are recorded in [0.14.0 delivery](../evaluation-packages/0.14.0/README.md).
 The final candidate includes explicit pre-setter rejection reporting; its 205-test
-run replaces the earlier 204-test candidate. Native status remains ready_for_owner_test.
+run replaces the earlier 204-test candidate. That delivery predated the
+0.14.0 preflight block and subsequent bounded 0.14.1 native PASS.
 All old delivered artifacts remain unchanged.
 
 
@@ -109,9 +116,10 @@ Setup/Restore preserved the journal. Source **fd78700378eceb6f217e4ca30a83b88004
 The delivery retains exact archive identity and source CI job/step observations.
 Do not repeat the full suite or prior native batches for documentation publication.
 
-The owner left the original disposable copy after the **single 0.13.0 Undo**:
+The owner left the original disposable copy after the **0.14.1 recovery Undo**:
 C03 mark `<niezdefiniowany>`, C04=S02, C02=S02; C05 structure/C06 NEW remain.
-Read-only Recover observed C03’s old value and a complete three-finding audit.
+Read-only Recover observed both targets’ old values and a complete three-finding
+audit; the full six-column snapshot matches the original baseline.
 **Leave/save this state until a new separately reviewed gate; no Redo or new Apply.**
 Historical completed/replay outcomes do not establish current values after Undo.
 Never reuse an old execution ID for a new repair.
@@ -145,8 +153,8 @@ Source [CI 38175934542](https://github.com/blandjelly/allplan-mcp-server-python/
 original logs, CI steps, instructions and package. Documentation publication
 repeats no tests/builds and leaves archives unchanged. Main ancestry was reconciled
 in the M3 branch; PR #2 stays draft into main, without merge/release.
-The original native attempt blocked before Apply; use corrected 0.14.1 for
-the next owner gate. Native recovery remains unaccepted; M3/UAT-05/UAT-06 are open.
+The original native attempt blocked before Apply; corrected 0.14.1 has since
+passed with bounded native recovery acceptance. M3/UAT-05/UAT-06 are open.
 
 ## Delivered 0.14.1 correction and owner action
 
@@ -159,8 +167,17 @@ passes all 23 bridge hashes, journal preservation and prior bridge restoration.
 source/archive, local logs, installation check and CI job/step observations.
 Documentation publication repeats no tests/builds and leaves old artifacts unchanged.
 
-The 0.14.0 attempt blocked before Apply/ID creation: leave the original copy
-unchanged with no Undo. Install 0.14.1 and repeat only the uncompleted
-[controlled recovery gate](m3-recovery-owner-test.md). Keep Local journal and
-0.14.0 logs. Native recovery remains ready_for_owner_test without acceptance;
-M3/UAT-05/UAT-06 remain open. PR #2 stays draft into main, with no merge/release.
+The 0.14.0 attempt blocked before Apply/ID creation; the corrected
+[controlled recovery gate](m3-recovery-acceptance-0.14.1.md) has since passed.
+Leave/save the copy after the completed 0.14.1 Undo, preserving Local journal
+and all logs. No repeat is requested. M3/UAT-05/UAT-06 remain open.
+PR #2 stays draft into main, with no merge/release.
+
+## Latest native acceptance — 0.14.1
+
+[Recorded recovery PASS](m3-recovery-acceptance-0.14.1.md) retains ten original
+uploads, their hashes and independent response/plan/request/audit/snapshot
+inspection. Package/source identity matches the delivered 0.14.1 manifest.
+This documentation/evidence update runs no product tests/builds. The original
+archives, delivery records and embedded instructions remain unchanged. Keep
+the saved execution identity; do not repeat the writing launcher.

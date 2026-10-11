@@ -47,8 +47,9 @@ For other saved executions, the typed MCP request is:
 
 Recovery observes old/new/conflicting/unknown values; it does not prove causality
 or resume skipped changes. Historical applied outcomes remain historical after
-UI Undo. Native recovery acceptance covers a completed execution after Redo;
-controlled native unknown-outcome recovery remains open.
+UI Undo. Native acceptance additionally covers [controlled C03 unknown-outcome
+recovery after restart](m3-recovery-acceptance-0.14.1.md); crash/power-loss recovery
+and broader identity guarantees remain open.
 
 The journal has **128 records**, no automatic eviction/pruning. At capacity,
 stop new writes. Setup/Restore preserve it, but bridge backups do not include it.
@@ -62,7 +63,8 @@ procedures are available through [Git history](validation-status.md#historical-r
 
 ## Controlled unknown-result test — 0.14.1
 
-Only the [new owner walkthrough](m3-recovery-owner-test.md) is requested.
+The [owner walkthrough](m3-recovery-owner-test.md) is completed with
+[bounded PASS](m3-recovery-acceptance-0.14.1.md); no repeat is requested.
 M3 Recovery Test.cmd writes C03 once and preserves the actual running/unknown
 write-ahead record with C04 skipped. Restart StartPythonHost before M3 Recovery
 Inspect.cmd; after successful inspection, one Undo and M3 Recovery Undo Check.cmd.

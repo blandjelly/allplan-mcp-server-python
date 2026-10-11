@@ -80,9 +80,10 @@ have separate bounded acceptance. Unchanged completed gates need no repetition.
 
 Mark assignment and deterministic versioned-standard numbering are implemented;
 [their bounded two-target native gate](m3-numbering-acceptance-0.12.0.md) passed
-complete audits 3 → 0 → 3, readback, replay/no-op and two-step Undo/recovery. Required next work: controlled partial/unknown outcomes with read-only recovery
-and remaining native scope; manual UI active-plan conflict is unaccepted. Known UI editing
-cancelled the host and must not be repeated unchanged. Journal maintenance and
+complete audits 3 → 0 → 3, readback, replay/no-op and two-step Undo/recovery.
+[Controlled partial/unknown recovery](m3-recovery-acceptance-0.14.1.md) now has
+bounded native PASS. Remaining native scope and manual UI active-plan conflict
+are unaccepted. Known UI editing cancelled the host and must not be repeated unchanged. Journal maintenance and
 identity limits, final UAT and main integration remain open. Graphical labels,
 file moves and universal native properties are conditional extensions.
 
@@ -154,6 +155,9 @@ with evidence. Do not repeat accepted batches without a relevant change/defect.
 The [explicit diagnostic stop](m3-recovery-contract.md) uses the normal durable
 write-ahead marker after the first C03 setter, before readback or C04. It requires
 a separate typed acknowledgement and the retained two-mark numbering fixture.
-Ordinary Apply retains its guards; generated numbering writes follow spatial assignment order; Recover/exact-ID replay never resume skipped targets.
-The [new owner gate](m3-recovery-owner-test.md) requires a host restart, inspection
-and one Undo; status ready_for_owner_test, no native acceptance yet.
+Ordinary Apply retains its guards; generated numbering writes follow spatial
+assignment order. Recover/exact-ID replay never resume skipped targets.
+The [bounded native gate](m3-recovery-acceptance-0.14.1.md) passed
+13/13 + 6/6 + 6/6: controlled C03-only interruption, restart/reconciliation,
+read-only replay/no-resume and owner Undo, with audits 3 → 2 → 3.
+No repeat is required; broader crash/identity/scope guarantees remain open.

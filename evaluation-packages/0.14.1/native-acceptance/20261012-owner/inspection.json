@@ -1,0 +1,71 @@
+{
+  "result": "PASS",
+  "scope": "bounded controlled C03 unknown/skipped outcome, host restart, read-only reconciliation/replay and owner Undo",
+  "source_commit": "1810e4fa284311e204b9133deee3245f8427697b",
+  "package": "0.14.1",
+  "execution_id": "d8a1baca4f7e487395af40119a386586",
+  "probe_execution_id": "40ba179b95b840238d4ebfe8a061ee75",
+  "steps_passed": [
+    13,
+    6,
+    6
+  ],
+  "mcp_text_matches_structured_responses": true,
+  "human_readable_reports_match": true,
+  "plan_hash_recomputed": "8b897771f4f797bf59a33d80ee1b4e5c6c37b99b7a8fcb5baf44b8e1f4c5a4a7",
+  "apply_request_hash_recomputed": "398883374f00e98b4a9beaf448870bf913dd849737435ebfa2b872defeb81609",
+  "audit_hashes_recomputed": {
+    "before": "c36566af15383508706faad70cd2b58d823959bc98e3a525042985dd8f06474c",
+    "preview": "c36566af15383508706faad70cd2b58d823959bc98e3a525042985dd8f06474c",
+    "partial": "8fc02dac78ccdbd7245ad387620e169adec11cf5bf5a80ffa04f88ae5be5daa9",
+    "recovery_internal": "402cf5005810a7a9009a5978aaeabc55f6c7294481598eb9970b626cca524019",
+    "after_inspection": "402cf5005810a7a9009a5978aaeabc55f6c7294481598eb9970b626cca524019",
+    "undo_internal": "10dcd841c26c2c931b6e49a0061b410e592c5a3cf2ab9d1febb601afc0976ff0",
+    "after_undo": "10dcd841c26c2c931b6e49a0061b410e592c5a3cf2ab9d1febb601afc0976ff0"
+  },
+  "reported_bridge_hashes_match_delivered_manifest": 23,
+  "host_sessions": {
+    "write_gate": "45d7bfab-6b30-4140-bcb1-b1254480ba5e",
+    "restart_inspection": "a3b0cfec-8571-4abf-a439-3fd62ba92ddd",
+    "undo_inspection": "95772e5b-4c28-4123-aeb3-313416d3c962"
+  },
+  "host_session_stable_within_each_phase": true,
+  "unknown_skipped_actual_result_and_read_only_replay": true,
+  "separate_new_identity_rejected_before_setters": true,
+  "recovery_outcomes": [
+    "reconciled",
+    "skipped"
+  ],
+  "recovery_observations_before_undo": [
+    "new_value_observed",
+    "old_value_observed"
+  ],
+  "recovery_observations_after_undo": [
+    "old_value_observed",
+    "old_value_observed"
+  ],
+  "historical_outcomes_unchanged_after_undo": true,
+  "audit_findings_before_partial_after_undo": [
+    3,
+    2,
+    3
+  ],
+  "partial_full_fields_only_c03_changed": true,
+  "full_fields_after_undo_match_baseline": true,
+  "final_saved_pointer": "undo_checked",
+  "owner_statement": "w allplanie wszystko zadzialalo zgodnie z planem - ui, brak innych zmian, undo",
+  "owner_observations": {
+    "ui_matches_walkthrough": true,
+    "no_other_changes": true,
+    "undo_worked_according_to_walkthrough": true
+  },
+  "session_note": "The final Undo inspection used another host session than Part B. Its cause was not specified; health and sessions are consistent within each phase.",
+  "project_instruction": "Leave/save the same disposable copy after Undo; preserve Local journal and logs; no Redo or repeated writing gate.",
+  "limits": [
+    "controlled interruption after one setter, not a native process crash/power-loss test",
+    "one setter/Undo, not grouped multiple-write Undo",
+    "retained original fixture only; cross-copy identity and broad write scope unaccepted",
+    "manual UI active-plan conflict unaccepted",
+    "M3/UAT-05/UAT-06 remain open"
+  ]
+}

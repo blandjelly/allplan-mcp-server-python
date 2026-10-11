@@ -28,14 +28,17 @@ read-only replay, complete audits **5 → 4 → 3** and owner-confirmed two-step
 standard; the [bounded two-target native gate](docs/m3-numbering-acceptance-0.12.0.md)
 passed writes, readback, replay/no-op and two-step Undo/recovery.
 **M3/UAT-05/UAT-06 remain open**: remaining scope acceptance, manual UI active-plan
-conflicts and controlled partial/unknown recovery are open.
+conflicts and broader journal/identity guarantees are open.
 0.13.0 retains invalidated plans for one bounded read-only source comparison;
 they remain unavailable to Apply. The [bounded same-session conflict gate](docs/m3-conflict-acceptance-0.13.0.md)
 passed 12/12 steps, one C03 write, stale C04 rejection, actual excluded-peer
 conflict and Undo/recovery. Leave/save the retained project after Undo.
 0.14.1 corrects UUID-dependent write order in the
 [controlled unknown-result/restart inspection gate](docs/m3-recovery-owner-test.md).
-The 0.14.0 attempt blocked before Apply; native recovery acceptance is still pending. It writes only C03 and never resumes C04.
+The 0.14.0 attempt blocked before Apply. The corrected
+[bounded native recovery gate passed](docs/m3-recovery-acceptance-0.14.1.md):
+13/13 + 6/6 + 6/6, audits 3 → 2 → 3, restart/replay without resume and owner Undo.
+Leave/save the same project after Undo; no repeat is required.
 [Validation status](docs/validation-status.md) defines the accepted boundaries.
 
 Use [Windows setup](docs/windows-setup.md), [fixture definition](docs/fixture-guide.md),

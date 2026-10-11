@@ -48,6 +48,9 @@ for general writes. Observe the current model before resuming after Undo/Redo.
 The [explicit diagnostic stop](m3-recovery-contract.md) uses the normal durable
 write-ahead marker after the first C03 setter, before readback or C04. It requires
 a separate typed acknowledgement and the retained two-mark numbering fixture.
-Ordinary Apply retains its guards; generated numbering writes follow spatial assignment order; Recover/exact-ID replay never resume skipped targets.
-The [new owner gate](m3-recovery-owner-test.md) requires a host restart, inspection
-and one Undo; status ready_for_owner_test, no native acceptance yet.
+Ordinary Apply retains its guards; generated numbering writes follow spatial
+assignment order. Recover/exact-ID replay never resume skipped targets.
+The [bounded native gate](m3-recovery-acceptance-0.14.1.md) passed
+13/13 + 6/6 + 6/6: controlled C03-only interruption, restart/reconciliation,
+read-only replay/no-resume and owner Undo, with audits 3 → 2 → 3.
+No repeat is required; broader crash/identity/scope guarantees remain open.
