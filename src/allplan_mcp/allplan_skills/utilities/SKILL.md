@@ -5,6 +5,12 @@ description: Use this skill when the agent needs small reusable patterns for ALL
 
 # ALLPLAN utilities
 
+This bundled resource is development guidance for PythonPart scripts, not a
+catalog of implemented MCP tools or native acceptance. The project targets
+Allplan 2026; verify each API signature against that release before use.
+Current workflow scope and acceptance are recorded in the repository's
+README and docs/next-model-handoff.md.
+
 Use this skill for small helper patterns that you want to copy into generated code
 
 ## Asset pack

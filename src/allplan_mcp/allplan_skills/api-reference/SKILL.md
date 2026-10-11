@@ -5,6 +5,12 @@ description: Use this skill when the agent needs exact ALLPLAN API names, signat
 
 # ALLPLAN API reference
 
+This bundled resource is development guidance for PythonPart scripts, not a
+catalog of implemented MCP tools or native acceptance. The project targets
+Allplan 2026; verify each API signature against that release before use.
+Current workflow scope and acceptance are recorded in the repository's
+README and docs/next-model-handoff.md.
+
 Use this skill when the agent is not sure about an ALLPLAN class name, constructor, enum, or helper module
 
 ## Asset pack

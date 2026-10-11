@@ -47,7 +47,8 @@ resources in `src/allplan_mcp/allplan_skills/`. MCP exposes `allplan://skills`,
 
 M1 implements bounded context, scope, session-bound references/snapshots and
 read-only selections; [read contracts](tool-reference.md) define their limits.
-The table also includes future mutation, audit and registry contracts.
+M2 implements AuditReport and M3 implements the bounded ChangePlan/ExecutionResult
+lifecycle below. General writable profiles and PackageRegistry remain future work.
 
 | Contract | Required fields and behavior |
 | --- | --- |
