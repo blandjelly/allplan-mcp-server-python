@@ -141,3 +141,20 @@ repeats no tests/builds and leaves archives unchanged. Main ancestry was reconci
 in the M3 branch; PR #2 stays draft into main, without merge/release.
 The original native attempt blocked before Apply; use corrected 0.14.1 for
 the next owner gate. Native recovery remains unaccepted; M3/UAT-05/UAT-06 are open.
+
+## Delivered 0.14.1 correction and owner action
+
+Clean source **1810e4fa284311e204b9133deee3245f8427697b**, final **207-test PASS**,
+frozen sync and clean-source wheel/sdist builds PASS. Exact ZIP verification
+passes all 23 bridge hashes, journal preservation and prior bridge restoration.
+[Source CI 38179275055](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38179275055)
+**6/6 PASS**, Windows/Ubuntu Python 3.11–3.13, including tests and builds.
+[0.14.1 delivery](../evaluation-packages/0.14.1/README.md) retains the exact
+source/archive, local logs, installation check and CI job/step observations.
+Documentation publication repeats no tests/builds and leaves old artifacts unchanged.
+
+The 0.14.0 attempt blocked before Apply/ID creation: leave the original copy
+unchanged with no Undo. Install 0.14.1 and repeat only the uncompleted
+[controlled recovery gate](m3-recovery-owner-test.md). Keep Local journal and
+0.14.0 logs. Native recovery remains ready_for_owner_test without acceptance;
+M3/UAT-05/UAT-06 remain open. PR #2 stays draft into main, with no merge/release.
