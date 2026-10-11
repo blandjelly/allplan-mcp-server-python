@@ -1,6 +1,16 @@
 # Validation status and limits
 
-Current package **0.14.1**; status recorded **2026-10-12 Europe/Warsaw**.
+Current package **0.15.0**; status recorded **2026-10-12 Europe/Warsaw**.
+0.15.0 adds [read-only journal inspection](m3-journal-contract.md) and a
+[new selected C04 mark owner gate](m3-selected-mark-owner-test.md).
+**219 portable tests PASS**, one final full run on Linux CPython 3.12.14 after
+focused journal/executor/real-HTTP checks; frozen sync PASS. Builds, exact
+installation and source CI are recorded in the [0.15.0 delivery](../evaluation-packages/0.15.0/README.md).
+The new scope is **ready_for_owner_test**, not native accepted: one explicit
+rule_based_edit mark write, excluded C02, journal inspection and one Undo.
+Previous native evidence remains scoped to its recorded source; no accepted
+owner gate is repeated.
+
 The previous 0.13.0 [bounded same-session conflict gate](m3-conflict-acceptance-0.13.0.md) is
 **PASS**: 12/12 steps, one C03 write, stale C04 rejection before setters, actual
 excluded-peer conflict and completed-execution recovery after one Undo (audits 3 → 2 → 3). It preserves invalidated

@@ -1,4 +1,4 @@
-# M3 shared mark/status/layer execution — 0.14.1
+# M3 shared mark/status/layer execution — 0.15.0
 
 Status **bounded native workflow-write gate PASS**, 2026-10-10 Europe/Warsaw.
 [Validation status](validation-status.md):
@@ -122,3 +122,13 @@ The [bounded native gate](m3-recovery-acceptance-0.14.1.md) passed
 13/13 + 6/6 + 6/6: controlled C03-only interruption, restart/reconciliation,
 read-only replay/no-resume and owner Undo, with audits 3 → 2 → 3.
 No repeat is required; broader crash/identity/scope guarantees remain open.
+
+## Next bounded owner gate — 0.15.0
+
+[Journal inspection](m3-journal-contract.md) exposes historical identities,
+capacity and unresolved/invalid blockers without native model access. The
+[new selected C04 mark gate](m3-selected-mark-owner-test.md) verifies positive
+rule_based_edit with excluded C02, full-field readback and one Undo/recovery.
+Status ready_for_owner_test; this scope is not yet native accepted. Previous
+accepted gates remain unchanged. Journal rollover, cross-copy identity and
+broader 1–32-change native acceptance remain outside this slice.

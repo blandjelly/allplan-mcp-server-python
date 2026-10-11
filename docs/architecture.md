@@ -117,11 +117,16 @@ do not include 2027-only BuildingStructure/ReportService claims. Distinguish
 ordinary native components from Structural Framing and single-/multi-layer walls.
 Configured floor/grid/file mappings remain necessary until API behavior is proven.
 
-## Controlled recovery evaluation — 0.14.0
+## Controlled recovery evaluation — 0.14.1
 
 The [explicit diagnostic stop](m3-recovery-contract.md) uses the normal durable
 write-ahead marker after the first C03 setter, before readback or C04. It requires
 a separate typed acknowledgement and the retained two-mark numbering fixture.
 Normal Apply is unchanged; Recover/exact-ID replay never resume skipped targets.
-The [new owner gate](m3-recovery-owner-test.md) requires a host restart, inspection
-and one Undo; status ready_for_owner_test, no native acceptance yet.
+The [bounded native recovery gate](m3-recovery-acceptance-0.14.1.md) passed
+restart/inspection and owner Undo; no repeat is required.
+
+0.15.0 adds [journal inspection](m3-journal-contract.md) before any native
+document/API lookup. It uses the existing writer lock, bounded verified history
+and structural record checks; no reconciliation/pruning is performed. The
+[new selected-mark owner gate](m3-selected-mark-owner-test.md) is ready_for_owner_test.

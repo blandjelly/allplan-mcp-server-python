@@ -18,7 +18,7 @@ Read these files in order when continuing implementation:
 5. [Validation schedule](docs/testing-policy.md): focused local work, publication
    checks, CI matrix and retained hash protections.
 
-Current package: **0.14.1**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
+Current package: **0.15.0**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
 **M0–M2 / UAT-00–UAT-04 are accepted within the recorded Allplan 2026-1-7 fixture scope**
 with local Windows Codex. M3 has accepted layer/status preview and bounded writes,
 standard/selection workflows and read-only mark collision previews.
@@ -40,6 +40,9 @@ The 0.14.0 attempt blocked before Apply. The corrected
 13/13 + 6/6 + 6/6, audits 3 → 2 → 3, restart/replay without resume and owner Undo.
 Leave/save the same project after Undo; no repeat is required.
 [Validation status](docs/validation-status.md) defines the accepted boundaries.
+0.15.0 adds [read-only journal inspection](docs/m3-journal-contract.md) and
+a [new selected C04 mark owner gate](docs/m3-selected-mark-owner-test.md).
+The new scope is ready_for_owner_test; no completed gate needs repetition.
 
 Use [Windows setup](docs/windows-setup.md), [fixture definition](docs/fixture-guide.md),
 [read tools](docs/tool-reference.md), [audit contract](docs/m2-audit-contract.md),

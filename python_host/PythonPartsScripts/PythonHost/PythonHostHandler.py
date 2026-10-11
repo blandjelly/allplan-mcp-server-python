@@ -42,6 +42,8 @@ class RequestHandler:
         if path == "/fix-model-issues":
             from .repair_contracts import validate_repair_request
             validate_repair_request(request)
+            if request["action"] == "inspect_journal":
+                return self.repair_plans.executor.inspect_journal()
         if path not in {"/get-allplan-version", "/get-runtime-info"}:
             major = AllplanSettings.AllplanVersion.MainReleaseName()
             if str(major) != "2026":

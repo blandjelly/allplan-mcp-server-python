@@ -12,7 +12,9 @@ def validate_repair_request(request):
     if not isinstance(request, dict):
         invalid("Repair request must be an object.")
     action = request.get("action")
-    if action in {"revalidate", "apply", "recover"}:
+    if action == "inspect_journal":
+        keys(request, {"schema_version", "action"}, {"schema_version", "action"})
+    elif action in {"revalidate", "apply", "recover"}:
         required = {"schema_version", "action", "plan_id", "plan_hash"}
         if action == "recover":
             required = {"schema_version", "action", "execution_id"}
@@ -138,7 +140,7 @@ def validate_repair_request(request):
                     or len(set(ids)) != len(ids)):
                 invalid("finding_ids must contain 1..100 distinct finding hashes.")
     else:
-        invalid("Repair action must be preview, revalidate, apply or recover.")
+        invalid("Repair action must be preview, revalidate, apply, recover or inspect_journal.")
     if request["schema_version"] != SCHEMA:
         invalid(f"schema_version must be {SCHEMA}.")
 

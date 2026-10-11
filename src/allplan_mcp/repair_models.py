@@ -109,4 +109,9 @@ class RepairRecover(ContractModel):
     execution_id: str = Field(pattern=r"^[0-9a-f]{32}$")
 
 
-RepairRequest = Annotated[RepairPreview | RepairRevalidate | RepairApply | RepairRecover, Field(discriminator="action")]
+class RepairJournalInspection(ContractModel):
+    action: Literal["inspect_journal"]
+
+
+RepairRequest = Annotated[RepairPreview | RepairRevalidate | RepairApply | RepairRecover | RepairJournalInspection,
+                          Field(discriminator="action")]

@@ -2,6 +2,8 @@
 import copy
 import json
 import os
+import re
+from itertools import islice
 from contextlib import contextmanager
 from pathlib import Path
 from uuid import uuid4
@@ -60,9 +62,79 @@ class RepairExecutor:
             if (content != fingerprint(record) or record["execution_id"] != execution_id
                     or record["schema_version"] != "m3-execution-1"):
                 raise ValueError("invalid record")
+            self.validate_record(record)
             return record
-        except (OSError, ValueError, KeyError, TypeError) as exc:
+        except (OSError, ValueError, KeyError, TypeError, AttributeError) as exc:
             raise BridgeError("repair_journal_unavailable", "Mutation record cannot be verified; do not retry writes.", 409) from exc
+
+    @staticmethod
+    def validate_record(record):
+        """Hashes alone do not establish a usable execution/recovery record."""
+        for key, size in (("execution_id", 32), ("request_hash", 64), ("plan_id", 32), ("plan_hash", 64)):
+            if not isinstance(record.get(key), str) or not re.fullmatch(r"[0-9a-f]{" + str(size) + "}", record[key]):
+                raise ValueError("invalid identity")
+        changes, outcomes = record.get("changes"), record.get("outcomes")
+        if (record.get("state") not in {"running", "stopped", "completed", "verification_failed"}
+                or not isinstance(record.get("audit_request"), dict)
+                or not isinstance(changes, list) or not 1 <= len(changes) <= RepairExecutor.MAX_CHANGES
+                or not isinstance(outcomes, list) or len(outcomes) != len(changes)):
+            raise ValueError("invalid execution structure")
+        for change, outcome in zip(changes, outcomes):
+            if (not isinstance(change, dict) or not isinstance(change.get("ref"), dict)
+                    or not isinstance(outcome, dict) or outcome.get("state") not in
+                    {"skipped", "unknown", "applied", "failed", "conflict", "reconciled"}):
+                raise ValueError("invalid target/outcome")
+            if any(key not in change["ref"] for key in
+                   ("project_key", "document_id", "drawing_file", "model_uuid", "type_uuid")):
+                raise ValueError("invalid target identity")
+            ref = change["ref"]
+            if (not isinstance(ref["project_key"], str) or not re.fullmatch(r"[0-9a-f]{64}", ref["project_key"])
+                    or type(ref["document_id"]) is not int or type(ref["drawing_file"]) is not int
+                    or any(not isinstance(ref[k], str) or not re.fullmatch(
+                        r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}", ref[k]) for k in ("model_uuid", "type_uuid"))):
+                raise ValueError("invalid target identity types")
+
+    def inspect_journal(self):
+        """Bounded, locked history inspection; no native read, reconciliation or pruning."""
+        with self.locked():
+            files = sorted(islice(self.path.glob("*.json"), self.MAX_RECORDS + 1))
+            records, blockers = [], []
+            if len(files) > self.MAX_RECORDS:
+                blockers.append("capacity_exceeded")
+            for file in files[:self.MAX_RECORDS]:
+                try:
+                    record = self.load(file.stem)
+                    if record is None:
+                        raise BridgeError("repair_journal_unavailable", "Record disappeared during inspection.", 409)
+                    states = [o["state"] for o in record["outcomes"]]
+                    unresolved = record["state"] == "running" or "unknown" in states
+                    ref = record["changes"][0]["ref"]
+                    records.append({"execution_id": record["execution_id"], "plan_id": record["plan_id"],
+                                    "plan_hash": record["plan_hash"], "state": record["state"],
+                                    "integrity": "verified", "requires_recovery": unresolved,
+                                    "changes": len(states), "outcome_counts": {s: states.count(s) for s in sorted(set(states))},
+                                    "source_identity": {k: ref[k] for k in ("project_key", "document_id", "drawing_file")}})
+                    if unresolved and "recovery_required" not in blockers:
+                        blockers.append("recovery_required")
+                except BridgeError:
+                    records.append({"execution_id": file.stem[:128], "integrity": "unverifiable",
+                                    "requires_recovery": None})
+                    if "invalid_record" not in blockers:
+                        blockers.append("invalid_record")
+            if len(files) >= self.MAX_RECORDS and "capacity_exceeded" not in blockers:
+                blockers.append("journal_full")
+            return {"schema_version": "m3-journal-inspection-1", "action": "inspect_journal",
+                    "state": "blocked" if blockers else "available", "read_only": True,
+                    "native_model_access": False, "records_modified": False,
+                    "complete": len(files) <= self.MAX_RECORDS, "record_limit": self.MAX_RECORDS,
+                    "record_count": len(files) if len(files) <= self.MAX_RECORDS else None,
+                    "remaining_slots": max(0, self.MAX_RECORDS - len(files)),
+                    "new_execution_blockers": blockers, "records": records,
+                    "current_model_values": "not_checked", "copy_identity": "not_proven",
+                    "automatic_pruning": False,
+                    "report_text": "Repair journal: " + str(len(records)) + " inspected records; " +
+                                   (", ".join(blockers) if blockers else "storage checks passed") +
+                                   ". Historical records only; model values and write eligibility are not checked."}
 
     def save(self, record):
         payload = json.dumps({**record, "record_hash": fingerprint(record)}, ensure_ascii=False, allow_nan=False).encode()

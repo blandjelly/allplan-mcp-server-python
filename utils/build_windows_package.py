@@ -34,6 +34,10 @@ def payload_files(repo: Path) -> dict[str, bytes]:
                          "M3 Recovery Test.cmd": "m3-recovery-test",
                          "M3 Recovery Inspect.cmd": "m3-recovery-inspect",
                          "M3 Recovery Undo Check.cmd": "m3-recovery-undo-check",
+                         "M3 Journal.cmd": "m3-journal",
+                         "M3 Selected Mark.cmd": "m3-selected-mark",
+                         "M3 Selected Mark Recover.cmd": "m3-selected-mark-recover",
+                         "M3 Selected Mark Undo Check.cmd": "m3-selected-mark-undo-check",
                          "M3 Recover.cmd": "m3-recover",
                          "Restore bridge.cmd": "restore"}.items():
         files[name] = (repo / "windows" / f"{action}.cmd").read_bytes()

@@ -239,6 +239,9 @@ def fix_model_issues(request: RepairRequest) -> dict[str, Any]:
     only for its accepted fixture. It checks native eligibility, stops on
     failure and reads back results. Repeated execution IDs never repeat setters.
     Recover reads persisted execution/current values without resuming writes.
+    inspect_journal returns verified historical record summaries, capacity and
+    unresolved/invalid record blockers without reading or changing the model.
+    It neither reconciles records nor establishes current values after Undo.
     The retained mark-numbering gate has bounded native acceptance. The diagnostic
     evaluation_stop control requires disposable_copy_reviewed_recovery_test and
     only the retained unselected two-mark numbering fixture. It stops after the

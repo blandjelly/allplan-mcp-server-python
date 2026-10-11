@@ -13,6 +13,21 @@ original disposable project with explicit file scope. Use current references and
 values. Completed history does not establish current state after Undo/Redo.
 Unknown/incomplete data remains not_checked.
 
+## Journal inspection and selected-mark gate
+
+**M3 Journal.cmd** returns capacity, verified historical execution summaries
+and invalid/unresolved blockers without native model access or reconciliation.
+Use `fix_model_issues` with `{"action":"inspect_journal"}` from local Codex.
+An available journal does not establish current model values or writability.
+[Inspection contract](m3-journal-contract.md).
+
+**M3 Selected Mark.cmd** is the new 0.15.0 bounded C04 mark gate with excluded
+C02. [Polish walkthrough](m3-selected-mark-owner-test.md) defines its exact
+retained starting state. **M3 Selected Mark Recover.cmd** and
+**M3 Selected Mark Undo Check.cmd** use logs/m3-last-selected-mark-execution.json
+and send Recover only, never Apply replay/resume. Retain the immutable identity;
+do not rerun the writing gate once a pointer exists.
+
 ## Lost replies and recovery
 
 **M3 Conflict.cmd** retains the accepted 0.13.0 same-session source-conflict gate,

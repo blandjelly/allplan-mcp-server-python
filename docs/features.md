@@ -2,7 +2,7 @@
 
 The toolkit plans 13 workflow tools. Bounded context/query reads and native
 model audits are accepted within the [recorded fixture scope](validation-status.md).
-Package **0.14.1** supports reviewed existing-string mark/status and layer execution through
+Package **0.15.0** supports reviewed existing-string mark/status and layer execution through
 fix_model_issues, apply_office_standard and rule_based_edit; its native acceptance
 covers two separately reviewed single-target workflow writes. Mark previews have
 collision-aware native acceptance; mark writes and deterministic numbering are implemented;
@@ -54,3 +54,13 @@ The [bounded native gate](m3-recovery-acceptance-0.14.1.md) passed
 13/13 + 6/6 + 6/6: controlled C03-only interruption, restart/reconciliation,
 read-only replay/no-resume and owner Undo, with audits 3 → 2 → 3.
 No repeat is required; broader crash/identity/scope guarantees remain open.
+
+## Next bounded owner gate — 0.15.0
+
+[Journal inspection](m3-journal-contract.md) exposes historical identities,
+capacity and unresolved/invalid blockers without native model access. The
+[new selected C04 mark gate](m3-selected-mark-owner-test.md) verifies positive
+rule_based_edit with excluded C02, full-field readback and one Undo/recovery.
+Status ready_for_owner_test; this scope is not yet native accepted. Previous
+accepted gates remain unchanged. Journal rollover, cross-copy identity and
+broader 1–32-change native acceptance remain outside this slice.

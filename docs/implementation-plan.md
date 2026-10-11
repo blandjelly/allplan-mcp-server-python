@@ -62,7 +62,7 @@ uniqueness scope, explicit unavailable data and locatable targets; no writes.
 
 ## M3 — Controlled repairs and standards: partially implemented, M3 open
 
-Package **0.14.1** supports 1–32 reviewed existing string mark/status or layer changes on
+Package **0.15.0** supports 1–32 reviewed existing string mark/status or layer changes on
 Column roots in one explicit foreground file. Office-standard and rule-based
 Apply/Revalidate/Recover reuse the executor, full-source/exception checks,
 durable deduplication and audited readback.
@@ -161,3 +161,13 @@ The [bounded native gate](m3-recovery-acceptance-0.14.1.md) passed
 13/13 + 6/6 + 6/6: controlled C03-only interruption, restart/reconciliation,
 read-only replay/no-resume and owner Undo, with audits 3 → 2 → 3.
 No repeat is required; broader crash/identity/scope guarantees remain open.
+
+## Next bounded owner gate — 0.15.0
+
+[Journal inspection](m3-journal-contract.md) exposes historical identities,
+capacity and unresolved/invalid blockers without native model access. The
+[new selected C04 mark gate](m3-selected-mark-owner-test.md) verifies positive
+rule_based_edit with excluded C02, full-field readback and one Undo/recovery.
+Status ready_for_owner_test; this scope is not yet native accepted. Previous
+accepted gates remain unchanged. Journal rollover, cross-copy identity and
+broader 1–32-change native acceptance remain outside this slice.
