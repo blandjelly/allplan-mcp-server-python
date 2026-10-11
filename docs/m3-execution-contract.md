@@ -1,6 +1,6 @@
 # M3 execution, native guards and recovery
 
-Package **0.13.0** shares this executor across fix_model_issues,
+Package **0.14.0** shares this executor across fix_model_issues,
 apply_office_standard and rule_based_edit. [Current eligibility/workflow metadata](m3-workflow-execution-contract.md)
 cover 1–32 existing string mark/status and layer changes on Column roots in one foreground
 file. [Native acceptance](validation-status.md) remains narrower: the earlier
@@ -148,3 +148,12 @@ crash/power-loss persistence remain open. Do not repeat the UI-edit scenario
 known to cancel the host. The bounded 0.12.0 mark-numbering gate passed writes/readback/replay/no-op
 and two-step Undo/recovery; [evidence](m3-numbering-acceptance-0.12.0.md). Next obtain
 the missing native evidence; see [handoff](next-model-handoff.md).
+
+## Controlled recovery evaluation — 0.14.0
+
+The [explicit diagnostic stop](m3-recovery-contract.md) uses the normal durable
+write-ahead marker after the first C03 setter, before readback or C04. It requires
+a separate typed acknowledgement and the retained two-mark numbering fixture.
+Normal Apply is unchanged; Recover/exact-ID replay never resume skipped targets.
+The [new owner gate](m3-recovery-owner-test.md) requires a host restart, inspection
+and one Undo; status ready_for_owner_test, no native acceptance yet.

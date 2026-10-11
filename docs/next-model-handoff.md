@@ -2,7 +2,7 @@
 
 ## Current state
 
-Continue **codex/m3-repair-preview**, package **0.13.0**, draft into main
+Continue **codex/m3-repair-preview**, package **0.14.0**, draft into main
 [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2).
 M0–M2 / UAT-00–UAT-04 are accepted within the recorded Allplan **2026-1-7**
 fixture scope. **M3/UAT-05/UAT-06 and the first MVP remain open**.
@@ -14,7 +14,8 @@ and [testing policy](testing-policy.md). Details: [read tools](tool-reference.md
 [audit](m2-audit-contract.md), [repair preview](m3-repair-contract.md),
 [standard/selection](m3-standards-contract.md), [marks](m3-marks-contract.md),
 [numbering](m3-numbering-contract.md), [invalidated-plan inspection](m3-conflict-contract.md),
-[new owner gate](m3-conflict-owner-test.md),
+[completed conflict gate](m3-conflict-owner-test.md),
+[controlled interruption](m3-recovery-contract.md), [new owner gate](m3-recovery-owner-test.md),
 [execution](m3-execution-contract.md) and
 [workflow execution/journal lifecycle](m3-workflow-execution-contract.md).
 
@@ -55,10 +56,11 @@ and [testing policy](testing-policy.md). Details: [read tools](tool-reference.md
 
 ## Next implementation
 
-1. Prepare the separate controlled partial/unknown-result recovery gate using
-   accepted 0.13.0 lifecycle evidence. It does not accept manual UI conflicts
-   or partial/unknown outcomes by inference. No repeat of conflict, numbering
-   or layer/status gates is requested.
+1. Obtain only the new 0.14.0 [controlled unknown-result/restart inspection gate](m3-recovery-owner-test.md).
+   The diagnostic stop leaves the actual running write-ahead marker after one C03 setter,
+   before readback/C04. After host restart, Recover/replay inspect and never resume.
+   One owner Undo plus final inspection returns the original retained fixture.
+   Status is ready_for_owner_test, not native accepted. No repeat of completed gates.
 2. Resolve remaining acceptance for the declared scope, journal maintenance and
    identity limits; integrate with main and complete UAT-05/UAT-06.
 
@@ -67,7 +69,14 @@ extensions. They do not enlarge mandatory M3 closure scope.
 
 ## Resume safely
 
-Current 0.13.0 final-candidate verification: **195 portable tests PASS** on
+0.14.0 final-candidate verification: **204 portable tests PASS**, one full run
+on Linux CPython 3.12.14 after focused executor/real-HTTP checks. Frozen sync PASS.
+The new runtime package, clean-source identity, builds, installation checks and
+source CI are recorded in [0.14.0 delivery](../evaluation-packages/0.14.0/README.md).
+Native status remains ready_for_owner_test. All old delivered artifacts remain unchanged.
+
+
+Previous 0.13.0 final-candidate verification: **195 portable tests PASS** on
 Linux CPython 3.12.14, frozen sync and wheel/sdist build PASS. The exact clean-source
 ZIP passes extracted integrity and 23 installed bridge hashes; registration/restore
 preserve the journal and restore the prior bridge fixture. Source

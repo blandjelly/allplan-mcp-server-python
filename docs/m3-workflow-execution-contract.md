@@ -1,4 +1,4 @@
-# M3 shared mark/status/layer execution — 0.13.0
+# M3 shared mark/status/layer execution — 0.14.0
 
 Status **bounded native workflow-write gate PASS**, 2026-10-10 Europe/Warsaw.
 [Validation status](validation-status.md):
@@ -109,3 +109,12 @@ partial/unknown-result recovery. The accepted two-workflow gate needs no repeat.
 Do not repeat UI editing known to cancel the host. Broader journal maintenance,
 identity guarantees and final UAT/main integration remain open. Graphic labels,
 file moves and universal native properties are conditional extensions.
+
+## Controlled recovery evaluation — 0.14.0
+
+The [explicit diagnostic stop](m3-recovery-contract.md) uses the normal durable
+write-ahead marker after the first C03 setter, before readback or C04. It requires
+a separate typed acknowledgement and the retained two-mark numbering fixture.
+Normal Apply is unchanged; Recover/exact-ID replay never resume skipped targets.
+The [new owner gate](m3-recovery-owner-test.md) requires a host restart, inspection
+and one Undo; status ready_for_owner_test, no native acceptance yet.

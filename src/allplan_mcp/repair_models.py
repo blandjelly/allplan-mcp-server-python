@@ -91,7 +91,17 @@ class RepairRevalidate(ContractModel):
 class RepairApply(RepairRevalidate):
     action: Literal["apply"]
     execution_id: str = Field(pattern=r"^[0-9a-f]{32}$")
-    acknowledgement: Literal["disposable_copy_reviewed_two_repairs", "disposable_copy_reviewed_plan"]
+    acknowledgement: Literal["disposable_copy_reviewed_two_repairs", "disposable_copy_reviewed_plan",
+                             "disposable_copy_reviewed_recovery_test"]
+    evaluation_stop: Literal["after_first_setter_before_readback"] | None = None
+
+    @model_validator(mode="after")
+    def paired_recovery_control(self):
+        controlled = self.acknowledgement == "disposable_copy_reviewed_recovery_test"
+        if controlled != (self.evaluation_stop is not None) or (
+                "evaluation_stop" in self.model_fields_set and self.evaluation_stop is None):
+            raise ValueError("The recovery-test acknowledgement and explicit evaluation stop must be paired.")
+        return self
 
 
 class RepairRecover(ContractModel):

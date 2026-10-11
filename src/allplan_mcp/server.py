@@ -237,7 +237,11 @@ def fix_model_issues(request: RepairRequest) -> dict[str, Any]:
     only for its accepted fixture. It checks native eligibility, stops on
     failure and reads back results. Repeated execution IDs never repeat setters.
     Recover reads persisted execution/current values without resuming writes.
-    Mark assignment native acceptance is pending. Other native-property writes remain unavailable. Native UI Undo requires
+    The retained mark-numbering gate has bounded native acceptance. The diagnostic
+    evaluation_stop control requires disposable_copy_reviewed_recovery_test and
+    only the retained unselected two-mark numbering fixture. It stops after the
+    first setter before readback; normal recovery never resumes the second target.
+    Other native-property writes remain unavailable. Native UI Undo requires
     two separate steps for the accepted retained fixture; no automatic rollback.
     """
     payload = request.model_dump(exclude_unset=True, exclude_none=True, by_alias=True)
@@ -257,7 +261,7 @@ def apply_office_standard(request: OfficeStandardRequest) -> dict[str, Any]:
     The mark-numbering standard preserves valid marks, retains a deterministic
     duplicate keeper and fills free S numbers in center Y/X/Z/UUID order.
     Excluded peers retain their marks and reserve numbers. Revalidate/recover
-    reuse the shared service. Mark writes await native acceptance; file moves
+    reuse the shared service. Mark writes have bounded fixture acceptance; file moves
     remain unavailable.
     """
     if request.action != "preview":
@@ -288,7 +292,7 @@ def rule_based_edit(request: RuleBasedRequest) -> dict[str, Any]:
     it must reference a rule-based plan. Mark choices require exact
     model_uuid targets and selected required/unique mark rules; final mark values
     are checked for collisions against the full scope, including excluded peers,
-    before evaluation Apply. Mark writes await native acceptance.
+    before evaluation Apply. Mark writes have bounded fixture acceptance.
     Revalidate/recover reuse the shared service.
     """
     if request.action != "preview":

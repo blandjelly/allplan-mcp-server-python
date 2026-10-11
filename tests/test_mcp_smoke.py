@@ -41,6 +41,141 @@ class FakeBridge:
 
 
 class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
+    def recovery_native_bridge(self, lose_reply=False):
+        native, elements = self.numbering_native_bridge(lose_reply=lose_reply)
+        elements[4].GetCommonProperties.return_value.Layer = 7
+        elements[5].GetAttributes.return_value = [(20001, 'S06'), (20002, 'NEW')]
+        original = self.bridge_handler.handle
+        session = ['recovery-session-before']
+        def handle(path, payload):
+            if path == '/model-query':
+                self.bridge_handler.calls.append((path, payload))
+                try:
+                    return native.handler.handle(path, payload)
+                except native.module.BridgeError as exc:
+                    raise transport.BridgeError(exc.code, str(exc), exc.status) from exc
+            result = original(path, payload)
+            if path == '/get-allplan-version':
+                result['host_session_id'] = session[0]
+            return result
+        self.bridge_handler.handle = handle
+        def restart():
+            from uuid import uuid4
+            session[0] = uuid4().hex
+            self.bridge.session_id = session[0]
+            native.handler.model_queries.session_id = uuid4().hex
+            native.handler.repair_plans = type(native.handler.repair_plans)(native.handler.model_queries, native.directory.name)
+        return native, elements, restart
+
+    async def test_unknown_recovery_gate_restart_inspection_undo_and_replays_never_resume(self):
+        from allplan_mcp.recovery_diagnostics import collect_recovery_test, inspect_recovery
+        native, elements, restart = self.recovery_native_bridge()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report = await collect_recovery_test(self.url, root / 'check.json', confirm=lambda _: 'SPRAWDZ ODZYSKIWANIE')
+            self.assertEqual(report['state'], 'awaiting_host_restart', report.get('message'))
+            self.assertEqual(len(report['steps']), 13)
+            self.assertTrue(all(s['ok'] for s in report['steps']))
+            pointer_path = root / 'm3-last-recovery-execution.json'
+            pointer = json.loads(pointer_path.read_text())
+            self.assertNotEqual(pointer['execution_id'], pointer['probe_request']['execution_id'])
+            self.assertFalse(pointer['uncertain_probe'])
+            blocked = await inspect_recovery(self.url, root / 'no-restart.json', pointer_path)
+            self.assertEqual(blocked['state'], 'blocked')
+            restart()
+            result = await inspect_recovery(self.url, root / 'inspect.json', pointer_path)
+            self.assertEqual(result['state'], 'ready_for_ui_observation', result.get('message'))
+            self.assertEqual(len(result['steps']), 6)
+            self.assertEqual(json.loads(pointer_path.read_text())['state'], 'recovered')
+            elements[2].GetAttributes.return_value = [(20001, '<niezdefiniowany>'), (20002, 'NEW')]
+            undo = await inspect_recovery(self.url, root / 'undo.json', pointer_path, after_undo=True)
+            self.assertEqual(undo['state'], 'ready_for_ui_observation', undo.get('message'))
+            self.assertEqual(json.loads(pointer_path.read_text())['state'], 'undo_checked')
+            rerun = await collect_recovery_test(self.url, root / 'repeat.json', confirm=lambda _: self.fail('One-off test'))
+            self.assertEqual(rerun['state'], 'blocked')
+            self.assertEqual(json.loads(pointer_path.read_text())['state'], 'undo_checked')
+        self.assertEqual(dict(elements[3].GetAttributes.return_value)[20001], 'S02')
+        native.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+        native.base.ElementsLayerService.ChangeLayer.assert_not_called()
+
+    async def test_controlled_unknown_lost_reply_keeps_original_id_for_read_only_recovery(self):
+        from allplan_mcp.recovery_diagnostics import collect_recovery_test, inspect_recovery
+        native, elements, restart = self.recovery_native_bridge(lose_reply=True)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report = await collect_recovery_test(self.url, root / 'check.json', confirm=lambda _: 'SPRAWDZ ODZYSKIWANIE')
+            self.assertEqual(report['state'], 'unknown')
+            pointer_path = root / 'm3-last-recovery-execution.json'
+            pointer = json.loads(pointer_path.read_text())
+            self.assertEqual(pointer['execution_id'], report['execution_id'])
+            self.assertEqual(pointer['state'], 'unknown')
+            self.assertTrue((root / ('m3-recovery-execution-' + report['execution_id'] + '.json')).exists())
+            restart()
+            result = await inspect_recovery(self.url, root / 'inspect.json', pointer_path)
+            self.assertEqual(result['state'], 'ready_for_ui_observation', result.get('message'))
+        native.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+        self.assertEqual(dict(elements[3].GetAttributes.return_value)[20001], 'S02')
+
+    async def test_recovery_gate_cancel_and_source_change_during_review_never_write(self):
+        from allplan_mcp.recovery_diagnostics import collect_recovery_test
+        native, elements, _ = self.recovery_native_bridge()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            cancelled = await collect_recovery_test(self.url, root / 'cancel.json', confirm=lambda _: 'STOP')
+            self.assertEqual(cancelled['state'], 'cancelled')
+            def changed(_):
+                elements[0].GetAttributes.return_value = [(20001, 'MANUAL'), (20002, 'NEW')]
+                return 'SPRAWDZ ODZYSKIWANIE'
+            blocked = await collect_recovery_test(self.url, root / 'changed.json', confirm=changed)
+            self.assertEqual(blocked['state'], 'blocked')
+            self.assertFalse((root / 'm3-last-recovery-execution.json').exists())
+        native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+    async def test_recovery_gate_retains_separate_lost_probe_identity_and_blocks_inspection(self):
+        from allplan_mcp.recovery_diagnostics import collect_recovery_test, inspect_recovery
+        native, _, restart = self.recovery_native_bridge()
+        original = self.bridge_handler.handle
+        def lose_probe(path, payload):
+            try:
+                return original(path, payload)
+            except transport.BridgeError as exc:
+                if exc.code == 'repair_recovery_required':
+                    raise transport.BridgeError('execution_unknown', 'Lost guard rejection response', 503) from exc
+                raise
+        self.bridge_handler.handle = lose_probe
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report = await collect_recovery_test(self.url, root / 'check.json', confirm=lambda _: 'SPRAWDZ ODZYSKIWANIE')
+            self.assertEqual(report['state'], 'unknown')
+            pointer_path = root / 'm3-last-recovery-execution.json'
+            pointer = json.loads(pointer_path.read_text())
+            self.assertTrue(pointer['uncertain_probe'])
+            self.assertNotEqual(pointer['execution_id'], pointer['probe_request']['execution_id'])
+            restart()
+            calls_before = len(self.bridge_handler.calls)
+            blocked = await inspect_recovery(self.url, root / 'inspect.json', pointer_path)
+            self.assertEqual(blocked['state'], 'blocked')
+            self.assertEqual(len(self.bridge_handler.calls), calls_before)
+        native.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+
+    async def test_partial_snapshot_collateral_change_blocks_gate_and_preserves_unknown(self):
+        from allplan_mcp.recovery_diagnostics import collect_recovery_test
+        native, elements, _ = self.recovery_native_bridge()
+        original = native.base.ElementsAttributeService.ChangeAttributes.side_effect
+        def collateral(*args):
+            original(*args)
+            # Remains audit-pass, but the full field snapshot must detect it.
+            elements[0].GetAttributes.return_value = [(20001, 'S01'), (20002, 'EXISTING')]
+        native.base.ElementsAttributeService.ChangeAttributes.side_effect = collateral
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report = await collect_recovery_test(self.url, root / 'check.json', confirm=lambda _: 'SPRAWDZ ODZYSKIWANIE')
+            self.assertEqual(report['state'], 'unknown')
+            self.assertEqual(report['steps'][-1]['name'], 'partial_snapshot_only_c03')
+            self.assertFalse(report['steps'][-1]['ok'])
+            self.assertEqual(json.loads((root / 'm3-last-recovery-execution.json').read_text())['state'], 'unknown')
+        native.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+
     async def test_conflict_gate_over_real_http_checks_excluded_peer_without_second_write(self):
         from allplan_mcp.conflict_diagnostics import collect_conflict
         from allplan_mcp.workflow_diagnostics import recover_workflow

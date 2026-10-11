@@ -18,7 +18,7 @@ def validate_repair_request(request):
             required = {"schema_version", "action", "execution_id"}
         elif action == "apply":
             required |= {"execution_id", "acknowledgement"}
-        optional = {"workflow_kind"} if action == "apply" else set()
+        optional = {"workflow_kind", "evaluation_stop"} if action == "apply" else set()
         keys(request, required | optional, required)
         for key, size in (("plan_id", 32), ("plan_hash", 64), ("execution_id", 32)):
             if key not in required:
@@ -27,8 +27,13 @@ def validate_repair_request(request):
                 invalid(f"Invalid {key}.")
         if action == "apply":
             if (not isinstance(request["acknowledgement"], str)
-                    or request["acknowledgement"] not in {"disposable_copy_reviewed_two_repairs", "disposable_copy_reviewed_plan"}):
+                    or request["acknowledgement"] not in {"disposable_copy_reviewed_two_repairs", "disposable_copy_reviewed_plan",
+                                                        "disposable_copy_reviewed_recovery_test"}):
                 invalid("Apply requires acknowledgement of the reviewed repairs on a disposable project copy.")
+            controlled = request["acknowledgement"] == "disposable_copy_reviewed_recovery_test"
+            if (controlled != ("evaluation_stop" in request)
+                    or (controlled and request["evaluation_stop"] != "after_first_setter_before_readback")):
+                invalid("The recovery-test acknowledgement and exact evaluation stop must be paired.")
             if "workflow_kind" in request and (not isinstance(request["workflow_kind"], str)
                     or request["workflow_kind"] not in {"office_standard_preview", "rule_based_edit_preview"}):
                 invalid("Unknown apply workflow.")

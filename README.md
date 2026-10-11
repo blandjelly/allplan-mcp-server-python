@@ -18,7 +18,7 @@ Read these files in order when continuing implementation:
 5. [Validation schedule](docs/testing-policy.md): focused local work, publication
    checks, CI matrix and retained hash protections.
 
-Current package: **0.13.0**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
+Current package: **0.14.0**, M1 read profile **1.0.2**, M2 audit profile **2.0.0**.
 **M0–M2 / UAT-00–UAT-04 are accepted within the recorded Allplan 2026-1-7 fixture scope**
 with local Windows Codex. M3 has accepted layer/status preview and bounded writes,
 standard/selection workflows and read-only mark collision previews.
@@ -33,6 +33,8 @@ conflicts and controlled partial/unknown recovery are open.
 they remain unavailable to Apply. The [bounded same-session conflict gate](docs/m3-conflict-acceptance-0.13.0.md)
 passed 12/12 steps, one C03 write, stale C04 rejection, actual excluded-peer
 conflict and Undo/recovery. Leave/save the retained project after Undo.
+0.14.0 adds a [controlled unknown-result/restart inspection gate](docs/m3-recovery-owner-test.md),
+ready for owner testing; no native acceptance yet. It writes only C03 and never resumes C04.
 [Validation status](docs/validation-status.md) defines the accepted boundaries.
 
 Use [Windows setup](docs/windows-setup.md), [fixture definition](docs/fixture-guide.md),

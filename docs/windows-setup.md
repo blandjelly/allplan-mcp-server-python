@@ -68,3 +68,10 @@ do not choose another user folder by guess.
 The bridge keeps bounded request/error logs in Local/.allplan-mcp/logs.
 For uncertain repair outcomes use [read-only recovery](diagnostics.md);
 do not send a new Apply or remove the Local journal.
+
+## Current owner gate — 0.14.0
+
+Use only [controlled unknown-result/restart inspection](m3-recovery-owner-test.md)
+with M3 Recovery Test.cmd, M3 Recovery Inspect.cmd and M3 Recovery Undo Check.cmd.
+The copy starts after the accepted 0.13.0 Undo and ends saved after one new Undo.
+Keep the same Local journal. Completed conflict/numbering gates need no repeat.

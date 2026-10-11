@@ -2,7 +2,7 @@
 
 The toolkit plans 13 workflow tools. Bounded context/query reads and native
 model audits are accepted within the [recorded fixture scope](validation-status.md).
-Package **0.13.0** supports reviewed existing-string mark/status and layer execution through
+Package **0.14.0** supports reviewed existing-string mark/status and layer execution through
 fix_model_issues, apply_office_standard and rule_based_edit; its native acceptance
 covers two separately reviewed single-target workflow writes. Mark previews have
 collision-aware native acceptance; mark writes and deterministic numbering are implemented;
@@ -42,3 +42,12 @@ manual-review evidence. Keep supplied, verified and uncheckable metadata distinc
 geometry, initial values and expected audit findings. Read profile **1.0.2**
 and audit profile **2.0.0** bind resources freshly; the demo remains inactive
 for general writes. Observe the current model before resuming after Undo/Redo.
+
+## Controlled recovery evaluation — 0.14.0
+
+The [explicit diagnostic stop](m3-recovery-contract.md) uses the normal durable
+write-ahead marker after the first C03 setter, before readback or C04. It requires
+a separate typed acknowledgement and the retained two-mark numbering fixture.
+Normal Apply is unchanged; Recover/exact-ID replay never resume skipped targets.
+The [new owner gate](m3-recovery-owner-test.md) requires a host restart, inspection
+and one Undo; status ready_for_owner_test, no native acceptance yet.

@@ -149,6 +149,30 @@ class RepairExecutor:
                         and c["old_value"].get("value") == "NWE" and c["new_value"] == "NEW" for c in changes) == 1
                 and all(f["state"] == "active_foreground" for f in plan["scope"]["included_files"]))
 
+    @staticmethod
+    def recovery_evaluation_scope(plan):
+        """A diagnostic stop may only use the retained two-mark numbering fixture."""
+        workflow = plan.get("workflow", {})
+        changes = plan["changes"]
+        if (workflow.get("kind") != "office_standard_preview"
+                or workflow.get("standard_id") != "native-model-qa-demo-mark-numbering"
+                or workflow.get("standard_version") != "1.0.0"
+                or "selection" in plan or len(changes) != 2
+                or plan["counts"]["audit_findings"] != 3
+                or plan.get("numbering", {}).get("state") != "validated"):
+            return False
+        for change, rule, old, new, center in zip(changes,
+                ("QA-001", "QA-002"), ("<niezdefiniowany>", "S02"), ("S03", "S04"),
+                ([12000, 0, 1500], [0, 6000, 1500])):
+            observed = change["locator"]["center_mm"]
+            if (change["operation"] != "set_attribute" or change.get("property_role") != "mark"
+                    or change["rule_id"] != rule or change["ref"]["drawing_file"] != 101
+                    or change["old_value"].get("value") != old or change["new_value"] != new
+                    or observed.get("status") != "observed" or len(observed["value"]) != 3
+                    or any(abs(a - b) > 1 for a, b in zip(observed["value"], center))):
+                return False
+        return changes[0]["resource"] == changes[1]["resource"]
+
     def handle(self, doc, base, settings, request):
         with self.locked():
             record = self.load(request["execution_id"])
@@ -187,6 +211,8 @@ class RepairExecutor:
                 or (request["acknowledgement"] == "disposable_copy_reviewed_two_repairs"
                     and not self.legacy_evaluation_scope(plan))):
             raise BridgeError("repair_scope_unavailable", "Apply requires a reviewed supported Column mark/status/layer plan in one foreground file; new plans require disposable_copy_reviewed_plan.", 409)
+        if request.get("evaluation_stop") and not self.recovery_evaluation_scope(plan):
+            raise BridgeError("repair_scope_unavailable", "Recovery-test stop requires the retained unselected two-mark numbering fixture.", 409)
         before = self.plans.queries._scan(doc, base, settings, query_request(entry["request"]["audit"]))
         if before["source_fingerprint"] != plan["source_fingerprint"]:
             raise BridgeError("repair_conflict", "Audited source changed during preflight.", 409)
@@ -213,6 +239,10 @@ class RepairExecutor:
                   "changes": copy.deepcopy(plan["changes"]),
                   "target_preflight": target_preflight,
                   "outcomes": [{"state": "skipped", "reason": "not_attempted"} for _ in plan["changes"]]}
+        if "evaluation_stop" in request:
+            record["evaluation_control"] = {"stop": request["evaluation_stop"],
+                                            "controlled_interruption": True,
+                                            "not_a_native_crash": True}
         self.save(record)
         self.plans.invalidate_for_execution()
         self.plans.queries.selections.clear()
@@ -237,6 +267,11 @@ class RepairExecutor:
             self.save(record)  # Write-ahead marker: a crash cannot authorize replay.
             try:
                 native_repairs.write(base, element, change)
+                if index == 0 and request.get("evaluation_stop"):
+                    # Leave the actual durable write-ahead marker unchanged. No
+                    # readback, final save, second setter or fabricated failure.
+                    # Exact-ID replay and Recover use the normal journal route.
+                    return self.result(record)
                 # Never trust returned/stale adapters or setter return values as success.
                 fresh = native_repairs.resolve(doc, base, self.plans.queries, change)
                 observed = native_repairs.read(base, self.plans.queries, fresh, change)

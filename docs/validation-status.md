@@ -1,11 +1,13 @@
 # Validation status and limits
 
-Current package **0.13.0**; status recorded **2026-10-11 Europe/Warsaw**.
-Its [bounded same-session conflict gate](m3-conflict-acceptance-0.13.0.md) is
+Current package **0.14.0**; status recorded **2026-10-11 Europe/Warsaw**.
+The previous 0.13.0 [bounded same-session conflict gate](m3-conflict-acceptance-0.13.0.md) is
 **PASS**: 12/12 steps, one C03 write, stale C04 rejection before setters, actual
 excluded-peer conflict and completed-execution recovery after one Undo (audits 3 → 2 → 3). It preserves invalidated
 plans for one read-only source comparison, never restoring authorization.
-Partial/unknown native recovery remains a separate subsequent gate.
+0.14.0 [controlled unknown-result inspection](m3-recovery-contract.md) is
+**ready_for_owner_test** with [new owner instructions](m3-recovery-owner-test.md).
+Native partial/unknown recovery remains unaccepted.
 Mark assignment and deterministic numbering have **bounded two-target native PASS**;
 [0.12.0 acceptance/evidence](m3-numbering-acceptance-0.12.0.md). Native acceptance
 below remains scoped to its recorded packages, fixture and supported behaviors.
@@ -49,6 +51,15 @@ recovery, crash/power-loss durability and cross-copy identity remain open.
 No unchanged accepted owner gate needs repetition.
 
 ## Portable verification and delivery
+
+0.14.0: **204 portable tests PASS** on Linux CPython 3.12.14, one final full run
+following focused checks of control validation, real durable unknown markers,
+restart/reconciliation, ordinary Apply, lost responses, guard identities,
+full-field collateral detection, read-only replay and Undo observations. Frozen sync PASS.
+These fakes/HTTP checks execute no native Allplan. Clean-source package/build/installation
+and separate source CI evidence are recorded in [0.14.0 delivery](../evaluation-packages/0.14.0/README.md).
+Native controlled recovery remains ready_for_owner_test.
+
 
 0.13.0 source **752e54795a1cfa676217b5ffba0ce5d301383269**: one full
 **195-test PASS** on Linux CPython 3.12.14 after focused plan/HTTP checks.

@@ -284,3 +284,12 @@ The schemas stay client-neutral. No arbitrary generated Python is involved.
 [BaseElementAdapter](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_ElementAdapter/BaseElementAdapter/),
 [ElementAdapterType](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_ElementAdapter/ElementAdapterType/),
 [ElementsSelectService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/ElementsSelectService/).
+
+## Controlled recovery evaluation — 0.14.0
+
+The [explicit diagnostic stop](m3-recovery-contract.md) uses the normal durable
+write-ahead marker after the first C03 setter, before readback or C04. It requires
+a separate typed acknowledgement and the retained two-mark numbering fixture.
+Normal Apply is unchanged; Recover/exact-ID replay never resume skipped targets.
+The [new owner gate](m3-recovery-owner-test.md) requires a host restart, inspection
+and one Undo; status ready_for_owner_test, no native acceptance yet.

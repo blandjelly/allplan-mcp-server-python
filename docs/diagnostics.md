@@ -15,7 +15,7 @@ Unknown/incomplete data remains not_checked.
 
 ## Lost replies and recovery
 
-**M3 Conflict.cmd** runs the new 0.13.0 same-session source-conflict gate,
+**M3 Conflict.cmd** retains the accepted 0.13.0 same-session source-conflict gate,
 with one separately reviewed C03 write. [Owner instructions](m3-conflict-owner-test.md).
 **M3 Conflict Recover.cmd** reads `logs/m3-last-conflict-execution.json` and
 observes only that C03 execution without Apply replay or resume. An uncertain
@@ -59,3 +59,17 @@ and [journal lifecycle](m3-workflow-execution-contract.md#journal-lifecycle-and-
 Completed milestone launchers and repository copies of old logs were removed.
 Local owner logs/journals and delivered archives remain untouched; archived
 procedures are available through [Git history](validation-status.md#historical-records).
+
+## Controlled unknown-result test — 0.14.0
+
+Only the [new owner walkthrough](m3-recovery-owner-test.md) is requested.
+M3 Recovery Test.cmd writes C03 once and preserves the actual running/unknown
+write-ahead record with C04 skipped. Restart StartPythonHost before M3 Recovery
+Inspect.cmd; after successful inspection, one Undo and M3 Recovery Undo Check.cmd.
+The writing launcher refuses to overwrite any saved recovery-test identity.
+All three phases save JSON/TXT under logs/m3-recovery-*. The latest pointer is
+logs/m3-last-recovery-execution.json, with an additional per-execution copy.
+Preserve both; a lost guard-probe reply retains its separate ID and blocks the
+walkthrough pending local Codex inspection. Do not delete journal records or
+retry Apply. Read-only inspection/replay can persist current journal observations
+but never writes model values or resumes skipped C04.
