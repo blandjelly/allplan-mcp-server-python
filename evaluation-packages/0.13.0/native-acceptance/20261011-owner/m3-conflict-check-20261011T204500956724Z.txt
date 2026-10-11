@@ -1,0 +1,61 @@
+M3 disposable-copy gate: ready_for_ui_observation. Execution: dffa3c94da434fddbda4cf146e18ef96.
+health_preflight: OK
+context_before: OK
+audit_before: OK
+Audit native-model-qa-demo 2.0.0: fail.
+6 elements; 3 findings on 3 elements; 0 unchecked checks.
+Requested scope complete: True; audit complete: True.
+QA-001 (error): fail {'pass': 5, 'fail': 1, 'not_checked': 0, 'not_applicable': 0}
+QA-002 (error): fail {'pass': 3, 'fail': 2, 'not_checked': 0, 'not_applicable': 1}
+QA-003 (warning): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-004 (warning): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm (model_local): required_value_missing. Assign a reviewed, nonempty mark.
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.
+QA-002: file 101, mark 'S02', model 80211557-a3c1-4ccd-84d9-1274ec533776, center [6000.0, 0.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.
+older_c04_preview: OK
+Repair preview: 1 proposed changes; 2 excluded findings.
+Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:5001 'S02' -> 'S03'.
+Selection: 1 selected; 5 explicit exceptions; 0 unchecked predicates.
+Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 1 remaining missing marks.
+Numbering preserve-valid-fill-gaps 1.0.0: 1 exact assignments.
+Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+c03_write_preview: OK
+Repair preview: 1 proposed changes; 2 excluded findings.
+Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+QA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm: attribute:5001 '<niezdefiniowany>' -> 'S03'.
+Selection: 1 selected; 5 explicit exceptions; 0 unchecked predicates.
+Mark validation: validated; 0 proposed collision groups; 1 remaining duplicate groups; 0 remaining missing marks.
+Numbering preserve-valid-fill-gaps 1.0.0: 1 exact assignments.
+Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+unchanged_preview_audit: OK
+Audit native-model-qa-demo 2.0.0: fail.
+6 elements; 3 findings on 3 elements; 0 unchecked checks.
+Requested scope complete: True; audit complete: True.
+QA-001 (error): fail {'pass': 5, 'fail': 1, 'not_checked': 0, 'not_applicable': 0}
+QA-002 (error): fail {'pass': 3, 'fail': 2, 'not_checked': 0, 'not_applicable': 1}
+QA-003 (warning): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-004 (warning): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm (model_local): required_value_missing. Assign a reviewed, nonempty mark.
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.
+QA-002: file 101, mark 'S02', model 80211557-a3c1-4ccd-84d9-1274ec533776, center [6000.0, 0.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.
+c03_revalidate: OK
+Plan evidence unchanged; bounded disposable-copy evaluation apply requires explicit acknowledgement.
+c03_apply_readback: OK
+Repair execution completed: applied. No automatic rollback or retry.
+older_c04_apply_rejected: OK
+Apply rejected before native setters: Plan expired or was invalidated by execution. Preview again. [code=plan_expired, request_id=e02552f8-bb0c-43f7-9647-6090086acaf3]
+excluded_peer_source_conflict: OK
+Plan conflict: identity, resources, scope or audited source changed. Preview again.
+audit_after_rejection: OK
+Audit native-model-qa-demo 2.0.0: fail.
+6 elements; 2 findings on 2 elements; 0 unchecked checks.
+Requested scope complete: True; audit complete: True.
+QA-001 (error): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-002 (error): fail {'pass': 4, 'fail': 2, 'not_checked': 0, 'not_applicable': 0}
+QA-003 (warning): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-004 (warning): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.
+QA-002: file 101, mark 'S02', model 80211557-a3c1-4ccd-84d9-1274ec533776, center [6000.0, 0.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.
+health_after: OK
+Observe C03=S03, C04/C02=S02 and unchanged other elements. Then one native Undo restores C03; use M3 Conflict Recover only. Partial/unknown native outcomes remain a separate gate.

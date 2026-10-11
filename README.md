@@ -27,11 +27,12 @@ read-only replay, complete audits **5 → 4 → 3** and owner-confirmed two-step
 0.12.0 implements reviewed mark assignment and a deterministic versioned numbering
 standard; the [bounded two-target native gate](docs/m3-numbering-acceptance-0.12.0.md)
 passed writes, readback, replay/no-op and two-step Undo/recovery.
-**M3/UAT-05/UAT-06 remain open**: remaining scope acceptance, native same-session
-conflicts and controlled partial/unknown recovery are next.
+**M3/UAT-05/UAT-06 remain open**: remaining scope acceptance, manual UI active-plan
+conflicts and controlled partial/unknown recovery are open.
 0.13.0 retains invalidated plans for one bounded read-only source comparison;
-they remain unavailable to Apply. The new [same-session conflict gate](docs/m3-conflict-owner-test.md)
-is ready for owner testing and requires one C03 write and one Undo.
+they remain unavailable to Apply. The [bounded same-session conflict gate](docs/m3-conflict-acceptance-0.13.0.md)
+passed 12/12 steps, one C03 write, stale C04 rejection, actual excluded-peer
+conflict and Undo/recovery. Leave/save the retained project after Undo.
 [Validation status](docs/validation-status.md) defines the accepted boundaries.
 
 Use [Windows setup](docs/windows-setup.md), [fixture definition](docs/fixture-guide.md),

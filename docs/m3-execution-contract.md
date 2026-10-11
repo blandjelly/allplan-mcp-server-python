@@ -5,8 +5,9 @@ apply_office_standard and rule_based_edit. [Current eligibility/workflow metadat
 cover 1–32 existing string mark/status and layer changes on Column roots in one foreground
 file. [Native acceptance](validation-status.md) remains narrower: the earlier
 two-target gate and latest two separately reviewed single-target workflows.
-Two separate Undo steps are accepted; grouped Undo, native same-session conflicts
-and unknown-outcome recovery remain open.
+Two separate Undo steps are accepted; grouped Undo, manual UI active-plan conflicts
+and unknown-outcome recovery remain open. The [bounded same-session typed conflict
+gate](m3-conflict-acceptance-0.13.0.md) passed one write and Undo/recovery.
 
 ## Eligibility correction and rejected requests
 
@@ -141,7 +142,7 @@ current state after UI Undo.
 
 Native acceptance covers the recorded layer/status writes/readbacks, audited-field
 verification, exact-ID replay, separate Undo and completed recovery after Redo.
-Restart invalidation and stale Apply rejection also pass. Native same-session
+Restart invalidation and stale Apply rejection also pass. Native manual UI active-plan
 conflicts, controlled partial/unknown recovery, broader scope/identity and
 crash/power-loss persistence remain open. Do not repeat the UI-edit scenario
 known to cancel the host. The bounded 0.12.0 mark-numbering gate passed writes/readback/replay/no-op

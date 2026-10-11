@@ -76,12 +76,12 @@ execution/Redo recovery, restart invalidation/stale Apply rejection,
 standard/selection no-op previews and explicit collision-aware mark previews
 have separate bounded acceptance. Unchanged completed gates need no repetition.
 0.13.0 adds bounded read-only inspection of invalidated evidence;
-[same-session native conflict gate](m3-conflict-owner-test.md) is ready for owner testing.
+[bounded same-session native conflict gate](m3-conflict-acceptance-0.13.0.md) passed 12/12 steps and Undo/recovery.
 
 Mark assignment and deterministic versioned-standard numbering are implemented;
 [their bounded two-target native gate](m3-numbering-acceptance-0.12.0.md) passed
-complete audits 3 → 0 → 3, readback, replay/no-op and two-step Undo/recovery. Required next work: native same-session conflicts in a supported lifecycle and
-controlled partial/unknown outcomes with read-only recovery. Known UI editing
+complete audits 3 → 0 → 3, readback, replay/no-op and two-step Undo/recovery. Required next work: controlled partial/unknown outcomes with read-only recovery
+and remaining native scope; manual UI active-plan conflict is unaccepted. Known UI editing
 cancelled the host and must not be repeated unchanged. Journal maintenance and
 identity limits, final UAT and main integration remain open. Graphical labels,
 file moves and universal native properties are conditional extensions.

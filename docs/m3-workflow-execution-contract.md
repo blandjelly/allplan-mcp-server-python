@@ -55,7 +55,8 @@ replay. Selection changes proposals only; excluded peers remain in the source
 fingerprint and full post-write verification. Invalidated plans remain blocked
 from Apply. 0.13.0 preserves their evidence for one read-only source comparison
 within shared original TTL/cache budgets;
-[new same-session conflict gate](m3-conflict-contract.md) awaits owner observation.
+[bounded same-session conflict gate](m3-conflict-acceptance-0.13.0.md) passed;
+manual UI active-plan conflicts remain unaccepted.
 
 Completed requires all proposed writes to read back correctly, a complete
 post-audit and an exact comparison of the entire audited snapshot against the
@@ -102,8 +103,8 @@ not establish authenticated history or sudden power-loss durability.
 
 Actual mark assignment and deterministic versioned-standard numbering are
 implemented in 0.12.0; [the bounded two-target native gate](m3-numbering-acceptance-0.12.0.md)
-passed. No repeat is requested. Next obtain
-native same-session conflict evidence in a supported lifecycle and controlled
+passed. The [bounded same-session conflict gate](m3-conflict-acceptance-0.13.0.md)
+also passed. No repeat is requested. Next prepare controlled
 partial/unknown-result recovery. The accepted two-workflow gate needs no repeat.
 Do not repeat UI editing known to cancel the host. Broader journal maintenance,
 identity guarantees and final UAT/main integration remain open. Graphic labels,

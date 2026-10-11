@@ -1,8 +1,9 @@
 # Validation status and limits
 
-Current package **0.13.0**; status recorded **2026-10-10 Europe/Warsaw**.
-Its [same-session conflict gate](m3-conflict-owner-test.md) is
-**ready_for_owner_test** and has no native acceptance yet. It preserves invalidated
+Current package **0.13.0**; status recorded **2026-10-11 Europe/Warsaw**.
+Its [bounded same-session conflict gate](m3-conflict-acceptance-0.13.0.md) is
+**PASS**: 12/12 steps, one C03 write, stale C04 rejection before setters, actual
+excluded-peer conflict and completed-execution recovery after one Undo (audits 3 → 2 → 3). It preserves invalidated
 plans for one read-only source comparison, never restoring authorization.
 Partial/unknown native recovery remains a separate subsequent gate.
 Mark assignment and deterministic numbering have **bounded two-target native PASS**;
@@ -39,10 +40,11 @@ not a live acceptance registry.
 | 0.10.0 | C03 → S03 / C04 → S04 mark proposals, selection exception, collision with excluded S06 peer, unchanged revalidations/audits; owner confirms unchanged model and uninterrupted host | All mark plans refuse Apply. Assignment, numbering and graphical labels are unimplemented. |
 | 0.11.0 | Ten steps: two separately reviewed single-target standard/selected writes, exact readbacks, audited fields match plan, exact-ID read-only replays, complete six-column audits 5 → 4 → 3 in one verified host session | Owner confirms both changes, host survival, other elements unchanged and two-step Undo. Broader 1–32-change/other-file execution is unaccepted. Final repaired/undone/redone state was unspecified. |
 | 0.12.0 | Two numbered mark writes on existing string attribute 5001, exact readback/audited verification, same-session unchanged deterministic previews, read-only replay and subsequent no-op; complete audits 3 → 0 → 3 after Undo/recovery | Owner confirms correct marks, unchanged other elements, host survival and two-step Undo. Recovery observes old values after a changed host session; it concerns completed execution, not unknown-outcome recovery. Broader mark/workflow scope is unaccepted. |
+| 0.13.0 | 12/12 same-session conflict steps: C03 write/readback, stale C04 rejection before setters, excluded-peer fresh source/report conflict; audits 3 → 2 → 3 and old-value recovery after Undo | Owner confirms UI, unchanged peers and host survival. One setter/one Undo does not prove grouped Undo; manual UI active-plan conflict and partial/unknown recovery remain open. [Evidence](m3-conflict-acceptance-0.13.0.md). |
 
 Final 0.11.0 findings: **QA-001 / QA-002 / QA-002**, with 24 checks:
 20 pass, 3 fail, 1 not_applicable, 0 not_checked. Failure is expected because
-mark issues remain. Native same-session conflicts, controlled partial/unknown
+mark issues remain. Native manual UI conflicts on active plans, controlled partial/unknown
 recovery, crash/power-loss durability and cross-copy identity remain open.
 No unchanged accepted owner gate needs repetition.
 
@@ -58,7 +60,7 @@ retains source/artifact identity and separate source-CI observations.
 Invalidated evidence is covered for actual excluded-peer changes, old-value
 restoration without renewed authorization, shared TTL/byte/count limits and
 restart; HTTP checks cover cancellation, stale rejection, lost write/probe
-replies, identity preservation and read-only recovery. Native acceptance is pending.
+replies, identity preservation and read-only recovery. Bounded native acceptance is recorded above; partial/unknown recovery remains open.
 Source [CI 38079063575](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38079063575)
 **6/6 PASS** on Windows/Ubuntu Python 3.11–3.13, including tests and builds;
 [original job/step observations](../evaluation-packages/0.13.0/source-ci-0.13.0.json).

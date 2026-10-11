@@ -1,8 +1,10 @@
 # Nowy test Allplana — konflikt w jednej sesji, 0.13.0
 
-Status: **ready_for_owner_test**, bez akceptacji natywnej. Wykonaj wyłącznie
-tę nową partię w Allplanie 2026-1-7. Nie powtarzaj numeracji 0.12.0 ani
-zakończonych testów warstwy/statusu. Test zapisuje tylko oznaczenie C03.
+Status: **PASS, 2026-10-11**, 12/12 kroków; [wyniki i ograniczenia](m3-conflict-acceptance-0.13.0.md).
+Nie powtarzaj zakończonego testu. Zostaw i zapisz tę samą kopię po Undo:
+C03 niezdefiniowany, C04/C02=S02, C05 warstwa struktury, C06=NEW.
+Zachowaj logi i dziennik; bez Redo i kolejnego Apply. Poniższa karta opisuje
+wykonany test jednego zapisu C03 i pojedynczego Undo.
 
 ## Przygotowanie
 

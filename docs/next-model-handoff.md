@@ -2,7 +2,7 @@
 
 ## Current state
 
-Continue **codex/m3-repair-preview**, package **0.13.0**, draft
+Continue **codex/m3-repair-preview**, package **0.13.0**, draft into main
 [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2).
 M0–M2 / UAT-00–UAT-04 are accepted within the recorded Allplan **2026-1-7**
 fixture scope. **M3/UAT-05/UAT-06 and the first MVP remain open**.
@@ -46,20 +46,19 @@ and [testing policy](testing-policy.md). Details: [read tools](tool-reference.md
   Grouped Undo and automatic rollback are unavailable.
 - 0.13.0 retains execution-invalidated plan evidence for one fresh read-only
   comparison within the original shared cache/TTL limits. Apply stays blocked
-  even if source values return to the old state. Its native gate is
-  **ready_for_owner_test**, not accepted: two selected previews, one C03 write,
-  rejected stale C04 Apply and a real excluded-peer source/report conflict in
-  the same host session. [Owner instructions](m3-conflict-owner-test.md).
+  even if source values return to the old state. Its bounded native gate is
+  **PASS (2026-10-11)**: 12/12 steps, one C03 write, stale C04 rejection before
+  setters and a real excluded-peer source/report conflict in one host session.
+  Owner confirms UI/unchanged peers/host survival and one Undo; read-only Recover
+  observes the old value and audits 3 → 2 → 3.
+  [Evidence and boundaries](m3-conflict-acceptance-0.13.0.md).
 
 ## Next implementation
 
-1. Obtain the new 0.13.0 same-session conflict gate in the original disposable
-   copy, with one C03 write and one Undo. The launcher uses a separately reviewed
-   typed write instead of the UI edit known to cancel the host. It distinguishes
-   execution invalidation from actual fresh source/report differences; it does
-   not accept manual UI conflicts or partial/unknown outcomes by inference.
-   Use that lifecycle evidence to prepare the separate controlled partial/unknown
-   recovery gate next. No repeated 0.12.0 numbering or layer/status gate is requested.
+1. Prepare the separate controlled partial/unknown-result recovery gate using
+   accepted 0.13.0 lifecycle evidence. It does not accept manual UI conflicts
+   or partial/unknown outcomes by inference. No repeat of conflict, numbering
+   or layer/status gates is requested.
 2. Resolve remaining acceptance for the declared scope, journal maintenance and
    identity limits; integrate with main and complete UAT-05/UAT-06.
 
@@ -77,7 +76,7 @@ preserve the journal and restore the prior bridge fixture. Source
 Documentation publication repeats no tests/builds and preserves archives.
 Source [CI 38079063575](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38079063575)
 **6/6 PASS**, Windows/Ubuntu Python 3.11–3.13, including tests and builds.
-Native gate remains ready_for_owner_test, not accepted.
+Bounded native conflict gate PASS; [owner evidence](m3-conflict-acceptance-0.13.0.md).
 
 Previous 0.12.0 final-candidate verification: 187 portable tests PASS, frozen dependency
 sync, wheel/sdist and exact extracted installation/23 bridge hashes PASS;
@@ -87,11 +86,10 @@ Setup/Restore preserved the journal. Source **fd78700378eceb6f217e4ca30a83b88004
 The delivery retains exact archive identity and source CI job/step observations.
 Do not repeat the full suite or prior native batches for documentation publication.
 
-The owner left the original disposable copy after **two Undo operations**:
+The owner left the original disposable copy after the **single 0.13.0 Undo**:
 C03 mark `<niezdefiniowany>`, C04=S02, C02=S02; C05 structure/C06 NEW remain.
-Read-only Recover confirmed both old mark values and a complete audit with three
-mark findings. **Leave/save this state until the new reviewed 0.13.0 gate; no Redo.**
-The new launcher starts with fresh health/context and a full audit in that same copy.
+Read-only Recover observed C03’s old value and a complete three-finding audit.
+**Leave/save this state until a new separately reviewed gate; no Redo or new Apply.**
 Historical completed/replay outcomes do not establish current values after Undo.
 Never reuse an old execution ID for a new repair.
 

@@ -1,0 +1,14 @@
+{
+  "state": "completed",
+  "execution_id": "dffa3c94da434fddbda4cf146e18ef96",
+  "tool": "apply_office_standard",
+  "apply_request": {
+    "action": "apply",
+    "plan_id": "5366ead055fc48f0afe203999d5a60ef",
+    "plan_hash": "81dc45c4682245bfa6c1d7135c05e465099b453edaa34405c679d532d66dd89c",
+    "execution_id": "dffa3c94da434fddbda4cf146e18ef96",
+    "acknowledgement": "disposable_copy_reviewed_plan"
+  },
+  "expected_changes": 1,
+  "steps": []
+}

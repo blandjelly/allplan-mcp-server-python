@@ -1,8 +1,9 @@
 # M3 invalidated-plan inspection — 0.13.0
 
-Status: **ready_for_owner_test**. Portable behavior and native acceptance are
-separate. [New owner gate](m3-conflict-owner-test.md) changes one existing C03
-mark through the shared executor without leaving the host session.
+Status: **bounded native PASS, 2026-10-11**; [evidence and limits](m3-conflict-acceptance-0.13.0.md).
+The completed [owner gate](m3-conflict-owner-test.md) changed one existing C03
+mark through the shared executor without leaving the host session. Portable
+behavior and broader native acceptance remain separate.
 
 ## Authorization remains invalidated
 

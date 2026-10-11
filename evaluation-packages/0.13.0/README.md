@@ -1,6 +1,10 @@
 # 0.13.0 same-session source-conflict evaluation
 
-Native gate: **ready_for_owner_test**; no 0.13.0 Allplan observation yet.
+Native gate: **bounded PASS, 2026-10-11**, 12/12 steps and Undo/recovery.
+[Acceptance and limits](../../docs/m3-conflict-acceptance-0.13.0.md),
+[original owner uploads](native-acceptance/20261011-owner/) and
+[inspection](native-acceptance/20261011-owner/inspection.json). Original delivery
+records/archives/instructions retain their historical pre-test status unchanged.
 M3/UAT-05/UAT-06 remain open. The shared executor still invalidates all plans
 at execution start. Invalidated evidence is retained for one read-only source
 comparison within the original shared TTL/count/byte limits; it never renews

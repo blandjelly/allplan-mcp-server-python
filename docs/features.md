@@ -8,7 +8,7 @@ covers two separately reviewed single-target workflow writes. Mark previews have
 collision-aware native acceptance; mark writes and deterministic numbering are implemented;
 [the bounded two-target gate passed](m3-numbering-acceptance-0.12.0.md). Wider native scope remains open.
 0.13.0 adds [read-only invalidated-plan inspection](m3-conflict-contract.md) and
-a [new native same-session conflict gate](m3-conflict-owner-test.md), pending owner tests.
+a [bounded native same-session conflict gate](m3-conflict-acceptance-0.13.0.md), PASS with Undo/recovery.
 Other workflow tools are planned. M0 utilities are allplan_health,
 get_allplan_version, get_all_object_names, create_cube and create_box.
 Baseline boxes have no automatic readback/deduplication.
