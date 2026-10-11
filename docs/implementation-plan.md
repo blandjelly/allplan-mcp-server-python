@@ -62,7 +62,7 @@ uniqueness scope, explicit unavailable data and locatable targets; no writes.
 
 ## M3 — Controlled repairs and standards: partially implemented, M3 open
 
-Package **0.14.0** supports 1–32 reviewed existing string mark/status or layer changes on
+Package **0.14.1** supports 1–32 reviewed existing string mark/status or layer changes on
 Column roots in one explicit foreground file. Office-standard and rule-based
 Apply/Revalidate/Recover reuse the executor, full-source/exception checks,
 durable deduplication and audited readback.
@@ -149,11 +149,11 @@ Record supported operations/builds, limits and the next action in the handoff.
 Use `ready_for_owner_test` before runtime acceptance and `accepted_on_build` only
 with evidence. Do not repeat accepted batches without a relevant change/defect.
 
-## Controlled recovery evaluation — 0.14.0
+## Controlled recovery evaluation — 0.14.1
 
 The [explicit diagnostic stop](m3-recovery-contract.md) uses the normal durable
 write-ahead marker after the first C03 setter, before readback or C04. It requires
 a separate typed acknowledgement and the retained two-mark numbering fixture.
-Normal Apply is unchanged; Recover/exact-ID replay never resume skipped targets.
+Ordinary Apply retains its guards; generated numbering writes follow spatial assignment order; Recover/exact-ID replay never resume skipped targets.
 The [new owner gate](m3-recovery-owner-test.md) requires a host restart, inspection
 and one Undo; status ready_for_owner_test, no native acceptance yet.

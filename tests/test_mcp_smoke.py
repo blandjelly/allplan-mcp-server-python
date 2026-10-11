@@ -43,6 +43,8 @@ class FakeBridge:
 class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
     def recovery_native_bridge(self, lose_reply=False):
         native, elements = self.numbering_native_bridge(lose_reply=lose_reply)
+        elements[2].GetModelElementUUID.return_value = '65ab07fe-d37a-4adf-b1b6-3040fdde84a2'
+        elements[3].GetModelElementUUID.return_value = '4f3cc27e-5224-403d-939d-7b4e0cedf9a2'
         elements[4].GetCommonProperties.return_value.Layer = 7
         elements[5].GetAttributes.return_value = [(20001, 'S06'), (20002, 'NEW')]
         original = self.bridge_handler.handle
@@ -128,8 +130,38 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
                 return 'SPRAWDZ ODZYSKIWANIE'
             blocked = await collect_recovery_test(self.url, root / 'changed.json', confirm=changed)
             self.assertEqual(blocked['state'], 'blocked')
+            self.assertIs(blocked['native_setters_started'], False)
+            self.assertIn('No Apply sent', blocked['message'])
             self.assertFalse((root / 'm3-last-recovery-execution.json').exists())
         native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+    async def test_recovery_preview_wrong_order_blocks_before_apply_and_allows_corrected_gate(self):
+        from allplan_mcp.recovery_diagnostics import collect_recovery_test
+        native, elements, _ = self.recovery_native_bridge()
+        original = self.bridge_handler.handle
+        def reversed_preview(path, payload):
+            result = original(path, payload)
+            if path == '/fix-model-issues' and payload.get('action') == 'preview':
+                result = {**result, 'changes': list(reversed(result['changes']))}
+            return result
+        self.bridge_handler.handle = reversed_preview
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report = await collect_recovery_test(self.url, root / 'blocked.json',
+                                                confirm=lambda _: self.fail('Must stop before review'))
+            self.assertEqual(report['state'], 'blocked')
+            self.assertEqual(report['steps'][-1]['name'], 'numbering_preview')
+            self.assertIs(report['native_setters_started'], False)
+            self.assertIn('No Apply sent', report['message'])
+            self.assertFalse((root / 'm3-last-recovery-execution.json').exists())
+            self.assertFalse(any(p.get('action') == 'apply' for _, p in self.bridge_handler.calls))
+            native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+            self.bridge_handler.handle = original
+            corrected = await collect_recovery_test(self.url, root / 'corrected.json',
+                                                    confirm=lambda _: 'SPRAWDZ ODZYSKIWANIE')
+            self.assertEqual(corrected['state'], 'awaiting_host_restart', corrected.get('message'))
+            self.assertEqual(dict(elements[3].GetAttributes.return_value)[20001], 'S02')
+            native.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
 
     async def test_recovery_gate_retains_separate_lost_probe_identity_and_blocks_inspection(self):
         from allplan_mcp.recovery_diagnostics import collect_recovery_test, inspect_recovery

@@ -75,3 +75,12 @@ layer/status defects can remain: total findings are 5 → 2 or 3 → 0 (also 4 �
 The owner checks fields/other elements and native Undo; grouped Undo is unimplemented.
 Native unknown recovery, supported-lifecycle source conflicts and remaining
 M3/UAT/main-integration work are still open.
+
+## Generated write order — 0.14.1
+
+Numbering changes retain the order of the canonical Y/X/Z/UUID assignments in
+the preview, report and immutable plan hash. Additional explicit non-numbering
+changes follow in their original file/UUID/field order. This fixes a 0.14.0
+recovery gate preflight that rejected correct targets when their UUIDs sorted
+C04 before C03. Numbering values, duplicate keepers, selection and full-source
+guards are unchanged.

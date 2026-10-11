@@ -1,9 +1,23 @@
-# Controlled unknown-result inspection — 0.14.0
+# Controlled unknown-result inspection — 0.14.1
 
 Status **ready_for_owner_test**. Native partial/unknown-result recovery has no
 acceptance yet. Previous [0.13.0 conflict acceptance](m3-conflict-acceptance-0.13.0.md)
 and [0.12.0 numbering acceptance](m3-numbering-acceptance-0.12.0.md) remain scoped
 and need no repeat. [Owner walkthrough](m3-recovery-owner-test.md).
+
+## Correction after the 0.14.0 owner preflight
+
+The owner report at 2026-10-11T21:57:26Z passed health, three-finding audit
+and full six-column snapshot, then blocked at numbering_preview. No Apply or
+execution ID was created. Correct proposals were ordered C04/C03 by model UUID,
+while the diagnostic requires C03/C04. Package 0.14.1 preserves generated
+numbering assignment order in the immutable preview before its hash is computed.
+The ordinary numbering values/keepers are unchanged; generated writes now follow
+the reviewed canonical spatial order. Non-numbering plans retain their order.
+The CLI and host still require the exact C03-first fixture; no guard was relaxed.
+Pre-Apply failures report native_setters_started=false / No Apply sent and allow
+a corrected preflight retry without deleting journals. Once an ID is saved,
+unknown/rejected/replay protections retain their existing behavior.
 
 ## Explicit diagnostic control
 

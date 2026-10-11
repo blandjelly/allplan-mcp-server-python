@@ -128,6 +128,13 @@ class RepairPlanService:
                             "old_value": copy.deepcopy(finding["evidence"]["raw"]), "new_value": new_value,
                             "source_fingerprint": finding["source_fingerprint"], "write_eligibility": "not_checked"})
         changes.sort(key=lambda c: (c["ref"]["drawing_file"], c["ref"]["model_uuid"], c["field"]))
+        if numbering_result is not None:
+            # Keep generated writes in the reviewed spatial assignment order.
+            # UUID sorting can otherwise put a later assignment first.
+            assignment_order = {(a["rule_id"], a["model_uuid"]): i
+                                for i, a in enumerate(numbering_result["assignments"])}
+            changes.sort(key=lambda c: assignment_order.get(
+                (c["rule_id"], c["ref"]["model_uuid"]), len(assignment_order)))
         plan_complete = (complete and not any(e["reason"] in {"file_not_active", "old_value_unavailable"} for e in exclusions)
                          and not (selection_result and selection_result["predicate_not_checked"]))
         created = self.queries.clock()

@@ -60,7 +60,7 @@ Completed milestone launchers and repository copies of old logs were removed.
 Local owner logs/journals and delivered archives remain untouched; archived
 procedures are available through [Git history](validation-status.md#historical-records).
 
-## Controlled unknown-result test — 0.14.0
+## Controlled unknown-result test — 0.14.1
 
 Only the [new owner walkthrough](m3-recovery-owner-test.md) is requested.
 M3 Recovery Test.cmd writes C03 once and preserves the actual running/unknown

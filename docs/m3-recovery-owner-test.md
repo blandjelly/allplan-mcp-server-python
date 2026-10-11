@@ -1,4 +1,4 @@
-# Nowy test Allplana — odzyskiwanie po przerwanym zapisie, 0.14.0
+# Nowy test Allplana — odzyskiwanie po przerwanym zapisie, 0.14.1
 
 Status: **ready_for_owner_test**, bez akceptacji natywnej. Wykonaj tylko tę
 nową partię na zachowanej kopii w Allplanie 2026-1-7. Poprzednich testów
@@ -9,12 +9,24 @@ część wykonania. **C04 pozostanie S02**. Potem sprawdzimy odzyskiwanie po
 restarcie hosta oraz jedno Undo. Program nie wywołuje awarii Allplana.
 Nie edytujesz Python/JSON ani dziennika.
 
+## Ponowienie po blokadzie 0.14.0
+
+Raport z 2026-10-11T21:57:26Z zakończył się na `numbering_preview`, przed
+wysłaniem Apply i przed utworzeniem ID wykonania. Przyczyną była kolejność
+C04/C03 zależna od UUID, mimo poprawnych propozycji S04/S03. **W tej próbie
+nie wykonano zapisu; nie używaj Undo.** Zachowaj te logi. Zainstaluj nową
+paczkę 0.14.1 zgodnie z punktami 1–3 i wykonaj część A od początku na tej
+samej niezmienionej kopii. Nie przenoś starych logów do nowego folderu paczki.
+Dziennik Local pozostaje w tym samym miejscu. Nie czyść żadnego dziennika
+ani zapisanych ID. To ponowienie dotyczy wyłącznie potwierdzonej blokady
+przed Apply; dla `unknown` lub istniejącego ID obowiązuje inspekcja.
+
 ## Przygotowanie
 
 1. Zostaw tę samą jednorazową kopię po ostatnim Undo i zapisz ją.
    C03 ma być niezdefiniowany, C04/C02=S02; C05 warstwa struktury, C06=NEW.
    Zachowaj starsze paczki, logi i `Local/.allplan-mcp/repairs`. Bez Redo.
-2. Zamknij Allplan i konsolę MCP. Rozpakuj całą paczkę **0.14.0** do nowego
+2. Zamknij Allplan i konsolę MCP. Rozpakuj całą paczkę **0.14.1** do nowego
    folderu. Uruchom **Setup.cmd**, wskazując ten sam właściwy folder Local.
    Nie usuwaj ani nie przenoś dziennika do innej kopii projektu.
 3. Otwórz tę samą kopię i plik **101** na pierwszym planie. Uruchom
@@ -73,10 +85,14 @@ prześlij raporty do lokalnego Codexa; zachowano dwa różne ID.
 Jeśli wynik to **rejected**, żądanie odrzucono przed zapisem. Zachowaj raport;
 inspekcja nie wyśle wtedy Recover, bo nie powstał zapis.
 
-Jeśli wynik to **blocked**, wersja lub stan kopii się nie zgadza, albo dane
-są niepełne, zatrzymaj się i prześlij raporty. Nie czyść dziennika ani nie
+Jeśli wynik to **blocked**, kontrola wstępna lub dane nie spełniają warunków,
+zatrzymaj się i prześlij raporty. Komunikat **No Apply sent** i
+`native_setters_started=false` oznaczają blokadę przed wysłaniem zapisu.
+Po usunięciu przyczyny taką próbę można powtórzyć, jeśli nie utworzono ID
+wykonania; potwierdzony przypadek 0.14.0 opisano wyżej. Nie czyść dziennika ani nie
 naprawiaj ręcznie fixture, żeby wymusić PASS. Inspekcję można powtórzyć po
-rozwiązaniu problemu połączenia; zapisującego Test.cmd nie powtarzamy.
+rozwiązaniu problemu połączenia. Po utworzeniu ID wykonania zapisującego
+Test.cmd nie powtarzamy.
 
 Test dotyczy kontrolowanego przerwania po jednym zapisie. Nie potwierdza
 odporności na awarię procesu/zasilania ani grupowego Undo wielu zapisów.

@@ -85,11 +85,15 @@ class Gate:
                                 snapshot(r) == expected if expected is not None else len(snapshot(r)) == 6)
         return snapshot(result)
 
-    def failure(self, exc, state):
+    def failure(self, exc, state, before_apply=False):
         if not self.report['steps'] or self.report['steps'][-1]['name'] != self.step:
             self.report['steps'].append({'name': self.step, 'ok': False})
-        self.report.update(state=state, message=str(exc) +
-                           '. Preserve logs and Local journal. Do not rerun the test or send a new Apply; use inspection only.')
+        if before_apply:
+            self.report['native_setters_started'] = False
+            instruction = '. No Apply sent. Preserve logs and Local journal; resolve the preflight failure before rerunning.'
+        else:
+            instruction = '. Preserve logs and Local journal. Do not rerun the test or send a new Apply; use inspection only.'
+        self.report.update(state=state, message=str(exc) + instruction)
 
 
 async def collect_recovery_test(url, path, confirm=input):
@@ -184,7 +188,7 @@ async def collect_recovery_test(url, path, confirm=input):
             persist_pointer(path, pointer)
         if gate:
             gate.failure(exc, 'rejected' if pointer and pointer.get('native_setters_started') is False
-                         else 'unknown' if pending else 'blocked')
+                         else 'unknown' if pending else 'blocked', before_apply=pointer is None)
         else:
             report.update(state='blocked', message=str(exc))
     finally:

@@ -134,11 +134,14 @@ class MarkExecutionTests(unittest.TestCase):
 
     def test_numbering_is_stable_across_adapter_order_preserves_valid_and_applies_once(self):
         elements = self.marks_fixture()
+        elements[2].GetModelElementUUID.return_value = '65ab07fe-d37a-4adf-b1b6-3040fdde84a2'
+        elements[3].GetModelElementUUID.return_value = '4f3cc27e-5224-403d-939d-7b4e0cedf9a2'
         self.base.ElementsSelectService.SelectAllElements.reset_mock()
         plan = self.call(self.numbering_request())
         self.base.ElementsSelectService.SelectAllElements.assert_called_once()
         expected = {str(elements[2].GetModelElementUUID()): 'S03', str(elements[3].GetModelElementUUID()): 'S04'}
         self.assertEqual({c['ref']['model_uuid']: c['new_value'] for c in plan['changes']}, expected)
+        self.assertEqual([c['new_value'] for c in plan['changes']], ['S03', 'S04'])
         self.assertTrue(plan['evaluation_apply_available'])
         self.assertEqual(plan['mark_validation']['remaining_duplicate_groups'], 0)
         self.assertEqual(plan['mark_validation']['remaining_missing_marks'], 0)

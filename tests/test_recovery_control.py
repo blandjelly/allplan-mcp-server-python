@@ -38,6 +38,27 @@ class RecoveryControlTests(unittest.TestCase):
         return self.apply_request(plan, acknowledgement='disposable_copy_reviewed_recovery_test',
                           evaluation_stop='after_first_setter_before_readback')
 
+    def test_spatial_write_order_with_owner_uuids_still_interrupts_only_c03(self):
+        elements = self.fixture_ready()
+        # The native owner's UUIDs sort C04 before C03; the old fixture hid this.
+        elements[2].GetModelElementUUID.return_value = '65ab07fe-d37a-4adf-b1b6-3040fdde84a2'
+        elements[3].GetModelElementUUID.return_value = '4f3cc27e-5224-403d-939d-7b4e0cedf9a2'
+        plan = self.call(self.numbering_request())
+        self.assertEqual([(c['rule_id'], c['new_value']) for c in plan['changes']],
+                         [('QA-001', 'S03'), ('QA-002', 'S04')])
+        self.base.ElementsSelectService.SelectAllElements.return_value = list(reversed(elements))
+        second = self.call(self.numbering_request())
+        self.assertEqual(second['changes'], plan['changes'])
+        request = self.control(second)
+        result = self.call(request)
+        self.assertEqual([o['state'] for o in result['outcomes']], ['unknown', 'skipped'])
+        self.assertEqual(dict(elements[2].GetAttributes.return_value)[20001], 'S03')
+        self.assertEqual(dict(elements[3].GetAttributes.return_value)[20001], 'S02')
+        self.assertEqual([o['state'] for o in self.recover(request)['recovery']['observations']],
+                         ['new_value_observed', 'old_value_observed'])
+        self.assertTrue(self.call(request)['replayed'])
+        self.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+
     def test_unknown_marker_survives_restart_and_reconciles_without_second_setter(self):
         elements = self.fixture_ready()
         plan = self.call(self.numbering_request())

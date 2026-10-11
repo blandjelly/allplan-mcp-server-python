@@ -2,7 +2,7 @@
 
 ## Current state
 
-Continue **codex/m3-repair-preview**, package **0.14.0**, draft into main
+Continue **codex/m3-repair-preview**, package **0.14.1**, draft into main
 [PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2).
 M0–M2 / UAT-00–UAT-04 are accepted within the recorded Allplan **2026-1-7**
 fixture scope. **M3/UAT-05/UAT-06 and the first MVP remain open**.
@@ -56,7 +56,7 @@ and [testing policy](testing-policy.md). Details: [read tools](tool-reference.md
 
 ## Next implementation
 
-1. Obtain only the new 0.14.0 [controlled unknown-result/restart inspection gate](m3-recovery-owner-test.md).
+1. Obtain only the corrected 0.14.1 [controlled unknown-result/restart inspection gate](m3-recovery-owner-test.md).
    The diagnostic stop leaves the actual running write-ahead marker after one C03 setter,
    before readback/C04. After host restart, Recover/replay inspect and never resume.
    One owner Undo plus final inspection returns the original retained fixture.
@@ -68,6 +68,18 @@ Graphical labels, file moves and universal native setters are conditional
 extensions. They do not enlarge mandatory M3 closure scope.
 
 ## Resume safely
+
+The 0.14.0 native attempt blocked at numbering_preview before Apply/ID creation:
+health, audit and full snapshot passed. UUID order put C04 ahead of C03;
+[diagnosis](m3-recovery-blocked-0.14.0.md). No native write or Undo occurred
+in that attempt. 0.14.1 preserves generated spatial assignment order before
+plan hashing, retains exact CLI/host guards and labels pre-Apply failures
+explicitly. Install the new version and repeat only this uncompleted gate
+on the same unchanged copy; old journals and packages remain preserved.
+Final **207 portable tests PASS**, one full run on Linux CPython 3.12.14;
+focused control/mark/HTTP checks, frozen sync and wheel/sdist builds PASS.
+[0.14.1 delivery](../evaluation-packages/0.14.1/README.md) records the exact
+clean-source package/installation checks and separate source CI.
 
 0.14.0 final-candidate verification: **205 portable tests PASS**, one full run
 on Linux CPython 3.12.14 after focused executor/real-HTTP checks. Frozen sync PASS.
@@ -122,7 +134,7 @@ may use Polish. The implementation model owns code, checks and ready-to-use
 packages; the owner observes Allplan through local Windows Codex and the UI.
 The owner does not edit Python/JSON or discover API identifiers.
 
-## Delivered 0.14.0 source and next owner action
+## Previous delivered 0.14.0 source
 
 Clean source **7ead0e9798c6c93a843fbfc8e9b5e33a58763fdd** has final 205-test
 portable PASS, frozen sync and wheel/sdist builds. The exact extracted ZIP verifies
@@ -133,6 +145,5 @@ Source [CI 38175934542](https://github.com/blandjelly/allplan-mcp-server-python/
 original logs, CI steps, instructions and package. Documentation publication
 repeats no tests/builds and leaves archives unchanged. Main ancestry was reconciled
 in the M3 branch; PR #2 stays draft into main, without merge/release.
-Only the [new controlled recovery owner gate](m3-recovery-owner-test.md) remains
-requested now, in the same original project after the accepted 0.13.0 Undo.
-Native status is ready_for_owner_test; M3/UAT-05/UAT-06 remain open.
+The original native attempt blocked before Apply; use corrected 0.14.1 for
+the next owner gate. Native recovery remains unaccepted; M3/UAT-05/UAT-06 are open.

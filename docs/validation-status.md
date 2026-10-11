@@ -1,12 +1,14 @@
 # Validation status and limits
 
-Current package **0.14.0**; status recorded **2026-10-11 Europe/Warsaw**.
+Current package **0.14.1**; status recorded **2026-10-12 Europe/Warsaw**.
 The previous 0.13.0 [bounded same-session conflict gate](m3-conflict-acceptance-0.13.0.md) is
 **PASS**: 12/12 steps, one C03 write, stale C04 rejection before setters, actual
 excluded-peer conflict and completed-execution recovery after one Undo (audits 3 → 2 → 3). It preserves invalidated
 plans for one read-only source comparison, never restoring authorization.
-0.14.0 [controlled unknown-result inspection](m3-recovery-contract.md) is
+0.14.1 [controlled unknown-result inspection](m3-recovery-contract.md) is
 **ready_for_owner_test** with [new owner instructions](m3-recovery-owner-test.md).
+The 0.14.0 attempt blocked at numbering_preview before Apply, due to UUID
+write order. [Diagnosis and correction](m3-recovery-blocked-0.14.0.md).
 Native partial/unknown recovery remains unaccepted.
 Mark assignment and deterministic numbering have **bounded two-target native PASS**;
 [0.12.0 acceptance/evidence](m3-numbering-acceptance-0.12.0.md). Native acceptance
@@ -51,6 +53,12 @@ recovery, crash/power-loss durability and cross-copy identity remain open.
 No unchanged accepted owner gate needs repetition.
 
 ## Portable verification and delivery
+
+0.14.1: **207 portable tests PASS**, one final full run on Linux CPython 3.12.14,
+after focused control/mark/real-HTTP checks using the owner UUID order.
+Frozen sync and wheel/sdist builds PASS. Exact clean-source package/installation
+verification and source CI belong to the [0.14.1 delivery](../evaluation-packages/0.14.1/README.md).
+The corrected native recovery gate is ready_for_owner_test, with no acceptance.
 
 0.14.0: **205 portable tests PASS** on Linux CPython 3.12.14, one final full run
 following focused checks of control validation, real durable unknown markers,
@@ -120,7 +128,7 @@ retain exact evidence hashes and separately attributed owner observations.
 retain removed build/test logs listed by historical delivery manifests.
 These are reference evidence, not instructions to rerun old batches.
 
-## Delivered 0.14.0 source and next owner action
+## Previous delivered 0.14.0 source
 
 Clean source **7ead0e9798c6c93a843fbfc8e9b5e33a58763fdd** has final 205-test
 portable PASS, frozen sync and wheel/sdist builds. The exact extracted ZIP verifies
@@ -131,6 +139,5 @@ Source [CI 38175934542](https://github.com/blandjelly/allplan-mcp-server-python/
 original logs, CI steps, instructions and package. Documentation publication
 repeats no tests/builds and leaves archives unchanged. Main ancestry was reconciled
 in the M3 branch; PR #2 stays draft into main, without merge/release.
-Only the [new controlled recovery owner gate](m3-recovery-owner-test.md) remains
-requested now, in the same original project after the accepted 0.13.0 Undo.
-Native status is ready_for_owner_test; M3/UAT-05/UAT-06 remain open.
+The original native attempt blocked before Apply; use corrected 0.14.1 for
+the next owner gate. Native recovery remains unaccepted; M3/UAT-05/UAT-06 are open.
