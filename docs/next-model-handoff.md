@@ -111,3 +111,16 @@ Repository documentation/API identifiers use English; owner walkthroughs may
 use Polish. The implementation model owns code, checks, diagnostics and ready
 packages. The owner observes through Allplan/local Codex; they do not edit
 Python/JSON or discover API identifiers.
+
+## Delivered 0.15.0 owner gate
+
+Clean source **7e3657bc33ecf913376d302da900af386b3b8a23**, one final
+219-test portable PASS, frozen sync and wheel/sdist builds PASS. Exact
+ZIP installation verifies 23 bridge hashes, journal preservation and previous
+bridge restoration. [Source CI 38181795091](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38181795091)
+**6/6 PASS**, Windows/Ubuntu Python 3.11–3.13, tests/builds included.
+[Delivery/artifacts](../evaluation-packages/0.15.0/README.md) retain source/archive
+identity, logs, installation verification, CI observations and Polish instructions.
+Publication repeats no product checks/builds or old artifact hash verification.
+The new selected-mark/journal scope remains ready_for_owner_test; no old gate
+needs repetition. PR #2 stays draft into main; M3 remains open.

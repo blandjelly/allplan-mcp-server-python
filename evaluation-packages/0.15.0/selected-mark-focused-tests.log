@@ -1,0 +1,61 @@
+test_cancel_changed_excluded_peer_and_invalid_journal_never_write (test_selected_mark_http.SelectedMarkHTTPTests.test_cancel_changed_excluded_peer_and_invalid_journal_never_write) ... ok
+test_collateral_change_stops_inspection_and_keeps_original_identity (test_selected_mark_http.SelectedMarkHTTPTests.test_collateral_change_stops_inspection_and_keeps_original_identity) ... ok
+test_lost_write_reply_keeps_id_and_recover_never_replays_apply (test_selected_mark_http.SelectedMarkHTTPTests.test_lost_write_reply_keeps_id_and_recover_never_replays_apply) ... ok
+test_pre_setter_rejection_retains_identity_and_persistence_failure_sends_no_apply (test_selected_mark_http.SelectedMarkHTTPTests.test_pre_setter_rejection_retains_identity_and_persistence_failure_sends_no_apply) ... Executing <Task pending name='mcp.client.streamable_http.StreamableHTTPTransport.post_writer.<locals>.handle_request_async' coro=<StreamableHTTPTransport.post_writer.<locals>.handle_request_async() running at /workspace/allplan-mcp-server-python/.venv/lib/python3.12/site-packages/mcp/client/streamable_http.py:565> wait_for=<Future pending cb=[Task.task_wakeup()] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:448> cb=[TaskGroup._spawn.<locals>.task_done() at /workspace/allplan-mcp-server-python/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:821] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/tasks.py:420> took 0.127 seconds
+ok
+test_selected_write_keeps_excluded_peer_journal_and_undo_snapshot (test_selected_mark_http.SelectedMarkHTTPTests.test_selected_write_keeps_excluded_peer_journal_and_undo_snapshot) ... ok
+test_successful_final_slot_reports_full_journal_without_invalidating_gate (test_selected_mark_http.SelectedMarkHTTPTests.test_successful_final_slot_reports_full_journal_without_invalidating_gate) ... Executing <Task pending name='Task-1703' coro=<SelectedMarkHTTPTests.test_successful_final_slot_reports_full_journal_without_invalidating_gate() running at /workspace/allplan-mcp-server-python/tests/test_selected_mark_http.py:128> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.162 seconds
+ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 13.708s
+
+OK
+Repair preview: 1 proposed changes; 2 excluded findings.
+Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 1 remaining missing marks.
+Tylko zachowana kopia projektu: C04 S02 -> S04. C02 pozostaje S02, C03 niezdefiniowany.
+Repair preview: 1 proposed changes; 2 excluded findings.
+Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 1 remaining missing marks.
+Tylko zachowana kopia projektu: C04 S02 -> S04. C02 pozostaje S02, C03 niezdefiniowany.
+Repair preview: 1 proposed changes; 2 excluded findings.
+Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 1 remaining missing marks.
+Tylko zachowana kopia projektu: C04 S02 -> S04. C02 pozostaje S02, C03 niezdefiniowany.
+Repair preview: 1 proposed changes; 2 excluded findings.
+Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 1 remaining missing marks.
+Tylko zachowana kopia projektu: C04 S02 -> S04. C02 pozostaje S02, C03 niezdefiniowany.
+Repair preview: 1 proposed changes; 2 excluded findings.
+Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 1 remaining missing marks.
+Tylko zachowana kopia projektu: C04 S02 -> S04. C02 pozostaje S02, C03 niezdefiniowany.
+Repair preview: 1 proposed changes; 2 excluded findings.
+Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 1 remaining missing marks.
+Tylko zachowana kopia projektu: C04 S02 -> S04. C02 pozostaje S02, C03 niezdefiniowany.
+Repair preview: 1 proposed changes; 2 excluded findings.
+Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 1 remaining missing marks.
+Tylko zachowana kopia projektu: C04 S02 -> S04. C02 pozostaje S02, C03 niezdefiniowany.
+Repair preview: 1 proposed changes; 2 excluded findings.
+Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 1 remaining missing marks.
+Tylko zachowana kopia projektu: C04 S02 -> S04. C02 pozostaje S02, C03 niezdefiniowany.

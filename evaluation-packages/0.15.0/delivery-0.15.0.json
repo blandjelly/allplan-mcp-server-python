@@ -1,0 +1,96 @@
+{
+  "schema_version": "m3-evaluation-delivery-1",
+  "version": "0.15.0",
+  "source_commit": "7e3657bc33ecf913376d302da900af386b3b8a23",
+  "source_modified": false,
+  "source_branch": "codex/m3-repair-preview",
+  "pull_request": "https://github.com/blandjelly/allplan-mcp-server-python/pull/2",
+  "prepared_at_utc": "2026-10-11T22:47:41.231720+00:00",
+  "owner_date_timezone": "2026-10-12 Europe/Warsaw",
+  "state": "ready_for_owner_test",
+  "allplan_acceptance": "not_run",
+  "portable_tests": {
+    "state": "PASS",
+    "count": 219,
+    "seconds": 90.899,
+    "full_runs_final_candidate": 1,
+    "environment": "Linux CPython 3.12.14",
+    "log": "portable-tests.log"
+  },
+  "frozen_sync": "PASS",
+  "wheel_sdist_build": "PASS",
+  "exact_package_installation": "PASS",
+  "verification": "package-verification.json",
+  "source_ci": {
+    "run_id": 38181795091,
+    "state": "PASS",
+    "source_commit": "7e3657bc33ecf913376d302da900af386b3b8a23",
+    "configurations": 6,
+    "url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38181795091",
+    "observations": "source-ci-0.15.0.json"
+  },
+  "artifacts": {
+    "TEST-ALLPLAN-0.15.0.md": {
+      "bytes": 3888,
+      "sha256": "6f64633f3b53fbb16e64a9ebb3252f031b891e5d294a222cd6b6274ddf8d1796"
+    },
+    "TEST-ALLPLAN-0.15.0.txt": {
+      "bytes": 3888,
+      "sha256": "6f64633f3b53fbb16e64a9ebb3252f031b891e5d294a222cd6b6274ddf8d1796"
+    },
+    "allplan-mcp-0.15.0-windows-evaluation.zip": {
+      "bytes": 318792,
+      "sha256": "0935043688c97bb950e8c97d1e9c34a0b7c0b69a15ad75ddca53be7fb120db23"
+    },
+    "allplan-mcp-0.15.0-windows-evaluation.zip.sha256": {
+      "bytes": 108,
+      "sha256": "a68c6bcacd1563f9694170149f5c8e79ad58b1a068647ddfbcd4446b0cba0768"
+    },
+    "allplan_mcp_server-0.15.0-py3-none-any.whl": {
+      "bytes": 74978,
+      "sha256": "a5f6ab3cfa61e43dbe47a68b99fdd3c0eb69436f6a4bbb56b48fb757aa9010c4"
+    },
+    "build.log": {
+      "bytes": 294,
+      "sha256": "caef5a118aabae8556e943c06497c654eb8190a188e8f1399822cc1f0d066b79"
+    },
+    "frozen-sync.log": {
+      "bytes": 30,
+      "sha256": "f109814782ea87bf1952306ecf0c30cc73e5df788f62d5fb7a91526f33770524"
+    },
+    "package-verification.json": {
+      "bytes": 2133,
+      "sha256": "78a9717a33c5ed6194435ac4189da75ff3c67f62a1ef8ab8033eccadf587c632"
+    },
+    "portable-tests.log": {
+      "bytes": 67132,
+      "sha256": "bf4ce28c4a0c5194a197fce9108cff5e46d1c9fea2daf8a316e965c22de0cd7a"
+    },
+    "selected-mark-focused-tests.log": {
+      "bytes": 7102,
+      "sha256": "c8c338bdba13b4f0c27e5b2d9f61cd21baebb304164558db475387e86053733d"
+    }
+  },
+  "native_gate": {
+    "scope": "one rule_based_edit C04 S02 to S04 with excluded C02; journal inspection; one Undo",
+    "expected_steps": [
+      13,
+      6
+    ],
+    "audit_findings": [
+      3,
+      1,
+      3
+    ]
+  },
+  "limits": [
+    "no native Allplan locally",
+    "no repeat of accepted gates",
+    "no wider 1-32-change acceptance",
+    "no cross-copy identity guarantee",
+    "no pruning/rollover",
+    "no grouped Undo or crash/power-loss acceptance"
+  ],
+  "sdist": "Built locally in /tmp/m3-0.15.0-build; approximately 99 MiB, not committed",
+  "older_delivered_archives_changed": false
+}
