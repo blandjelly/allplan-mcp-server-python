@@ -70,6 +70,9 @@ projektu, logi i dziennik; bez Undo do czasu inspekcji. Po restarcie hosta użyj
 nowego Apply. Jeżeli inspekcja zgłasza osobną nierozstrzygniętą próbę blokady,
 prześlij raporty do lokalnego Codexa; zachowano dwa różne ID.
 
+Jeśli wynik to **rejected**, żądanie odrzucono przed zapisem. Zachowaj raport;
+inspekcja nie wyśle wtedy Recover, bo nie powstał zapis.
+
 Jeśli wynik to **blocked**, wersja lub stan kopii się nie zgadza, albo dane
 są niepełne, zatrzymaj się i prześlij raporty. Nie czyść dziennika ani nie
 naprawiaj ręcznie fixture, żeby wymusić PASS. Inspekcję można powtórzyć po

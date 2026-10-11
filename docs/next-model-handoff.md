@@ -69,11 +69,13 @@ extensions. They do not enlarge mandatory M3 closure scope.
 
 ## Resume safely
 
-0.14.0 final-candidate verification: **204 portable tests PASS**, one full run
+0.14.0 final-candidate verification: **205 portable tests PASS**, one full run
 on Linux CPython 3.12.14 after focused executor/real-HTTP checks. Frozen sync PASS.
 The new runtime package, clean-source identity, builds, installation checks and
 source CI are recorded in [0.14.0 delivery](../evaluation-packages/0.14.0/README.md).
-Native status remains ready_for_owner_test. All old delivered artifacts remain unchanged.
+The final candidate includes explicit pre-setter rejection reporting; its 205-test
+run replaces the earlier 204-test candidate. Native status remains ready_for_owner_test.
+All old delivered artifacts remain unchanged.
 
 
 Previous 0.13.0 final-candidate verification: **195 portable tests PASS** on

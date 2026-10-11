@@ -158,6 +158,23 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(len(self.bridge_handler.calls), calls_before)
         native.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
 
+    async def test_recovery_test_pre_setter_rejection_is_explicit_and_inspection_sends_no_recover(self):
+        from allplan_mcp.recovery_diagnostics import collect_recovery_test, inspect_recovery
+        native, elements, _ = self.recovery_native_bridge()
+        elements[3].IsInActiveLayer.return_value = False
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report = await collect_recovery_test(self.url, root / 'check.json', confirm=lambda _: 'SPRAWDZ ODZYSKIWANIE')
+            self.assertEqual(report['state'], 'rejected')
+            self.assertFalse(report['native_setters_started'])
+            pointer_path = root / 'm3-last-recovery-execution.json'
+            self.assertEqual(json.loads(pointer_path.read_text())['state'], 'rejected')
+            count = len(self.bridge_handler.calls)
+            result = await inspect_recovery(self.url, root / 'inspect.json', pointer_path)
+            self.assertEqual(result['state'], 'rejected')
+            self.assertEqual(len(self.bridge_handler.calls), count)
+        native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
     async def test_partial_snapshot_collateral_change_blocks_gate_and_preserves_unknown(self):
         from allplan_mcp.recovery_diagnostics import collect_recovery_test
         native, elements, _ = self.recovery_native_bridge()

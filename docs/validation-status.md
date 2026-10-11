@@ -52,7 +52,7 @@ No unchanged accepted owner gate needs repetition.
 
 ## Portable verification and delivery
 
-0.14.0: **204 portable tests PASS** on Linux CPython 3.12.14, one final full run
+0.14.0: **205 portable tests PASS** on Linux CPython 3.12.14, one final full run
 following focused checks of control validation, real durable unknown markers,
 restart/reconciliation, ordinary Apply, lost responses, guard identities,
 full-field collateral detection, read-only replay and Undo observations. Frozen sync PASS.

@@ -142,6 +142,13 @@ async def collect_recovery_test(url, path, confirm=input):
             persist_pointer(path, pointer)
             pending = True
             def unknown(r):
+                nonlocal pending
+                if r.get('state') == 'rejected' and r.get('native_setters_started') is False:
+                    pending = False
+                    pointer.update(state='rejected', native_setters_started=False)
+                    persist_pointer(path, pointer)
+                    report['native_setters_started'] = False
+                    return False
                 return (r.get('execution_id') == request['execution_id'] and r.get('state') == 'running'
                         and r.get('replayed') is False
                         and r.get('evaluation_control', {}).get('controlled_interruption') is True
@@ -176,7 +183,8 @@ async def collect_recovery_test(url, path, confirm=input):
             pointer['state'] = 'unknown'
             persist_pointer(path, pointer)
         if gate:
-            gate.failure(exc, 'unknown' if pending else 'blocked')
+            gate.failure(exc, 'rejected' if pointer and pointer.get('native_setters_started') is False
+                         else 'unknown' if pending else 'blocked')
         else:
             report.update(state='blocked', message=str(exc))
     finally:
@@ -190,6 +198,10 @@ async def inspect_recovery(url, path, pointer_path, after_undo=False):
     try:
         previous = json.loads(pointer_path.read_text(encoding='utf-8'))
         report['execution_id'] = previous['execution_id']
+        if previous.get('state') == 'rejected' and previous.get('native_setters_started') is False:
+            report.update(state='rejected', native_setters_started=False,
+                          message='The test Apply was rejected before setters; no recovery call sent. Preserve reports.')
+            return report
         if previous.get('uncertain_probe'):
             raise ValueError('The separate guard-probe reply is unresolved; retain both identities for local Codex inspection')
         if after_undo and previous['state'] != 'recovered':

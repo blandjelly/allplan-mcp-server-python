@@ -62,7 +62,8 @@ historical; exact-ID replay still cannot write. All inspection operations can
 update journal observations but invoke no native setter, retry, resume or Undo.
 
 A saved test pointer blocks rerunning the writing launcher even after resolution.
-Lost write replies retain the original identity; after host restart use inspection,
+Categorized pre-setter rejection retains explicit rejected/native_setters_started=false
+evidence; inspection sends no recovery request for it. Lost write replies retain the original identity; after host restart use inspection,
 never a new Apply. A lost guard-probe reply retains both identities and blocks
 ordinary inspection until local Codex inspects the separate probe and fresh
 model/journal evidence. No deletion or automatic journal pruning is introduced.
