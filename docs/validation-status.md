@@ -1,6 +1,8 @@
 # Validation status and limits
 
 Updated **2026-10-12 Europe/Warsaw**. Package **0.15.0**.
+The new **0.16.0** property/highlight delivery is **ready_for_owner_test**, not
+accepted_on_build. M3 write acceptance below remains scoped to 0.15.0 evidence.
 **M0–M3 / UAT-00–UAT-06 are accepted within the retained test-project scope.**
 The owner explicitly narrowed M3/UAT-05/UAT-06 to existing demonstrated scenarios.
 This closes the fixture evaluation MVP; it does not accept the original broader
@@ -79,8 +81,8 @@ acceptance registry.
 
 Keep the [fixture](fixture-guide.md) saved after Undo: C02/C04=S02, C03 undefined,
 C05 structure/C06 NEW. Completed gates need no repeat. Follow the
-[office-project roadmap](office-project-roadmap.md) for wall fire resistance and
-storey-scoped column concrete class. Before main integration, perform the
+[editing development plan](office-editing-development-plan.pl.md) for column
+fire-resistance discovery/W1 and thin-wall native C35 material. Before main integration, perform the
 final-candidate checks/full matrix in [testing policy](testing-policy.md).
 
 ## Historical records

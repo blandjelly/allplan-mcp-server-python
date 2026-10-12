@@ -102,14 +102,15 @@ class ModelQueryService:
                                 "complete": end == len(items), "is_full_selection": offset == 0 and end == len(items)}})
         return result
 
-    def _scan(self, doc, base, settings, request):
+    def _scan(self, doc, base, settings, request, adapter_sink=None):
         started = self.clock()
         context = context_probe(doc, base, settings, {})
         project = context["project"]
         if (project["status"] != "observed" or project["value"]["key_status"] != "observed"
                 or context["document_id"]["status"] != "observed" or context["loaded_drawing_files"]["status"] != "observed"):
             raise BridgeError("context_unavailable", "Project key, document identity and loaded-file inventory must be readable before querying.", 409)
-        scope = request["scope"]
+        from .model_scope import resolve_scope
+        scope = resolve_scope(request.get("scope", "open_drawings"), context)
         def check_budget():
             if self.clock() - started >= self.SCAN_SECONDS:
                 raise BridgeError("scan_limit_exceeded", "Query exceeded its time budget; no selection was created.", 409)
@@ -237,6 +238,8 @@ class ModelQueryService:
                     continue
                 key = (number, model["value"])
                 groups.setdefault(key, []).append(record)
+                if adapter_sink is not None and view["status"] == "observed":
+                    adapter_sink.setdefault(key, {}).setdefault(view["value"], []).append(adapter)
         except BridgeError:
             raise
         except Exception as exc:

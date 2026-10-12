@@ -19,6 +19,7 @@ dispatch. Shutdown must not join a worker waiting on the UI dispatcher.
 | `src/allplan_mcp/server.py`, `allplan_client.py` | Typed MCP tools, JSON bridge, request IDs/error mapping; no automatic write retries. |
 | Host `StartPythonHost.py`, `PythonHostHandler.py`, `transport.py` | Interactor/listener lifecycle, UI dispatch and typed routes. |
 | Host `model_context.py`, `model_query.py`, `native_readers.py`, `model_metadata.py` | Context, bounded reads/geometry/hierarchy and profile/metadata inspection. |
+| Host `model_scope.py`, `model_properties.py`, `model_selection.py`, `property_contracts.py` | Open-file read scope, sampled property support registry and full-result UI highlight probe. |
 | Host `model_audit.py`, `model_repair.py`, `mark_numbering.py` | Fresh audits, immutable plans, source/collision checks and numbering. |
 | Host `native_repairs.py`, `repair_execution.py` | Native preflight/setters, OS lock, durable journal, readback and recovery. |
 | `profiles/`, MCP `*_models.py`, host `*_contracts.py` | Versioned profiles and typed contracts; host remains dependency-free. |
@@ -33,6 +34,12 @@ Canonical geometry uses mm/degrees and applies project offset once. Preserve raw
 attribute units and observation provenance. Names/document IDs are not unique
 project identities; timestamps are not universal change counters. Coverage,
 omissions and not_checked states must remain explicit.
+
+M4 discovery/highlight resolves live adapters only inside the current UI request;
+the query cache retains JSON only. Presentation revalidates full-source evidence
+including rejected peers before obtaining all matched adapters, checks TTL again
+after reads and never converts a highlight into write authorization. Symbol
+availability, submission, native observation and accepted_on_build are separate.
 
 Bundled API-reference/geometry/rebar/utilities skills are MCP resources under
 allplan://skills. `execute_python` is development-only: both runtimes must opt

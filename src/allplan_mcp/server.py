@@ -16,6 +16,7 @@ from allplan_mcp.audit_models import AuditRequest
 from allplan_mcp.repair_models import RepairRequest
 from allplan_mcp.standard_models import OfficeStandardRequest, RuleBasedRequest
 from allplan_mcp.office_standard import load_office_standard
+from allplan_mcp.property_models import PropertiesRequest, SelectionRequest
 
 
 DEFAULT_ALLPLAN_HOST_URL = "http://127.0.0.1:5679"
@@ -169,8 +170,11 @@ def get_model_context(identity_sample_size: int = 0, profile_id: str | None = No
 def model_query(request: QueryRequest) -> dict[str, Any]:
     """Read-only model query, page, summary, metadata inspection or profile binding.
 
-    Query requires explicit positive drawing_files, include_passive and
-    visibility=api_select_all. Use observed type GUID/name, layer ID or
+    Query defaults to open_drawings, including passive files for reads. The host
+    resolves the loaded inventory on every scan and reports explicit file states
+    and omissions. Whole-project scope is unavailable. An explicit scope uses
+    positive drawing_files, include_passive and visibility=api_select_all.
+    Use observed type GUID/name, layer ID or
     attribute:<ID> predicates with all/any/not. Missing/failed reads are distinct.
     Pages and summaries revalidate query fields; stale selections are rejected.
     Selections expire after five minutes or host restart, count model UUIDs rather
@@ -199,6 +203,45 @@ def model_query(request: QueryRequest) -> dict[str, Any]:
         payload.pop("cursor", None)
     payload["schema_version"] = "m1-query-1"
     return _allplan_client().post("/model-query", payload)
+
+
+@mcp.tool
+def model_properties(request: PropertiesRequest) -> dict[str, Any]:
+    """Discover project-local attribute definitions and sampled Column/Wall values.
+
+    Defaults to open_drawings, including passive files for reads. Optional exact
+    attribute_names/layer_short_names resolve through native ID/name round trips;
+    no IDs or semantic aliases are guessed. Reports raw types, units, enum labels,
+    sampled adapter ownership and a build-bound support registry. This catalog
+    covers sampled attributes and requested names, not every project definition.
+    A read or API symbol never establishes replace/add/native-update support.
+    native.material, attribute material, visual.surface and organizational.layer
+    remain separate. C35 requires the actual catalog; wall thickness has no AABB
+    substitute. No resources are created and no writes are enabled by this probe.
+    New native behavior is ready_for_owner_test, not accepted_on_build.
+    """
+    payload = request.model_dump(exclude_unset=True)
+    payload["schema_version"] = "m4-properties-1"
+    return _allplan_client().post("/model-properties", payload)
+
+
+@mcp.tool
+def model_selection(request: SelectionRequest) -> dict[str, Any]:
+    """Present the full revalidated model_query selection through explicit UI actions.
+
+    highlight re-resolves every match across all pages, with optional model-UUID
+    exceptions. It replaces all highlights in the current document, including
+    other sources. clear_highlight has the same document-wide clear scope.
+    Native visibility/highlight count requires owner observation; submitted counts
+    are not proof of highlighted or selected elements. select returns unsupported
+    in the current interactor and never substitutes highlighting. Stale/expired
+    selections fail before UI calls. No model data is written, no files activated,
+    and UI presentation never authorizes a repair. UI failures return unknown;
+    inspect the view and clear explicitly, without automatic retry.
+    """
+    payload = request.model_dump(exclude_unset=True)
+    payload["schema_version"] = "m4-selection-1"
+    return _allplan_client().post("/model-selection", payload)
 
 
 @mcp.tool

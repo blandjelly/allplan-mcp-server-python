@@ -26,6 +26,7 @@ def payload_files(repo: Path) -> dict[str, bytes]:
     # Place the no-code entry points at the top level for Explorer users.
     for name, action in {"Setup.cmd": "setup", "Launch Allplan MCP.cmd": "launch",
                          "Connect Codex.cmd": "connect", "Diagnostics.cmd": "diagnostics",
+                         "M4 Properties.cmd": "m4-properties", "M4 Clear Highlight.cmd": "m4-clear-highlight",
                          "M3 Workflow Recover.cmd": "m3-workflow-recover",
                          "M3 Numbering.cmd": "m3-numbering",
                          "M3 Numbering Recover.cmd": "m3-numbering-recover",

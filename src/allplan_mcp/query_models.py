@@ -46,7 +46,7 @@ class SpatialBox(ContractModel):
 
 class QueryInput(ContractModel):
     action: Literal["query"]
-    scope: QueryScope
+    scope: QueryScope | Literal["open_drawings"] = "open_drawings"
     predicate: Predicate | None = None
     fields: list[QueryField] = Field(default_factory=lambda: ["display_name", "layer_id"])
     attribute_ids: list[Annotated[int, Field(ge=1, le=2147483647)]] = Field(default_factory=list, max_length=32)

@@ -17,11 +17,19 @@ the original copy. It is a fixture evaluation MVP. Manual UI active-plan conflic
 wider identity/journal guarantees and arbitrary 1–32-change plans remain outside
 acceptance; they are not silently declared complete by closing this stage.
 
-## M4 — Native edits, frames and foundations
+## M4 — Property discovery, selection and native edits
 
-Prioritize the owner's wall fire-resistance and storey-scoped column concrete-class
-workflows before generation. [Office-project roadmap](office-project-roadmap.md)
-defines their property probes, writable profiles, identity, batching and journal prerequisites.
+Follow the [owner's editing development plan](office-editing-development-plan.pl.md),
+K1–K7. First: columns without fire resistance → existing W1 organizational layer.
+Next: walls with native total thickness <240 mm → native concrete material C35,
+with a separate explicitly requested attribute variant. Property ownership,
+project metadata and actual resources must resolve before enabling new edits.
+
+**M4.1a / early M4.1b, package 0.16.0:** sampled property metadata/support registry,
+open-drawings read scope and full-result highlight/clear probe are ready_for_owner_test.
+Native selection is BLOCKED by the current interactor; K1/K2 are not closed.
+[Native observation guide](m4-properties-owner-test.pl.md). K3 write planning remains
+unchanged until the first native discovery/presentation observation.
 
 - **M4.1:** Probe ordinary columns/beams versus Structural Framing and wall
   materials/attributes; establish read/write support per build, type and property.
@@ -34,6 +42,8 @@ defines their property probes, writable profiles, identity, batching and journal
 
 UAT-07–09: native types/counts/geometry/levels/links/exceptions and repeat
 update/no-op/conflict behavior. Never silently replace manual work.
+Generation M4.3/M4.4 and subsequent layouts/exports are deferred until the editing
+workflows in K1–K6 are usable and accepted; the task IDs below remain historical.
 
 ## M5 — Layouts and issue exports
 

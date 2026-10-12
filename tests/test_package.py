@@ -38,25 +38,25 @@ class PackageTests(unittest.TestCase):
                          "M3 Workflow Recover.cmd", "M3 Numbering.cmd", "M3 Numbering Recover.cmd",
                          "M3 Conflict.cmd", "M3 Conflict Recover.cmd",
                          "M3 Recovery Test.cmd", "M3 Recovery Inspect.cmd", "M3 Recovery Undo Check.cmd", "M3 Journal.cmd", "M3 Selected Mark.cmd",
-                         "M3 Selected Mark Recover.cmd", "M3 Selected Mark Undo Check.cmd"):
+                         "M3 Selected Mark Recover.cmd", "M3 Selected Mark Undo Check.cmd", "M4 Properties.cmd", "M4 Clear Highlight.cmd"):
                 self.assertTrue((package / name).is_file())
             self.assertEqual({p.name for p in package.glob("M*.cmd")},
                              {"M3 Recover.cmd", "M3 Workflow Recover.cmd", "M3 Numbering.cmd", "M3 Numbering Recover.cmd",
                               "M3 Conflict.cmd", "M3 Conflict Recover.cmd",
                               "M3 Recovery Test.cmd", "M3 Recovery Inspect.cmd", "M3 Recovery Undo Check.cmd", "M3 Journal.cmd", "M3 Selected Mark.cmd",
-                              "M3 Selected Mark Recover.cmd", "M3 Selected Mark Undo Check.cmd"})
+                              "M3 Selected Mark Recover.cmd", "M3 Selected Mark Undo Check.cmd", "M4 Properties.cmd", "M4 Clear Highlight.cmd"})
             self.assertEqual({p.name for p in (package / "windows").glob("m*.cmd")},
                              {"m3-recover.cmd", "m3-workflow-recover.cmd", "m3-numbering.cmd", "m3-numbering-recover.cmd",
                               "m3-conflict.cmd", "m3-conflict-recover.cmd",
                               "m3-recovery-test.cmd", "m3-recovery-inspect.cmd", "m3-recovery-undo-check.cmd", "m3-journal.cmd", "m3-selected-mark.cmd",
-                              "m3-selected-mark-recover.cmd", "m3-selected-mark-undo-check.cmd"})
+                              "m3-selected-mark-recover.cmd", "m3-selected-mark-undo-check.cmd", "m4-properties.cmd", "m4-clear-highlight.cmd"})
             for retired in ("test-results", "probes", "reviews"):
                 self.assertFalse((package / "docs" / retired).exists())
             local = work / "Allplan Local"
             local.mkdir()
             registration.register(package, local)
             self.assertTrue((local / "PythonPartsScripts/PythonHost/sandbox/executor.py").is_file())
-            for name in ("model_context.py", "query_contracts.py", "model_query.py", "model_metadata.py", "native_readers.py", "spatial_contracts.py", "profile_contracts.py", "model_audit.py", "audit_contracts.py", "model_repair.py", "repair_contracts.py", "native_repairs.py", "repair_execution.py", "mark_numbering.py"):
+            for name in ("model_context.py", "query_contracts.py", "model_query.py", "model_metadata.py", "native_readers.py", "spatial_contracts.py", "profile_contracts.py", "model_audit.py", "audit_contracts.py", "model_repair.py", "repair_contracts.py", "native_repairs.py", "repair_execution.py", "mark_numbering.py", "model_scope.py", "property_contracts.py", "model_properties.py", "model_selection.py"):
                 self.assertTrue((local / "PythonPartsScripts/PythonHost" / name).is_file())
             self.assertTrue((package / "src/allplan_mcp/query_models.py").is_file())
             self.assertEqual((package / "src/allplan_mcp/profiles/native-model-qa.demo.json").read_bytes(),

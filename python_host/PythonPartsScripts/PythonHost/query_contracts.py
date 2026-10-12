@@ -114,7 +114,7 @@ def validate_request(request):
         invalid(f"schema_version must be {SCHEMA}.")
     action = request["action"]
     if action == "query":
-        keys(request, {"schema_version", "action", "scope", "predicate", "fields", "attribute_ids", "page_size", "max_adapters"} | extensions, {"schema_version", "action", "scope"})
+        keys(request, {"schema_version", "action", "scope", "predicate", "fields", "attribute_ids", "page_size", "max_adapters"} | extensions, {"schema_version", "action"})
         if request.get("component_kind", "model_identity") not in ("model_identity", "top_level_component"):
             invalid("component_kind must be model_identity or top_level_component.")
         if request.get("coordinate_frame", "model_local") not in ("model_local", "project_global"):
@@ -127,17 +127,18 @@ def validate_request(request):
         if "profile" in request:
             from .profile_contracts import validate_profile
             validate_profile(request["profile"])
-        scope = request["scope"]
-        keys(scope, {"drawing_files", "include_passive", "visibility"}, {"drawing_files", "include_passive", "visibility"})
-        files = scope["drawing_files"]
-        if not isinstance(files, list) or not 1 <= len(files) <= 100:
-            invalid("scope.drawing_files must contain 1 to 100 explicit positive IDs.")
-        for number in files:
-            bounded_int(number, 1, 2147483647, "drawing-file ID")
-        if len(set(files)) != len(files):
-            invalid("Duplicate drawing-file IDs are not allowed.")
-        if not isinstance(scope["include_passive"], bool) or scope["visibility"] != "api_select_all":
-            invalid("Explicit include_passive boolean and visibility=api_select_all are required.")
+        scope = request.get("scope", "open_drawings")
+        if scope != "open_drawings":
+            keys(scope, {"drawing_files", "include_passive", "visibility"}, {"drawing_files", "include_passive", "visibility"})
+            files = scope["drawing_files"]
+            if not isinstance(files, list) or not 1 <= len(files) <= 100:
+                invalid("scope.drawing_files must contain 1 to 100 explicit positive IDs.")
+            for number in files:
+                bounded_int(number, 1, 2147483647, "drawing-file ID")
+            if len(set(files)) != len(files):
+                invalid("Duplicate drawing-file IDs are not allowed.")
+            if not isinstance(scope["include_passive"], bool) or scope["visibility"] != "api_select_all":
+                invalid("Explicit include_passive boolean and visibility=api_select_all are required.")
         fields = request.get("fields", ["display_name", "layer_id"])
         if not isinstance(fields, list) or len(fields) > len(FIELDS) or any(not isinstance(f, str) or f not in FIELDS for f in fields) or len(set(fields)) != len(fields):
             invalid("fields must be distinct supported field names.")

@@ -41,6 +41,66 @@ class FakeBridge:
 
 
 class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
+    async def test_m4_properties_highlight_owner_probe_and_validation_over_http(self):
+        from test_model_properties import PropertyTests
+        from allplan_mcp.property_diagnostics import collect_property_probe
+        native = PropertyTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        native.fixture()
+        original = self.bridge_handler.handle
+        def handle(path, payload):
+            if path in ("/model-query", "/model-properties", "/model-selection"):
+                self.bridge_handler.calls.append((path, payload))
+                try:
+                    return native.handler.handle(path, payload)
+                except native.module.BridgeError as exc:
+                    raise transport.BridgeError(exc.code, str(exc), exc.status) from exc
+            return original(path, payload)
+        self.bridge_handler.handle = handle
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "m4.json"
+            report = await collect_property_probe(self.url, path)
+            self.assertEqual(report["state"], "awaiting_owner_observation", report.get("message"))
+            self.assertEqual(len(report["steps"]), 8)
+            self.assertEqual(report["native_selection_gate"], "BLOCKED_current_interactor")
+            self.assertEqual(report["allplan_acceptance"], "not_run")
+            saved = json.loads(path.read_text(encoding="utf-8"))
+            self.assertEqual(saved, report)
+            self.assertEqual(len(native.module.AllplanIFW.HighlightService.HighlightElements.call_args.args[0]), 2)
+            cleared = await collect_property_probe(self.url, Path(directory) / "clear.json", clear=True)
+            self.assertEqual(cleared["state"], "awaiting_owner_observation")
+            self.assertEqual(len(cleared["steps"]), 3)
+        async with Client(self.url, timeout=5) as client:
+            before = len(self.bridge_handler.calls)
+            for tool, request in (("model_properties", {"scope": "project"}),
+                                  ("model_properties", {"sample_limit": True}),
+                                  ("model_selection", {"action": "clear_highlight", "selection_id": "a" * 32})):
+                response = await client.call_tool(tool, {"request": request}, raise_on_error=False)
+                self.assertTrue(response.is_error)
+            self.assertEqual(before, len(self.bridge_handler.calls))
+            response = await client.call_tool("model_properties", {"request": {"attribute_names": ["x", "x"]}}, raise_on_error=False)
+            self.assertTrue(response.is_error)
+            native.module.AllplanIFW.HighlightService.HighlightElements.assert_called_once()
+        native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+        native.base.ElementsLayerService.ChangeLayer.assert_not_called()
+        self.assertFalse(any(path in ("/create-box", "/fix-model-issues") for path, _ in self.bridge_handler.calls))
+
+    async def test_m4_probe_stops_on_mismatched_loaded_bridge_before_queries(self):
+        from allplan_mcp.property_diagnostics import collect_property_probe
+        original = self.bridge_handler.handle
+        def handle(path, payload):
+            response = original(path, payload)
+            if path == "/get-allplan-version":
+                response["bridge_package"]["version"] = "old-build"
+            return response
+        self.bridge_handler.handle = handle
+        with tempfile.TemporaryDirectory() as directory:
+            report = await collect_property_probe(self.url, Path(directory) / "probe.json")
+            self.assertEqual(report["state"], "blocked")
+            self.assertEqual(len(report["steps"]), 1)
+            self.assertEqual([path for path, _ in self.bridge_handler.calls], ["/get-allplan-version"])
+
     def recovery_native_bridge(self, lose_reply=False):
         native, elements = self.numbering_native_bridge(lose_reply=lose_reply)
         elements[2].GetModelElementUUID.return_value = '65ab07fe-d37a-4adf-b1b6-3040fdde84a2'
@@ -1038,7 +1098,7 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
     async def test_discovery_health_version_names_box_and_diagnostic_bundle(self):
         async with Client(self.url, timeout=5) as client:
             names = {t.name for t in await client.list_tools()}
-            self.assertEqual(names, {"allplan_health", "get_allplan_version", "get_all_object_names", "create_cube", "create_box", "get_model_context", "model_query", "model_audit", "fix_model_issues", "apply_office_standard", "rule_based_edit"})
+            self.assertEqual(names, {"allplan_health", "get_allplan_version", "get_all_object_names", "create_cube", "create_box", "get_model_context", "model_query", "model_properties", "model_selection", "model_audit", "fix_model_issues", "apply_office_standard", "rule_based_edit"})
             resources = await client.list_resources()
             self.assertIn("allplan://skills", {str(r.uri) for r in resources})
             health = (await client.call_tool("allplan_health")).data

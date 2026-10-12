@@ -36,6 +36,12 @@ class RequestHandler:
 
         if not isinstance(request, dict):
             raise BridgeError("invalid_payload", "Request body must be a JSON object.")
+        if path == "/model-properties":
+            from .property_contracts import validate_properties
+            validate_properties(request)
+        if path == "/model-selection":
+            from .property_contracts import validate_selection
+            validate_selection(request)
         if path == "/model-audit":
             from .audit_contracts import validate_audit_request
             validate_audit_request(request)
@@ -66,6 +72,14 @@ class RequestHandler:
             case "/model-query":
                 validate_request(request)
                 return self.model_queries.handle(self.current_document(), AllplanBaseEle, AllplanSettings, request)
+
+            case "/model-properties":
+                from .model_properties import discover_properties
+                return discover_properties(self.model_queries, self.current_document(), AllplanBaseEle, AllplanSettings, request)
+
+            case "/model-selection":
+                from .model_selection import present_selection
+                return present_selection(self.model_queries, self.current_document(), AllplanBaseEle, AllplanSettings, AllplanIFW, request)
 
             case "/model-audit":
                 from .model_audit import run_audit
