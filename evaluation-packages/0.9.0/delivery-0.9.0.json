@@ -1,0 +1,27 @@
+{
+  "schema_version": "evaluation-delivery-1",
+  "package_version": "0.9.0",
+  "source_commit": "61c7579645d497a9df1e3ff0cb5640861225b56c",
+  "source_modified": false,
+  "status": "ready_for_owner_test",
+  "native_standard_selected_preview": "not_run",
+  "portable_tests_passed": 155,
+  "files": {
+    "allplan-mcp-0.9.0-windows-evaluation.zip": {
+      "bytes": 624503,
+      "sha256": "c4cf31d6b08c651c10e4020062d5c0d0dba6d5ea0380b748c16b6c8f9d349e33"
+    },
+    "allplan-mcp-0.9.0-windows-evaluation.zip.sha256": {
+      "bytes": 107,
+      "sha256": "e57184efb0bc24b42fb58ef5cdca1094388b6336c145d578b77bebdac87a3a19"
+    },
+    "allplan_mcp_server-0.9.0-py3-none-any.whl": {
+      "bytes": 49014,
+      "sha256": "b63692df12014d6745e0216c6c42ce8110fabb12569ebba158178c8f5951d4cd"
+    },
+    "allplan_mcp_server-0.9.0.tar.gz": {
+      "bytes": 5783409,
+      "sha256": "9e46b2d9afb41b5d680ec5c686934cc734d1547a34a970f9f90f94c8592e4d19"
+    }
+  }
+}

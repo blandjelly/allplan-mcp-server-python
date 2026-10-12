@@ -1,0 +1,55 @@
+M3 disposable-copy gate: awaiting_host_restart. Execution: d8a1baca4f7e487395af40119a386586.
+health_preflight: OK
+audit_before: OK
+Audit native-model-qa-demo 2.0.0: fail.
+6 elements; 3 findings on 3 elements; 0 unchecked checks.
+Requested scope complete: True; audit complete: True.
+QA-001 (error): fail {'pass': 5, 'fail': 1, 'not_checked': 0, 'not_applicable': 0}
+QA-002 (error): fail {'pass': 3, 'fail': 2, 'not_checked': 0, 'not_applicable': 1}
+QA-003 (warning): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-004 (warning): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm (model_local): required_value_missing. Assign a reviewed, nonempty mark.
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.
+QA-002: file 101, mark 'S02', model 80211557-a3c1-4ccd-84d9-1274ec533776, center [6000.0, 0.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.
+snapshot_before: OK
+numbering_preview: OK
+Repair preview: 2 proposed changes; 1 excluded findings.
+Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+QA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm: attribute:5001 '<niezdefiniowany>' -> 'S03'.
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:5001 'S02' -> 'S04'.
+Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 0 remaining missing marks.
+Numbering preserve-valid-fill-gaps 1.0.0: 2 exact assignments.
+Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+unchanged_preview_audit: OK
+Audit native-model-qa-demo 2.0.0: fail.
+6 elements; 3 findings on 3 elements; 0 unchecked checks.
+Requested scope complete: True; audit complete: True.
+QA-001 (error): fail {'pass': 5, 'fail': 1, 'not_checked': 0, 'not_applicable': 0}
+QA-002 (error): fail {'pass': 3, 'fail': 2, 'not_checked': 0, 'not_applicable': 1}
+QA-003 (warning): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-004 (warning): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm (model_local): required_value_missing. Assign a reviewed, nonempty mark.
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.
+QA-002: file 101, mark 'S02', model 80211557-a3c1-4ccd-84d9-1274ec533776, center [6000.0, 0.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.
+unchanged_preview_snapshot: OK
+revalidate: OK
+Plan evidence unchanged; bounded disposable-copy evaluation apply requires explicit acknowledgement.
+controlled_unknown: OK
+Repair execution running: unknown, skipped. No automatic rollback or retry.
+exact_id_replay_unknown: OK
+Repair execution running: unknown, skipped. No automatic rollback or retry.
+new_identity_blocked: OK
+Apply rejected before native setters: An unresolved mutation exists. Recover its execution ID before new writes. [code=repair_recovery_required, request_id=89a2affa-6ba1-4ffe-93a2-0f99f7d6c7cb]
+partial_audit: OK
+Audit native-model-qa-demo 2.0.0: fail.
+6 elements; 2 findings on 2 elements; 0 unchecked checks.
+Requested scope complete: True; audit complete: True.
+QA-001 (error): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-002 (error): fail {'pass': 4, 'fail': 2, 'not_checked': 0, 'not_applicable': 0}
+QA-003 (warning): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-004 (warning): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.
+QA-002: file 101, mark 'S02', model 80211557-a3c1-4ccd-84d9-1274ec533776, center [6000.0, 0.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.
+partial_snapshot_only_c03: OK
+health_after: OK
+C03=S03, C04/C02=S02. No Undo yet. Stop/restart StartPythonHost in the same project; run M3 Recovery Inspect.cmd.

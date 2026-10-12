@@ -1,0 +1,19 @@
+M3 disposable-copy gate: ready_for_ui_observation. Execution: d8a1baca4f7e487395af40119a386586.
+health_restarted: OK
+recover_original_id: OK
+Repair execution stopped: reconciled, skipped. No automatic rollback or retry.
+exact_id_replay_no_resume: OK
+Repair execution stopped: reconciled, skipped. No automatic rollback or retry.
+audit_after_inspection: OK
+Audit native-model-qa-demo 2.0.0: fail.
+6 elements; 2 findings on 2 elements; 0 unchecked checks.
+Requested scope complete: True; audit complete: True.
+QA-001 (error): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-002 (error): fail {'pass': 4, 'fail': 2, 'not_checked': 0, 'not_applicable': 0}
+QA-003 (warning): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-004 (warning): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.
+QA-002: file 101, mark 'S02', model 80211557-a3c1-4ccd-84d9-1274ec533776, center [6000.0, 0.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.
+snapshot_after_inspection: OK
+health_after_inspection: OK
+Recover observed C03=S03 and skipped C04=S02; no resume. Check UI/other elements, then one Undo and M3 Recovery Undo Check.cmd.

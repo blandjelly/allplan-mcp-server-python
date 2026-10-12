@@ -1,131 +1,77 @@
-# Implementation stages
+# Implementation plan
 
-Current state and next action: [handoff](next-model-handoff.md).
-Tool scope: [features](features.md). Shared contracts: [architecture](architecture.md).
-Work in small, reviewable slices; task IDs remain stable. Dates depend on accepted
-capabilities and API probes rather than a fixed completion promise.
+Current acceptance and limits: [validation status](validation-status.md).
+Use the [testing policy](testing-policy.md); stage IDs remain stable.
 
-## M0 — Installation and bridge baseline: complete
+## Accepted fixture MVP
 
-**M0.1–M0.5 complete, 2026-10-07**, package 0.1.2, Allplan 2026-1-7.
+| Stage/tasks | Delivered scope | Gate |
+| --- | --- | --- |
+| M0.1–M0.5 | Runtime discovery, recursive installation/integrity/restore, health/version/box tools, host lifecycle and Windows package. | UAT-00/01 accepted, package 0.1.2. |
+| M1.1–M1.4 | Context/identity/geometry, typed query, cached full selections/pages/summaries, metadata/profile binding and demo fixture. | UAT-02/03 accepted within the bounded read contract, package 0.5.3. |
+| M2.1–M2.3 | Typed audit profile, fresh read-only reports, coverage/evidence and locatable deterministic findings. | UAT-04 accepted, package 0.6.1. |
+| M3.1–M3.4 | Shared preview/apply/revalidate, layer/status/mark repairs and demo standards, stale guards, journal deduplication/readback and controlled unknown-result recovery. | Bounded UAT-05/06 accepted by the owner's test-project scope decision, package 0.15.0. |
 
-| Completed task | Delivered scope |
-| --- | --- |
-| M0.1 | Repository provenance and separate runtime/build discovery. |
-| M0.2 | Recursive registration, integrity, backups and restore. |
-| M0.3 | Health/version/names/box and readable connection errors. |
-| M0.4 | Host lifecycle, ESC/restart, recovery and project switching. |
-| M0.5 | Versioned Windows package, launchers, diagnostics and Codex configuration. |
-
-**Exit gate met:** UAT-00/UAT-01 PASS for installation, one correctly sized box,
-ESC/restart, minimize/restore and project switching. Evidence/limits are in the
-handoff. Retest M0 only for relevant changes or a new defect.
-
-## M1 — Context, identity, selections and query: complete within the bounded read contract
-
-**M1.1–M1.4 complete, 2026-10-09**, package 0.5.3, profile 1.0.2,
-Allplan 2026-1-7. [Acceptance and limits](test-results/m1-acceptance-0.5.3.md).
-
-| Completed task | Delivered scope |
-| --- | --- |
-| M1.1 | Explicit session/project/file scope, model/view identity, canonical mm geometry and offset once; configured levels retain their provenance. |
-| M1.2 | Typed scalar/dimension/AABB predicates and six supported top-level root families, with child deduplication and wall/slab tier unions. |
-| M1.3 | Full cached selections, pages/summaries, relevant-source revalidation, TTL/eviction and restart invalidation. |
-| M1.4 | Validated demo profile, fresh named resource read binding, metadata inspection and the owner-built fixture. |
-
-**Exit gate met (UAT-02/UAT-03):** native A/B/C captures verify ten file-101
-roots, six columns, two S02 and one C01 spatial/height match, complete pages/
-summaries, display-unit invariance and offset (100000,200000,0) mm once.
-Owner UI dimensions/coordinates and unchanged appearance agree. Static
-runtime_verified flags are not an acceptance registry. Durable references,
-write eligibility/Undo, native BWS, arbitrary framing families and nonzero Z
-offsets remain outside acceptance. No further M1 owner batch is requested.
-
-## M2 — Audits and profile foundations: closed; bounded UAT-04 PASS
-
-Package **0.6.1**, audit profile **2.0.0**. Native 0.6.0 report and owner UI checks
-match; a later invalid-scope request coincided with a managed-exception crash.
-[Callback containment fix](test-results/m2-dispatch-fix-0.6.1.md) is portable-tested;
-[native 0.6.1 acceptance](test-results/m2-acceptance-0.6.1.md) confirms two identical
-complete audits, public/host scope rejection and continued host/Allplan operation.
-The earlier crash's precise cause remains unproven. No repeated owner test is required.
-[Contract](m2-audit-contract.md),
-[portable validation](validation-and-history.md) and
-[diagnostic reference](diagnostics.md). Acceptance is limited to the recorded fixture.
-
-- **M2.1** Versioned schema for typed attributes/layers, values, uniqueness and tolerances; validate bound resources.
-- **M2.2** `model_audit` with severity, evidence, distinct unchecked states and readable/structured reports.
-- **M2.3** Findings tied to session/project/document/model references and deterministic finding IDs; file/mark/model-local box and center for inspection. Durable references and native highlight remain unverified.
-
-**Exit gate (UAT-04):** demo returns exactly 5 findings on 5 columns, correct
-uniqueness scope, explicit unavailable data and locatable targets; no writes.
-
-## M3 — Controlled repairs and standards: preview in a separate draft
-
-Main has no M3 repair tool. [Draft PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2)
-implements read-only preview and fresh revalidation in package 0.7.0;
-134 portable tests are reported and native owner testing is pending. Apply,
-readback and Undo remain unavailable. Continue that PR for the remaining scope.
-
-- **M3.1** Shared preview/apply, stale checks, serialized writes, request identity, readback, partial outcomes and tested Undo limits.
-- **M3.2** `fix_model_issues` for writable attributes/layers; data marks and graphical labels stay distinct.
-- **M3.3** `apply_office_standard` and attribute/layer `rule_based_edit` reuse the same services.
-- **M3.4** Persist/reconcile managed records where needed; prove retry deduplication and unknown-outcome recovery.
-
-**Exit gate (UAT-05/UAT-06):** preview leaves the model unchanged, only authorized
-writable targets change, demo repairs leave 3 findings, stale/manual edits conflict,
-repeated requests do not repeat writes, and re-audit/readback match the model.
-**First MVP = accepted M0–M3**, with versioned install/update/restore and support limits.
+M3 closure covers recorded one-/two-change scenarios in foreground file 101 of
+the original copy. It is a fixture evaluation MVP. Manual UI active-plan conflicts,
+wider identity/journal guarantees and arbitrary 1–32-change plans remain outside
+acceptance; they are not silently declared complete by closing this stage.
 
 ## M4 — Native edits, frames and foundations
 
-- **M4.1** Probe ordinary columns/beams versus Structural Framing and wall materials; record read/create/update support per type/property/build.
-- **M4.2** Extend native-property `rule_based_edit` only for proven combinations, preserving dependencies and exceptions.
-- **M4.3** Native explicit-grid frame generation, generation keys and manual-edit conflicts; framing/bracing only after probes.
-- **M4.4** Pads under selected base columns, then straight-wall strips; profile dimensions/elevations and update/no-op/conflict on repeat.
+Prioritize the owner's wall fire-resistance and storey-scoped column concrete-class
+workflows before generation. [Office-project roadmap](office-project-roadmap.md)
+defines their property probes, writable profiles, identity, batching and journal prerequisites.
 
-**Exit gate (UAT-07–UAT-09):** native types, counts, geometry, levels, exceptions,
-links and repeat behavior verified. No silent deletion/recreation of manual work.
+- **M4.1:** Probe ordinary columns/beams versus Structural Framing and wall
+  materials/attributes; establish read/write support per build, type and property.
+- **M4.2:** Extend `rule_based_edit` only through proven native-property/attribute
+  adapters, preserving dependencies/exceptions; expand storey and multi-file scope.
+- **M4.3:** `generate_structural_frame` from explicit grids/elevations,
+  native columns/beams and owned generation keys; detect manual-edit conflicts.
+- **M4.4:** `generate_foundations_from_structure`: native pads under selected
+  base columns, then straight-wall strips, with profile dimensions/elevations.
 
-## M5 — Prepared layouts and issue exports
+UAT-07–09: native types/counts/geometry/levels/links/exceptions and repeat
+update/no-op/conflict behavior. Never silently replace manual work.
 
-- **M5.1** Probe insertion, paper scale/crop/margins, title blocks and PDF/DWG on one sheet; native revisions separate.
-- **M5.2** `populate_layouts` with template reserved areas, numbering, occupied-sheet policy and deterministic overflow.
-- **M5.3** Limited `documentation_audit` for known requirements and explicit unchecked/manual-review states.
-- **M5.4** `prepare_issue_package` with preflight, metadata, new output directory, verified files/hashes and partial-export recovery.
+## M5 — Layouts and issue exports
 
-**Exit gate (UAT-10/UAT-12):** contents, scale, fields and exact output list match;
-PDF/DWG opens correctly, critical audit failures block issue readiness, existing
-issues stay preserved. Export recovery is separate from model Undo.
-M5 may follow M3 before M4; it does not require full structural generation.
+- **M5.1:** Probe one-sheet insertion, paper scale/crop/margins, title blocks
+  and PDF/DWG; native revisions require separate evidence.
+- **M5.2:** `populate_layouts` using prepared files/templates, reserved areas,
+  numbering, occupied-sheet policy and deterministic overflow.
+- **M5.3:** `documentation_audit` for declared requirements with explicit
+  unchecked/manual-review states.
+- **M5.4:** `prepare_issue_package` with preflight, issue metadata, a new output
+  directory, exact verified file/hash list and partial-export recovery.
 
-## M6 — One managed documentation workflow
+UAT-10/12: correct contents/scales/fields and readable PDF/DWG; critical audit
+failures block readiness, existing issues stay preserved. Export recovery is
+separate from model Undo. M5 may precede generation work in M4.
 
-- **M6.1** Probe UVS creation/update using `ViewSectionElement` / `CreateSectionsAndViews()`, labels/dimensions and source changes.
-- **M6.2** Foundation plan, two sections, dimension chains, marks and own schedule with declared checked quantities.
-- **M6.3** Owned roles/dependencies, missing/stale audit and manual-adjustment preservation or explicit conflict.
-- **M6.4** Compose with M5 layouts/exports without duplicate numbering/content.
+## M6 — Managed documentation workflow
 
-**Exit gate (UAT-11):** initial generation, repeat and source change work; missing
-dimension roles are detected and manual edits preserved or surfaced for review.
+- **M6.1:** Probe UVS create/update, labels/dimensions and source changes.
+- **M6.2:** `create_documentation_package`: one foundation plan, two sections,
+  dimension chains, marks and a schedule with declared checked quantities.
+- **M6.3:** Owned roles/dependencies, missing/stale audits and preservation
+  of manual adjustments or explicit conflict.
+- **M6.4:** Compose with M5 layouts/exports without duplicate content/numbering.
 
-## M7 — Coordination openings and extensions
+UAT-11: initial/repeat/source-change behavior, missing dimension detection and
+manual-edit preservation/conflict. General third-party drawing completeness is deferred.
 
-- **M7.1** Early spike after M1: one pipe/wall and one pipe/slab crossing, actual host link and repeat prevention.
-- **M7.2** Proven crossings, broad-phase candidates plus geometric intersection, clearance, source links and edge/support exceptions.
-- **M7.3** Extend imports, oblique/merged openings, native edits and documentation only with demand and evidence.
-- **M7.4** Probe native revisions, building structure and file moves before claiming 2026 support.
+## M7 — Coordination openings
 
-**Exit gate (UAT-13):** openings modify correct hosts, have expected clearances,
-do not duplicate and report ambiguity/unsupported cases. DN does not replace
-actual outer/insulation geometry. A feasibility spike is not production acceptance.
+- **M7.1:** Feasibility spike: one pipe/wall and one pipe/slab crossing with
+  real host modification/link and repeat prevention.
+- **M7.2:** `generate_coordination_openings`: proven crossings, geometric
+  intersection/clearance, source links and edge/support exceptions.
+- **M7.3:** Imports, oblique/merged openings and documentation only with demand/evidence.
+- **M7.4:** Probe native revisions, building structure and file moves separately.
 
-## Validation and delivery
-
-The model runs relevant portable checks and prepares the runtime package; the
-owner receives only the applicable small batch with exact version/build, prompts,
-expected counts/visual results, reset/recovery and PASS/FAIL/BLOCKED reporting.
-Portable tests, documented APIs and actual Allplan evidence are separate.
-Record supported operations/builds, limits and the next action in the handoff.
-Use `ready_for_owner_test` before runtime acceptance and `accepted_on_build` only
-with evidence. Do not repeat accepted batches without a relevant change/defect.
+UAT-13: correct modified hosts/clearances, no duplicate openings and explicit
+ambiguity/unsupported cases. DN is not outer/insulation geometry; a spike is not
+production acceptance. Generic-solid fallbacks need explicit agreement/labels;
+structural/geotechnical design calculations remain outside tool scope.

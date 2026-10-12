@@ -1,0 +1,50 @@
+{
+  "result": "PASS",
+  "scope": "bounded 0.13.0 same-session excluded-peer conflict and completed-execution Undo recovery",
+  "source_commit": "752e54795a1cfa676217b5ffba0ce5d301383269",
+  "execution_id": "dffa3c94da434fddbda4cf146e18ef96",
+  "stale_execution_id": "dfa44a5156744f058a0dfc2a7f3fb322",
+  "steps_passed": 12,
+  "mcp_text_matches_structured_responses": true,
+  "human_readable_report_matches": true,
+  "plan_hashes_recomputed": {
+    "older_c04_preview": "fce0dc09d2beb17baafb9e25910680696ac6cd683260374e520186754c2dd525",
+    "c03_write_preview": "81dc45c4682245bfa6c1d7135c05e465099b453edaa34405c679d532d66dd89c"
+  },
+  "apply_request_hash_recomputed": "509a3689b5ff36384d760e5d0aa04df8a4a2187fb66d854dc0d7390f1955efec",
+  "audit_hashes_recomputed": {
+    "before": "ef8c2e364562186f899afe931197782993d7142ea5e94d6f8484e2c495ae8a48",
+    "after_previews": "ef8c2e364562186f899afe931197782993d7142ea5e94d6f8484e2c495ae8a48",
+    "after_apply": "b4b375e40e8765458c8c53c109fb70aab1e03571e448673985b710688fedb312",
+    "after_rejection": "b4b375e40e8765458c8c53c109fb70aab1e03571e448673985b710688fedb312",
+    "after_undo": "64ef6da8cd140023bf329cbce7774ba847f5db190585aa70ab3369bb64ead022"
+  },
+  "reported_bridge_hashes_match_existing_manifest": 23,
+  "same_host_session_during_gate": "6ad09618-52c5-4054-b2ca-37063f2d3211",
+  "recovery_host_session": "651e561c-3771-4096-a0f9-327057dc04c0",
+  "audit_findings_before_after_apply_after_undo": [
+    3,
+    2,
+    3
+  ],
+  "post_apply_audited_fields_match_plan": true,
+  "stale_apply_rejected_before_setters": true,
+  "actual_excluded_peer_source_conflict": true,
+  "read_only_recovery_after_undo": [
+    "old_value_observed"
+  ],
+  "audited_checks_after_undo_match_before": true,
+  "owner_observations": {
+    "parameters_match_ui": true,
+    "other_elements_unchanged": true,
+    "host_survived_gate": true,
+    "undo": "Owner reports all changes reverted in one Undo; this execution contains only one C03 mark setter. Grouped multiple-write Undo is not established."
+  },
+  "project_instruction": "Leave/save original disposable copy after Undo: C03 undefined, C04/C02=S02, C05 structure and C06 NEW retained; preserve journal/logs; no Redo/new Apply.",
+  "limits": [
+    "controlled typed source mutation, not manual UI conflict on an active plan",
+    "completed-execution recovery, not native partial/unknown recovery",
+    "one mark setter: not grouped multiple-write Undo",
+    "original retained fixture only; M3/UAT-05/UAT-06 remain open"
+  ]
+}

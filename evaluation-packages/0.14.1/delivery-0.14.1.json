@@ -1,0 +1,97 @@
+{
+  "version": "0.14.1",
+  "source_commit": "1810e4fa284311e204b9133deee3245f8427697b",
+  "source_modified": false,
+  "status": "ready_for_owner_test",
+  "date": "2026-10-12 Europe/Warsaw",
+  "native_gate_status": "ready_for_owner_test",
+  "native_acceptance": "not_run",
+  "correction": "0.14.0 owner gate blocked at numbering_preview before Apply: UUID-sorted changes disagreed with spatial assignment order. Generated changes now preserve reviewed assignment order; CLI/host scope guards remain unchanged.",
+  "portable_checks": {
+    "full_suite": {
+      "tests": 207,
+      "result": "PASS",
+      "runs": 1,
+      "source_commit": "1810e4fa284311e204b9133deee3245f8427697b"
+    },
+    "focused_checks": {
+      "recovery_control": 5,
+      "mark_execution": 10,
+      "real_http_recovery": 11,
+      "result": "PASS"
+    },
+    "python": "3.12.14",
+    "platform": "Linux",
+    "frozen_sync": "PASS",
+    "wheel_sdist_build": "PASS",
+    "deterministic_package_test": "PASS"
+  },
+  "exact_package_verification": {
+    "version": "0.14.1",
+    "source_commit": "1810e4fa284311e204b9133deee3245f8427697b",
+    "source_modified": false,
+    "extracted_package_integrity": "sha256-verified",
+    "bridge_hashes_verified": 23,
+    "registration_restore_preserves_journal": true,
+    "restored_previous_bridge_fixture": true,
+    "new_launchers_and_embedded_owner_instructions": "PASS",
+    "platform": "Linux",
+    "native_allplan": "not_run"
+  },
+  "source_ci": {
+    "status": "PASS",
+    "run_id": 38179275055,
+    "url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38179275055",
+    "source_commit": "1810e4fa284311e204b9133deee3245f8427697b",
+    "portable_jobs_passed": 6,
+    "observations": "source-ci-0.14.1.json"
+  },
+  "artifacts": {
+    "TEST-ALLPLAN-0.14.1.md": {
+      "bytes": 5684,
+      "sha256": "f6ed4285adb05c2212f7f3016b23a30ada91865be0f815d9a67330b14580ce86"
+    },
+    "TEST-ALLPLAN-0.14.1.txt": {
+      "bytes": 5684,
+      "sha256": "f6ed4285adb05c2212f7f3016b23a30ada91865be0f815d9a67330b14580ce86"
+    },
+    "allplan-mcp-0.14.1-windows-evaluation.zip": {
+      "bytes": 301564,
+      "sha256": "b5a7702f556ff68533e3e090252617dc7f76025dc4615a0b3a9169119b9ccd83"
+    },
+    "allplan-mcp-0.14.1-windows-evaluation.zip.sha256": {
+      "bytes": 108,
+      "sha256": "57c59bc5942c32c5d70f741bd7cfbfaf68025e0dea800dc7a2612632324ffcdc"
+    },
+    "allplan_mcp_server-0.14.1-py3-none-any.whl": {
+      "bytes": 70567,
+      "sha256": "9fed436b9db0b5ad4fa6cfe8de5b0f0daf05279f45ef51eed5ad303131a4a388"
+    },
+    "build.log": {
+      "bytes": 199,
+      "sha256": "eb3b8d06656327bd074b9dfd214875aa480af4a9ca39e4444cd9b92f271986f7"
+    },
+    "frozen-sync.log": {
+      "bytes": 30,
+      "sha256": "0b97fa1299cb97001943f8a8713b91b1c0eaed2002877ddd8a047f30ef934678"
+    },
+    "package-verification.json": {
+      "bytes": 408,
+      "sha256": "03a7943e4db1a33395d8b0302b878c11876fba842c0223e687bc4dc03a38d78c"
+    },
+    "portable-tests.log": {
+      "bytes": 59070,
+      "sha256": "d3d4750783661ed73cdda0083ba4ccf820a0f019a18d3d5ee8eaa233cb658c42"
+    },
+    "source-ci-0.14.1.json": {
+      "bytes": 13378,
+      "sha256": "1057f6591960a2b478734d1eb35fc9d87c4dab5ce9ab4992a0eb1ee3c7476a97"
+    }
+  },
+  "local_sdist": {
+    "path": "dist/allplan_mcp_server-0.14.1.tar.gz",
+    "bytes": 102666700,
+    "sha256": "d0f308aae1a26250aa7a6f2b297572ebdf4df98f321db9ebeddc371a36957347",
+    "repository_delivery": "omitted; nested historical delivery archives make this source distribution approximately 98 MiB"
+  }
+}

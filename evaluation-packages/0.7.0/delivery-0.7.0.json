@@ -1,0 +1,18 @@
+{
+  "archive": "allplan-mcp-0.7.0-windows-evaluation.zip",
+  "bytes": 382353,
+  "sha256": "e47a103b8a280bf786877f22bab8faf8bfd183f4de9531d8918305bd87cf56c6",
+  "source_commit": "22f18db27faf5e0873de18c1e079d1217da736fb",
+  "source_modified": false,
+  "integrity": "sha256-verified",
+  "checks": [
+    "zip_crc",
+    "all_payload_hashes",
+    "deterministic_rebuild",
+    "fresh_bridge_registration",
+    "wheel_repair_schema"
+  ],
+  "portable_tests_passed": 134,
+  "allplan_acceptance": "not_run",
+  "owner_publication_authorized": true
+}

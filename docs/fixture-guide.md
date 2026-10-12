@@ -1,37 +1,31 @@
-# Reference fixture for M1–M3
+# Test fixture
 
-This is the reusable setup for the accepted M1/M2 fixture, not a request to
-reinstall or repeat completed tests. [M1 acceptance](test-results/m1-acceptance-0.5.3.md)
-and [M2 acceptance](test-results/m2-acceptance-0.6.1.md) define its verified scope.
-The MCP read commands do not construct or repair this fixture.
+Use the original disposable **MCP_QA_DEMO** copy. Completed M1–M3 gates need no
+repeat. Preserve the project, package logs and installed Local repair journal;
+read current values before any new plan.
 
-## Project and resources
+## Resources and scope
 
-Use a disposable `MCP_QA_DEMO` project or copy. Reserve empty drawing files
-**101** (foreground), **102** (loaded passive) and **103** (unloaded). Use mm,
-zero offset and visible relevant layers for the initial baseline. Occupied
-files require a separately prepared profile; never overwrite a model.
+The demo [read profile](../profiles/examples/native-model-qa.demo.json), revision
+**1.0.2**, resolves existing **MCP_QA_MARK** and **MCP_QA_STATUS** text attributes
+and **SZ_OGÓ01** (structure) / **SZ_OGÓ02** (review) layer short names freshly.
+Both attributes are free text with empty defaults, no units/formulas/geometry links.
+Do not recreate resources or guess IDs. Attribute 498 is object name, not mark/status.
+The profile is `bound_for_read`, `active_for_write=false`.
 
-Through the Allplan UI, use two ordinary free-text attributes named
-**MCP_QA_MARK** and **MCP_QA_STATUS**, with empty defaults and no units,
-formulae or enumerated choices. Existing definitions are reused. The recorded
-owner setup groups them under MCP_QA. Use the existing layer short names
-**SZ_OGÓ01** (Ogólne01, structure) and **SZ_OGÓ02** (Ogólne02, review).
-The owner does not choose API IDs or edit JSON. Attribute 498 (Nazwa obiektu)
-is not the demo mark/status binding.
-
-**M1 Profile.cmd** verifies distinct attribute/layer IDs, name/type round trips
-and `bound_for_read`; it creates no resource. Missing or incompatible resources
-must be resolved before profile queries/audits. Read compatibility does not
-establish write eligibility.
+Baseline: millimetres, zero project offset, relevant layers visible,
+file **101 foreground**, **102 loaded passive**, **103 unloaded**.
+Different file IDs require a separately validated profile.
+Ordinary UI/file-state commands may end StartPythonHost. Prepare the model
+before starting it and restart from Library when necessary.
 
 ## Geometry and values
 
-Create six ungrouped ordinary native columns in file 101, with center insertion,
-section **400 × 400 mm**, bottom/top **0 / 3000 mm**, and a consistent sample
-material such as C30/37. C01–C06 identify recipe positions, not extra attributes.
+Use ungrouped ordinary native columns, center insertion, bottom/top **0/3000 mm**,
+section **400 × 400 mm**, consistent material such as C30/37.
+C01–C06 identify recipe positions.
 
-| Position | Center X/Y (mm) | MCP_QA_MARK | Layer | MCP_QA_STATUS |
+| Position | Center X/Y (mm) | Mark | Layer | Status |
 | --- | --- | --- | --- | --- |
 | C01 | 0 / 0 | S01 | SZ_OGÓ01 | NEW |
 | C02 | 6000 / 0 | S02 | SZ_OGÓ01 | NEW |
@@ -40,37 +34,31 @@ material such as C30/37. C01–C06 identify recipe positions, not extra attribut
 | C05 | 6000 / 6000 | S05 | SZ_OGÓ02 | NEW |
 | C06 | 12000 / 6000 | S06 | SZ_OGÓ01 | NWE |
 
-C03 was observed as literal `<niezdefiniowany>`. Queries preserve this raw
-string; M2 profile 2.0.0 explicitly classifies it as missing.
+Allplan returned C03's mark as literal `<niezdefiniowany>`; preserve the raw
+value. Audit profile **2.0.0** explicitly classifies it as missing.
+Add two **300 × 500 mm** beams along C01–C02/C02–C03 at a documented common
+elevation, one separate **200 × 4000 × 3000 mm** single-layer wall and one
+**4000 × 4000 × 200 mm** native slab beyond the C01 query box. Accepted beam
+roots are SkeletonBeam; slab is MultiSlab with Slab tiers. Expected:
+**10 top-level components** in 101. Child representations must not inflate counts.
+Add an S02 reference column to each of 102/103; those are outside audit uniqueness.
 
-Keep two native 300 × 500 mm beams between C01/C02 and C02/C03 at a documented
-elevation. The accepted fixture uses SkeletonBeam roots; ordinary Beam roots
-are also supported. Add a separate 200 × 4000 × 3000 mm single-layer wall and
-4000 × 4000 × 200 mm aggregate slab, away from C01's spatial test box (for
-example beyond X=20000 mm). The accepted slab is MultiSlab with Slab tiers.
-Expected file-101 count: **10 top-level components**, including six columns.
-Add one separate ordinary S02 column in each of files 102 and 103. Restore
-101 foreground, 102 passive, 103 unloaded and retain the zero-offset baseline.
+## Accepted observations and current state
 
-## Expected read results
+Read counts: **10/6/2/1** components/columns/S02/spatial-height C01 matches.
+Display units do not change canonical mm dimensions. Accepted XY offset adds
+**(100000,200000,0) mm** once to global coordinates, preserving local geometry.
+Configured levels are not native BWS.
 
-M1 Final.cmd runs the packaged read batch, summaries and page traversal.
-The accepted A capture verifies **10/6/2/1** file-101 components / profile
-columns / S02 matches / C01 spatial-height matches. Broad scope includes one
-reference from 102 and explicitly omits unloaded 103. B changes display units
-to metres with unchanged canonical mm geometry; it separately restores passive
-102 and C05's review layer. C uses a saved copy with offset
-**(100000,200000,0) mm**: global geometry equals local geometry plus offset
-exactly once. C01 base-center UI coordinates are **100/200/0 m**; its whole-box
-center is **(100000,200000,1500) mm**. Nonzero Z offsets were not tested.
+The [audit profile](../profiles/examples/native-model-qa.audit.json) examines
+only the six columns in 101: QA-001 missing C03 mark; QA-002 duplicate C02/C04
+mark (two findings, one group); QA-003 C05 review layer; QA-004 C06 NWE status.
+Baseline: **5 findings on 5 columns**, complete coverage; C01 passes.
+Layer/status repairs leave **5 → 4 → 3** findings; numbering from the repaired
+state gives **3 → 0 → 3** after Undo. [Acceptance and evidence](validation-status.md).
 
-M2 Audit.cmd reads only the six file-101 columns. Expected **24 checks**:
-18 pass, 5 fail, 1 not_applicable, 0 not_checked; **5 findings on 5 columns**:
-missing C03 mark, duplicate C02/C04 marks, C05 review layer and C06 NWE status.
-C01 passes; reference columns outside file 101 do not create duplicate findings.
-The report's fail state is the intentional fixture outcome, not a transport error.
+The owner confirms the saved copy after accepted Undo: **C02/C04=S02,
+C03 missing, C05 structure layer, C06 NEW**. Its complete audit has three mark
+findings. Keep that state; no Redo or repeated writing gate is requested.
 
-The separate [M3 preview PR](https://github.com/blandjelly/allplan-mcp-server-python/pull/2)
-proposes C05 layer SZ_OGÓ02 → SZ_OGÓ01 and C06 status NWE → NEW without writes.
-Apply remains unavailable. Future accepted application would leave three mark
-findings; it must use a reviewed plan and native readback/Undo evidence.
+See [validation limits](validation-status.md) and [current handoff](next-model-handoff.md).

@@ -1,15 +1,89 @@
-name: Portable M0, M1 and M2 checks
+name: Portable M0, M1, M2 and M3 execution checks
 on:
   push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'evaluation-packages/**'
   pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'evaluation-packages/**'
+  workflow_dispatch:
+    inputs:
+      full_matrix:
+        description: 'Run Windows/Ubuntu on Python 3.11, 3.12 and 3.13'
+        type: boolean
+        default: true
 permissions:
   contents: read
+concurrency:
+  group: portable-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
+  configuration:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      run_portable: ${{ steps.matrix.outputs.run_portable }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: matrix
+        name: Select compatibility matrix
+        shell: bash
+        run: |
+          python - <<'PY'
+          import fnmatch
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
+
+          event = json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text())
+          run_portable = True
+          if os.environ['GITHUB_EVENT_NAME'] == 'workflow_dispatch':
+              full = str(event.get('inputs', {}).get('full_matrix', 'true')).lower() == 'true'
+          else:
+              pr = event.get('pull_request')
+              before = (event.get('before') if pr and event.get('action') == 'synchronize'
+                        else pr['base']['sha'] if pr else event.get('before'))
+              after = pr['head']['sha'] if pr else event.get('after')
+              if not before or not after or set(before) == {'0'}:
+                  full = True
+              else:
+                  try:
+                      paths = subprocess.check_output(
+                          ['git', 'diff', '--name-only', before, after], text=True).splitlines()
+                  except subprocess.CalledProcessError:
+                      full = True
+                  else:
+                      patterns = ('pyproject.toml', 'uv.lock', 'windows/*',
+                                  'utils/register_python_host.*', 'utils/build_windows_package.py',
+                                  '.github/workflows/*')
+                      full = any(fnmatch.fnmatchcase(path, pattern)
+                                 for path in paths for pattern in patterns)
+                      documentation = ('docs/*', 'README.md', 'evaluation-packages/*')
+                      run_portable = any(not any(fnmatch.fnmatchcase(path, pattern)
+                                                for pattern in documentation) for path in paths)
+          versions = ['3.11', '3.12', '3.13'] if full else ['3.12']
+          matrix = {'include': [{'os': system, 'python': version}
+                               for system in ['ubuntu-latest', 'windows-latest']
+                               for version in versions]}
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('matrix=' + json.dumps(matrix) + '\n')
+              output.write('run_portable=' + str(run_portable).lower() + '\n')
+          print('Documentation only; skip product checks' if not run_portable else
+                'Full compatibility matrix' if full else 'Basic Windows/Ubuntu matrix')
+          PY
   portable:
+    needs: configuration
+    if: needs.configuration.outputs.run_portable == 'true'
     strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        python: ['3.11', '3.12', '3.13']
+      matrix: ${{ fromJSON(needs.configuration.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4

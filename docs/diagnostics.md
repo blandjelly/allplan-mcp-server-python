@@ -1,47 +1,48 @@
-# Diagnostic commands
+# Diagnostics and recovery
 
-Run these on the Windows machine running Allplan, with the installed bridge and
-MCP launcher active. [Windows setup](windows-setup.md) covers installation and
-recovery; [fixture setup](fixture-guide.md) defines the demo's exact resources.
-Restart StartPythonHost after UI/file-state commands that end its interactor.
-No accepted M1/M2 batch needs repetition without a relevant change or defect.
+Use local Windows Codex with StartPythonHost and **Launch Allplan MCP.cmd**
+running. **Diagnostics.cmd** saves read-only discovery/version/integrity/context
+data under package logs. [Windows setup](windows-setup.md).
 
-| Packaged command | Purpose and explicit scope |
-| --- | --- |
-| Diagnostics.cmd | Read-only health, versions and bounded context; no model mutation. |
-| M1 Metadata.cmd | Inspect files 1/2 with passive reads and attribute 498, using `docs/probes/m1-metadata-1-2.json`. These IDs are a diagnostic example, not demo mark bindings. |
-| M1 Profile.cmd | Fresh demo resource compatibility, using `docs/probes/m1-profile.json`; creates no attributes/layers. |
-| M1 Component Types.cmd | Native root/type diagnostic, using `docs/probes/m1-component-types.json`. |
-| M1 Final.cmd | Six explicit query requests from `docs/probes/m1-final.json`, with summaries and bounded page traversal over the reference fixture. |
-| M2 Audit.cmd | Read-only file-101 demo audit from `docs/probes/m2-audit.json`, with JSON and readable TXT findings. |
-| M2 Stability.cmd | Loaded-boundary preflight, two file-101 audits, public/direct-host scope rejection and post-error health; stops on failure. |
+Read health/context and a fresh explicit-scope audit before planning a change.
+Historical execution results do not establish current values after Undo/Redo.
+Unknown data remains not_checked.
 
-M1 Component Types.cmd is in `windows/`; run it there in a source checkout.
-The other commands are also placed at the evaluation ZIP's top level.
+## Unknown results
 
-Reports are written under the extracted package's ignored `logs/` directory.
-The bridge separately keeps UTC request/error logs at
-`Local/.allplan-mcp/logs/bridge.log`, with a 1 MiB limit and two backups.
-Log-write failure falls back to the console. Native rotation/traceback behavior
-has not been accepted from the owner-supplied reports.
+After a lost reply or partial/unknown result, preserve the original request and
+execution IDs, project, logs and **Local/.allplan-mcp/repairs**. Do not send a
+new Apply or overwrite/delete pointers. New IDs can bypass deduplication.
 
-For an explicitly prepared source diagnostic:
-
-```sh
-uv run --frozen allplan-mcp-diagnostics --query-request docs/probes/m1-profile.json
-uv run --frozen allplan-mcp-diagnostics --audit-request docs/probes/m2-audit.json
-uv run --frozen allplan-mcp-diagnostics --m2-stability
+```json
+{"action":"recover","execution_id":"<saved 32-hex execution ID>"}
 ```
 
-Input validation precedes network reads. Lost responses are never automatically
-retried by these launchers. The stability preflight requires matching 0.6.1
-host/MCP versions, verified installed hashes and the loaded marker
-`ui_dispatch_exception_boundary=contained_result_error_v1`; an old loaded bridge
-must be restarted before probing. Scope [101,102] is deliberately rejected by
-the file-101 profile. Do not treat this negative test as an accepted passive audit.
+Recover observes old/new/conflicting/unknown values in the original copy; it
+does not resume skipped targets, retry, Undo or prove write causality. Exact-ID
+replay returns historical outcomes without setters. After host restart, use
+recovery for the saved execution and a fresh preview for any new authorized work.
 
-Report flags such as runtime_verified=false/allplan_acceptance=not_run are not
-an automatic UAT decision. [Acceptance records](validation-and-history.md)
-separate portable checks, native results and owner UI observations. Keep new
-raw diagnostic/crash files outside tracked documentation; summarize relevant
-scope, hashes, findings and unresolved limits when a new record is needed.
+| Launcher | Saved pointer under package logs |
+| --- | --- |
+| M3 Workflow Recover.cmd | m3-last-workflow-execution.json |
+| M3 Numbering Recover.cmd | m3-last-numbering-execution.json |
+| M3 Conflict Recover.cmd | m3-last-conflict-execution.json |
+| M3 Selected Mark Recover.cmd / Undo Check.cmd | m3-last-selected-mark-execution.json |
+| M3 Recovery Inspect.cmd / Undo Check.cmd | m3-last-recovery-execution.json, plus retained per-execution copies |
+| M3 Recover.cmd | m3-last-execution.json, older exact-ID replay/recovery route |
+
+An uncertain conflict/recovery guard probe has a separate saved identity;
+inspect that probe and fresh model/journal evidence before further writes.
+Completed writing launchers need no repeat; their saved pointers prevent reruns.
+Original walkthroughs/reports remain in [historical records](validation-status.md#historical-records).
+
+## History and capacity
+
+**M3 Journal.cmd** or fix_model_issues action=inspect_journal reports verified
+historical summaries, slots and invalid/unresolved blockers without native model
+access or reconciliation. It is not a backup or proof of current values.
+At **128 records**, stop new writes. Never delete IDs to gain slots. Before
+migration/restoration close Allplan/MCP and preserve the entire journal, original
+project and logs; bridge backups do not include journal history. Use the
+[M3 contract](m3-execution-contract.md#journal-lifecycle-and-inspection) for limits.

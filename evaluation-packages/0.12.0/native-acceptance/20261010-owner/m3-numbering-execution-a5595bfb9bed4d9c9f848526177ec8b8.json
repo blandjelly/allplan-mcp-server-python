@@ -1,0 +1,14 @@
+{
+  "state": "apply_pending",
+  "execution_id": "a5595bfb9bed4d9c9f848526177ec8b8",
+  "tool": "apply_office_standard",
+  "apply_request": {
+    "action": "apply",
+    "plan_id": "9d5abd5412bb4ca1ad3d10d43262d2b5",
+    "plan_hash": "f58e1716c07b61211a1559f93f7ed829669e9ec3d5b586074aebe987cae09283",
+    "execution_id": "a5595bfb9bed4d9c9f848526177ec8b8",
+    "acknowledgement": "disposable_copy_reviewed_plan"
+  },
+  "expected_changes": 2,
+  "steps": []
+}
