@@ -1,0 +1,43 @@
+M3 disposable-copy gate: ready_for_ui_observation. Execution: b5b397c7f7134b27b9304259e53e6bc4.
+health_preflight: OK
+journal_before: OK
+Repair journal: 6 inspected records; storage checks passed. Historical records only; model values and write eligibility are not checked.
+audit_before: OK
+Audit native-model-qa-demo 2.0.0: fail.
+6 elements; 3 findings on 3 elements; 0 unchecked checks.
+Requested scope complete: True; audit complete: True.
+QA-001 (error): fail {'pass': 5, 'fail': 1, 'not_checked': 0, 'not_applicable': 0}
+QA-002 (error): fail {'pass': 3, 'fail': 2, 'not_checked': 0, 'not_applicable': 1}
+QA-003 (warning): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-004 (warning): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm (model_local): required_value_missing. Assign a reviewed, nonempty mark.
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.
+QA-002: file 101, mark 'S02', model 80211557-a3c1-4ccd-84d9-1274ec533776, center [6000.0, 0.0, 1500.0] mm (model_local): duplicate_value. Review the duplicate group and assign distinct marks within the drawing file and element family.
+snapshot_before: OK
+selected_mark_preview: OK
+Repair preview: 1 proposed changes; 2 excluded findings.
+Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:5001 'S02' -> 'S04'.
+Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 1 remaining missing marks.
+snapshot_after_preview: OK
+fresh_selected_revalidation: OK
+Plan evidence unchanged; bounded disposable-copy evaluation apply requires explicit acknowledgement.
+selected_apply_readback: OK
+Repair execution completed: applied. No automatic rollback or retry.
+same_id_read_only_replay: OK
+Repair execution completed: applied. No automatic rollback or retry.
+journal_after: OK
+Repair journal: 7 inspected records; storage checks passed. Historical records only; model values and write eligibility are not checked.
+audit_after: OK
+Audit native-model-qa-demo 2.0.0: fail.
+6 elements; 1 findings on 1 elements; 0 unchecked checks.
+Requested scope complete: True; audit complete: True.
+QA-001 (error): fail {'pass': 5, 'fail': 1, 'not_checked': 0, 'not_applicable': 0}
+QA-002 (error): pass {'pass': 5, 'fail': 0, 'not_checked': 0, 'not_applicable': 1}
+QA-003 (warning): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-004 (warning): pass {'pass': 6, 'fail': 0, 'not_checked': 0, 'not_applicable': 0}
+QA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm (model_local): required_value_missing. Assign a reviewed, nonempty mark.
+snapshot_only_c04_changed: OK
+health_after: OK
+Observe C04=S04, excluded C02=S02 and unchanged other columns. One native Undo restores C04; then run M3 Selected Mark Undo Check.cmd. Do not repeat Apply.

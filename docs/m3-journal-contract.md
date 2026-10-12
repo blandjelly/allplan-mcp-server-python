@@ -30,6 +30,9 @@ Restore preserve records but bridge backups do not back them up. There is no
 rollover, restore/import or pruning operation. Do not delete identities to gain slots.
 
 Portable validation uses real journal files and MCP/bridge HTTP with stateful
-native fakes. Native inspection and the selected explicit-mark workflow await
-[the new bounded owner gate](m3-selected-mark-owner-test.md). Existing recovery
-acceptance remains scoped to 0.14.1; no accepted batch needs repetition.
+native fakes. [Bounded native 0.15.0 acceptance](m3-selected-mark-acceptance-0.15.0.md)
+verifies healthy journal summaries 6 → 7 → 7 records alongside one selected C04
+mark write/replay and Undo/recovery. It does not establish native capacity,
+corruption, unresolved-record handling, migration or pruning. Original recovery
+acceptance keeps its recorded 0.14.1 scope. No completed gate needs repeat;
+further work is paused at the owner's request.

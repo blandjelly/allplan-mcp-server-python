@@ -41,8 +41,11 @@ The 0.14.0 attempt blocked before Apply. The corrected
 Leave/save the same project after Undo; no repeat is required.
 [Validation status](docs/validation-status.md) defines the accepted boundaries.
 0.15.0 adds [read-only journal inspection](docs/m3-journal-contract.md) and
-a [new selected C04 mark owner gate](docs/m3-selected-mark-owner-test.md).
-The new scope is ready_for_owner_test; no completed gate needs repetition.
+[bounded native selected-mark acceptance](docs/m3-selected-mark-acceptance-0.15.0.md):
+13/13 + 6/6 steps, C04 S02 → S04 with excluded C02, readback/replay, journal
+history and Undo/recovery; audits 3 → 1 → 3. Owner confirms UI and uninterrupted
+host in A. Leave/save the same copy after Undo. No repeat is required;
+further work is paused at the owner's request. M3 remains open.
 
 Use [Windows setup](docs/windows-setup.md), [fixture definition](docs/fixture-guide.md),
 [read tools](docs/tool-reference.md), [audit contract](docs/m2-audit-contract.md),

@@ -1,0 +1,1013 @@
+{
+  "state": "undo_checked",
+  "execution_id": "b5b397c7f7134b27b9304259e53e6bc4",
+  "apply_request": {
+    "action": "apply",
+    "plan_id": "c292745b598f4adb8c7933bd9fca66a0",
+    "plan_hash": "2bfc2c06218e0df382b2fdd42a787ed5b4984d0b3473a78e726f66e6bc03e139",
+    "execution_id": "b5b397c7f7134b27b9304259e53e6bc4",
+    "acknowledgement": "disposable_copy_reviewed_plan"
+  },
+  "baseline": {
+    "4f3cc27e-5224-403d-939d-7b4e0cedf9a2": {
+      "ref": {
+        "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+        "document_id": 0,
+        "profile_binding_fingerprint": "471be0c017f1ba24a4a1bcce85e8eda40dcd46c86f97b02b6df25a0516f8712f",
+        "drawing_file": 101,
+        "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+        "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+        "durable_identity_verified": false,
+        "component_kind": "top_level_component"
+      },
+      "fields": {
+        "file_state": {
+          "status": "observed",
+          "value": "active_foreground"
+        },
+        "layer_id": {
+          "status": "observed",
+          "value": 3700
+        },
+        "type_name": {
+          "status": "observed",
+          "value": "Column_TypeUUID"
+        },
+        "type_uuid": {
+          "status": "observed",
+          "value": "ac9415e3-4337-4860-8cd4-2f0d48596f12"
+        },
+        "attribute:5001": {
+          "status": "observed",
+          "value": "S02"
+        },
+        "attribute:5002": {
+          "status": "observed",
+          "value": "NEW"
+        },
+        "bounding_box_mm": {
+          "status": "observed",
+          "value": {
+            "min": [
+              -200.00000000000017,
+              5800.0,
+              9.0951551845464e-15
+            ],
+            "max": [
+              200.00000000000017,
+              6200.0,
+              3000.0
+            ],
+            "unit": "mm",
+            "frame": "model_local",
+            "source_api": "GetModelGeometry/CalcMinMax",
+            "source_frame": "model_local",
+            "offset_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "offset_applied": false,
+            "runtime_verified": false
+          }
+        },
+        "hierarchy": {
+          "status": "observed",
+          "value": {
+            "root": {
+              "drawing_file": 101,
+              "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+              "type_name": "Column_TypeUUID"
+            },
+            "top_level": true
+          }
+        },
+        "mark": {
+          "status": "observed",
+          "value": "S02"
+        },
+        "status": {
+          "status": "observed",
+          "value": "NEW"
+        }
+      }
+    },
+    "51db6258-4f95-4fab-ac80-8948e13bfd21": {
+      "ref": {
+        "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+        "document_id": 0,
+        "profile_binding_fingerprint": "471be0c017f1ba24a4a1bcce85e8eda40dcd46c86f97b02b6df25a0516f8712f",
+        "drawing_file": 101,
+        "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+        "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+        "durable_identity_verified": false,
+        "component_kind": "top_level_component"
+      },
+      "fields": {
+        "file_state": {
+          "status": "observed",
+          "value": "active_foreground"
+        },
+        "layer_id": {
+          "status": "observed",
+          "value": 3700
+        },
+        "type_name": {
+          "status": "observed",
+          "value": "Column_TypeUUID"
+        },
+        "type_uuid": {
+          "status": "observed",
+          "value": "ac9415e3-4337-4860-8cd4-2f0d48596f12"
+        },
+        "attribute:5001": {
+          "status": "observed",
+          "value": "S05"
+        },
+        "attribute:5002": {
+          "status": "observed",
+          "value": "NEW"
+        },
+        "bounding_box_mm": {
+          "status": "observed",
+          "value": {
+            "min": [
+              5800.0,
+              5800.0,
+              9.0951551845464e-15
+            ],
+            "max": [
+              6200.0,
+              6200.0,
+              3000.0
+            ],
+            "unit": "mm",
+            "frame": "model_local",
+            "source_api": "GetModelGeometry/CalcMinMax",
+            "source_frame": "model_local",
+            "offset_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "offset_applied": false,
+            "runtime_verified": false
+          }
+        },
+        "hierarchy": {
+          "status": "observed",
+          "value": {
+            "root": {
+              "drawing_file": 101,
+              "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+              "type_name": "Column_TypeUUID"
+            },
+            "top_level": true
+          }
+        },
+        "mark": {
+          "status": "observed",
+          "value": "S05"
+        },
+        "status": {
+          "status": "observed",
+          "value": "NEW"
+        }
+      }
+    },
+    "65ab07fe-d37a-4adf-b1b6-3040fdde84a2": {
+      "ref": {
+        "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+        "document_id": 0,
+        "profile_binding_fingerprint": "471be0c017f1ba24a4a1bcce85e8eda40dcd46c86f97b02b6df25a0516f8712f",
+        "drawing_file": 101,
+        "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+        "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+        "durable_identity_verified": false,
+        "component_kind": "top_level_component"
+      },
+      "fields": {
+        "file_state": {
+          "status": "observed",
+          "value": "active_foreground"
+        },
+        "layer_id": {
+          "status": "observed",
+          "value": 3700
+        },
+        "type_name": {
+          "status": "observed",
+          "value": "Column_TypeUUID"
+        },
+        "type_uuid": {
+          "status": "observed",
+          "value": "ac9415e3-4337-4860-8cd4-2f0d48596f12"
+        },
+        "attribute:5001": {
+          "status": "observed",
+          "value": "<niezdefiniowany>"
+        },
+        "attribute:5002": {
+          "status": "observed",
+          "value": "NEW"
+        },
+        "bounding_box_mm": {
+          "status": "observed",
+          "value": {
+            "min": [
+              11800.0,
+              -200.0,
+              9.0951551845464e-15
+            ],
+            "max": [
+              12200.0,
+              200.0,
+              3000.0
+            ],
+            "unit": "mm",
+            "frame": "model_local",
+            "source_api": "GetModelGeometry/CalcMinMax",
+            "source_frame": "model_local",
+            "offset_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "offset_applied": false,
+            "runtime_verified": false
+          }
+        },
+        "hierarchy": {
+          "status": "observed",
+          "value": {
+            "root": {
+              "drawing_file": 101,
+              "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+              "type_name": "Column_TypeUUID"
+            },
+            "top_level": true
+          }
+        },
+        "mark": {
+          "status": "observed",
+          "value": "<niezdefiniowany>"
+        },
+        "status": {
+          "status": "observed",
+          "value": "NEW"
+        }
+      }
+    },
+    "80211557-a3c1-4ccd-84d9-1274ec533776": {
+      "ref": {
+        "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+        "document_id": 0,
+        "profile_binding_fingerprint": "471be0c017f1ba24a4a1bcce85e8eda40dcd46c86f97b02b6df25a0516f8712f",
+        "drawing_file": 101,
+        "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+        "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+        "durable_identity_verified": false,
+        "component_kind": "top_level_component"
+      },
+      "fields": {
+        "file_state": {
+          "status": "observed",
+          "value": "active_foreground"
+        },
+        "layer_id": {
+          "status": "observed",
+          "value": 3700
+        },
+        "type_name": {
+          "status": "observed",
+          "value": "Column_TypeUUID"
+        },
+        "type_uuid": {
+          "status": "observed",
+          "value": "ac9415e3-4337-4860-8cd4-2f0d48596f12"
+        },
+        "attribute:5001": {
+          "status": "observed",
+          "value": "S02"
+        },
+        "attribute:5002": {
+          "status": "observed",
+          "value": "NEW"
+        },
+        "bounding_box_mm": {
+          "status": "observed",
+          "value": {
+            "min": [
+              5800.0,
+              -200.0,
+              9.0951551845464e-15
+            ],
+            "max": [
+              6200.0,
+              200.0,
+              3000.0
+            ],
+            "unit": "mm",
+            "frame": "model_local",
+            "source_api": "GetModelGeometry/CalcMinMax",
+            "source_frame": "model_local",
+            "offset_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "offset_applied": false,
+            "runtime_verified": false
+          }
+        },
+        "hierarchy": {
+          "status": "observed",
+          "value": {
+            "root": {
+              "drawing_file": 101,
+              "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+              "type_name": "Column_TypeUUID"
+            },
+            "top_level": true
+          }
+        },
+        "mark": {
+          "status": "observed",
+          "value": "S02"
+        },
+        "status": {
+          "status": "observed",
+          "value": "NEW"
+        }
+      }
+    },
+    "d26a3d87-2981-4657-b592-65c894ce41ba": {
+      "ref": {
+        "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+        "document_id": 0,
+        "profile_binding_fingerprint": "471be0c017f1ba24a4a1bcce85e8eda40dcd46c86f97b02b6df25a0516f8712f",
+        "drawing_file": 101,
+        "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+        "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+        "durable_identity_verified": false,
+        "component_kind": "top_level_component"
+      },
+      "fields": {
+        "file_state": {
+          "status": "observed",
+          "value": "active_foreground"
+        },
+        "layer_id": {
+          "status": "observed",
+          "value": 3700
+        },
+        "type_name": {
+          "status": "observed",
+          "value": "Column_TypeUUID"
+        },
+        "type_uuid": {
+          "status": "observed",
+          "value": "ac9415e3-4337-4860-8cd4-2f0d48596f12"
+        },
+        "attribute:5001": {
+          "status": "observed",
+          "value": "S06"
+        },
+        "attribute:5002": {
+          "status": "observed",
+          "value": "NEW"
+        },
+        "bounding_box_mm": {
+          "status": "observed",
+          "value": {
+            "min": [
+              11800.0,
+              5800.0,
+              9.0951551845464e-15
+            ],
+            "max": [
+              12200.0,
+              6200.0,
+              3000.0
+            ],
+            "unit": "mm",
+            "frame": "model_local",
+            "source_api": "GetModelGeometry/CalcMinMax",
+            "source_frame": "model_local",
+            "offset_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "offset_applied": false,
+            "runtime_verified": false
+          }
+        },
+        "hierarchy": {
+          "status": "observed",
+          "value": {
+            "root": {
+              "drawing_file": 101,
+              "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+              "type_name": "Column_TypeUUID"
+            },
+            "top_level": true
+          }
+        },
+        "mark": {
+          "status": "observed",
+          "value": "S06"
+        },
+        "status": {
+          "status": "observed",
+          "value": "NEW"
+        }
+      }
+    },
+    "eb88c850-0cac-408a-8091-f118872d74c2": {
+      "ref": {
+        "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+        "document_id": 0,
+        "profile_binding_fingerprint": "471be0c017f1ba24a4a1bcce85e8eda40dcd46c86f97b02b6df25a0516f8712f",
+        "drawing_file": 101,
+        "model_uuid": "eb88c850-0cac-408a-8091-f118872d74c2",
+        "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+        "durable_identity_verified": false,
+        "component_kind": "top_level_component"
+      },
+      "fields": {
+        "file_state": {
+          "status": "observed",
+          "value": "active_foreground"
+        },
+        "layer_id": {
+          "status": "observed",
+          "value": 3700
+        },
+        "type_name": {
+          "status": "observed",
+          "value": "Column_TypeUUID"
+        },
+        "type_uuid": {
+          "status": "observed",
+          "value": "ac9415e3-4337-4860-8cd4-2f0d48596f12"
+        },
+        "attribute:5001": {
+          "status": "observed",
+          "value": "S01"
+        },
+        "attribute:5002": {
+          "status": "observed",
+          "value": "NEW"
+        },
+        "bounding_box_mm": {
+          "status": "observed",
+          "value": {
+            "min": [
+              -199.99999999999997,
+              -200.00000000000003,
+              9.0951551845464e-15
+            ],
+            "max": [
+              199.99999999999997,
+              200.00000000000003,
+              3000.0
+            ],
+            "unit": "mm",
+            "frame": "model_local",
+            "source_api": "GetModelGeometry/CalcMinMax",
+            "source_frame": "model_local",
+            "offset_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "offset_applied": false,
+            "runtime_verified": false
+          }
+        },
+        "hierarchy": {
+          "status": "observed",
+          "value": {
+            "root": {
+              "drawing_file": 101,
+              "model_uuid": "eb88c850-0cac-408a-8091-f118872d74c2",
+              "type_name": "Column_TypeUUID"
+            },
+            "top_level": true
+          }
+        },
+        "mark": {
+          "status": "observed",
+          "value": "S01"
+        },
+        "status": {
+          "status": "observed",
+          "value": "NEW"
+        }
+      }
+    }
+  },
+  "expected": {
+    "4f3cc27e-5224-403d-939d-7b4e0cedf9a2": {
+      "ref": {
+        "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+        "document_id": 0,
+        "profile_binding_fingerprint": "471be0c017f1ba24a4a1bcce85e8eda40dcd46c86f97b02b6df25a0516f8712f",
+        "drawing_file": 101,
+        "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+        "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+        "durable_identity_verified": false,
+        "component_kind": "top_level_component"
+      },
+      "fields": {
+        "file_state": {
+          "status": "observed",
+          "value": "active_foreground"
+        },
+        "layer_id": {
+          "status": "observed",
+          "value": 3700
+        },
+        "type_name": {
+          "status": "observed",
+          "value": "Column_TypeUUID"
+        },
+        "type_uuid": {
+          "status": "observed",
+          "value": "ac9415e3-4337-4860-8cd4-2f0d48596f12"
+        },
+        "attribute:5001": {
+          "status": "observed",
+          "value": "S04"
+        },
+        "attribute:5002": {
+          "status": "observed",
+          "value": "NEW"
+        },
+        "bounding_box_mm": {
+          "status": "observed",
+          "value": {
+            "min": [
+              -200.00000000000017,
+              5800.0,
+              9.0951551845464e-15
+            ],
+            "max": [
+              200.00000000000017,
+              6200.0,
+              3000.0
+            ],
+            "unit": "mm",
+            "frame": "model_local",
+            "source_api": "GetModelGeometry/CalcMinMax",
+            "source_frame": "model_local",
+            "offset_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "offset_applied": false,
+            "runtime_verified": false
+          }
+        },
+        "hierarchy": {
+          "status": "observed",
+          "value": {
+            "root": {
+              "drawing_file": 101,
+              "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+              "type_name": "Column_TypeUUID"
+            },
+            "top_level": true
+          }
+        },
+        "mark": {
+          "status": "observed",
+          "value": "S04"
+        },
+        "status": {
+          "status": "observed",
+          "value": "NEW"
+        }
+      }
+    },
+    "51db6258-4f95-4fab-ac80-8948e13bfd21": {
+      "ref": {
+        "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+        "document_id": 0,
+        "profile_binding_fingerprint": "471be0c017f1ba24a4a1bcce85e8eda40dcd46c86f97b02b6df25a0516f8712f",
+        "drawing_file": 101,
+        "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+        "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+        "durable_identity_verified": false,
+        "component_kind": "top_level_component"
+      },
+      "fields": {
+        "file_state": {
+          "status": "observed",
+          "value": "active_foreground"
+        },
+        "layer_id": {
+          "status": "observed",
+          "value": 3700
+        },
+        "type_name": {
+          "status": "observed",
+          "value": "Column_TypeUUID"
+        },
+        "type_uuid": {
+          "status": "observed",
+          "value": "ac9415e3-4337-4860-8cd4-2f0d48596f12"
+        },
+        "attribute:5001": {
+          "status": "observed",
+          "value": "S05"
+        },
+        "attribute:5002": {
+          "status": "observed",
+          "value": "NEW"
+        },
+        "bounding_box_mm": {
+          "status": "observed",
+          "value": {
+            "min": [
+              5800.0,
+              5800.0,
+              9.0951551845464e-15
+            ],
+            "max": [
+              6200.0,
+              6200.0,
+              3000.0
+            ],
+            "unit": "mm",
+            "frame": "model_local",
+            "source_api": "GetModelGeometry/CalcMinMax",
+            "source_frame": "model_local",
+            "offset_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "offset_applied": false,
+            "runtime_verified": false
+          }
+        },
+        "hierarchy": {
+          "status": "observed",
+          "value": {
+            "root": {
+              "drawing_file": 101,
+              "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+              "type_name": "Column_TypeUUID"
+            },
+            "top_level": true
+          }
+        },
+        "mark": {
+          "status": "observed",
+          "value": "S05"
+        },
+        "status": {
+          "status": "observed",
+          "value": "NEW"
+        }
+      }
+    },
+    "65ab07fe-d37a-4adf-b1b6-3040fdde84a2": {
+      "ref": {
+        "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+        "document_id": 0,
+        "profile_binding_fingerprint": "471be0c017f1ba24a4a1bcce85e8eda40dcd46c86f97b02b6df25a0516f8712f",
+        "drawing_file": 101,
+        "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+        "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+        "durable_identity_verified": false,
+        "component_kind": "top_level_component"
+      },
+      "fields": {
+        "file_state": {
+          "status": "observed",
+          "value": "active_foreground"
+        },
+        "layer_id": {
+          "status": "observed",
+          "value": 3700
+        },
+        "type_name": {
+          "status": "observed",
+          "value": "Column_TypeUUID"
+        },
+        "type_uuid": {
+          "status": "observed",
+          "value": "ac9415e3-4337-4860-8cd4-2f0d48596f12"
+        },
+        "attribute:5001": {
+          "status": "observed",
+          "value": "<niezdefiniowany>"
+        },
+        "attribute:5002": {
+          "status": "observed",
+          "value": "NEW"
+        },
+        "bounding_box_mm": {
+          "status": "observed",
+          "value": {
+            "min": [
+              11800.0,
+              -200.0,
+              9.0951551845464e-15
+            ],
+            "max": [
+              12200.0,
+              200.0,
+              3000.0
+            ],
+            "unit": "mm",
+            "frame": "model_local",
+            "source_api": "GetModelGeometry/CalcMinMax",
+            "source_frame": "model_local",
+            "offset_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "offset_applied": false,
+            "runtime_verified": false
+          }
+        },
+        "hierarchy": {
+          "status": "observed",
+          "value": {
+            "root": {
+              "drawing_file": 101,
+              "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+              "type_name": "Column_TypeUUID"
+            },
+            "top_level": true
+          }
+        },
+        "mark": {
+          "status": "observed",
+          "value": "<niezdefiniowany>"
+        },
+        "status": {
+          "status": "observed",
+          "value": "NEW"
+        }
+      }
+    },
+    "80211557-a3c1-4ccd-84d9-1274ec533776": {
+      "ref": {
+        "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+        "document_id": 0,
+        "profile_binding_fingerprint": "471be0c017f1ba24a4a1bcce85e8eda40dcd46c86f97b02b6df25a0516f8712f",
+        "drawing_file": 101,
+        "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+        "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+        "durable_identity_verified": false,
+        "component_kind": "top_level_component"
+      },
+      "fields": {
+        "file_state": {
+          "status": "observed",
+          "value": "active_foreground"
+        },
+        "layer_id": {
+          "status": "observed",
+          "value": 3700
+        },
+        "type_name": {
+          "status": "observed",
+          "value": "Column_TypeUUID"
+        },
+        "type_uuid": {
+          "status": "observed",
+          "value": "ac9415e3-4337-4860-8cd4-2f0d48596f12"
+        },
+        "attribute:5001": {
+          "status": "observed",
+          "value": "S02"
+        },
+        "attribute:5002": {
+          "status": "observed",
+          "value": "NEW"
+        },
+        "bounding_box_mm": {
+          "status": "observed",
+          "value": {
+            "min": [
+              5800.0,
+              -200.0,
+              9.0951551845464e-15
+            ],
+            "max": [
+              6200.0,
+              200.0,
+              3000.0
+            ],
+            "unit": "mm",
+            "frame": "model_local",
+            "source_api": "GetModelGeometry/CalcMinMax",
+            "source_frame": "model_local",
+            "offset_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "offset_applied": false,
+            "runtime_verified": false
+          }
+        },
+        "hierarchy": {
+          "status": "observed",
+          "value": {
+            "root": {
+              "drawing_file": 101,
+              "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+              "type_name": "Column_TypeUUID"
+            },
+            "top_level": true
+          }
+        },
+        "mark": {
+          "status": "observed",
+          "value": "S02"
+        },
+        "status": {
+          "status": "observed",
+          "value": "NEW"
+        }
+      }
+    },
+    "d26a3d87-2981-4657-b592-65c894ce41ba": {
+      "ref": {
+        "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+        "document_id": 0,
+        "profile_binding_fingerprint": "471be0c017f1ba24a4a1bcce85e8eda40dcd46c86f97b02b6df25a0516f8712f",
+        "drawing_file": 101,
+        "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+        "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+        "durable_identity_verified": false,
+        "component_kind": "top_level_component"
+      },
+      "fields": {
+        "file_state": {
+          "status": "observed",
+          "value": "active_foreground"
+        },
+        "layer_id": {
+          "status": "observed",
+          "value": 3700
+        },
+        "type_name": {
+          "status": "observed",
+          "value": "Column_TypeUUID"
+        },
+        "type_uuid": {
+          "status": "observed",
+          "value": "ac9415e3-4337-4860-8cd4-2f0d48596f12"
+        },
+        "attribute:5001": {
+          "status": "observed",
+          "value": "S06"
+        },
+        "attribute:5002": {
+          "status": "observed",
+          "value": "NEW"
+        },
+        "bounding_box_mm": {
+          "status": "observed",
+          "value": {
+            "min": [
+              11800.0,
+              5800.0,
+              9.0951551845464e-15
+            ],
+            "max": [
+              12200.0,
+              6200.0,
+              3000.0
+            ],
+            "unit": "mm",
+            "frame": "model_local",
+            "source_api": "GetModelGeometry/CalcMinMax",
+            "source_frame": "model_local",
+            "offset_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "offset_applied": false,
+            "runtime_verified": false
+          }
+        },
+        "hierarchy": {
+          "status": "observed",
+          "value": {
+            "root": {
+              "drawing_file": 101,
+              "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+              "type_name": "Column_TypeUUID"
+            },
+            "top_level": true
+          }
+        },
+        "mark": {
+          "status": "observed",
+          "value": "S06"
+        },
+        "status": {
+          "status": "observed",
+          "value": "NEW"
+        }
+      }
+    },
+    "eb88c850-0cac-408a-8091-f118872d74c2": {
+      "ref": {
+        "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+        "document_id": 0,
+        "profile_binding_fingerprint": "471be0c017f1ba24a4a1bcce85e8eda40dcd46c86f97b02b6df25a0516f8712f",
+        "drawing_file": 101,
+        "model_uuid": "eb88c850-0cac-408a-8091-f118872d74c2",
+        "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+        "durable_identity_verified": false,
+        "component_kind": "top_level_component"
+      },
+      "fields": {
+        "file_state": {
+          "status": "observed",
+          "value": "active_foreground"
+        },
+        "layer_id": {
+          "status": "observed",
+          "value": 3700
+        },
+        "type_name": {
+          "status": "observed",
+          "value": "Column_TypeUUID"
+        },
+        "type_uuid": {
+          "status": "observed",
+          "value": "ac9415e3-4337-4860-8cd4-2f0d48596f12"
+        },
+        "attribute:5001": {
+          "status": "observed",
+          "value": "S01"
+        },
+        "attribute:5002": {
+          "status": "observed",
+          "value": "NEW"
+        },
+        "bounding_box_mm": {
+          "status": "observed",
+          "value": {
+            "min": [
+              -199.99999999999997,
+              -200.00000000000003,
+              9.0951551845464e-15
+            ],
+            "max": [
+              199.99999999999997,
+              200.00000000000003,
+              3000.0
+            ],
+            "unit": "mm",
+            "frame": "model_local",
+            "source_api": "GetModelGeometry/CalcMinMax",
+            "source_frame": "model_local",
+            "offset_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "offset_applied": false,
+            "runtime_verified": false
+          }
+        },
+        "hierarchy": {
+          "status": "observed",
+          "value": {
+            "root": {
+              "drawing_file": 101,
+              "model_uuid": "eb88c850-0cac-408a-8091-f118872d74c2",
+              "type_name": "Column_TypeUUID"
+            },
+            "top_level": true
+          }
+        },
+        "mark": {
+          "status": "observed",
+          "value": "S01"
+        },
+        "status": {
+          "status": "observed",
+          "value": "NEW"
+        }
+      }
+    }
+  },
+  "gate_host_session": "fcf043b3-f963-4da0-997b-360754fbc0a3",
+  "expected_changes": 1
+}

@@ -1,8 +1,11 @@
 # 0.15.0 — marka C04 z wykluczonym C02 i inspekcja dziennika
 
-Status: **ready_for_owner_test**, bez akceptacji natywnej tego nowego zakresu.
-To jeden nowy test `rule_based_edit`, nie powtórzenie zakończonego testu
-numerowania ani kontrolowanego przerwania. M3/UAT-05/UAT-06 pozostają otwarte.
+Status: **PASS / accepted_on_build, 2026-10-12** dla zachowanej kopii:
+13/13 kroków A i 6/6 kroków B, audyty 3 → 1 → 3 oraz potwierdzenie UI.
+[Wynik i ograniczenia](m3-selected-mark-acceptance-0.15.0.md).
+Test jest zakończony; **nie powtarzaj zapisu**. Poniższa instrukcja opisuje
+wykonany test. Pozostaw kopię po Undo i zachowaj dziennik/logi.
+Dalsza praca jest wstrzymana na polecenie właściciela. M3/UAT-05/UAT-06 pozostają otwarte.
 
 ## Przygotowanie
 

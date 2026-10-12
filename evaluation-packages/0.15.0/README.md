@@ -1,10 +1,17 @@
 # 0.15.0 selected-mark and journal evaluation
 
-**ready_for_owner_test**; native Allplan acceptance of this new scope is pending.
-The new gate writes only C04 S02 → S04 through rule_based_edit with C02 explicitly
-excluded. It checks full-scope collision/source evidence, readback/replay,
-journal history, complete six-column snapshots and one owner Undo/Recover.
-Expected 13 + 6 steps, audits **3 → 1 → 3**. Old accepted gates need no repeat.
+**Bounded native PASS / accepted_on_build, 2026-10-12 Europe/Warsaw**:
+13/13 A + 6/6 B, one rule_based_edit C04 S02 → S04 with excluded C02,
+readback/full snapshots, read-only replay, healthy journal inspection and owner
+Undo/recovery; audits **3 → 1 → 3**. Owner confirms A/B UI and uninterrupted
+host in A. B uses another session of unspecified cause.
+[Acceptance and limits](../../docs/m3-selected-mark-acceptance-0.15.0.md),
+[eight original uploads](native-acceptance/20261012-owner/),
+[inspection](native-acceptance/20261012-owner/inspection.json).
+No repeat is requested; leave/save the same copy after Undo and preserve logs/journal.
+Further work is paused at the owner's request; M3 remains open.
+Original archives, delivery records, logs and embedded instructions retain their
+historical ready_for_owner_test status unchanged.
 
 [Windows ZIP](allplan-mcp-0.15.0-windows-evaluation.zip),
 [checksum](allplan-mcp-0.15.0-windows-evaluation.zip.sha256),
@@ -38,6 +45,11 @@ is retained locally and is not committed.
 and Windows ZIP generation. [Original job/step observations](source-ci-0.15.0.json)
 verify the exact source commit. Publication is documentation/artifacts only;
 it repeats no product tests/builds or old artifact hash verification.
+
+## Historical completed-gate installation instructions
+
+The following instructions describe the delivered gate, which has now passed.
+Do not repeat the writing launcher; leave/save the copy after Undo.
 
 Install the complete new ZIP against the same Local after closing Allplan/MCP.
 Use the same original disposable project after accepted 0.14.1 Undo:

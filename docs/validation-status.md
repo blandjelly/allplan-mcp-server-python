@@ -2,14 +2,16 @@
 
 Current package **0.15.0**; status recorded **2026-10-12 Europe/Warsaw**.
 0.15.0 adds [read-only journal inspection](m3-journal-contract.md) and a
-[new selected C04 mark owner gate](m3-selected-mark-owner-test.md).
+[completed selected C04 mark gate](m3-selected-mark-owner-test.md).
 **219 portable tests PASS**, one final full run on Linux CPython 3.12.14 after
 focused journal/executor/real-HTTP checks; frozen sync PASS. Builds, exact
 installation and source CI are recorded in the [0.15.0 delivery](../evaluation-packages/0.15.0/README.md).
-The new scope is **ready_for_owner_test**, not native accepted: one explicit
-rule_based_edit mark write, excluded C02, journal inspection and one Undo.
-Previous native evidence remains scoped to its recorded source; no accepted
-owner gate is repeated.
+The [new bounded native scope has PASS / accepted_on_build](m3-selected-mark-acceptance-0.15.0.md):
+13/13 A + 6/6 B, one rule_based_edit C04 mark write, excluded C02, readback,
+read-only replay, healthy journal inspection and owner Undo; audits 3 → 1 → 3.
+Owner confirms UI in both phases and uninterrupted host in A. B uses another
+session of unspecified cause. No accepted gate needs repeat. Further work is
+paused at the owner's request; M3/UAT-05/UAT-06 remain open.
 
 The previous 0.13.0 [bounded same-session conflict gate](m3-conflict-acceptance-0.13.0.md) is
 **PASS**: 12/12 steps, one C03 write, stale C04 rejection before setters, actual
@@ -59,6 +61,7 @@ not a live acceptance registry.
 | 0.12.0 | Two numbered mark writes on existing string attribute 5001, exact readback/audited verification, same-session unchanged deterministic previews, read-only replay and subsequent no-op; complete audits 3 → 0 → 3 after Undo/recovery | Owner confirms correct marks, unchanged other elements, host survival and two-step Undo. Recovery observes old values after a changed host session; it concerns completed execution, not unknown-outcome recovery. Broader mark/workflow scope is unaccepted. |
 | 0.13.0 | 12/12 same-session conflict steps: C03 write/readback, stale C04 rejection before setters, excluded-peer fresh source/report conflict; audits 3 → 2 → 3 and old-value recovery after Undo | Owner confirms UI, unchanged peers and host survival. One setter/one Undo does not prove grouped Undo; manual UI active-plan conflict and partial/unknown recovery remain open. [Evidence](m3-conflict-acceptance-0.13.0.md). |
 | 0.14.1 | 13/13 + 6/6 + 6/6: C03-only controlled running/unknown write, new-ID rejection before setters, restart/reconciliation, read-only replay/no-resume, complete snapshots and audits 3 → 2 → 3 after owner Undo | One setter in the retained original fixture; process crash/power-loss, grouped Undo, manual UI active-plan conflicts, cross-copy identity and broader scope remain unaccepted. [Evidence](m3-recovery-acceptance-0.14.1.md). |
+| 0.15.0 | 13/13 + 6/6: one explicit rule_based_edit C04 S02 → S04, excluded C02, full audited-field/snapshot checks, read-only replay, journal summaries 6 → 7 → 7 and Undo/recovery; audits 3 → 1 → 3 | Owner confirms A/B UI and uninterrupted host in A; B uses another session with unspecified cause. Healthy journal only; broader native scope, capacity/corruption/migration, copy identity and grouped Undo remain unaccepted. [Evidence](m3-selected-mark-acceptance-0.15.0.md). |
 
 Final 0.11.0 findings: **QA-001 / QA-002 / QA-002**, with 24 checks:
 20 pass, 3 fail, 1 not_applicable, 0 not_checked. Failure is expected because
@@ -193,5 +196,7 @@ bridge restoration. [Source CI 38181795091](https://github.com/blandjelly/allpla
 [Delivery/artifacts](../evaluation-packages/0.15.0/README.md) retain source/archive
 identity, logs, installation verification, CI observations and Polish instructions.
 Publication repeats no product checks/builds or old artifact hash verification.
-The new selected-mark/journal scope remains ready_for_owner_test; no old gate
-needs repetition. PR #2 stays draft into main; M3 remains open.
+[Bounded native selected-mark/journal PASS](m3-selected-mark-acceptance-0.15.0.md)
+is recorded separately from unchanged archives and original delivery records.
+No completed gate needs repetition. Further work is paused at the owner's
+request; PR #2 stays draft into main and M3 remains open.

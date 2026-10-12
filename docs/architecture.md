@@ -129,4 +129,7 @@ restart/inspection and owner Undo; no repeat is required.
 0.15.0 adds [journal inspection](m3-journal-contract.md) before any native
 document/API lookup. It uses the existing writer lock, bounded verified history
 and structural record checks; no reconciliation/pruning is performed. The
-[new selected-mark owner gate](m3-selected-mark-owner-test.md) is ready_for_owner_test.
+[bounded native selected-mark gate](m3-selected-mark-acceptance-0.15.0.md) passed
+13/13 + 6/6 steps with excluded C02, journal inspection and owner Undo/recovery.
+The healthy journal scope is accepted; broader storage/identity limits remain.
+No repeat is required; further work is paused at the owner's request.

@@ -162,12 +162,13 @@ The [bounded native gate](m3-recovery-acceptance-0.14.1.md) passed
 read-only replay/no-resume and owner Undo, with audits 3 → 2 → 3.
 No repeat is required; broader crash/identity/scope guarantees remain open.
 
-## Next bounded owner gate — 0.15.0
+## Bounded selected-mark/journal acceptance — 0.15.0
 
-[Journal inspection](m3-journal-contract.md) exposes historical identities,
-capacity and unresolved/invalid blockers without native model access. The
-[new selected C04 mark gate](m3-selected-mark-owner-test.md) verifies positive
-rule_based_edit with excluded C02, full-field readback and one Undo/recovery.
-Status ready_for_owner_test; this scope is not yet native accepted. Previous
-accepted gates remain unchanged. Journal rollover, cross-copy identity and
-broader 1–32-change native acceptance remain outside this slice.
+[Native PASS / accepted_on_build](m3-selected-mark-acceptance-0.15.0.md):
+13/13 + 6/6 steps, one rule_based_edit C04 S02 → S04 with excluded C02,
+full audited-field/snapshot checks, read-only replay, healthy journal history
+6 → 7 → 7 and owner-confirmed UI/Undo, audits 3 → 1 → 3. A has a stable,
+owner-confirmed uninterrupted host; B uses another session with unspecified cause.
+Leave/save the same copy after Undo. No repeat is requested. Broader 1–32-change
+scope, journal rollover and cross-copy identity remain unaccepted; M3 remains open.
+Further implementation/tests/main integration are paused at the owner's request.

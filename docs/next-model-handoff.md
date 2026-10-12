@@ -1,10 +1,13 @@
 # Next-model handoff
 
-Updated **2026-10-12 Europe/Warsaw**. Continue **codex/m3-repair-preview**,
+Updated **2026-10-12 Europe/Warsaw**. Branch **codex/m3-repair-preview**,
 package **0.15.0**, [draft PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2)
 into main. M0–M2 / UAT-00–UAT-04 remain accepted within the recorded
 Allplan **2026-1-7** fixture scope. **M3/UAT-05/UAT-06 and the first MVP remain open**.
-No merge/release is requested by this handoff.
+**Work is paused at the owner's explicit request after reviewing native 0.15.0
+logs. Only evidence/documentation publication is authorized for this update.
+Do not continue implementation, run tests, request a new owner batch or integrate
+main until the owner explicitly resumes work.** No merge/release is requested.
 
 ## Read first
 
@@ -36,24 +39,29 @@ and [testing policy](testing-policy.md). Current changes:
   installation and source CI results are recorded with the
   [0.15.0 delivery](../evaluation-packages/0.15.0/README.md).
 
-## Next required action — native owner test
+## Latest native result — 0.15.0; work paused
 
-0.15.0 is **ready_for_owner_test**; the new selected-mark/journal scope has no
-native acceptance yet. Use only [the new bounded gate](m3-selected-mark-owner-test.md):
-13 steps for one C04 change, owner UI observations, one Undo and six read-only
-verification steps. Expected audits **3 → 1 → 3**. No previous gate needs repeat.
+[Bounded PASS / accepted_on_build](m3-selected-mark-acceptance-0.15.0.md):
+13/13 A + 6/6 B. One explicit rule_based_edit C04 S02 → S04 with excluded C02,
+fresh revalidation, full readback/audited-field checks, read-only exact-ID replay,
+healthy journal inspection and Undo/recovery pass. Full six-column snapshots
+show only the authorized mark/attribute change and exact baseline restoration;
+audits **3 → 1 → 3**. Owner confirms matching UI in A/B and uninterrupted host
+in A. Sessions are stable within each phase; B uses another session of unspecified
+cause. Final pointer undo_checked, execution b5b397c7f7134b27b9304259e53e6bc4.
 
-Use the same original disposable project retained after the accepted 0.14.1 Undo:
-C02=S02, C03=`<niezdefiniowany>`, C04=S02; C05 structure/C06 NEW remain.
-The prior final full snapshot matched baseline. Preserve that project, installed
-**Local/.allplan-mcp/repairs** and all package logs. Install the complete new ZIP
-against the same Local; old delivered artifacts stay unchanged. No Redo, new
-copy, old writing launcher or invented execution ID is needed.
+Eight original uploads and independent inspection are retained in the
+[0.15.0 native evidence](../evaluation-packages/0.15.0/native-acceptance/20261012-owner/).
+Plan/request hashes, five audit hashes, 19 MCP text responses, complete snapshots
+and reported bridge/source identity match. Journal summaries are 6 → 7 → 7
+verified records with no blockers. This is healthy-journal inspection acceptance,
+not native capacity/corruption/migration or wider identity acceptance.
 
-After the new gate, retain original owner JSON/TXT and UI/Undo/build evidence,
-record bounded PASS/FAIL/BLOCKED, and leave/save the same copy after Undo.
-A lost response uses the saved ID and Selected Mark Recover only. Native
-Allplan is available only through local Windows Codex/UI, not this cloud workspace.
+Leave/save the same original copy after Undo: C02/C04=S02, C03 undefined,
+C05 structure/C06 NEW retained. Preserve Local/.allplan-mcp/repairs and all logs.
+No Redo, repeat writing gate or new owner test is requested. The owner explicitly
+asked for documentation updates only and no continued task work. Runtime tests,
+builds and main integration remain paused.
 
 ## Existing native acceptance — do not repeat
 
@@ -122,5 +130,7 @@ bridge restoration. [Source CI 38181795091](https://github.com/blandjelly/allpla
 [Delivery/artifacts](../evaluation-packages/0.15.0/README.md) retain source/archive
 identity, logs, installation verification, CI observations and Polish instructions.
 Publication repeats no product checks/builds or old artifact hash verification.
-The new selected-mark/journal scope remains ready_for_owner_test; no old gate
-needs repetition. PR #2 stays draft into main; M3 remains open.
+[Selected-mark/journal bounded native PASS](m3-selected-mark-acceptance-0.15.0.md)
+is recorded separately from the unchanged delivery/embedded instructions.
+No completed gate needs repetition. Further work is paused; PR #2 stays draft
+into main and M3 remains open.

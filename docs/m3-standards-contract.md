@@ -1,9 +1,13 @@
 # M3 office standards and selected repairs
 
-Current **0.13.0** tools apply_office_standard and rule_based_edit share the
+Current **0.15.0** tools apply_office_standard and rule_based_edit share the
 repair planner/executor. They accept preview, revalidate, apply and recover.
 [Native boundaries](validation-status.md) distinguish the earlier no-op previews
 from the latest two separately reviewed single-target writes.
+[Bounded selected-mark acceptance](m3-selected-mark-acceptance-0.15.0.md)
+adds one explicit rule_based_edit C04 S02 → S04 with excluded C02, readback,
+read-only replay/journal inspection and Undo/recovery; audits 3 → 1 → 3.
+No completed gate needs repeat; further work is paused at the owner's request.
 [Workflow execution](m3-workflow-execution-contract.md) defines Apply eligibility
 and journal/recovery limits. M3/UAT-05/UAT-06 remain open.
 

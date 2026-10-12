@@ -5,7 +5,10 @@ The owner confirms unchanged model and uninterrupted host. They reuse audit,
 planner, selection, hashing and revalidation. 0.12.0 implements existing-string
 mark writes and [deterministic numbering](m3-numbering-contract.md); their
 [bounded two-target native numbering gate passed](m3-numbering-acceptance-0.12.0.md);
-wider explicit-request/workflow scope remains outside native acceptance.
+[0.15.0](m3-selected-mark-acceptance-0.15.0.md) additionally has bounded native
+acceptance for one explicit rule_based_edit C04 mark with excluded C02,
+read-only replay/journal inspection and Undo/recovery. Wider combinations remain
+outside native acceptance. No completed gate needs repetition.
 
 ## Explicit rule and target, no automatic numbering
 

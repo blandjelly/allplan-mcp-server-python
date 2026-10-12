@@ -21,9 +21,11 @@ Use `fix_model_issues` with `{"action":"inspect_journal"}` from local Codex.
 An available journal does not establish current model values or writability.
 [Inspection contract](m3-journal-contract.md).
 
-**M3 Selected Mark.cmd** is the new 0.15.0 bounded C04 mark gate with excluded
-C02. [Polish walkthrough](m3-selected-mark-owner-test.md) defines its exact
-retained starting state. **M3 Selected Mark Recover.cmd** and
+**M3 Selected Mark.cmd** is the completed 0.15.0 bounded C04 mark gate with
+excluded C02. [Native PASS and limits](m3-selected-mark-acceptance-0.15.0.md)
+record 13/13 + 6/6 steps and audits 3 → 1 → 3. No repeat is requested;
+leave/save the same copy after Undo. [Historical walkthrough](m3-selected-mark-owner-test.md)
+defines the tested starting state. **M3 Selected Mark Recover.cmd** and
 **M3 Selected Mark Undo Check.cmd** use logs/m3-last-selected-mark-execution.json
 and send Recover only, never Apply replay/resume. Retain the immutable identity;
 do not rerun the writing gate once a pointer exists.
