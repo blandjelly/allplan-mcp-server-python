@@ -1,0 +1,103 @@
+{
+  "schema_version": "m4-evaluation-delivery-1",
+  "version": "0.16.0",
+  "source_commit": "8ac5e97563c881f3427fc47ef752b5c5362786ee",
+  "source_modified": false,
+  "source_branch": "codex/m4-property-discovery",
+  "base_branch": "codex/m3-repair-preview",
+  "pull_request": "https://github.com/blandjelly/allplan-mcp-server-python/pull/5",
+  "prepared_at_utc": "2026-10-12T19:45:06.630670+00:00",
+  "owner_date_timezone": "2026-10-12 Europe/Warsaw",
+  "state": "ready_for_owner_test",
+  "allplan_acceptance": "not_run",
+  "portable_tests": {
+    "state": "PASS",
+    "count": 233,
+    "seconds": 94.537,
+    "full_runs_final_candidate": 1,
+    "environment": "Linux CPython 3.12.14",
+    "log": "portable-tests.log"
+  },
+  "frozen_sync": "PASS",
+  "wheel_sdist_build": "PASS",
+  "exact_package_installation": "PASS",
+  "verification": "package-verification.json",
+  "installation_scope": "Linux portable filesystem simulation, not native Allplan or Windows setup UI",
+  "source_ci": {
+    "state": "PASS",
+    "run_id": 38299080569,
+    "source_commit": "8ac5e97563c881f3427fc47ef752b5c5362786ee",
+    "configurations": 6,
+    "url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38299080569",
+    "observations": "source-ci-0.16.0.json"
+  },
+  "artifacts": {
+    "README.md": {
+      "bytes": 3191,
+      "sha256": "e3c29813723c9865dc12b534b4f6c470ccc056b112ddab1310263a06dde59918"
+    },
+    "TEST-ALLPLAN-0.16.0.md": {
+      "bytes": 4641,
+      "sha256": "2ec1b0838ee56c04555f4ba3c8c31e7defa5a09e40e3a45f8032f10d1139d95a"
+    },
+    "TEST-ALLPLAN-0.16.0.txt": {
+      "bytes": 4641,
+      "sha256": "2ec1b0838ee56c04555f4ba3c8c31e7defa5a09e40e3a45f8032f10d1139d95a"
+    },
+    "allplan-mcp-0.16.0-windows-evaluation.zip": {
+      "bytes": 280001,
+      "sha256": "c8931c31ed2e0b2289d2736f7ee850f47780c753352cd917985b1782fd514336"
+    },
+    "allplan-mcp-0.16.0-windows-evaluation.zip.sha256": {
+      "bytes": 108,
+      "sha256": "07bf4b0cd6c96c07a7b2059f77dc50bf83894d6ad0d12cd79c9ef2da88a6e21a"
+    },
+    "allplan_mcp_server-0.16.0-py3-none-any.whl": {
+      "bytes": 78160,
+      "sha256": "b93a4bb007350eb5f16acc143cae198c6023feb528aa4d1db6002b20d892c402"
+    },
+    "build.log": {
+      "bytes": 241,
+      "sha256": "428acc71c84a7d257d2b972ef71fc38d1eac3d4e0f237e7d053743aeb8ce4949"
+    },
+    "frozen-sync.log": {
+      "bytes": 30,
+      "sha256": "d4258ed9205d0b22015adb6a0fd7be64876b798026ea4f1cd05f30e8b2b4e5c4"
+    },
+    "package-verification.json": {
+      "bytes": 981,
+      "sha256": "af88f141d5fa7ac5cd3e4dc57f1083cc12f16b298a10e429699a9f47a0fb8518"
+    },
+    "portable-tests.log": {
+      "bytes": 74377,
+      "sha256": "dd51b4cda78e53815c3aa7960eaf7978812f101d179f29f2ceb288ec69eff76e"
+    },
+    "source-ci-0.16.0.json": {
+      "bytes": 12337,
+      "sha256": "45f79aa7bb8f7d71d6c4a0b0488bf47e681bf56d490c41f4b0e9c8789b02e1c9"
+    }
+  },
+  "sdist": {
+    "committed": false,
+    "bytes": 103633467,
+    "sha256": "b443aed83fe0c7982168a34f0b4936e274511c1e08ff9914f5a3cb88660e1e85"
+  },
+  "native_gate": {
+    "target_allplan_build": "2026-1-7",
+    "project": "original retained MCP_QA_DEMO copy after Undo",
+    "scope": "open drawings, sampled Column/Wall metadata, full query highlight and document-wide clear",
+    "native_selection": "BLOCKED_current_interactor",
+    "model_setters_requested": false,
+    "walkthrough": "TEST-ALLPLAN-0.16.0.md",
+    "owner_observation_required": true
+  },
+  "limits": [
+    "not a complete project property catalog",
+    "native owner and semantic aliases not verified",
+    "API symbols/submission do not prove native read/write acceptance",
+    "no native wall thickness/material reader or new write adapter",
+    "highlight does not establish native UI selection",
+    "existing M3 write acceptance remains bounded to earlier evidence"
+  ],
+  "older_delivered_archives_changed": false
+}

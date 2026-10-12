@@ -66,6 +66,22 @@ acceptance registry.
 
 ## Current limits and next work
 
+### M4 discovery/presentation delivery
+
+[0.16.0 delivery](../evaluation-packages/0.16.0/README.md), source
+**8ac5e97563c881f3427fc47ef752b5c5362786ee**, records **233 portable tests PASS**,
+frozen sync, wheel/sdist builds and exact ZIP install/restore simulation (27 host
+hashes; journal bytes preserved). Source compatibility CI is recorded in that
+delivery. These checks use native fakes/portable filesystem simulation.
+
+`model_properties`, the open-drawings query default and full-result highlight/clear
+are **ready_for_owner_test** on Allplan 2026-1-7. Native UI selection is
+**BLOCKED_current_interactor**; no new write adapter, native wall thickness or
+material support is accepted. Follow the [new observation guide](m4-properties-owner-test.pl.md).
+No completed native M3 gate needs repeating for this delivery.
+
+### Retained M3 limits
+
 - Executor eligibility **1–32** is broader than accepted one-/two-change scenarios.
   Other profiles/files, mixed/larger plans, walls, native concrete properties,
   attribute addition, labels and file moves have no accepted M3 write support.

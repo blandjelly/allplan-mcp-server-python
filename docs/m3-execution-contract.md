@@ -129,4 +129,4 @@ the entire journal, original project and logs before migration. Deleting IDs or
 restoring older history removes retry protection; copying extracted packages
 does not transfer installed history. Do not replay transferred identities or
 retry newer writes after history rollback. Wider identity/journal/Undo guarantees
-are prerequisites in the [office-project roadmap](office-project-roadmap.md).
+are prerequisites in the [editing development plan](office-editing-development-plan.pl.md).

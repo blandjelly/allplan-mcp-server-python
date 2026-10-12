@@ -1,0 +1,28 @@
+{
+  "schema_version": "m4-package-verification-1",
+  "state": "PASS",
+  "version": "0.16.0",
+  "source_commit": "8ac5e97563c881f3427fc47ef752b5c5362786ee",
+  "source_modified": false,
+  "environment": "Linux portable filesystem simulation; no native Allplan or Windows installer execution",
+  "archive": "allplan-mcp-0.16.0-windows-evaluation.zip",
+  "manifest_integrity": "sha256-verified",
+  "payload_files_verified": 129,
+  "installed_bridge_files_verified": 27,
+  "new_host_modules_installed": [
+    "model_scope.py",
+    "property_contracts.py",
+    "model_properties.py",
+    "model_selection.py"
+  ],
+  "launchers_verified": [
+    "M4 Properties.cmd",
+    "M4 Clear Highlight.cmd"
+  ],
+  "journal_bytes_preserved_after_install": true,
+  "journal_bytes_preserved_after_restore": true,
+  "previous_installation_fixture_restored_exactly": true,
+  "previous_fixture_is_not_native_M3_evidence": true,
+  "wheel_version_and_new_modules": "PASS",
+  "native_acceptance": "not_run"
+}

@@ -1,0 +1,419 @@
+{
+  "schema_version": "m4-source-ci-1",
+  "state": "PASS",
+  "source_commit": "8ac5e97563c881f3427fc47ef752b5c5362786ee",
+  "run_id": 38299080569,
+  "url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38299080569",
+  "status": "completed",
+  "conclusion": "success",
+  "event": "pull_request",
+  "run_attempt": 1,
+  "configurations": 6,
+  "configuration_job": "success",
+  "observed_at_utc": "2026-10-12 19:45:05 UTC",
+  "jobs": [
+    {
+      "id": 114977348047,
+      "name": "portable (windows-latest, 3.13)",
+      "head_sha": "8ac5e97563c881f3427fc47ef752b5c5362786ee",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38299080569/job/114977348047",
+      "started_at": "2026-10-12T19:39:36Z",
+      "completed_at": "2026-10-12T19:44:08Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run python -m pip install uv==0.12.19",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv sync --frozen",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv run --frozen python -m unittest discover -s tests -v",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv build",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv run --frozen python utils/build_windows_package.py",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "id": 114977348068,
+      "name": "portable (ubuntu-latest, 3.13)",
+      "head_sha": "8ac5e97563c881f3427fc47ef752b5c5362786ee",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38299080569/job/114977348068",
+      "started_at": "2026-10-12T19:39:36Z",
+      "completed_at": "2026-10-12T19:41:11Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run python -m pip install uv==0.12.19",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv sync --frozen",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv run --frozen python -m unittest discover -s tests -v",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv build",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv run --frozen python utils/build_windows_package.py",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "id": 114977348076,
+      "name": "portable (windows-latest, 3.12)",
+      "head_sha": "8ac5e97563c881f3427fc47ef752b5c5362786ee",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38299080569/job/114977348076",
+      "started_at": "2026-10-12T19:39:37Z",
+      "completed_at": "2026-10-12T19:44:07Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run python -m pip install uv==0.12.19",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv sync --frozen",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv run --frozen python -m unittest discover -s tests -v",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv build",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv run --frozen python utils/build_windows_package.py",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "id": 114977348195,
+      "name": "portable (ubuntu-latest, 3.11)",
+      "head_sha": "8ac5e97563c881f3427fc47ef752b5c5362786ee",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38299080569/job/114977348195",
+      "started_at": "2026-10-12T19:39:37Z",
+      "completed_at": "2026-10-12T19:41:34Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run python -m pip install uv==0.12.19",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv sync --frozen",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv run --frozen python -m unittest discover -s tests -v",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv build",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv run --frozen python utils/build_windows_package.py",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "id": 114977348196,
+      "name": "portable (ubuntu-latest, 3.12)",
+      "head_sha": "8ac5e97563c881f3427fc47ef752b5c5362786ee",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38299080569/job/114977348196",
+      "started_at": "2026-10-12T19:39:36Z",
+      "completed_at": "2026-10-12T19:41:06Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run python -m pip install uv==0.12.19",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv sync --frozen",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv run --frozen python -m unittest discover -s tests -v",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv build",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv run --frozen python utils/build_windows_package.py",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "id": 114977348236,
+      "name": "portable (windows-latest, 3.11)",
+      "head_sha": "8ac5e97563c881f3427fc47ef752b5c5362786ee",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38299080569/job/114977348236",
+      "started_at": "2026-10-12T19:39:36Z",
+      "completed_at": "2026-10-12T19:43:23Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run python -m pip install uv==0.12.19",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv sync --frozen",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv run --frozen python -m unittest discover -s tests -v",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv build",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Run uv run --frozen python utils/build_windows_package.py",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "conclusion": "success",
+          "status": "completed"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "status": "completed"
+        }
+      ]
+    }
+  ],
+  "scope": "Native fakes/portable tests and builds only; no native Allplan acceptance."
+}
