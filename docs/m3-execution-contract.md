@@ -170,5 +170,7 @@ full audited-field/snapshot checks, read-only replay, healthy journal history
 6 → 7 → 7 and owner-confirmed UI/Undo, audits 3 → 1 → 3. A has a stable,
 owner-confirmed uninterrupted host; B uses another session with unspecified cause.
 Leave/save the same copy after Undo. No repeat is requested. Broader 1–32-change
-scope, journal rollover and cross-copy identity remain unaccepted; M3 remains open.
-Further implementation/tests/main integration are paused at the owner's request.
+scope, journal rollover and cross-copy identity remain unaccepted.
+[M3 is now closed within the retained fixture scope](m3-closure.md) by the
+owner's later decision. No completed gate needs repetition; wider work follows
+the [office-project roadmap](office-project-roadmap.md). Main integration is separate.

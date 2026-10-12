@@ -3,7 +3,10 @@
 Use the versioned package on the Windows machine running Allplan and Codex.
 It requires external Python 3.11+ and internet access for locked dependencies;
 Allplan, Python and Codex are not bundled. Acceptance is scoped to the
-[recorded fixture/build](validation-status.md). M3 remains open.
+[recorded fixture/build](validation-status.md). [M3 is closed within that test
+project](m3-closure.md). For the latest accepted package use the
+[0.15.0 delivery](../evaluation-packages/0.15.0/README.md); the versioned
+installation example below describes the historical 0.13.0 package.
 
 For ongoing M3 work use the existing disposable project, establish its current
 values before planning and preserve Local/.allplan-mcp/repairs and package logs.

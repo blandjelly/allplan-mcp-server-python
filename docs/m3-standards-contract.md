@@ -7,9 +7,10 @@ from the latest two separately reviewed single-target writes.
 [Bounded selected-mark acceptance](m3-selected-mark-acceptance-0.15.0.md)
 adds one explicit rule_based_edit C04 S02 → S04 with excluded C02, readback,
 read-only replay/journal inspection and Undo/recovery; audits 3 → 1 → 3.
-No completed gate needs repeat; further work is paused at the owner's request.
+No completed gate needs repeat.
 [Workflow execution](m3-workflow-execution-contract.md) defines Apply eligibility
-and journal/recovery limits. M3/UAT-05/UAT-06 remain open.
+and journal/recovery limits. [M3 / bounded UAT-05/UAT-06 are closed](m3-closure.md)
+for the retained test project; office-project support remains future work.
 
 ## Versioned preset and public requests
 

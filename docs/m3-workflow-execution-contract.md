@@ -6,7 +6,8 @@ ten steps, both separately reviewed changes/readbacks, exact-ID read-only replay
 complete audits 5 → 4 → 3 and same-session verified 0.11.0. Owner confirms both
 changes, host survival, unchanged other elements and two-step Undo. Acceptance
 covers the retained workflow pair, not every eligible 1–32-change plan/file.
-M3/UAT-05/UAT-06 and the first MVP remain open.
+[M3 / bounded UAT-05/UAT-06 are now closed for the retained test project](m3-closure.md).
+The fixture evaluation MVP does not accept wider eligibility or office-project use.
 
 ## Supported operations and typed actions
 
@@ -100,7 +101,7 @@ older Local backup may remove newer records: inspect model/logs and do not retry
 their writes. Atomic writes/content hashes detect some storage failures but do
 not establish authenticated history or sudden power-loss durability.
 
-## Remaining M3 work
+## Work beyond the fixture closure
 
 Actual mark assignment and deterministic versioned-standard numbering are
 implemented in 0.12.0; [the bounded two-target native gate](m3-numbering-acceptance-0.12.0.md)
@@ -108,8 +109,9 @@ passed. The [bounded same-session conflict gate](m3-conflict-acceptance-0.13.0.m
 also passed. The [0.14.1 controlled recovery gate](m3-recovery-acceptance-0.14.1.md)
 passed restart/reconciliation, no-resume replay and Undo. No completed gate needs repeat.
 Do not repeat UI editing known to cancel the host. Broader journal maintenance,
-identity guarantees and final UAT/main integration remain open. Graphic labels,
-file moves and universal native properties are conditional extensions.
+identity guarantees and broader UAT remain open for office-project use;
+[fixture UAT is closed](m3-closure.md). Main integration is separate. Graphic
+labels, file moves and universal native properties are conditional extensions.
 
 ## Controlled recovery evaluation — 0.14.1
 
@@ -131,5 +133,7 @@ full audited-field/snapshot checks, read-only replay, healthy journal history
 6 → 7 → 7 and owner-confirmed UI/Undo, audits 3 → 1 → 3. A has a stable,
 owner-confirmed uninterrupted host; B uses another session with unspecified cause.
 Leave/save the same copy after Undo. No repeat is requested. Broader 1–32-change
-scope, journal rollover and cross-copy identity remain unaccepted; M3 remains open.
-Further implementation/tests/main integration are paused at the owner's request.
+scope, journal rollover and cross-copy identity remain unaccepted.
+[M3 is now closed within the retained fixture scope](m3-closure.md) by the
+owner's later decision. No completed gate needs repetition; wider work follows
+the [office-project roadmap](office-project-roadmap.md). Main integration is separate.

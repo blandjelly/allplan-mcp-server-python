@@ -73,8 +73,10 @@ back both values, verify all audited fields, remove exactly three mark findings,
 replay read-only and produce a subsequent empty numbering plan. Existing
 layer/status defects can remain: total findings are 5 → 2 or 3 → 0 (also 4 → 1).
 The owner checks fields/other elements and native Undo; grouped Undo is unimplemented.
-Native unknown recovery, supported-lifecycle source conflicts and remaining
-M3/UAT/main-integration work are still open.
+[0.13.0 supported-lifecycle conflicts](m3-conflict-acceptance-0.13.0.md) and
+[0.14.1 controlled unknown recovery](m3-recovery-acceptance-0.14.1.md) subsequently
+passed. [M3 / bounded UAT are now closed within the test project](m3-closure.md);
+broader native scope and main integration remain separate.
 
 ## Generated write order — 0.14.1
 

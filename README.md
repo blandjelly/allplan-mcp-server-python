@@ -27,8 +27,12 @@ read-only replay, complete audits **5 → 4 → 3** and owner-confirmed two-step
 0.12.0 implements reviewed mark assignment and a deterministic versioned numbering
 standard; the [bounded two-target native gate](docs/m3-numbering-acceptance-0.12.0.md)
 passed writes, readback, replay/no-op and two-step Undo/recovery.
-**M3/UAT-05/UAT-06 remain open**: remaining scope acceptance, manual UI active-plan
-conflicts and broader journal/identity guarantees are open.
+**M3 / bounded UAT-05/UAT-06 are closed for the retained test project** by the
+owner's explicit scope decision. [Closure and evidence](docs/m3-closure.md) define
+the fixture evaluation MVP and its one-/two-change scenarios. The executor's
+1–32-change eligibility does not extend native acceptance. Typical office-project
+use, manual UI active-plan conflicts and broader journal/identity guarantees
+remain unaccepted; see the [office-project roadmap](docs/office-project-roadmap.md).
 0.13.0 retains invalidated plans for one bounded read-only source comparison;
 they remain unavailable to Apply. The [bounded same-session conflict gate](docs/m3-conflict-acceptance-0.13.0.md)
 passed 12/12 steps, one C03 write, stale C04 rejection, actual excluded-peer
@@ -44,8 +48,10 @@ Leave/save the same project after Undo; no repeat is required.
 [bounded native selected-mark acceptance](docs/m3-selected-mark-acceptance-0.15.0.md):
 13/13 + 6/6 steps, C04 S02 → S04 with excluded C02, readback/replay, journal
 history and Undo/recovery; audits 3 → 1 → 3. Owner confirms UI and uninterrupted
-host in A. Leave/save the same copy after Undo. No repeat is required;
-further work is paused at the owner's request. M3 remains open.
+host in A. Leave/save the same copy after Undo. No repeat is required.
+The owner resumed work to close M3 within this fixture scope; historical gate
+reports and delivered archives retain their as-recorded status. Main integration
+and release are separate from milestone acceptance.
 
 Use [Windows setup](docs/windows-setup.md), [fixture definition](docs/fixture-guide.md),
 [read tools](docs/tool-reference.md), [audit contract](docs/m2-audit-contract.md),

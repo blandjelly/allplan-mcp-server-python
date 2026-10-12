@@ -85,5 +85,6 @@ ordinary inspection until local Codex inspects the separate probe and fresh
 model/journal evidence. No deletion or automatic journal pruning is introduced.
 Copy identity and mutation causality remain unproven; use only the original copy.
 
-M3/UAT-05/UAT-06 remain open. Any native acceptance must be recorded separately
+[M3 / bounded UAT-05/UAT-06 are closed within the test project](m3-closure.md).
+Any broader native acceptance must be recorded separately
 from portable fake/HTTP checks and bounded to the observations actually supplied.

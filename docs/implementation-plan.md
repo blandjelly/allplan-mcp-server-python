@@ -60,9 +60,14 @@ crash cause remains unproven. [Audit contract](m2-audit-contract.md).
 **Exit gate (UAT-04):** demo returns exactly 5 findings on 5 columns, correct
 uniqueness scope, explicit unavailable data and locatable targets; no writes.
 
-## M3 — Controlled repairs and standards: partially implemented, M3 open
+## M3 — Controlled repairs and standards: closed within the retained test project
 
-Package **0.15.0** supports 1–32 reviewed existing string mark/status or layer changes on
+**Owner-selected bounded closure, 2026-10-12 Europe/Warsaw:**
+[UAT mapping and support limits](m3-closure.md). M3.1–M3.4 are accepted only
+within the recorded fixture scenarios; the [office-project roadmap](office-project-roadmap.md)
+tracks wider capability and acceptance work.
+
+Package **0.15.0** implements 1–32 reviewed existing string mark/status or layer changes on
 Column roots in one explicit foreground file. Office-standard and rule-based
 Apply/Revalidate/Recover reuse the executor, full-source/exception checks,
 durable deduplication and audited readback.
@@ -83,21 +88,32 @@ Mark assignment and deterministic versioned-standard numbering are implemented;
 complete audits 3 → 0 → 3, readback, replay/no-op and two-step Undo/recovery.
 [Controlled partial/unknown recovery](m3-recovery-acceptance-0.14.1.md) now has
 bounded native PASS. Remaining native scope and manual UI active-plan conflict
-are unaccepted. Known UI editing cancelled the host and must not be repeated unchanged. Journal maintenance and
-identity limits, final UAT and main integration remain open. Graphical labels,
-file moves and universal native properties are conditional extensions.
+are unaccepted and outside the narrowed milestone. Known UI editing cancelled
+the host and must not be repeated unchanged. Journal maintenance, wider identity
+guarantees and broader UAT move to office-project work; main integration remains
+separate. Graphical labels, file moves and universal native properties are
+conditional extensions.
 
 - **M3.1** Shared preview/apply, stale checks, serialized writes, request identity, readback, partial outcomes and tested Undo limits.
 - **M3.2** `fix_model_issues` for writable attributes/layers; data marks and graphical labels stay distinct.
 - **M3.3** `apply_office_standard` and attribute/layer `rule_based_edit` reuse the same services.
 - **M3.4** Persist/reconcile managed records where needed; prove retry deduplication and unknown-outcome recovery.
 
-**Exit gate (UAT-05/UAT-06):** preview leaves the model unchanged, only authorized
-writable targets change, demo repairs leave 3 findings, stale/manual edits conflict,
-repeated requests do not repeat writes, and re-audit/readback match the model.
-**First MVP = accepted M0–M3**, with versioned install/update/restore and support limits.
+**Bounded exit gate met (UAT-05/UAT-06):** existing evidence verifies unchanged
+preview, authorized fixture writes, layer/status repairs leaving 3 findings,
+stale-plan rejection and excluded-peer source comparison, replay without repeat
+writes, controlled unknown-result recovery and matching readback/re-audit/Undo.
+Native manual UI active-plan conflicts are explicitly outside this narrowed gate;
+the original broader gate is not retroactively labelled PASS.
+**First fixture evaluation MVP = accepted M0–M3**, with versioned
+install/update/restore and recorded support limits; office-project use remains planned.
 
 ## M4 — Native edits, frames and foundations
+
+Prioritize **M4.1–M4.2** for the owner's requested wall fire-resistance and
+storey-scoped column concrete-class workflows before frame/foundation generation.
+The [office-project roadmap](office-project-roadmap.md) defines per-property
+probes, writable profiles, identity, multi-file scope, batching and journal prerequisites.
 
 - **M4.1** Probe ordinary columns/beams versus Structural Framing and wall materials; record read/create/update support per type/property/build.
 - **M4.2** Extend native-property `rule_based_edit` only for proven combinations, preserving dependencies and exceptions.
@@ -170,5 +186,7 @@ full audited-field/snapshot checks, read-only replay, healthy journal history
 6 → 7 → 7 and owner-confirmed UI/Undo, audits 3 → 1 → 3. A has a stable,
 owner-confirmed uninterrupted host; B uses another session with unspecified cause.
 Leave/save the same copy after Undo. No repeat is requested. Broader 1–32-change
-scope, journal rollover and cross-copy identity remain unaccepted; M3 remains open.
-Further implementation/tests/main integration are paused at the owner's request.
+scope, journal rollover and cross-copy identity remain unaccepted.
+[M3 is now closed within the retained fixture scope](m3-closure.md) by the
+owner's later decision. No completed gate needs repetition; wider work follows
+the [office-project roadmap](office-project-roadmap.md). Main integration is separate.

@@ -132,4 +132,6 @@ and structural record checks; no reconciliation/pruning is performed. The
 [bounded native selected-mark gate](m3-selected-mark-acceptance-0.15.0.md) passed
 13/13 + 6/6 steps with excluded C02, journal inspection and owner Undo/recovery.
 The healthy journal scope is accepted; broader storage/identity limits remain.
-No repeat is required; further work is paused at the owner's request.
+No repeat is required. [M3 is closed for the retained test project](m3-closure.md);
+the [office-project roadmap](office-project-roadmap.md) tracks wider writes and
+identity/storage requirements. Runtime eligibility remains broader than acceptance.

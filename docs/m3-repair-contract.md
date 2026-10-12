@@ -7,7 +7,8 @@ are described in the [mark contract](m3-marks-contract.md).
 Package **0.13.0** executes eligible reviewed existing-string mark/status and layer plans through the
 [shared executor](m3-execution-contract.md) and
 [workflow contract](m3-workflow-execution-contract.md).
-M3/UAT-05/UAT-06 remain open.
+[M3 / bounded UAT-05/UAT-06 are closed for the retained test project](m3-closure.md).
+Broader writable profiles and native plans remain unaccepted.
 
 ## Explicit preview
 

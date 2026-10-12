@@ -1,6 +1,13 @@
 # Validation status and limits
 
 Current package **0.15.0**; status recorded **2026-10-12 Europe/Warsaw**.
+**[M3 / bounded UAT-05/UAT-06 are closed for the retained test project](m3-closure.md)**
+by the owner's explicit scope decision. The first MVP is a fixture evaluation.
+The closure maps existing evidence and explicitly excludes wider native scope,
+active-plan manual edits and office-project guarantees. Main integration and
+release remain separate. Historical reports/deliveries below retain their
+as-recorded status; previous open/pause statements are superseded by the closure.
+
 0.15.0 adds [read-only journal inspection](m3-journal-contract.md) and a
 [completed selected C04 mark gate](m3-selected-mark-owner-test.md).
 **219 portable tests PASS**, one final full run on Linux CPython 3.12.14 after
@@ -10,8 +17,9 @@ The [new bounded native scope has PASS / accepted_on_build](m3-selected-mark-acc
 13/13 A + 6/6 B, one rule_based_edit C04 mark write, excluded C02, readback,
 read-only replay, healthy journal inspection and owner Undo; audits 3 → 1 → 3.
 Owner confirms UI in both phases and uninterrupted host in A. B uses another
-session of unspecified cause. No accepted gate needs repeat. Further work is
-paused at the owner's request; M3/UAT-05/UAT-06 remain open.
+session of unspecified cause. No accepted gate needs repeat. The owner resumed
+work to close the fixture milestone; wider use follows the
+[office-project roadmap](office-project-roadmap.md).
 
 The previous 0.13.0 [bounded same-session conflict gate](m3-conflict-acceptance-0.13.0.md) is
 **PASS**: 12/12 steps, one C03 write, stale C04 rejection before setters, actual
@@ -30,7 +38,8 @@ Mark assignment and deterministic numbering have **bounded two-target native PAS
 below remains scoped to its recorded packages, fixture and supported behaviors.
 Native acceptance concerns the retained disposable fixture and observed Allplan
 **2026-1-7** setup with local Windows Codex. It is separate from portable tests.
-M3/UAT-05/UAT-06 and the first MVP remain open.
+These slices support the [bounded fixture MVP closure](m3-closure.md),
+not general office-project acceptance.
 
 ## Accepted baseline
 
@@ -49,6 +58,10 @@ Read profiles remain inactive for general writes. Static diagnostic flags
 not a live acceptance registry.
 
 ## Accepted M3 slices
+
+The table retains each package's original acceptance and remaining boundary.
+A limitation listed for an older package may have later evidence in another
+row; the [closure](m3-closure.md) gives the current aggregate fixture scope.
 
 | Package | Native gate | Remaining boundary |
 | --- | --- | --- |
@@ -158,7 +171,8 @@ original logs, CI steps, instructions and package. Documentation publication
 repeats no tests/builds and leaves archives unchanged. Main ancestry was reconciled
 in the M3 branch; PR #2 stays draft into main, without merge/release.
 The original native attempt blocked before Apply; corrected 0.14.1 has since
-passed with bounded native recovery acceptance. M3/UAT-05/UAT-06 are open.
+passed with bounded native recovery acceptance. M3/UAT-05/UAT-06 were still open
+at this delivery; the later [fixture closure](m3-closure.md) supersedes that status.
 
 ## Delivered 0.14.1 correction and owner action
 
@@ -174,8 +188,9 @@ Documentation publication repeats no tests/builds and leaves old artifacts uncha
 The 0.14.0 attempt blocked before Apply/ID creation; the corrected
 [controlled recovery gate](m3-recovery-acceptance-0.14.1.md) has since passed.
 Leave/save the copy after the completed 0.14.1 Undo, preserving Local journal
-and all logs. No repeat is requested. M3/UAT-05/UAT-06 remain open.
-PR #2 stays draft into main, with no merge/release.
+and all logs. No repeat is requested. At this delivery M3/UAT-05/UAT-06 remained
+open and PR #2 stayed draft into main, with no merge/release. The later
+[fixture closure](m3-closure.md) defines the current milestone status.
 
 ## Native 0.14.1 recovery result — 2026-10-12
 
@@ -198,5 +213,6 @@ identity, logs, installation verification, CI observations and Polish instructio
 Publication repeats no product checks/builds or old artifact hash verification.
 [Bounded native selected-mark/journal PASS](m3-selected-mark-acceptance-0.15.0.md)
 is recorded separately from unchanged archives and original delivery records.
-No completed gate needs repetition. Further work is paused at the owner's
-request; PR #2 stays draft into main and M3 remains open.
+No completed gate needs repetition. [M3 / bounded UAT are now closed for the
+retained test project](m3-closure.md). Main integration/release remain separate;
+original delivery manifests and native evidence are unchanged.

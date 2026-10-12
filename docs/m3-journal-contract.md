@@ -34,5 +34,6 @@ native fakes. [Bounded native 0.15.0 acceptance](m3-selected-mark-acceptance-0.1
 verifies healthy journal summaries 6 → 7 → 7 records alongside one selected C04
 mark write/replay and Undo/recovery. It does not establish native capacity,
 corruption, unresolved-record handling, migration or pruning. Original recovery
-acceptance keeps its recorded 0.14.1 scope. No completed gate needs repeat;
-further work is paused at the owner's request.
+acceptance keeps its recorded 0.14.1 scope. No completed gate needs repeat.
+[M3 is closed within the retained test project](m3-closure.md); broader journal
+lifecycle work is tracked in the [office-project roadmap](office-project-roadmap.md).
