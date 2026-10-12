@@ -16,6 +16,7 @@ use is planned. [Acceptance, tests and limits](docs/validation-status.md).
 | [Validation status](docs/validation-status.md) | Accepted scope, test results, limits and original evidence. |
 | [Implementation plan](docs/implementation-plan.md) | Completed stages and planned workflows. |
 | [Office-project roadmap](docs/office-project-roadmap.md) | Wall fire resistance, column concrete class and wider edits. |
+| [Owner development plan (Polish)](docs/office-editing-development-plan.pl.md) | M3 review and proposed query, selection and editing milestones for six element families. |
 | [Windows setup](docs/windows-setup.md) / [diagnostics](docs/diagnostics.md) | Install, connect, preserve history and recover unknown results. |
 | [Fixture](docs/fixture-guide.md) | Test geometry, resources and current saved state. |
 | [Read/audit tools](docs/tool-reference.md) / [M3 execution](docs/m3-execution-contract.md) | Requests and current operational boundaries. |
