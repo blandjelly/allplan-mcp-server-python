@@ -1,295 +1,111 @@
-# M1 scope and model query contract — 0.5.3
+# Read and audit tools
 
-Status: **M1 accepted on Allplan 2026-1-7 within the bounded read contract**.
-[Acceptance and limits](validation-status.md). Schema
-`m1-query-1`, public MCP tool `model_query`, typed bridge route `/model-query`.
-Native geometry/hierarchy, demo resources, display-unit invariance and
-nonzero XY offset have bounded acceptance. Other predicate variants, changed-source
-staleness and TTL/eviction remain backed by portable checks; do not infer wider
-native support. The context probe preserves raw units/offset provenance.
+Native acceptance is bounded to the [recorded fixture/build](validation-status.md).
+These tools do not write, load/activate files, highlight or select on screen.
+Use typed MCP requests; the wrapper supplies host schema versions.
 
-## Scope and identity
+## Context, scope and identity
 
-Every new query requires `scope.drawing_files` (1–100 distinct positive numbers),
-an explicit `include_passive` boolean and `visibility: api_select_all`. No default
-current-file or whole-project query is inferred. Only requested, currently loaded
-files with known foreground/background/passive states are included. Unknown,
-unloaded and deliberately excluded passive files are reported in `omissions`.
-An included empty loaded file has an observed zero result. No files are loaded,
-activated, selected on screen, highlighted or edited by this tool.
+`get_model_context` reports session/project/document, file states, units/offset,
+capabilities and omissions. Optional profile_id=native-model-qa-demo exposes
+configured levels, labelled profile_configuration_not_native_BWS.
 
-The 2026 API exposes `SelectAllElements(doc)`, without a documented drawing-file
-parameter. The host enumerates that current-document candidate list, checks its
-signed file number, and reads requested properties only inside the resolved
-scope. Adapter/time limits therefore cover the entire candidate enumeration,
-including outside-scope adapters. This does not establish hidden-layer, screen,
-occlusion or whole-project coverage. No visibility state is changed.
+New queries/audits require explicit scope: 1–100 distinct positive drawing_files,
+include_passive and visibility=api_select_all. Only loaded files with known states
+are included; unloaded/unknown/excluded-passive scope is reported as omissions.
+SelectAllElements(doc) enumerates the current document, so budgets include
+outside-scope candidates. No hidden-layer/screen/whole-project completeness is inferred.
 
-References contain the query-handler session ID, current project name/host/path
-key, document ID, normalized drawing-file number, model UUID and observed adapter
-type UUID. View UUIDs are stored separately. Negative passive numbers are retained
-as evidence while normalized identity uses the positive file number. A negative
-number inconsistent with the inventory is excluded and reported. Project names
-and `document_id=0` are never treated as unique project identities on their own.
-If project key, document ID or file inventory cannot be read, querying fails with
-`context_unavailable`; it does not reuse previous context.
+References carry session/project key/document/file/model/type identity; view UUID
+is separate. Normalize passive signed file numbers while retaining state.
+Missing/conflicting identities are excluded. References are read evidence with
+durable_identity_verified=false and usable_for_write=false, not durable write keys.
+top_level_component follows bounded parent chains and deduplicates Column,
+Beam, Wall, Slab, SkeletonBeam and MultiSlab roots; arbitrary trees and other
+Structural Framing families remain unaccepted.
 
-Identical file/model UUIDs are combined across returned representations. If
-requested/mandatory fields disagree, that identity is excluded as a conflict.
-Missing model/type UUIDs are excluded; an unavailable view UUID is separately
-reported. Default counts describe **unique file/model UUIDs**. Explicit
-component_kind=top_level_component instead follows at most 16 parent levels,
-rejects cycles/cross-file parents and deduplicates Column_TypeUUID,
-Beam_TypeUUID, Wall_TypeUUID and Slab_TypeUUID plus the observed
-SkeletonBeam_TypeUUID and MultiSlab_TypeUUID roots (0.5.3). Children/tiers map to their root; labels
-and other root types are counted as excluded non_component_adapters. Failed
-hierarchy reads reduce scope completeness; they never become a guessed count.
-SkeletonAxis children map to their supported beam roots; Slab_TypeUUID
-children map to MultiSlab roots. Aggregate slab geometry unions direct slab
-tier solids, including hidden tiers, with the same 256-child/file-scope bound
-as walls. Missing/failed tier or beam solids remain not_checked; axes are
-never geometry substitutes. Other Structural Framing families, grouped roots
-and arbitrary native trees remain outside this bounded fixture contract. The native
-ten-component gate passes for the recorded fixture. References remain session-bound read evidence with
-`durable_identity_verified: false` and `usable_for_write: false`.
+## model_query
 
-## Predicates and fields
+Schema m1-query-1, bridge /model-query.
 
-`predicate` is optional (all identifiable in-scope candidates). Use exactly one
-of `all: [...]`, `any: [...]`, `not: {...}`, or a leaf `{field, op, ...}`. Groups
-must be nonempty; the complete tree is validated before enumeration, with at
-most 64 nodes and depth 8. Unsupported keys/fields and inconsistent spatial
-frames are errors, never ignored filters. New dimensions and aliases below use
-the same three-valued scalar comparison semantics.
-
-Supported fields: `type_name`, `type_uuid`, `layer_id`, `display_name`,
-`drawing_file`, `file_state`, and `attribute:<positive integer ID>`. New scalar
-geometry fields: size_x_mm / size_y_mm / size_z_mm, center_x_mm / center_y_mm /
-center_z_mm, min_z_mm / max_z_mm. Projection-only bounding_box_mm and hierarchy
-are structured observations and cannot be scalar predicate fields. mark/status
-require profile_id=native-model-qa-demo. Type names
-come from `GetTypeName()`, type GUIDs from `GetGuid()` and layers from common
-properties. Use observed values; localized display names are not unique IDs.
-Defaults project `display_name` and `layer_id`. Model/type identity is mandatory;
-predicate fields are also returned. `attribute_ids` adds explicit projected
-attributes. At most 32 distinct attribute IDs are read across predicates and
-projection. No attribute call occurs without an attribute request. The 2026
-adapter provides `GetAttributes(ReadAll)`; only requested IDs/values are retained
-or returned. Attribute metadata/profile bindings are not guessed.
-
-| Operator | Meaning |
+| Action | Inputs/result |
 | --- | --- |
-| `eq`, `ne` | Typed equality/inequality; numbers compare numerically, booleans differ from numbers, strings are never converted to numbers. |
-| `lt`, `lte`, `gt`, `gte` | Numeric only. With absolute tolerance `t`, strict boundaries use `< v-t` / `> v+t`, inclusive boundaries `<= v+t` / `>= v-t`. |
-| `in` | Equality against 1–100 scalar alternatives, without numeric tolerance. |
-| `contains` | Literal string substring, without patterns or regular expressions. |
-| `exists` | True for a successful present value (including null), false for an observed missing attribute. |
-| `is_null` | True only for an observed null; a missing field is unresolved. |
-
-Strings are case-sensitive and untrimmed by default. `case_sensitive: false`
-uses Unicode casefold; `trim: true` strips leading/trailing whitespace. Numeric
-`tolerance` is finite, nonnegative and absolute; default zero. Attribute numeric
-values remain **raw attribute units**. They are not native geometric dimensions
-in mm: the documentation's dimensional attributes can use metres. No implicit
-unit conversion occurs. Null is supported in the JSON predicate contract; this
-does not claim native Allplan attributes normally return null.
-
-Each read has `observed`, `missing` or `not_checked` status. Empty string, zero
-and null remain distinct. Failed reads and comparisons of incompatible ordered
-types evaluate to unknown (`not_checked`). Missing values compare as unknown
-except `exists=false`. `not` preserves unknown; `all` is false if any child is
-false, otherwise unknown if any child is unknown; `any` is true if any child is
-true, otherwise unknown if any child is unknown. Unknown identities/predicates
-are counted and excluded, with up to ten diagnostic samples. Do not interpret
-zero matches as a successful complete audit when coverage is incomplete.
-
-## Paging, full selections and staleness
-
-`action: query` creates a JSON snapshot with a random `selection_id` and the
-first page. `page_size` is 1–200 (default 100). `action: page` takes that ID and
-an opaque returned `cursor`; omit the cursor to read the first page. Cursor
-ownership is checked. Ordering is deterministic by file number/model UUID.
-`page.complete` means the last page was reached;
-`page.is_full_selection` means this single page contains the whole selection.
-Neither means the requested scope was complete: inspect `coverage` and omissions.
-
-`action: summary` reads **all** selected identities, independent of page size,
-and returns counts by drawing file and observed type name. The M2 audit reads a separate fresh full snapshot; it does not consume a cached
-selection or its displayed page. No edit consumer exists. The cached selection contains the full result, not just
-the page, but never authorizes a future write.
-
-Before every page or summary, the host resolves current context and repeats the
-original bounded query reads. SHA-256 fingerprints cover the context binding,
-resolved file states/omissions and every in-scope candidate's identity plus
-requested/predicate/mandatory fields, including candidates previously rejected.
-Adding/deleting elements, changed relevant values, or a project/document/scoped
-file-state change causes `selection_stale` and removes the cache entry. Failed
-revalidation returns `selection_unverifiable` and also removes it. Unrequested
-attributes/geometry and valid outside-scope properties are not a freshness
-promise. Creation timestamps are not used as modification counters.
-
-Selections expire **five minutes from creation** (reads do not extend TTL),
-are limited to eight per host handler (oldest-created eviction), and disappear
-on host restart. Unknown/expired/evicted IDs return `selection_unavailable`.
-They are not persisted. A five-second cooperative scan budget, 4 MiB serialized
-source budget and `max_adapters` of 1–10000 (default 5000) reject excessive scans
-with `scan_limit_exceeded`, with **no partial selection or complete count**.
-The timer cannot interrupt a blocking native API call. Paging reduces response
-size; revalidation still scans the bounded candidate set. Runtime performance
-remains unmeasured.
-
-## Metadata inspection
-
-`action=inspect` requires the same explicit `scope` and an explicit
-`attribute_ids` list (0–32 distinct positive IDs). `sample_limit` is 1–20,
-default 10; `max_adapters` retains the query limits. Predicate, paging, field
-projection and selection IDs are rejected for this action. The public typed
-schema and dependency-free host both validate before native enumeration.
-
-Inspection scans the bounded scope using the existing identity/conflict rules,
-then samples in drawing-file/model-UUID order. It returns `counts`, original
-scope/coverage/omissions, raw element fields and requested attributes,
-`sample.is_full_selection`, and project resource metadata. The sample limit
-limits returned elements, not the scan. It creates no reusable selection.
-Layer names/short names cover only observed layer IDs in the returned sample;
-attribute names, integer type/control codes and raw unit labels cover requested
-IDs. Each field retains observed or not_checked independently. Empty labels
-remain raw empty strings; enum codes have no guessed semantic labels.
-
-`source_fingerprint` covers scanned candidate/context fields. A separate
-`probe_fingerprint` also covers metadata and the sample report; it is evidence
-identity, not a durable/write reference. Total inspection uses a five-second
-cooperative budget and rejects responses above 4 MiB. Blocking native reads
-cannot be interrupted by this timer. No partial success is returned on budget
-failure. `metadata_reads_complete` concerns read failures and does not establish
-attribute existence, semantic validity, writability or profile binding.
-
-`missing` means a requested ID was absent from `GetAttributes(ReadAll)` output.
-Passive native absence remains `not_checked`; null, empty string and zero retain
-their observed raw values. No fallback read changes state or creates attributes.
-`runtime_verified=false`, `usable_for_write=false`, `profile_binding=not_checked`
-remain explicit. Units are metadata strings without conversion. The demo
-binding is not established by metadata inspection. The separate profile action
-freshly resolves resources for reads. See [native limits](validation-status.md);
-static flags are not an acceptance registry.
+| query | Explicit scope, optional predicate/fields/attribute_ids/profile_id/spatial_box; returns a full cached selection and first page. |
+| page | selection_id and returned opaque cursor; reads a page of the revalidated full selection. |
+| summary | selection_id; counts the entire revalidated selection, independent of page size. |
+| inspect | Explicit scope and attribute_ids (0–32), sample_limit 1–20 (default 10); raw sampled fields/resource metadata, no cached selection. |
+| profile | profile_id=native-model-qa-demo; freshly resolves named read resources, creates none. |
 
 ```json
-{"action":"inspect","scope":{"drawing_files":[1,2],"include_passive":true,"visibility":"api_select_all"},"attribute_ids":[498],"sample_limit":10}
+{"action":"query","scope":{"drawing_files":[101],"include_passive":false,"visibility":"api_select_all"},"profile_id":"native-model-qa-demo","fields":["mark","status","layer_id"],"page_size":100}
 ```
 
-**Diagnostics.cmd** captures basic health/version/context. Developer CLI `--query-request <JSON path>`
-can capture another typed read-only request; it never automatically pages,
-retries a write or marks acceptance. Raw results require separate interpretation.
+Predicates use all/any/not or typed leaves, at most **64 nodes/depth 8**.
+Scalar fields: type_name/type_uuid, layer_id/display_name, drawing_file/file_state,
+`attribute:<ID>`, sizes/centers in mm and min_z_mm/max_z_mm. mark/status require
+the demo profile. bounding_box_mm/hierarchy are projections, not scalar predicates.
+At most **32** distinct attribute IDs are read across predicate/projection.
 
-2026 resource signatures checked:
-[AttributeService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/AttributeService/)
-uses a DocumentAdapter; [LayerService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/LayerService/)
-uses an integer document ID. This documentation evidence is separate from
-[portable checks](validation-status.md) and Allplan verification.
+Operators: eq/ne/in (typed comparison), lt/lte/gt/gte (numeric), contains
+(literal string), exists and is_null. Strings default to case-sensitive/untrimmed;
+trim/case_sensitive are explicit. Numeric tolerance is finite, nonnegative and
+absolute; strict comparisons use < v-t / > v+t, inclusive use <= v+t / >= v-t.
+Attribute values retain raw attribute units; no implicit mm conversion.
+Null, empty, absent and failed reads remain distinct. Unknown stays unknown under
+not; all/any use three-valued logic. exists=false requires observed absence,
+not a failed/passive attribute read.
 
-## Geometry, spatial scope and coordinate convention
+Page size is **1–200** (default 100). page.complete means the last page;
+is_full_selection means that page contains the whole selection. Neither proves
+scope coverage. page/summary rerun the original relevant-source query, including
+rejected peers; changes invalidate the cache with selection_stale. Failed
+revalidation returns selection_unverifiable. Unrequested fields are not a
+freshness guarantee. No cached selection/page authorizes an M3 write.
 
-Geometry is read only for projected/predicate geometry fields or spatial_box,
-inside the resolved file scope. GetModelGeometry supplies Polyhedron3D/BRep3D;
-CalcMinMax returns (MinMax3D, eServiceResult), with native NO_ERR checked. General
-GetGeometry is not used because architectural results depend on the view.
-Wall roots use the union of all direct WallTier geometries, including hidden
-tiers, with a 256-child budget. Failed/unsupported geometry is not_checked.
-Axis-aligned size fields are box extents, not rotated native cross-sections.
+Limits: **300-second creation TTL**, **8 selections**, **5-second cooperative scan**,
+**4 MiB source/report**, max_adapters **1–10000** (default 5000). Restart/expiry/
+eviction require a new query. Budget failures return no partial successful count;
+a blocking native call cannot be interrupted. Paging does not reduce scan cost.
+Metadata samples limit output, not scanning, and do not establish writability.
 
-coordinate_frame defaults to model_local; project_global adds the project offset
-once. Source coordinates and offset use the declared API-mm/model-local
-convention; display units are not used as a scaling factor. Conversion metadata
-preserves source API, source frame, offset, applied flag and runtime_verified=false.
-The explicit arithmetic has portable evidence. The native source convention,
-display-unit invariance and nonzero XY offset passed A/B/C plus independent
-owner UI observations on Allplan 2026-1-7; see [acceptance and limits](validation-status.md).
-Nonzero Z offsets remain untested. The static runtime_verified annotation is
-unchanged; acceptance applies to the recorded build/fixture. ModelContext
-retains raw offset/input-unit observations; geometry queries supply the canonical
-summaries. No angular/orientation/native-level geometry reader is claimed.
+Geometry uses GetModelGeometry and checked CalcMinMax; wall/slab direct-tier
+unions have a **256-child** bound. Axis-aligned box extents are not rotated
+cross-sections. model_local is default; project_global adds the offset once.
+spatial_box uses AABB intersects/contained, inclusive/exclusive boundary and
+optional tolerance_mm with a matching coordinate frame; it is not exact solid
+intersection. Display-unit invariance and nonzero XY offset passed; Z offset
+and arbitrary native geometry/levels remain unaccepted.
 
-spatial_box requires finite min/max triples, relation=intersects or contained,
-boundary=inclusive or exclusive, frame matching coordinate_frame, and optional
-nonnegative tolerance_mm. This is an AABB broad-phase test, not exact solid
-intersection. Inclusive includes touching; exclusive excludes equality. Tolerance
-expands requested bounds. Missing geometry propagates unknown through composition
-and negation. Geometry source fields, rejected candidates and queried parent
-chains join the source fingerprint; geometry/hierarchy/profile changes invalidate
-reused pages/summary. Budget failure creates no partial selection.
+## model_audit
 
-## Validated demo profile and configured levels
-
-The packaged allplan://profiles/native-model-qa-demo resource is schema
-m1-profile-1, version 1.0.2. It validates the four future QA rule references,
-explicit units/frame, family GUID, file scope, resource names/types and tolerance.
-The separate M2 audit profile wraps this unchanged read profile and adds explicit
-value policies and typed rules. See the [M2 audit contract](m2-audit-contract.md).
-M3 0.7.0 adds `fix_model_issues` read-only preview/revalidation;
-[request, plan and limits](m3-repair-contract.md). 0.8.0 adds a separate
-[bounded evaluation apply/recovery contract](m3-execution-contract.md);
-[native 0.8.1 write/Undo gate PASS](validation-status.md).
-0.12.0 adds [existing-string mark writes and deterministic numbering](m3-numbering-contract.md),
-with [bounded two-target native acceptance](m3-numbering-acceptance-0.12.0.md). 0.11.0 added [shared standard/selection execution](m3-workflow-execution-contract.md),
-with bounded native acceptance for the retained two-workflow gate.
-0.13.0 adds [one read-only comparison of invalidated-plan evidence](m3-conflict-contract.md);
-Apply cannot use that evidence. The [bounded native same-session gate](m3-conflict-acceptance-0.13.0.md) passed.
-
-model_query action=profile, profile_id=native-model-qa-demo freshly resolves
-MCP_QA_MARK / MCP_QA_STATUS and layer short names SZ_OGÓ01 (structure) /
-SZ_OGÓ02 (review). Positive IDs,
-exact name/short-name round trips, distinct resources and the expected observed
-string type code are required. Attribute 498 remains Object_name; it is not a
-mark binding. No resource is created. Missing/incompatible definitions return
-not_checked; profile queries fail with profile_unbound before creating a selection.
-
-Queries with this profile bind its declared column family and restrict requested
-files to its configured file-101 scope. mark/status aliases read actual resolved
-attribute IDs and require observed string values. A binding fingerprint includes
-profile/version and fresh project/document/resource reads; it is added to the
-selection source binding. Fresh page/summary revalidation catches changed binding.
-Binding status bound_for_read is resource compatibility, not proof of writable
-native properties. active_for_write=false and write_eligibility=not_checked remain
-explicit. No persistent globally bound profile or durable write references are
-created. Actual project binding is recorded by the owner's preflight JSON.
-
-get_model_context accepts optional profile_id=native-model-qa-demo and then exposes
-its configured floor mapping, explicitly labeled profile_configuration_not_native_BWS.
-Absent profile leaves levels not_checked. User-created UI resources and a real
-fixture are prerequisites; the [fixture definition](fixture-guide.md) supplies them
-without asking the owner to edit JSON or discover IDs.
-
-## Examples
-
-MCP argument `request` (substitute actual loaded file numbers):
+Schema m2-audit-1, bridge /model-audit; profile schema m2-profile-1. Exactly one
+profile_id or typed profile is required; rule_ids optionally selects 1–32 rules.
+Scope must be within the profile. Invalid public/host requests and unbound
+resources reject before enumeration rather than returning zero findings.
 
 ```json
-{"action":"query","scope":{"drawing_files":[1,2],"include_passive":true,"visibility":"api_select_all"},"fields":["display_name","layer_id"],"attribute_ids":[498],"page_size":1}
+{"scope":{"drawing_files":[101],"include_passive":false,"visibility":"api_select_all"},"profile_id":"native-model-qa-demo"}
 ```
 
-To filter by a returned type name, add
-`"predicate":{"field":"type_name","op":"eq","value":"<observed type name>"}`.
-Do not infer a column type from a localized display name alone.
+Every audit reads a fresh full snapshot, not cached selections/pages. Supported
+rules: required_attribute, allowed_attribute_values, unique_attribute,
+required_layer and dimension_range (AABB dimensions, not engineering checks).
+Uniqueness is drawing_file + element_family + normalized value: every duplicate
+member gets a finding; a singleton passes only with complete known peer data.
+Raw inputs and comparison policies remain in evidence.
 
-```json
-{"action":"page","selection_id":"<returned ID>","cursor":"<returned cursor>","page_size":1}
-{"action":"summary","selection_id":"<returned ID>"}
-```
+Demo [audit profile 2.0.0](../profiles/examples/native-model-qa.audit.json) embeds
+[read profile 1.0.2](../profiles/examples/native-model-qa.demo.json). It freshly
+binds MCP_QA_MARK/MCP_QA_STATUS strings and SZ_OGÓ01/SZ_OGÓ02 layer short names
+by exact name/type/ID round trips. Attribute 498 is object name, not mark/status.
+The demo trims, compares case-sensitively and treats absent/null/empty/whitespace/
+`<niezdefiniowany>` as missing where observable. Passive absence/failed reads stay
+not_checked. Binding is bound_for_read, active_for_write=false.
 
-Host JSON also requires `schema_version: m1-query-1`; the MCP wrapper supplies it.
-The schemas stay client-neutral. No arbitrary generated Python is involved.
-
-2026 documentation checked for signatures, separately from runtime evidence:
-[read access](https://pythonparts.allplan.com/2026/manual/features/model_access/read_access/),
-[BaseElementAdapter](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_ElementAdapter/BaseElementAdapter/),
-[ElementAdapterType](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_ElementAdapter/ElementAdapterType/),
-[ElementsSelectService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/ElementsSelectService/).
-
-## Controlled recovery evaluation — 0.14.0
-
-The [explicit diagnostic stop](m3-recovery-contract.md) uses the normal durable
-write-ahead marker after the first C03 setter, before readback or C04. It requires
-a separate typed acknowledgement and the retained two-mark numbering fixture.
-Normal Apply is unchanged; Recover/exact-ID replay never resume skipped targets.
-The [new owner gate](m3-recovery-owner-test.md) requires a host restart, inspection
-and one Undo; status ready_for_owner_test, no native acceptance yet.
+Report states are pass/fail/not_checked/not_applicable. Known violations can
+coexist with incomplete coverage: check audit_complete, requested_scope_complete
+and rule_inputs_complete, not just finding count. Findings include deterministic
+context/profile-bound IDs, raw evidence, references, locations and readable remedies.
+They are historical snapshots, not persistent authorization. Scan/report budgets
+are the same **5 seconds / 4 MiB / adapter limit**; no partial successful audit.
+For controlled repairs use the [M3 contract](m3-execution-contract.md).

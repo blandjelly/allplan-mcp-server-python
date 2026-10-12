@@ -1,23 +1,21 @@
-# Development fixture
+# Test fixture
 
-Use the existing disposable **MCP_QA_DEMO** project/copy for M1–M3.
-This defines reusable data; it does not request a repeated accepted test.
-Read current values before further M3 work: previous Undo/Redo may have changed
-them. Keep the original baseline and installed Local repair journal.
+Use the original disposable **MCP_QA_DEMO** copy. Completed M1–M3 gates need no
+repeat. Preserve the project, package logs and installed Local repair journal;
+read current values before any new plan.
 
 ## Resources and scope
 
 The demo [read profile](../profiles/examples/native-model-qa.demo.json), revision
 **1.0.2**, resolves existing **MCP_QA_MARK** and **MCP_QA_STATUS** text attributes
 and **SZ_OGÓ01** (structure) / **SZ_OGÓ02** (review) layer short names freshly.
-Both attributes are ordinary free text with empty defaults, no units, formulas,
-enumerated choices or geometry links. Do not recreate resources that already
-exist or guess API IDs. Attribute 498 is Nazwa obiektu, not mark/status.
+Both attributes are free text with empty defaults, no units/formulas/geometry links.
+Do not recreate resources or guess IDs. Attribute 498 is object name, not mark/status.
 The profile is `bound_for_read`, `active_for_write=false`.
 
-Initial baseline: millimetres, zero project offset, relevant layers visible,
-file **101 foreground**, **102 loaded passive**, **103 unloaded**. Reserve empty
-files only; different IDs require a separately validated profile.
+Baseline: millimetres, zero project offset, relevant layers visible,
+file **101 foreground**, **102 loaded passive**, **103 unloaded**.
+Different file IDs require a separately validated profile.
 Ordinary UI/file-state commands may end StartPythonHost. Prepare the model
 before starting it and restart from Library when necessary.
 
@@ -25,7 +23,7 @@ before starting it and restart from Library when necessary.
 
 Use ungrouped ordinary native columns, center insertion, bottom/top **0/3000 mm**,
 section **400 × 400 mm**, consistent material such as C30/37.
-C01–C06 are recipe positions, not extra attributes or graphical labels.
+C01–C06 identify recipe positions.
 
 | Position | Center X/Y (mm) | Mark | Layer | Status |
 | --- | --- | --- | --- | --- |
@@ -45,7 +43,7 @@ roots are SkeletonBeam; slab is MultiSlab with Slab tiers. Expected:
 **10 top-level components** in 101. Child representations must not inflate counts.
 Add an S02 reference column to each of 102/103; those are outside audit uniqueness.
 
-## Expected observations
+## Accepted observations and current state
 
 Read counts: **10/6/2/1** components/columns/S02/spatial-height C01 matches.
 Display units do not change canonical mm dimensions. Accepted XY offset adds
@@ -56,12 +54,11 @@ The [audit profile](../profiles/examples/native-model-qa.audit.json) examines
 only the six columns in 101: QA-001 missing C03 mark; QA-002 duplicate C02/C04
 mark (two findings, one group); QA-003 C05 review layer; QA-004 C06 NWE status.
 Baseline: **5 findings on 5 columns**, complete coverage; C01 passes.
-Repairing C05 layer then C06 status leaves **4 then 3 findings**; remaining issues
-concern marks. Explicit C03=S03/C04=S04 preview simulates zero findings;
-0.12.0 implements mark setters and deterministic numbering; the retained
-two-target native gate passed writes, replay/no-op and Undo/recovery. Numbering leaves two findings in the original five-finding fixture
-or zero in the repaired three-finding fixture. See [acceptance](m3-numbering-acceptance-0.12.0.md).
-The owner left marks after two Undo operations: C03 missing, C04=S02.
-C05 structure layer/C06 NEW remain; current complete audit has three mark findings.
+Layer/status repairs leave **5 → 4 → 3** findings; numbering from the repaired
+state gives **3 → 0 → 3** after Undo. [Acceptance and evidence](validation-status.md).
+
+The owner confirms the saved copy after accepted Undo: **C02/C04=S02,
+C03 missing, C05 structure layer, C06 NEW**. Its complete audit has three mark
+findings. Keep that state; no Redo or repeated writing gate is requested.
 
 See [validation limits](validation-status.md) and [current handoff](next-model-handoff.md).

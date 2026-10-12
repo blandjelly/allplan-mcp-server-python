@@ -1,71 +1,47 @@
-# From the fixture MVP to office-project edits
+# Office-project roadmap
 
-The owner wants the tool to operate on a typical, more complex office project.
-The [bounded M3 closure](m3-closure.md) is the foundation for that goal; it does
-not accept production-project writes. The first requested use cases are:
+Goal: edit a typical complex office project. The [accepted M3 fixture MVP](validation-status.md)
+provides controlled execution; it does not yet support whole-project edits.
+Prioritize **M4.1–M4.2** before frame/foundation generation.
 
-1. Select all walls without a fire-resistance value and assign the intended
-   attribute/value.
-2. Change the concrete class of all columns on a specified storey.
+## First property-edit slices
 
-These are planned workflows, not current capabilities. Prioritize the native
-read/edit probes in **M4.1–M4.2** before frame/foundation generation. No new owner
-test is dispatched by this roadmap.
-
-## First deliverable: one wall and one column
-
-| Workflow | Required discovery | Acceptance for the first small slice |
+| Requested workflow | Required probe | First acceptance |
 | --- | --- | --- |
-| Wall fire-resistance assignment | Identify the actual Allplan 2026 attribute and type; distinguish absent, empty, undefined and unreadable values; establish ordinary/multilayer wall root-versus-tier ownership. | Query identifies the intended test wall, preview shows exact owner/old state/value, the proven setter replaces or adds only the intended attribute, readback and whole audited-field verification pass, replay is read-only and Undo is observed. Unknown data cannot silently count as a missing value. |
-| Column concrete-class change | Identify whether the project stores the intended class as an ordinary attribute or a native material property; prove the matching read/write API and configured storey-to-file/elevation mapping. | A specified test column changes the intended property, excluded storeys/elements remain unchanged, related geometry/material fields are checked, and readback/replay/Undo pass. Do not substitute a custom text attribute for the native property without an explicit product decision. |
+| Select walls without fire resistance and assign it | Identify the real attribute/type, absent versus empty/undefined/unreadable values, and root/tier ownership for ordinary/multilayer walls. | One intended test wall changes through a proven replace/add adapter; exact readback, audited-field comparison, read-only replay and observed Undo. Unknown data never silently counts as missing. |
+| Change concrete class of columns on a storey | Establish whether the intended class is an attribute or native material property and prove its read/write API; configure storey-to-file/elevation mapping. | One test column changes the intended property, excluded elements stay unchanged, related geometry/material fields are checked, and readback/replay/Undo pass. |
 
-The current M3 adapter replaces **existing strings** on **Column roots** or
-changes their layer. It does not append absent attributes, write walls, write
-native concrete properties or infer storeys from a generic model. An observed
-undefined string such as C03's mark is different from an absent attribute.
+Current M3 replaces existing string marks/statuses or layers on Column roots.
+It does not add absent attributes, write walls/native concrete properties or
+infer storeys. Do not substitute custom text for the intended native property.
+The model discovers API IDs/signatures and prepares typed diagnostics/packages;
+the owner supplies intended property/value and observes through Allplan/local Codex.
 
-The implementation model researches identifiers and signatures and prepares
-typed requests, diagnostics and a ready package. The owner supplies the intended
-property/value and observes the prepared slice through Allplan/local Codex;
-they do not edit Python/JSON or discover API IDs. Confirm the actual attribute,
-concrete-class representation and intended target values when preparing each
-workflow, rather than requesting them as a prerequisite for closing M3.
+## Expand after the small slices pass
 
-## Expand only after the per-property slice passes
+1. **Write profiles/identity:** validated resources and supported build/type/property
+   registry; fresh resolution, reopen/copy/move identity and recovery boundaries.
+   Project names or copied UUIDs alone do not prove cross-copy uniqueness.
+2. **Storey/multi-file scope:** preview explicit files/elevations and account for
+   locked/passive/unloaded data and shared references. Report incomplete coverage;
+   never silently activate files or claim native BWS support.
+3. **Project operations:** reviewed manifest, complete inventory/exceptions,
+   deterministic bounded batches and pre-send identities. Revalidate batches while
+   distinguishing earlier operation writes from outside edits; report partial
+   outcomes. Raising the 32-change limit alone does not solve scan/cache/time/
+   transport budgets, journal consumption or performance acceptance.
+4. **Journal lifecycle:** backup/import/migration and capacity handling preserving
+   deduplication, unresolved outcomes and recovery across batches. Validate
+   full/corrupt history and storage rollback; deleting IDs is not maintenance.
+5. **Native conflicts/recovery:** a safe active-plan manual-edit experiment,
+   broader interrupted/partial outcomes, promised crash/persistence behavior and
+   observed Undo. Controlled stops are not power-loss proof; model/journal/multi-file
+   changes are not one atomic transaction.
+6. **Office-project acceptance:** on a disposable representative project copy,
+   verify full selection, values/exceptions, audits, repeat/no-op, partial recovery,
+   Undo and performance before normal use.
 
-1. **Write profiles and target identity.** Introduce an explicit supported
-   build/type/property registry and validated project resources. Prove fresh
-   resolution and handling of reopen/copy/move/duplicate identities before
-   allowing recovery or replay outside the original copy. A project name or
-   copied element UUID alone is not a demonstrated cross-copy boundary.
-2. **Storey and multi-file scope.** Configure and preview exactly which files
-   and elevations define the requested storey. Account for loaded/unloaded,
-   foreground/passive and locked files and shared references. Report unchecked
-   or inaccessible members instead of claiming all walls/columns were covered.
-   Do not silently change active files or claim native BWS support.
-3. **Plans for a whole project.** Design a reviewed operation manifest with
-   complete inventory, exceptions and deterministic bounded batches. Revalidate
-   each batch against its reviewed inputs while distinguishing earlier changes
-   made by the same operation from outside edits. Preserve stable batch/execution
-   identities before sending and report partial results honestly. Raising the
-   32-change constant alone does not solve scan/cache/time/transport limits or
-   journal consumption. Define performance acceptance on representative data.
-4. **Journal lifecycle.** Design backup/import/migration and capacity handling
-   that retain deduplication across batches and recovery. Validate full,
-   invalid/unresolved history and storage rollback. Automatic eviction or deleting
-   old IDs cannot serve as the maintenance design.
-5. **Native conflicts and recovery.** Prove a safe active-plan manual-edit
-   conflict experiment, broader partial outcomes, interrupted setters/processes
-   and the promised persistence behavior. Separate controlled diagnostic stops
-   from crash/power-loss tests. Define and observe Undo behavior; multi-file writes
-   and journal records are not one atomic transaction.
-6. **Representative office-project acceptance.** On a disposable copy of a
-   typical project, prove the complete requested selection, values, exclusions,
-   before/after audits, repeat/no-op, partial recovery and Undo contract. Record
-   supported combinations and limits before allowing normal office use.
-
-Keep M0–M3 evidence as regression references. New tests cover new or materially
-affected behavior under the [testing policy](testing-policy.md); there is no
-automatic repeat of completed fixture gates. Graphical labels, file moves,
-Structural Framing and general geometry generation have their own probes and
-do not block the first two requested property-edit workflows.
+Use [testing policy](testing-policy.md); no completed fixture gate needs automatic
+repetition. Labels, file moves and geometry generation have separate probes and
+do not block the first two requested property edits. No new owner batch is
+requested by this roadmap.

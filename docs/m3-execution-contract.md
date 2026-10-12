@@ -1,176 +1,132 @@
-# M3 execution, native guards and recovery
+# M3 repairs, execution and journal
 
-Package **0.15.0** shares this executor across fix_model_issues,
-apply_office_standard and rule_based_edit. [Current eligibility/workflow metadata](m3-workflow-execution-contract.md)
-cover 1–32 existing string mark/status and layer changes on Column roots in one foreground
-file. [Native acceptance](validation-status.md) remains narrower: the earlier
-two-target gate and latest two separately reviewed single-target workflows.
-Two separate Undo steps are accepted; grouped Undo and manual UI active-plan
-conflicts remain open. [Controlled unknown-outcome recovery](m3-recovery-acceptance-0.14.1.md)
-has bounded native acceptance after one C03 setter. The [bounded same-session typed conflict
-gate](m3-conflict-acceptance-0.13.0.md) passed one write and Undo/recovery.
+Package **0.15.0**. [Acceptance and limits](validation-status.md) cover the
+recorded one-/two-change fixture scenarios; executor eligibility is broader.
+`fix_model_issues`, `apply_office_standard` and `rule_based_edit` share the
+planner/executor. Native general writable profiles remain disabled.
 
-## Eligibility correction and rejected requests
+## Preview and selection
 
-IsInMacro=true alone is not a macro classifier. Macro/container ancestors cannot
-match the required terminal Column root in the native parent traversal; unknown
-or cyclic/unreadable hierarchy still fails closed. Successful preflight records
-contain exact root identity and raw flag observations. Other required native
-null/deleted/valid/active-document/active-layer/label checks are unchanged.
+Preview requires a fresh full typed audit in **one explicit file** with
+include_passive=false. fix_model_issues uses explicit repairs and optional
+selection/finding_ids; rule_based_edit requires selection. Current finding IDs
+narrow proposals, not audit/collision scope. Absent/stale choices reject.
 
-The public MCP wrapper uses categorized AllplanHostError codes, never message
-text, for a small set of known pre-setter failures. `rejected` responses include
-`native_setters_started=false`, execution ID, request ID and the host error.
-That statement concerns this request; it does not erase earlier historical
-executions. CLI recovery pointers record the final rejection and recovery sends
-no apply replay for them. Journal/transport/unexpected failures cannot be
-classified as pre-write safety because they may happen after a setter.
+Supported proposals replace an existing string mark/status or assign the rule's
+expected named layer. Status values must satisfy the audit profile. Explicit
+marks name a current model_uuid, require required-mark plus uniqueness rules,
+and use nonmissing strings of **1–128** characters without control characters.
+Absent/null/non-string attributes are not appended or converted. Duplicate
+target/field proposals, incomplete evidence and unknown selection inputs reject.
 
-## Disposable-copy apply
+Selection uses three-valued predicates (**64 nodes/depth 8**) on audited mark/
+status/layer/file-state/dimension fields and up to **100** distinct UUID exceptions.
+Exceptions run first; excluded peers remain in source/collision/post-write checks.
+Unknown remains not_checked under negation and blocks readiness. A displayed page
+or cached selection cannot narrow full-source authorization.
 
-`fix_model_issues` / `/fix-model-issues` retains schema `m3-repair-1` and the
-side-effect-free preview/revalidate actions. General `apply_available` and
-`usable_for_write` remain false. A preview additionally advertises
-`evaluation_apply_available` when it matches current bounded execution eligibility.
-This experimental execution route has bounded native acceptance for the retained
-fixture; it does not provide a generic writable profile/reference registry.
-Generic profiles remain inactive for writes.
+apply_office_standard accepts demo standard IDs
+native-model-qa-demo-layer-status and native-model-qa-demo-mark-numbering,
+version **1.0.0**, explicit scope and optional selection. The layer/status
+standard repairs QA-003/QA-004 and leaves valid EXISTING status unchanged.
+Numbering preserves valid marks, retains an unselected duplicate keeper first,
+then orders center **Y/X/Z/model UUID**, filling available S01-style numbers.
+All full-scope marks reserve normalized values. Generated writes follow that
+spatial assignment order. Numbering cannot mix with explicit mark choices.
+Unavailable order/marks or over 32 choices reject; compliant plans are read-only no-op.
 
-```json
-{
-  "action": "apply",
-  "plan_id": "<exact reviewed 32-hex ID>",
-  "plan_hash": "<exact reviewed 64-hex hash>",
-  "execution_id": "<new 32-hex ID saved before sending>",
-  "acknowledgement": "disposable_copy_reviewed_plan"
-}
-```
+Mark collision simulation checks simultaneous proposals and all excluded peers.
+The immutable plan hash binds exact targets/old-new values, resources, full
+source/report fingerprints, workflow/standard definition and selection/exclusions.
+Preview alone invokes no setter. Generic apply_available/usable_for_write remain
+false; evaluation_apply_available advertises eligible evaluation plans only.
 
-The host preflights the full typed request before native document access.
-Apply supports 1–32 native Column layer/existing-string mark/status changes in one
-active_foreground file with complete evidence and current native capabilities.
-The demo profile remains bounded to file 101; other scopes require validated
-explicit profiles. The legacy acknowledgement disposable_copy_reviewed_two_repairs
-is accepted only for its original exact unselected/unwrapped two-target gate:
-S05 layer → SZ_OGÓ01 and S06 status NWE → NEW, 2 changes/3 exclusions/5 findings.
-It cannot authorize expanded plans. Mark assignment is implemented in 0.12.0 with collision validation;
-no attribute append/delete,
-label, component replacement or passive/background write is inferred.
+## Plan lifetime and stale evidence
 
-Under an OS writer lock per `Local/.allplan-mcp/repairs`, apply reruns the full
-audit and compares source/report hashes, expiry and exact reviewed hash.
-It takes another fresh audited snapshot, re-resolves every root by
-file/model/type UUID without retaining adapters across requests, and checks
-old values plus native IsNull/IsDeleted/IsValid/IsInActiveDocument/
-IsInActiveLayer/IsLabelElement booleans. IsInMacro is diagnostic only. Unknown or ambiguous
-resolution blocks writes. Each target is checked again immediately before its
-setter. These documented eligibility checks are provisional; they do not prove
-all permission/property restrictions on the installed build.
+Plans live **300 seconds from creation**, with **8 entries**, **4 MiB per entry**
+and **8 MiB total**. Copies returned to clients cannot mutate saved plans.
+Revalidate reruns the full source/audit and requires exact plan ID/hash; changes
+to audited peers/resources/context conflict. Expiry is checked after reads too.
+Restart/eviction/expiry requires fresh preview; unchanged evidence does not extend TTL.
 
-The [2026 ChangeAttributes API](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/ElementsAttributeService/)
-receives one `(attribute ID, exact value)` pair, one BaseElementAdapterList and
-both undef/delete flags false. The
-[2026 layer guide](https://pythonparts.allplan.com/2026/manual/features/format_properties/)
-requires a short layer name; ChangeLayer receives the freshly resolved short
-name (for example `SZ_OGÓ01`), never its ID.
-Returned adapters/return values do not establish success. Fresh resolution and
-typed field readback determine applied/failed/unknown. A mismatch, exception,
-conflict or time budget stops later writes. No automatic retry or rollback runs.
-There is a 20-second boundary before starting each setter, 5-second individual
-read budgets and 10,000-adapter resolution limits; an executing native setter
-cannot be forcibly interrupted. HTTP timeout may therefore have an unknown result.
+Starting execution invalidates all plans and cached selections. Invalidated
+evidence remains for **one read-only revalidate** within the original shared
+TTL/cache budgets. It always returns conflict/plan_invalidated, reports actual
+source_unchanged independently and never restores Apply. Successful inspection
+consumes it; a hash mismatch does not scan/consume it. Native active-plan manual
+UI edit conflicts remain unaccepted.
 
-All plans/selections are invalidated when execution starts. In 0.13.0 invalidated
-plan evidence can be compared once through read-only revalidate, within the
-original shared cache/TTL limits; it cannot authorize Apply again.
-[Inspection contract and new native gate](m3-conflict-contract.md).
-Full post-audit
-verification compares the entire audited snapshot to the original plus only
-reviewed field/alias changes, including excluded peers, marks and geometry.
-It does not cover every native property or out-of-scope element. Readbacks alone
-cannot report completed if that verification fails. The old two-target fixture
-leaves three findings; general execution has no fixed finding-count requirement.
-Collateral changes/unreadable verification produce verification_failed.
-
-## Durable execution identity and recovery
-
-The dependency-free host stores schema `m3-execution-1` records atomically:
-temporary file, flush/fsync and replace; POSIX also fsyncs the directory.
-Records retain request/plan hashes, exact changes, per-target outcomes and
-post-audit evidence. Content hashes detect malformed/tampered accidental state;
-they are not authentication. The journal must be writable before the first setter.
-A write-ahead `unknown` marker is persisted before each setter; post-readback
-states are persisted before another target. Journal failures stop execution.
-
-The interactive host's cancellation stops its server; restarting creates a new
-session-local plan cache. A preview from before the UI cancellation cannot be
-continued after restart: native revalidation returns plan_expired in the accepted
-restart capture. Fresh previews after restart are separate plans, not renewals
-of the old authorization. Persisted executions remain a separate mechanism.
-
-The same execution ID with the same apply request returns saved outcomes
-without invoking setters, even after host restart, plan expiry or UI Undo.
-Reusing an ID with another request conflicts. Request transport IDs are separate.
-Up to 128 records and 1 MiB per record are stored; they are never automatically
-evicted. A full/corrupt/unwritable journal or competing writer blocks new writes.
-Unresolved running/unknown records require recovery before new execution.
-The lock covers this repair route; unrelated baseline box/development operations
-do not acquire it. The UI dispatcher serializes native callbacks; avoid concurrent
-model operations during these bounded writes.
+## Apply guards and outcomes
 
 ```json
-{"action": "recover", "execution_id": "<saved 32-hex ID>"}
+{"action":"apply","plan_id":"<reviewed 32-hex ID>","plan_hash":"<reviewed 64-hex hash>","execution_id":"<new 32-hex ID saved before sending>","acknowledgement":"disposable_copy_reviewed_plan"}
 ```
 
-Recover reads the original audit and checks project key/document/file/model/type
-identity. It reports `new_value_observed`, `old_value_observed`, `conflict` or
-`unknown`. Previously unknown outcomes may become `reconciled` with their current
-observations; this does not prove mutation causality. Recover never resumes a
-skipped target or invokes a setter/Undo. Historical applied outcomes remain
-historical after UI Undo; current observations are recorded separately.
-Cross-copy identity and durable element identity are unproven, so recovery is
-restricted to inspection in the original disposable project/document. There is
-no cross-machine guarantee when the Local journal is removed/copied or storage
-rolls back. Windows atomic replace/fsync is implemented, but native persistence
-and sudden power loss are unaccepted. Preserve the journal with the package logs.
+Eligibility: **1–32** complete mark/status/layer changes on native **Column roots**
+in one **active_foreground** file, validated profile/resources and observed native
+capabilities. Standard/rule Apply also checks matching workflow provenance.
+The legacy disposable_copy_reviewed_two_repairs acknowledgement remains restricted
+to its original two-layer/status-repair gate. No label/native-property/passive write
+or arbitrary-family setter is inferred.
 
-## Recovery tools and remaining work
+Under the installed Local journal's OS writer lock, Apply validates request,
+hash/expiry and full source/report, re-resolves every root and checks hierarchy,
+identity, active-document/layer and native null/deleted/valid/label flags. Unknown
+or ambiguous resolution rejects. IsInMacro alone is not a macro classifier.
+All targets preflight before setters; old values are checked again per target.
+ChangeLayer receives the freshly bound short name; ChangeAttributes writes one
+exact pair with undef/delete flags false. Return values/adapters do not prove success.
 
-[M3 Recover.cmd and M3 Workflow Recover.cmd](diagnostics.md) retain access to
-saved local executions. Recovery sends no new write, automatic retry, resume,
-rollback or Undo. Exact-ID replay returns saved outcomes; it does not establish
-current state after UI Undo.
+Persist a durable unknown marker before each setter; fresh resolution/readback
+determines outcomes. Stop later writes after conflict/failure/unknown/time limit.
+Completion requires full post-audit and the entire audited snapshot matching
+only authorized field/alias changes, including excluded peers/geometry. This
+does not verify every property or out-of-scope element. Verification failures
+cannot report completed. No automatic retry, rollback, Undo or resume occurs.
 
-Native acceptance covers the recorded layer/status writes/readbacks, audited-field
-verification, exact-ID replay, separate Undo and completed recovery after Redo.
-Restart invalidation and stale Apply rejection also pass. Native manual UI active-plan
-conflicts, broader scope/identity and
-crash/power-loss persistence remain open. Do not repeat the UI-edit scenario
-known to cancel the host. The bounded 0.12.0 mark-numbering gate passed writes/readback/replay/no-op
-and two-step Undo/recovery; [evidence](m3-numbering-acceptance-0.12.0.md). Next obtain
-the missing native evidence; see [handoff](next-model-handoff.md).
+Budgets: **20 seconds before starting setters**, **5 seconds per bounded read**,
+**10000 adapters per resolution**. A running native call cannot be forcibly
+interrupted; HTTP timeout may leave an unknown result. The lock protects this
+repair route, not unrelated baseline box/development operations.
 
-## Controlled recovery evaluation — 0.14.1
+## Replay, recovery and controlled interruption
 
-The [explicit diagnostic stop](m3-recovery-contract.md) uses the normal durable
-write-ahead marker after the first C03 setter, before readback or C04. It requires
-a separate typed acknowledgement and the retained two-mark numbering fixture.
-Ordinary Apply retains its guards; generated numbering writes follow spatial
-assignment order. Recover/exact-ID replay never resume skipped targets.
-The [bounded native gate](m3-recovery-acceptance-0.14.1.md) passed
-13/13 + 6/6 + 6/6: controlled C03-only interruption, restart/reconciliation,
-read-only replay/no-resume and owner Undo, with audits 3 → 2 → 3.
-No repeat is required; broader crash/identity/scope guarantees remain open.
+Same execution ID plus the same Apply request returns saved historical outcomes
+without setters, even after restart/expiry/Undo. A different request with that
+ID conflicts. Transport request IDs are separate. Recover checks original
+project/document/file/model/type and observes old/new/conflicting/unknown values;
+unknown outcomes may reconcile, but observations do not prove write causality.
+Historical applied outcomes remain historical after Undo. It never resumes skipped
+targets; use only the original project copy/Local. See [recovery tools](diagnostics.md).
 
-## Bounded selected-mark/journal acceptance — 0.15.0
+The diagnostic evaluation_stop=after_first_setter_before_readback requires
+acknowledgement=disposable_copy_reviewed_recovery_test and the retained unselected
+two-mark numbering fixture: C03 undefined → S03 first, C04 S02 → S04 second,
+three initial findings, original locations/shared resource. It leaves a real
+running/unknown write-ahead record after C03 with C04 skipped. This accepted
+controlled stop is not evidence for native crash/power-loss recovery.
 
-[Native PASS / accepted_on_build](m3-selected-mark-acceptance-0.15.0.md):
-13/13 + 6/6 steps, one rule_based_edit C04 S02 → S04 with excluded C02,
-full audited-field/snapshot checks, read-only replay, healthy journal history
-6 → 7 → 7 and owner-confirmed UI/Undo, audits 3 → 1 → 3. A has a stable,
-owner-confirmed uninterrupted host; B uses another session with unspecified cause.
-Leave/save the same copy after Undo. No repeat is requested. Broader 1–32-change
-scope, journal rollover and cross-copy identity remain unaccepted.
-[M3 is now closed within the retained fixture scope](m3-closure.md) by the
-owner's later decision. No completed gate needs repetition; wider work follows
-the [office-project roadmap](office-project-roadmap.md). Main integration is separate.
+## Journal lifecycle and inspection
+
+Storage: **Local/.allplan-mcp/repairs**, schema m3-execution-1, maximum **128 records /
+1 MiB each**. Atomic temp/flush/fsync/replace and content/structural hashes detect
+some failures, not authenticated history or power-loss durability. Full/corrupt/
+unwritable history or competing writers blocks new execution; unresolved
+running/unknown records require saved-ID recovery. Valid replay/recovery remain
+available at capacity. No automatic eviction, import, rollover or pruning exists.
+
+fix_model_issues action=inspect_journal (**M3 Journal.cmd**) takes the writer lock
+and validates installed records **before native API/document access**. Schema
+m3-journal-inspection-1 reports verified historical summaries/remaining slots and
+blockers: journal_full, capacity_exceeded, recovery_required, invalid_record.
+A 129th record makes the inventory incomplete/count unknown. Unavailable storage
+or lock returns repair_journal_unavailable. Inspection can create a missing
+directory/lock but never changes records, scans the model or reconciles outcomes.
+available means storage checks passed, not current values/writability/copy identity.
+
+Setup/Restore preserve the journal; bridge backups do not back it up. Preserve
+the entire journal, original project and logs before migration. Deleting IDs or
+restoring older history removes retry protection; copying extracted packages
+does not transfer installed history. Do not replay transferred identities or
+retry newer writes after history rollback. Wider identity/journal/Undo guarantees
+are prerequisites in the [office-project roadmap](office-project-roadmap.md).

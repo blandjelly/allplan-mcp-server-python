@@ -1,218 +1,94 @@
 # Validation status and limits
 
-Current package **0.15.0**; status recorded **2026-10-12 Europe/Warsaw**.
-**[M3 / bounded UAT-05/UAT-06 are closed for the retained test project](m3-closure.md)**
-by the owner's explicit scope decision. The first MVP is a fixture evaluation.
-The closure maps existing evidence and explicitly excludes wider native scope,
-active-plan manual edits and office-project guarantees. Main integration and
-release remain separate. Historical reports/deliveries below retain their
-as-recorded status; previous open/pause statements are superseded by the closure.
+Updated **2026-10-12 Europe/Warsaw**. Package **0.15.0**.
+**M0–M3 / UAT-00–UAT-06 are accepted within the retained test-project scope.**
+The owner explicitly narrowed M3/UAT-05/UAT-06 to existing demonstrated scenarios.
+This closes the fixture evaluation MVP; it does not accept the original broader
+gate or typical office-project writes. Main integration/release remain separate.
 
-0.15.0 adds [read-only journal inspection](m3-journal-contract.md) and a
-[completed selected C04 mark gate](m3-selected-mark-owner-test.md).
-**219 portable tests PASS**, one final full run on Linux CPython 3.12.14 after
-focused journal/executor/real-HTTP checks; frozen sync PASS. Builds, exact
-installation and source CI are recorded in the [0.15.0 delivery](../evaluation-packages/0.15.0/README.md).
-The [new bounded native scope has PASS / accepted_on_build](m3-selected-mark-acceptance-0.15.0.md):
-13/13 A + 6/6 B, one rule_based_edit C04 mark write, excluded C02, readback,
-read-only replay, healthy journal inspection and owner Undo; audits 3 → 1 → 3.
-Owner confirms UI in both phases and uninterrupted host in A. B uses another
-session of unspecified cause. No accepted gate needs repeat. The owner resumed
-work to close the fixture milestone; wider use follows the
-[office-project roadmap](office-project-roadmap.md).
+## Accepted scope
 
-The previous 0.13.0 [bounded same-session conflict gate](m3-conflict-acceptance-0.13.0.md) is
-**PASS**: 12/12 steps, one C03 write, stale C04 rejection before setters, actual
-excluded-peer conflict and completed-execution recovery after one Undo (audits 3 → 2 → 3). It preserves invalidated
-plans for one read-only source comparison, never restoring authorization.
-0.14.1 [controlled unknown-result inspection](m3-recovery-contract.md) has
-**bounded native PASS / accepted_on_build**: 13/13 + 6/6 + 6/6,
-restart/reconciliation, replay without resume and owner-confirmed UI/unchanged
-other elements/Undo. [Evidence and limits](m3-recovery-acceptance-0.14.1.md).
-The 0.14.0 attempt blocked at numbering_preview before Apply, due to UUID
-write order. [Diagnosis and correction](m3-recovery-blocked-0.14.0.md).
-Acceptance concerns one controlled C03 interruption in the original copy;
-native crash/power-loss recovery remains unaccepted.
-Mark assignment and deterministic numbering have **bounded two-target native PASS**;
-[0.12.0 acceptance/evidence](m3-numbering-acceptance-0.12.0.md). Native acceptance
-below remains scoped to its recorded packages, fixture and supported behaviors.
-Native acceptance concerns the retained disposable fixture and observed Allplan
-**2026-1-7** setup with local Windows Codex. It is separate from portable tests.
-These slices support the [bounded fixture MVP closure](m3-closure.md),
-not general office-project acceptance.
+The original disposable **MCP_QA_DEMO** copy and installed Local history,
+Allplan **2026-1-7** with local Windows Codex. M3 writes concern the six Column
+roots in foreground file **101**, read profile **1.0.2**, audit profile **2.0.0**
+and retained demo standards. Acceptance covers the recorded one-/two-change
+layer/status, numbering, selected-mark and controlled-recovery scenarios;
+it does not cover arbitrary combinations or writes to the wall/beams/slab.
 
-## Accepted baseline
-
-| Stage | Accepted behavior | Boundary |
+| Stage | Accepted native behavior | Evidence |
 | --- | --- | --- |
-| M0 / 0.1.2 | Install, integrity, backup/restore, correctly sized box, ESC/restart, minimize/restore, project switching; UAT-00/UAT-01 PASS | Baseline box tools lack automatic readback and durable write deduplication. |
-| M1 / 0.5.3, profile 1.0.2 | UAT-02/UAT-03 PASS: fresh named read bindings, ten file-101 roots, passive 102, unloaded 103 omission, counts 10/6/2/1, geometry/hierarchy, display-unit invariance and XY offset once | Six columns, two SkeletonBeam roots, Wall and MultiSlab; offset (100000,200000,0) mm. Native BWS, arbitrary trees, nonzero Z offsets, durable references and generic write eligibility are unaccepted. |
-| M2 / 0.6.1, audit profile 2.0.0 | UAT-04 PASS: six columns, five findings, one duplicate group, complete coverage; repeated audits, invalid public/host scope rejection and post-error health | Fixture file 101 only. Callback exceptions are contained; the precise earlier CLR crash cause remains unproven. Native log rotation and long-term/concurrent stability are unverified. |
-
-Observed API release **2026.1**, executable file/product versions
-**16.1617.8659.814 / 2026.0.1.0**, embedded CPython **3.13.13**, external
-Python **3.14.8**. Executable strings do not independently identify the
-owner-reported UI hotfix. Windows/Codex app versions remain unspecified.
-Read profiles remain inactive for general writes. Static diagnostic flags
-`runtime_verified=false` / `allplan_acceptance=not_run` are capture fields,
-not a live acceptance registry.
+| M0 / 0.1.2, UAT-00/01 | Installation/restore, correctly sized box, ESC/restart, minimize/restore and project switching. | [Baseline history](https://github.com/blandjelly/allplan-mcp-server-python/blob/75e80bd65f678fce0c1a5eeafae07d3f3778883b/docs/validation-and-history.md) |
+| M1 / 0.5.3, UAT-02/03 | Ten file-101 roots, counts 10/6/2/1, paging/summary, native geometry, display-unit invariance and XY offset (100000,200000,0) mm once. | [Original report](https://github.com/blandjelly/allplan-mcp-server-python/blob/5ec1f57dd0ebb08e0e2bc19ef23c7440333c7b74/docs/test-results/m1-acceptance-0.5.3.md) |
+| M2 / 0.6.1, UAT-04 | Five findings on five of six columns, full coverage, scope rejection and continued operation after errors. | [Original report](https://github.com/blandjelly/allplan-mcp-server-python/blob/5ec1f57dd0ebb08e0e2bc19ef23c7440333c7b74/docs/test-results/m2-acceptance-0.6.1.md) |
 
 ## Accepted M3 slices
 
-The table retains each package's original acceptance and remaining boundary.
-A limitation listed for an older package may have later evidence in another
-row; the [closure](m3-closure.md) gives the current aggregate fixture scope.
+Together these establish bounded UAT-05/06: unchanged preview, authorized writes,
+readback/audit agreement, stale rejection, replay without repeated writes and
+controlled unknown-result recovery. Manual UI edits against an active plan are
+explicitly outside the narrowed gate; invalidated-plan inspection does not prove
+that case. Finding counts below are scenario-specific.
 
-| Package | Native gate | Remaining boundary |
+| Package | Native PASS | Original evidence |
 | --- | --- | --- |
-| 0.7.0 | Explicit two-change layer/status preview, exact values/targets, unchanged revalidation and follow-up audit | Preview does not establish writable native properties. |
-| 0.8.1 | Two layer/status writes, readback/full audited-field verification, exact-ID replay across host sessions, two separate Undo steps, recovery after owner-confirmed Redo | Recovery concerns a completed execution, not a native unknown outcome. Grouped Undo and whole-project verification are unaccepted. The earlier 0.8.0 rejection before setters used an overly broad IsInMacro check, corrected with root-hierarchy validation. |
-| 0.8.1 restart/stale Apply | Old-plan revalidation returns plan_expired after UI cancellation/restart; stale Apply rejected before setters, identical full audits, unchanged owner-observed model | Same-session manual-edit conflict was blocked because UI ended the host; restart protection does not prove that case. |
-| 0.9.0 | Three no-op standard/selection previews, exceptions, revalidations and identical full audits | Zero-proposal observations do not establish positive writes. |
-| 0.10.0 | C03 → S03 / C04 → S04 mark proposals, selection exception, collision with excluded S06 peer, unchanged revalidations/audits; owner confirms unchanged model and uninterrupted host | All mark plans refuse Apply. Assignment, numbering and graphical labels are unimplemented. |
-| 0.11.0 | Ten steps: two separately reviewed single-target standard/selected writes, exact readbacks, audited fields match plan, exact-ID read-only replays, complete six-column audits 5 → 4 → 3 in one verified host session | Owner confirms both changes, host survival, other elements unchanged and two-step Undo. Broader 1–32-change/other-file execution is unaccepted. Final repaired/undone/redone state was unspecified. |
-| 0.12.0 | Two numbered mark writes on existing string attribute 5001, exact readback/audited verification, same-session unchanged deterministic previews, read-only replay and subsequent no-op; complete audits 3 → 0 → 3 after Undo/recovery | Owner confirms correct marks, unchanged other elements, host survival and two-step Undo. Recovery observes old values after a changed host session; it concerns completed execution, not unknown-outcome recovery. Broader mark/workflow scope is unaccepted. |
-| 0.13.0 | 12/12 same-session conflict steps: C03 write/readback, stale C04 rejection before setters, excluded-peer fresh source/report conflict; audits 3 → 2 → 3 and old-value recovery after Undo | Owner confirms UI, unchanged peers and host survival. One setter/one Undo does not prove grouped Undo; manual UI active-plan conflict and partial/unknown recovery remain open. [Evidence](m3-conflict-acceptance-0.13.0.md). |
-| 0.14.1 | 13/13 + 6/6 + 6/6: C03-only controlled running/unknown write, new-ID rejection before setters, restart/reconciliation, read-only replay/no-resume, complete snapshots and audits 3 → 2 → 3 after owner Undo | One setter in the retained original fixture; process crash/power-loss, grouped Undo, manual UI active-plan conflicts, cross-copy identity and broader scope remain unaccepted. [Evidence](m3-recovery-acceptance-0.14.1.md). |
-| 0.15.0 | 13/13 + 6/6: one explicit rule_based_edit C04 S02 → S04, excluded C02, full audited-field/snapshot checks, read-only replay, journal summaries 6 → 7 → 7 and Undo/recovery; audits 3 → 1 → 3 | Owner confirms A/B UI and uninterrupted host in A; B uses another session with unspecified cause. Healthy journal only; broader native scope, capacity/corruption/migration, copy identity and grouped Undo remain unaccepted. [Evidence](m3-selected-mark-acceptance-0.15.0.md). |
+| 0.7.0–0.10.0 | Read-only previews/no-op, layer/status execution, replay across sessions, separate Undo, restart/stale rejection and mark-collision previews. | [Historical reports](https://github.com/blandjelly/allplan-mcp-server-python/tree/5ec1f57dd0ebb08e0e2bc19ef23c7440333c7b74/docs/test-results) |
+| 0.11.0 | Two separately reviewed single-target workflows, readback/whole audited-field checks, read-only replay, audits **5 → 4 → 3**, owner-confirmed host/peers/UI and two-step Undo. | [Workflow report](https://github.com/blandjelly/allplan-mcp-server-python/blob/5ec1f57dd0ebb08e0e2bc19ef23c7440333c7b74/docs/test-results/m3-workflow-acceptance-0.11.0.md) |
+| 0.12.0 | C03/C04 deterministic numbering, readback/replay/no-op, two-step Undo/recovery, audits **3 → 0 → 3**. | [Report](https://github.com/blandjelly/allplan-mcp-server-python/blob/b0678da6d9d5565951c8576db8d83972331158c1/docs/m3-numbering-acceptance-0.12.0.md), [raw uploads/inspection](../evaluation-packages/0.12.0/native-acceptance/20261010-owner/) |
+| 0.13.0 | **12/12** same-session steps: C03 write, stale C04 rejection before setters, changed excluded-peer comparison and Undo/recovery; audits **3 → 2 → 3**. | [Report](https://github.com/blandjelly/allplan-mcp-server-python/blob/b0678da6d9d5565951c8576db8d83972331158c1/docs/m3-conflict-acceptance-0.13.0.md), [raw uploads/inspection](../evaluation-packages/0.13.0/native-acceptance/20261011-owner/) |
+| 0.14.1 | **13/13 + 6/6 + 6/6**: actual C03 running/unknown, skipped C04, new-ID rejection, restart/reconciliation, no-resume replay and Undo; audits **3 → 2 → 3**. Controlled stop, not crash/power-loss. | [Report](https://github.com/blandjelly/allplan-mcp-server-python/blob/b0678da6d9d5565951c8576db8d83972331158c1/docs/m3-recovery-acceptance-0.14.1.md), [raw uploads/inspection](../evaluation-packages/0.14.1/native-acceptance/20261012-owner/) |
+| 0.15.0 | **13/13 A + 6/6 B**: selected C04 S02 → S04, excluded C02 preserved, full snapshots/readback, read-only replay, healthy journal **6 → 7 → 7**, Undo/recovery; audits **3 → 1 → 3**. | [Report](https://github.com/blandjelly/allplan-mcp-server-python/blob/b0678da6d9d5565951c8576db8d83972331158c1/docs/m3-selected-mark-acceptance-0.15.0.md), [eight raw uploads/inspection](../evaluation-packages/0.15.0/native-acceptance/20261012-owner/) |
 
-Final 0.11.0 findings: **QA-001 / QA-002 / QA-002**, with 24 checks:
-20 pass, 3 fail, 1 not_applicable, 0 not_checked. Failure is expected because
-mark issues remain. Native manual UI conflicts on active plans,
-crash/power-loss durability and cross-copy identity remain open.
-No unchanged accepted owner gate needs repetition.
+In 0.15.0 the owner confirms A/B UI and uninterrupted host in A. Sessions are
+stable within each phase; B uses another session of unspecified cause. The 0.14.1
+Undo phase also used another session of unspecified cause. Do not infer continuous
+host life across phases. The 0.14.0 attempt blocked before Apply because of UUID
+write ordering; corrected spatial ordering passed in 0.14.1.
 
 ## Portable verification and delivery
 
-0.14.1: **207 portable tests PASS**, one final full run on Linux CPython 3.12.14,
-after focused control/mark/real-HTTP checks using the owner UUID order.
-Frozen sync and wheel/sdist builds PASS. Exact clean-source package/installation
-verification and source CI belong to the [0.14.1 delivery](../evaluation-packages/0.14.1/README.md).
-The corrected native recovery gate has [bounded native PASS](m3-recovery-acceptance-0.14.1.md).
+The unchanged [0.15.0 delivery](../evaluation-packages/0.15.0/README.md) records:
 
-0.14.0: **205 portable tests PASS** on Linux CPython 3.12.14, one final full run
-following focused checks of control validation, real durable unknown markers,
-restart/reconciliation, ordinary Apply, lost responses, guard identities,
-full-field collateral detection, read-only replay and Undo observations. Frozen sync PASS.
-These fakes/HTTP checks execute no native Allplan. Clean-source package/build/installation
-and separate source CI evidence are recorded in [0.14.0 delivery](../evaluation-packages/0.14.0/README.md).
-The original delivery status was ready_for_owner_test; 0.14.0 blocked before
-Apply, and the corrected 0.14.1 native gate subsequently passed.
+- Clean source **7e3657bc33ecf913376d302da900af386b3b8a23**; **219 portable tests PASS**,
+  one final full run on Linux CPython **3.12.14** after focused journal/executor/HTTP checks.
+- Frozen sync, wheel/sdist builds and exact ZIP installation/restore **PASS**:
+  **23** bridge hashes, journal bytes preserved and previous bridge restored.
+- [Source CI 38181795091](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38181795091)
+  **6/6 PASS**, Windows/Ubuntu Python 3.11–3.13, tests/builds included.
 
+Portable checks use native fakes; they do not run Allplan. Results belong to the
+recorded source, not later documentation commits. Observed native API **2026.1**,
+executable file/product **16.1617.8659.814 / 2026.0.1.0**, embedded Python **3.13.13**
+and external Python **3.14.8** do not independently identify the owner-reported UI
+hotfix. Static diagnostic runtime_verified/allplan_acceptance fields are not an
+acceptance registry.
 
-0.13.0 source **752e54795a1cfa676217b5ffba0ce5d301383269**: one full
-**195-test PASS** on Linux CPython 3.12.14 after focused plan/HTTP checks.
-Frozen sync and wheel/sdist build PASS. Exact extracted registration/restore
-fixture PASS: all 23 bridge hashes match, the journal sentinel is preserved and
-the previous bridge fixture is restored. Native Allplan and Windows Setup UI
-were not run locally. [Exact 0.13.0 delivery](../evaluation-packages/0.13.0/README.md)
-retains source/artifact identity and separate source-CI observations.
-Invalidated evidence is covered for actual excluded-peer changes, old-value
-restoration without renewed authorization, shared TTL/byte/count limits and
-restart; HTTP checks cover cancellation, stale rejection, lost write/probe
-replies, identity preservation and read-only recovery. Bounded native acceptance is recorded above; partial/unknown recovery remains open.
-Source [CI 38079063575](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38079063575)
-**6/6 PASS** on Windows/Ubuntu Python 3.11–3.13, including tests and builds;
-[original job/step observations](../evaluation-packages/0.13.0/source-ci-0.13.0.json).
+## Current limits and next work
 
+- Executor eligibility **1–32** is broader than accepted one-/two-change scenarios.
+  Other profiles/files, mixed/larger plans, walls, native concrete properties,
+  attribute addition, labels and file moves have no accepted M3 write support.
+- General writable profiles remain disabled. Durable/cross-copy identity,
+  manual UI active-plan conflicts, crash/power-loss and broader/grouped Undo
+  remain unaccepted. Do not repeat the UI scenario known to cancel the host unchanged.
+- Journal limit: **128 records**, no rollover/import/pruning. Healthy inspection
+  passed; native capacity/corruption/migration handling is unaccepted. Stop at
+  capacity, preserve Local history, and never transfer/retry IDs against another copy.
+- M1 lacks native BWS, arbitrary trees/Structural Framing and nonzero Z-offset
+  acceptance. Baseline box tools lack durable deduplication/readback. The precise
+  earlier CLR crash cause and long-term/concurrent stability remain unproven.
 
-0.12.0 final implementation candidate: **187 portable tests PASS** on Linux
-CPython 3.12; one full run after focused repair/mark and 26 HTTP/MCP checks.
-Frozen dependency sync PASS. Coverage includes deterministic order/no-op,
-excluded duplicate keepers and normalized reservations, pre-context policy
-rejection, missing/unknown mark boundaries, fresh source conflicts, explicit
-mark readback, durable replay after restart/Undo, stopped partial writes and
-read-only recovery after a lost HTTP reply. These fakes do not execute Allplan.
-Wheel/sdist build and exact extracted package/23 bridge hashes PASS;
-Setup/Restore preserved the journal and restored the prior bridge in the fixture.
-[0.12.0 delivery](../evaluation-packages/0.12.0/README.md) records the exact source,
-artifact identity and six-configuration source CI. Old 0.11.0 evidence below
-remains unchanged; no archives are rebuilt for publication.
-Source **fd78700378eceb6f217e4ca30a83b88004b73a57**, source_modified=false;
-[CI 38075847420](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38075847420)
-**6/6 PASS** on Windows/Ubuntu Python 3.11–3.13, including tests, wheel/sdist and
-Windows package builds. This code update exercises the revised PR/full-matrix
-selection schedule; documentation publication runs no new checks/builds.
-
-Delivered 0.11.0 source **26d70b27bd06e2916cda74213cb8995aa9f0f19a** has
-**178 portable tests PASS**, frozen sync, wheel/sdist builds, deterministic ZIP
-and extracted installation/integrity checks. Setup/Restore preserved the journal
-in the portable fixture; all 22 registered bridge hashes matched.
-[Source CI 38063710029](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38063710029)
-passed **6/6** Windows/Ubuntu Python 3.11–3.13 jobs for that source.
-The revised CI schedule from **1e36945** was not exercised by its documentation
-update; the earlier result does not validate that workflow revision.
-
-The [0.11.0 delivery](../evaluation-packages/0.11.0/README.md) and immutable
-delivery manifests retain artifact identity. Documentation cleanup does not
-rebuild existing archives; their embedded docs/launchers reflect original source.
-New source packages use the current tree.
+Keep the [fixture](fixture-guide.md) saved after Undo: C02/C04=S02, C03 undefined,
+C05 structure/C06 NEW. Completed gates need no repeat. Follow the
+[office-project roadmap](office-project-roadmap.md) for wall fire resistance and
+storey-scoped column concrete class. Before main integration, perform the
+final-candidate checks/full matrix in [testing policy](testing-policy.md).
 
 ## Historical records
 
-Completed test cards, raw JSON/TXT logs, prior handoffs and superseded reviews
-are archived at documentation baseline
-[5ec1f57](https://github.com/blandjelly/allplan-mcp-server-python/tree/5ec1f57dd0ebb08e0e2bc19ef23c7440333c7b74).
-[Original acceptance records](https://github.com/blandjelly/allplan-mcp-server-python/tree/5ec1f57dd0ebb08e0e2bc19ef23c7440333c7b74/docs/test-results)
-retain exact evidence hashes and separately attributed owner observations.
-[Original delivery records](https://github.com/blandjelly/allplan-mcp-server-python/tree/5ec1f57dd0ebb08e0e2bc19ef23c7440333c7b74/evaluation-packages)
-retain removed build/test logs listed by historical delivery manifests.
-These are reference evidence, not instructions to rerun old batches.
-
-## Previous delivered 0.14.0 source
-
-Clean source **7ead0e9798c6c93a843fbfc8e9b5e33a58763fdd** has final 205-test
-portable PASS, frozen sync and wheel/sdist builds. The exact extracted ZIP verifies
-23 installed bridge hashes, journal preservation and prior bridge restoration.
-Source [CI 38175934542](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38175934542)
-**6/6 PASS**, Windows/Ubuntu Python 3.11–3.13, tests/builds included.
-[Delivery/artifact identities](../evaluation-packages/0.14.0/README.md) retain
-original logs, CI steps, instructions and package. Documentation publication
-repeats no tests/builds and leaves archives unchanged. Main ancestry was reconciled
-in the M3 branch; PR #2 stays draft into main, without merge/release.
-The original native attempt blocked before Apply; corrected 0.14.1 has since
-passed with bounded native recovery acceptance. M3/UAT-05/UAT-06 were still open
-at this delivery; the later [fixture closure](m3-closure.md) supersedes that status.
-
-## Delivered 0.14.1 correction and owner action
-
-Clean source **1810e4fa284311e204b9133deee3245f8427697b**, final **207-test PASS**,
-frozen sync and clean-source wheel/sdist builds PASS. Exact ZIP verification
-passes all 23 bridge hashes, journal preservation and prior bridge restoration.
-[Source CI 38179275055](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38179275055)
-**6/6 PASS**, Windows/Ubuntu Python 3.11–3.13, including tests and builds.
-[0.14.1 delivery](../evaluation-packages/0.14.1/README.md) retains the exact
-source/archive, local logs, installation check and CI job/step observations.
-Documentation publication repeats no tests/builds and leaves old artifacts unchanged.
-
-The 0.14.0 attempt blocked before Apply/ID creation; the corrected
-[controlled recovery gate](m3-recovery-acceptance-0.14.1.md) has since passed.
-Leave/save the copy after the completed 0.14.1 Undo, preserving Local journal
-and all logs. No repeat is requested. At this delivery M3/UAT-05/UAT-06 remained
-open and PR #2 stayed draft into main, with no merge/release. The later
-[fixture closure](m3-closure.md) defines the current milestone status.
-
-## Native 0.14.1 recovery result — 2026-10-12
-
-[Bounded PASS](m3-recovery-acceptance-0.14.1.md), 13/13 + 6/6 + 6/6,
-owner-confirmed UI/no-other-changes/Undo. Recover and exact-ID replay did not
-resume skipped C04; final full snapshot matches the baseline and audits are
-3 → 2 → 3. Leave/save the original copy after Undo and preserve the journal/logs.
-No repeat is requested. Documentation/evidence publication reruns no runtime
-tests/builds or old archive checks. PR #2 stays draft into main.
-
-## Delivered 0.15.0 owner gate
-
-Clean source **7e3657bc33ecf913376d302da900af386b3b8a23**, one final
-219-test portable PASS, frozen sync and wheel/sdist builds PASS. Exact
-ZIP installation verifies 23 bridge hashes, journal preservation and previous
-bridge restoration. [Source CI 38181795091](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38181795091)
-**6/6 PASS**, Windows/Ubuntu Python 3.11–3.13, tests/builds included.
-[Delivery/artifacts](../evaluation-packages/0.15.0/README.md) retain source/archive
-identity, logs, installation verification, CI observations and Polish instructions.
-Publication repeats no product checks/builds or old artifact hash verification.
-[Bounded native selected-mark/journal PASS](m3-selected-mark-acceptance-0.15.0.md)
-is recorded separately from unchanged archives and original delivery records.
-No completed gate needs repetition. [M3 / bounded UAT are now closed for the
-retained test project](m3-closure.md). Main integration/release remain separate;
-original delivery manifests and native evidence are unchanged.
+Detailed contracts, completed walkthroughs and acceptance reports are available
+in the [pre-cleanup documentation](https://github.com/blandjelly/allplan-mcp-server-python/tree/b0678da6d9d5565951c8576db8d83972331158c1/docs).
+Their open/pause statements describe the original gate date, not current M3 status.
+Raw uploads, manifests, checksums, logs and delivered archives remain in
+[evaluation-packages](../evaluation-packages/); original removed baseline logs
+remain in [Git history](https://github.com/blandjelly/allplan-mcp-server-python/tree/5ec1f57dd0ebb08e0e2bc19ef23c7440333c7b74/evaluation-packages).
+Do not rerun completed gates or rebuild old archives for documentation changes.

@@ -1,74 +1,47 @@
-# Shorter validation cycle for M3
+# Testing policy
 
-Adopted by the owner on 2026-10-10. Preserve meaningful regression tests;
-choose when to run them according to the change. A request to postpone tests
-overrides this default schedule: do not run local tests, builds used as checks,
-native owner gates or manually dispatch CI until testing is authorized again.
+Preserve meaningful regression coverage and test according to the change.
+An explicit owner pause overrides the schedule; do not run tests/builds/native
+gates or manually dispatch CI while paused. The prior M3 closure pause was
+superseded by the owner's resumed, fixture-bounded work.
 
-## Local work and publication
-
-| Change or milestone | Required work when testing is authorized |
+| Change | Required validation |
 | --- | --- |
-| Iterative M3 implementation | Focused M3 tests plus tests of other affected modules; add HTTP tests when MCP/transport/launchers change. |
-| Documentation-only change | Read the edits, check links and git diff formatting. Do not repeat runtime tests, package builds or old evidence/hash verification. |
-| New owner-test package | Run the full portable suite once for the final code candidate, frozen dependency sync, wheel/sdist build and exact package/installation checks. Use source CI as evidence for its tested commit. |
-| Dependency, installer, package builder or workflow change | Full portable suite and the six-configuration compatibility matrix. |
-| Release/main integration | Full portable suite and six-configuration compatibility matrix for the final candidate; required native acceptance remains separate. |
-| Native Allplan observation | Test new behavior or a materially affected accepted behavior. Do not repeat unchanged accepted gates; record their evidence and scope; completed logs remain in Git history. |
+| Iterative implementation | Focused affected tests, including dependent read/audit modules; HTTP tests for MCP/transport/launcher changes. |
+| Documentation only | Read/diff formatting and links. No runtime tests, builds or old artifact/evidence hash reruns. |
+| New owner-test package | One final full portable suite, frozen sync, wheel/sdist build and exact package/installation verification; source CI evidence for the tested commit. |
+| Dependency/installer/builder/workflow change | Full suite and six-configuration compatibility matrix. |
+| Main integration/release | Full suite and full Windows/Ubuntu × Python 3.11–3.13 matrix for the final candidate; native acceptance remains separate. |
+| Native observation | New/materially affected behavior only; retain unchanged completed-gate evidence and scope. |
 
-Run one full suite for the final implementation candidate; repeat only for
-new relevant changes, failures or unresolved concerns. Select affected modules
-for focused iteration, including dependent read/audit/HTTP checks when contracts
-change. [README](../README.md#source-development) holds current development
-commands. Record actual checks/source/results; focused PASS is not full PASS.
+Repeat a full final-candidate run only after relevant new changes/failures or
+unresolved concerns. Focused PASS is not full PASS. The model owns automated
+checks, diagnostics and packages; the owner receives a small version/build-bound
+walkthrough with expected results, reset/recovery and PASS/FAIL/BLOCKED reporting.
+Use ready_for_owner_test before observations, accepted_on_build only with evidence.
+[Source commands](../README.md#source-development).
 
-## CI schedule
+## CI
 
-[Portable workflow](../.github/workflows/portable.yml):
+[portable.yml](../.github/workflows/portable.yml) runs PR updates once; pushes
+trigger only on main. Docs/README/evaluation-packages-only updates skip product
+jobs; a mixed PR may still run its lightweight configuration job to detect this.
+Routine code updates use Windows/Ubuntu Python 3.12. Dependency, installer,
+package-builder or workflow changes select the full **six-job** matrix.
+Synchronize compares the latest update; missing comparison history selects the
+full matrix conservatively. Superseded runs cancel; cancellation is not PASS.
 
-- PR updates run CI once. Push-triggered CI is restricted to main, avoiding
-  a second push run for the same feature-branch PR commit.
-- Documentation-only changes under docs, README.md and evaluation-packages
-  skip product tests/builds. A mixed code/documentation PR can still run the
-  lightweight configuration job, because GitHub's PR path filter considers the
-  full PR diff. The job checks the latest update and skips the product jobs.
-  Runtime/source, tests, profiles and workflow changes remain eligible.
-- Routine code changes use Windows and Ubuntu, Python 3.12. Each job runs the
-  full portable suite, wheel/sdist build and Windows ZIP build; the shorter
-  focused set is the local iteration check.
-- Changes to pyproject.toml, uv.lock, windows, installer/package utilities or
-  workflows automatically select all six Windows/Ubuntu Python 3.11–3.13 jobs.
-  PR synchronize events compare the previous head with the new head, so an old
-  dependency change does not force the full matrix on every later update.
-  Opened/reopened PRs compare base/head; unavailable diff history selects the
-  full matrix conservatively.
-- workflow_dispatch exposes full_matrix, default true. Before release/main
-  integration, explicitly request the full matrix even without matching paths.
-  A manually requested basic run can set full_matrix=false.
-- New updates cancel superseded runs for the same PR/ref. A cancelled run is
-  not PASS. A configuration job chooses the matrix; it runs no product tests.
+Before main integration/release use workflow_dispatch with full_matrix=true,
+even without matching paths. Results remain scoped to their tested source;
+[current evidence](validation-status.md#portable-verification-and-delivery).
 
-Historical CI results remain scoped to their original commits; see
-[validation status](validation-status.md#portable-verification-and-delivery).
+## Retained checks and hashes
 
-## Hashes and package checks
-
-Keep exact plan hashes, fresh source/report checks before Apply and journal
-record/request hashes. They bind authorization to reviewed data, detect source
-conflicts and invalid records, and support exact-ID deduplication. Do not replace
-fresh source validation with an old successful result or a cached model hash.
-
-For a new delivered package, generate its checksum/manifest and verify the
-actual extracted installation once. Later documentation/log summaries refer to
-that recorded source, checksum and verification; do not rebuild the archive or
-recompute all older archive/evidence hashes for each documentation edit.
-
-Keep installer integrity checks and host health integrity checks. No runtime
-hashing or native preflight/readback is removed by this policy. The cost of
-hashing alone has not been profiled. Independent forensic recomputation remains
-appropriate for a suspected mismatch/corruption or an explicit review request.
-
-The package tests already exercise two identical ZIP builds and registration.
-Do not additionally repeat those checks on every matrix job or local edit.
-For delivery from a clean source, run one artifact verification pass and retain
-its result; any added check should resolve a concrete remaining uncertainty.
+Keep reviewed plan/request hashes, fresh source checks before Apply, journal
+integrity/identity validation and installer/health hashes. Old PASS never replaces
+fresh model authorization. No runtime protection is removed by this schedule.
+For a new delivery, record manifest/checksum and verify the actual extracted
+installation once. Later docs refer to that result without rebuilding old archives.
+The existing package test already covers deterministic ZIP builds/registration;
+do not redundantly repeat those checks on every job. Independent hash review is
+appropriate for a suspected mismatch/corruption or explicit review request.
