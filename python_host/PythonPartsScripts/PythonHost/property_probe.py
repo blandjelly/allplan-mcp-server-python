@@ -88,7 +88,8 @@ class PropertyProbeService:
                      "component_kind": "top_level_component", "fields": ["layer_id", "file_state", "display_name"],
                      "predicate": {"field": "type_name", "op": "eq", "value": "Column_TypeUUID"}}
             live = {}
-            snapshot = trace.call("M1.column_scan", lambda: self.queries._scan(doc, base, settings, query, adapter_sink=live))
+            native_owners = []
+            snapshot = trace.call("M1.column_scan", lambda: self.queries._scan(doc, base, settings, query, adapter_sink=live, adapter_owners=native_owners))
             budget()
             if (not snapshot["coverage"]["requested_scope_complete"] or not snapshot["elements"]
                     or snapshot["scope"]["included_files"][0]["state"] != "active_foreground"):

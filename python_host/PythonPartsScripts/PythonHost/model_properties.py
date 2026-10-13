@@ -51,7 +51,8 @@ def discover_properties(service, doc, base, settings, request):
              "predicate": {"field": "type_name", "op": "in", "value": request.get("native_types", ["Column_TypeUUID", "Wall_TypeUUID"])},
              "max_adapters": request.get("max_adapters", 5000)}
     live = {}
-    snapshot = service._scan(doc, base, settings, query, adapter_sink=live)
+    native_owners = []
+    snapshot = service._scan(doc, base, settings, query, adapter_sink=live, adapter_owners=native_owners)
     check()
     samples = []
     discovered = set()

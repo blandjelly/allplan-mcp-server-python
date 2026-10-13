@@ -145,6 +145,8 @@ stops. Other phases require a separate reviewed native observation. No batch,
 automatic continuation, GetEnumValues, geometry filter, highlight, resource
 creation or model setter is invoked. Raw absence/null/empty/undefined/error values
 retain their distinction and sampled adapter ownership remains unverified.
+The native enumeration container remains alive until its captured adapter reader
+finishes; adapters/containers are never saved in the JSON query cache.
 
 Before every new native reader a started record is appended, flushed and fsynced
 in **Local/.allplan-mcp/logs/m4-native-probe.jsonl**; returned/failed records follow.

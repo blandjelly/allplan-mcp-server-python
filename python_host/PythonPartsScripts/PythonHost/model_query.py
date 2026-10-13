@@ -102,7 +102,7 @@ class ModelQueryService:
                                 "complete": end == len(items), "is_full_selection": offset == 0 and end == len(items)}})
         return result
 
-    def _scan(self, doc, base, settings, request, adapter_sink=None):
+    def _scan(self, doc, base, settings, request, adapter_sink=None, adapter_owners=None):
         started = self.clock()
         context = context_probe(doc, base, settings, {})
         project = context["project"]
@@ -169,6 +169,10 @@ class ModelQueryService:
                           "hierarchy_not_checked": 0, "non_component_adapters": 0})
         try:
             adapters = base.ElementsSelectService.SelectAllElements(doc) if files else []
+            if adapter_owners is not None:
+                # Keep the native enumeration container alive until the caller
+                # has finished using adapters captured during this scan.
+                adapter_owners.append(adapters)
             for adapter in adapters:
                 if counts["raw_adapters_visited"] >= request.get("max_adapters", 5000) or self.clock() - started >= self.SCAN_SECONDS:
                     raise BridgeError("scan_limit_exceeded", "Query exceeded the adapter/time budget; no selection or complete count was created. Narrow loaded files or use max_adapters up to 10000.", 409)

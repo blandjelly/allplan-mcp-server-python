@@ -27,6 +27,12 @@ They were removed because enum applicability was unproven. This is a code issue,
 **not a proven causal explanation** of the crash. The public broad route now
 rejects valid requests before any native build/document read; no opt-in bypass exists.
 
+Adapter readers also retain the native enumeration container until they finish,
+then release it within the UI request. This addresses a lifetime concern in the
+captured-adapter design without claiming the uploaded logs prove a dangling
+adapter. A portable lifetime regression checks the owner survives the reader and
+is not retained in the JSON query cache.
+
 0.16.1 instead provides an isolated Column sample in one foreground file with
 durable before/after records for new native readers. The old M1 scan is a named,
 coarse boundary. The client saves exact pending requests before contacting the

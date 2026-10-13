@@ -2,6 +2,7 @@
 import json
 import tempfile
 import unittest
+import weakref
 from pathlib import Path
 
 import test_model_properties as fixtures
@@ -59,6 +60,25 @@ class PropertyProbeTests(unittest.TestCase):
         self.assert_code("probe_trace_unavailable", lambda: self.probe(phase="attribute_definition", attribute_id=83))
         self.coord.GetInputViewDocument.assert_not_called()
         self.base.AttributeService.GetAttributeName.assert_not_called()
+
+    def test_native_enumeration_owner_lives_through_reader_and_not_in_JSON_cache(self):
+        self.fixture()
+        root = self.base.ElementsSelectService.SelectAllElements.return_value[0]
+        owners = []
+        class NativeOwnerList(list):
+            pass
+        def enumerate_roots(_doc):
+            owner = NativeOwnerList([root])
+            owners.append(weakref.ref(owner))
+            return owner
+        self.base.ElementsSelectService.SelectAllElements.side_effect = enumerate_roots
+        def attributes(_state):
+            self.assertIsNotNone(owners[-1](), "Native container died before the captured adapter reader")
+            return [(83, "R60")]
+        root.GetAttributes.side_effect = attributes
+        self.probe(phase="column_sample", drawing_file=101)
+        self.assertIsNone(owners[-1]())
+        self.assertFalse(self.handler.model_queries.selections)
 
     def test_definition_stops_at_failed_method_and_preserves_native_boundary(self):
         self.fixture()

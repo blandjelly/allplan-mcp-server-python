@@ -37,8 +37,9 @@ def present_selection(service, doc, base, settings, ifw, request):
     if entry is None:
         raise BridgeError("selection_unavailable", "Selection expired or belongs to another host session. Query again.", 409)
     live = {}
+    native_owners = []
     try:
-        snapshot = service._scan(doc, base, settings, entry["request"], adapter_sink=live)
+        snapshot = service._scan(doc, base, settings, entry["request"], adapter_sink=live, adapter_owners=native_owners)
     except BridgeError as exc:
         service.selections.pop(ident, None)
         raise BridgeError("selection_unverifiable", "No UI call started; the full selection could not be revalidated.", 409) from exc
