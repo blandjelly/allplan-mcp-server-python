@@ -17,7 +17,7 @@ def save(path, report):
     lines = ["M4 metadata/highlight observation: " + report.get("state", "collecting"),
              "Allplan acceptance: not_run; native UI selection: BLOCKED in current interactor.",
              "No model setters requested."]
-    lines.extend(step["name"] + ": recorded (see JSON)" for step in report["steps"])
+    lines.extend(step["name"] + ": " + step.get("state", "recorded") + " (see JSON)" for step in report["steps"])
     if report.get("message"):
         lines.append(report["message"])
     path.with_suffix(".txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -28,8 +28,18 @@ async def collect_property_probe(url, path, *, clear=False):
               "allplan_acceptance": "not_run", "model_setters_requested": False, "steps": []}
 
     async def call(client, name, tool, request=None):
-        result = (await client.call_tool(tool, {"request": request} if request is not None else {})).data
-        report["steps"].append({"name": name, "tool": tool, "request": request, "response": result})
+        step = {"name": name, "tool": tool, "request": request, "state": "request_pending"}
+        report["steps"].append(step)
+        # Save the exact pending tool/request before contacting the native host.
+        # If the host/process dies, this evidence must not vanish with its reply.
+        save(path, report)
+        try:
+            result = (await client.call_tool(tool, {"request": request} if request is not None else {})).data
+        except Exception as exc:
+            step.update(state="failed", message=str(exc))
+            save(path, report)
+            raise
+        step.update(state="response_received", response=result)
         save(path, report)
         return result
 
@@ -53,36 +63,16 @@ async def collect_property_probe(url, path, *, clear=False):
                 if response.get("state") != "submitted":
                     raise ValueError("Clear outcome is unknown; inspect Allplan before repeating.")
             else:
-                properties = {"sample_limit": 20, "attribute_names": ["Odporność ogniowa", "Fire resistance"], "layer_short_names": ["W1"]}
-                baseline = await call(client, "properties_before", "model_properties", properties)
-                if baseline.get("usable_for_write") is not False or not baseline.get("sample", {}).get("elements"):
-                    raise ValueError("No Column/Wall sample is available in open drawings.")
-                query = {"action": "query", "component_kind": "top_level_component", "page_size": 1,
-                         "predicate": {"field": "type_name", "op": "in", "value": ["Column_TypeUUID", "Wall_TypeUUID"]},
-                         "fields": ["layer_id", "file_state", "bounding_box_mm"]}
-                selected = await call(client, "query_first_page", "model_query", query)
-                if not selected["coverage"]["requested_scope_complete"] or not selected["counts"]["matched_model_identities"]:
-                    raise ValueError("Query coverage is incomplete or has no matches; retain omissions, narrow scope through local Codex.")
-                highlight = await call(client, "highlight_full_selection", "model_selection", {"action": "highlight", "selection_id": selected["selection_id"]})
-                if (highlight.get("state") != "submitted"
-                        or highlight["counts"]["submitted_model_identities"] != selected["counts"]["matched_model_identities"]
-                        or highlight["counts"]["selected"] is not None or highlight["counts"]["highlighted"] is not None):
-                    raise ValueError("Highlight submission differs from the full query; observe UI before any repeat.")
-                native = await call(client, "native_selection_capability", "model_selection", {"action": "select", "selection_id": selected["selection_id"]})
-                if native.get("state") != "unsupported" or native.get("ui_calls_started") is not False:
-                    raise ValueError("Native selection capability differs from the declared probe.")
-                after = await call(client, "properties_after", "model_properties", properties)
-                if after["probe_fingerprint"] != baseline["probe_fingerprint"]:
-                    raise ValueError("Sampled properties changed during presentation; retain both reports.")
-                reread = await call(client, "query_after", "model_query", query)
-                if reread["source_fingerprint"] != selected["source_fingerprint"]:
-                    raise ValueError("Query source/geometry changed during presentation; retain both reports.")
-                report["native_selection_gate"] = "BLOCKED_current_interactor"
-                report["metadata_observation"] = "owner_and_local_Codex_must_verify_actual_fire_resistance_field_and_W1_resolution"
+                sample = await call(client, "isolated_column_sample", "model_property_probe", {"phase": "column_sample", "drawing_file": 101})
+                if (sample.get("read_only") is not True or sample.get("usable_for_write") is not False
+                        or sample.get("sample", {}).get("attributes", {}).get("status") != "observed"):
+                    raise ValueError("Isolated Column raw attributes are unavailable; do not continue to another probe phase.")
+                report["native_trace_required"] = "Local/.allplan-mcp/logs/m4-native-probe.jsonl"
+                report["next_phase"] = "stop_and_return_evidence_no_automatic_metadata_or_UI_calls"
             health_check(await call(client, "health_after", "allplan_health"), session)
             report["state"] = "awaiting_owner_observation"
     except Exception as exc:
-        report.update(state="blocked", message=str(exc), recovery="Inspect the view and logs; clear highlights explicitly. No Apply or model writes were requested.")
+        report.update(state="blocked", message=str(exc), recovery="Preserve this report and Local/.allplan-mcp/logs/bridge.log. Do not repeat M4 Properties after the native crash. No Apply or model writes were requested.")
     save(path, report)
     return report
 
@@ -97,7 +87,10 @@ def main():
     result = asyncio.run(collect_property_probe(os.getenv("MCP_URL", "http://127.0.0.1:8888/mcp"), path, clear=args.action == "clear"))
     print("Report:", path.resolve())
     print("State:", result["state"])
-    print("Observe Column/Wall highlights, then use M4 Clear Highlight.cmd. Native UI selection remains BLOCKED; no model changes requested.")
+    if result["state"] == "blocked":
+        print("M4 blocked. Preserve this report and bridge.log; do not repeat M4 Properties. No model setters requested.")
+    else:
+        print("Observe the UI. Native UI selection remains BLOCKED; no model setters requested.")
     return 1 if result["state"] == "blocked" else 0
 
 

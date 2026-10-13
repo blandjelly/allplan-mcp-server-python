@@ -56,7 +56,7 @@ class PackageTests(unittest.TestCase):
             local.mkdir()
             registration.register(package, local)
             self.assertTrue((local / "PythonPartsScripts/PythonHost/sandbox/executor.py").is_file())
-            for name in ("model_context.py", "query_contracts.py", "model_query.py", "model_metadata.py", "native_readers.py", "spatial_contracts.py", "profile_contracts.py", "model_audit.py", "audit_contracts.py", "model_repair.py", "repair_contracts.py", "native_repairs.py", "repair_execution.py", "mark_numbering.py", "model_scope.py", "property_contracts.py", "model_properties.py", "model_selection.py"):
+            for name in ("model_context.py", "query_contracts.py", "model_query.py", "model_metadata.py", "native_readers.py", "spatial_contracts.py", "profile_contracts.py", "model_audit.py", "audit_contracts.py", "model_repair.py", "repair_contracts.py", "native_repairs.py", "repair_execution.py", "mark_numbering.py", "model_scope.py", "property_contracts.py", "model_properties.py", "model_selection.py", "property_probe.py"):
                 self.assertTrue((local / "PythonPartsScripts/PythonHost" / name).is_file())
             self.assertTrue((package / "src/allplan_mcp/query_models.py").is_file())
             self.assertEqual((package / "src/allplan_mcp/profiles/native-model-qa.demo.json").read_bytes(),

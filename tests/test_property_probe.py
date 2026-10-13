@@ -1,0 +1,113 @@
+"""Isolated read/trace ordering and quarantine; no native Allplan acceptance."""
+import json
+import tempfile
+import unittest
+from pathlib import Path
+
+import test_model_properties as fixtures
+
+
+class PropertyProbeTests(unittest.TestCase):
+    setUp = fixtures.PropertyTests.setUp
+    prepare_context = fixtures.PropertyTests.prepare_context
+    prepare = fixtures.PropertyTests.prepare
+    adapter = fixtures.PropertyTests.adapter
+    native = fixtures.PropertyTests.native
+    element = fixtures.PropertyTests.element
+    assert_code = fixtures.PropertyTests.assert_code
+
+    def fixture(self):
+        fixtures.PropertyTests.fixture(self)
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.path = Path(self.directory.name) / "native.jsonl"
+        self.handler.property_probes.trace_path = self.path
+
+    def probe(self, **request):
+        result = self.handler.handle("/model-property-probe", {"schema_version": "m4-property-probe-1", **request})
+        json.dumps(result, allow_nan=False)
+        self.base.CreateElements.assert_not_called()
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+        self.base.ElementsLayerService.ChangeLayer.assert_not_called()
+        self.module.AllplanIFW.HighlightService.HighlightElements.assert_not_called()
+        self.base.AttributeService.GetEnumValues.assert_not_called()
+        return result
+
+    def records(self):
+        return [json.loads(line) for line in self.path.read_text(encoding="utf-8").splitlines()]
+
+    def test_sample_reads_one_foreground_column_without_metadata_enum_or_UI(self):
+        self.fixture()
+        elements = self.base.ElementsSelectService.SelectAllElements.return_value
+        def raw(_state):
+            records = self.records()
+            self.assertEqual(records[-1]["api"], "BaseElementAdapter.GetAttributes(ReadAll)")
+            self.assertEqual(records[-1]["state"], "started")
+            return [(83, "R60")]
+        elements[0].GetAttributes.side_effect = raw
+        result = self.probe(phase="column_sample", drawing_file=101)
+        self.assertEqual(result["sample"]["attributes"]["value"], [{"attribute_id": 83, "value": "R60"}])
+        self.assertEqual(result["counts"]["matched_model_identities"], 1)
+        elements[1].GetAttributes.assert_not_called()  # wall excluded
+        self.base.AttributeService.GetAttributeName.assert_not_called()
+        self.assertEqual(self.records()[-1]["state"], "completed")
+        self.assertFalse(self.handler.model_queries.selections)
+
+    def test_unwritable_trace_rejects_before_document_or_property_call(self):
+        self.fixture()
+        self.handler.property_probes.trace_path = Path(self.directory.name)
+        self.assert_code("probe_trace_unavailable", lambda: self.probe(phase="attribute_definition", attribute_id=83))
+        self.coord.GetInputViewDocument.assert_not_called()
+        self.base.AttributeService.GetAttributeName.assert_not_called()
+
+    def test_definition_stops_at_failed_method_and_preserves_native_boundary(self):
+        self.fixture()
+        self.base.AttributeService.GetAttributeType.side_effect = RuntimeError("fake native failure")
+        result = self.probe(phase="attribute_definition", attribute_id=83)
+        self.assertEqual(result["metadata"]["GetAttributeType"]["status"], "not_checked")
+        self.assertEqual(set(result["metadata"]), {"GetAttributeName", "GetAttributeType"})
+        self.base.AttributeService.GetAttributeUnit.assert_not_called()
+        self.base.AttributeService.GetAttributeControlType.assert_not_called()
+        records = self.records()
+        failed = [item for item in records if item["state"] == "failed"]
+        self.assertEqual(failed[0]["api"], "AttributeService.GetAttributeType")
+        self.assertEqual(failed[0]["attribute_id"], 83)
+        self.assertNotIn("fake native failure", self.path.read_text())
+
+    def test_name_round_trip_mismatch_cannot_bind_semantic_alias(self):
+        self.fixture()
+        self.base.AttributeService.GetAttributeID.side_effect = None
+        self.base.AttributeService.GetAttributeID.return_value = 83
+        result = self.probe(phase="attribute_name", attribute_name="Fire resistance")
+        self.assertFalse(result["exact_name_round_trip"])
+        self.assertFalse(result["semantic_alias_verified"])
+        self.base.AttributeService.GetAttributeType.assert_not_called()
+        self.base.ElementsSelectService.SelectAllElements.assert_not_called()
+
+    def test_native_base_exception_leaves_failed_call_trace_and_never_continues(self):
+        self.fixture()
+        self.base.AttributeService.GetAttributeName.side_effect = SystemExit("fake callback escape")
+        with self.assertRaises(SystemExit):
+            self.probe(phase="attribute_definition", attribute_id=83)
+        self.assertEqual(self.records()[-1]["state"], "failed")
+        self.assertEqual(self.records()[-1]["exception_type"], "SystemExit")
+        self.base.AttributeService.GetAttributeType.assert_not_called()
+
+    def test_invalid_phase_fields_and_passive_scope_reject_without_attribute_reads(self):
+        self.fixture()
+        for request in ({"phase": "attribute_definition", "attribute_id": True},
+                        {"phase": "column_sample", "drawing_file": 101, "attribute_id": 83},
+                        {"phase": "attribute_name", "attribute_name": ""}, {"phase": "enum"}):
+            self.assert_code("invalid_payload", lambda: self.probe(**request))
+        self.coord.GetInputViewDocument.assert_not_called()
+        self.assertFalse(self.path.exists())
+        self.assert_code("probe_scope_unavailable", lambda: self.probe(phase="column_sample", drawing_file=102))
+        self.base.ElementsSelectService.SelectAllElements.return_value[0].GetAttributes.assert_not_called()
+
+    def test_trace_capacity_blocks_following_calls_without_pruning_old_evidence(self):
+        self.fixture()
+        data = b'x' * (1024 * 1024)
+        self.path.write_bytes(data)
+        self.assert_code("probe_trace_unavailable", lambda: self.probe(phase="layer_name", layer_short_name="W1"))
+        self.assertEqual(self.path.read_bytes(), data)
+        self.base.LayerService.GetIDByShortName.assert_not_called()

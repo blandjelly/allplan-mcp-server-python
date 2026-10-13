@@ -1,0 +1,22 @@
+{
+  "raw_files_published": false,
+  "reason": "Crash XML contains environment variables/private paths; repository stores the incident summary and relevant bridge excerpt only.",
+  "files": {
+    "m4-properties-check-20261013T183244328676Z.txt": {
+      "bytes": 390,
+      "sha256": "a1743d276f7c10e586919f685e01cb64dde0e1f8585b86823434944ea7a88908"
+    },
+    "m4-properties-check-20261013T183244328676Z.json": {
+      "bytes": 5986,
+      "sha256": "170e0769633bf00e0ba90987fea8a1f9207754d73ab8a994015867fc4b121dd4"
+    },
+    "allplan-crash-description.xml": {
+      "bytes": 287859,
+      "sha256": "5b29844453e2f0fe2b22055e10f242ca295965ed4c006e6873921f31bd607fb1"
+    },
+    "bridge.log": {
+      "bytes": 65938,
+      "sha256": "679cbf41d2f7277e682e4d114986554f52afe43c7c1f0f56b926b2fe47a2a23b"
+    }
+  }
+}

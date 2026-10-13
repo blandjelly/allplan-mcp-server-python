@@ -1,0 +1,47 @@
+{
+  "schema_version": "m4-native-incident-1",
+  "package": "0.16.0",
+  "source_commit": "8ac5e97563c881f3427fc47ef752b5c5362786ee",
+  "native_result": "FAIL_CRASH",
+  "feature_status": "blocked_after_native_crash",
+  "installation_integrity_as_reported": {
+    "status": "verified",
+    "mismatches": []
+  },
+  "native_build_from_crash_module": "2026-1-7",
+  "embedded_python": "3.13.13",
+  "external_python": "3.14.8",
+  "failed_request_id": "4fb64cc5-c87e-4580-ba15-adfda4f95c70",
+  "last_route": "/model-properties",
+  "last_request_started_utc": "2026-10-13T18:32:45.220Z",
+  "crash_utc": "2026-10-13T18:32:45.389Z",
+  "crash_local": "2026-10-13 20:32:45.389 Europe/Warsaw",
+  "elapsed_ms_from_request_start": 169,
+  "health_before": "PASS_as_reported",
+  "python_traceback_present": false,
+  "native_stack_present_in_uploaded_XML": false,
+  "metadata_response_received": false,
+  "highlight_reached": false,
+  "Apply_or_model_setters_requested": false,
+  "exception": {
+    "ExceptionCode": "Unknown exception",
+    "ExceptionFlags": "0x81",
+    "ExceptionRecord": "0x0000000000000000",
+    "ExceptionAddress": "0x00007FFE84F741CA",
+    "NumberOfParameters": "0x5",
+    "Parameters": [
+      "0xffffffff80131604",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x7ffe5cbe0000"
+    ]
+  },
+  "fault_address_module": "KERNELBASE.dll",
+  "fault_address_module_offset": "0xc41ca",
+  "exact_failing_API": "unknown",
+  "root_cause": "not_established",
+  "code_issue_found": "Unconditional GetEnumValues for every discovered attribute; removed, but not proven as crash cause.",
+  "mitigation": "Quarantine broad model_properties route before native reads; isolate one Column sample with durable before-call trace. No automatic metadata/enum/UI stages.",
+  "portable_0_16_0_PASS_does_not_override_native_failure": true
+}

@@ -1,3 +1,8 @@
+> **WYCOFANA PRÓBA NATYWNA / FAIL_CRASH (13.10.2026): nie uruchamiaj M4 Properties z 0.16.0.**
+> Pierwsze żądanie spowodowało crash Allplana. Poniższe przygotowanie/portable PASS
+> jest historyczne i nie oznacza odbioru natywnego. Użyj wyłącznie nowej próby 0.16.1
+> po zainstalowaniu całej nowej paczki; źródła i archiwum 0.16.0 pozostają dowodem.
+
 # M4 — krótka obserwacja właściwości i podświetlenia, 0.16.0
 
 Status: **ready_for_owner_test**. Docelowa próba: **Allplan 2026-1-7**,

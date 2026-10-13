@@ -6,6 +6,22 @@ from .query_contracts import SCHEMA, bounded_int, invalid, keys, validate_reques
 
 PROPERTIES_SCHEMA = "m4-properties-1"
 SELECTION_SCHEMA = "m4-selection-1"
+PROBE_SCHEMA = "m4-property-probe-1"
+
+
+def validate_probe(request):
+    keys(request, {"schema_version", "phase", "drawing_file", "attribute_name", "attribute_id", "layer_short_name"}, {"schema_version", "phase"})
+    if request["schema_version"] != PROBE_SCHEMA:
+        invalid(f"schema_version must be {PROBE_SCHEMA}.")
+    required = {"column_sample": "drawing_file", "attribute_name": "attribute_name",
+                "attribute_definition": "attribute_id", "layer_name": "layer_short_name"}.get(request["phase"] if isinstance(request["phase"], str) else "")
+    if required is None:
+        invalid("Unknown isolated property probe phase.")
+    keys(request, {"schema_version", "phase", required}, {"schema_version", "phase", required})
+    if required in ("drawing_file", "attribute_id"):
+        bounded_int(request[required], 1, 2147483647, required)
+    else:
+        names([request[required]], 1, 16 if required == "layer_short_name" else 128, required)
 
 
 def names(value, limit, length, label):

@@ -16,7 +16,7 @@ from allplan_mcp.audit_models import AuditRequest
 from allplan_mcp.repair_models import RepairRequest
 from allplan_mcp.standard_models import OfficeStandardRequest, RuleBasedRequest
 from allplan_mcp.office_standard import load_office_standard
-from allplan_mcp.property_models import PropertiesRequest, SelectionRequest
+from allplan_mcp.property_models import PropertiesRequest, SelectionRequest, PropertyProbeRequest
 
 
 DEFAULT_ALLPLAN_HOST_URL = "http://127.0.0.1:5679"
@@ -207,7 +207,11 @@ def model_query(request: QueryRequest) -> dict[str, Any]:
 
 @mcp.tool
 def model_properties(request: PropertiesRequest) -> dict[str, Any]:
-    """Discover project-local attribute definitions and sampled Column/Wall values.
+    """Property discovery is suspended after the native 0.16.0 crash.
+
+    Valid requests return native_probe_blocked before native API/document access.
+    Preserve bridge.log; do not repeat the broad discovery experiment. The
+    following contract describes the suspended implementation, not native support.
 
     Defaults to open_drawings, including passive files for reads. Optional exact
     attribute_names/layer_short_names resolve through native ID/name round trips;
@@ -218,11 +222,30 @@ def model_properties(request: PropertiesRequest) -> dict[str, Any]:
     native.material, attribute material, visual.surface and organizational.layer
     remain separate. C35 requires the actual catalog; wall thickness has no AABB
     substitute. No resources are created and no writes are enabled by this probe.
-    New native behavior is ready_for_owner_test, not accepted_on_build.
+    This discovery gate failed natively; it is not ready_for_owner_test.
     """
     payload = request.model_dump(exclude_unset=True)
     payload["schema_version"] = "m4-properties-1"
     return _allplan_client().post("/model-properties", payload)
+
+
+@mcp.tool
+def model_property_probe(request: PropertyProbeRequest) -> dict[str, Any]:
+    """Run exactly one isolated native property-read phase after the M4 crash.
+
+    Begin with column_sample in foreground file 101 of the retained test copy;
+    it reads one Column root's raw attributes, without metadata, enums or UI.
+    Other phases resolve one exact attribute/layer name or read one observed
+    attribute ID's metadata. Every new native call is preceded by a flushed/fsynced
+    Local/.allplan-mcp/logs/m4-native-probe.jsonl entry. Unwritable/full tracing blocks
+    calls. M1 scan is logged as one existing service phase, not an individual API
+    trace. Review one phase's evidence before requesting another; no automatic
+    batch, retries, GetEnumValues, highlighting, writes or resource creation.
+    The broad model_properties route stays blocked. Native acceptance is pending.
+    """
+    payload = request.model_dump(exclude_unset=True)
+    payload["schema_version"] = "m4-property-probe-1"
+    return _allplan_client().post("/model-property-probe", payload)
 
 
 @mcp.tool

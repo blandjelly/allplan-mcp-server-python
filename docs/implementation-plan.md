@@ -25,10 +25,10 @@ Next: walls with native total thickness <240 mm → native concrete material C35
 with a separate explicitly requested attribute variant. Property ownership,
 project metadata and actual resources must resolve before enabling new edits.
 
-**M4.1a / early M4.1b, package 0.16.0:** sampled property metadata/support registry,
-open-drawings read scope and full-result highlight/clear probe are ready_for_owner_test.
+**M4.1a / early M4.1b:** the first 0.16.0 discovery crashed natively and is blocked.
+0.16.1 isolates one Column read with durable trace; metadata/enum/UI stages remain pending.
 Native selection is BLOCKED by the current interactor; K1/K2 are not closed.
-[Native observation guide](m4-properties-owner-test.pl.md). K3 write planning remains
+[Native observation guide](m4-isolated-probe-owner-test.pl.md). K3 write planning remains
 unchanged until the first native discovery/presentation observation.
 
 - **M4.1:** Probe ordinary columns/beams versus Structural Framing and wall

@@ -116,31 +116,50 @@ They are historical snapshots, not persistent authorization. Scan/report budgets
 are the same **5 seconds / 4 MiB / adapter limit**; no partial successful audit.
 For controlled repairs use the [M3 contract](m3-execution-contract.md).
 
-## model_properties — M4 discovery probe
+## model_properties — suspended after native crash
 
-Bridge `/model-properties`, schema `m4-properties-1`, status **ready_for_owner_test**.
-Defaults to `open_drawings` and ordinary Column/Wall roots; `native_types` may
-explicitly include the other supported M1 root variants. It samples 1–20 roots
-(default 10), reads up to 256 raw attribute pairs per representation, and compares
-duplicate representations instead of selecting the first differing value.
-Definition output is bounded to 1–128 IDs (default 64), with explicit omissions.
-This is not enumeration of every attribute definition in the project.
+Bridge `/model-properties`, schema `m4-properties-1`. The 0.16.0 native gate
+failed with an Allplan crash on its first request. Valid requests now return
+native_probe_blocked **before build/document/API reads**. Do not repeat the broad
+experiment. No runtime/writable support may be inferred from its portable tests.
+[Incident and limits](m4-native-crash-0.16.0.md).
 
-Optional `attribute_names` (up to 16 exact names) and `layer_short_names` (up to
-16 names) bind through API ID/name round trips. No resources are created. Requested
-attribute IDs take precedence in the metadata budget; sampled definitions report
-name, raw type/control codes, unit labels and up to 100 raw enum labels. Unavailable
-fields remain not_checked. Empty enum output is an observed response, not proof
-that arbitrary strings are valid writes. No raw unit/enum conversion is guessed.
+The dormant implementation has also stopped unconditional GetEnumValues calls.
+That code issue is not a proven explanation of the crash. The former automatic
+Column/Wall discovery, all sampled definitions and UI chain remain suspended.
 
-The report includes runtime/package identity and a family × property × operation
-support registry. `observed_in_sample` is distinct from native ownership and
-accepted_on_build (still null). This tool supports no replace/add/native_update.
-Material attributes, native.material, visual.surface and organizational.layer
-are separate. Native wall.total_thickness is unavailable here; AABB dimensions
-must not substitute for wall thickness. Door/window and wider Structural Framing
-variants require later probes. Read budgets remain 5 seconds/4 MiB/5000 adapters
-(explicit max_adapters up to 10000); failure returns no partial successful report.
+## model_property_probe — isolated read phases
+
+Bridge `/model-property-probe`, schema `m4-property-probe-1`. Exactly one phase
+is required, with only its declared parameter:
+
+| Phase | Parameter / native work |
+| --- | --- |
+| column_sample | drawing_file: one explicit foreground file; existing M1 Column scan, then raw GetAttributes(ReadAll) on one unambiguous root adapter. |
+| attribute_name | attribute_name: one exact project name; GetAttributeID and, if observed, GetAttributeName round trip. |
+| attribute_definition | attribute_id: one ID observed from project metadata/sample; name/type/unit/control readers, stopping at first unavailable value. |
+| layer_name | layer_short_name: one exact short name; native ID/name round trip, no creation. |
+
+The owner delivery invokes **only column_sample in file 101**, then health and
+stops. Other phases require a separate reviewed native observation. No batch,
+automatic continuation, GetEnumValues, geometry filter, highlight, resource
+creation or model setter is invoked. Raw absence/null/empty/undefined/error values
+retain their distinction and sampled adapter ownership remains unverified.
+
+Before every new native reader a started record is appended, flushed and fsynced
+in **Local/.allplan-mcp/logs/m4-native-probe.jsonl**; returned/failed records follow.
+M1.column_scan is recorded as an existing service phase, not every internal API
+call. Each phase has a probe_id and UTC timestamps; values/private environment
+are not logged. Unwritable/full tracing (1 MiB) blocks further calls; it is not
+pruned automatically and is separate from the M3 execution journal. No native
+crash containment is promised by these file records.
+
+The external diagnostic saves request_pending **before sending** the MCP call,
+then response_received/failed. Lost response never causes an automatic retry or
+next phase. Read budgets remain 5 seconds and inherited M1 scan limits; failed
+native observations do not establish support. This is ready_for_owner_test for
+the first isolated read, not accepted_on_build.
+[Owner guide](m4-isolated-probe-owner-test.pl.md).
 
 ## model_selection — M4 UI probe
 

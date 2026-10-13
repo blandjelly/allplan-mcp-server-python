@@ -30,7 +30,11 @@ class PropertyTests(unittest.TestCase):
         self.adapter_module.BaseElementAdapterList = list
 
     def discover(self, **changes):
-        result = self.handler.handle("/model-properties", {"schema_version": "m4-properties-1", **changes})
+        # Test dormant discovery semantics with fakes. The public bridge route
+        # is quarantined independently and must never execute this function.
+        from test_allplan_host.model_properties import discover_properties
+        result = discover_properties(self.handler.model_queries, self.coord.GetInputViewDocument(), self.base,
+                                     self.settings, {"schema_version": "m4-properties-1", **changes})
         json.dumps(result, allow_nan=False)
         self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
         self.base.ElementsLayerService.ChangeLayer.assert_not_called()
@@ -54,7 +58,8 @@ class PropertyTests(unittest.TestCase):
         self.assertEqual(resolutions[0]["resolution"]["value"]["attribute_id"], 83)
         self.assertFalse(resolutions[0]["semantic_alias_verified"])
         self.assertEqual(resolutions[1]["resolution"]["status"], "not_checked")
-        self.assertEqual(result["attribute_metadata"][0]["enum_values"]["value"], ["R30", "R60"])
+        self.assertEqual(result["attribute_metadata"][0]["enum_values"]["reason"], "native_enum_probe_not_accepted")
+        self.base.AttributeService.GetEnumValues.assert_not_called()
         self.assertEqual(result["attribute_metadata"][0]["type_code"]["value"], 67)
         self.assertEqual(result["layer_name_resolution"][0]["resolution"]["value"], {"layer_id": 8, "short_name": "W1"})
         keys = {item["property_key"] for item in result["support_registry"]}
@@ -110,6 +115,12 @@ class PropertyTests(unittest.TestCase):
             self.assert_code("invalid_payload", lambda: self.handler.handle(route, request))
         self.coord.GetInputViewDocument.assert_not_called()
         self.base.ElementsSelectService.SelectAllElements.assert_not_called()
+
+    def test_crashing_discovery_route_is_quarantined_before_all_native_access(self):
+        self.assert_code("native_probe_blocked", lambda: self.handler.handle("/model-properties", {"schema_version": "m4-properties-1"}))
+        self.coord.GetInputViewDocument.assert_not_called()
+        self.settings.AllplanVersion.MainReleaseName.assert_not_called()
+        self.assertFalse(self.base.mock_calls)
 
     def test_open_default_passive_known_unknown_and_inventory_change_invalidate(self):
         self.fixture([self.element(), self.element(2, number=-102)])

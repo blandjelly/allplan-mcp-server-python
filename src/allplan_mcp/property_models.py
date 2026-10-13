@@ -30,3 +30,26 @@ class ClearHighlightInput(ContractModel):
 
 
 SelectionRequest = Annotated[HighlightInput | ClearHighlightInput, Field(discriminator="action")]
+
+
+class ColumnProbeInput(ContractModel):
+    phase: Literal["column_sample"]
+    drawing_file: int = Field(ge=1, le=2147483647)
+
+
+class AttributeNameProbeInput(ContractModel):
+    phase: Literal["attribute_name"]
+    attribute_name: str = Field(min_length=1, max_length=128)
+
+
+class AttributeDefinitionProbeInput(ContractModel):
+    phase: Literal["attribute_definition"]
+    attribute_id: int = Field(ge=1, le=2147483647)
+
+
+class LayerNameProbeInput(ContractModel):
+    phase: Literal["layer_name"]
+    layer_short_name: str = Field(min_length=1, max_length=16)
+
+
+PropertyProbeRequest = Annotated[ColumnProbeInput | AttributeNameProbeInput | AttributeDefinitionProbeInput | LayerNameProbeInput, Field(discriminator="phase")]

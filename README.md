@@ -1,12 +1,13 @@
 # Allplan MCP Server
 
 A local MCP bridge between Codex and Allplan 2026 for model queries, audits and
-reviewed attribute/layer repairs. Current package: **0.16.0**.
+reviewed attribute/layer repairs. Current package: **0.16.1**.
 
-0.16.0 adds read-only project property discovery, an `open_drawings` query default
-and full-result highlighting. These new native behaviors are **ready_for_owner_test**;
-native UI selection remains unsupported by the current interactor.
-[Short Polish observation guide](docs/m4-properties-owner-test.pl.md).
+0.16.0's first native property discovery crashed Allplan; that broad route is
+**blocked_after_native_crash**. 0.16.1 provides one isolated Column read with
+persistent native-call trace, without automatic metadata, enum or UI stages.
+[Short Polish observation guide](docs/m4-isolated-probe-owner-test.pl.md).
+Native property/selection support remains unaccepted.
 
 **M0–M3 are accepted within the retained test project**, Allplan **2026-1-7**
 with local Windows Codex. M3 covers recorded one-/two-change Column scenarios
@@ -28,7 +29,7 @@ use is planned. [Acceptance, tests and limits](docs/validation-status.md).
 
 ## Local Windows setup
 
-Use the [0.16.0 evaluation package](evaluation-packages/0.16.0/README.md) on
+Use the [0.16.1 evaluation package](evaluation-packages/0.16.1/README.md) on
 the machine running Allplan. External Python **3.11+** and internet access for
 locked dependencies are required; Allplan, Python and Codex are not bundled.
 

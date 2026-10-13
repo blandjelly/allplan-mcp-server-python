@@ -28,6 +28,8 @@ class RequestHandler:
         self.coord_input = coord_input
         self.sandbox_executor = SandboxExecutor(coord_input)
         self.model_queries = ModelQueryService()
+        from .property_probe import PropertyProbeService
+        self.property_probes = PropertyProbeService(self.model_queries)
         from .model_repair import RepairPlanService
         self.repair_plans = RepairPlanService(self.model_queries)
 
@@ -39,9 +41,16 @@ class RequestHandler:
         if path == "/model-properties":
             from .property_contracts import validate_properties
             validate_properties(request)
+            # 0.16.0 crashed natively on its first discovery request. Reject
+            # before build/document/API reads until the offending operation is
+            # isolated and a narrower native probe has been reviewed.
+            raise BridgeError("native_probe_blocked", "M4 property discovery is suspended after the 0.16.0 native crash. Preserve bridge.log; do not repeat the broad probe.", 409)
         if path == "/model-selection":
             from .property_contracts import validate_selection
             validate_selection(request)
+        if path == "/model-property-probe":
+            from .property_contracts import validate_probe
+            validate_probe(request)
         if path == "/model-audit":
             from .audit_contracts import validate_audit_request
             validate_audit_request(request)
@@ -73,9 +82,8 @@ class RequestHandler:
                 validate_request(request)
                 return self.model_queries.handle(self.current_document(), AllplanBaseEle, AllplanSettings, request)
 
-            case "/model-properties":
-                from .model_properties import discover_properties
-                return discover_properties(self.model_queries, self.current_document(), AllplanBaseEle, AllplanSettings, request)
+            case "/model-property-probe":
+                return self.property_probes.handle(self.current_document, AllplanBaseEle, AllplanSettings, request)
 
             case "/model-selection":
                 from .model_selection import present_selection

@@ -93,20 +93,13 @@ def discover_properties(service, doc, base, settings, request):
     ids = sorted(requested_ids) + sorted(discovered - requested_ids)[:max(0, limit - len(requested_ids))]
     attributes = []
     for ident in ids:
-        def enum_values(ident=ident):
-            values = []
-            for index, value in enumerate(base.AttributeService.GetEnumValues(doc, ident)):
-                check()
-                if index >= 100:
-                    raise ValueError("Enum list exceeds 100 entries")
-                values.append(bounded_text(value))
-            return values
         attributes.append({"property_key": f"attribute:{ident}", "attribute_id": ident,
                            "name": read(lambda: bounded_text(base.AttributeService.GetAttributeName(doc, ident))),
                            "type_code": read(lambda: enum_code(base.AttributeService.GetAttributeType(doc, ident))),
                            "unit_label": read(lambda: bounded_text(base.AttributeService.GetAttributeUnit(doc, ident))),
                            "control_type_code": read(lambda: enum_code(base.AttributeService.GetAttributeControlType(doc, ident))),
-                           "enum_values": read(enum_values), "enum_encoding": "raw_API_labels_not_verified_write_values",
+                           "enum_values": {"status": "not_checked", "value": None, "reason": "native_enum_probe_not_accepted"},
+                           "enum_encoding": "not_checked_no_unconditional_GetEnumValues_calls",
                            "unit_conversion": "not_checked", "native_owner": "not_checked",
                            "replace": "unsupported_by_this_tool", "add": "unsupported_by_this_tool"})
     doc_id = read(lambda: integer(doc.GetDocumentID()))

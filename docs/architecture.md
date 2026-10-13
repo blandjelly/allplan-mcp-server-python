@@ -19,7 +19,7 @@ dispatch. Shutdown must not join a worker waiting on the UI dispatcher.
 | `src/allplan_mcp/server.py`, `allplan_client.py` | Typed MCP tools, JSON bridge, request IDs/error mapping; no automatic write retries. |
 | Host `StartPythonHost.py`, `PythonHostHandler.py`, `transport.py` | Interactor/listener lifecycle, UI dispatch and typed routes. |
 | Host `model_context.py`, `model_query.py`, `native_readers.py`, `model_metadata.py` | Context, bounded reads/geometry/hierarchy and profile/metadata inspection. |
-| Host `model_scope.py`, `model_properties.py`, `model_selection.py`, `property_contracts.py` | Open-file read scope, sampled property support registry and full-result UI highlight probe. |
+| Host `model_scope.py`, `model_properties.py`, `model_selection.py`, `property_contracts.py`, `property_probe.py` | Open-file read scope, sampled property support registry and full-result UI highlight probe. |
 | Host `model_audit.py`, `model_repair.py`, `mark_numbering.py` | Fresh audits, immutable plans, source/collision checks and numbering. |
 | Host `native_repairs.py`, `repair_execution.py` | Native preflight/setters, OS lock, durable journal, readback and recovery. |
 | `profiles/`, MCP `*_models.py`, host `*_contracts.py` | Versioned profiles and typed contracts; host remains dependency-free. |
@@ -47,3 +47,9 @@ in; the evaluation launcher disables it. AST filtering is not process isolation.
 Keep loopback deployment and Local/.allplan-mcp/logs. Validate signatures against
 [Allplan 2026 documentation](https://pythonparts.allplan.com/2026/), then prove
 native behavior; do not infer 2027 API support or generic writable properties.
+
+Broad M4 property discovery is quarantined after the 0.16.0 native crash. The
+isolated property service traces each new reader before invocation with flush/fsync;
+its inherited M1 scan is a coarse service boundary. Tracing does not isolate
+native faults from the process. External pending requests are saved before send,
+and no new phase or retry follows a lost reply.

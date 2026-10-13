@@ -1,8 +1,8 @@
 # Validation status and limits
 
-Updated **2026-10-12 Europe/Warsaw**. Package **0.15.0**.
-The new **0.16.0** property/highlight delivery is **ready_for_owner_test**, not
-accepted_on_build. M3 write acceptance below remains scoped to 0.15.0 evidence.
+Updated **2026-10-13 Europe/Warsaw**. Package **0.15.0**.
+The **0.16.0** property gate is **FAIL_CRASH / blocked_after_native_crash**.
+**0.16.1** is ready_for_owner_test only for one isolated Column read, not accepted_on_build. M3 write acceptance below remains scoped to 0.15.0 evidence.
 **M0–M3 / UAT-00–UAT-06 are accepted within the retained test-project scope.**
 The owner explicitly narrowed M3/UAT-05/UAT-06 to existing demonstrated scenarios.
 This closes the fixture evaluation MVP; it does not accept the original broader
@@ -74,11 +74,19 @@ frozen sync, wheel/sdist builds and exact ZIP install/restore simulation (27 hos
 hashes; journal bytes preserved). Source compatibility CI is recorded in that
 delivery. These checks use native fakes/portable filesystem simulation.
 
-`model_properties`, the open-drawings query default and full-result highlight/clear
-are **ready_for_owner_test** on Allplan 2026-1-7. Native UI selection is
-**BLOCKED_current_interactor**; no new write adapter, native wall thickness or
-material support is accepted. Follow the [new observation guide](m4-properties-owner-test.pl.md).
-No completed native M3 gate needs repeating for this delivery.
+On 2026-10-13 the first /model-properties request crashed Allplan **2026-1-7**
+169 ms after request_started, with healthy 0.16.0 installation reported. No
+metadata response, highlight, Apply or setter request followed. The uploaded XML
+has no native stack and bridge.log has no Python traceback. Exact API/root cause
+remain unknown. [Incident](m4-native-crash-0.16.0.md),
+[inspection](../evaluation-packages/0.16.0/native-acceptance/20261013-owner/inspection.json).
+The portable/CI PASS above does not override this native **FAIL_CRASH**.
+
+The broad property route is blocked before native access. **0.16.1** offers
+only a first isolated Column read with durable native boundaries and saved pending
+client requests. [Owner guide](m4-isolated-probe-owner-test.pl.md).
+Metadata/enum/UI/writable support remains pending; no K1/K2/K3 completion or new
+write acceptance is inferred. Existing completed M3 native gates need no repeat.
 
 ### Retained M3 limits
 
