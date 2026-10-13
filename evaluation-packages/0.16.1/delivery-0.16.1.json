@@ -1,0 +1,111 @@
+{
+  "schema_version": "m4-evaluation-delivery-2",
+  "version": "0.16.1",
+  "source_commit": "e06a605c2ab1f1a70170072a61f2280c82658aed",
+  "source_modified": false,
+  "source_branch": "codex/m4-property-discovery",
+  "pull_request": "https://github.com/blandjelly/allplan-mcp-server-python/pull/5",
+  "prepared_at_utc": "2026-10-13T19:05:48.503473+00:00",
+  "owner_date_timezone": "2026-10-13 Europe/Warsaw",
+  "state": "ready_for_owner_test_isolated_column_only",
+  "allplan_acceptance": "not_run",
+  "original_0_16_0_native_result": "FAIL_CRASH",
+  "root_cause": "not_established",
+  "broad_property_discovery": "blocked_before_native_access",
+  "portable_tests": {
+    "state": "PASS",
+    "count": 243,
+    "seconds": 92.204,
+    "full_runs_final_candidate": 1,
+    "environment": "Linux CPython 3.12.14",
+    "log": "portable-tests.log",
+    "earlier_candidate_repeated_reason": "Final runtime added native enumeration-owner retention and a meaningful lifetime regression."
+  },
+  "frozen_sync": "PASS",
+  "wheel_sdist_build": "PASS",
+  "exact_package_installation": "PASS",
+  "verification": "package-verification.json",
+  "installation_scope": "portable filesystem simulation; no native Allplan or Windows setup UI",
+  "source_ci": {
+    "state": "PASS",
+    "final_runtime_run": 38451275058,
+    "final_runtime_configurations": 2,
+    "package_compatibility_run": 38450384581,
+    "package_compatibility_source": "7b239b26342c60067ac7e0d4b790901916f36c40",
+    "package_compatibility_configurations": 6,
+    "observations": "source-ci-0.16.1.json"
+  },
+  "native_gate": {
+    "allplan_build": "2026-1-7",
+    "project": "original retained MCP_QA_DEMO copy after Undo",
+    "drawing_file": 101,
+    "probe": "column_sample",
+    "sampled_columns": 1,
+    "automatic_metadata_enum_UI_calls": false,
+    "model_setters_requested": false,
+    "required_evidence": [
+      "m4-properties-check JSON",
+      "Local/.allplan-mcp/logs/m4-native-probe.jsonl",
+      "bridge.log",
+      "owner PASS/FAIL/BLOCKED observation"
+    ]
+  },
+  "artifacts": {
+    "README.md": {
+      "bytes": 3440,
+      "sha256": "ae91f781dd623b9df001e3b79c4115eafbcd85e8ef02cd4c78568f199b073244"
+    },
+    "TEST-ALLPLAN-0.16.1.md": {
+      "bytes": 2374,
+      "sha256": "e8fd89c2dbbb3aa5457903e8ea8f9a0b1837addf99fb88081b1bc41a098e7e14"
+    },
+    "TEST-ALLPLAN-0.16.1.txt": {
+      "bytes": 2374,
+      "sha256": "e8fd89c2dbbb3aa5457903e8ea8f9a0b1837addf99fb88081b1bc41a098e7e14"
+    },
+    "allplan-mcp-0.16.1-windows-evaluation.zip": {
+      "bytes": 288634,
+      "sha256": "8da447af5bdcf2ea1e87b3f8e2aa5a4b96dfc334b81f488f3dfe1abfa4889e5d"
+    },
+    "allplan-mcp-0.16.1-windows-evaluation.zip.sha256": {
+      "bytes": 108,
+      "sha256": "8fce018356efaf969323794a4307a4c1ea9ea60d501ddf6ca0be26e18364a012"
+    },
+    "allplan_mcp_server-0.16.1-py3-none-any.whl": {
+      "bytes": 78384,
+      "sha256": "45b1165132d8d97df28b1af0e613a617d3b74c56c57077ea8f9f51b0682d6eca"
+    },
+    "build.log": {
+      "bytes": 253,
+      "sha256": "d5e850a1438046af429f40bc86f44705a173a305bf792a3215e0ca9bc6c07034"
+    },
+    "frozen-sync.log": {
+      "bytes": 30,
+      "sha256": "8037d30af1c360e58ce5358726218ad185688852dc5731b542475e5e3e513c53"
+    },
+    "package-verification.json": {
+      "bytes": 728,
+      "sha256": "d74dee7b4616601768af20446275d74ce83b503b03428c255bc8566b48afe24e"
+    },
+    "portable-tests.log": {
+      "bytes": 74210,
+      "sha256": "f6af54051cd29b56ef0bd40c410e82e49ad25ad858ad7215921f4a7a1e6af358"
+    },
+    "source-ci-0.16.1.json": {
+      "bytes": 14822,
+      "sha256": "0fab75e9e382fa4985436943c0a6014f1f6379458c8f26fbf543d35ce412de71"
+    }
+  },
+  "sdist": {
+    "committed": false,
+    "bytes": 103998006
+  },
+  "limits": [
+    "exact failing API unknown",
+    "native traces do not contain process faults",
+    "M1 scan is a coarse trace boundary",
+    "no accepted definitions/enums/wall material/selection/new write support",
+    "M3 accepted write scope/history unchanged"
+  ],
+  "older_delivered_archives_changed": false
+}

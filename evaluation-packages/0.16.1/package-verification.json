@@ -1,0 +1,17 @@
+{
+  "schema_version": "m4-package-verification-1",
+  "state": "PASS",
+  "version": "0.16.1",
+  "source_commit": "e06a605c2ab1f1a70170072a61f2280c82658aed",
+  "source_modified": false,
+  "archive": "allplan-mcp-0.16.1-windows-evaluation.zip",
+  "environment": "Linux portable filesystem simulation; no native Allplan or Windows setup UI",
+  "payload_files_verified": 132,
+  "installed_bridge_files_verified": 28,
+  "new_probe_module_installed": true,
+  "journal_bytes_preserved_after_install_and_restore": true,
+  "diagnostic_trace_bytes_preserved_after_install_and_restore": true,
+  "previous_portable_installation_fixture_restored_exactly": true,
+  "wheel_version_and_probe_modules": "PASS",
+  "native_acceptance": "not_run"
+}

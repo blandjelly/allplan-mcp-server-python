@@ -85,6 +85,12 @@ The portable/CI PASS above does not override this native **FAIL_CRASH**.
 The broad property route is blocked before native access. **0.16.1** offers
 only a first isolated Column read with durable native boundaries and saved pending
 client requests. [Owner guide](m4-isolated-probe-owner-test.pl.md).
+The [0.16.1 delivery](../evaluation-packages/0.16.1/README.md) records **243 portable
+tests PASS**, frozen sync, wheel/sdist and exact ZIP install/restore simulation
+(28 bridge hashes; journal/trace bytes preserved). Final runtime source
+**e06a605c2ab1f1a70170072a61f2280c82658aed** has Windows/Ubuntu Python 3.12 CI
+**2/2 PASS**; package/launcher source **7b239b26342c60067ac7e0d4b790901916f36c40**
+has the six-job compatibility matrix **6/6 PASS**. These source scopes are distinct.
 Metadata/enum/UI/writable support remains pending; no K1/K2/K3 completion or new
 write acceptance is inferred. Existing completed M3 native gates need no repeat.
 
