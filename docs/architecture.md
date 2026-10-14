@@ -53,3 +53,10 @@ isolated property service traces each new reader before invocation with flush/fs
 its inherited M1 scan is a coarse service boundary. Tracing does not isolate
 native faults from the process. External pending requests are saved before send,
 and no new phase or retry follows a lost reply.
+
+M4 0.17.0 `column_layer.py` builds criterion-based plans independently of audits.
+RepairPlanService supplies source observations to the same RepairExecutor for
+both audit and criterion plans. Journal records keep either audit_request or
+criterion_request; recovery remains read-only. A submitted exact highlight is
+required for Column-layer Apply and clearing/replacing highlights invalidates it.
+The native resolver retains enumeration owners through caller reads/setters.

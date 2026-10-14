@@ -9,8 +9,6 @@ from pathlib import Path
 from uuid import uuid4
 
 from . import native_repairs
-from .audit_contracts import query_request
-from .model_audit import run_audit
 from .query_contracts import fingerprint
 from .transport import BridgeError
 
@@ -73,9 +71,20 @@ class RepairExecutor:
         for key, size in (("execution_id", 32), ("request_hash", 64), ("plan_id", 32), ("plan_hash", 64)):
             if not isinstance(record.get(key), str) or not re.fullmatch(r"[0-9a-f]{" + str(size) + "}", record[key]):
                 raise ValueError("invalid identity")
+        if ("audit_request" in record) == ("criterion_request" in record):
+            raise ValueError("exactly one source request is required")
+        if "criterion_request" in record:
+            from .column_layer import validate_request
+            try:
+                validate_request(record["criterion_request"])
+                if record["criterion_request"]["action"] != "preview":
+                    raise ValueError("journal criterion must be a preview")
+            except BridgeError as exc:
+                raise ValueError("invalid journal criterion") from exc
         changes, outcomes = record.get("changes"), record.get("outcomes")
         if (record.get("state") not in {"running", "stopped", "completed", "verification_failed"}
-                or not isinstance(record.get("audit_request"), dict)
+                or (not isinstance(record.get("audit_request"), dict)
+                    and not isinstance(record.get("criterion_request"), dict))
                 or not isinstance(changes, list) or not 1 <= len(changes) <= RepairExecutor.MAX_CHANGES
                 or not isinstance(outcomes, list) or len(outcomes) != len(changes)):
             raise ValueError("invalid execution structure")
@@ -172,7 +181,8 @@ class RepairExecutor:
                 or not 1 <= len(changes) <= RepairExecutor.MAX_CHANGES
                 or len(files) != 1 or files[0]["state"] != "active_foreground"
                 or not all(plan["coverage"].get(key) is True for key in
-                           ("audit_complete", "requested_scope_complete", "returned_fields_complete"))):
+                           ("criteria_complete" if plan.get("source_kind") == "column_missing_fire_layer" else "audit_complete",
+                            "requested_scope_complete", "returned_fields_complete"))):
             return False
         fields = set()
         for change in changes:
@@ -277,6 +287,10 @@ class RepairExecutor:
             raise BridgeError("repair_conflict", "Reviewed source changed; preview again.", 409)
         entry = self.plans.plans[request["plan_id"]]
         plan = entry["plan"]
+        if request.get("schema_version") == "m4-column-layer-1" and plan.get("source_kind") != "column_missing_fire_layer":
+            raise BridgeError("repair_scope_unavailable", "This route requires a Column criterion plan.", 409)
+        if plan.get("requires_highlight") and entry.get("presentation") != {"state": "submitted", "plan_hash": plan["plan_hash"]}:
+            raise BridgeError("presentation_required", "Highlight the exact reviewed Column plan before Apply.", 409)
         expected_workflow = request.get("workflow_kind")
         if (not self.evaluation_scope(plan)
                 or (expected_workflow is not None and plan.get("workflow", {}).get("kind") != expected_workflow)
@@ -285,7 +299,9 @@ class RepairExecutor:
             raise BridgeError("repair_scope_unavailable", "Apply requires a reviewed supported Column mark/status/layer plan in one foreground file; new plans require disposable_copy_reviewed_plan.", 409)
         if request.get("evaluation_stop") and not self.recovery_evaluation_scope(plan):
             raise BridgeError("repair_scope_unavailable", "Recovery-test stop requires the retained unselected two-mark numbering fixture.", 409)
-        before = self.plans.queries._scan(doc, base, settings, query_request(entry["request"]["audit"]))
+        before_report, before = self.plans.source_observation(doc, base, settings, entry["request"])
+        if plan.get("source_kind") == "column_missing_fire_layer" and before_report["report_fingerprint"] != plan["evidence_fingerprint"]:
+            raise BridgeError("repair_conflict", "Column resource or criterion evidence changed during preflight.", 409)
         if before["source_fingerprint"] != plan["source_fingerprint"]:
             raise BridgeError("repair_conflict", "Audited source changed during preflight.", 409)
         expected = {e["ref"]["model_uuid"]: copy.deepcopy(e["fields"]) for e in before["elements"]}
@@ -299,7 +315,8 @@ class RepairExecutor:
         target_preflight = []
         for change in plan["changes"]:
             diagnostics = {"ref": copy.deepcopy(change["ref"])}
-            element = native_repairs.resolve(doc, base, self.plans.queries, change, writable=True, diagnostics=diagnostics)
+            native_owners = []
+            element = native_repairs.resolve(doc, base, self.plans.queries, change, writable=True, diagnostics=diagnostics, adapter_owners=native_owners)
             target_preflight.append(diagnostics)
             if native_repairs.read(base, self.plans.queries, element, change) != change["old_value"]:
                 raise BridgeError("repair_conflict", "Target old value differs from the reviewed plan.", 409)
@@ -307,10 +324,14 @@ class RepairExecutor:
             raise BridgeError("plan_expired", "Plan expired during target preflight.", 409)
         record = {"schema_version": "m3-execution-1", "execution_id": request["execution_id"],
                   "request_hash": fingerprint(request), "plan_id": plan["plan_id"], "plan_hash": plan["plan_hash"],
-                  "state": "running", "audit_request": entry["request"]["audit"],
+                  "state": "running",
                   "changes": copy.deepcopy(plan["changes"]),
                   "target_preflight": target_preflight,
                   "outcomes": [{"state": "skipped", "reason": "not_attempted"} for _ in plan["changes"]]}
+        if plan.get("source_kind") == "column_missing_fire_layer":
+            record["criterion_request"] = copy.deepcopy(entry["request"])
+        else:
+            record["audit_request"] = entry["request"]["audit"]
         if "evaluation_stop" in request:
             record["evaluation_control"] = {"stop": request["evaluation_stop"],
                                             "controlled_interruption": True,
@@ -324,7 +345,8 @@ class RepairExecutor:
                 outcome["reason"] = "execution_time_budget"
                 break
             try:
-                element = native_repairs.resolve(doc, base, self.plans.queries, change, writable=True)
+                native_owners = []
+                element = native_repairs.resolve(doc, base, self.plans.queries, change, writable=True, adapter_owners=native_owners)
                 old = native_repairs.read(base, self.plans.queries, element, change)
                 if old != change["old_value"]:
                     outcome.update(state="conflict", reason="old_value_changed", readback=old)
@@ -345,7 +367,8 @@ class RepairExecutor:
                     # Exact-ID replay and Recover use the normal journal route.
                     return self.result(record)
                 # Never trust returned/stale adapters or setter return values as success.
-                fresh = native_repairs.resolve(doc, base, self.plans.queries, change)
+                fresh_owners = []
+                fresh = native_repairs.resolve(doc, base, self.plans.queries, change, adapter_owners=fresh_owners)
                 observed = native_repairs.read(base, self.plans.queries, fresh, change)
                 outcome["readback"] = observed
                 if observed.get("status") == "observed" and observed.get("value") == change["new_value"]:
@@ -361,16 +384,17 @@ class RepairExecutor:
                 break
         record["state"] = "completed" if all(o["state"] == "applied" for o in record["outcomes"]) else "stopped"
         try:
-            record["audit_after"] = run_audit(self.plans.queries, doc, base, settings, record["audit_request"])
-            after = self.plans.queries._scan(doc, base, settings, query_request(record["audit_request"]))
+            report_key = "criteria_after" if "criterion_request" in record else "audit_after"
+            record[report_key], after = self.plans.source_observation(doc, base, settings,
+                record.get("criterion_request", record.get("audit_request")))
             actual = {e["ref"]["model_uuid"]: e["fields"] for e in after["elements"]}
             record["audited_fields_match_plan"] = (after["coverage"]["requested_scope_complete"]
                                                     and after["scope"] == before["scope"] and actual == expected)
             if record["state"] == "completed" and (not record["audited_fields_match_plan"]
-                    or not record["audit_after"]["coverage"]["audit_complete"]):
+                    or not record[report_key]["coverage"]["criteria_complete" if "criterion_request" in record else "audit_complete"]):
                 record["state"] = "verification_failed"
         except Exception as exc:
-            record["audit_after"] = {"state": "not_checked", "reason": getattr(exc, "code", type(exc).__name__)}
+            record[report_key] = {"state": "not_checked", "reason": getattr(exc, "code", type(exc).__name__)}
             record["audited_fields_match_plan"] = False
             if record["state"] == "completed":
                 record["state"] = "verification_failed"
@@ -379,8 +403,9 @@ class RepairExecutor:
 
     def recover(self, doc, base, settings, record):
         # Recovery is observation only; session-local refs are never resumed.
-        report = run_audit(self.plans.queries, doc, base, settings, record["audit_request"])
-        if not report["coverage"]["audit_complete"]:
+        report, _ = self.plans.source_observation(doc, base, settings,
+            record.get("criterion_request", record.get("audit_request")))
+        if not report["coverage"]["criteria_complete" if "criterion_request" in record else "audit_complete"]:
             raise BridgeError("repair_recovery_unavailable", "Recovery audit is incomplete.", 409)
         current = report["checks"][0]["ref"] if report["checks"] else None
         reference = record["changes"][0]["ref"]
@@ -389,7 +414,8 @@ class RepairExecutor:
         observations = []
         for index, change in enumerate(record["changes"]):
             try:
-                element = native_repairs.resolve(doc, base, self.plans.queries, change)
+                native_owners = []
+                element = native_repairs.resolve(doc, base, self.plans.queries, change, adapter_owners=native_owners)
                 value = native_repairs.read(base, self.plans.queries, element, change)
                 state = ("new_value_observed" if value.get("status") == "observed" and value.get("value") == change["new_value"]
                          else "old_value_observed" if value == change["old_value"] else "conflict")
@@ -399,7 +425,7 @@ class RepairExecutor:
             if record["outcomes"][index]["state"] == "unknown" and state in {"new_value_observed", "old_value_observed"}:
                 record["outcomes"][index].update(state="reconciled", reason=state, readback=value)
         record["state"] = "stopped" if record["state"] == "running" else record["state"]
-        record["recovery"] = {"observations": observations, "audit": report,
+        record["recovery"] = {"observations": observations, ("criteria" if "criterion_request" in record else "audit"): report,
                               "identity_limit": "project/document/model match; copy identity and mutation causality not proven"}
         self.save(record)
         result = self.result(record)

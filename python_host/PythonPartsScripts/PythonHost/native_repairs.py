@@ -4,14 +4,19 @@ from .native_readers import adapter_ref, root_adapter
 from .transport import BridgeError
 
 
-def resolve(doc, base, queries, change, writable=False, diagnostics=None):
+def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapter_owners=None):
     ref = change["ref"]
     matches = {}
     started = queries.clock()
     def budget():
         if queries.clock() - started >= queries.SCAN_SECONDS:
             raise BridgeError("scan_limit_exceeded", "Repair resolution time budget exceeded.", 409)
-    for index, candidate in enumerate(base.ElementsSelectService.SelectAllElements(doc)):
+    # Native container ownership must extend through the caller's read/setter,
+    # not just through iteration in this resolver.
+    owner = base.ElementsSelectService.SelectAllElements(doc)
+    if adapter_owners is not None:
+        adapter_owners.append(owner)
+    for index, candidate in enumerate(owner):
         budget()
         if index >= 10000:
             raise BridgeError("scan_limit_exceeded", "Repair resolution adapter budget exceeded.", 409)

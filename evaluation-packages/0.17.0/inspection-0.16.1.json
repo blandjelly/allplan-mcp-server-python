@@ -1,0 +1,26 @@
+{
+  "source_uploads": [
+    {
+      "file": "m4-properties-check-20261013T191556511941Z.json",
+      "sha256": "71bed1c2a34f349a261634cbf31cb5978c94bc0bf5058d71d1def2c641144346"
+    },
+    {
+      "file": "m4-properties-check-20261013T191556511941Z.txt",
+      "sha256": "9e5682c5b31b001775fb850fb9964b671f752f546fd4b88dcaf997a9fc5d8a72"
+    }
+  ],
+  "reported_package": "0.16.1",
+  "bridge_integrity_before": "verified",
+  "bridge_integrity_after": "verified",
+  "same_host_session": true,
+  "sample_attributes_status": "observed",
+  "matched_columns": 6,
+  "definition_reads": "not_requested",
+  "enum_reads": "not_requested",
+  "native_selection": "not_requested",
+  "model_setters_requested": false,
+  "owner_reported_no_crash": true,
+  "new_017_native_acceptance": "not_run",
+  "exact_016_crash_cause": "unknown",
+  "interpretation": "One Column raw-attribute read only; no evidence of name binding, highlighting, W1 writes or Undo."
+}

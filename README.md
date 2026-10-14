@@ -1,13 +1,14 @@
 # Allplan MCP Server
 
 A local MCP bridge between Codex and Allplan 2026 for model queries, audits and
-reviewed attribute/layer repairs. Current package: **0.16.1**.
+reviewed attribute/layer repairs. Current candidate: **0.17.0**.
 
-0.16.0's first native property discovery crashed Allplan; that broad route is
-**blocked_after_native_crash**. 0.16.1 provides one isolated Column read with
-persistent native-call trace, without automatic metadata, enum or UI stages.
-[Short Polish observation guide](docs/m4-isolated-probe-owner-test.pl.md).
-Native property/selection support remains unaccepted.
+0.17.0 adds a criterion-based workflow: Columns with unset fire resistance →
+exact target highlighting → existing W1, using the shared M3 executor/journal.
+The owner accepts highlighting for this workflow. No broad metadata/enum scan is
+used; the 0.16.0 discovery route remains quarantined. Native 0.17.0 acceptance is
+pending; the root cause of the earlier crash is not proven.
+[Polish workflow and observation guide](docs/m4-column-layer-0.17.0.pl.md).
 
 **M0–M3 are accepted within the retained test project**, Allplan **2026-1-7**
 with local Windows Codex. M3 covers recorded one-/two-change Column scenarios
@@ -29,7 +30,7 @@ use is planned. [Acceptance, tests and limits](docs/validation-status.md).
 
 ## Local Windows setup
 
-Use the [0.16.1 evaluation package](evaluation-packages/0.16.1/README.md) on
+Use the [0.17.0 evaluation package](evaluation-packages/0.17.0/README.md) on
 the machine running Allplan. External Python **3.11+** and internet access for
 locked dependencies are required; Allplan, Python and Codex are not bundled.
 

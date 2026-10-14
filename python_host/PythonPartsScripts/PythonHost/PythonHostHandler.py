@@ -45,6 +45,9 @@ class RequestHandler:
             # before build/document/API reads until the offending operation is
             # isolated and a narrower native probe has been reviewed.
             raise BridgeError("native_probe_blocked", "M4 property discovery is suspended after the 0.16.0 native crash. Preserve bridge.log; do not repeat the broad probe.", 409)
+        if path == "/column-layer":
+            from .column_layer import validate_request as validate_column_layer
+            validate_column_layer(request)
         if path == "/model-selection":
             from .property_contracts import validate_selection
             validate_selection(request)
@@ -82,10 +85,16 @@ class RequestHandler:
                 validate_request(request)
                 return self.model_queries.handle(self.current_document(), AllplanBaseEle, AllplanSettings, request)
 
+            case "/column-layer":
+                return self.repair_plans.handle_column_layer(self.current_document(), AllplanBaseEle, AllplanSettings, AllplanIFW, request)
+
             case "/model-property-probe":
                 return self.property_probes.handle(self.current_document, AllplanBaseEle, AllplanSettings, request)
 
             case "/model-selection":
+                if request["action"] != "select":
+                    for entry in self.repair_plans.plans.values():
+                        entry.pop("presentation", None)
                 from .model_selection import present_selection
                 return present_selection(self.model_queries, self.current_document(), AllplanBaseEle, AllplanSettings, AllplanIFW, request)
 

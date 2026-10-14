@@ -191,3 +191,21 @@ API basis checked against Allplan 2026:
 [AttributeService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/AttributeService/),
 [HighlightService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/HighlightService/),
 [CoordinateInput](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/CoordinateInput/).
+
+## column_layer (0.17.0)
+
+`preview` requires one foreground `drawing_file`; defaults resolve the exact
+candidate names `Odporność ogniowa` / `Fire resistance` and existing `W1`.
+An explicit `attribute_names` list, `undefined_values` and `exclude_model_uuids`
+can refine the request. Multiple distinct resolved IDs block; no IDs are guessed.
+Null/empty/explicit undefined values match. Absent from ReadAll, unreadable and
+unsupported values remain unknown; no Apply on an incomplete plan.
+
+`highlight` / `revalidate` take `plan_id` and `plan_hash`. `apply` additionally
+takes a persisted `execution_id` and `acknowledgement=disposable_copy_reviewed_plan`.
+Highlight exactly the changing targets before Apply. Both the full source and
+resource bindings are checked again. Existing-W1 targets are no-op. Shared M3
+journal/preflight/readback/recovery limits apply (up to 32 Column layer changes).
+`recover` takes only the original execution_id and never invokes setters.
+This is highlighting, not native selection, as agreed for this workflow.
+[Native observation and limits](m4-column-layer-0.17.0.pl.md).

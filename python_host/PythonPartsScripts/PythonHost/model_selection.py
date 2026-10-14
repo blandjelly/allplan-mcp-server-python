@@ -8,7 +8,7 @@ from .property_contracts import SELECTION_SCHEMA, validate_selection
 from .transport import BridgeError
 
 
-def present_selection(service, doc, base, settings, ifw, request):
+def present_selection(service, doc, base, settings, ifw, request, *, target_model_uuids=None):
     validate_selection(request)
     result = {"schema_version": SELECTION_SCHEMA, "action": request["action"],
               "model_data_changed": False, "usable_for_write": False, "runtime_verified": False,
@@ -39,7 +39,8 @@ def present_selection(service, doc, base, settings, ifw, request):
     live = {}
     native_owners = []
     try:
-        snapshot = service._scan(doc, base, settings, entry["request"], adapter_sink=live, adapter_owners=native_owners)
+        snapshot = service._scan(doc, base, settings, entry["request"], adapter_sink=live, adapter_owners=native_owners,
+                                 native_type_gate=entry.get("native_type_gate"))
     except BridgeError as exc:
         service.selections.pop(ident, None)
         raise BridgeError("selection_unverifiable", "No UI call started; the full selection could not be revalidated.", 409) from exc
@@ -53,6 +54,10 @@ def present_selection(service, doc, base, settings, ifw, request):
     adapters = BaseElementAdapterList()
     excluded = set(request.get("exclude_model_uuids", []))
     all_ids = {item["ref"]["model_uuid"] for item in snapshot["elements"]}
+    if target_model_uuids is not None:
+        if not set(target_model_uuids) <= all_ids:
+            raise BridgeError("selection_stale", "A reviewed target disappeared; no UI call started.", 409)
+        excluded = all_ids - set(target_model_uuids)
     if excluded - all_ids:
         raise BridgeError("invalid_payload", "Every exception must name a member of the full selection.")
     targets = [item for item in snapshot["elements"] if item["ref"]["model_uuid"] not in excluded]

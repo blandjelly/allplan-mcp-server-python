@@ -19,13 +19,43 @@ class RepairPlanService:
 
     def __init__(self, queries, journal_path=None):
         self.queries = queries
+        from pathlib import Path
+        self.trace_path = Path(__file__).resolve().parents[2] / ".allplan-mcp/logs/m4-native-probe.jsonl"
         self.plans = OrderedDict()
         # Invalidated evidence is inspectable once, never executable. Both caches
         # share the existing count/byte/TTL limits and disappear on host restart.
         self.invalidated_plans = OrderedDict()
-        from pathlib import Path
         from .repair_execution import RepairExecutor
         self.executor = RepairExecutor(self, journal_path or Path(__file__).resolve().parents[2] / ".allplan-mcp" / "repairs")
+
+    def source_observation(self, doc, base, settings, request):
+        """Common executor evidence; criterion edits never fabricate audit findings."""
+        if request.get("schema_version") == "m4-column-layer-1":
+            from .column_layer import observe
+            report, snapshot, _ = observe(self, doc, base, settings, request)
+            return report, snapshot
+        audit = request.get("audit", request)
+        return run_audit(self.queries, doc, base, settings, audit, with_snapshot=True)
+
+    def expire(self):
+        now = self.queries.clock()
+        for cache in (self.plans, self.invalidated_plans):
+            for ident, entry in list(cache.items()):
+                if now - entry["created"] >= self.TTL_SECONDS:
+                    del cache[ident]
+
+    def handle_column_layer(self, doc, base, settings, ifw, request):
+        from . import column_layer
+        column_layer.validate_request(request)
+        self.expire()
+        action = request["action"]
+        if action == "preview":
+            return column_layer.preview(self, doc, base, settings, request)
+        if action == "highlight":
+            return column_layer.highlight(self, doc, base, settings, ifw, request)
+        if action == "revalidate":
+            return column_layer.revalidate(self, doc, base, settings, request)
+        return self.executor.handle(doc, base, settings, request)
 
     def handle(self, doc, base, settings, request):
         validate_repair_request(request)
@@ -240,6 +270,10 @@ class RepairPlanService:
         self.plans.clear()
 
     def _revalidate(self, doc, base, settings, request):
+        candidate = self.plans.get(request["plan_id"]) or self.invalidated_plans.get(request["plan_id"])
+        if candidate and candidate["plan"].get("source_kind") == "column_missing_fire_layer":
+            from .column_layer import revalidate
+            return revalidate(self, doc, base, settings, request)
         invalidated = request["plan_id"] not in self.plans
         cache = self.invalidated_plans if invalidated else self.plans
         entry = cache.get(request["plan_id"])

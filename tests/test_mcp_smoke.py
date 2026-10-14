@@ -1126,7 +1126,7 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
     async def test_discovery_health_version_names_box_and_diagnostic_bundle(self):
         async with Client(self.url, timeout=5) as client:
             names = {t.name for t in await client.list_tools()}
-            self.assertEqual(names, {"allplan_health", "get_allplan_version", "get_all_object_names", "create_cube", "create_box", "get_model_context", "model_query", "model_properties", "model_property_probe", "model_selection", "model_audit", "fix_model_issues", "apply_office_standard", "rule_based_edit"})
+            self.assertEqual(names, {"allplan_health", "get_allplan_version", "get_all_object_names", "create_cube", "create_box", "get_model_context", "model_query", "model_properties", "model_property_probe", "model_selection", "model_audit", "fix_model_issues", "apply_office_standard", "rule_based_edit", "column_layer"})
             resources = await client.list_resources()
             self.assertIn("allplan://skills", {str(r.uri) for r in resources})
             health = (await client.call_tool("allplan_health")).data

@@ -8,6 +8,17 @@ The owner explicitly narrowed M3/UAT-05/UAT-06 to existing demonstrated scenario
 This closes the fixture evaluation MVP; it does not accept the original broader
 gate or typical office-project writes. Main integration/release remain separate.
 
+## 0.17.0 candidate
+
+Local Python 3.12 full portable suite: **261 tests PASS** (2026-10-14).
+
+Implements the owner-confirmed criterion → highlight → W1 workflow; native
+acceptance **not_run**. The 0.16.1 attachment confirms only one observed Column
+attribute read and healthy same-session replies; user reports no crash.
+The exact native cause of 0.16.0 remains unknown. Broad discovery stays blocked.
+[New workflow/limits](m4-column-layer-0.17.0.pl.md),
+[delivery and portable evidence](../evaluation-packages/0.17.0/README.md).
+
 ## Accepted scope
 
 The original disposable **MCP_QA_DEMO** copy and installed Local history,

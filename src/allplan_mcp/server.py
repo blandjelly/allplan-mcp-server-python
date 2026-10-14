@@ -16,6 +16,7 @@ from allplan_mcp.audit_models import AuditRequest
 from allplan_mcp.repair_models import RepairRequest
 from allplan_mcp.standard_models import OfficeStandardRequest, RuleBasedRequest
 from allplan_mcp.office_standard import load_office_standard
+from allplan_mcp.column_layer_models import ColumnLayerRequest
 from allplan_mcp.property_models import PropertiesRequest, SelectionRequest, PropertyProbeRequest
 
 
@@ -203,6 +204,44 @@ def model_query(request: QueryRequest) -> dict[str, Any]:
         payload.pop("cursor", None)
     payload["schema_version"] = "m1-query-1"
     return _allplan_client().post("/model-query", payload)
+
+
+@mcp.tool
+def column_layer(request: ColumnLayerRequest) -> dict[str, Any]:
+    """Find Columns with unset fire resistance and assign an existing layer (W1).
+
+    preview resolves exact project field names and the layer with ID/name round
+    trips, scans one foreground drawing and reports every Column's value state.
+    Null, empty/whitespace and the explicit undefined strings match. Read errors,
+    unsupported types and omission from ReadAll are unknown and block Apply;
+    ReadAll omits computed attributes, so omission never proves native absence.
+    Conflicting field names block instead of selecting an arbitrary attribute.
+    No metadata type/unit/enum discovery, resource creation or audit findings.
+
+    highlight submits exactly the plan's changing targets, excluding no-ops and
+    explicit exceptions. This is highlighting, not native selection. The owner
+    accepts highlighting for this workflow; observe visibility in Allplan.
+    apply requires the exact highlighted plan/hash, an execution ID and reviewed
+    disposable-copy acknowledgement. Shared M3 controls enforce fresh whole-scope
+    evidence, 1..32 Column layer changes, writable targets, durable write-ahead
+    journal, readback, replay deduplication and read-only recover. Persist the
+    exact Apply request before sending; on lost reply recover that ID, never
+    generate a new ID or retry a setter. Preview again after model/resource changes.
+    This implementation requires native 0.17.0 acceptance; no crash-free claim.
+    """
+    payload = request.model_dump(exclude_unset=True)
+    payload["schema_version"] = "m4-column-layer-1"
+    try:
+        return _allplan_client().post("/column-layer", payload)
+    except AllplanHostError as exc:
+        before_write = {"target_not_writable", "plan_expired", "plan_hash_mismatch", "presentation_required",
+                        "repair_scope_unavailable", "repair_conflict", "repair_journal_full",
+                        "execution_id_conflict", "repair_recovery_required", "property_binding_unavailable"}
+        if payload["action"] != "apply" or exc.code not in before_write:
+            raise
+        return {"schema_version": "m3-execution-1", "action": "apply", "state": "rejected",
+                "read_only": True, "native_setters_started": False, "execution_id": payload["execution_id"],
+                "error": {"code": exc.code, "message": str(exc)}}
 
 
 @mcp.tool

@@ -1,6 +1,6 @@
 [project]
 name = "allplan-mcp-server"
-version = "0.16.1"
+version = "0.17.0"
 description = "FastMCP bridge for controlling an Allplan Python host."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -24,6 +24,10 @@ package = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/allplan_mcp"]
+
+[tool.hatch.build.targets.sdist]
+# Do not recursively redistribute historical evaluation archives (over 100 MiB).
+only-include = ["src", "python_host", "windows", "utils", "tests", "docs", "profiles", ".github", "README.md", "pyproject.toml", "uv.lock", ".gitattributes"]
 
 [build-system]
 requires = ["hatchling==1.28.0"]

@@ -102,7 +102,7 @@ class ModelQueryService:
                                 "complete": end == len(items), "is_full_selection": offset == 0 and end == len(items)}})
         return result
 
-    def _scan(self, doc, base, settings, request, adapter_sink=None, adapter_owners=None):
+    def _scan(self, doc, base, settings, request, adapter_sink=None, adapter_owners=None, native_type_gate=None):
         started = self.clock()
         context = context_probe(doc, base, settings, {})
         project = context["project"]
@@ -209,11 +209,18 @@ class ModelQueryService:
                             continue
                     if request.get("component_kind") == "top_level_component":
                         adapter = root
-                basic_needed = {f for f in needed if f in BASIC_FIELDS or attribute_id(f) is not None}
+                read_needed = needed
+                if native_type_gate is not None:
+                    family = observation(lambda: text(adapter.GetElementAdapterType().GetTypeName()))
+                    if family.get("value") != native_type_gate:
+                        # Criterion workflow must not read attributes/geometry of
+                        # walls, beams or unknown native families while finding Columns.
+                        read_needed = {f for f in needed if f not in GEOMETRY_FIELDS and attribute_id(f) is None}
+                basic_needed = {f for f in read_needed if f in BASIC_FIELDS or attribute_id(f) is not None}
                 values = self._fields(adapter, base, basic_needed, number, states[number])
-                if needed & GEOMETRY_FIELDS:
+                if read_needed & GEOMETRY_FIELDS:
                     from .native_readers import geometry_fields
-                    values.update(geometry_fields(adapter, settings, request.get("coordinate_frame", "model_local"), needed & GEOMETRY_FIELDS, check_budget))
+                    values.update(geometry_fields(adapter, settings, request.get("coordinate_frame", "model_local"), read_needed & GEOMETRY_FIELDS, check_budget))
                 if "hierarchy" in needed:
                     root_ref = {k: v for k, v in chain[-1].items() if k != "view_uuid"} if chain else None
                     values["hierarchy"] = ({"status": "observed", "value": {"root": root_ref, "top_level": len(chain) == 1}}
