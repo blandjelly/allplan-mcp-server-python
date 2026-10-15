@@ -1,8 +1,10 @@
 # Current handoff
 
-Updated 2026-10-15 Europe/Warsaw. Current candidate **0.17.2**; package and
-automated verification are being prepared. Owner testing is appropriate after
-those checks are recorded in the [0.17.2 delivery README](../evaluation-packages/0.17.2/README.md).
+Updated 2026-10-15 Europe/Warsaw. Current candidate **0.17.2**, **ready_for_owner_test**.
+Clean source **6e87f56fc3e200c16d229d23e0bf85c483ce1220** passed 275 portable
+tests, six Windows/Ubuntu × Python 3.11–3.13 CI jobs, frozen sync, builds and exact
+ZIP install/upgrade/restore verification (29 bridge hashes; journal/trace preserved).
+Evidence and artifacts: [0.17.2 delivery README](../evaluation-packages/0.17.2/README.md).
 No main integration.
 
 The owner requested the full first scenario and explicitly accepted highlighting:
@@ -15,8 +17,8 @@ matching no-op was omitted from highlighting.
 0.17.2 assigns hash-bound `highlight_targets` to all matched `change` and
 `no_op` Columns, while `changes` contains only layer setters. A full plan with
 no changes can still highlight all matches; it cannot be confirmed or applied.
-Unknown values block the action, and more than 32 changes remain blocked. Once
-automated verification/package evidence is in place, test only the changed
+Unknown values block the action, and more than 32 changes remain blocked.
+Next, test only the changed
 highlight semantics and no-op behavior using the
 [short 0.17.2 owner guide](m4-column-layer-0.17.2.pl.md).
 

@@ -1,8 +1,8 @@
 # Validation status and limits
 
-Updated **2026-10-15 Europe/Warsaw**. Current candidate **0.17.2**; automated
-verification and package evidence are pending. The **0.17.1** native observation
-is recorded below; 0.17.2 owner testing follows its delivery checks.
+Updated **2026-10-15 Europe/Warsaw**. Current candidate **0.17.2**, **ready_for_owner_test**;
+native observation remains **not_run**. The **0.17.1** partial native observation
+is recorded below. Automated checks passed for the packaged source.
 The **0.16.0** property gate is **FAIL_CRASH / blocked_after_native_crash**.
 **0.16.1** is ready_for_owner_test only for one isolated Column read, not accepted_on_build. M3 write acceptance below remains scoped to 0.15.0 evidence.
 **M0–M3 / UAT-00–UAT-06 are accepted within the retained test-project scope.**
@@ -32,11 +32,17 @@ The launcher checks counts against `highlight_targets`, highlights no-op plans
 without offering confirmation/Apply, and clears stale highlights when there are
 zero matches. Unknown values block the action; more than 32 changes remain
 blocked. The bounded owner test is specified in the
-[0.17.2 guide](m4-column-layer-0.17.2.pl.md). Source CI, full portable results
-and package verification are pending in the
-[0.17.2 delivery README](../evaluation-packages/0.17.2/README.md); owner testing
-is ready only after those automated checks pass. This does not accept the whole
-M4 workflow or repeat completed M3 gates.
+[0.17.2 guide](m4-column-layer-0.17.2.pl.md).
+
+Clean source **6e87f56fc3e200c16d229d23e0bf85c483ce1220** passed **275 portable
+tests** on CPython 3.12.14, frozen sync, wheel/sdist and Windows ZIP builds.
+[Source CI 38785067377](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38785067377)
+passed **6/6** Windows/Ubuntu × Python 3.11–3.13 jobs, including tests and builds.
+Exact ZIP installation/upgrade from 0.17.1/restore passed with **29 bridge hashes**
+and journal/trace bytes preserved. [Delivery and evidence](../evaluation-packages/0.17.2/README.md).
+This makes the candidate ready for the bounded native observation; it does not
+accept the whole M4 workflow or repeat completed M3 gates. Later delivery/docs
+commits retain the frozen artifacts and do not expand those source scopes.
 
 [Original 0.17.1 observation and uploads](m4-column-layer-observation-0.17.1.md).
 

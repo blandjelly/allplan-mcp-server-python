@@ -227,10 +227,10 @@ for this workflow.
 
 The 0.17.1 native observation confirmed the field binding and two writes but
 submitted only two highlight targets, omitting a matching no-op. See the
-[observation report](m4-column-layer-observation-0.17.1.md). The 0.17.2 source,
-package and automated check results are pending in the
-[delivery README](../evaluation-packages/0.17.2/README.md); this candidate is
-ready for owner testing only after those checks pass.
+[observation report](m4-column-layer-observation-0.17.1.md). The 0.17.2 candidate
+is **ready_for_owner_test** after 275 portable tests, six CI jobs and exact ZIP
+installation verification passed. Source and evidence scopes are in the
+[delivery README](../evaluation-packages/0.17.2/README.md). Native observation is pending.
 
 The 0.17.0 owner run bound the wrong field, 1398, and stopped with six unknown
 ReadAll omissions before setters. A healthy `health_before` and available journal

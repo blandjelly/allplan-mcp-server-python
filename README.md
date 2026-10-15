@@ -12,9 +12,10 @@ with more than 32 changes remain blocked. The exact default names are
 is resolved and checked by name roundtrip. No broad metadata/enum scan is used;
 the 0.16.0 discovery route remains quarantined. The
 [0.17.1 observation](docs/m4-column-layer-observation-0.17.1.md) found the
-no-op highlighting gap after two layer updates. 0.17.2 is being prepared;
-automated verification and package delivery will be recorded in its
-[delivery README](evaluation-packages/0.17.2/README.md) before the owner test.
+no-op highlighting gap after two layer updates. 0.17.2 is **ready_for_owner_test**:
+275 portable tests, six CI configurations and exact ZIP installation passed;
+source scopes and artifacts are in the [delivery README](evaluation-packages/0.17.2/README.md).
+Native 0.17.2 highlighting remains unobserved.
 [Short Polish owner test](docs/m4-column-layer-0.17.2.pl.md).
 
 **M0–M3 are accepted within the retained test project**, Allplan **2026-1-7**
@@ -38,7 +39,7 @@ use is planned. [Acceptance, tests and limits](docs/validation-status.md).
 ## Local Windows setup
 
 Use the [0.17.2 evaluation package](evaluation-packages/0.17.2/README.md) on
-the machine running Allplan after its delivery checks are recorded. External
+the machine running Allplan. External
 Python **3.11+** and internet access for locked dependencies are required;
 Allplan, Python and Codex are not bundled.
 

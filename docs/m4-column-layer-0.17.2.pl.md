@@ -1,6 +1,8 @@
 # M4 Columns → W1 — krótka próba 0.17.2
 
 Ta próba sprawdza zmianę semantyki podświetlania i przypadek samych no-opów.
+Zakres: pakiet **0.17.2**, Allplan **2026-1-7** (API **2026.1**), zachowana
+kopia **MCP_QA_DEMO**, aktywny rysunek **101** i istniejąca warstwa **W1**.
 Uruchom ją po przejściu kontroli źródła, CI i pakietu opisanych w
 [README pakietu 0.17.2](../evaluation-packages/0.17.2/README.md). Nie powtarzaj
 zakończonych bramek M3.
@@ -18,6 +20,9 @@ zakończonych bramek M3.
 3. Zatrzymaj się na podglądzie. Nie wpisuj `ZMIEN`; nie powinno być potwierdzenia
    ani Apply. Uruchom **M4 Clear Highlight.cmd**, sprawdź zniknięcie podświetleń
    i odpowiedź `allplan_health`.
+
+Brak dopasowań oznacza wyczyszczenie podświetlenia. Polecenie czyszczenia
+usuwa wszystkie podświetlenia w bieżącym dokumencie, również z innych źródeł.
 
 ## Scenariusz B: dwie zmiany i jeden no-op (opcjonalnie)
 
