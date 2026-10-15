@@ -1,11 +1,28 @@
 # Current handoff
 
-Updated 2026-10-15 Europe/Warsaw. Current candidate **0.17.2**, **ready_for_owner_test**.
-Clean source **6e87f56fc3e200c16d229d23e0bf85c483ce1220** passed 275 portable
-tests, six Windows/Ubuntu × Python 3.11–3.13 CI jobs, frozen sync, builds and exact
-ZIP install/upgrade/restore verification (29 bridge hashes; journal/trace preserved).
-Evidence and artifacts: [0.17.2 delivery README](../evaluation-packages/0.17.2/README.md).
+Updated 2026-10-15 Europe/Warsaw. Current candidate **0.18.0**; automated
+checks and package evidence are **pending**. Do not report it as
+ready_for_owner_test until those records exist. The package carries the
+0.17.2 `column_layer.py` and `column_layer_diagnostics.py` runtime unchanged,
+and adds the isolated wall-property phase, its diagnostic and
+**M4 Wall Properties.cmd**. The [0.18.0 delivery README](../evaluation-packages/0.18.0/README.md)
+and [short owner guide](m4-wall-properties-0.18.0.pl.md) are being prepared.
 No main integration.
+
+The 0.17.2 artifacts, README, source and CI evidence remain unchanged. Its
+native observation was **not run**. The owner deferred native checks for both
+versions to a later time: either package may be tested first, independently.
+The 0.17.2 native check is not a prerequisite for 0.18.0, and the wall read is
+not a prerequisite for the retained Columns workflow.
+
+The new `wall_sample` phase is limited to one existing, single-tier native Wall
+in foreground drawing 101. It reads the first tier's thickness and raw material
+after confirming the object type and `TierCount == 1`. For the fixture wall,
+expect 200 mm under the API-mm assumption and
+`sample.criterion.matches_assuming_native_mm=true` only when both fields are
+valid. Runtime unit verification and material
+target binding remain false/not checked; no material write is available. A
+native wall read must be observed before material writes can be enabled.
 
 The owner requested the full first scenario and explicitly accepted highlighting:
 Columns without fire resistance classification → matching targets highlighted →
@@ -14,13 +31,13 @@ F30/F60 values. The [0.17.1 observation](m4-column-layer-observation-0.17.1.md)
 confirmed the exact binding and two writes but exposed that the already-W1
 matching no-op was omitted from highlighting.
 
-0.17.2 assigns hash-bound `highlight_targets` to all matched `change` and
+The retained 0.17.2 runtime assigns hash-bound `highlight_targets` to all matched `change` and
 `no_op` Columns, while `changes` contains only layer setters. A full plan with
 no changes can still highlight all matches; it cannot be confirmed or applied.
 Unknown values block the action, and more than 32 changes remain blocked.
-Next, test only the changed
-highlight semantics and no-op behavior using the
-[short 0.17.2 owner guide](m4-column-layer-0.17.2.pl.md).
+Native highlighting behavior for 0.17.2 remains unobserved; use the
+[short 0.17.2 owner guide](m4-column-layer-0.17.2.pl.md) if testing that
+package later. It does not gate the independent 0.18.0 wall observation.
 
 The 0.17.0 owner run on **2026-10-15 at 19:40 Europe/Warsaw** was **BLOCKED**.
 It bound `Odporność ogniowa` (1398), absent from ReadAll on all six Columns;
@@ -54,15 +71,15 @@ source/resource revalidation, native writability, readback and bounded journal
 guards remain. The old isolated probe launcher remains available, but the new
 task uses **M4 Columns to W1.cmd** and **M4 Columns Recover.cmd**.
 
-The next owner check is constrained to the 0.17.2 changes: leave the model after
-0.17.1 (Columns 1, 5, 6 on W1; 2, 3, 4 at F120), confirm a no-op preview has
-three highlight targets and zero changes, and stop without `ZMIEN`/Apply. An
-optional second scenario restores only Columns 5 and 6 to their old layer before
-starting a fresh preview; expect three highlight targets, two changes and one
-no-op. See the [owner guide](m4-column-layer-0.17.2.pl.md) for safe sequencing.
-Preserve source/CI/package scopes, all logs and Local/.allplan-mcp/repairs. After
-unknown results use saved-ID Recover, never a new Apply. This is not blanket
-acceptance of M4 or a repeat of completed M3 gates.
+The next native observation, after 0.18.0 has its automated and package records,
+is exactly one wall read using **M4 Wall Properties.cmd**. Bracket the request
+with `health_before` and `health_after` in the same MCP session; preserve
+`logs/wall-properties-*.json` and `.txt`, `bridge.log`,
+`Local/.allplan-mcp/logs/m4-native-probe.jsonl`, and
+`Local/.allplan-mcp/repairs`. The pending request must be saved before sending;
+lost replies do not trigger another native call. If Allplan crashes, retain the
+trace and do not rerun. See the [wall guide](m4-wall-properties-0.18.0.pl.md).
+This bounded read does not accept material writes or the broader M4 workflow.
 
 M3 acceptance remains limited to its historical fixture/build/single- and
 two-change cases. See [validation](validation-status.md) and [testing policy](testing-policy.md).

@@ -1,22 +1,18 @@
 # Allplan MCP Server
 
 A local MCP bridge between Codex and Allplan 2026 for model queries, audits and
-reviewed attribute/layer repairs. Current candidate: **0.17.2**.
+reviewed attribute/layer repairs. Current candidate: **0.18.0**; automated
+checks and package evidence are pending.
 
-0.17.2 updates M4 highlighting so every Column matching “no fire resistance
-classification” is highlighted, including Columns already on W1. Only actual
-layer changes enter Apply; an all-no-op plan highlights its matches without
-confirmation or setters. Unknown values still block the whole action, and plans
-with more than 32 changes remain blocked. The exact default names are
-`Klasa odporności ogniowej` / `Fire resistance classification`; the native ID
-is resolved and checked by name roundtrip. No broad metadata/enum scan is used;
-the 0.16.0 discovery route remains quarantined. The
-[0.17.1 observation](docs/m4-column-layer-observation-0.17.1.md) found the
-no-op highlighting gap after two layer updates. 0.17.2 is **ready_for_owner_test**:
-275 portable tests, six CI configurations and exact ZIP installation passed;
-source scopes and artifacts are in the [delivery README](evaluation-packages/0.17.2/README.md).
-Native 0.17.2 highlighting remains unobserved.
-[Short Polish owner test](docs/m4-column-layer-0.17.2.pl.md).
+0.18.0 retains the 0.17.2 Columns runtime unchanged and adds one isolated,
+read-only native wall-property sample plus **M4 Wall Properties.cmd**. It reads
+one existing single-tier wall in foreground file 101 and reports its first
+tier's raw material and thickness. The API millimetre assumption is not yet
+runtime-verified; no material writes are enabled. The separate 0.17.2 package
+and its source/CI evidence remain unchanged, and its native observation was not
+run. The owner may test either package first; neither native test is a
+prerequisite for the other. See the [0.18.0 delivery README](evaluation-packages/0.18.0/README.md)
+and [short Polish wall guide](docs/m4-wall-properties-0.18.0.pl.md).
 
 **M0–M3 are accepted within the retained test project**, Allplan **2026-1-7**
 with local Windows Codex. M3 covers recorded one-/two-change Column scenarios
@@ -38,7 +34,7 @@ use is planned. [Acceptance, tests and limits](docs/validation-status.md).
 
 ## Local Windows setup
 
-Use the [0.17.2 evaluation package](evaluation-packages/0.17.2/README.md) on
+Use the [0.18.0 evaluation package](evaluation-packages/0.18.0/README.md) on
 the machine running Allplan. External
 Python **3.11+** and internet access for locked dependencies are required;
 Allplan, Python and Codex are not bundled.

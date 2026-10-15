@@ -10,9 +10,17 @@ PROBE_SCHEMA = "m4-property-probe-1"
 
 
 def validate_probe(request):
-    keys(request, {"schema_version", "phase", "drawing_file", "attribute_name", "attribute_id", "layer_short_name"}, {"schema_version", "phase"})
+    keys(request, {"schema_version", "phase", "drawing_file", "attribute_name", "attribute_id", "layer_short_name", "model_uuid"}, {"schema_version", "phase"})
     if request["schema_version"] != PROBE_SCHEMA:
         invalid(f"schema_version must be {PROBE_SCHEMA}.")
+    if request["phase"] == "wall_sample":
+        keys(request, {"schema_version", "phase", "drawing_file", "model_uuid"}, {"schema_version", "phase", "drawing_file"})
+        bounded_int(request["drawing_file"], 1, 2147483647, "drawing_file")
+        if "model_uuid" in request and (not isinstance(request["model_uuid"], str)
+                or not re.fullmatch(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}", request["model_uuid"])
+                or request["model_uuid"] == "00000000-0000-0000-0000-000000000000"):
+            invalid("model_uuid must name one canonical nonzero model UUID.")
+        return
     required = {"column_sample": "drawing_file", "attribute_name": "attribute_name",
                 "attribute_definition": "attribute_id", "layer_name": "layer_short_name"}.get(request["phase"] if isinstance(request["phase"], str) else "")
     if required is None:

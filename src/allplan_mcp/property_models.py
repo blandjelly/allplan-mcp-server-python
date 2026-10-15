@@ -37,6 +37,12 @@ class ColumnProbeInput(ContractModel):
     drawing_file: int = Field(ge=1, le=2147483647)
 
 
+class WallProbeInput(ContractModel):
+    phase: Literal["wall_sample"]
+    drawing_file: int = Field(ge=1, le=2147483647)
+    model_uuid: str = Field(default=None, pattern=r"^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$")
+
+
 class AttributeNameProbeInput(ContractModel):
     phase: Literal["attribute_name"]
     attribute_name: str = Field(min_length=1, max_length=128)
@@ -52,4 +58,4 @@ class LayerNameProbeInput(ContractModel):
     layer_short_name: str = Field(min_length=1, max_length=16)
 
 
-PropertyProbeRequest = Annotated[ColumnProbeInput | AttributeNameProbeInput | AttributeDefinitionProbeInput | LayerNameProbeInput, Field(discriminator="phase")]
+PropertyProbeRequest = Annotated[ColumnProbeInput | WallProbeInput | AttributeNameProbeInput | AttributeDefinitionProbeInput | LayerNameProbeInput, Field(discriminator="phase")]

@@ -38,12 +38,30 @@ hash-bound `highlight_targets` for both `change` and `no_op`, with `changes`
 containing only `set_layer` operations. A complete supported plan can highlight
 all matches even when every match is already on W1; no-op plans do not offer
 Apply. Unknown criteria still block highlighting and writes, and more than 32
-changes remain blocked. The new owner observation is limited to this semantic
-change and the previously unconfirmed no-op case; see the
+changes remain blocked. The separate 0.17.2 package has 275 portable tests, six
+CI jobs and exact package verification recorded in its unchanged
+[delivery README](../evaluation-packages/0.17.2/README.md); its native
+observation remains not_run at the owner's request. That observation is
+independent of 0.18.0 and is not a prerequisite. See the
 [0.17.2 walkthrough](m4-column-layer-0.17.2.pl.md) and
-[0.17.1 observation](m4-column-layer-observation-0.17.1.md). The candidate is
-**ready_for_owner_test** after 275 portable tests, six CI jobs and exact package
-verification passed; [source scopes and delivery](../evaluation-packages/0.17.2/README.md).
+[0.17.1 observation](m4-column-layer-observation-0.17.1.md).
+
+**M4.1a isolated wall-property read, 0.18.0:** the candidate adds a single
+`wall_sample` phase and **M4 Wall Properties.cmd**. Automated checks and package
+evidence are pending. The observation is limited to one Wall in foreground file
+101. M1 uses required type/identity fields plus display name/file state, counts
+matched Wall roots, and reads no attributes or geometry. The host selects one
+exact UUID (or the first Wall in UUID order), verifies a native `WallElement`,
+reads `Properties` and `TierCount`, and proceeds to tier 1 only when
+`TierCount == 1`. It reads positive finite `.Thickness` and bounded raw
+`.Material` only from that sample; the predicate
+`sample.criterion.matches_assuming_native_mm` uses an explicitly unverified API
+millimetre assumption. It does not read thickness from every matched Wall or read
+metadata/enums, highlight, or write. Read acceptance is required before any
+material write support is enabled. The 0.18.0 observation can be performed
+without first testing 0.17.2. See the [wall guide](m4-wall-properties-0.18.0.pl.md)
+and the pinned official SDK example at
+[ModifyWall.py, 8e2c252477e20bc9afac8918f78a8eeabd473a81](https://github.com/NemetschekAllplan/PythonPartsExamples/blob/8e2c252477e20bc9afac8918f78a8eeabd473a81/PythonPartsExampleScripts/ArchitectureExamples/ModifyObjects/ModifyWall.py).
 
 - **M4.1:** Probe ordinary columns/beams versus Structural Framing and wall
   materials/attributes; establish read/write support per build, type and property.

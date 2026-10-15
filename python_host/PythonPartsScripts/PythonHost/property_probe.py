@@ -82,7 +82,10 @@ class PropertyProbeService:
                   "runtime_verified": False, "status": "ready_for_isolated_owner_probe",
                   "trace_file": "Local/.allplan-mcp/logs/m4-native-probe.jsonl",
                   "native_calls_not_automatically_retried": True, "native_selection": "not_requested"}
-        if phase == "column_sample":
+        if phase == "wall_sample":
+            from .wall_probe import sample_wall
+            result.update(sample_wall(self.queries, doc, base, settings, request, trace, budget))
+        elif phase == "column_sample":
             query = {"schema_version": SCHEMA, "action": "query",
                      "scope": {"drawing_files": [request["drawing_file"]], "include_passive": False, "visibility": "api_select_all"},
                      "component_kind": "top_level_component", "fields": ["layer_id", "file_state", "display_name"],

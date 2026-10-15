@@ -278,6 +278,12 @@ def model_property_probe(request: PropertyProbeRequest) -> dict[str, Any]:
 
     Begin with column_sample in foreground file 101 of the retained test copy;
     it reads one Column root's raw attributes, without metadata, enums or UI.
+    wall_sample independently reads one Wall root's native properties in one
+    foreground drawing, optionally by model_uuid (otherwise first by model UUID).
+    Only a single-tier Wall is read: native Thickness and Material, no attribute
+    or surface substitution. Multi-tier/invalid/failed reads stop without fallback.
+    The <240 mm comparison is informational pending native units/value observation;
+    it neither finds all thin walls nor binds C35 or authorizes material writes.
     Other phases resolve one exact attribute/layer name or read one observed
     attribute ID's metadata. Every new native call is preceded by a flushed/fsynced
     Local/.allplan-mcp/logs/m4-native-probe.jsonl entry. Unwritable/full tracing blocks

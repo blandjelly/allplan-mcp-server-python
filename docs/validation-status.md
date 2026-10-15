@@ -1,14 +1,51 @@
 # Validation status and limits
 
-Updated **2026-10-15 Europe/Warsaw**. Current candidate **0.17.2**, **ready_for_owner_test**;
-native observation remains **not_run**. The **0.17.1** partial native observation
-is recorded below. Automated checks passed for the packaged source.
+Updated **2026-10-15 Europe/Warsaw**. Current candidate **0.18.0**; its
+automated checks and package evidence are **pending**, so it is not yet
+ready_for_owner_test. Its native wall observation has not run. The owner deferred
+native checks for both 0.17.2 and 0.18.0; either can be tested first, without a
+dependency between them. The 0.17.2 source, artifacts and prior automated
+evidence remain unchanged; its native observation remains **not_run**. The
+**0.17.1** partial native observation is recorded below.
 The **0.16.0** property gate is **FAIL_CRASH / blocked_after_native_crash**.
 **0.16.1** is ready_for_owner_test only for one isolated Column read, not accepted_on_build. M3 write acceptance below remains scoped to 0.15.0 evidence.
 **M0–M3 / UAT-00–UAT-06 are accepted within the retained test-project scope.**
 The owner explicitly narrowed M3/UAT-05/UAT-06 to existing demonstrated scenarios.
 This closes the fixture evaluation MVP; it does not accept the original broader
 gate or typical office-project writes. Main integration/release remain separate.
+
+## 0.18.0 wall-property read candidate
+
+0.18.0 retains the 0.17.2 `column_layer.py` and
+`column_layer_diagnostics.py` semantics unchanged, and adds a narrow
+`model_property_probe` phase, `wall_sample`, plus **M4 Wall Properties.cmd**.
+Automated verification and delivery records are pending; do not infer a test
+count, CI result, package verification or `ready_for_owner_test` until the
+[0.18.0 delivery README](../evaluation-packages/0.18.0/README.md) records them.
+
+The wall phase requests one foreground file (101) and optionally one canonical
+nonzero model UUID; explicit null UUID is invalid. Its M1 query uses the
+required `type_name`, `type_uuid`, and identity fields plus `display_name` and
+`file_state`; it reads no attributes or geometry. It counts matched Wall roots,
+then selects the exact requested UUID or, without one, the first accepted Wall
+in deterministic UUID order. A requested UUID with no exact match has no
+fallback. It imports the native Wall type, resolves only the selected element
+and verifies it is a `WallElement` before reading `.Properties` and
+`.TierCount`. Any tier count other than one stops as unsupported before tier
+access. The only tier read is tier 1 `.Thickness` and `.Material`; thickness is
+not read for every matched Wall. It performs no whole-model thickness filter,
+highlight, Apply, metadata/enum discovery, resource lookup or model write.
+
+For a valid positive finite thickness and bounded raw material string,
+`sample.criterion.matches_assuming_native_mm` reports the strict `<240`
+comparison under an explicit API-mm assumption. `units_runtime_verified=false`,
+`material_target_binding=not_checked`, and `material_write_available=false`.
+No missing/invalid value gets a fallback or retry. Native read acceptance is
+required before material writes can be enabled. Persist the pending request
+before the single MCP call, bracket it with same-host health replies, and retain
+the flushed/fsynced native trace. A lost reply means no following native call;
+the trace does not establish crash containment. See the
+[0.18.0 wall guide](m4-wall-properties-0.18.0.pl.md).
 
 ## 0.17.2 candidate and 0.17.1 native observation
 
@@ -40,9 +77,11 @@ tests** on CPython 3.12.14, frozen sync, wheel/sdist and Windows ZIP builds.
 passed **6/6** Windows/Ubuntu × Python 3.11–3.13 jobs, including tests and builds.
 Exact ZIP installation/upgrade from 0.17.1/restore passed with **29 bridge hashes**
 and journal/trace bytes preserved. [Delivery and evidence](../evaluation-packages/0.17.2/README.md).
-This makes the candidate ready for the bounded native observation; it does not
-accept the whole M4 workflow or repeat completed M3 gates. Later delivery/docs
-commits retain the frozen artifacts and do not expand those source scopes.
+These checks qualified the 0.17.2 package for its bounded native observation;
+the owner deferred that observation. It does not accept the whole M4 workflow
+or repeat completed M3 gates. Later delivery/docs commits retain the frozen
+artifacts and do not expand those source scopes. This observation is independent
+of the pending 0.18.0 automated gates and wall read.
 
 [Original 0.17.1 observation and uploads](m4-column-layer-observation-0.17.1.md).
 

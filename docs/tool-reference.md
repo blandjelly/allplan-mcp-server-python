@@ -139,29 +139,58 @@ is required, with only its declared parameter:
 | attribute_name | attribute_name: one exact project name; GetAttributeID and, if observed, GetAttributeName round trip. |
 | attribute_definition | attribute_id: one ID observed from project metadata/sample; name/type/unit/control readers, stopping at first unavailable value. |
 | layer_name | layer_short_name: one exact short name; native ID/name round trip, no creation. |
+| wall_sample | drawing_file (required integer) and optional model_uuid: one foreground file and one exact native Wall root; reads tier count and, only for a single-tier Wall, tier 1 thickness and raw material. |
 
-The owner delivery invokes **only column_sample in file 101**, then health and
-stops. Other phases require a separate reviewed native observation. No batch,
-automatic continuation, GetEnumValues, geometry filter, highlight, resource
-creation or model setter is invoked. Raw absence/null/empty/undefined/error values
-retain their distinction and sampled adapter ownership remains unverified.
-The native enumeration container remains alive until its captured adapter reader
-finishes; adapters/containers are never saved in the JSON query cache.
+The historical isolated Column observation invoked only `column_sample` in file
+101. The new 0.18.0 wall candidate invokes only `wall_sample` in file 101; its
+automated checks and package evidence are pending, so native owner observation
+is not yet ready. No phase is a prerequisite for another package's native test.
+
+For `wall_sample`, `drawing_file` is required and must identify one foreground
+file. Optional `model_uuid` must be canonical and nonzero; explicit null is
+invalid. The M1 query includes required `type_name`, `type_uuid`, and identity
+fields plus `display_name` and `file_state`; it requests no attributes or
+geometry. It counts matched Wall roots while retaining native container owners,
+then selects the exact requested UUID or, when omitted, the first accepted Wall
+in deterministic UUID order. A requested UUID with no exact match has no
+fallback. The host imports `NemAll_Python_ArchElements`, resolves only the
+selected element with `GetElement`, verifies `isinstance(WallElement)`, and
+reads `.Properties` and `.TierCount`. A tier count other than 1 returns
+unsupported before any tier read. Otherwise it reads only
+`GetWallTierProperties(1).Thickness` and `.Material`; it does not read native
+thickness from every matched Wall.
+
+Thickness must be positive and finite; the bounded material is returned as a
+raw string. `sample.criterion.matches_assuming_native_mm` reports strict `<240`
+only after both fields are valid and under an API-mm assumption. The response keeps
+`units_runtime_verified=false`, `material_target_binding=not_checked`, and
+`material_write_available=false`. There is no all-walls filter, highlight,
+Apply, resource/metadata/enum discovery, or model write. A native wall read must
+be observed before enabling material writes.
+
+No batch or automatic continuation is invoked. Raw absence/null/empty/undefined/
+error values retain their distinction. Adapters and containers are never saved
+in the JSON query cache.
 
 Before every new native reader a started record is appended, flushed and fsynced
 in **Local/.allplan-mcp/logs/m4-native-probe.jsonl**; returned/failed records follow.
+The wall phase also flushes and fsyncs every new native boundary before moving
+to its next read.
 M1.column_scan is recorded as an existing service phase, not every internal API
 call. Each phase has a probe_id and UTC timestamps; values/private environment
 are not logged. Unwritable/full tracing (1 MiB) blocks further calls; it is not
 pruned automatically and is separate from the M3 execution journal. No native
 crash containment is promised by these file records.
 
-The external diagnostic saves request_pending **before sending** the MCP call,
-then response_received/failed. Lost response never causes an automatic retry or
-next phase. Read budgets remain 5 seconds and inherited M1 scan limits; failed
-native observations do not establish support. This is ready_for_owner_test for
-the first isolated read, not accepted_on_build.
-[Owner guide](m4-isolated-probe-owner-test.pl.md).
+The wall diagnostic atomically saves and fsyncs `request_pending` before sending
+its one MCP call, then records the structured response. The launcher brackets
+that request with `health_before` and `health_after` replies from the same host
+session. A lost reply never causes an automatic retry or following native call.
+Read budgets remain 5 seconds and inherited M1 scan limits; failed native observations do
+not establish support. The 0.18.0 wall observation is pending automated checks,
+package evidence and subsequent owner gate; this is not accepted_on_build.
+[Wall guide](m4-wall-properties-0.18.0.pl.md). Historical isolated Column
+[owner guide](m4-isolated-probe-owner-test.pl.md).
 
 ## model_selection — M4 UI probe
 
