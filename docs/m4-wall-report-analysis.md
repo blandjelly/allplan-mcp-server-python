@@ -17,6 +17,11 @@ the input report and prints a JSON analysis to stdout. It has no output-file
 option, does not overwrite the input, and makes no network or native Allplan
 calls.
 
+Exit code 0 means the report yielded a conditional conclusion, an exclusion, or
+an unsupported-tier result. Code 1 means evidence could not be checked; code 2
+means invalid input, file/JSON failure or invalid options. None establishes a
+native PASS or write eligibility.
+
 By default, the target material label is the exact string `C35`. To compare a
 different label, pass `--target-material LABEL`. The comparison does not trim,
 change case, or convert classes: `C35/45`, `c35`, and ` C35 ` differ from `C35`.
@@ -72,3 +77,10 @@ preservation. The CLI test runs with site packages disabled and socket creation
 forbidden. This is portable analysis coverage, not a new full-suite result or
 native acceptance. No new owner package or archive rebuild is needed for this
 source-only addition.
+
+Source **0c3a2987df164254d03cd749bcb72b71a79716ee** also passed the normal
+Windows/Ubuntu Python 3.12 CI matrix, **2/2 jobs**, including the full **299-test**
+portable suite and the workflow's standard build steps:
+[CI 38824865834](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38824865834).
+These source checks do not replace or expand the separately frozen 0.18.0
+package evidence. Later documentation-only commits do not change that source scope.

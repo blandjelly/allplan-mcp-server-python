@@ -18,7 +18,10 @@ same-reported-host steps, source/ref agreement and field provenance, but never
 proves report authenticity, live model state, native units or material binding.
 Every result is non-executable: no plan/Apply IDs, no native/HTTP calls, and
 `usable_for_write=false`. **10 focused tests PASS**; this is not a full-suite
-result. [Usage and limits](m4-wall-report-analysis.md). No new owner package,
+result. Source **0c3a2987df164254d03cd749bcb72b71a79716ee** additionally passed
+[standard Windows/Ubuntu Python 3.12 CI](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38824865834),
+**2/2 jobs**, with the full **299-test** portable suite and standard builds.
+[Usage and limits](m4-wall-report-analysis.md). No new owner package,
 version bump or rebuild of the frozen archives is needed for this source-only
 step. The supported material setter remains blocked pending native evidence.
 

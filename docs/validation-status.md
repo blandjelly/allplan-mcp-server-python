@@ -18,9 +18,13 @@ gate or typical office-project writes. Main integration/release remain separate.
 Subsequent **source-only** work adds an offline saved-report analyzer; it is not
 included in the frozen 0.18.0 package. **10 focused tests PASS** for strict
 thresholds, exact labels, exclusions, source consistency, forged flags, invalid
-JSON and dependency-free CLI input preservation. This is focused PASS, not a
-new full-suite/package/native result. No new native calls or material writes are
-enabled. [Analyzer contract](m4-wall-report-analysis.md). The packaged-source
+JSON and dependency-free CLI input preservation. Source
+**0c3a2987df164254d03cd749bcb72b71a79716ee** subsequently passed
+[standard CI 38824865834](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38824865834):
+**2/2 Windows/Ubuntu Python 3.12 jobs**, full **299-test** portable suite and
+standard build steps. This is source verification, not a new owner package or
+native result. No new native calls or material writes are enabled.
+[Analyzer contract](m4-wall-report-analysis.md). The packaged-source
 results below retain their original scope.
 
 0.18.0 retains the 0.17.2 `column_layer.py` and
