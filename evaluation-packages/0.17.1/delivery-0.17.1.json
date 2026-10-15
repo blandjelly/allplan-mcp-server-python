@@ -1,0 +1,43 @@
+{
+  "version": "0.17.1",
+  "base_m4_commit": "5f0c044514ac0c68dcf08fafb6d65a75bde1ff99",
+  "source_commit": "4287e472661dba9e21e60b9eb0e65ffe05d153df",
+  "status": "portable_verified_native_pending",
+  "native_acceptance": "not_run",
+  "historical_0160_crash_cause": "unknown",
+  "workflow": "Column unset fire resistance classification -> exact highlight -> existing W1",
+  "bug": "0.17.0 default names resolved unrelated attribute1398; correct exact classification names replace them without relaxing missing-value guards",
+  "owner_accepts_highlight": true,
+  "portable_tests": {
+    "python": "3.12.14",
+    "passed": 270,
+    "seconds": 154.653,
+    "scope": "final source commit"
+  },
+  "frozen_sync": "pass",
+  "build": "wheel and sdist pass",
+  "exact_package_verification": "package-verification.json",
+  "ci": {
+    "run_id": 38780900814,
+    "url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38780900814",
+    "source_commit": "4287e472661dba9e21e60b9eb0e65ffe05d153df",
+    "status": "completed",
+    "evidence": "source-ci-0.17.1.json",
+    "conclusion": "success",
+    "compatibility_jobs_passed": 6
+  },
+  "artifacts": {
+    "allplan_mcp_server-0.17.1.tar.gz": {
+      "sha256": "4d9f472e62d2d70e3f801dd51c0b325c4b74890a738bf9170d2b6948195506ce",
+      "bytes": 285233
+    },
+    "allplan-mcp-0.17.1-windows-evaluation.zip": {
+      "sha256": "85ff1a1961222cfb45013b158a81b0c431aebc7cd86a52d9b35bcadcc3827416",
+      "bytes": 309944
+    },
+    "allplan_mcp_server-0.17.1-py3-none-any.whl": {
+      "sha256": "d7ad2c0db922759b568e0576926ce283b7162f38ade024cae3eee6a9d866b0b9",
+      "bytes": 83853
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "source_commit": "4287e472661dba9e21e60b9eb0e65ffe05d153df",
+  "source_modified": false,
+  "payload_files": 141,
+  "bridge_hashes_verified": 29,
+  "archive_integrity": "sha256-verified",
+  "install_from_exact_zip": "pass",
+  "upgrade_from_0170": "pass",
+  "restore_to_0170": "pass",
+  "journal_and_trace_preserved": "pass",
+  "wheel_corrected_defaults": "pass",
+  "sdist_includes_host_and_excludes_historical_packages": "pass",
+  "native_Allplan": "not_run"
+}
