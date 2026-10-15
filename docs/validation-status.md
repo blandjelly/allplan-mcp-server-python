@@ -15,6 +15,14 @@ gate or typical office-project writes. Main integration/release remain separate.
 
 ## 0.18.0 wall-property read candidate
 
+Subsequent **source-only** work adds an offline saved-report analyzer; it is not
+included in the frozen 0.18.0 package. **10 focused tests PASS** for strict
+thresholds, exact labels, exclusions, source consistency, forged flags, invalid
+JSON and dependency-free CLI input preservation. This is focused PASS, not a
+new full-suite/package/native result. No new native calls or material writes are
+enabled. [Analyzer contract](m4-wall-report-analysis.md). The packaged-source
+results below retain their original scope.
+
 0.18.0 retains the 0.17.2 `column_layer.py` and
 `column_layer_diagnostics.py` semantics unchanged, and adds a narrow
 `model_property_probe` phase, `wall_sample`, plus **M4 Wall Properties.cmd**.

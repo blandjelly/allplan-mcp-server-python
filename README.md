@@ -15,6 +15,11 @@ run. The owner may test either package first; neither native test is a
 prerequisite for the other. See the [0.18.0 delivery README](evaluation-packages/0.18.0/README.md)
 and [short Polish wall guide](docs/m4-wall-properties-0.18.0.pl.md).
 
+Source development also includes an [offline saved-wall-report analyzer](docs/m4-wall-report-analysis.md).
+It checks conditional thickness/material conclusions and missing evidence without
+contacting Allplan. It is not in the frozen 0.18.0 ZIP and cannot authorize writes;
+the two native owner checks above remain deferred independently.
+
 **M0–M3 are accepted within the retained test project**, Allplan **2026-1-7**
 with local Windows Codex. M3 covers recorded one-/two-change Column scenarios
 in foreground file 101. This is a fixture evaluation MVP; whole-project office

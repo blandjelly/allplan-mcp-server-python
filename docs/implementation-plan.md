@@ -65,6 +65,11 @@ without first testing 0.17.2. See the [wall guide](m4-wall-properties-0.18.0.pl.
 and the pinned official SDK example at
 [ModifyWall.py, 8e2c252477e20bc9afac8918f78a8eeabd473a81](https://github.com/NemetschekAllplan/PythonPartsExamples/blob/8e2c252477e20bc9afac8918f78a8eeabd473a81/PythonPartsExampleScripts/ArchitectureExamples/ModifyObjects/ModifyWall.py).
 
+Source-only preparation for **K4 / M4.2b** adds an offline analyzer for one saved
+wall report, with strict threshold/exact-label/exclusion semantics and explicit
+missing-evidence states. It does not construct an executable ChangePlan or close
+native read/material-binding/write gates. [Contract and usage](m4-wall-report-analysis.md).
+
 - **M4.1:** Probe ordinary columns/beams versus Structural Framing and wall
   materials/attributes; establish read/write support per build, type and property.
 - **M4.2:** Extend `rule_based_edit` only through proven native-property/attribute

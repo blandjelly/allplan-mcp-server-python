@@ -11,6 +11,17 @@ and adds the isolated wall-property phase, its diagnostic and
 and [short owner guide](m4-wall-properties-0.18.0.pl.md) record the bounded next observation.
 No main integration.
 
+Source-only work after that delivery adds `wall_report_analysis`, a stdlib-only
+CLI for an already saved 0.18.0 report. It recomputes strict `<240`, compares the
+exact native material text and applies file+UUID exceptions. It checks complete
+same-reported-host steps, source/ref agreement and field provenance, but never
+proves report authenticity, live model state, native units or material binding.
+Every result is non-executable: no plan/Apply IDs, no native/HTTP calls, and
+`usable_for_write=false`. **10 focused tests PASS**; this is not a full-suite
+result. [Usage and limits](m4-wall-report-analysis.md). No new owner package,
+version bump or rebuild of the frozen archives is needed for this source-only
+step. The supported material setter remains blocked pending native evidence.
+
 The 0.17.2 artifacts, README, source and CI evidence remain unchanged. Its
 native observation was **not run**. The owner deferred native checks for both
 versions to a later time: either package may be tested first, independently.
