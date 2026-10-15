@@ -41,7 +41,7 @@ Apply. Unknown criteria still block highlighting and writes, and more than 32
 changes remain blocked. The new owner observation is limited to this semantic
 change and the previously unconfirmed no-op case; see the
 [0.17.2 walkthrough](m4-column-layer-0.17.2.pl.md) and
-[0.17.1 observation](test-results/m4-column-layer-0.17.1.md). Automated
+[0.17.1 observation](m4-column-layer-observation-0.17.1.md). Automated
 verification and package evidence are pending in the
 [0.17.2 delivery record](../evaluation-packages/0.17.2/README.md).
 

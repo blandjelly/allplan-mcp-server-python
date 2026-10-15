@@ -227,7 +227,7 @@ for this workflow.
 
 The 0.17.1 native observation confirmed the field binding and two writes but
 submitted only two highlight targets, omitting a matching no-op. See the
-[observation report](test-results/m4-column-layer-0.17.1.md). The 0.17.2 source,
+[observation report](m4-column-layer-observation-0.17.1.md). The 0.17.2 source,
 package and automated check results are pending in the
 [delivery README](../evaluation-packages/0.17.2/README.md); this candidate is
 ready for owner testing only after those checks pass.

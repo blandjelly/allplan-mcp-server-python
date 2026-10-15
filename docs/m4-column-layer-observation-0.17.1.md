@@ -44,11 +44,11 @@ prove geometry preservation or native UI Undo behavior.
 
 ## Original evidence
 
-- [Original JSON](../../evaluation-packages/0.17.1/native-acceptance/20261015-owner/m4-column-layer-check-20261015T180606761353Z.json)
+- [Original JSON](../evaluation-packages/0.17.1/native-acceptance/20261015-owner/m4-column-layer-check-20261015T180606761353Z.json)
   (SHA-256 `83048187210f4ea3e765c02718c8ea692ee81cf6648a57fe244411c56e78bb56`)
-- [Original TXT](../../evaluation-packages/0.17.1/native-acceptance/20261015-owner/m4-column-layer-check-20261015T180606761353Z.txt)
+- [Original TXT](../evaluation-packages/0.17.1/native-acceptance/20261015-owner/m4-column-layer-check-20261015T180606761353Z.txt)
   (SHA-256 `ded0aaa0f65fb59f005bcb99fa7cc9507c3cce6ee37755ab0d6b0bd66d6ba579`)
 
 Both uploaded files were copied unchanged. Package source/build/CI evidence is
-recorded in the [0.17.1 delivery README](../../evaluation-packages/0.17.1/README.md);
+recorded in the [0.17.1 delivery README](../evaluation-packages/0.17.1/README.md);
 it does not expand the native scope of this observation.

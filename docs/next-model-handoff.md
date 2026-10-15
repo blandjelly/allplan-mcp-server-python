@@ -8,7 +8,7 @@ No main integration.
 The owner requested the full first scenario and explicitly accepted highlighting:
 Columns without fire resistance classification → matching targets highlighted →
 existing W1. The owner clarified the field as **Klasa odporności ogniowej**, with
-F30/F60 values. The [0.17.1 observation](test-results/m4-column-layer-0.17.1.md)
+F30/F60 values. The [0.17.1 observation](m4-column-layer-observation-0.17.1.md)
 confirmed the exact binding and two writes but exposed that the already-W1
 matching no-op was omitted from highlighting.
 

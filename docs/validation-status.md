@@ -38,7 +38,7 @@ and package verification are pending in the
 is ready only after those automated checks pass. This does not accept the whole
 M4 workflow or repeat completed M3 gates.
 
-[Original 0.17.1 observation and uploads](test-results/m4-column-layer-0.17.1.md).
+[Original 0.17.1 observation and uploads](m4-column-layer-observation-0.17.1.md).
 
 ## Historical 0.17.1 delivery and 0.17.0 owner result
 

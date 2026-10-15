@@ -11,7 +11,7 @@ with more than 32 changes remain blocked. The exact default names are
 `Klasa odporności ogniowej` / `Fire resistance classification`; the native ID
 is resolved and checked by name roundtrip. No broad metadata/enum scan is used;
 the 0.16.0 discovery route remains quarantined. The
-[0.17.1 observation](docs/test-results/m4-column-layer-0.17.1.md) found the
+[0.17.1 observation](docs/m4-column-layer-observation-0.17.1.md) found the
 no-op highlighting gap after two layer updates. 0.17.2 is being prepared;
 automated verification and package delivery will be recorded in its
 [delivery README](evaluation-packages/0.17.2/README.md) before the owner test.
