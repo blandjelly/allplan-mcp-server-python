@@ -4,8 +4,9 @@ Ta próba odczytuje jedną istniejącą natywną ścianę jednowarstwową. Zakre
 pakiet **0.18.0**, Allplan **2026-1-7** (API **2026.1**), zachowana kopia
 **MCP_QA_DEMO** i rysunek **101 foreground**. Pakiet 0.18.0 zawiera niezmieniony
 runtime Columns z 0.17.2 oraz nowy launcher **M4 Wall Properties.cmd**.
-Najpierw wykonaj kontrole źródła, CI i instalacji opisane w
+Wyniki kontroli źródła, CI i instalacji są zapisane w
 [README pakietu 0.18.0](../evaluation-packages/0.18.0/README.md).
+Nie uruchamiaj ponownie testów automatycznych ani buildów; ta instrukcja dotyczy próby w Allplanie.
 
 ## Przygotowanie
 

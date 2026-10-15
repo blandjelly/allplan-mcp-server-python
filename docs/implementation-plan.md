@@ -47,8 +47,10 @@ independent of 0.18.0 and is not a prerequisite. See the
 [0.17.1 observation](m4-column-layer-observation-0.17.1.md).
 
 **M4.1a isolated wall-property read, 0.18.0:** the candidate adds a single
-`wall_sample` phase and **M4 Wall Properties.cmd**. Automated checks and package
-evidence are pending. The observation is limited to one Wall in foreground file
+`wall_sample` phase and **M4 Wall Properties.cmd**. The candidate is **ready_for_owner_test**
+after 289 portable tests, six CI jobs and exact package verification passed;
+[source scopes and evidence](../evaluation-packages/0.18.0/README.md).
+The observation is limited to one Wall in foreground file
 101. M1 uses required type/identity fields plus display name/file state, counts
 matched Wall roots, and reads no attributes or geometry. The host selects one
 exact UUID (or the first Wall in UUID order), verifies a native `WallElement`,

@@ -1,12 +1,14 @@
 # Current handoff
 
-Updated 2026-10-15 Europe/Warsaw. Current candidate **0.18.0**; automated
-checks and package evidence are **pending**. Do not report it as
-ready_for_owner_test until those records exist. The package carries the
+Updated 2026-10-15 Europe/Warsaw. Current candidate **0.18.0**, **ready_for_owner_test**.
+Clean source **5ea4bcfd88f500bbf137e361ba5d6cc3d83710b5** passed **289 portable
+tests**, six Windows/Ubuntu × Python 3.11–3.13 CI jobs, frozen sync, builds and
+exact ZIP install/upgrade from 0.17.2/restore verification (30 bridge hashes;
+journal/trace preserved). The package carries the
 0.17.2 `column_layer.py` and `column_layer_diagnostics.py` runtime unchanged,
 and adds the isolated wall-property phase, its diagnostic and
 **M4 Wall Properties.cmd**. The [0.18.0 delivery README](../evaluation-packages/0.18.0/README.md)
-and [short owner guide](m4-wall-properties-0.18.0.pl.md) are being prepared.
+and [short owner guide](m4-wall-properties-0.18.0.pl.md) record the bounded next observation.
 No main integration.
 
 The 0.17.2 artifacts, README, source and CI evidence remain unchanged. Its

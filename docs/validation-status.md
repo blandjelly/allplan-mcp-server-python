@@ -1,8 +1,7 @@
 # Validation status and limits
 
-Updated **2026-10-15 Europe/Warsaw**. Current candidate **0.18.0**; its
-automated checks and package evidence are **pending**, so it is not yet
-ready_for_owner_test. Its native wall observation has not run. The owner deferred
+Updated **2026-10-15 Europe/Warsaw**. Current candidate **0.18.0**, **ready_for_owner_test**;
+its source, CI and package checks passed. Its native wall observation has not run. The owner deferred
 native checks for both 0.17.2 and 0.18.0; either can be tested first, without a
 dependency between them. The 0.17.2 source, artifacts and prior automated
 evidence remain unchanged; its native observation remains **not_run**. The
@@ -19,9 +18,14 @@ gate or typical office-project writes. Main integration/release remain separate.
 0.18.0 retains the 0.17.2 `column_layer.py` and
 `column_layer_diagnostics.py` semantics unchanged, and adds a narrow
 `model_property_probe` phase, `wall_sample`, plus **M4 Wall Properties.cmd**.
-Automated verification and delivery records are pending; do not infer a test
-count, CI result, package verification or `ready_for_owner_test` until the
-[0.18.0 delivery README](../evaluation-packages/0.18.0/README.md) records them.
+Clean source **5ea4bcfd88f500bbf137e361ba5d6cc3d83710b5** passed **289 portable
+tests** (CPython 3.12.14), frozen sync, wheel/sdist and Windows ZIP builds.
+[Source CI 38823160113](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38823160113)
+passed **6/6** Windows/Ubuntu × Python 3.11–3.13 jobs, including tests/builds.
+Exact ZIP installation, upgrade from 0.17.2 and restore passed with **30 bridge
+hashes** and journal/trace preservation. Column runtime byte identity was checked.
+[0.18.0 delivery and evidence](../evaluation-packages/0.18.0/README.md).
+Later delivery/docs commits retain those frozen artifacts and source scopes.
 
 The wall phase requests one foreground file (101) and optionally one canonical
 nonzero model UUID; explicit null UUID is invalid. Its M1 query uses the

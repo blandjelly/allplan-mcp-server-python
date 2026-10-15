@@ -131,7 +131,7 @@ Column/Wall discovery, all sampled definitions and UI chain remain suspended.
 ## model_property_probe — isolated read phases
 
 Bridge `/model-property-probe`, schema `m4-property-probe-1`. Exactly one phase
-is required, with only its declared parameter:
+is required, with only its declared parameters:
 
 | Phase | Parameter / native work |
 | --- | --- |
@@ -143,8 +143,8 @@ is required, with only its declared parameter:
 
 The historical isolated Column observation invoked only `column_sample` in file
 101. The new 0.18.0 wall candidate invokes only `wall_sample` in file 101; its
-automated checks and package evidence are pending, so native owner observation
-is not yet ready. No phase is a prerequisite for another package's native test.
+289 portable tests, six CI jobs and exact package installation passed, making it
+**ready_for_owner_test**. No phase is a prerequisite for another package's native test.
 
 For `wall_sample`, `drawing_file` is required and must identify one foreground
 file. Optional `model_uuid` must be canonical and nonzero; explicit null is
@@ -176,7 +176,7 @@ Before every new native reader a started record is appended, flushed and fsynced
 in **Local/.allplan-mcp/logs/m4-native-probe.jsonl**; returned/failed records follow.
 The wall phase also flushes and fsyncs every new native boundary before moving
 to its next read.
-M1.column_scan is recorded as an existing service phase, not every internal API
+M1.column_scan / M1.wall_scan are recorded as existing service phases, not every internal API
 call. Each phase has a probe_id and UTC timestamps; values/private environment
 are not logged. Unwritable/full tracing (1 MiB) blocks further calls; it is not
 pruned automatically and is separate from the M3 execution journal. No native
@@ -187,8 +187,8 @@ its one MCP call, then records the structured response. The launcher brackets
 that request with `health_before` and `health_after` replies from the same host
 session. A lost reply never causes an automatic retry or following native call.
 Read budgets remain 5 seconds and inherited M1 scan limits; failed native observations do
-not establish support. The 0.18.0 wall observation is pending automated checks,
-package evidence and subsequent owner gate; this is not accepted_on_build.
+not establish support. The 0.18.0 wall observation remains pending; automated
+checks do not establish accepted_on_build. [Source and delivery evidence](../evaluation-packages/0.18.0/README.md).
 [Wall guide](m4-wall-properties-0.18.0.pl.md). Historical isolated Column
 [owner guide](m4-isolated-probe-owner-test.pl.md).
 
