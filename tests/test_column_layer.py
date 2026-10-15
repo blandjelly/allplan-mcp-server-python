@@ -1,5 +1,4 @@
 """M4 criterion edits exercised through the real shared executor with native fakes."""
-import copy
 import importlib
 import json
 import tempfile
@@ -8,21 +7,26 @@ import weakref
 from pathlib import Path
 from uuid import uuid4
 
-import test_model_properties as fixtures
+import test_m1_completion as fixtures
 
 
 class ColumnLayerTests(unittest.TestCase):
-    setUp = fixtures.PropertyTests.setUp
-    prepare_context = fixtures.PropertyTests.prepare_context
-    prepare = fixtures.PropertyTests.prepare
-    adapter = fixtures.PropertyTests.adapter
-    native = fixtures.PropertyTests.native
-    element = fixtures.PropertyTests.element
-    assert_code = fixtures.PropertyTests.assert_code
+    setUp = fixtures.M1CompletionTests.setUp
+    prepare_context = fixtures.M1CompletionTests.prepare_context
+    prepare = fixtures.M1CompletionTests.prepare
+    adapter = fixtures.M1CompletionTests.adapter
+    native = fixtures.M1CompletionTests.native
+    element = fixtures.M1CompletionTests.element
+    assert_code = fixtures.M1CompletionTests.assert_code
 
-    def fixture(self, values=("", "R60", "<niezdefiniowany>")):
-        elements = [self.element(i, attrs=[(83, v)]) for i, v in enumerate(values, 1)]
-        fixtures.PropertyTests.fixture(self, elements)
+    def fixture(self, values=("", "F60", "<niezdefiniowany>")):
+        elements = [self.element(i, attrs=[(935, v)]) for i, v in enumerate(values, 1)]
+        self.native(elements)
+        self.attribute_catalog({935: "Klasa odporności ogniowej", 1398: "Odporność ogniowa"})
+        self.base.LayerService.GetIDByShortName.side_effect = lambda name, doc: {"COL": 7, "W1": 8}.get(name, -1)
+        self.base.LayerService.GetShortNameByID.side_effect = lambda ident, doc: {7: "COL", 8: "W1"}[ident]
+        self.base.LayerService.GetNameByID.side_effect = lambda ident, doc: {7: "Columns", 8: "W1"}[ident]
+        self.adapter_module.BaseElementAdapterList = list
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
         self.plans = self.handler.repair_plans
@@ -37,6 +41,11 @@ class ColumnLayerTests(unittest.TestCase):
             targets[0].GetCommonProperties.return_value.Layer = 8
         self.base.ElementsLayerService.ChangeLayer.side_effect = layer
         return elements
+
+    def attribute_catalog(self, names):
+        self.base.AttributeService.GetAttributeID.side_effect = lambda doc, name: next(
+            (ident for ident, actual in names.items() if actual == name), -1)
+        self.base.AttributeService.GetAttributeName.side_effect = lambda doc, ident: names[ident]
 
     def call(self, **request):
         result = self.handler.handle('/column-layer', {'schema_version': 'm4-column-layer-1', **request})
@@ -80,8 +89,89 @@ class ColumnLayerTests(unittest.TestCase):
         self.assertEqual(next_plan['counts']['no_op'], 2)
         self.assertFalse(next_plan['changes'])
 
+    def test_six_columns_use_classification_when_legacy_attribute_is_omitted(self):
+        elements = self.fixture(('', 'F30', 'F60', '  ', 'F90', 'F120'))
+        plan = self.preview()
+        self.assertEqual(plan['criteria']['binding']['attribute'],
+                         {'attribute_id': 935, 'name': 'Klasa odporności ogniowej'})
+        self.assertEqual(plan['counts']['columns'], 6)
+        self.assertEqual([c['decision'] for c in plan['criteria']['checks']],
+                         ['change', 'nonmatching', 'nonmatching', 'change', 'nonmatching', 'nonmatching'])
+        targets = [elements[0], elements[3]]
+        self.assertEqual([c['ref']['model_uuid'] for c in plan['changes']],
+                         [e.GetModelElementUUID() for e in targets])
+        self.highlight(plan)
+        sent = self.module.AllplanIFW.HighlightService.HighlightElements.call_args.args[0]
+        self.assertEqual([id(e) for e in sent], [id(e) for e in targets])
+        self.assertEqual(self.apply(plan)['state'], 'completed')
+        calls = self.base.ElementsLayerService.ChangeLayer.call_args_list
+        self.assertEqual([id(call.args[0][0]) for call in calls], [id(e) for e in targets])
+        self.assertEqual([e.GetAttributes.return_value for e in elements],
+                         [[(935, v)] for v in ('', 'F30', 'F60', '  ', 'F90', 'F120')])
+
+    def test_legacy_attribute_values_cannot_change_classification_matches(self):
+        elements = self.fixture(('', 'F30'))
+        elements[0].GetAttributes.return_value.append((1398, 'F30'))
+        elements[1].GetAttributes.return_value.append((1398, ''))
+        plan = self.preview()
+        self.assertEqual([c['decision'] for c in plan['criteria']['checks']], ['change', 'nonmatching'])
+        self.highlight(plan)
+        self.assertEqual(self.apply(plan)['state'], 'completed')
+        self.base.ElementsLayerService.ChangeLayer.assert_called_once()
+        self.assertIs(self.base.ElementsLayerService.ChangeLayer.call_args.args[0][0], elements[0])
+
+    def test_only_legacy_catalog_fails_before_scan_ui_or_writes(self):
+        self.fixture()
+        self.attribute_catalog({1398: 'Odporność ogniowa'})
+        self.assert_code('property_binding_unavailable', self.preview)
+        self.assertEqual([call.args[1] for call in self.base.AttributeService.GetAttributeID.call_args_list],
+                         ['Klasa odporności ogniowej', 'Fire resistance classification'])
+        self.base.ElementsSelectService.SelectAllElements.assert_not_called()
+        self.module.AllplanIFW.HighlightService.HighlightElements.assert_not_called()
+        self.module.AllplanIFW.HighlightService.CancelAllHighlightedElements.assert_not_called()
+        self.base.ElementsLayerService.ChangeLayer.assert_not_called()
+
+    def test_english_classification_name_resolves_by_exact_round_trip(self):
+        self.fixture()
+        self.attribute_catalog({935: 'Fire resistance classification', 1398: 'Fire resistance'})
+        plan = self.preview()
+        self.assertEqual(plan['criteria']['binding']['attribute'],
+                         {'attribute_id': 935, 'name': 'Fire resistance classification'})
+        self.assertEqual(plan['counts']['changes'], 2)
+        self.highlight(plan)
+        self.assertEqual(self.apply(plan)['state'], 'completed')
+
+    def test_explicit_custom_name_binds_catalog_id_without_assuming_935(self):
+        elements = self.fixture(('', 'F30'))
+        self.attribute_catalog({935: 'Klasa odporności ogniowej', 20017: 'Project classification'})
+        elements[0].GetAttributes.return_value = [(935, 'F60'), (20017, '')]
+        elements[1].GetAttributes.return_value = [(935, ''), (20017, 'F30')]
+        plan = self.preview(attribute_names=['Project classification'])
+        self.assertEqual(plan['criteria']['binding']['attribute'],
+                         {'attribute_id': 20017, 'name': 'Project classification'})
+        self.assertEqual([call.args[1] for call in self.base.AttributeService.GetAttributeID.call_args_list],
+                         ['Project classification'])
+        self.assertEqual([c['decision'] for c in plan['criteria']['checks']], ['change', 'nonmatching'])
+        self.highlight(plan)
+        self.assertEqual(self.apply(plan)['state'], 'completed')
+        self.base.ElementsLayerService.ChangeLayer.assert_called_once()
+        self.assertIs(self.base.ElementsLayerService.ChangeLayer.call_args.args[0][0], elements[0])
+
+    def test_missing_classification_stays_unknown_even_when_legacy_field_is_blank(self):
+        elements = self.fixture(('F30',))
+        elements[0].GetAttributes.return_value = [(1398, '')]
+        plan = self.preview()
+        self.assertEqual(plan['criteria']['checks'][0]['value_state'], 'absent_from_readall_unknown')
+        self.assertEqual(plan['criteria']['checks'][0]['decision'], 'unknown')
+        self.assertEqual(plan['changes'], [])
+        self.assertFalse(plan['evaluation_apply_available'])
+        self.assert_code('repair_scope_unavailable', lambda: self.highlight(plan))
+        self.assert_code('presentation_required', lambda: self.apply(plan))
+        self.module.AllplanIFW.HighlightService.HighlightElements.assert_not_called()
+        self.base.ElementsLayerService.ChangeLayer.assert_not_called()
+
     def test_value_states_are_distinct_and_omission_is_unknown_not_a_write_target(self):
-        elements = self.fixture((None, '', '  ', '<niezdefiniowany>', 'R60', 0, 'x'))
+        elements = self.fixture((None, '', '  ', '<niezdefiniowany>', 'F60', 0, 'x'))
         elements[-1].GetAttributes.return_value = []
         plan = self.preview()
         self.assertEqual([c['value_state'] for c in plan['criteria']['checks']],
@@ -95,17 +185,25 @@ class ColumnLayerTests(unittest.TestCase):
         self.base.AttributeService.GetAttributeID.side_effect = lambda doc, name: -1
         self.assert_code('property_binding_unavailable', self.preview)
         self.base.ElementsSelectService.SelectAllElements.assert_not_called()
-        self.base.AttributeService.GetAttributeID.side_effect = lambda doc, name: {'Odporność ogniowa': 83, 'Fire resistance': 84}[name]
-        self.base.AttributeService.GetAttributeName.side_effect = lambda doc, ident: {83: 'Odporność ogniowa', 84: 'Fire resistance'}[ident]
+        self.base.AttributeService.GetAttributeID.side_effect = lambda doc, name: {'Klasa odporności ogniowej': 935, 'Fire resistance classification': 936}[name]
+        self.base.AttributeService.GetAttributeName.side_effect = lambda doc, ident: {935: 'Klasa odporności ogniowej', 936: 'Fire resistance classification'}[ident]
         self.assert_code('property_binding_unavailable', self.preview)
         self.base.ElementsSelectService.SelectAllElements.assert_not_called()
+
+    def test_classification_name_round_trip_mismatch_never_scans_or_writes(self):
+        self.fixture()
+        self.base.AttributeService.GetAttributeName.side_effect = lambda doc, ident: 'Odporność ogniowa'
+        self.assert_code('property_binding_unavailable', self.preview)
+        self.base.ElementsSelectService.SelectAllElements.assert_not_called()
+        self.module.AllplanIFW.HighlightService.HighlightElements.assert_not_called()
+        self.base.ElementsLayerService.ChangeLayer.assert_not_called()
 
     def test_apply_requires_highlight_and_rechecks_full_source_including_nonmatch(self):
         elements = self.fixture()
         plan = self.preview()
         self.assert_code('presentation_required', lambda: self.apply(plan))
         self.highlight(plan)
-        elements[1].GetAttributes.return_value = [(83, '')]
+        elements[1].GetAttributes.return_value = [(935, '')]
         self.assert_code('repair_conflict', lambda: self.apply(plan))
         self.base.ElementsLayerService.ChangeLayer.assert_not_called()
 
@@ -116,7 +214,7 @@ class ColumnLayerTests(unittest.TestCase):
                 plan = self.preview()
                 self.highlight(plan)
                 if mutation == 'new_column':
-                    self.base.ElementsSelectService.SelectAllElements.return_value.append(self.element(10, attrs=[(83, '')]))
+                    self.base.ElementsSelectService.SelectAllElements.return_value.append(self.element(10, attrs=[(935, '')]))
                 elif mutation == 'resource':
                     self.base.LayerService.GetIDByShortName.side_effect = lambda name, doc: 9
                     self.base.LayerService.GetShortNameByID.side_effect = lambda ident, doc: 'W1'
@@ -222,7 +320,7 @@ class ColumnLayerTests(unittest.TestCase):
         wall.GetModelGeometry.assert_not_called()
 
     def test_full_large_result_highlights_only_plan_targets_and_clear_invalidates_submission(self):
-        elements = self.fixture(['R60'] * 201 + ['', ''])
+        elements = self.fixture(['F60'] * 201 + ['', ''])
         plan = self.preview()
         result = self.highlight(plan)
         self.assertEqual(result['counts']['submitted_model_identities'], 2)

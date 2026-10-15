@@ -1,6 +1,6 @@
 # Validation status and limits
 
-Updated **2026-10-13 Europe/Warsaw**. Package **0.15.0**.
+Updated **2026-10-15 Europe/Warsaw**. Current candidate **0.17.1**.
 The **0.16.0** property gate is **FAIL_CRASH / blocked_after_native_crash**.
 **0.16.1** is ready_for_owner_test only for one isolated Column read, not accepted_on_build. M3 write acceptance below remains scoped to 0.15.0 evidence.
 **M0–M3 / UAT-00–UAT-06 are accepted within the retained test-project scope.**
@@ -8,16 +8,44 @@ The owner explicitly narrowed M3/UAT-05/UAT-06 to existing demonstrated scenario
 This closes the fixture evaluation MVP; it does not accept the original broader
 gate or typical office-project writes. Main integration/release remain separate.
 
-## 0.17.0 candidate
+## 0.17.1 candidate and 0.17.0 owner result
 
-Local Python 3.12 full portable suite: **261 tests PASS** (2026-10-14).
+0.17.1 source tests, CI and builds/package verification are recorded with their
+exact source scope in the [delivery record](../evaluation-packages/0.17.1/README.md).
+Native acceptance is **pending**.
+It corrects the criterion binding to exact names `Klasa odporności ogniowej` /
+`Fire resistance classification`. The runtime resolves the ID and verifies the
+name roundtrip; no fallback to 1398 or hardcoded binding to 935 is used.
 
-Implements the owner-confirmed criterion → highlight → W1 workflow; native
-acceptance **not_run**. The 0.16.1 attachment confirms only one observed Column
+The uploaded 0.17.0 owner report from **2026-10-15 at 19:40 Europe/Warsaw**
+records **BLOCKED**. It resolved `Odporność ogniowa` to **1398**, which was absent
+from the ReadAll response on all six Columns. All six criteria were unknown;
+no highlighting, Apply or setters followed. The owner clarified the intended
+field as **Klasa odporności ogniowej**, with F30/F60 choices. The guard correctly
+blocked unknown reads, but the resolved field did not represent the requested
+criterion: this is a semantic binding error, not successful criterion acceptance.
+`health_before` was healthy and `journal_before` available with seven records
+and no blockers. There is no `health_after`; full-run/after-run host health is
+not established by this report.
+[Original JSON](../evaluation-packages/0.17.0/native-acceptance/20261015-owner/m4-column-layer-check-20261015T174011580242Z.json),
+[original TXT](../evaluation-packages/0.17.0/native-acceptance/20261015-owner/m4-column-layer-check-20261015T174011580242Z.txt).
+
+Official [2026-1 attribute definitions](https://help.allplan.com/Allplan/2026-1/1034/Allplan/326206.htm)
+identify **935** as **Fire resistance classification**, String. The
+[official SDK example](https://github.com/NemetschekAllplan/PythonPartsExamples/blob/8e2c252477e20bc9afac8918f78a8eeabd473a81/PythonPartsExampleScripts/BasisExamples/MacroWithElementGroup.py#L164)
+sets 935 to **F30**; the [attribute tutorial](https://pythonparts.allplan.com/2026/manual/features/attributes/element_attributes/)
+uses 1398 as **Fire risk factor** with **A1/A2**. These support the distinction;
+the owner-confirmed Polish name is still checked against the actual project.
+The existing ReadAll reader is retained. Genuine omissions remain unknown and
+block Apply, as do actual read failures and unsupported values.
+
+Historical 0.17.0 portable evidence remains **261 tests PASS** (2026-10-14),
+with delivery/source CI evidence in its unchanged package; this does not establish
+0.17.1 verification or native support. The 0.16.1 attachment confirms only one observed Column
 attribute read and healthy same-session replies; user reports no crash.
 The exact native cause of 0.16.0 remains unknown. Broad discovery stays blocked.
-[New workflow/limits](m4-column-layer-0.17.0.pl.md),
-[delivery and portable evidence](../evaluation-packages/0.17.0/README.md).
+[Current workflow/limits](m4-column-layer-0.17.1.pl.md),
+[historical 0.17.0 delivery and portable evidence](../evaluation-packages/0.17.0/README.md).
 
 ## Accepted scope
 

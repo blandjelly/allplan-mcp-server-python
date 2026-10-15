@@ -1,0 +1,522 @@
+{
+  "schema_version": "m4-column-layer-owner-1",
+  "state": "blocked",
+  "steps": [
+    {
+      "name": "health_before",
+      "tool": "allplan_health",
+      "request": null,
+      "state": "response_received",
+      "response": {
+        "ok": true,
+        "allplan_version": "2026.1",
+        "runtime": {
+          "version": "2026.1",
+          "allplan_release": {
+            "Version": "2026.1",
+            "MainReleaseName": "2026",
+            "SubReleaseName": "2026.1",
+            "WindowsReleaseName": ""
+          },
+          "executable_versions": {
+            "status": "observed",
+            "file_version": "16.1617.8659.814",
+            "product_version": "2026.0.1.0",
+            "source": "running_process_executable"
+          },
+          "hotfix": {
+            "status": "not_checked",
+            "value": null
+          },
+          "embedded_python": {
+            "version": "3.13.13",
+            "implementation": "CPython"
+          },
+          "bridge_package": {
+            "version": "0.17.0",
+            "source_commit": "2e7967218f51bdea14fc36b566a8d588799f47f2",
+            "integrity": "sha256-verified",
+            "bridge_files": {
+              "Library/PythonHost/StartPythonHost.pyp": "b1aba49ed554eeefa9e44f4e9a6f06992e74d4f2916277ef451de11d72167813",
+              "PythonPartsScripts/PythonHost/audit_contracts.py": "155b10200982c879f3bd0226ea8f26c00e15118f8b5f3df532c7937ac3e8f035",
+              "PythonPartsScripts/PythonHost/column_layer.py": "de1adba31aa4527020dc9bea1df5cf7acdc5c43c156495c93e72d33a68fe5a9a",
+              "PythonPartsScripts/PythonHost/mark_numbering.py": "dc6f7b87ba26aed1db1b50c6925b35df9509fb8b841e17fdb9d6e791666b51f4",
+              "PythonPartsScripts/PythonHost/model_audit.py": "50c74918d1b23d93f182ff01ea5859e0ea2b39ee54a70a13f0d8ee2346acbcd0",
+              "PythonPartsScripts/PythonHost/model_context.py": "8af4dfa1ac72523bb4b5fb4a068e5e202276118a95cf378d734082465e88d013",
+              "PythonPartsScripts/PythonHost/model_metadata.py": "c1339766382fd52de47fb66e11d87106942b67cf5dc743088739473738802d4a",
+              "PythonPartsScripts/PythonHost/model_properties.py": "812ee879e7926f6ed0356c678e1529b506284863fd1c7f02e46175464f5bc3e1",
+              "PythonPartsScripts/PythonHost/model_query.py": "6228264afcb8aabba77f53973b7dc47324125d88f7291ae72be078a18f2ea71f",
+              "PythonPartsScripts/PythonHost/model_repair.py": "f07dbcfd301f96a34ba638955b8cba74c7f87ebb608f4b5f1f72b193b17009bb",
+              "PythonPartsScripts/PythonHost/model_scope.py": "a80b72eda1ddac1563bdbdf73aafce9164c21304c82bfb72a2adb9e1f2c5f2b9",
+              "PythonPartsScripts/PythonHost/model_selection.py": "ebd904379f6704a211dd3e0a3a74c6b0290d07c31c7f067e8d29e1b65b6e839e",
+              "PythonPartsScripts/PythonHost/native_readers.py": "15c62a3c295bbeda4722bc54a6d36a4ada04fba866f0f1eb7aacd3a7f6c48cd0",
+              "PythonPartsScripts/PythonHost/native_repairs.py": "0123ba4946e92a2eeb4eb2a8e6960e4a4227924d3d31526834888f2b0bc2f87d",
+              "PythonPartsScripts/PythonHost/profile_contracts.py": "bed1c0099c2dfdc5fc48374cd78c16ea1ea0a6df3309deb919322b060d7a46b6",
+              "PythonPartsScripts/PythonHost/property_contracts.py": "42d7291fa46159c3d0d932febef9e2d3aeb3a74336dde2baeb73d759db5946b4",
+              "PythonPartsScripts/PythonHost/property_probe.py": "910b92ba8ff36e1642ab7c0bff9b0ac767502cea45f6e1c9c24ce8a32a2e034a",
+              "PythonPartsScripts/PythonHost/PythonHostHandler.py": "45faf048dc48c52aca3fc6dee195461778928df2421394fa92cdea0a1d055fb0",
+              "PythonPartsScripts/PythonHost/query_contracts.py": "5c27eebe084abe383de1e1330a0f5b46db08d097e00aaca171c9e8f49e396513",
+              "PythonPartsScripts/PythonHost/repair_contracts.py": "46469c0447c91e60b21cdcf6af47bb2946f066367e8c712e9e91110072f7f6b0",
+              "PythonPartsScripts/PythonHost/repair_execution.py": "ae467619e68699dc8ad9867ec58a6efc94bff39cb2055140d4804d7ad1f12e32",
+              "PythonPartsScripts/PythonHost/runtime_info.py": "6d46a44d0c8e8d3c1d757a22b4012a9919eb782bb8ea60577a1e229acfde91a2",
+              "PythonPartsScripts/PythonHost/sandbox/__init__.py": "b895513c191ba9ea7a8748f3aef1c6c9d74875b990d8ef41e10faf3904e0e586",
+              "PythonPartsScripts/PythonHost/sandbox/const.py": "168b93f376d54ddaf67ac62ffc5fb7e94570ab24e1f828d0732effa097e659d4",
+              "PythonPartsScripts/PythonHost/sandbox/executor.py": "c06f9810291a1c9e6f3deb7939d4b6615905d15c6662a6e69d7973b3fcbf0f6a",
+              "PythonPartsScripts/PythonHost/sandbox/validator.py": "5a4d3bf2bb6d2556512285a778083385c5c5049a398bc7a77cdaab9c5d8ddaec",
+              "PythonPartsScripts/PythonHost/spatial_contracts.py": "40820192b5500782cab4fb3fe837244989283861c143079b245f8f2e223ee086",
+              "PythonPartsScripts/PythonHost/StartPythonHost.py": "6962786bd8dfa3f7de555856a0c64a1943b09612f314bef74d51f572c58fe6ba",
+              "PythonPartsScripts/PythonHost/transport.py": "a7c700a368538ada76f32360f1962d2d3f483966ea6030eae254732fa1f44fbe"
+            }
+          },
+          "installed_bridge_integrity": {
+            "status": "verified",
+            "mismatches": []
+          },
+          "compatibility": {
+            "target_major": "2026",
+            "major_matches": true,
+            "runtime_verified": false
+          },
+          "request_id": "d7f19b21-8bfa-46a9-9f08-41dbf622c52e",
+          "host_session_id": "4e4a494b-720b-4f1e-8703-2a333838db84",
+          "ui_dispatch_exception_boundary": "contained_result_error_v1"
+        },
+        "external_python": "3.14.8",
+        "mcp_package_version": "0.17.0",
+        "request_id": "d7f19b21-8bfa-46a9-9f08-41dbf622c52e",
+        "allplan_host_url": "http://127.0.0.1:5679"
+      }
+    },
+    {
+      "name": "journal_before",
+      "tool": "fix_model_issues",
+      "request": {
+        "action": "inspect_journal"
+      },
+      "state": "response_received",
+      "response": {
+        "schema_version": "m3-journal-inspection-1",
+        "action": "inspect_journal",
+        "state": "available",
+        "read_only": true,
+        "native_model_access": false,
+        "records_modified": false,
+        "complete": true,
+        "record_limit": 128,
+        "record_count": 7,
+        "remaining_slots": 121,
+        "new_execution_blockers": [],
+        "records": [
+          {
+            "execution_id": "69326f48d8724ae7abb6105f3263ba23",
+            "plan_id": "038e1f21b36743d8ab0b4ef94b6f58ab",
+            "plan_hash": "9c8737dcc57a39415a11ee778f68357e2920810d97324ae3d5a6595783fad5b9",
+            "state": "completed",
+            "integrity": "verified",
+            "requires_recovery": false,
+            "changes": 1,
+            "outcome_counts": {
+              "applied": 1
+            },
+            "source_identity": {
+              "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+              "document_id": 0,
+              "drawing_file": 101
+            }
+          },
+          {
+            "execution_id": "750655bf38ee458792b375dcb413f24d",
+            "plan_id": "db8cdfe9ad2b43e0b469286051b46f20",
+            "plan_hash": "d355765ff055aed13fbf04d79c5c3038db2d3de51d3b852fa62546bbe9280bf9",
+            "state": "completed",
+            "integrity": "verified",
+            "requires_recovery": false,
+            "changes": 1,
+            "outcome_counts": {
+              "applied": 1
+            },
+            "source_identity": {
+              "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+              "document_id": 0,
+              "drawing_file": 101
+            }
+          },
+          {
+            "execution_id": "82ce52f62acb4590b1e62765612f219e",
+            "plan_id": "ca0e44ad4bf8499eafc79043db36e80e",
+            "plan_hash": "4eb6ae8f12143e9985c612f5d77c0d588bc285ad54f181f0cee4afd8324be26a",
+            "state": "completed",
+            "integrity": "verified",
+            "requires_recovery": false,
+            "changes": 2,
+            "outcome_counts": {
+              "applied": 2
+            },
+            "source_identity": {
+              "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+              "document_id": 0,
+              "drawing_file": 101
+            }
+          },
+          {
+            "execution_id": "a5595bfb9bed4d9c9f848526177ec8b8",
+            "plan_id": "9d5abd5412bb4ca1ad3d10d43262d2b5",
+            "plan_hash": "f58e1716c07b61211a1559f93f7ed829669e9ec3d5b586074aebe987cae09283",
+            "state": "completed",
+            "integrity": "verified",
+            "requires_recovery": false,
+            "changes": 2,
+            "outcome_counts": {
+              "applied": 2
+            },
+            "source_identity": {
+              "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+              "document_id": 0,
+              "drawing_file": 101
+            }
+          },
+          {
+            "execution_id": "b5b397c7f7134b27b9304259e53e6bc4",
+            "plan_id": "c292745b598f4adb8c7933bd9fca66a0",
+            "plan_hash": "2bfc2c06218e0df382b2fdd42a787ed5b4984d0b3473a78e726f66e6bc03e139",
+            "state": "completed",
+            "integrity": "verified",
+            "requires_recovery": false,
+            "changes": 1,
+            "outcome_counts": {
+              "applied": 1
+            },
+            "source_identity": {
+              "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+              "document_id": 0,
+              "drawing_file": 101
+            }
+          },
+          {
+            "execution_id": "d8a1baca4f7e487395af40119a386586",
+            "plan_id": "1bcdfa795ab94caa9c198a701a45452a",
+            "plan_hash": "8b897771f4f797bf59a33d80ee1b4e5c6c37b99b7a8fcb5baf44b8e1f4c5a4a7",
+            "state": "stopped",
+            "integrity": "verified",
+            "requires_recovery": false,
+            "changes": 2,
+            "outcome_counts": {
+              "reconciled": 1,
+              "skipped": 1
+            },
+            "source_identity": {
+              "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+              "document_id": 0,
+              "drawing_file": 101
+            }
+          },
+          {
+            "execution_id": "dffa3c94da434fddbda4cf146e18ef96",
+            "plan_id": "5366ead055fc48f0afe203999d5a60ef",
+            "plan_hash": "81dc45c4682245bfa6c1d7135c05e465099b453edaa34405c679d532d66dd89c",
+            "state": "completed",
+            "integrity": "verified",
+            "requires_recovery": false,
+            "changes": 1,
+            "outcome_counts": {
+              "applied": 1
+            },
+            "source_identity": {
+              "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+              "document_id": 0,
+              "drawing_file": 101
+            }
+          }
+        ],
+        "current_model_values": "not_checked",
+        "copy_identity": "not_proven",
+        "automatic_pruning": false,
+        "report_text": "Repair journal: 7 inspected records; storage checks passed. Historical records only; model values and write eligibility are not checked.",
+        "request_id": "cc894347-c9e2-4230-96a1-19664b457820",
+        "host_session_id": "4e4a494b-720b-4f1e-8703-2a333838db84"
+      }
+    },
+    {
+      "name": "preview",
+      "tool": "column_layer",
+      "request": {
+        "action": "preview",
+        "drawing_file": 101
+      },
+      "state": "response_received",
+      "response": {
+        "schema_version": "m4-column-layer-1",
+        "action": "preview",
+        "read_only": true,
+        "plan_id": "b5625e0b208f41e2865cef44924f864a",
+        "state": "not_checked",
+        "source_kind": "column_missing_fire_layer",
+        "source_fingerprint": "b5d420b076a7e1b9403ae41289c0f153ac835c7ca960066b93aed78a06a9f133",
+        "evidence_fingerprint": "711cc0efa3912c018a31e2997ab6346181ff8d2fd863ecf4a060952168c44b3d",
+        "scope": {
+          "requested": {
+            "drawing_files": [
+              101
+            ],
+            "include_passive": false,
+            "visibility": "api_select_all"
+          },
+          "included_files": [
+            {
+              "drawing_file": 101,
+              "state": "active_foreground",
+              "write_eligibility": "not_checked"
+            }
+          ]
+        },
+        "coverage": {
+          "scan_complete": true,
+          "requested_scope_complete": true,
+          "returned_fields_complete": true,
+          "returned_fields_not_checked": 0,
+          "whole_project": false,
+          "unloaded_files": "not_enumerated",
+          "visibility": "api_select_all_screen_and_occlusion_not_checked",
+          "count_kind": "supported_native_top_level_components",
+          "native_component_counts": "implemented_runtime_pending",
+          "supported_component_types": [
+            "Beam_TypeUUID",
+            "Column_TypeUUID",
+            "MultiSlab_TypeUUID",
+            "SkeletonBeam_TypeUUID",
+            "Slab_TypeUUID",
+            "Wall_TypeUUID"
+          ],
+          "geometry_units_offset": "implemented_runtime_pending",
+          "criteria_complete": false
+        },
+        "changes": [],
+        "criteria": {
+          "schema_version": "m4-column-layer-1",
+          "read_only": true,
+          "checks": [
+            {
+              "ref": {
+                "query_session_id": "a07c2f7bd54c440c84f14bb45e2c2536",
+                "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+                "document_id": 0,
+                "drawing_file": 101,
+                "model_uuid": "4f3cc27e-5224-403d-939d-7b4e0cedf9a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "fire_resistance": {
+                "status": "missing",
+                "value": null
+              },
+              "value_state": "absent_from_readall_unknown",
+              "decision": "unknown"
+            },
+            {
+              "ref": {
+                "query_session_id": "a07c2f7bd54c440c84f14bb45e2c2536",
+                "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+                "document_id": 0,
+                "drawing_file": 101,
+                "model_uuid": "51db6258-4f95-4fab-ac80-8948e13bfd21",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "fire_resistance": {
+                "status": "missing",
+                "value": null
+              },
+              "value_state": "absent_from_readall_unknown",
+              "decision": "unknown"
+            },
+            {
+              "ref": {
+                "query_session_id": "a07c2f7bd54c440c84f14bb45e2c2536",
+                "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+                "document_id": 0,
+                "drawing_file": 101,
+                "model_uuid": "65ab07fe-d37a-4adf-b1b6-3040fdde84a2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "fire_resistance": {
+                "status": "missing",
+                "value": null
+              },
+              "value_state": "absent_from_readall_unknown",
+              "decision": "unknown"
+            },
+            {
+              "ref": {
+                "query_session_id": "a07c2f7bd54c440c84f14bb45e2c2536",
+                "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+                "document_id": 0,
+                "drawing_file": 101,
+                "model_uuid": "80211557-a3c1-4ccd-84d9-1274ec533776",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "fire_resistance": {
+                "status": "missing",
+                "value": null
+              },
+              "value_state": "absent_from_readall_unknown",
+              "decision": "unknown"
+            },
+            {
+              "ref": {
+                "query_session_id": "a07c2f7bd54c440c84f14bb45e2c2536",
+                "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+                "document_id": 0,
+                "drawing_file": 101,
+                "model_uuid": "d26a3d87-2981-4657-b592-65c894ce41ba",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "fire_resistance": {
+                "status": "missing",
+                "value": null
+              },
+              "value_state": "absent_from_readall_unknown",
+              "decision": "unknown"
+            },
+            {
+              "ref": {
+                "query_session_id": "a07c2f7bd54c440c84f14bb45e2c2536",
+                "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+                "document_id": 0,
+                "drawing_file": 101,
+                "model_uuid": "eb88c850-0cac-408a-8091-f118872d74c2",
+                "type_uuid": "ac9415e3-4337-4860-8cd4-2f0d48596f12",
+                "durable_identity_verified": false,
+                "component_kind": "top_level_component"
+              },
+              "fire_resistance": {
+                "status": "missing",
+                "value": null
+              },
+              "value_state": "absent_from_readall_unknown",
+              "decision": "unknown"
+            }
+          ],
+          "binding": {
+            "attribute": {
+              "attribute_id": 1398,
+              "name": "Odporność ogniowa"
+            },
+            "layer": {
+              "layer_id": 65535,
+              "short_name": "W1"
+            },
+            "name_resolutions": [
+              {
+                "attribute_id": 1398,
+                "name": "Odporność ogniowa"
+              }
+            ]
+          },
+          "source_fingerprint": "b5d420b076a7e1b9403ae41289c0f153ac835c7ca960066b93aed78a06a9f133",
+          "scope": {
+            "requested": {
+              "drawing_files": [
+                101
+              ],
+              "include_passive": false,
+              "visibility": "api_select_all"
+            },
+            "included_files": [
+              {
+                "drawing_file": 101,
+                "state": "active_foreground",
+                "write_eligibility": "not_checked"
+              }
+            ]
+          },
+          "coverage": {
+            "scan_complete": true,
+            "requested_scope_complete": true,
+            "returned_fields_complete": true,
+            "returned_fields_not_checked": 0,
+            "whole_project": false,
+            "unloaded_files": "not_enumerated",
+            "visibility": "api_select_all_screen_and_occlusion_not_checked",
+            "count_kind": "supported_native_top_level_components",
+            "native_component_counts": "implemented_runtime_pending",
+            "supported_component_types": [
+              "Beam_TypeUUID",
+              "Column_TypeUUID",
+              "MultiSlab_TypeUUID",
+              "SkeletonBeam_TypeUUID",
+              "Slab_TypeUUID",
+              "Wall_TypeUUID"
+            ],
+            "geometry_units_offset": "implemented_runtime_pending",
+            "criteria_complete": false
+          },
+          "counts": {
+            "unknown": 6
+          },
+          "missing_policy": {
+            "matches": [
+              "null",
+              "empty",
+              "undefined"
+            ],
+            "undefined_values": [
+              "<niezdefiniowany>",
+              "<undefined>"
+            ],
+            "absent_from_readall": "unknown_never_selected"
+          },
+          "omissions": [],
+          "runtime_verified": false,
+          "report_fingerprint": "711cc0efa3912c018a31e2997ab6346181ff8d2fd863ecf4a060952168c44b3d"
+        },
+        "capabilities": {
+          "method": "symbol_inspection_without_invocation",
+          "symbols": {
+            "ElementsAttributeService.ChangeAttributes": {
+              "status": "observed",
+              "callable": true,
+              "doc": "\nChangeAttributes( (list)attributeDataList, (BaseElementAdapterList)elements [, (bool)setUndefAttrib=False [, (bool)setDeleteAttrib=False]]) -> BaseElementAdapterList :\n    Change an attribute\n    \n    Parameter: attributeDataList   List with the attribute data as tuple(number, value)\n               elements            Elements as BaseElementAdapterList\n               setUndefAttrib      Set Attribute undefined (optional)\n               setDeleteAttrib     Delete Attribute (optional)\n    \n    Return:  Modified elements"
+            },
+            "ElementsLayerService.ChangeLayer": {
+              "status": "observed",
+              "callable": true,
+              "doc": "\nChangeLayer( (BaseElementAdapterList)elements, (wstring)newValue) -> BaseElementAdapterList :\n    Change the Layer\n    \n    Parameter: elements           Elements to change\n               newValue           New value\n    \n    Return:  List with the modified elements"
+            }
+          },
+          "per_element_writability": "not_checked",
+          "native_write_readback": "not_checked",
+          "undo": "not_checked",
+          "durable_retry_deduplication": "not_implemented",
+          "apply_available": false
+        },
+        "counts": {
+          "unknown": 6,
+          "changes": 0,
+          "columns": 6
+        },
+        "requires_highlight": true,
+        "native_selection": "not_requested_owner_accepts_highlight",
+        "runtime_verified": false,
+        "allplan_acceptance": "not_run",
+        "usable_for_write": false,
+        "expires_after_seconds": 300,
+        "evaluation_apply_available": false,
+        "plan_hash": "24601ffc1c89f296901bab83110b4ab940ea0dfcce19af1e17ed31f0c499364d",
+        "request_id": "53423020-3e4c-414f-a130-ce00b0049a2e",
+        "host_session_id": "4e4a494b-720b-4f1e-8703-2a333838db84"
+      }
+    }
+  ],
+  "allplan_acceptance": "not_run",
+  "native_selection": "highlight_only",
+  "model_setters_requested": false,
+  "message": "Plan niekompletny lub poza zakresem zapisu. Sprawdz criteria w raporcie; nic nie zmieniono."
+}

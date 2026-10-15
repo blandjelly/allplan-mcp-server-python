@@ -1,0 +1,5 @@
+M4 Column -> W1: blocked
+Plan niekompletny lub poza zakresem zapisu. Sprawdz criteria w raporcie; nic nie zmieniono.
+health_before: response_received
+journal_before: response_received
+preview: response_received

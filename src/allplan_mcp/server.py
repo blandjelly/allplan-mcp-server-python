@@ -208,10 +208,12 @@ def model_query(request: QueryRequest) -> dict[str, Any]:
 
 @mcp.tool
 def column_layer(request: ColumnLayerRequest) -> dict[str, Any]:
-    """Find Columns with unset fire resistance and assign an existing layer (W1).
+    """Find Columns with unset fire resistance classification and assign W1.
 
     preview resolves exact project field names and the layer with ID/name round
     trips, scans one foreground drawing and reports every Column's value state.
+    Defaults use Klasa odporności ogniowej / Fire resistance classification
+    (F30/F60), not the separate fire-risk attribute Odporność ogniowa.
     Null, empty/whitespace and the explicit undefined strings match. Read errors,
     unsupported types and omission from ReadAll are unknown and block Apply;
     ReadAll omits computed attributes, so omission never proves native absence.
@@ -227,7 +229,7 @@ def column_layer(request: ColumnLayerRequest) -> dict[str, Any]:
     journal, readback, replay deduplication and read-only recover. Persist the
     exact Apply request before sending; on lost reply recover that ID, never
     generate a new ID or retry a setter. Preview again after model/resource changes.
-    This implementation requires native 0.17.0 acceptance; no crash-free claim.
+    This implementation requires native 0.17.1 acceptance; no crash-free claim.
     """
     payload = request.model_dump(exclude_unset=True)
     payload["schema_version"] = "m4-column-layer-1"

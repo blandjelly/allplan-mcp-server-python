@@ -192,10 +192,12 @@ API basis checked against Allplan 2026:
 [HighlightService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/HighlightService/),
 [CoordinateInput](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/CoordinateInput/).
 
-## column_layer (0.17.0)
+## column_layer (0.17.1 candidate)
 
 `preview` requires one foreground `drawing_file`; defaults resolve the exact
-candidate names `Odporność ogniowa` / `Fire resistance` and existing `W1`.
+candidate names `Klasa odporności ogniowej` / `Fire resistance classification`
+and existing `W1`. IDs come only from native name/ID/name roundtrips; there is no
+fallback to `Odporność ogniowa` (1398) and no hardcoded binding to 935.
 An explicit `attribute_names` list, `undefined_values` and `exclude_model_uuids`
 can refine the request. Multiple distinct resolved IDs block; no IDs are guessed.
 Null/empty/explicit undefined values match. Absent from ReadAll, unreadable and
@@ -208,4 +210,15 @@ resource bindings are checked again. Existing-W1 targets are no-op. Shared M3
 journal/preflight/readback/recovery limits apply (up to 32 Column layer changes).
 `recover` takes only the original execution_id and never invokes setters.
 This is highlighting, not native selection, as agreed for this workflow.
-[Native observation and limits](m4-column-layer-0.17.0.pl.md).
+[Native observation and limits](m4-column-layer-0.17.1.pl.md).
+
+The 0.17.0 owner run bound the wrong field, 1398, and stopped with six unknown
+ReadAll omissions before setters. A healthy `health_before` and available journal
+do not establish a healthy full run without `health_after`. See
+[validation status and original evidence](validation-status.md).
+Official [2026-1 attributes](https://help.allplan.com/Allplan/2026-1/1034/Allplan/326206.htm)
+identify 935 as Fire resistance classification (String), and the
+[SDK example](https://github.com/NemetschekAllplan/PythonPartsExamples/blob/8e2c252477e20bc9afac8918f78a8eeabd473a81/PythonPartsExampleScripts/BasisExamples/MacroWithElementGroup.py#L164)
+sets it to F30. The [attribute tutorial](https://pythonparts.allplan.com/2026/manual/features/attributes/element_attributes/)
+instead illustrates 1398 as Fire risk factor with A1/A2. These distinguish the
+fields; runtime project resources still determine the binding.

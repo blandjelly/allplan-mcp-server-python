@@ -8,7 +8,7 @@ class ColumnLayerPreview(ContractModel):
     action: Literal["preview"]
     drawing_file: int = Field(ge=1, le=2147483647)
     attribute_names: list[Annotated[str, Field(min_length=1, max_length=128)]] = Field(
-        default_factory=lambda: ["Odporność ogniowa", "Fire resistance"], min_length=1, max_length=4)
+        default_factory=lambda: ["Klasa odporności ogniowej", "Fire resistance classification"], min_length=1, max_length=4)
     layer_short_name: str = Field(default="W1", min_length=1, max_length=16)
     undefined_values: list[Annotated[str, Field(min_length=1, max_length=128)]] = Field(
         default_factory=lambda: ["<niezdefiniowany>", "<undefined>"], min_length=1, max_length=8)

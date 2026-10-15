@@ -21,7 +21,10 @@ from .transport import BridgeError
 
 SCHEMA = "m4-column-layer-1"
 KIND = "column_missing_fire_layer"
-DEFAULT_NAMES = ["Odporność ogniowa", "Fire resistance"]
+# Fire resistance *classification* (F30/F60), not the separate fire-risk field
+# resolved as "Odporność ogniowa" / 1398 in the 0.17.0 native report. Resolve
+# project IDs by exact names; do not replace missing bindings with a guessed ID.
+DEFAULT_NAMES = ["Klasa odporności ogniowej", "Fire resistance classification"]
 DEFAULT_UNDEFINED = ["<niezdefiniowany>", "<undefined>"]
 
 
@@ -104,7 +107,9 @@ def observe(plans, doc, base, settings, request):
             raise BridgeError("property_binding_unavailable", "Attribute name/ID round trip differs; no field was guessed.", 409)
         resolutions.append({"attribute_id": ident, "name": actual})
     if len({r["attribute_id"] for r in resolutions}) != 1:
-        raise BridgeError("property_binding_unavailable", "Expected exactly one fire-resistance field. Exact names were absent or ambiguous; inspect the project field name.", 409)
+        raise BridgeError("property_binding_unavailable", "Expected exactly one fire-resistance classification field (F30/F60): "
+                          + ", ".join(request.get("attribute_names", DEFAULT_NAMES))
+                          + ". Exact names were absent or ambiguous; no alternative fire-risk field was substituted.", 409)
     attribute = resolutions[0]
     name = request.get("layer_short_name", "W1")
     ident = call("LayerService.GetIDByShortName", lambda: positive_id(base.LayerService.GetIDByShortName(name, doc)), short_name=name)

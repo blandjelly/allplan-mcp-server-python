@@ -80,7 +80,18 @@ async def run(url, path, *, drawing_file=101, attribute_names=None, confirm=None
                     report.update(state='no_op', message='Brak zmian: dopasowane slupy sa juz na W1 albo nie ma dopasowan.')
                 else:
                     if plan.get('evaluation_apply_available') is not True:
-                        raise ValueError('Plan niekompletny lub poza zakresem zapisu. Sprawdz criteria w raporcie; nic nie zmieniono.')
+                        criteria = plan.get('criteria', {})
+                        attribute = criteria.get('binding', {}).get('attribute', {})
+                        states = {}
+                        for check in criteria.get('checks', []):
+                            if check.get('decision') == 'unknown':
+                                state = check.get('value_state', 'unknown')
+                                states[state] = states.get(state, 0) + 1
+                        raise ValueError(
+                            f"Plan niekompletny lub poza zakresem zapisu. Pole: {attribute.get('name', '?')} "
+                            f"(ID {attribute.get('attribute_id', '?')}); nierozstrzygniete odczyty: {states}. "
+                            'Oczekiwane pole to Klasa odporności ogniowej (np. F30/F60). '
+                            'Brak pola w odczycie nie dowodzi pustej wartosci. Sprawdz criteria w raporcie; nic nie zmieniono.')
                     refs = {'plan_id': plan['plan_id'], 'plan_hash': plan['plan_hash']}
                     shown = await call(client, 'highlight_exact_targets', 'column_layer', {'action': 'highlight', **refs})
                     if (shown.get('state') != 'submitted'
@@ -113,7 +124,8 @@ async def run(url, path, *, drawing_file=101, attribute_names=None, confirm=None
 
 def confirm_plan(plan):
     binding = plan['criteria']['binding']
-    print('Pole:', binding['attribute']['name'], '; warstwa:', binding['layer']['short_name'])
+    print('Pole:', binding['attribute']['name'], '(ID', str(binding['attribute']['attribute_id']) + ')',
+          '; warstwa:', binding['layer']['short_name'])
     print('Zmiany:', len(plan['changes']), '; pozostale stany:', plan['criteria']['counts'])
     for change in plan['changes']:
         print('Rysunek', change['ref']['drawing_file'], 'slup', change['ref']['model_uuid'],

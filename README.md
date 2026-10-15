@@ -1,14 +1,19 @@
 # Allplan MCP Server
 
 A local MCP bridge between Codex and Allplan 2026 for model queries, audits and
-reviewed attribute/layer repairs. Current candidate: **0.17.0**.
+reviewed attribute/layer repairs. Current candidate: **0.17.1**.
 
-0.17.0 adds a criterion-based workflow: Columns with unset fire resistance →
+0.17.1 corrects the criterion-based workflow: Columns with unset fire resistance classification →
 exact target highlighting → existing W1, using the shared M3 executor/journal.
-The owner accepts highlighting for this workflow. No broad metadata/enum scan is
-used; the 0.16.0 discovery route remains quarantined. Native 0.17.0 acceptance is
-pending; the root cause of the earlier crash is not proven.
-[Polish workflow and observation guide](docs/m4-column-layer-0.17.0.pl.md).
+The exact default names are `Klasa odporności ogniowej` / `Fire resistance classification`;
+the native ID is resolved and checked by name roundtrip. The 0.17.0 owner run
+was **BLOCKED** after binding another field, `Odporność ogniowa` (1398), with
+six unknown values and no setters. This exposed a semantic binding error.
+ReadAll omissions still block Apply. The owner accepts highlighting for this workflow.
+No broad metadata/enum scan is used; the 0.16.0 discovery route remains quarantined.
+See the delivery record for source/package checks. Native 0.17.1 acceptance is
+pending; the earlier crash's root cause is not proven.
+[Polish workflow and observation guide](docs/m4-column-layer-0.17.1.pl.md).
 
 **M0–M3 are accepted within the retained test project**, Allplan **2026-1-7**
 with local Windows Codex. M3 covers recorded one-/two-change Column scenarios
@@ -30,7 +35,7 @@ use is planned. [Acceptance, tests and limits](docs/validation-status.md).
 
 ## Local Windows setup
 
-Use the [0.17.0 evaluation package](evaluation-packages/0.17.0/README.md) on
+Use the [0.17.1 evaluation package](evaluation-packages/0.17.1/README.md) on
 the machine running Allplan. External Python **3.11+** and internet access for
 locked dependencies are required; Allplan, Python and Codex are not bundled.
 
