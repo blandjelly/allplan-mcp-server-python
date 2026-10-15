@@ -76,27 +76,30 @@ async def run(url, path, *, drawing_file=101, attribute_names=None, confirm=None
                 if attribute_names:
                     request['attribute_names'] = attribute_names
                 plan = await call(client, 'preview', 'column_layer', request)
+                if (plan.get('evaluation_highlight_available') is not True
+                        or (plan.get('state') != 'no_op' and plan.get('evaluation_apply_available') is not True)):
+                    criteria = plan.get('criteria', {})
+                    attribute = criteria.get('binding', {}).get('attribute', {})
+                    states = {}
+                    for check in criteria.get('checks', []):
+                        if check.get('decision') == 'unknown':
+                            state = check.get('value_state', 'unknown')
+                            states[state] = states.get(state, 0) + 1
+                    raise ValueError(
+                        f"Plan niekompletny lub poza zakresem zapisu. Pole: {attribute.get('name', '?')} "
+                        f"(ID {attribute.get('attribute_id', '?')}); nierozstrzygniete odczyty: {states}. "
+                        'Oczekiwane pole to Klasa odporności ogniowej (np. F30/F60). '
+                        'Brak pola w odczycie nie dowodzi pustej wartosci. Sprawdz criteria w raporcie; nic nie zmieniono.')
+                refs = {'plan_id': plan['plan_id'], 'plan_hash': plan['plan_hash']}
+                shown = await call(client, 'highlight_exact_targets', 'column_layer', {'action': 'highlight', **refs})
+                if (shown.get('state') != 'submitted'
+                        or shown.get('counts', {}).get('submitted_model_identities') != len(plan['highlight_targets'])):
+                    raise ValueError('Wynik podswietlenia niepewny; nie wyslano Apply.')
                 if plan.get('state') == 'no_op':
-                    report.update(state='no_op', message='Brak zmian: dopasowane slupy sa juz na W1 albo nie ma dopasowan.')
+                    report.update(state='no_op', message=(
+                        f"Dopasowane slupy do podswietlenia: {len(plan['highlight_targets'])}; zmian: 0. "
+                        'Sa juz na W1 albo nie ma dopasowan. Nie wyslano Apply.'))
                 else:
-                    if plan.get('evaluation_apply_available') is not True:
-                        criteria = plan.get('criteria', {})
-                        attribute = criteria.get('binding', {}).get('attribute', {})
-                        states = {}
-                        for check in criteria.get('checks', []):
-                            if check.get('decision') == 'unknown':
-                                state = check.get('value_state', 'unknown')
-                                states[state] = states.get(state, 0) + 1
-                        raise ValueError(
-                            f"Plan niekompletny lub poza zakresem zapisu. Pole: {attribute.get('name', '?')} "
-                            f"(ID {attribute.get('attribute_id', '?')}); nierozstrzygniete odczyty: {states}. "
-                            'Oczekiwane pole to Klasa odporności ogniowej (np. F30/F60). '
-                            'Brak pola w odczycie nie dowodzi pustej wartosci. Sprawdz criteria w raporcie; nic nie zmieniono.')
-                    refs = {'plan_id': plan['plan_id'], 'plan_hash': plan['plan_hash']}
-                    shown = await call(client, 'highlight_exact_targets', 'column_layer', {'action': 'highlight', **refs})
-                    if (shown.get('state') != 'submitted'
-                            or shown.get('counts', {}).get('submitted_model_identities') != len(plan['changes'])):
-                        raise ValueError('Wynik podswietlenia niepewny; nie wyslano Apply.')
                     if confirm is None or not confirm(plan):
                         report.update(state='preview_only', message='Plan i podswietlenie gotowe; nie wyslano Apply.')
                     else:
@@ -126,11 +129,15 @@ def confirm_plan(plan):
     binding = plan['criteria']['binding']
     print('Pole:', binding['attribute']['name'], '(ID', str(binding['attribute']['attribute_id']) + ')',
           '; warstwa:', binding['layer']['short_name'])
-    print('Zmiany:', len(plan['changes']), '; pozostale stany:', plan['criteria']['counts'])
+    print('Do podswietlenia:', len(plan['highlight_targets']), '; zmiany warstwy:', len(plan['changes']),
+          '; juz na W1:', plan['criteria']['counts'].get('no_op', 0))
+    for ref in plan['highlight_targets']:
+        print('Dopasowany slup:', ref['model_uuid'])
     for change in plan['changes']:
         print('Rysunek', change['ref']['drawing_file'], 'slup', change['ref']['model_uuid'],
               'warstwa', change['old_value']['value'], '->', change['new_value'])
-    print('Sprawdz podswietlone slupy w Allplanie. Testuj na kopii projektu. Zmiana dotyczy tylko tej listy.')
+    print('Sprawdz podswietlone slupy w Allplanie. Slupy juz na W1 pozostaja podswietlone bez zapisu.')
+    print('Testuj na kopii projektu. Zmiana warstwy dotyczy tylko powyzszej listy zmian.')
     return input('Wpisz ZMIEN, aby przypisac W1 (Enter pozostawia sam podglad): ').strip() == 'ZMIEN'
 
 

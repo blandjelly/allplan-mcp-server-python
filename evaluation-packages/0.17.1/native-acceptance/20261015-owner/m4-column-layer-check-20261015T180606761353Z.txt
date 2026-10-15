@@ -1,0 +1,8 @@
+M4 Column -> W1: completed
+
+health_before: response_received
+journal_before: response_received
+preview: response_received
+highlight_exact_targets: response_received
+apply: response_received
+health_after: response_received

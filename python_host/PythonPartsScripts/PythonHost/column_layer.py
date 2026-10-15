@@ -170,16 +170,23 @@ def preview(plans, doc, base, settings, request):
                                     "bounding_box_mm": e["fields"]["bounding_box_mm"]}})
     ident = uuid4().hex
     ready = report["coverage"]["criteria_complete"] and len(changes) <= plans.executor.MAX_CHANGES
+    # Matching the criterion is independent of needing a layer write. A Column
+    # already on W1 still has unset fire classification and must remain visible.
+    highlight_targets = [copy.deepcopy(c["ref"]) for c in report["checks"]
+                         if c["decision"] in {"change", "no_op"}]
     plan = {"schema_version": SCHEMA, "action": "preview", "read_only": True, "plan_id": ident,
             "state": ("preview_ready" if changes else "no_op") if ready else "not_checked",
             "source_kind": KIND, "source_fingerprint": snapshot["source_fingerprint"],
             "evidence_fingerprint": report["report_fingerprint"], "scope": report["scope"], "coverage": report["coverage"],
-            "changes": changes, "criteria": report, "capabilities": capability_probe(base),
-            "counts": {**report["counts"], "changes": len(changes), "columns": len(snapshot["elements"])},
+            "changes": changes, "highlight_targets": highlight_targets,
+            "criteria": report, "capabilities": capability_probe(base),
+            "counts": {**report["counts"], "changes": len(changes), "highlight_targets": len(highlight_targets),
+                       "columns": len(snapshot["elements"])},
             "requires_highlight": True, "native_selection": "not_requested_owner_accepts_highlight",
             "runtime_verified": False, "allplan_acceptance": "not_run", "usable_for_write": False,
             "expires_after_seconds": plans.TTL_SECONDS}
     plan["evaluation_apply_available"] = plans.executor.evaluation_scope(plan)
+    plan["evaluation_highlight_available"] = ready and (plan["evaluation_apply_available"] or plan["state"] == "no_op")
     plan["plan_hash"] = fingerprint({"plan": plan, "request": request})
     entry = {"created": plans.queries.clock(), "request": copy.deepcopy(request), "plan": plan}
     entry["size"] = len(json.dumps(entry, ensure_ascii=False, allow_nan=False).encode())
@@ -220,8 +227,8 @@ def highlight(plans, doc, base, settings, ifw, request):
     entry = plans.plans[request["plan_id"]]
     for pending in plans.plans.values():
         pending.pop("presentation", None)
-    if not entry["plan"]["evaluation_apply_available"]:
-        raise BridgeError("repair_scope_unavailable", "Only a complete applicable Column plan may be highlighted for Apply.", 409)
+    if not entry["plan"]["evaluation_highlight_available"]:
+        raise BridgeError("repair_scope_unavailable", "Only a complete supported Column plan may be highlighted.", 409)
     report, snapshot, query = observe(plans, doc, base, settings, entry["request"])
     if report["report_fingerprint"] != entry["plan"]["evidence_fingerprint"]:
         raise BridgeError("repair_conflict", "Column evidence changed before highlight.", 409)
@@ -232,7 +239,7 @@ def highlight(plans, doc, base, settings, ifw, request):
     if len(queries.selections) >= queries.MAX_SELECTIONS:
         queries.selections.popitem(last=False)
     queries.selections[ident] = {"created": entry["created"], "request": query, "snapshot": snapshot, "cursors": {}, "native_type_gate": "Column_TypeUUID"}
-    targets = {c["ref"]["model_uuid"] for c in entry["plan"]["changes"]}
+    targets = {ref["model_uuid"] for ref in entry["plan"]["highlight_targets"]}
     try:
         trace = NativeProbeTrace(plans.trace_path, "column_layer_highlight")
         result = trace.call("M4.present_selection", lambda: present_selection(queries, doc, base, settings, ifw,

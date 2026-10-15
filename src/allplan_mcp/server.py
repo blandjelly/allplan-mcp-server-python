@@ -220,8 +220,10 @@ def column_layer(request: ColumnLayerRequest) -> dict[str, Any]:
     Conflicting field names block instead of selecting an arbitrary attribute.
     No metadata type/unit/enum discovery, resource creation or audit findings.
 
-    highlight submits exactly the plan's changing targets, excluding no-ops and
-    explicit exceptions. This is highlighting, not native selection. The owner
+    highlight submits all matching Columns, including those already on W1;
+    explicit exceptions remain excluded. highlight_targets and changes are
+    separate hash-bound lists. All-no-op plans can highlight without Apply.
+    This is highlighting, not native selection. The owner
     accepts highlighting for this workflow; observe visibility in Allplan.
     apply requires the exact highlighted plan/hash, an execution ID and reviewed
     disposable-copy acknowledgement. Shared M3 controls enforce fresh whole-scope
@@ -229,7 +231,7 @@ def column_layer(request: ColumnLayerRequest) -> dict[str, Any]:
     journal, readback, replay deduplication and read-only recover. Persist the
     exact Apply request before sending; on lost reply recover that ID, never
     generate a new ID or retry a setter. Preview again after model/resource changes.
-    This implementation requires native 0.17.1 acceptance; no crash-free claim.
+    The revised highlighting requires native 0.17.2 observation.
     """
     payload = request.model_dump(exclude_unset=True)
     payload["schema_version"] = "m4-column-layer-1"

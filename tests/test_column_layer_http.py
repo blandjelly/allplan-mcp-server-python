@@ -41,7 +41,9 @@ class ColumnLayerHTTPTests(unittest.IsolatedAsyncioTestCase):
         return native
 
     async def test_launcher_completes_exact_changes_and_health_without_broad_discovery(self):
-        native = self.native_bridge(values=('', 'F30', 'F60', '  ', 'F90', 'F120'))
+        native = self.native_bridge(values=('<niezdefiniowany>', 'F120', 'F120', 'F120', '', '  '))
+        elements = native.base.ElementsSelectService.SelectAllElements.return_value
+        elements[0].GetCommonProperties.return_value.Layer = 8
         typed = ColumnLayerPreview(action='preview', drawing_file=101)
         expected_names = ['Klasa odporności ogniowej', 'Fire resistance classification']
         self.assertEqual(typed.attribute_names, expected_names)
@@ -57,13 +59,53 @@ class ColumnLayerHTTPTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(plan['criteria']['binding'], direct['criteria']['binding'])
             self.assertEqual(plan['criteria']['checks'], direct['criteria']['checks'])
             self.assertEqual(plan['changes'], direct['changes'])
+            self.assertEqual(plan['counts']['highlight_targets'], 3)
+            shown = next(step['response'] for step in report['steps'] if step['name'] == 'highlight_exact_targets')
+            self.assertEqual(shown['counts']['submitted_model_identities'], 3)
             request = next(payload for route, payload in self.bridge_handler.calls
                            if route == '/column-layer' and payload['action'] == 'preview')
             self.assertNotIn('attribute_names', request)
             self.assertEqual(native.base.ElementsLayerService.ChangeLayer.call_count, 2)
             self.assertFalse(any(p in {'/model-properties', '/model-property-probe'} for p, _ in self.bridge_handler.calls))
+            native.module.AllplanIFW.HighlightService.HighlightElements.reset_mock()
             no_op = await run(self.url, Path(directory) / 'noop.json', confirm=lambda plan: self.fail('No-op must not ask Apply'))
             self.assertEqual(no_op['state'], 'no_op')
+            self.assertFalse(no_op['model_setters_requested'])
+            self.assertNotIn('apply_request', no_op)
+            shown = next(step['response'] for step in no_op['steps'] if step['name'] == 'highlight_exact_targets')
+            self.assertEqual(shown['counts']['submitted_model_identities'], 3)
+            self.assertEqual(no_op['steps'][-1]['name'], 'health_after')
+            sent = native.module.AllplanIFW.HighlightService.HighlightElements.call_args.args[0]
+            self.assertEqual([id(e) for e in sent], [id(elements[i]) for i in (0, 4, 5)])
+            self.assertEqual(native.base.ElementsLayerService.ChangeLayer.call_count, 2)
+
+    async def test_highlight_count_mismatch_blocks_apply(self):
+        native = self.native_bridge()
+        original = self.bridge_handler.handle
+        def mismatch(route, payload):
+            result = original(route, payload)
+            if route == '/column-layer' and payload['action'] == 'highlight':
+                result['counts']['submitted_model_identities'] = 1
+            return result
+        self.bridge_handler.handle = mismatch
+        with tempfile.TemporaryDirectory() as directory:
+            report = await run(self.url, Path(directory) / 'report.json',
+                               confirm=lambda plan: self.fail('Uncertain highlight must not ask Apply'))
+        self.assertEqual(report['state'], 'blocked')
+        self.assertFalse(report['model_setters_requested'])
+        self.assertNotIn('apply_request', report)
+        native.base.ElementsLayerService.ChangeLayer.assert_not_called()
+
+    async def test_no_matches_clear_highlights_without_asking_apply(self):
+        native = self.native_bridge(values=('F120',))
+        with tempfile.TemporaryDirectory() as directory:
+            report = await run(self.url, Path(directory) / 'report.json',
+                               confirm=lambda plan: self.fail('No matches must not ask Apply'))
+        self.assertEqual(report['state'], 'no_op')
+        self.assertFalse(report['model_setters_requested'])
+        native.module.AllplanIFW.HighlightService.CancelAllHighlightedElements.assert_called_once()
+        native.module.AllplanIFW.HighlightService.HighlightElements.assert_not_called()
+        native.base.ElementsLayerService.ChangeLayer.assert_not_called()
 
     async def test_legacy_catalog_blocks_launcher_before_scan_highlight_or_apply(self):
         native = self.native_bridge()

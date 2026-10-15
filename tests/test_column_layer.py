@@ -223,16 +223,63 @@ class ColumnLayerTests(unittest.TestCase):
                 self.assert_code('plan_expired' if mutation == 'expiry' else 'repair_conflict', lambda: self.apply(plan))
                 self.base.ElementsLayerService.ChangeLayer.assert_not_called()
 
-    def test_exception_and_existing_W1_are_not_highlighted_or_written(self):
+    def test_exception_is_excluded_but_existing_W1_matches_without_write(self):
         elements = self.fixture(('', '', ''))
         elements[1].GetCommonProperties.return_value.Layer = 8
         plan = self.preview(exclude_model_uuids=[elements[0].GetModelElementUUID()])
         self.assertEqual(plan['counts']['changes'], 1)
+        self.assertEqual(plan['counts']['highlight_targets'], 2)
         self.highlight(plan)
         sent = self.module.AllplanIFW.HighlightService.HighlightElements.call_args.args[0]
-        self.assertEqual([id(e) for e in sent], [id(elements[2])])
+        self.assertEqual([id(e) for e in sent], [id(elements[1]), id(elements[2])])
         self.assertEqual(self.apply(plan)['state'], 'completed')
         self.base.ElementsLayerService.ChangeLayer.assert_called_once()
+        self.assertIs(self.base.ElementsLayerService.ChangeLayer.call_args.args[0][0], elements[2])
+
+    def test_owner_six_columns_highlight_all_missing_but_write_only_two_then_no_op(self):
+        values = ('<niezdefiniowany>', 'F120', 'F120', 'F120', '<niezdefiniowany>', '<niezdefiniowany>')
+        elements = self.fixture(values)
+        elements[0].GetCommonProperties.return_value.Layer = 8
+        plan = self.preview()
+        targets = [elements[i] for i in (0, 4, 5)]
+        self.assertEqual(plan['counts']['highlight_targets'], 3)
+        self.assertEqual(plan['counts']['changes'], 2)
+        self.assertEqual(plan['counts']['no_op'], 1)
+        self.assertEqual(plan['highlight_targets'], [c['ref'] for c in plan['criteria']['checks']
+                                                   if c['decision'] in {'change', 'no_op'}])
+        self.assertEqual(self.highlight(plan)['counts']['submitted_model_identities'], 3)
+        sent = self.module.AllplanIFW.HighlightService.HighlightElements.call_args.args[0]
+        self.assertEqual([id(e) for e in sent], [id(e) for e in targets])
+        self.assertEqual(self.apply(plan)['state'], 'completed')
+        calls = self.base.ElementsLayerService.ChangeLayer.call_args_list
+        self.assertEqual([id(c.args[0][0]) for c in calls], [id(elements[4]), id(elements[5])])
+        next_plan = self.preview()
+        self.assertEqual(next_plan['state'], 'no_op')
+        self.assertEqual(next_plan['changes'], [])
+        self.assertFalse(next_plan['evaluation_apply_available'])
+        self.assertTrue(next_plan['evaluation_highlight_available'])
+        self.assertEqual(self.highlight(next_plan)['counts']['submitted_model_identities'], 3)
+        self.assert_code('repair_scope_unavailable', lambda: self.apply(next_plan))
+        self.assertEqual(self.base.ElementsLayerService.ChangeLayer.call_count, 2)
+        self.assertEqual([e.GetAttributes.return_value for e in elements], [[(935, v)] for v in values])
+
+    def test_all_no_op_highlight_rejects_changed_criterion_before_UI(self):
+        elements = self.fixture(('',))
+        elements[0].GetCommonProperties.return_value.Layer = 8
+        plan = self.preview()
+        elements[0].GetAttributes.return_value = [(935, 'F120')]
+        self.assert_code('repair_conflict', lambda: self.highlight(plan))
+        self.module.AllplanIFW.HighlightService.HighlightElements.assert_not_called()
+        self.base.ElementsLayerService.ChangeLayer.assert_not_called()
+
+    def test_no_matches_clear_old_highlights_without_setters(self):
+        self.fixture(('F120',))
+        plan = self.preview()
+        self.assertEqual(plan['highlight_targets'], [])
+        self.assertEqual(self.highlight(plan)['counts']['submitted_model_identities'], 0)
+        self.module.AllplanIFW.HighlightService.CancelAllHighlightedElements.assert_called_once()
+        self.module.AllplanIFW.HighlightService.HighlightElements.assert_not_called()
+        self.base.ElementsLayerService.ChangeLayer.assert_not_called()
 
     def test_unwritable_later_target_prevents_all_setters(self):
         elements = self.fixture()

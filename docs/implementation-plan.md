@@ -28,8 +28,22 @@ project metadata and actual resources must resolve before enabling new edits.
 **M4.1a / early M4.1b:** the first 0.16.0 discovery crashed natively and is blocked.
 0.16.1 isolates one Column read with durable trace; metadata/enum/UI stages remain pending.
 Native selection is BLOCKED by the current interactor; K1/K2 are not closed.
-[Native observation guide](m4-isolated-probe-owner-test.pl.md). K3 write planning remains
-unchanged until the first native discovery/presentation observation.
+[Native observation guide](m4-isolated-probe-owner-test.pl.md). The bounded
+Column workflow below advances K3 without closing broad discovery or native selection.
+
+**M4.1 criterion-based Column layer workflow:** 0.17.1 established the exact
+fire-resistance attribute binding and two W1 writes, but its highlight request
+excluded a matching Column already on W1. 0.17.2 changes the plan contract to
+hash-bound `highlight_targets` for both `change` and `no_op`, with `changes`
+containing only `set_layer` operations. A complete supported plan can highlight
+all matches even when every match is already on W1; no-op plans do not offer
+Apply. Unknown criteria still block highlighting and writes, and more than 32
+changes remain blocked. The new owner observation is limited to this semantic
+change and the previously unconfirmed no-op case; see the
+[0.17.2 walkthrough](m4-column-layer-0.17.2.pl.md) and
+[0.17.1 observation](test-results/m4-column-layer-0.17.1.md). Automated
+verification and package evidence are pending in the
+[0.17.2 delivery record](../evaluation-packages/0.17.2/README.md).
 
 - **M4.1:** Probe ordinary columns/beams versus Structural Framing and wall
   materials/attributes; establish read/write support per build, type and property.

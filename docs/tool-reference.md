@@ -192,7 +192,7 @@ API basis checked against Allplan 2026:
 [HighlightService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/HighlightService/),
 [CoordinateInput](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/CoordinateInput/).
 
-## column_layer (0.17.1 candidate)
+## column_layer (0.17.2 candidate)
 
 `preview` requires one foreground `drawing_file`; defaults resolve the exact
 candidate names `Klasa odporności ogniowej` / `Fire resistance classification`
@@ -203,14 +203,34 @@ can refine the request. Multiple distinct resolved IDs block; no IDs are guessed
 Null/empty/explicit undefined values match. Absent from ReadAll, unreadable and
 unsupported values remain unknown; no Apply on an incomplete plan.
 
+The 0.17.2 plan binds both `highlight_targets` and `changes` into its hash.
+`highlight_targets` contains references whose criterion decision is `change` or
+`no_op`; `changes` contains only `set_layer` operations. `counts` reports
+`highlight_targets`. A complete supported plan makes
+`evaluation_highlight_available=true`, including a no-op plan, while
+`evaluation_apply_available=false` when there are zero changes. A mixed plan
+can apply its changes while its no-op matches remain unwritten. The
+launcher verifies the reported count against `highlight_targets` and highlights
+all matches, regardless of current W1 state. Zero matches clear old highlights.
+Unknown criteria block the whole action; more than 32 changes remain blocked.
+
 `highlight` / `revalidate` take `plan_id` and `plan_hash`. `apply` additionally
 takes a persisted `execution_id` and `acknowledgement=disposable_copy_reviewed_plan`.
-Highlight exactly the changing targets before Apply. Both the full source and
-resource bindings are checked again. Existing-W1 targets are no-op. Shared M3
-journal/preflight/readback/recovery limits apply (up to 32 Column layer changes).
-`recover` takes only the original execution_id and never invokes setters.
-This is highlighting, not native selection, as agreed for this workflow.
-[Native observation and limits](m4-column-layer-0.17.1.pl.md).
+Only changes can be confirmed and sent to setters. A no-op plan still runs
+highlight, with no confirm/Apply path. Confirmation lists all matched targets
+and separately lists the changes. Both full source and resource bindings are
+checked again. Shared M3 journal/preflight/readback/recovery limits apply (up to
+32 Column layer changes). `recover` takes only the original execution_id and
+never invokes setters. This is highlighting, not native selection, as agreed
+for this workflow.
+[0.17.2 owner guide](m4-column-layer-0.17.2.pl.md).
+
+The 0.17.1 native observation confirmed the field binding and two writes but
+submitted only two highlight targets, omitting a matching no-op. See the
+[observation report](test-results/m4-column-layer-0.17.1.md). The 0.17.2 source,
+package and automated check results are pending in the
+[delivery README](../evaluation-packages/0.17.2/README.md); this candidate is
+ready for owner testing only after those checks pass.
 
 The 0.17.0 owner run bound the wrong field, 1398, and stopped with six unknown
 ReadAll omissions before setters. A healthy `health_before` and available journal

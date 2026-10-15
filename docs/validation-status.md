@@ -1,6 +1,8 @@
 # Validation status and limits
 
-Updated **2026-10-15 Europe/Warsaw**. Current candidate **0.17.1**.
+Updated **2026-10-15 Europe/Warsaw**. Current candidate **0.17.2**; automated
+verification and package evidence are pending. The **0.17.1** native observation
+is recorded below; 0.17.2 owner testing follows its delivery checks.
 The **0.16.0** property gate is **FAIL_CRASH / blocked_after_native_crash**.
 **0.16.1** is ready_for_owner_test only for one isolated Column read, not accepted_on_build. M3 write acceptance below remains scoped to 0.15.0 evidence.
 **M0–M3 / UAT-00–UAT-06 are accepted within the retained test-project scope.**
@@ -8,11 +10,42 @@ The owner explicitly narrowed M3/UAT-05/UAT-06 to existing demonstrated scenario
 This closes the fixture evaluation MVP; it does not accept the original broader
 gate or typical office-project writes. Main integration/release remain separate.
 
-## 0.17.1 candidate and 0.17.0 owner result
+## 0.17.2 candidate and 0.17.1 native observation
+
+The 0.17.1 observation on **2026-10-15 at 20:06 Europe/Warsaw** confirmed the
+attribute roundtrip to ID **935**, `Klasa odporności ogniowej`, and reported
+two successful W1 changes with readback **65535** and audited fields matching
+the plan. It exposed a highlight semantic gap: only the two planned changes were
+submitted; the matching Column already on W1 was omitted. The owner identified
+that already-W1 Column as Column 1; the raw preview record identifies the no-op
+by UUID `eb88c850-0cac-408a-8091-f118872d74c2`. The owner reported Columns 5 and
+6 highlighted and moved. Three Columns with F120 were nonmatching. The report
+records healthy before/after replies from the same host session and no crash
+reported by the owner. Undo, rerun/no-op verification, and geometry confirmation
+were not reported, so the result is partial native evidence, not blanket
+`accepted_on_build`.
+
+0.17.2 separates hash-bound `highlight_targets` (all `change` and `no_op`
+matches) from `changes` (only `set_layer`). A complete supported plan remains
+highlightable when state is `no_op`; Apply is unavailable when there are zero changes.
+The launcher checks counts against `highlight_targets`, highlights no-op plans
+without offering confirmation/Apply, and clears stale highlights when there are
+zero matches. Unknown values block the action; more than 32 changes remain
+blocked. The bounded owner test is specified in the
+[0.17.2 guide](m4-column-layer-0.17.2.pl.md). Source CI, full portable results
+and package verification are pending in the
+[0.17.2 delivery README](../evaluation-packages/0.17.2/README.md); owner testing
+is ready only after those automated checks pass. This does not accept the whole
+M4 workflow or repeat completed M3 gates.
+
+[Original 0.17.1 observation and uploads](test-results/m4-column-layer-0.17.1.md).
+
+## Historical 0.17.1 delivery and 0.17.0 owner result
 
 0.17.1 source tests, CI and builds/package verification are recorded with their
 exact source scope in the [delivery record](../evaluation-packages/0.17.1/README.md).
-Native acceptance is **pending**.
+The bounded native observation above confirms binding and two W1 writes;
+complete workflow acceptance remains pending.
 It corrects the criterion binding to exact names `Klasa odporności ogniowej` /
 `Fire resistance classification`. The runtime resolves the ID and verifies the
 name roundtrip; no fallback to 1398 or hardcoded binding to 935 is used.
@@ -41,10 +74,10 @@ block Apply, as do actual read failures and unsupported values.
 
 Historical 0.17.0 portable evidence remains **261 tests PASS** (2026-10-14),
 with delivery/source CI evidence in its unchanged package; this does not establish
-0.17.1 verification or native support. The 0.16.1 attachment confirms only one observed Column
-attribute read and healthy same-session replies; user reports no crash.
+0.17.1 native acceptance. The 0.16.1 attachment confirms only one observed Column
+attribute read and healthy same-session replies; the owner reports no crash.
 The exact native cause of 0.16.0 remains unknown. Broad discovery stays blocked.
-[Current workflow/limits](m4-column-layer-0.17.1.pl.md),
+[Historical 0.17.1 workflow/limits](m4-column-layer-0.17.1.pl.md),
 [historical 0.17.0 delivery and portable evidence](../evaluation-packages/0.17.0/README.md).
 
 ## Accepted scope
@@ -149,9 +182,11 @@ write acceptance is inferred. Existing completed M3 native gates need no repeat.
   earlier CLR crash cause and long-term/concurrent stability remain unproven.
 
 Keep the [fixture](fixture-guide.md) saved after Undo: C02/C04=S02, C03 undefined,
-C05 structure/C06 NEW. Completed gates need no repeat. Follow the
-[editing development plan](office-editing-development-plan.pl.md) for column
-fire-resistance discovery/W1 and thin-wall native C35 material. Before main integration, perform the
+C05 structure/C06 NEW. Completed gates need no repeat. Continue the
+[Column fire-resistance/W1 workflow](m4-column-layer-0.17.2.pl.md) within its
+bounded owner test, then follow the
+[editing development plan](office-editing-development-plan.pl.md) for thin-wall
+native C35 material. Before main integration, perform the
 final-candidate checks/full matrix in [testing policy](testing-policy.md).
 
 ## Historical records
