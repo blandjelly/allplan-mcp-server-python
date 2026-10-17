@@ -5,7 +5,9 @@ New M4 PRs target this shared branch. Main remains a separate accepted baseline;
 legacy M4 branches/PRs are historical references. [Branch layout and workflow](docs/branch-layout.md).
 
 A local MCP bridge between Codex and Allplan 2026 for model queries, audits and
-reviewed attribute/layer repairs. Current source candidate: **0.20.0** adds typed criterion-based `model_edit`
+reviewed attribute/layer repairs. Current source candidate: **0.20.1** fixes typed numeric undefined values and
+binds Wall layer edits to their actual tiers. [Focused fixes and native trial](docs/m4-agent-fixes-0.20.1.pl.md).
+The preceding **0.20.0** adds typed criterion-based `model_edit`
 with exact project bindings, attribute add/replace/upsert and organizational layer
 changes through the shared guarded executor. New native behavior awaits a scoped
 Allplan trial; [Polish workflow and limits](docs/m4-model-edit.pl.md).

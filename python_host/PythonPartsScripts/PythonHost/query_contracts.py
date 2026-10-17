@@ -108,7 +108,7 @@ def validate_request(request):
         bounded_int(request.get("sample_limit", 10), 1, 20, "sample_limit")
         validate_request({**{k: v for k, v in request.items() if k != "sample_limit"}, "action": "query"})
         return
-    extensions = {"component_kind", "coordinate_frame", "spatial_box", "profile"}
+    extensions = {"component_kind", "coordinate_frame", "spatial_box", "profile", "layer_resolution"}
     keys(request, {"schema_version", "action", "scope", "predicate", "fields", "attribute_ids", "page_size", "max_adapters", "selection_id", "cursor"} | extensions, {"schema_version", "action"})
     if request["schema_version"] != SCHEMA:
         invalid(f"schema_version must be {SCHEMA}.")
@@ -117,6 +117,11 @@ def validate_request(request):
         keys(request, {"schema_version", "action", "scope", "predicate", "fields", "attribute_ids", "page_size", "max_adapters"} | extensions, {"schema_version", "action"})
         if request.get("component_kind", "model_identity") not in ("model_identity", "top_level_component", "semantic_component"):
             invalid("component_kind must be model_identity, top_level_component or semantic_component.")
+        if (not isinstance(request.get("layer_resolution", "adapter"), str)
+                or request.get("layer_resolution", "adapter") not in {"adapter", "component"}):
+            invalid("layer_resolution must be adapter or component.")
+        if request.get("layer_resolution", "adapter") == "component" and request.get("component_kind") != "semantic_component":
+            invalid("Component layer resolution requires component_kind=semantic_component.")
         if request.get("coordinate_frame", "model_local") not in ("model_local", "project_global"):
             invalid("coordinate_frame must be model_local or project_global.")
         if "spatial_box" in request:

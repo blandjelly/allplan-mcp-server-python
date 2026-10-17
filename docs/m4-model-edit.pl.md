@@ -1,5 +1,7 @@
 # M4 — typowana edycja modelu: przewodnik operatora
 
+Poprawki **0.20.1** po próbie użytkownika: [Wartość U i warstwa ściany](m4-agent-fixes-0.20.1.pl.md).
+
 Stan dokumentu: 2026-10-17. Ten przewodnik opisuje nową, eksperymentalną
 ścieżkę `model_edit` i nie oznacza jej akceptacji w Allplanie. Przeczytaj też
 [evidence API Allplan 2026](m4-attribute-api-evidence.md) oraz

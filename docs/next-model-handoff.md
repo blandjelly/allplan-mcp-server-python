@@ -32,7 +32,28 @@ from the default branch as well. [Verification](test-results/testing-policy-2026
 records the one-time six-job workflow check, one build and the confirmed M4
 draft skip. M4 runtime integration remains separate.
 
-**New source candidate: 0.20.0 — typed criterion `model_edit`, native acceptance pending.**
+**New source candidate: 0.20.1 — fixes from the owner agent log.**
+Branch `fix/m4-undefined-values-wall-layer` starts from develop/m4 `7493ed3`;
+PRs still target develop/m4 and main remains separate. Typed numeric/boolean
+replacements accept only the exact observed undefined strings with a bound
+old_value_state marker; original raw values/fingerprints remain intact.
+The preview and low-level executor/adapter enforce the same narrow policy.
+Wall layer changes bind real WallTier owners, check all tiers before setters
+and read them freshly afterward, instead of treating the Wall root's raw layer
+as proof of its component layer. Existing journal set_layer semantics remain
+unchanged. New query layer_resolution=component is explicit and semantic-only;
+the default adapter reader and successful owner fire/query/highlight slice
+remain preserved. Mixed-tier layers/unknown hierarchy block before mutation.
+
+Focused numeric, hierarchy, replay/recovery, target-writability and MCP HTTP
+regressions pass with native fakes. Final source CI and package evidence are
+pending for this candidate; **new native behavior is not_run**. Next owner
+trial is only the numeric Wartość U from undefined and the Wall tier layer path.
+Do not repeat accepted fire/query/highlight or historical read gates. Native
+material edits remain unavailable and must not be substituted with an arbitrary
+attribute. [Short trial and limits](m4-agent-fixes-0.20.1.pl.md).
+
+**Previous source candidate: 0.20.0 — typed criterion `model_edit`, native acceptance pending.**
 Topic `topic/m4-universal-attribute-edit` starts from develop/m4 `cc062bc` and
 must target develop/m4; main integration remains separate. The new MCP route
 plans direct attribute/layer edits without audit findings, resolves exact

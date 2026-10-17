@@ -9,7 +9,8 @@ from uuid import uuid4
 from .model_context import integer
 from .model_metadata import bounded_text
 from .model_properties import positive_id
-from .model_edit_contracts import DEFAULT_NATIVE_TYPES, SCHEMA, validate_request
+from .model_edit_contracts import (DEFAULT_NATIVE_TYPES, SCHEMA, UNDEFINED_ATTRIBUTE_VALUES,
+                                  is_undefined_attribute_value, validate_request)
 from .query_contracts import evaluate, fingerprint, predicate_fields
 from .repair_contracts import capability_probe
 from .transport import BridgeError
@@ -119,10 +120,38 @@ def observe(plans, doc, base, settings, request):
              "fields": sorted((fields - {f for f in fields if f.startswith("attribute:")}) |
                               {"display_name", "layer_id", "file_state", "family"}),
              "attribute_ids": attribute_ids, "max_adapters": request.get("max_adapters", 5000)}
+    layer_requested = any(b["operation"] == "set_layer" for b in binding)
+    if layer_requested or "layer_id" in predicate_fields(request.get("predicate")):
+        query["layer_resolution"] = "component"
     live, owners = {}, []
     snapshot = trace.call("M1.semantic_component_scan", lambda: plans.queries._scan(
         doc, base, settings, query, adapter_sink=live, adapter_owners=owners))
     check()
+    if layer_requested:
+        from .wall_layer import observe as observe_wall_layer
+        import NemAll_Python_IFW_ElementAdapter as native_adapters
+        for element in snapshot["elements"]:
+            if element["fields"]["type_name"].get("value") != "Wall_TypeUUID":
+                continue
+            representations = live.get((element["ref"]["drawing_file"], element["ref"]["model_uuid"]), {})
+            observations = []
+            try:
+                for adapters in representations.values():
+                    for adapter in adapters:
+                        check()
+                        observations.append(trace.call("WallTier.layer_ownership", lambda:
+                            observe_wall_layer(adapter, native_adapters, check),
+                            drawing_file=element["ref"]["drawing_file"], model_uuid=element["ref"]["model_uuid"]))
+                if (not observations or len({fingerprint(o) for o in observations}) != 1
+                        or element["view_identity_not_checked"]):
+                    raise ValueError("Wall layer representations disagree")
+                element["wall_layer_ownership"] = observations[0]
+            except BridgeError as exc:
+                if exc.code in {"scan_limit_exceeded", "probe_trace_unavailable"}:
+                    raise
+                element["fields"]["layer_id"] = {"status": "not_checked", "value": None, "reason": exc.code}
+            except Exception as exc:
+                element["fields"]["layer_id"] = {"status": "not_checked", "value": None, "reason": type(exc).__name__}
     # A new opt-in reader can establish absence; legacy ReadAll paths stay intact.
     if request.get("attribute_read_mode", "stored") == "all_and_computable" and attribute_ids:
         from .native_model_edit import attribute_fields
@@ -196,7 +225,14 @@ def preview(plans, doc, base, settings, request):
             elif observed and mode == "add":
                 reason = "add_requires_proven_absence"
             elif observed and bound["operation"] != "set_layer" and old.get("value") is not None and not value_matches(old["value"], bound["resource"]["data_type"]):
-                reason = "old_value_type_differs"
+                data_type = bound["resource"].get("data_type")
+                undefined_numeric_or_boolean = (
+                    data_type in {"integer", "real", "boolean"}
+                    and old.get("computed_only") is not True
+                    and is_undefined_attribute_value(old.get("value"))
+                )
+                if not undefined_numeric_or_boolean:
+                    reason = "old_value_type_differs"
             if reason:
                 blocked.append({"ref": element["ref"], "field": bound["field"], "reason": reason})
                 continue
@@ -204,8 +240,19 @@ def preview(plans, doc, base, settings, request):
                       "adapter_version": SCHEMA, "native_type": element["fields"]["type_name"]["value"],
                       "old_value": copy.deepcopy(old), "source_fingerprint": element["source_fingerprint"],
                       "locator": {"drawing_file": element["ref"]["drawing_file"], "model_uuid": element["ref"]["model_uuid"]}}
+            if (bound["operation"] != "set_layer"
+                    and bound["resource"].get("data_type") in {"integer", "real", "boolean"}
+                    and is_undefined_attribute_value(old.get("value"))):
+                change["old_value_state"] = "undefined"
             if absent:
                 change["operation"] = "add_attribute"
+            if bound["operation"] == "set_layer" and change["native_type"] == "Wall_TypeUUID":
+                ownership = element.get("wall_layer_ownership")
+                if ownership is None:
+                    blocked.append({"ref": element["ref"], "field": "layer_id", "reason": "wall_layer_ownership_unavailable"})
+                    continue
+                change["operation"] = "set_wall_layer"
+                change["resource"]["wall_layer_ownership"] = copy.deepcopy(ownership)
             changes.append(change)
     ready = report["coverage"]["criteria_complete"] and not blocked and len(changes) <= plans.executor.MAX_CHANGES
     plan = {"schema_version": SCHEMA, "action": "preview", "read_only": True, "plan_id": uuid4().hex,
@@ -220,6 +267,11 @@ def preview(plans, doc, base, settings, request):
             "expires_after_seconds": plans.TTL_SECONDS,
             "limits": {"changes": plans.executor.MAX_CHANGES, "write_scope": "one_active_foreground_drawing",
                        "native_material_update": "unsupported_use_explicit_attribute_target"}}
+    plan["undefined_policy"] = {
+        "recognized_raw_values": sorted(UNDEFINED_ATTRIBUTE_VALUES),
+        "allowed_metadata_types": ["integer", "real", "boolean"],
+        "raw_old_value_preserved": True,
+    }
     plan["evaluation_apply_available"] = plans.executor.evaluation_scope(plan)
     plan["evaluation_highlight_available"] = ready
     plan["plan_hash"] = fingerprint({"plan": plan, "request": request})

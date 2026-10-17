@@ -107,6 +107,10 @@ def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapte
                 raise BridgeError("target_not_writable", f"Target fails {method}; no write requested.", 409)
         if integer(element.GetDrawingfileNumber()) != ref["drawing_file"]:
             raise BridgeError("target_not_writable", "Passive target cannot be changed.", 409)
+        if change.get("operation") == "set_wall_layer":
+            import NemAll_Python_IFW_ElementAdapter as native_adapters
+            from .wall_layer import preflight
+            preflight(base, element, change, native_adapters, budget)
     return element
 
 
@@ -118,6 +122,10 @@ def read(base, queries, element, change):
     deliberately reported as unknown, because ReadAll omits computed values.
     """
     operation = change.get("operation")
+    if operation == "set_wall_layer":
+        import NemAll_Python_IFW_ElementAdapter as native_adapters
+        from .wall_layer import read as read_wall_layer
+        return read_wall_layer(base, element, change, native_adapters)
     if operation == "set_layer":
         return queries._fields(element, base, {"layer_id"}, change["ref"]["drawing_file"],
                                "active_foreground")["layer_id"]
@@ -218,11 +226,31 @@ def value_matches(value, data_type):
         return False
 
 
+def replaceable_attribute_value(change):
+    """A typed replacement may start from a known native undefined marker."""
+    from .model_edit_contracts import is_undefined_attribute_value
+    old = change.get("old_value") or {}
+    data_type = (change.get("resource") or {}).get("data_type")
+    if old.get("status") != "observed" or old.get("computed_only") is True:
+        return False
+    undefined = (data_type in {"integer", "real", "boolean"}
+                 and is_undefined_attribute_value(old.get("value")))
+    if undefined:
+        return change.get("old_value_state") == "undefined"
+    if "old_value_state" in change:
+        return False
+    return old.get("value") is None or value_matches(old.get("value"), data_type)
+
+
 def write(base, element, change):
     """Invoke an established setter only for the explicit evaluation adapter."""
     if change.get("adapter_version") != "m4-model-edit-1":
         raise BridgeError("target_not_writable", "Native model edit adapter version is not enabled.", 409)
     operation = change.get("operation")
+    if operation == "set_wall_layer":
+        import NemAll_Python_IFW_ElementAdapter as native_adapters
+        from .wall_layer import write as write_wall_layer
+        return write_wall_layer(base, element, change, native_adapters)
     if operation not in {"set_attribute", "add_attribute", "set_layer"}:
         raise BridgeError("target_not_writable", "Native model edit operation is unsupported.", 409)
     import NemAll_Python_IFW_ElementAdapter as adapters
@@ -250,6 +278,8 @@ def write(base, element, change):
         raise BridgeError("target_not_writable", "Attribute replacement requires an observed old value.", 409)
     elif (change.get("old_value") or {}).get("computed_only") is True:
         raise BridgeError("target_not_writable", "Computed-only attributes cannot be edited through the element attribute setter.", 409)
+    elif not replaceable_attribute_value(change):
+        raise BridgeError("target_not_writable", "Attribute old value is neither type-compatible nor an explicitly bound undefined value.", 409)
     # The 2026 API documents ChangeAttributes as appending an attribute when it
     # is absent and replacing it when present. Flags remain False: no deletion
     # and no undefined-value operation is exposed here.

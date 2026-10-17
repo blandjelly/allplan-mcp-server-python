@@ -1,5 +1,6 @@
 """Typed model-edit workflow over fake native adapters and the shared M3 executor."""
 import json
+import importlib
 import unittest
 from types import SimpleNamespace
 from uuid import uuid4
@@ -184,6 +185,94 @@ class ModelEditTests(unittest.TestCase):
         self.assertEqual(self.apply(plan)["state"], "completed")
         self.assertEqual(elements[0].GetAttributes.return_value,
                          [(935, ""), (20001, 7), (20002, True)])
+
+    def test_exact_undefined_numeric_old_value_is_preserved_through_apply_recovery_and_noop(self):
+        elements = self.fixture(("",))
+        elements[0].GetAttributes.return_value.extend([(20001, "<niezdefiniowany>")])
+        self.attribute_catalog({935: "Klasa odporności ogniowej", 20001: "QA_REAL"})
+        self.attribute_type_names[20001] = "Double"
+        self.base.DrawingFileService.GetActiveFileNumber.return_value = 101
+
+        def write_then_lose_reply(attributes, targets, *flags):
+            targets[0].GetAttributes.return_value = [(935, ""), (20001, 0.2)]
+            raise RuntimeError("simulated lost native setter reply")
+
+        self.base.ElementsAttributeService.ChangeAttributes.side_effect = write_then_lose_reply
+        plan = self.preview(predicate={"field": "type_name", "op": "eq", "value": "Column_TypeUUID"},
+                            changes=[{"target": {"kind": "attribute", "attribute_id": 20001},
+                                      "value_type": "real", "value": 0.2, "mode": "upsert"}])
+        self.assertEqual(plan["counts"]["changes"], 1)
+        change = plan["changes"][0]
+        self.assertEqual(change["old_value"], {"status": "observed", "value": "<niezdefiniowany>"})
+        self.assertEqual(change["old_value_state"], "undefined")
+        self.assertTrue(plan["undefined_policy"]["raw_old_value_preserved"])
+        self.highlight(plan)
+        execution_id = uuid4().hex
+        applied = self.apply(plan, execution_id)
+        self.assertEqual(applied["outcomes"][0]["state"], "unknown")
+        recovery = self.recover(execution_id)
+        self.assertEqual(recovery["recovery"]["observations"][0]["state"], "new_value_observed")
+        self.assertEqual(recovery["outcomes"][0]["state"], "reconciled")
+        self.assertTrue(self.apply(plan, execution_id)["replayed"])
+        self.assertEqual(self.base.ElementsAttributeService.ChangeAttributes.call_count, 1)
+        self.base.ElementsAttributeService.ChangeAttributes.side_effect = None
+        next_plan = self.preview(predicate={"field": "type_name", "op": "eq", "value": "Column_TypeUUID"},
+                                 changes=[{"target": {"kind": "attribute", "attribute_id": 20001},
+                                           "value_type": "real", "value": 0.2, "mode": "upsert"}])
+        self.assertEqual(next_plan["state"], "no_op")
+
+    def test_arbitrary_numeric_strings_remain_type_mismatches(self):
+        elements = self.fixture(("",))
+        self.attribute_catalog({935: "Klasa odporności ogniowej", 20001: "QA_REAL"})
+        self.attribute_type_names[20001] = "Double"
+        for raw in ("0,2", "abc"):
+            elements[0].GetAttributes.return_value = [(935, ""), (20001, raw)]
+            plan = self.preview(predicate={"field": "type_name", "op": "eq", "value": "Column_TypeUUID"},
+                                changes=[{"target": {"kind": "attribute", "attribute_id": 20001},
+                                          "value_type": "real", "value": 0.2, "mode": "replace"}])
+            self.assertEqual(plan["state"], "not_checked", raw)
+            self.assertEqual(plan["blocked"][0]["reason"], "old_value_type_differs", raw)
+            self.assertFalse(plan["changes"], raw)
+            self.assertNotIn("old_value_state", plan["changes"][0] if plan["changes"] else {})
+
+    def test_undefined_old_value_change_conflicts_if_raw_value_changes_before_apply(self):
+        elements = self.fixture(("",))
+        elements[0].GetAttributes.return_value.extend([(20001, "<niezdefiniowany>")])
+        self.attribute_catalog({935: "Klasa odporności ogniowej", 20001: "QA_REAL"})
+        self.attribute_type_names[20001] = "Double"
+        self.setter_fakes(elements)
+        plan = self.preview(predicate={"field": "type_name", "op": "eq", "value": "Column_TypeUUID"},
+                            changes=[{"target": {"kind": "attribute", "attribute_id": 20001},
+                                      "value_type": "real", "value": 0.2, "mode": "replace"}])
+        self.assertEqual(plan["changes"][0]["old_value"],
+                         {"status": "observed", "value": "<niezdefiniowany>"})
+        self.highlight(plan)
+        elements[0].GetAttributes.return_value = [(935, ""), (20001, "<undefined>")]
+        self.assert_code("repair_conflict", lambda: self.apply(plan))
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+    def test_executor_scope_requires_exact_undefined_annotation(self):
+        elements = self.fixture(("",))
+        elements[0].GetAttributes.return_value.extend([(20001, "<niezdefiniowany>")])
+        self.attribute_catalog({935: "Klasa odporności ogniowej", 20001: "QA_REAL"})
+        self.attribute_type_names[20001] = "Double"
+        plan = self.preview(predicate={"field": "type_name", "op": "eq", "value": "Column_TypeUUID"},
+                            changes=[{"target": {"kind": "attribute", "attribute_id": 20001},
+                                      "value_type": "real", "value": 0.2, "mode": "replace"}])
+        RepairExecutor = importlib.import_module("test_allplan_host.repair_execution").RepairExecutor
+        self.assertTrue(RepairExecutor.model_edit_scope(plan))
+
+        missing_marker = json.loads(json.dumps(plan))
+        missing_marker["changes"][0].pop("old_value_state")
+        self.assertFalse(RepairExecutor.model_edit_scope(missing_marker))
+
+        fake_marker = json.loads(json.dumps(plan))
+        fake_marker["changes"][0]["old_value"]["value"] = "0,2"
+        self.assertFalse(RepairExecutor.model_edit_scope(fake_marker))
+
+        unexpected_marker = json.loads(json.dumps(plan))
+        unexpected_marker["changes"][0]["old_value"]["value"] = 1.0
+        self.assertFalse(RepairExecutor.model_edit_scope(unexpected_marker))
 
     def test_more_than_32_native_changes_are_never_applicable(self):
         elements = self.fixture(tuple("" for _ in range(17)))

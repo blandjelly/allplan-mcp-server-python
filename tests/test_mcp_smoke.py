@@ -1275,3 +1275,111 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(dict(elements[0].GetAttributes.return_value)[935], "F120")
         self.assertEqual(native.base.ElementsAttributeService.ChangeAttributes.call_count, 1)
         self.assertTrue(native.module.AllplanIFW.HighlightService.HighlightElements.called)
+
+    async def test_model_edit_wall_undefined_real_attribute_over_http(self):
+        from test_model_edit import ModelEditTests
+        native = ModelEditTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        elements = native.fixture(("",))
+        wall = elements[0]
+        wall.GetElementAdapterType.return_value.GetTypeName.return_value = "Wall_TypeUUID"
+        wall.GetElementAdapterType.return_value.GetGuid.return_value = "20000000-0000-4000-8000-000000000201"
+        wall.GetAttributes.return_value = [(20001, "<niezdefiniowany>")]
+        native.attribute_catalog({20001: "Wartość U"})
+        native.attribute_type_names[20001] = "Double"
+        native.setter_fakes(elements)
+        original = self.bridge_handler.handle
+
+        def handle(path, payload):
+            if path == "/model-edit":
+                self.bridge_handler.calls.append((path, payload))
+                try:
+                    return native.handler.handle(path, payload)
+                except native.module.BridgeError as exc:
+                    raise transport.BridgeError(exc.code, str(exc), exc.status) from exc
+            return original(path, payload)
+
+        self.bridge_handler.handle = handle
+        request = native.request(
+            native_types=["Wall_TypeUUID"],
+            predicate={"field": "type_name", "op": "eq", "value": "Wall_TypeUUID"},
+            changes=[{"target": {"kind": "attribute", "name": "Wartość U"},
+                      "value_type": "real", "value": 0.2, "mode": "upsert"}],
+        )
+        request.pop("schema_version")
+        async with Client(self.url, timeout=5) as client:
+            preview = (await client.call_tool("model_edit", {"request": request})).data
+            self.assertEqual(preview["state"], "preview_ready")
+            self.assertEqual(preview["counts"]["changes"], 1)
+            self.assertEqual(len(preview["changes"]), 1)
+            change = preview["changes"][0]
+            self.assertEqual(change["field"], "attribute:20001")
+            self.assertEqual(change["resource"]["name"], "Wartość U")
+            self.assertEqual(change["old_value"], {"status": "observed", "value": "<niezdefiniowany>"})
+            self.assertEqual(change["new_value"], 0.2)
+            plan_request = {"schema_version": "m4-model-edit-1", "action": "highlight",
+                            "plan_id": preview["plan_id"], "plan_hash": preview["plan_hash"]}
+            highlighted = (await client.call_tool("model_edit", {"request": plan_request})).data
+            self.assertEqual(highlighted["state"], "submitted")
+            execution_id = "f" * 32
+            apply_request = {"schema_version": "m4-model-edit-1", "action": "apply",
+                             "plan_id": preview["plan_id"], "plan_hash": preview["plan_hash"],
+                             "execution_id": execution_id,
+                             "acknowledgement": "disposable_copy_reviewed_plan"}
+            applied = (await client.call_tool("model_edit", {"request": apply_request})).data
+            replay = (await client.call_tool("model_edit", {"request": apply_request})).data
+            self.assertEqual(applied["state"], "completed")
+            self.assertTrue(replay["replayed"])
+            next_preview = (await client.call_tool("model_edit", {"request": request})).data
+            self.assertEqual(next_preview["state"], "no_op")
+            self.assertEqual(next_preview["counts"]["changes"], 0)
+
+        self.assertEqual(wall.GetAttributes.return_value, [(20001, 0.2)])
+        self.assertEqual(native.base.ElementsAttributeService.ChangeAttributes.call_count, 1)
+        self.assertEqual(native.base.ElementsAttributeService.ChangeAttributes.call_args.args[0], [(20001, 0.2)])
+
+    async def test_wall_layer_tier_owner_apply_and_component_query_over_http(self):
+        from test_wall_layer_edit import WallLayerEditTests
+        fixture = WallLayerEditTests()
+        root, tiers, *_ = fixture.fixture((3735, 3735))
+        self.addCleanup(fixture.doCleanups)
+        native = fixture.native
+        original = self.bridge_handler.handle
+        def handle(path, payload):
+            if path in {"/model-edit", "/model-query"}:
+                self.bridge_handler.calls.append((path, payload))
+                try:
+                    return native.handler.handle(path, payload)
+                except native.module.BridgeError as exc:
+                    raise transport.BridgeError(exc.code, str(exc), exc.status) from exc
+            return original(path, payload)
+        self.bridge_handler.handle = handle
+        request = native.request(native_types=["Wall_TypeUUID"],
+            predicate={"field": "family", "op": "eq", "value": "wall"},
+            changes=[{"target": {"kind": "layer", "short_name": "W1"}}])
+        request.pop("schema_version")
+        async with Client(self.url, timeout=5) as client:
+            plan = (await client.call_tool("model_edit", {"request": request})).data
+            self.assertEqual(plan["changes"][0]["operation"], "set_wall_layer")
+            follow = {"plan_id": plan["plan_id"], "plan_hash": plan["plan_hash"]}
+            await client.call_tool("model_edit", {"request": {"action": "highlight", **follow}})
+            apply = {"action": "apply", **follow, "execution_id": "e" * 32,
+                     "acknowledgement": "disposable_copy_reviewed_plan"}
+            result = (await client.call_tool("model_edit", {"request": apply})).data
+            self.assertEqual(result["state"], "completed")
+            self.assertTrue((await client.call_tool("model_edit", {"request": apply})).data["replayed"])
+            query = {"action": "query", "scope": request["scope"], "component_kind": "semantic_component",
+                     "layer_resolution": "component", "fields": ["layer_id"],
+                     "predicate": {"field": "type_name", "op": "eq", "value": "Wall_TypeUUID"}}
+            readback = (await client.call_tool("model_query", {"request": query})).data
+            self.assertEqual(readback["elements"][0]["fields"]["layer_id"]["value"], 8)
+            self.assertEqual(readback["coverage"]["layer_resolution"], "component")
+            calls = len(self.bridge_handler.calls)
+            invalid = await client.call_tool("model_query", {"request": {**query, "component_kind": "model_identity"}},
+                                             raise_on_error=False)
+            self.assertTrue(invalid.is_error)
+            self.assertEqual(len(self.bridge_handler.calls), calls)
+        self.assertEqual(root.GetCommonProperties.return_value.Layer, 3735)
+        self.assertTrue(all(tier.GetCommonProperties.return_value.Layer == 8 for tier in tiers))
+        self.assertEqual(native.base.ElementsLayerService.ChangeLayer.call_count, 1)
