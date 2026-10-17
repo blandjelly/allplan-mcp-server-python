@@ -1,0 +1,15 @@
+{
+  "source_commit": "ec2aeae832c2ac017c07c4af71b7c7a6ff47f9d9",
+  "source_modified": false,
+  "zip_sha256": "8d78fb8d872dccb5f9404ff62ac97b04b26552a1a837feef1d4d3e9bdbe6c054",
+  "payload_files": 170,
+  "bridge_hashes_verified": 34,
+  "zip_checksum": "pass",
+  "payload_integrity": "pass",
+  "exact_zip_registration": "pass",
+  "exact_zip_frozen_sync_and_import": "pass",
+  "upgrade_from_0190": "pass",
+  "restore_to_0190": "pass",
+  "journal_trace_and_bridge_log_preserved": "pass",
+  "native_Allplan": "not_run"
+}

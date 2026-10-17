@@ -44,9 +44,15 @@ and execution ID, one foreground drawing and at most 32 setters. Multi-drawing
 write batches, enum/date codecs and native property/material updates are not
 implemented. The complete office-editing plan is **not** accepted or complete.
 
-Focused runtime, schema, query/native-family and HTTP workflow tests have passed
-with native fakes; final source CI/package evidence will be recorded after the
-candidate run. These are portable checks, not native Allplan results. Next owner
+Runtime source **ec2aeae832c2ac017c07c4af71b7c7a6ff47f9d9** passed
+[CI 39049036363](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39049036363):
+**387 tests on each Windows/Ubuntu Python 3.12 job**, then one package job.
+Workspace artifact transfer returned HTTP 403; one allowed local fallback build
+used that exact clean source. The delivered ZIP passed exact payload/checksum,
+registration, frozen sync/import, upgrade from 0.19.0 and restore, with **34 bridge
+hashes** and journal/trace/bridge-log preservation.
+[Package, checksums and evidence](../evaluation-packages/0.20.0/README.md).
+These are portable checks, not native Allplan results. Next owner
 trial is only the NEW typed attribute add/replace + layer path (including
 readback/replay/Undo), and optional opening-kind recognition on representative
 objects. Do not repeat accepted historical Wall/Column/M3 trials. See the

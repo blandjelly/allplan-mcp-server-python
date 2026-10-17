@@ -128,7 +128,8 @@ owner powinien wykonać jeden krótki, ograniczony scenariusz w kopii projektu:
 3. Na jednym słupie w tym samym aktywnym pliku sprawdź połączony zapis atrybutu
    odporności `F120` i istniejącej warstwy `W1`; potwierdź dokładny zakres,
    odczyt po zapisie i brak zmian w polach poza planem.
-4. Sprawdź ponowne preview jako no-op oraz pojedyncze Undo w Allplanie. Zapisz
+4. Sprawdź ponowne preview jako no-op i rzeczywisty zakres Undo w Allplanie.
+   Nie zakładaj jednego wspólnego Undo dla kilku setterów. Zapisz
    odpowiedzi `health_before`/`health_after`, plan, wynik Apply i obserwację UI.
 
 Otwór `WindowDoor_TypeUUID` nie jest częścią próby odróżniania drzwi od okien;

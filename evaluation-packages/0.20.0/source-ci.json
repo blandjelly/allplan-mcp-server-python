@@ -1,0 +1,40 @@
+{
+  "source_commit": "ec2aeae832c2ac017c07c4af71b7c7a6ff47f9d9",
+  "run_id": 39049036363,
+  "url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39049036363",
+  "matrix": "Windows/Ubuntu x Python 3.12",
+  "tests_per_platform": 387,
+  "jobs": [
+    {
+      "id": 117443626911,
+      "name": "configuration",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117443660164,
+      "name": "portable (ubuntu-latest, 3.12)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117443660239,
+      "name": "portable (windows-latest, 3.12)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 117444916887,
+      "name": "package",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "ci_artifact": {
+    "id": 12107341025,
+    "name": "candidate-ec2aeae832c2ac017c07c4af71b7c7a6ff47f9d9",
+    "archive_sha256": "6d3593d62d87db82f3b392b9e9ad513cdb48aba9508ae0f251130758e62e79cf",
+    "workspace_transfer": "blocked_HTTP_403"
+  },
+  "native_allplan": "not_run"
+}
