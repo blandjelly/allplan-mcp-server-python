@@ -1,5 +1,13 @@
 # Current handoff
 
+**Canonical M4 branch: `develop/m4`.** Created from `cf3c4bb`; all heads of
+`codex/m4-property-discovery`, `codex/m4-0.18.0`, `fix/m4-host-timeout` and
+`fix/m4-wall-sample` are included. New topic branches/PRs target develop/m4.
+PRs #5/#7/#8 are closed as superseded; #6 was already closed. Legacy refs and
+package links remain available; `fix/m4-wall-sample` is a compatibility ref.
+Main remains separate and was not updated by this consolidation. Read the
+[branch layout](branch-layout.md) before continuing or opening a PR.
+
 **Testing procedure approved 2026-10-17:** read [AGENTS.md](../AGENTS.md) and
 [the testing policy](testing-policy.md) at the start of every chat. Iterate with
 affected/dependent tests and draft PRs; do not repeat the full local suite or
@@ -13,7 +21,8 @@ from the default branch as well. [Verification](test-results/testing-policy-2026
 records the one-time six-job workflow check, one build and the confirmed M4
 draft skip. M4 runtime integration remains separate.
 
-Current correction: **0.18.2**, `fix/m4-wall-sample`, based on the verified
+Current runtime: **0.18.2** on `develop/m4`, originally delivered through
+`fix/m4-wall-sample`, based on the verified
 0.18.1 delivery at `0860438`. The documentation/evidence update was committed
 first (`194088c`), before runtime edits. `wall_sample` now accepts distinct
 Python wrappers only within one complete, consistent M1 root identity and view.
@@ -34,8 +43,8 @@ from 0.18.1/restore (30 bridge hashes; journal/trace/bridge log preserved).
 Only `wall_probe.py` changes in the native payload.
 [Source CI 39027996719](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39027996719)
 passed **6/6 Windows/Ubuntu × Python 3.11–3.13** jobs, including tests/builds.
-[Draft PR #8](https://github.com/blandjelly/allplan-mcp-server-python/pull/8)
-targets `fix/m4-host-timeout`; main integration remains separate.
+[Historical PR #8](https://github.com/blandjelly/allplan-mcp-server-python/pull/8)
+is closed as superseded by develop/m4; main integration remains separate.
 
 Previous transport delivery, 2026-10-17 Europe/Warsaw: **0.18.1** on
 `fix/m4-host-timeout`, based on `codex/m4-0.18.0` at `0dbe7cf`.
@@ -54,8 +63,8 @@ scoped Columns highlight and Wall sample observations. Columns highlight
 visibility and same-session health are owner-confirmed; the Wall sample blocked
 before native read. Neither result accepts writes or the complete M4 workflow.
 [Observation report](m4-native-observation-0.18.1-2026-10-17.md).
-[Draft PR #7](https://github.com/blandjelly/allplan-mcp-server-python/pull/7)
-targets `codex/m4-0.18.0`, without main integration.
+[Historical PR #7](https://github.com/blandjelly/allplan-mcp-server-python/pull/7)
+originally targeted `codex/m4-0.18.0` and is now closed as superseded by develop/m4.
 All original 0.18.0 artifacts remain frozen. The preceding Wall/Columns work and
 its limits below remain applicable after transport verification.
 

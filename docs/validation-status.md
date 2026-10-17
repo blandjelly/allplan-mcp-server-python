@@ -1,5 +1,10 @@
 # Validation status and limits
 
+Current development branch: **develop/m4**, consolidated from `cf3c4bb` with
+all earlier M4 heads already included. This branch/PR/documentation cleanup
+does not change runtime, frozen packages or the source scopes below. Main is
+separate. [Branch layout](branch-layout.md).
+
 **0.18.2 correction:** the single-Wall read resolves consistent M1 root
 wrappers by native file/model/view identity rather than Python object identity.
 One Wall is read once; multiple views, conflicting fields and incomplete
