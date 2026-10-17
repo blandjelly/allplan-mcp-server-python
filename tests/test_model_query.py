@@ -4,7 +4,7 @@ import importlib
 import json
 import types
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import test_host_handler as host_fixtures
 
@@ -130,8 +130,11 @@ class QueryTests(unittest.TestCase):
         self.assertEqual(result["counts"]["matched_model_identities"], 1)
         self.assertEqual(result["counts"]["predicate_not_checked"], 2)
         result = self.query(predicate={"not": {"field": "attribute:83", "op": "exists"}})
-        self.assertEqual(result["counts"]["matched_model_identities"], 1)
-        self.assertEqual(result["counts"]["predicate_not_checked"], 1)
+        self.assertEqual(result["counts"]["matched_model_identities"], 0)
+        self.assertEqual(result["counts"]["predicate_not_checked"], 2)
+        result = self.query(predicate={"field": "attribute:83", "op": "is_unset"})
+        self.assertEqual(result["counts"]["matched_model_identities"], 2)
+        self.assertEqual(result["counts"]["predicate_not_checked"], 2)
 
     def test_composition_numeric_tolerance_and_string_normalization(self):
         first = self.adapter(attrs=[(83, " S02 "), (220, 400.5)])
@@ -149,6 +152,68 @@ class QueryTests(unittest.TestCase):
         self.assertTrue(self.contracts.evaluate({"any": [unknown, true]}, fields))
         self.assertFalse(self.contracts.evaluate({"all": [unknown, false]}, fields))
         self.assertIsNone(self.contracts.evaluate({"all": [unknown, true]}, fields))
+
+    def test_semantic_family_field_uses_reported_native_type_names_and_attributes_filter_safely(self):
+        wall = self.adapter(attrs=[(83, "Concrete")])
+        wall.GetElementAdapterType.return_value.GetTypeName.return_value = "Wall_TypeUUID"
+        door = self.adapter(ident=2, attrs=[(83, "Steel")])
+        door.GetElementAdapterType.return_value.GetTypeName.return_value = "WindowDoor_TypeUUID"
+        window = self.adapter(ident=3, attrs=[])
+        window.GetElementAdapterType.return_value.GetTypeName.return_value = "WindowDoor_TypeUUID"
+        self.prepare([wall, door, window])
+        result = self.query(fields=["family", "type_uuid"], predicate={"all": [
+            {"field": "family", "op": "eq", "value": "opening"},
+            {"field": "attribute:83", "op": "ne", "value": "Concrete"}]})
+        self.assertEqual(result["counts"]["matched_model_identities"], 1)
+        self.assertEqual(result["counts"]["predicate_not_checked"], 1)
+        self.assertEqual(result["elements"][0]["fields"]["family"]["value"], "opening")
+        self.assertEqual(result["elements"][0]["fields"]["type_uuid"]["value"], "20000000-0000-4000-8000-000000000001")
+
+    def test_semantic_component_stops_at_nested_opening_adapter(self):
+        door = self.adapter(ident=1)
+        door.GetElementAdapterType.return_value.GetTypeName.return_value = "WindowDoor_TypeUUID"
+        wall = self.adapter(ident=2)
+        wall.GetElementAdapterType.return_value.GetTypeName.return_value = "Wall_TypeUUID"
+        service = MagicMock()
+        with patch.dict("sys.modules", {"NemAll_Python_IFW_ElementAdapter": types.SimpleNamespace(
+                BaseElementAdapterParentElementService=types.SimpleNamespace(GetParentElement=service.GetParentElement))}):
+            self.prepare([door, wall])
+            result = self.query(component_kind="semantic_component", fields=["family"])
+        self.assertEqual({element["fields"]["family"]["value"] for element in result["elements"]}, {"opening", "wall"})
+        service.GetParentElement.assert_not_called()
+
+    def test_opening_kind_uses_only_documented_runtime_element_classes_and_keeps_unknown_incomplete(self):
+        class DoorOpeningElement:
+            pass
+        class WindowOpeningElement:
+            pass
+        door, window, unknown = (self.adapter(ident=i) for i in (1, 2, 3))
+        for element in (door, window, unknown):
+            element.GetElementAdapterType.return_value.GetTypeName.return_value = "WindowDoor_TypeUUID"
+        native_elements = {door: DoorOpeningElement(), window: WindowOpeningElement(), unknown: object()}
+        self.base.GetElement.side_effect = lambda adapter: native_elements[adapter]
+        architecture = types.SimpleNamespace(DoorOpeningElement=DoorOpeningElement,
+                                             WindowOpeningElement=WindowOpeningElement)
+        with patch.dict("sys.modules", {"NemAll_Python_ArchElements": architecture}):
+            self.prepare([door, window])
+            classified = self.query(fields=["opening_kind"], predicate={"field": "opening_kind", "op": "in",
+                                                                          "value": ["door", "window"]})
+            self.assertEqual({e["fields"]["opening_kind"]["value"] for e in classified["elements"]}, {"door", "window"})
+            self.prepare([unknown])
+            observed_unknown = self.query(fields=["opening_kind"])
+            self.assertEqual(observed_unknown["elements"][0]["fields"]["opening_kind"]["status"], "not_checked")
+            self.assertFalse(observed_unknown["coverage"]["returned_fields_complete"])
+            self.prepare([unknown])
+            unresolved = self.query(fields=["opening_kind"], predicate={"field": "opening_kind", "op": "eq", "value": "door"})
+            wall = self.adapter(ident=4)
+            wall.GetElementAdapterType.return_value.GetTypeName.return_value = "Wall_TypeUUID"
+            self.prepare([wall])
+            other_family = self.query(fields=["opening_kind"])
+        self.assertEqual(unresolved["counts"]["predicate_not_checked"], 1)
+        self.assertEqual(unresolved["not_checked_samples"][0]["fields"]["opening_kind"]["status"], "not_checked")
+        self.assertEqual(other_family["elements"][0]["fields"]["opening_kind"],
+                         {"status": "observed", "value": "not_applicable"})
+        self.assertEqual(self.base.GetElement.call_count, 4)
 
     def test_scalar_types_are_not_coerced_and_ordered_type_mismatch_is_unknown(self):
         self.prepare()

@@ -30,6 +30,10 @@ class RepairPlanService:
 
     def source_observation(self, doc, base, settings, request):
         """Common executor evidence; criterion edits never fabricate audit findings."""
+        if request.get("schema_version") == "m4-model-edit-1":
+            from .model_edit import observe
+            report, snapshot, _ = observe(self, doc, base, settings, request)
+            return report, snapshot
         if request.get("schema_version") == "m4-column-layer-1":
             from .column_layer import observe
             report, snapshot, _ = observe(self, doc, base, settings, request)
@@ -55,6 +59,19 @@ class RepairPlanService:
             return column_layer.highlight(self, doc, base, settings, ifw, request)
         if action == "revalidate":
             return column_layer.revalidate(self, doc, base, settings, request)
+        return self.executor.handle(doc, base, settings, request)
+
+    def handle_model_edit(self, doc, base, settings, ifw, request):
+        from . import model_edit
+        model_edit.validate_request(request)
+        self.expire()
+        action = request["action"]
+        if action == "preview":
+            return model_edit.preview(self, doc, base, settings, request)
+        if action == "highlight":
+            return model_edit.highlight(self, doc, base, settings, ifw, request)
+        if action == "revalidate":
+            return model_edit.revalidate(self, doc, base, settings, request)
         return self.executor.handle(doc, base, settings, request)
 
     def handle(self, doc, base, settings, request):
@@ -271,6 +288,9 @@ class RepairPlanService:
 
     def _revalidate(self, doc, base, settings, request):
         candidate = self.plans.get(request["plan_id"]) or self.invalidated_plans.get(request["plan_id"])
+        if candidate and candidate["plan"].get("source_kind") == "typed_model_edit":
+            from .model_edit import revalidate
+            return revalidate(self, doc, base, settings, request)
         if candidate and candidate["plan"].get("source_kind") == "column_missing_fire_layer":
             from .column_layer import revalidate
             return revalidate(self, doc, base, settings, request)

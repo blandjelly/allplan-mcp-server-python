@@ -50,6 +50,9 @@ class RequestHandler:
         if path == "/column-layer":
             from .column_layer import validate_request as validate_column_layer
             validate_column_layer(request)
+        if path == "/model-edit":
+            from .model_edit_contracts import validate_request as validate_model_edit
+            validate_model_edit(request)
         if path == "/model-wall-filter":
             from .wall_filter import validate_request as validate_wall_filter
             validate_wall_filter(request)
@@ -92,6 +95,9 @@ class RequestHandler:
 
             case "/column-layer":
                 return self.repair_plans.handle_column_layer(self.current_document(), AllplanBaseEle, AllplanSettings, AllplanIFW, request)
+
+            case "/model-edit":
+                return self.repair_plans.handle_model_edit(self.current_document(), AllplanBaseEle, AllplanSettings, AllplanIFW, request)
 
             case "/model-property-probe":
                 return self.property_probes.handle(self.current_document, AllplanBaseEle, AllplanSettings, request)

@@ -7,7 +7,7 @@ import time
 from collections import Counter, OrderedDict
 from uuid import uuid4
 
-from .native_readers import COMPONENT_TYPES
+from .native_readers import COMPONENT_TYPES, semantic_family
 from .model_context import context_probe, guid, integer, observation, text
 from .query_contracts import BASIC_FIELDS, GEOMETRY_FIELDS, SCHEMA, attribute_id, evaluate, fingerprint, predicate_fields, scalar, validate_request
 from .transport import BridgeError
@@ -144,7 +144,7 @@ class ModelQueryService:
         needed.update(f"attribute:{number}" for number in request.get("attribute_ids", []))
         if "spatial_box" in request:
             needed.add("bounding_box_mm")
-        if request.get("component_kind") == "top_level_component":
+        if request.get("component_kind") in {"top_level_component", "semantic_component"}:
             needed.add("hierarchy")
         for role in needed & {"mark", "status"}:
             needed.add(f"attribute:{profile_binding['attributes'][role]['value']['attribute_id']}")
@@ -194,10 +194,11 @@ class ModelQueryService:
                     continue
                 counts["in_scope_adapters"] += 1
                 chain = None
-                if request.get("component_kind") == "top_level_component" or "hierarchy" in needed:
+                if request.get("component_kind") in {"top_level_component", "semantic_component"} or "hierarchy" in needed:
                     from .native_readers import root_adapter
                     try:
-                        root, chain = root_adapter(adapter, check_budget)
+                        stop_types = COMPONENT_TYPES if request.get("component_kind") == "semantic_component" else None
+                        root, chain = root_adapter(adapter, check_budget, stop_types)
                     except BridgeError:
                         raise
                     except Exception as exc:
@@ -205,9 +206,9 @@ class ModelQueryService:
                         record = {"drawing_file": number, "model_uuid": observation(lambda: guid(adapter.GetModelElementUUID())), "reason": type(exc).__name__}
                         add_source(record)
                         sample("hierarchy_not_checked", record)
-                        if request.get("component_kind") == "top_level_component":
+                        if request.get("component_kind") in {"top_level_component", "semantic_component"}:
                             continue
-                    if request.get("component_kind") == "top_level_component":
+                    if request.get("component_kind") in {"top_level_component", "semantic_component"}:
                         adapter = root
                 read_needed = needed
                 if native_type_gate is not None:
@@ -216,7 +217,7 @@ class ModelQueryService:
                         # Criterion workflow must not read attributes/geometry of
                         # walls, beams or unknown native families while finding Columns.
                         read_needed = {f for f in needed if f not in GEOMETRY_FIELDS and attribute_id(f) is None}
-                basic_needed = {f for f in read_needed if f in BASIC_FIELDS or attribute_id(f) is not None}
+                basic_needed = {f for f in read_needed if f in BASIC_FIELDS or f in {"family", "opening_kind"} or attribute_id(f) is not None}
                 values = self._fields(adapter, base, basic_needed, number, states[number])
                 if read_needed & GEOMETRY_FIELDS:
                     from .native_readers import geometry_fields
@@ -225,7 +226,7 @@ class ModelQueryService:
                     root_ref = {k: v for k, v in chain[-1].items() if k != "view_uuid"} if chain else None
                     values["hierarchy"] = ({"status": "observed", "value": {"root": root_ref, "top_level": len(chain) == 1}}
                                            if chain else {"status": "not_checked", "value": None, "reason": "hierarchy_unavailable"})
-                    if request.get("component_kind") == "top_level_component":
+                    if request.get("component_kind") in {"top_level_component", "semantic_component"}:
                         values["hierarchy"] = {"status": "observed", "value": {"root": root_ref, "top_level": True}}
                 for role in needed & {"mark", "status"}:
                     value = values[f"attribute:{profile_binding['attributes'][role]['value']['attribute_id']}"]
@@ -244,7 +245,7 @@ class ModelQueryService:
                     counts["identity_not_checked"] += 1
                     sample("identity_not_checked", record)
                     continue
-                if request.get("component_kind") == "top_level_component" and values["type_name"].get("value") not in COMPONENT_TYPES:
+                if request.get("component_kind") in {"top_level_component", "semantic_component"} and values["type_name"].get("value") not in COMPONENT_TYPES:
                     counts["non_component_adapters"] += 1
                     continue
                 key = (number, model["value"])
@@ -298,8 +299,8 @@ class ModelQueryService:
                              "returned_fields_complete": failed_fields == 0, "returned_fields_not_checked": failed_fields,
                              "whole_project": False, "unloaded_files": "not_enumerated",
                              "visibility": "api_select_all_screen_and_occlusion_not_checked",
-                             "count_kind": ("supported_native_top_level_components" if request.get("component_kind") == "top_level_component" else "unique_file_model_uuid_not_top_level_components"),
-                             "native_component_counts": "implemented_runtime_pending" if request.get("component_kind") == "top_level_component" else "not_checked",
+                             "count_kind": ("supported_native_semantic_components" if request.get("component_kind") == "semantic_component" else "supported_native_top_level_components" if request.get("component_kind") == "top_level_component" else "unique_file_model_uuid_not_top_level_components"),
+                             "native_component_counts": "implemented_runtime_pending" if request.get("component_kind") in {"top_level_component", "semantic_component"} else "not_checked",
                              "supported_component_types": sorted(COMPONENT_TYPES),
                              "geometry_units_offset": "implemented_runtime_pending" if needed & GEOMETRY_FIELDS else "not_checked"},
                 "profile_binding": profile_binding,
@@ -313,8 +314,28 @@ class ModelQueryService:
             if len(value) > 8192:
                 raise ValueError("Text exceeds the query field budget")
             return value
+        def type_name():
+            return bounded_text(adapter.GetElementAdapterType().GetTypeName())
+        def family():
+            value = semantic_family(type_name())
+            if value is None:
+                raise ValueError("Native type has no supported semantic family")
+            return value
+        def opening_kind():
+            if type_name() != "WindowDoor_TypeUUID":
+                return "not_applicable"
+            import NemAll_Python_ArchElements as architecture
+            element = base.GetElement(adapter)
+            door_type = getattr(architecture, "DoorOpeningElement", None)
+            window_type = getattr(architecture, "WindowOpeningElement", None)
+            if not isinstance(door_type, type) or not isinstance(window_type, type):
+                raise AttributeError("Documented opening classes are unavailable in this runtime")
+            is_door, is_window = isinstance(element, door_type), isinstance(element, window_type)
+            if is_door == is_window:
+                raise ValueError("Opening element kind is unsupported or ambiguous")
+            return "door" if is_door else "window"
         readers = {"display_name": lambda: bounded_text(adapter.GetDisplayName()),
-                   "type_name": lambda: bounded_text(adapter.GetElementAdapterType().GetTypeName()),
+                   "type_name": type_name, "family": family, "opening_kind": opening_kind,
                    "type_uuid": lambda: guid(adapter.GetElementAdapterType().GetGuid()),
                    "layer_id": lambda: integer(adapter.GetCommonProperties().Layer),
                    "drawing_file": lambda: number, "file_state": lambda: state}

@@ -12,8 +12,8 @@ SCHEMA = "m1-query-1"
 BASIC_FIELDS = {"display_name", "type_name", "type_uuid", "layer_id", "drawing_file", "file_state"}
 GEOMETRY_FIELDS = {"bounding_box_mm", "size_x_mm", "size_y_mm", "size_z_mm",
                    "center_x_mm", "center_y_mm", "center_z_mm", "min_z_mm", "max_z_mm"}
-FIELDS = BASIC_FIELDS | GEOMETRY_FIELDS | {"hierarchy", "mark", "status"}
-OPS = {"eq", "ne", "lt", "lte", "gt", "gte", "in", "contains", "exists", "is_null"}
+FIELDS = BASIC_FIELDS | GEOMETRY_FIELDS | {"hierarchy", "family", "opening_kind", "mark", "status"}
+OPS = {"eq", "ne", "lt", "lte", "gt", "gte", "in", "contains", "exists", "is_null", "is_unset"}
 
 
 def invalid(message):
@@ -70,9 +70,9 @@ def predicate_fields(node, depth=0, budget=None):
         bounded_int(attribute_id(field), 1, 2147483647, "attribute ID")
     if not isinstance(op, str) or op not in OPS:
         invalid("Unknown predicate operator.")
-    if op in {"exists", "is_null"}:
+    if op in {"exists", "is_null", "is_unset"}:
         if set(node) != {"field", "op"}:
-            invalid("exists/is_null accept only field and op.")
+            invalid("exists/is_null/is_unset accept only field and op.")
     else:
         if "value" not in node:
             invalid("This predicate requires a value.")
@@ -115,8 +115,8 @@ def validate_request(request):
     action = request["action"]
     if action == "query":
         keys(request, {"schema_version", "action", "scope", "predicate", "fields", "attribute_ids", "page_size", "max_adapters"} | extensions, {"schema_version", "action"})
-        if request.get("component_kind", "model_identity") not in ("model_identity", "top_level_component"):
-            invalid("component_kind must be model_identity or top_level_component.")
+        if request.get("component_kind", "model_identity") not in ("model_identity", "top_level_component", "semantic_component"):
+            invalid("component_kind must be model_identity, top_level_component or semantic_component.")
         if request.get("coordinate_frame", "model_local") not in ("model_local", "project_global"):
             invalid("coordinate_frame must be model_local or project_global.")
         if "spatial_box" in request:
@@ -196,11 +196,13 @@ def evaluate(node, fields):
     if status == "not_checked":
         return None
     if op == "exists":
-        return status == "observed"
+        return True if status == "observed" else None
     if status != "observed":
         return None
     if op == "is_null":
         return actual is None
+    if op == "is_unset":
+        return actual is None or isinstance(actual, str) and not actual.strip()
     def normalized(value):
         if isinstance(value, str):
             value = value.strip() if node.get("trim", False) else value

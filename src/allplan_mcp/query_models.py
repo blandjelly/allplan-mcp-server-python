@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field
 Scalar = str | int | float | bool | None
 QueryField = Literal["display_name", "type_name", "type_uuid", "layer_id", "drawing_file", "file_state",
                      "bounding_box_mm", "size_x_mm", "size_y_mm", "size_z_mm", "center_x_mm", "center_y_mm",
-                     "center_z_mm", "min_z_mm", "max_z_mm", "hierarchy", "mark", "status"]
+                     "center_z_mm", "min_z_mm", "max_z_mm", "hierarchy", "family", "opening_kind", "mark", "status"]
 
 
 class ContractModel(BaseModel):
@@ -28,7 +28,7 @@ class Predicate(ContractModel):
     any: list[Predicate] | None = None
     not_: Predicate | None = Field(default=None, alias="not")
     field: str | None = None
-    op: Literal["eq", "ne", "lt", "lte", "gt", "gte", "in", "contains", "exists", "is_null"] | None = None
+    op: Literal["eq", "ne", "lt", "lte", "gt", "gte", "in", "contains", "exists", "is_null", "is_unset"] | None = None
     value: Scalar | list[Scalar] = None
     tolerance: float = Field(default=0, ge=0, allow_inf_nan=False)
     case_sensitive: bool = True
@@ -52,7 +52,7 @@ class QueryInput(ContractModel):
     attribute_ids: list[Annotated[int, Field(ge=1, le=2147483647)]] = Field(default_factory=list, max_length=32)
     page_size: int = Field(default=100, ge=1, le=200)
     max_adapters: int = Field(default=5000, ge=1, le=10000)
-    component_kind: Literal["model_identity", "top_level_component"] = "model_identity"
+    component_kind: Literal["model_identity", "top_level_component", "semantic_component"] = "model_identity"
     coordinate_frame: Literal["model_local", "project_global"] = "model_local"
     spatial_box: SpatialBox | None = None
     profile_id: Literal["native-model-qa-demo"] | None = None
