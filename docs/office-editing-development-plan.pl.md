@@ -1,5 +1,40 @@
 # Allplan MCP 2026 — ocena M3 i plan edycji modelu
 
+## Aktualizacja statusu — 17 października 2026
+
+Od historycznej oceny poniżej powstał eksperymentalny, typowany kontrakt
+`model_edit` dla zmian atrybutu i istniejącej warstwy, wybieranych kryterium
+bez findings audytu. Kandydat obsługuje atrybuty tekstowe, całkowite,
+rzeczywiste i logiczne oraz jawne tryby replace/add/upsert; natywny materiał
+ściany nadal jest poza tą ścieżką. Próba zapisu w Allplanie nie została
+zaakceptowana, więc obecny stan nie zamyka M4 ani bramek K1–K6.
+
+Obsługiwane grupy źródłowych adapterów to Column, Beam (w tym SkeletonBeam),
+Wall, Slab (w tym MultiSlab) i opening (`WindowDoor_TypeUUID`), który jest
+domyślnie włączony do listy. Opcjonalny `opening_kind=door|window` sprawdza
+reprezentację zwróconą przez `GetElement(adapter)` względem klas
+`DoorOpeningElement` i `WindowOpeningElement`; wynik nieobsługiwany jest
+`not_checked` i nie pozwala uznać kryterium za kompletne. Odczyt klasy wymaga
+próby natywnej; nie twierdzi, że zapis atrybutów na otworach został zaakceptowany.
+Dla brakującego atrybutu domyślny odczyt `ReadAll` nie dowodzi
+braku. Nowa ścieżka może jawnie zażądać `ReadAllAndComputable`; tylko kompletny
+odczyt może wtedy udowodnić nieobecność. Ta opcja nie zmienia przyjętych
+ścieżek odczytu. Zapis do elementu może dodać jego atrybut, którego definicja
+już istnieje w projekcie; narzędzie nie tworzy definicji atrybutów. Powiązanie
+atrybutu sprawdza `GetAttributeType` względem rzeczywistych członków enum SDK,
+bez zgadywania kodów liczbowych. Apply kandydata pozostaje ograniczony do 32 rzeczywistych
+setterów w jednym aktywnym rysunku foregroundowym; multi-file Apply, partie i
+pełne K6 nie są ukończone.
+
+Szczegóły dla operatora są w [przewodniku `model_edit`](m4-model-edit.pl.md),
+kontrakt narzędzia w [tool-reference](tool-reference.md),
+a sprawdzone podstawy w [evidence API Allplan 2026](m4-attribute-api-evidence.md).
+Dokumentacja SDK opisuje dostępny mechanizm, ale nie zastępuje natywnej próby
+zmiany, odczytu zwrotnego i Undo w kopii testowej.
+
+Poniższy opis zachowuje historyczny stan M3 i plan szerszego celu; jego stare
+daty, gałąź i liczby odnoszą się do przeglądu z 12 października 2026.
+
 Stan sprawdzony: 12 października 2026, Europe/Warsaw.
 Repozytorium: `blandjelly/allplan-mcp-server-python`.
 Gałąź: `codex/m3-repair-preview`, HEAD `bc421959e0e488b38867816ee6ec953f680580db`.

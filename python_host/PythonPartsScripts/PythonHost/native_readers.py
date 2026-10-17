@@ -6,8 +6,22 @@ from .spatial_contracts import box, convert_point, vector
 
 # Root families observed/read through native adapters. Child axes/tiers resolve
 # to these roots; unrelated Structural Framing families remain unsupported.
-COMPONENT_TYPES = {"Column_TypeUUID", "Beam_TypeUUID", "SkeletonBeam_TypeUUID",
-                   "Wall_TypeUUID", "Slab_TypeUUID", "MultiSlab_TypeUUID"}
+FAMILY_TYPES = {
+    "column": {"Column_TypeUUID"},
+    "wall": {"Wall_TypeUUID"},
+    "slab": {"Slab_TypeUUID", "MultiSlab_TypeUUID"},
+    "beam": {"Beam_TypeUUID", "SkeletonBeam_TypeUUID"},
+    # The SDK exposes one WindowDoor adapter for both openings. Keep it
+    # explicitly classified as opening until a documented discriminator exists.
+    "opening": {"WindowDoor_TypeUUID"},
+}
+TYPE_FAMILIES = {name: family for family, names in FAMILY_TYPES.items() for name in names}
+COMPONENT_TYPES = set(TYPE_FAMILIES)
+
+
+def semantic_family(type_name):
+    """Classify only exact adapter type names; UUIDs always come from the adapter."""
+    return TYPE_FAMILIES.get(type_name)
 
 
 def adapter_ref(adapter):
@@ -17,7 +31,7 @@ def adapter_ref(adapter):
             "type_name": text(adapter.GetElementAdapterType().GetTypeName())}
 
 
-def root_adapter(adapter, check_budget):
+def root_adapter(adapter, check_budget, stop_types=None):
     import NemAll_Python_IFW_ElementAdapter as adapters
     visited, chain = set(), []
     current = adapter
@@ -29,6 +43,8 @@ def root_adapter(adapter, check_budget):
             raise ValueError("Hierarchy cycle")
         visited.add(key)
         chain.append(ref)
+        if stop_types and ref["type_name"] in stop_types:
+            return current, chain
         parent = adapters.BaseElementAdapterParentElementService.GetParentElement(current)
         if boolean(parent.IsNull()):
             return current, chain

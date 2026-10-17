@@ -5,6 +5,9 @@ from .transport import BridgeError
 
 
 def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapter_owners=None):
+    if change.get("adapter_version") == "m4-model-edit-1":
+        from . import native_model_edit
+        return native_model_edit.resolve(doc, base, queries, change, writable, diagnostics, adapter_owners)
     ref = change["ref"]
     matches = {}
     started = queries.clock()
@@ -55,11 +58,17 @@ def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapte
 
 
 def read(base, queries, element, change):
+    if change.get("adapter_version") == "m4-model-edit-1":
+        from . import native_model_edit
+        return native_model_edit.read(base, queries, element, change)
     return queries._fields(element, base, {change["field"]}, change["ref"]["drawing_file"],
                            "active_foreground")[change["field"]]
 
 
 def write(base, element, change):
+    if change.get("adapter_version") == "m4-model-edit-1":
+        from . import native_model_edit
+        return native_model_edit.write(base, element, change)
     import NemAll_Python_IFW_ElementAdapter as adapters
     targets = adapters.BaseElementAdapterList()
     targets.append(element)

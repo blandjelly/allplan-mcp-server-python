@@ -1148,7 +1148,7 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
     async def test_discovery_health_version_names_box_and_diagnostic_bundle(self):
         async with Client(self.url, timeout=5) as client:
             names = {t.name for t in await client.list_tools()}
-            self.assertEqual(names, {"allplan_health", "get_allplan_version", "get_all_object_names", "create_cube", "create_box", "get_model_context", "model_query", "model_properties", "model_property_probe", "model_selection", "model_audit", "fix_model_issues", "apply_office_standard", "rule_based_edit", "column_layer", "model_wall_filter"})
+            self.assertEqual(names, {"allplan_health", "get_allplan_version", "get_all_object_names", "create_cube", "create_box", "get_model_context", "model_query", "model_properties", "model_property_probe", "model_selection", "model_audit", "fix_model_issues", "apply_office_standard", "rule_based_edit", "column_layer", "model_wall_filter", "model_edit"})
             resources = await client.list_resources()
             self.assertIn("allplan://skills", {str(r.uri) for r in resources})
             health = (await client.call_tool("allplan_health")).data
@@ -1207,3 +1207,71 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
                 self.assertTrue(result.is_error)
             self.assertEqual(len(self.bridge_handler.calls), before)
         self.assertFalse(any(path == "/create-box" for path, _ in self.bridge_handler.calls))
+
+    async def test_model_query_family_and_is_unset_schema_over_real_http(self):
+        request = {"action": "query", "scope": {"drawing_files": [101], "include_passive": False,
+                   "visibility": "api_select_all"}, "component_kind": "semantic_component",
+                   "fields": ["family", "type_uuid"], "predicate": {"all": [
+                       {"field": "family", "op": "eq", "value": "opening"},
+                       {"field": "opening_kind", "op": "eq", "value": "door"},
+                       {"field": "attribute:83", "op": "is_unset"}]}}
+        async with Client(self.url, timeout=5) as client:
+            result = (await client.call_tool("model_query", {"request": request})).data
+        self.assertEqual(result["request"], {"schema_version": "m1-query-1", **request})
+        self.assertEqual(self.bridge_handler.calls[-1], ("/model-query", {"schema_version": "m1-query-1", **request}))
+
+    async def test_model_edit_http_preview_highlight_apply_replay_and_invalid_payload_guard(self):
+        from test_model_edit import ModelEditTests
+        native = ModelEditTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        elements = native.fixture()
+        native.setter_fakes(elements)
+        original = self.bridge_handler.handle
+
+        def handle(path, payload):
+            if path == "/model-edit":
+                self.bridge_handler.calls.append((path, payload))
+                try:
+                    return native.handler.handle(path, payload)
+                except native.module.BridgeError as exc:
+                    raise transport.BridgeError(exc.code, str(exc), exc.status) from exc
+            return original(path, payload)
+
+        self.bridge_handler.handle = handle
+        request = native.request(predicate={"all": [
+            {"field": "family", "op": "eq", "value": "column"},
+            {"field": "attribute:935", "op": "is_unset"}]},
+            changes=[{"target": {"kind": "attribute", "attribute_id": 935},
+                      "value_type": "text", "value": "F120", "mode": "replace"}])
+        request.pop("schema_version")  # The public MCP tool supplies its host schema.
+        async with Client(self.url, timeout=5) as client:
+            preview = (await client.call_tool("model_edit", {"request": request})).data
+            self.assertEqual(preview["action"], "preview")
+            self.assertEqual(preview["counts"]["changes"], 1)
+            self.assertEqual(preview["changes"][0]["new_value"], "F120")
+            plan_request = {"schema_version": "m4-model-edit-1", "action": "highlight",
+                            "plan_id": preview["plan_id"], "plan_hash": preview["plan_hash"]}
+            highlighted = (await client.call_tool("model_edit", {"request": plan_request})).data
+            self.assertEqual(highlighted["state"], "submitted")
+            execution_id = "e" * 32
+            apply_request = {"schema_version": "m4-model-edit-1", "action": "apply",
+                             "plan_id": preview["plan_id"], "plan_hash": preview["plan_hash"],
+                             "execution_id": execution_id,
+                             "acknowledgement": "disposable_copy_reviewed_plan"}
+            applied = (await client.call_tool("model_edit", {"request": apply_request})).data
+            replay = (await client.call_tool("model_edit", {"request": apply_request})).data
+            self.assertEqual(applied["state"], "completed")
+            self.assertTrue(replay["replayed"])
+            before_invalid = len(self.bridge_handler.calls)
+            bad_request = {**request, "changes": [{"target": {"kind": "attribute", "attribute_id": 935},
+                                                   "value_type": "integer", "value": True}]}
+            invalid = await client.call_tool("model_edit", {"request": bad_request}, raise_on_error=False)
+            self.assertTrue(invalid.is_error)
+            self.assertEqual(len(self.bridge_handler.calls), before_invalid)
+
+        self.assertEqual([payload["action"] for path, payload in self.bridge_handler.calls if path == "/model-edit"],
+                         ["preview", "highlight", "apply", "apply"])
+        self.assertEqual(dict(elements[0].GetAttributes.return_value)[935], "F120")
+        self.assertEqual(native.base.ElementsAttributeService.ChangeAttributes.call_count, 1)
+        self.assertTrue(native.module.AllplanIFW.HighlightService.HighlightElements.called)

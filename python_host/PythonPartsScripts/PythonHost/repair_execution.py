@@ -13,6 +13,21 @@ from .query_contracts import fingerprint
 from .transport import BridgeError
 
 
+def same_observation(change, observed, expected):
+    if change.get("adapter_version") == "m4-model-edit-1":
+        return fingerprint(observed) == fingerprint(expected)
+    return observed == expected
+
+
+def new_value_observed(change, observed):
+    if observed.get("status") != "observed":
+        return False
+    if change.get("adapter_version") == "m4-model-edit-1":
+        return (type(observed.get("value")) is type(change["new_value"])
+                and observed.get("value") == change["new_value"])
+    return observed.get("value") == change["new_value"]
+
+
 class RepairExecutor:
     MAX_RECORDS = 128
     MAX_RECORD_BYTES = 1024 * 1024
@@ -74,7 +89,10 @@ class RepairExecutor:
         if ("audit_request" in record) == ("criterion_request" in record):
             raise ValueError("exactly one source request is required")
         if "criterion_request" in record:
-            from .column_layer import validate_request
+            if record["criterion_request"].get("schema_version") == "m4-model-edit-1":
+                from .model_edit_contracts import validate_request
+            else:
+                from .column_layer import validate_request
             try:
                 validate_request(record["criterion_request"])
                 if record["criterion_request"]["action"] != "preview":
@@ -170,6 +188,8 @@ class RepairExecutor:
     @staticmethod
     def evaluation_scope(plan):
         """Existing string mark/status and layer writes in one foreground file."""
+        if plan.get("source_kind") == "typed_model_edit":
+            return RepairExecutor.model_edit_scope(plan)
         changes = plan["changes"]
         files = plan["scope"]["included_files"]
         validation = plan.get("mark_validation")
@@ -211,6 +231,56 @@ class RepairExecutor:
                         or change["field"] != f"attribute:{resource['attribute_id']}"
                         or not isinstance(change["old_value"].get("value"), str)
                         or not isinstance(change["new_value"], str)):
+                    return False
+            else:
+                return False
+        return True
+
+    @staticmethod
+    def model_edit_scope(plan):
+        """Separate evaluation contract; does not broaden historical M3 permissions."""
+        from .native_model_edit import value_matches
+        from .native_readers import COMPONENT_TYPES
+        changes, files = plan["changes"], plan["scope"]["included_files"]
+        if (plan.get("schema_version") != "m4-model-edit-1" or plan["state"] != "preview_ready"
+                or plan.get("blocked") or not 1 <= len(changes) <= RepairExecutor.MAX_CHANGES
+                or len(files) != 1 or files[0]["state"] != "active_foreground"
+                or not all(plan["coverage"].get(k) is True for k in
+                           ("criteria_complete", "requested_scope_complete", "returned_fields_complete"))):
+            return False
+        seen = set()
+        for change in changes:
+            ref, resource, old = change["ref"], change["resource"], change["old_value"]
+            key = (ref["drawing_file"], ref["model_uuid"], change["field"])
+            if (key in seen or ref["drawing_file"] != files[0]["drawing_file"]
+                    or change.get("adapter_version") != "m4-model-edit-1"
+                    or change.get("native_type") not in COMPONENT_TYPES):
+                return False
+            seen.add(key)
+            symbol = ("ElementsLayerService.ChangeLayer" if change["operation"] == "set_layer"
+                      else "ElementsAttributeService.ChangeAttributes")
+            capability = plan["capabilities"]["symbols"].get(symbol, {})
+            if capability.get("status") != "observed" or capability.get("callable") is not True:
+                return False
+            if change["operation"] == "set_layer":
+                if (old.get("status") != "observed" or change["field"] != "layer_id"
+                        or change.get("property_role") != "layer" or type(resource.get("layer_id")) is not int
+                        or change["new_value"] != resource["layer_id"]
+                        or not isinstance(resource.get("short_name"), str) or not resource["short_name"]):
+                    return False
+            elif change["operation"] in {"set_attribute", "add_attribute"}:
+                if (change.get("property_role") != "attribute" or type(resource.get("attribute_id")) is not int
+                        or change["field"] != f"attribute:{resource['attribute_id']}"
+                        or old.get("computed_only") is True
+                        or not value_matches(change["new_value"], resource.get("data_type"))):
+                    return False
+                if change["operation"] == "add_attribute":
+                    if (old.get("status") != "absent" or old.get("presence_proven") is not True
+                            or old.get("evidence") != "absent_from_ReadAllAndComputable"
+                            or resource.get("read_mode") != "all_and_computable"
+                            or change.get("mode") not in {"add", "upsert"}):
+                        return False
+                elif old.get("status") != "observed" or change.get("mode") not in {"replace", "upsert"}:
                     return False
             else:
                 return False
@@ -287,6 +357,8 @@ class RepairExecutor:
             raise BridgeError("repair_conflict", "Reviewed source changed; preview again.", 409)
         entry = self.plans.plans[request["plan_id"]]
         plan = entry["plan"]
+        if ((plan.get("source_kind") == "typed_model_edit") != (request.get("schema_version") == "m4-model-edit-1")):
+            raise BridgeError("repair_scope_unavailable", "Typed model edit plans require their own route and acknowledgement.", 409)
         if request.get("schema_version") == "m4-column-layer-1" and plan.get("source_kind") != "column_missing_fire_layer":
             raise BridgeError("repair_scope_unavailable", "This route requires a Column criterion plan.", 409)
         if plan.get("requires_highlight") and entry.get("presentation") != {"state": "submitted", "plan_hash": plan["plan_hash"]}:
@@ -300,7 +372,7 @@ class RepairExecutor:
         if request.get("evaluation_stop") and not self.recovery_evaluation_scope(plan):
             raise BridgeError("repair_scope_unavailable", "Recovery-test stop requires the retained unselected two-mark numbering fixture.", 409)
         before_report, before = self.plans.source_observation(doc, base, settings, entry["request"])
-        if plan.get("source_kind") == "column_missing_fire_layer" and before_report["report_fingerprint"] != plan["evidence_fingerprint"]:
+        if plan.get("source_kind") in {"column_missing_fire_layer", "typed_model_edit"} and before_report["report_fingerprint"] != plan["evidence_fingerprint"]:
             raise BridgeError("repair_conflict", "Column resource or criterion evidence changed during preflight.", 409)
         if before["source_fingerprint"] != plan["source_fingerprint"]:
             raise BridgeError("repair_conflict", "Audited source changed during preflight.", 409)
@@ -318,7 +390,7 @@ class RepairExecutor:
             native_owners = []
             element = native_repairs.resolve(doc, base, self.plans.queries, change, writable=True, diagnostics=diagnostics, adapter_owners=native_owners)
             target_preflight.append(diagnostics)
-            if native_repairs.read(base, self.plans.queries, element, change) != change["old_value"]:
+            if not same_observation(change, native_repairs.read(base, self.plans.queries, element, change), change["old_value"]):
                 raise BridgeError("repair_conflict", "Target old value differs from the reviewed plan.", 409)
         if self.plans.queries.clock() - entry["created"] >= self.plans.TTL_SECONDS:
             raise BridgeError("plan_expired", "Plan expired during target preflight.", 409)
@@ -328,7 +400,7 @@ class RepairExecutor:
                   "changes": copy.deepcopy(plan["changes"]),
                   "target_preflight": target_preflight,
                   "outcomes": [{"state": "skipped", "reason": "not_attempted"} for _ in plan["changes"]]}
-        if plan.get("source_kind") == "column_missing_fire_layer":
+        if plan.get("source_kind") in {"column_missing_fire_layer", "typed_model_edit"}:
             record["criterion_request"] = copy.deepcopy(entry["request"])
         else:
             record["audit_request"] = entry["request"]["audit"]
@@ -348,7 +420,7 @@ class RepairExecutor:
                 native_owners = []
                 element = native_repairs.resolve(doc, base, self.plans.queries, change, writable=True, adapter_owners=native_owners)
                 old = native_repairs.read(base, self.plans.queries, element, change)
-                if old != change["old_value"]:
+                if not same_observation(change, old, change["old_value"]):
                     outcome.update(state="conflict", reason="old_value_changed", readback=old)
                     break
                 if self.plans.queries.clock() - started >= 20:
@@ -371,9 +443,9 @@ class RepairExecutor:
                 fresh = native_repairs.resolve(doc, base, self.plans.queries, change, adapter_owners=fresh_owners)
                 observed = native_repairs.read(base, self.plans.queries, fresh, change)
                 outcome["readback"] = observed
-                if observed.get("status") == "observed" and observed.get("value") == change["new_value"]:
+                if new_value_observed(change, observed):
                     outcome.update(state="applied", reason="readback_matches")
-                elif observed == change["old_value"]:
+                elif same_observation(change, observed, change["old_value"]):
                     outcome.update(state="failed", reason="readback_unchanged")
                 else:
                     outcome.update(state="unknown", reason="readback_differs_or_unavailable")
@@ -388,8 +460,10 @@ class RepairExecutor:
             record[report_key], after = self.plans.source_observation(doc, base, settings,
                 record.get("criterion_request", record.get("audit_request")))
             actual = {e["ref"]["model_uuid"]: e["fields"] for e in after["elements"]}
+            fields_match = (fingerprint(actual) == fingerprint(expected) if plan.get("source_kind") == "typed_model_edit"
+                            else actual == expected)
             record["audited_fields_match_plan"] = (after["coverage"]["requested_scope_complete"]
-                                                    and after["scope"] == before["scope"] and actual == expected)
+                                                    and after["scope"] == before["scope"] and fields_match)
             if record["state"] == "completed" and (not record["audited_fields_match_plan"]
                     or not record[report_key]["coverage"]["criteria_complete" if "criterion_request" in record else "audit_complete"]):
                 record["state"] = "verification_failed"
@@ -417,8 +491,8 @@ class RepairExecutor:
                 native_owners = []
                 element = native_repairs.resolve(doc, base, self.plans.queries, change, adapter_owners=native_owners)
                 value = native_repairs.read(base, self.plans.queries, element, change)
-                state = ("new_value_observed" if value.get("status") == "observed" and value.get("value") == change["new_value"]
-                         else "old_value_observed" if value == change["old_value"] else "conflict")
+                state = ("new_value_observed" if new_value_observed(change, value)
+                         else "old_value_observed" if same_observation(change, value, change["old_value"]) else "conflict")
             except Exception as exc:
                 value, state = {"status": "not_checked", "reason": getattr(exc, "code", type(exc).__name__)}, "unknown"
             observations.append({"state": state, "readback": value})

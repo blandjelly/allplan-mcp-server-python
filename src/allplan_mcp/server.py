@@ -19,6 +19,7 @@ from allplan_mcp.office_standard import load_office_standard
 from allplan_mcp.column_layer_models import ColumnLayerRequest
 from allplan_mcp.property_models import PropertiesRequest, SelectionRequest, PropertyProbeRequest
 from allplan_mcp.wall_filter_models import WallFilterRequest
+from allplan_mcp.model_edit_models import ModelEditRequest
 
 
 DEFAULT_ALLPLAN_HOST_URL = "http://127.0.0.1:5679"
@@ -247,6 +248,36 @@ def column_layer(request: ColumnLayerRequest) -> dict[str, Any]:
         return {"schema_version": "m3-execution-1", "action": "apply", "state": "rejected",
                 "read_only": True, "native_setters_started": False, "execution_id": payload["execution_id"],
                 "error": {"code": exc.code, "message": str(exc)}}
+
+
+@mcp.tool
+def model_edit(request: ModelEditRequest) -> dict[str, Any]:
+    """Find semantic components and plan typed attribute/layer edits without audit findings.
+
+    Use exact project attribute names/IDs, never guessed IDs. Preview defaults to
+    open_drawings and binds the whole family scope, predicate, explicit exclusions,
+    old/new values and resources. Choose native_types or a family predicate and
+    component owners are resolved without redirecting doors/windows to their wall.
+    Attribute targets accept text/integer/real/boolean values with replace/add/upsert;
+    layer targets resolve an existing short name. Attribute material is distinct
+    from native material and surface; this route does not update native properties.
+    is_unset matches observed null/blank. Combine explicit undefined values with any.
+    Stored ReadAll omissions are unknown, never absence. The new opt-in
+    attribute_read_mode=all_and_computable establishes absence only after a complete
+    documented read; is_unset then includes absent and not exists matches absence.
+    No broad definition/enum discovery; enum keys/units must already be resolved.
+
+    highlight presents all matches including no-ops; native select stays unsupported.
+    Apply is experimental, limited to 32 setters in one foreground drawing, with
+    exact highlighted plan/hash, execution_id and disposable_copy_reviewed_plan.
+    Persist the exact Apply request before sending. Lost replies require recover
+    with the same execution ID; never create a new ID or automatically retry writes.
+    Shared journal, fresh scope/resource checks, native writability and readback
+    remain enforced. Native acceptance of this new path is pending.
+    """
+    payload = request.model_dump(by_alias=True, exclude_unset=True)
+    payload["schema_version"] = "m4-model-edit-1"
+    return _allplan_client().post("/model-edit", payload)
 
 
 @mcp.tool

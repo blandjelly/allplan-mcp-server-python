@@ -49,7 +49,7 @@ Schema m1-query-1, bridge /model-query.
 ```
 
 Predicates use all/any/not or typed leaves, at most **64 nodes/depth 8**.
-Scalar fields: type_name/type_uuid, layer_id/display_name, drawing_file/file_state,
+Scalar fields: type_name/type_uuid, family, opening_kind, layer_id/display_name, drawing_file/file_state,
 `attribute:<ID>`, sizes/centers in mm and min_z_mm/max_z_mm. mark/status require
 the demo profile. bounding_box_mm/hierarchy are projections, not scalar predicates.
 At most **32** distinct attribute IDs are read across predicate/projection.
@@ -59,6 +59,10 @@ Operators: eq/ne/in (typed comparison), lt/lte/gt/gte (numeric), contains
 trim/case_sensitive are explicit. Numeric tolerance is finite, nonnegative and
 absolute; strict comparisons use < v-t / > v+t, inclusive use <= v+t / >= v-t.
 Attribute values retain raw attribute units; no implicit mm conversion.
+`family` uses exact supported native adapter names; `opening_kind` applies only
+to `WindowDoor_TypeUUID`, uses runtime element-class checks, and returns
+`not_applicable` for other adapters. Unsupported opening representations are
+`not_checked` and keep predicates incomplete.
 Null, empty, absent and failed reads remain distinct. Unknown stays unknown under
 not; all/any use three-valued logic. exists=false requires observed absence,
 not a failed/passive attribute read.
@@ -268,6 +272,80 @@ does not read material, attributes, or metadata and invokes no setters. The
 owner workflow saves a pending record and fsyncs it before each MCP call,
 brackets the filter call with same-session health, and never retries a lost
 reply. See the [0.19.0 owner guide](m4-wall-filter-0.19.0.pl.md).
+
+## model_edit — typed model attribute/layer edits
+
+Schema `m4-model-edit-1`, bridge `/model-edit`. This is an experimental
+preview/apply path for edits selected by a criterion, independent of audit
+findings. It supports exact attribute targets with `text`, `integer`, `real`,
+or `boolean` values and modes `replace`, `add`, or `upsert`, plus a separate
+existing organizational layer target. Attribute values such as `Beton C37`
+are distinct from a wall's native material and visual surface; this route does
+not modify native element properties. Enum/date conversion and general
+attribute catalog discovery are outside this contract.
+
+The default native type list is Column, Beam, SkeletonBeam, Wall, Slab,
+MultiSlab, and the documented `WindowDoor_TypeUUID` opening adapter. Without
+an additional criterion, an opening is not classified as a door or a window.
+The optional `opening_kind` predicate field can request `door` or `window`;
+the reader resolves the element with `GetElement(adapter)` and checks the
+documented `DoorOpeningElement` or `WindowOpeningElement` runtime class. If
+the representation cannot be resolved or is another class, the field is
+`not_checked` and the criterion is incomplete; non-opening adapters return
+`not_applicable`. This defensive reader has not received native acceptance.
+No undocumented `Door_TypeUUID` or
+`Window_TypeUUID` is used; other adapter types remain outside the supported
+set.
+
+Preview defaults to `scope=open_drawings`; reads can include passive open
+drawings, while Apply is limited to one active foreground drawing. A predicate
+can use a resolved `attribute:<id>` field with `is_unset`. The default
+`attribute_read_mode=stored` treats `ReadAll` omissions as unknown. The
+explicit opt-in `all_and_computable` mode is required to treat an omission as
+absent, and only after a complete read. A failed, partial, or unsupported read
+still blocks the decision. Existing `model_query`, `column_layer`, and other
+accepted routes retain their prior read behavior.
+
+Resolve attribute names against the current document's metadata before
+planning; never invent numeric IDs. The native path checks name/ID round trips
+and compares targeted `GetAttributeType` results with actual loaded SDK enum
+members for supported scalar values; it uses no guessed numeric type codes.
+Allplan's published metadata API does not itself establish that an arbitrary
+attribute is writable. `ChangeAttributes` can append an existing attribute
+definition to an element, but this route does not create project attribute
+definitions or layers. Apply additionally re-resolves resources, checks old
+values, records the request before setters, and performs a fresh readback.
+Native acceptance of this new setter path is pending.
+
+Example shape for a simple Column: the `attribute:<ID_FROM_PROBE>` token below
+is a placeholder for the numeric ID actually resolved in the current
+document. An agent should derive this request from the user's natural-language
+instruction, not ask the operator to guess IDs or write JSON.
+
+```json
+{
+  "action": "preview",
+  "scope": "open_drawings",
+  "native_types": ["Column_TypeUUID"],
+  "attribute_read_mode": "all_and_computable",
+  "predicate": {"field": "attribute:<ID_FROM_PROBE>", "op": "is_unset"},
+  "changes": [
+    {"target": {"kind": "attribute", "name": "Klasa odporności ogniowej"},
+     "value_type": "text", "value": "F120", "mode": "upsert"},
+    {"target": {"kind": "layer", "short_name": "W1"}}
+  ]
+}
+```
+
+Preview and revalidate are read-only. The Apply acknowledgement is
+`disposable_copy_reviewed_plan`; Apply requires the exact highlighted
+`plan_id`/`plan_hash` and a persisted new `execution_id`. It is capped at 32
+actual setters and one foreground drawing. More than 32 changes, multiple
+write drawings, and uncertain coverage are blocked before setters; there is no
+automatic batching or hidden partial multi-drawing Apply. Lost replies remain
+unknown and require recovery with the same execution ID. This is not full K6
+acceptance. See the [Polish operator guide](m4-model-edit.pl.md) and [Allplan
+2026 API evidence](m4-attribute-api-evidence.md).
 
 ## column_layer (0.17.2 candidate)
 

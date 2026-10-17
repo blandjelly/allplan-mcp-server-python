@@ -21,6 +21,43 @@ from the default branch as well. [Verification](test-results/testing-policy-2026
 records the one-time six-job workflow check, one build and the confirmed M4
 draft skip. M4 runtime integration remains separate.
 
+**New source candidate: 0.20.0 — typed criterion `model_edit`, native acceptance pending.**
+Topic `topic/m4-universal-attribute-edit` starts from develop/m4 `cc062bc` and
+must target develop/m4; main integration remains separate. The new MCP route
+plans direct attribute/layer edits without audit findings, resolves exact
+project names/IDs and SDK type members, and reuses the shared executor,
+write-ahead journal, revalidation, highlight binding, fresh native writability,
+readback, replay and read-only recovery. Attribute replace/add/upsert supports
+explicit text/integer/real/boolean values only when the loaded SDK's matching
+type exists. Unknown/special types fail closed. Stored omissions remain unknown;
+the new opt-in computed-inclusive dual read can prove absence and rejects
+computed-only destinations. The broad property discovery quarantine remains.
+
+Query adds semantic component owners, family and optional opening_kind:
+`WindowDoor_TypeUUID` remains a common opening owner; defensive GetElement
+class checks distinguish documented DoorOpeningElement/WindowOpeningElement
+when available. Unresolved opening kinds remain not_checked, never a claimed
+zero-match set. Ordinary Column/Wall/Slab/Beam variants retain exact API UUIDs.
+Native selection remains unsupported; the explicit presentation is highlight.
+New writes still require a reviewed disposable copy, exact highlighted plan
+and execution ID, one foreground drawing and at most 32 setters. Multi-drawing
+write batches, enum/date codecs and native property/material updates are not
+implemented. The complete office-editing plan is **not** accepted or complete.
+
+Runtime source **ec2aeae832c2ac017c07c4af71b7c7a6ff47f9d9** passed
+[CI 39049036363](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39049036363):
+**387 tests on each Windows/Ubuntu Python 3.12 job**, then one package job.
+Workspace artifact transfer returned HTTP 403; one allowed local fallback build
+used that exact clean source. The delivered ZIP passed exact payload/checksum,
+registration, frozen sync/import, upgrade from 0.19.0 and restore, with **34 bridge
+hashes** and journal/trace/bridge-log preservation.
+[Package, checksums and evidence](../evaluation-packages/0.20.0/README.md).
+These are portable checks, not native Allplan results. Next owner
+trial is only the NEW typed attribute add/replace + layer path (including
+readback/replay/Undo), and optional opening-kind recognition on representative
+objects. Do not repeat accepted historical Wall/Column/M3 trials. See the
+[Polish workflow](m4-model-edit.pl.md) and [API evidence](m4-attribute-api-evidence.md).
+
 **Current runtime: 0.19.0, `model_wall_filter`, scoped native PASS / accepted_on_build.**
 Runtime source **e455f35cf4d546d9b77cf6ae5f59edcc026cc875** passed
 [CI 39033571910](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39033571910):
