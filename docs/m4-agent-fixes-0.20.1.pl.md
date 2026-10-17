@@ -1,5 +1,7 @@
 # M4 0.20.1 — poprawki po próbie z agentem
 
+[Zweryfikowana paczka 0.20.1 i wyniki CI](../evaluation-packages/0.20.1/README.md).
+
 [Zachowany log i zakres obserwacji](test-results/m4-agent-observation-2026-10-17.md)
 potwierdzają udane polecenia odporności ogniowej, query i podświetlania. Tych
 prób nie trzeba powtarzać. Log nie zawiera surowych wywołań ani wersji paczki;

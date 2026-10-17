@@ -48,9 +48,17 @@ Native single-tier wall.total_thickness_mm is now a direct query/edit criterion;
 the `< 240` edit plan binds all Wall peers and catches thickness changes before
 writing. Multi-tier/unknown thickness remains not_checked; no geometry fallback.
 
-Focused numeric, hierarchy, replay/recovery, target-writability and MCP HTTP
-regressions pass with native fakes. Final source CI and package evidence are
-pending for this candidate; **new native behavior is not_run**. Next owner
+Runtime source **a0321dc40b52544b88e0f21724e523ab0c7bbb13** passed
+[CI 39057801089](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39057801089):
+**414 tests on each Windows/Ubuntu Python 3.12 job**, followed by one successful
+package job. Workspace transfer of the CI artifact returned HTTP 403; one
+allowed local fallback build used that exact clean source. The delivered ZIP
+passed checksum/payload, fresh registration, frozen sync/import, upgrade from
+0.20.0 and restore, verifying **35 bridge hashes** and preserving journal,
+native trace and bridge log. [Package and evidence](../evaluation-packages/0.20.1/README.md).
+Focused numeric, hierarchy, replay/recovery, target-writability, stale-thickness
+and MCP HTTP regressions pass with native fakes. These portable checks do not
+establish native acceptance; **new native behavior is not_run**. Next owner
 trial is only the numeric Wartość U from undefined and the Wall tier layer path.
 Do not repeat accepted fire/query/highlight or historical read gates. Native
 material edits remain unavailable and must not be substituted with an arbitrary
