@@ -1,28 +1,30 @@
 # Allplan MCP Server
 
 A local MCP bridge between Codex and Allplan 2026 for model queries, audits and
-reviewed attribute/layer repairs. Current candidate: **0.18.1**, **ready_for_owner_test**
-for host transport. **306 portable tests, 6/6 CI jobs and exact package
-installation/upgrade/restore PASS**; native recovery remains **not_run**.
+reviewed attribute/layer repairs. Current package: **0.18.1**. The owner confirmed
+responsive host transport and the retained Columns no-op highlighting behavior.
+**306 portable tests, 6/6 CI jobs and exact package installation/upgrade/restore PASS**.
 [Download and checks](evaluation-packages/0.18.1/README.md),
 [health timeout investigation and Polish check](docs/mcp-timeout-0.18.1.md).
 The frozen **0.18.0** Wall package passed 289 portable tests, six CI configurations
-and exact package installation; native wall observation remains pending.
+and exact package installation. The Wall sample on 0.18.1 was **BLOCKED** by
+ambiguous adapter representations before its native property read.
+[Latest observations and original logs](docs/m4-native-observation-0.18.1-2026-10-17.md).
 
 0.18.0 retains the 0.17.2 Columns runtime unchanged and adds one isolated,
 read-only native wall-property sample plus **M4 Wall Properties.cmd**. It reads
 one existing single-tier wall in foreground file 101 and reports its first
 tier's raw material and thickness. The API millimetre assumption is not yet
 runtime-verified; no material writes are enabled. The separate 0.17.2 package
-and its source/CI evidence remain unchanged, and its native observation was not
-run. The owner may test either package first; neither native test is a
-prerequisite for the other. See the [0.18.0 delivery README](evaluation-packages/0.18.0/README.md)
+and its source/CI evidence remain unchanged. The owner confirmed its no-op
+highlight behavior through the same handler in 0.18.1; writes and complete M4
+acceptance remain separate. See the [0.18.0 delivery README](evaluation-packages/0.18.0/README.md)
 and [short Polish wall guide](docs/m4-wall-properties-0.18.0.pl.md).
 
 Source development also includes an [offline saved-wall-report analyzer](docs/m4-wall-report-analysis.md).
 It checks conditional thickness/material conclusions and missing evidence without
 contacting Allplan. It is not in the frozen 0.18.0 ZIP and cannot authorize writes;
-the two native owner checks above remain deferred independently.
+the blocked Wall property read still needs a corrected native observation.
 
 **M0–M3 are accepted within the retained test project**, Allplan **2026-1-7**
 with local Windows Codex. M3 covers recorded one-/two-change Column scenarios

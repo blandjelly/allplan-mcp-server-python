@@ -71,6 +71,11 @@ tests, six source CI configurations and exact ZIP installation/upgrade/restore.
    z utraconą odpowiedzią. Pakiet można wycofać przez **Restore bridge.cmd**
    po zamknięciu Allplana i MCP.
 
-Native recovery remains **not_run** until that observation. The original 0.18.0
-archives and their recorded checks remain unchanged; this candidate does not
-accept the Wall read, material writes, or expand M4 acceptance.
+The owner later confirmed that the host was responsive on 0.18.1 and completed
+scoped Columns and Wall observations. Healthy same-session health replies
+bracketed the Columns no-op preview and submitted highlight; the owner confirmed
+UI visibility. The Wall request was blocked before returning a sample. Details
+and original uploads are in the [observation report](m4-native-observation-0.18.1-2026-10-17.md).
+This closes the health/response delivery check only. The Wall read, material
+writes, and broader M4 workflow remain unaccepted. The original 0.18.0 archives
+and their recorded checks remain unchanged.

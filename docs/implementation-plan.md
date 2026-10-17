@@ -40,17 +40,22 @@ all matches even when every match is already on W1; no-op plans do not offer
 Apply. Unknown criteria still block highlighting and writes, and more than 32
 changes remain blocked. The separate 0.17.2 package has 275 portable tests, six
 CI jobs and exact package verification recorded in its unchanged
-[delivery README](../evaluation-packages/0.17.2/README.md); its native
-observation remains not_run at the owner's request. That observation is
-independent of 0.18.0 and is not a prerequisite. See the
+[delivery README](../evaluation-packages/0.17.2/README.md); the owner later
+observed its no-op highlight behavior through the same Column handler in
+0.18.1 and confirmed UI visibility. This supports only scoped highlight
+acceptance, without writes or complete M4 acceptance. See the
+[0.18.1 observation report](m4-native-observation-0.18.1-2026-10-17.md),
 [0.17.2 walkthrough](m4-column-layer-0.17.2.pl.md) and
 [0.17.1 observation](m4-column-layer-observation-0.17.1.md).
 
 **M4.1a isolated wall-property read, 0.18.0:** the candidate adds a single
-`wall_sample` phase and **M4 Wall Properties.cmd**. The candidate is **ready_for_owner_test**
-after 289 portable tests, six CI jobs and exact package verification passed;
-[source scopes and evidence](../evaluation-packages/0.18.0/README.md).
-The observation is limited to one Wall in foreground file
+`wall_sample` phase and **M4 Wall Properties.cmd**. Its source, CI and package
+checks passed ([evidence](../evaluation-packages/0.18.0/README.md)). A later
+0.18.1 owner request was blocked before native read with
+`probe_scope_unavailable` (“Wall sample has ambiguous adapter representations”);
+no sample was returned and the cause is not established by the observation.
+See the [0.18.1 observation report](m4-native-observation-0.18.1-2026-10-17.md).
+The intended observation is limited to one Wall in foreground file
 101. M1 uses required type/identity fields plus display name/file state, counts
 matched Wall roots, and reads no attributes or geometry. The host selects one
 exact UUID (or the first Wall in UUID order), verifies a native `WallElement`,

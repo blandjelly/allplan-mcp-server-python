@@ -12,8 +12,12 @@ tests**, frozen sync, builds, exact ZIP installation/upgrade from 0.18.0/restore
 and [source CI 39026387338](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39026387338),
 **6/6 Windows/Ubuntu × Python 3.11–3.13**. Thirty bridge hashes verified;
 journal/trace/bridge log preserved. [Frozen delivery](../evaluation-packages/0.18.1/README.md).
-Status **ready_for_owner_test** for health/response delivery only; native recovery
-is **not_run**. [Draft PR #7](https://github.com/blandjelly/allplan-mcp-server-python/pull/7)
+The owner subsequently confirmed the host was responsive on 0.18.1 and completed
+scoped Columns highlight and Wall sample observations. Columns highlight
+visibility and same-session health are owner-confirmed; the Wall sample blocked
+before native read. Neither result accepts writes or the complete M4 workflow.
+[Observation report](m4-native-observation-0.18.1-2026-10-17.md).
+[Draft PR #7](https://github.com/blandjelly/allplan-mcp-server-python/pull/7)
 targets `codex/m4-0.18.0`, without main integration.
 All original 0.18.0 artifacts remain frozen. The preceding Wall/Columns work and
 its limits below remain applicable after transport verification.
@@ -44,10 +48,9 @@ version bump or rebuild of the frozen archives is needed for this source-only
 step. The supported material setter remains blocked pending native evidence.
 
 The 0.17.2 artifacts, README, source and CI evidence remain unchanged. Its
-native observation was **not run**. The owner deferred native checks for both
-versions to a later time: either package may be tested first, independently.
-The 0.17.2 native check is not a prerequisite for 0.18.0, and the wall read is
-not a prerequisite for the retained Columns workflow.
+deferred native observation was later run through the same Column handler in
+0.18.1; the 0.18.1 report records the result and owner-confirmed UI visibility.
+The wall sample is still pending after a blocked request.
 
 The new `wall_sample` phase is limited to one existing, single-tier native Wall
 in foreground drawing 101. It reads the first tier's thickness and raw material
@@ -69,9 +72,10 @@ The retained 0.17.2 runtime assigns hash-bound `highlight_targets` to all matche
 `no_op` Columns, while `changes` contains only layer setters. A full plan with
 no changes can still highlight all matches; it cannot be confirmed or applied.
 Unknown values block the action, and more than 32 changes remain blocked.
-Native highlighting behavior for 0.17.2 remains unobserved; use the
-[short 0.17.2 owner guide](m4-column-layer-0.17.2.pl.md) if testing that
-package later. It does not gate the independent 0.18.0 wall observation.
+The owner later confirmed highlight visibility for the no-op scenario through
+the same handler in 0.18.1. This does not accept writes, Undo or full M4; see
+the [observation report](m4-native-observation-0.18.1-2026-10-17.md).
+The 0.18.1 Wall sample was blocked before read and remains pending.
 
 The 0.17.0 owner run on **2026-10-15 at 19:40 Europe/Warsaw** was **BLOCKED**.
 It bound `Odporność ogniowa` (1398), absent from ReadAll on all six Columns;
@@ -105,8 +109,7 @@ source/resource revalidation, native writability, readback and bounded journal
 guards remain. The old isolated probe launcher remains available, but the new
 task uses **M4 Columns to W1.cmd** and **M4 Columns Recover.cmd**.
 
-The next native observation, after 0.18.0 has its automated and package records,
-is exactly one wall read using **M4 Wall Properties.cmd**. Bracket the request
+The next wall observation is a corrected, bounded single read using **M4 Wall Properties.cmd**. Bracket the request
 with `health_before` and `health_after` in the same MCP session; preserve
 `logs/wall-properties-*.json` and `.txt`, `bridge.log`,
 `Local/.allplan-mcp/logs/m4-native-probe.jsonl`, and

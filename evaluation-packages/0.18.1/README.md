@@ -3,7 +3,9 @@
 Download [the complete Windows ZIP](allplan-mcp-0.18.1-windows-evaluation.zip).
 This candidate addresses HTTP worker/UI scheduling and records where a host
 reply stops. The owner-supplied 0.18.0 logs prove incomplete health replies;
-they do not prove a specific native root cause. Native recovery: **not_run**.
+they do not prove a specific native root cause. The owner later confirmed host
+response on 0.18.1 in scoped M4 observations; see the
+[observation report and original uploads](../../docs/m4-native-observation-0.18.1-2026-10-17.md).
 
 The UI timer now processes a Python request queue and briefly yields to HTTP
 workers. Queued work that does not start within three seconds is cancelled;
@@ -32,8 +34,10 @@ Validation of clean source **f477f138231f2a8f45690c03bd761364c7e94ab6**:
 [Delivery manifest and artifact hashes](delivery-0.18.1.json).
 The artifacts are frozen from the clean source above. Later delivery/documentation
 commits do not rebuild them or expand the tested scope.
-**ready_for_owner_test**, limited to host health/response delivery. Native recovery
-is **not_run**; the PR remains a draft pending that observation.
+The owner check confirmed host health/response delivery. The Columns observation
+supports owner-confirmed highlight visibility and same-session health only; the
+Wall sample was blocked before native read. Writes, Undo/recovery and full M4
+acceptance remain pending. The PR remains a draft.
 
 ## Krótka próba
 

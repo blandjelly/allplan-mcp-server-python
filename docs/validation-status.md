@@ -1,21 +1,26 @@
 # Validation status and limits
 
-Updated **2026-10-17 Europe/Warsaw**. Current **0.18.1** transport candidate is
-**ready_for_owner_test** for health/response delivery only. Clean source
+Updated **2026-10-17 Europe/Warsaw**. **0.18.1** transport owner check passed
+for health/response delivery; scoped Columns highlight visibility is owner
+confirmed, while the Wall sample was blocked before native read. Clean source
 `f477f138231f2a8f45690c03bd761364c7e94ab6` passed **306 portable tests**, frozen
 sync, builds, exact ZIP installation/upgrade from 0.18.0/restore and
 [6/6 Windows/Ubuntu × Python 3.11–3.13 CI jobs](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39026387338).
-Thirty bridge hashes verified; journal, trace and bridge log preserved. Native
-recovery remains **not_run**. [Delivery](../evaluation-packages/0.18.1/README.md),
-[incident evidence and health-only observation](mcp-timeout-0.18.1.md).
+Thirty bridge hashes verified; journal, trace and bridge log preserved. The
+owner subsequently confirmed the host was responsive on 0.18.1 and completed
+two scoped M4 observations. The Columns highlight and health observation is
+recorded below; the Wall sample was blocked before native read. This does not
+accept M4 writes or the complete M4 workflow. [Observation report and original
+uploads](m4-native-observation-0.18.1-2026-10-17.md). [Delivery](../evaluation-packages/0.18.1/README.md),
+[timeout investigation](mcp-timeout-0.18.1.md).
 The logs establish incomplete host replies, not a proven native root cause.
 
 Prior 2026-10-15 record: **0.18.0**, **ready_for_owner_test** for the Wall read;
-its source, CI and package checks passed. Its native wall observation has not run. The owner deferred
-native checks for both 0.17.2 and 0.18.0; either can be tested first, without a
-dependency between them. The 0.17.2 source, artifacts and prior automated
-evidence remain unchanged; its native observation remains **not_run**. The
-**0.17.1** partial native observation is recorded below.
+its source, CI and package checks passed. Its native wall observation did not
+run on that package. The 0.17.2 owner observation was later exercised using the
+same Column handler in package 0.18.1; see the scoped result below. The 0.17.2
+source, artifacts and prior automated evidence remain unchanged. The **0.17.1**
+partial native observation is recorded below.
 The **0.16.0** property gate is **FAIL_CRASH / blocked_after_native_crash**.
 **0.16.1** is ready_for_owner_test only for one isolated Column read, not accepted_on_build. M3 write acceptance below remains scoped to 0.15.0 evidence.
 **M0–M3 / UAT-00–UAT-06 are accepted within the retained test-project scope.**
@@ -75,6 +80,26 @@ the trace does not establish crash containment. See the
 
 ## 0.17.2 candidate and 0.17.1 native observation
 
+### 0.18.1 owner observations (2026-10-17)
+
+The owner confirmed the host was responsive on 0.18.1. In one session,
+`health_before` and `health_after` were healthy around the Columns preview and
+highlight. The preview found six Columns: three F120 nonmatches and three
+undefined fire-resistance values on W1 as targets; it produced a no-op with zero
+changes. The highlight request submitted three adapters. The owner confirmed
+the targets were visible highlighted in the UI. The JSON leaves `highlighted`
+null and `allplan_acceptance=not_run`, so UI visibility rests on the owner's
+observation. This accepts only scoped highlight visibility and health delivery;
+there was no Apply or setter, and no write/Undo/recovery acceptance.
+
+The Wall `model_property_probe` request for drawing file 101 was blocked before
+returning a wall sample, with `probe_scope_unavailable` and the message “Wall
+sample has ambiguous adapter representations.” Its report has a healthy
+`health_before`, a pending request, and no `health_after`. No native wall read or
+highlight is established, and the report does not show a crash or prove the
+underlying cause. Wall read and material writes remain pending. See the
+[observation report and original uploads](m4-native-observation-0.18.1-2026-10-17.md).
+
 The 0.17.1 observation on **2026-10-15 at 20:06 Europe/Warsaw** confirmed the
 attribute roundtrip to ID **935**, `Klasa odporności ogniowej`, and reported
 two successful W1 changes with readback **65535** and audited fields matching
@@ -103,11 +128,10 @@ tests** on CPython 3.12.14, frozen sync, wheel/sdist and Windows ZIP builds.
 passed **6/6** Windows/Ubuntu × Python 3.11–3.13 jobs, including tests and builds.
 Exact ZIP installation/upgrade from 0.17.1/restore passed with **29 bridge hashes**
 and journal/trace bytes preserved. [Delivery and evidence](../evaluation-packages/0.17.2/README.md).
-These checks qualified the 0.17.2 package for its bounded native observation;
-the owner deferred that observation. It does not accept the whole M4 workflow
-or repeat completed M3 gates. Later delivery/docs commits retain the frozen
-artifacts and do not expand those source scopes. This observation is independent
-of the pending 0.18.0 automated gates and wall read.
+These checks qualified the 0.17.2 package for a bounded native observation.
+The owner later tested the same Column handler in 0.18.1; scoped highlight
+evidence is recorded above. This does not accept the whole M4 workflow or
+repeat completed M3 gates. The frozen 0.17.2 artifacts remain unchanged.
 
 [Original 0.17.1 observation and uploads](m4-column-layer-observation-0.17.1.md).
 

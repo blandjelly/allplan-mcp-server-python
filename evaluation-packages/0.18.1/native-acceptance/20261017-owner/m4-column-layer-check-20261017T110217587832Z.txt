@@ -1,0 +1,7 @@
+M4 Column -> W1: no_op
+Dopasowane slupy do podswietlenia: 3; zmian: 0. Sa juz na W1 albo nie ma dopasowan. Nie wyslano Apply.
+health_before: response_received
+journal_before: response_received
+preview: response_received
+highlight_exact_targets: response_received
+health_after: response_received

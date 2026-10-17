@@ -1,0 +1,5 @@
+M4 Wall native properties: blocked
+No model setters requested.
+health_before: response_received
+one_wall_sample: request_pending
+Error calling tool 'model_property_probe': Wall sample has ambiguous adapter representations. [code=probe_scope_unavailable, request_id=75b32e0a-e53e-4086-abd1-361ad1a822c1]
