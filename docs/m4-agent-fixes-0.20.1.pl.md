@@ -35,6 +35,12 @@ Nowy jawny odczyt `model_query` z `component_kind=semantic_component` i
 warstwy. Dlatego wynik nowego odczytu komponentu może różnić się od warstwy
 surowego adaptera nadrzędnego; nie jest to samo w sobie błąd zapisu.
 
+Kryterium `wall.total_thickness_mm` odczytuje rzeczywistą natywną grubość
+jednowarstwowej ściany w mm. Podgląd edycji z warunkiem `< 240` wiąże także
+niematchingujące ściany; zmiana grubości przed Apply powoduje konflikt planu.
+Nie trzeba przekazywać UUID z osobnego filtra. Wielowarstwowe lub nierozpoznane
+reprezentacje zwracają `not_checked`, bez szacowania grubości z obwiedni.
+
 Oba scenariusze zachowują hash planu, jawny podgląd/podświetlenie, kopię testową,
 dziennik przed setterem, świeży readback, replay bez zapisu i read-only recover.
 Nowa operacja Wall jest odrębna od dawnych `set_layer`, więc historyczne
@@ -64,8 +70,9 @@ W zachowanej kopii testowej użyj lokalnego agenta:
    readback i następny preview/no-op. Jeśli wartości są już 0,2, nie wymuszaj
    ponownego zapisu tylko w celu testu.
 2. „Przenieś ściany o grubości mniejszej niż 24 cm na istniejącą warstwę W1”.
-   Agent może użyć zaakceptowanego filtra jako wejścia, ale nie musi powtarzać
-   osobnego testu tego filtra. Plan ma objąć właściwą ścianę 200 mm i jej części,
+   Agent ma użyć w `model_edit` kryterium `wall.total_thickness_mm < 240`,
+   bez przekazywania samych UUID z osobnego wyszukiwania. Plan ma objąć właściwą
+   jednowarstwową ścianę 200 mm i jej części,
    z wyłączeniem ściany 240 mm. Sprawdź warstwę w UI i nowym odczycie komponentu,
    nie tylko na adapterze nadrzędnym. Oś, otwory i wyłączona ściana mają pozostać
    poza celami setterów. Sprawdź faktyczny zakres Undo oraz działanie hosta.

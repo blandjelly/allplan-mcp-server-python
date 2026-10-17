@@ -12,7 +12,7 @@ SCHEMA = "m1-query-1"
 BASIC_FIELDS = {"display_name", "type_name", "type_uuid", "layer_id", "drawing_file", "file_state"}
 GEOMETRY_FIELDS = {"bounding_box_mm", "size_x_mm", "size_y_mm", "size_z_mm",
                    "center_x_mm", "center_y_mm", "center_z_mm", "min_z_mm", "max_z_mm"}
-FIELDS = BASIC_FIELDS | GEOMETRY_FIELDS | {"hierarchy", "family", "opening_kind", "mark", "status"}
+FIELDS = BASIC_FIELDS | GEOMETRY_FIELDS | {"hierarchy", "family", "opening_kind", "mark", "status", "wall.total_thickness_mm"}
 OPS = {"eq", "ne", "lt", "lte", "gt", "gte", "in", "contains", "exists", "is_null", "is_unset"}
 
 

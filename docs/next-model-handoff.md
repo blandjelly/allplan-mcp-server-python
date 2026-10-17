@@ -44,6 +44,9 @@ as proof of its component layer. Existing journal set_layer semantics remain
 unchanged. New query layer_resolution=component is explicit and semantic-only;
 the default adapter reader and successful owner fire/query/highlight slice
 remain preserved. Mixed-tier layers/unknown hierarchy block before mutation.
+Native single-tier wall.total_thickness_mm is now a direct query/edit criterion;
+the `< 240` edit plan binds all Wall peers and catches thickness changes before
+writing. Multi-tier/unknown thickness remains not_checked; no geometry fallback.
 
 Focused numeric, hierarchy, replay/recovery, target-writability and MCP HTTP
 regressions pass with native fakes. Final source CI and package evidence are

@@ -185,6 +185,9 @@ def model_query(request: QueryRequest) -> dict[str, Any]:
     the raw layer on the queried adapter. Query/highlight can still satisfy the
     independent presentation part of an unsupported native-material request;
     never silently replace native material with a different attribute target.
+    wall.total_thickness_mm reads the real single-tier Wall Thickness in native
+    mm; it never substitutes axis-aligned bounding-box extents. Unsupported
+    multi-tier/unknown representations remain not_checked.
     Pages and summaries revalidate query fields; stale selections are rejected.
     Selections expire after five minutes or host restart, count model UUIDs rather
     than components by default, and cannot authorize writes. Explicit
@@ -277,6 +280,9 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     Arbitrary old strings are never parsed/coerced. Wall layer edits bind all
     directly owned tiers and use their agreed layer, rather than a root-only
     setter/readback. Mixed tier layers or unknown ownership block the plan.
+    Use wall.total_thickness_mm < 240 for walls thinner than 24 cm: the native
+    criterion and the complete Wall peer set are bound/revalidated in the plan,
+    including changes into or out of the match, without a separate UUID handoff.
 
     highlight presents all matches including no-ops; native select stays unsupported.
     Apply is experimental, limited to 32 setters in one foreground drawing, with

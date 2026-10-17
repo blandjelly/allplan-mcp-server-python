@@ -1342,7 +1342,8 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
     async def test_wall_layer_tier_owner_apply_and_component_query_over_http(self):
         from test_wall_layer_edit import WallLayerEditTests
         fixture = WallLayerEditTests()
-        root, tiers, *_ = fixture.fixture((3735, 3735))
+        root, tiers, *_ = fixture.fixture((3735,))
+        fixture.thickness({id(root): 200})
         self.addCleanup(fixture.doCleanups)
         native = fixture.native
         original = self.bridge_handler.handle
@@ -1356,7 +1357,7 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
             return original(path, payload)
         self.bridge_handler.handle = handle
         request = native.request(native_types=["Wall_TypeUUID"],
-            predicate={"field": "family", "op": "eq", "value": "wall"},
+            predicate={"field": "wall.total_thickness_mm", "op": "lt", "value": 240},
             changes=[{"target": {"kind": "layer", "short_name": "W1"}}])
         request.pop("schema_version")
         async with Client(self.url, timeout=5) as client:

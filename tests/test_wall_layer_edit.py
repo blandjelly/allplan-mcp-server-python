@@ -1,8 +1,10 @@
 """Wall layer root no-op regression through the typed planner and real journal."""
 import copy
+import sys
 import unittest
 from types import SimpleNamespace
 from uuid import uuid4
+from unittest.mock import patch
 
 import test_model_edit as fixtures
 
@@ -39,9 +41,19 @@ class WallLayerEditTests(unittest.TestCase):
         native.base.ElementsLayerService.ChangeLayer.side_effect = change_layer
         return root, tiers, axis, opening
 
-    def preview(self):
+    def thickness(self, values):
+        class Wall:
+            def __init__(self, root):
+                self.Properties = SimpleNamespace(TierCount=1,
+                    GetWallTierProperties=lambda index: SimpleNamespace(Thickness=values[id(root)]))
+        sdk = patch.dict(sys.modules, {"NemAll_Python_ArchElements": SimpleNamespace(WallElement=Wall)})
+        sdk.start()
+        self.addCleanup(sdk.stop)
+        self.native.base.GetElement.side_effect = lambda root: Wall(root)
+
+    def preview(self, predicate=None):
         return self.native.preview(native_types=["Wall_TypeUUID"],
-            predicate={"field": "family", "op": "eq", "value": "wall"},
+            predicate=predicate or {"field": "family", "op": "eq", "value": "wall"},
             changes=[{"target": {"kind": "layer", "short_name": "W1"}}])
 
     def query(self, component=False):
@@ -112,6 +124,38 @@ class WallLayerEditTests(unittest.TestCase):
         forged = copy.deepcopy(plan)
         forged["changes"][0]["resource"]["wall_layer_ownership"]["tiers"] = []
         self.assertFalse(self.native.plans.executor.evaluation_scope(forged))
+
+    def test_native_thickness_criterion_is_bound_for_all_wall_peers_before_write(self):
+        root, tiers, *_ = self.fixture()
+        native = self.native
+        other = native.element(70, name="Wall_TypeUUID")
+        other_tier = native.element(71, name="WallTier_TypeUUID")
+        other.GetCommonProperties.return_value.Layer = 3735
+        other_tier.GetCommonProperties.return_value.Layer = 3735
+        native.children[id(other)] = [other_tier]
+        native.parents[id(other_tier)] = other
+        native.base.ElementsSelectService.SelectAllElements.return_value.extend([other, other_tier])
+        thickness = {id(root): 200, id(other): 240}
+        self.thickness(thickness)
+        criterion = {"field": "wall.total_thickness_mm", "op": "lt", "value": 240}
+        plan = self.preview(criterion)
+        self.assertEqual(plan["counts"]["matched"], 1)
+        self.assertEqual(plan["counts"]["nonmatching"], 1)
+        self.assertEqual(plan["changes"][0]["ref"]["model_uuid"], root.GetModelElementUUID())
+        native.highlight(plan)
+        # A previously nonmatching peer now qualifies: it must force a fresh
+        # plan rather than silently widening or preserving a stale target set.
+        thickness[id(other)] = 200
+        native.assert_code("repair_conflict", lambda: native.apply(plan))
+        native.base.ElementsLayerService.ChangeLayer.assert_not_called()
+        thickness[id(other)] = 240
+        fresh = self.preview(criterion)
+        native.highlight(fresh)
+        result = native.apply(fresh)
+        self.assertEqual(result["state"], "completed", result)
+        self.assertEqual(tiers[0].GetCommonProperties.return_value.Layer, 8)
+        self.assertEqual(other_tier.GetCommonProperties.return_value.Layer, 3735)
+        self.assertEqual(native.base.ElementsLayerService.ChangeLayer.call_count, 1)
 
     def test_lost_setter_reply_recovers_tier_state_without_writing_again(self):
         _root, tiers, *_ = self.fixture()

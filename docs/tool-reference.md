@@ -419,3 +419,9 @@ the directly owned tiers, returning not_checked for mixed/unknown layers.
 Other component families use their existing layer reader. model_edit selects
 component resolution for layer predicates/edits automatically. Neither mode
 changes the native model. [Focused owner guide](m4-agent-fixes-0.20.1.pl.md).
+
+`wall.total_thickness_mm` is a query/edit criterion read from native single-tier
+Wall properties in mm, without geometry approximation. Multi-tier or unknown
+representations return not_checked. A model_edit predicate such as `< 240`
+binds thickness for the full Wall peer set and revalidates it before writing,
+including previously nonmatching peers; use it instead of a separate UUID handoff.

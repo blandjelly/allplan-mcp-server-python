@@ -219,6 +219,9 @@ class ModelQueryService:
                         read_needed = {f for f in needed if f not in GEOMETRY_FIELDS and attribute_id(f) is None}
                 basic_needed = {f for f in read_needed if f in BASIC_FIELDS or f in {"family", "opening_kind"} or attribute_id(f) is not None}
                 values = self._fields(adapter, base, basic_needed, number, states[number])
+                if "wall.total_thickness_mm" in read_needed:
+                    from .native_readers import wall_total_thickness
+                    values["wall.total_thickness_mm"] = wall_total_thickness(adapter, base, check_budget)
                 if (request.get("layer_resolution") == "component" and "layer_id" in read_needed
                         and values["type_name"].get("value") == "Wall_TypeUUID"):
                     from .wall_layer import layer_value, observe as observe_wall_layer
