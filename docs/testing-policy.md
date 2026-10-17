@@ -63,3 +63,6 @@ record the tested scope and evidence in the handoff after a completed stage.
 
 Preserve all existing runtime write guards, revalidation, journaling, and hash
 safeguards. Testing or packaging changes do not authorize weakening them.
+
+[Verification of this procedure](test-results/testing-policy-2026-10-17.md)
+records the full workflow-change candidate and the draft-PR skip behavior.

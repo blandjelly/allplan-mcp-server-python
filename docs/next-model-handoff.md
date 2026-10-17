@@ -8,8 +8,10 @@ run: two Python 3.12 platforms normally, six for compatibility/main integration.
 Project-version-only bumps do not expand the matrix. Build once after tests;
 documentation/evidence updates skip product checks. Preserve accepted native
 observations. [Procedure PR #9](https://github.com/blandjelly/allplan-mcp-server-python/pull/9)
-also installs these instructions on main for future chats; M4 runtime integration
-remains separate.
+is merged into main at `b91c471`, so future chats receive these instructions
+from the default branch as well. [Verification](test-results/testing-policy-2026-10-17.md)
+records the one-time six-job workflow check, one build and the confirmed M4
+draft skip. M4 runtime integration remains separate.
 
 Current correction: **0.18.2**, `fix/m4-wall-sample`, based on the verified
 0.18.1 delivery at `0860438`. The documentation/evidence update was committed
