@@ -1,0 +1,6 @@
+M4 metadata/highlight observation: awaiting_owner_observation
+Allplan acceptance: not_run; native UI selection: BLOCKED in current interactor.
+No model setters requested.
+health_before: response_received (see JSON)
+clear_highlight: response_received (see JSON)
+health_after: response_received (see JSON)

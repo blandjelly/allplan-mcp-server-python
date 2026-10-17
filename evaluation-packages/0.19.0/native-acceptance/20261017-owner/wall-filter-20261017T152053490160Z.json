@@ -1,0 +1,314 @@
+{
+  "schema_version": "m4-wall-filter-owner-1",
+  "state": "awaiting_owner_observation",
+  "steps": [
+    {
+      "name": "health_before",
+      "tool": "allplan_health",
+      "request": null,
+      "state": "response_received",
+      "response": {
+        "ok": true,
+        "allplan_version": "2026.1",
+        "runtime": {
+          "version": "2026.1",
+          "allplan_release": {
+            "Version": "2026.1",
+            "MainReleaseName": "2026",
+            "SubReleaseName": "2026.1",
+            "WindowsReleaseName": ""
+          },
+          "executable_versions": {
+            "status": "observed",
+            "file_version": "16.1617.8659.814",
+            "product_version": "2026.0.1.0",
+            "source": "running_process_executable"
+          },
+          "hotfix": {
+            "status": "not_checked",
+            "value": null
+          },
+          "embedded_python": {
+            "version": "3.13.13",
+            "implementation": "CPython"
+          },
+          "bridge_package": {
+            "version": "0.19.0",
+            "source_commit": "e455f35cf4d546d9b77cf6ae5f59edcc026cc875",
+            "integrity": "sha256-verified",
+            "bridge_files": {
+              "Library/PythonHost/StartPythonHost.pyp": "b1aba49ed554eeefa9e44f4e9a6f06992e74d4f2916277ef451de11d72167813",
+              "PythonPartsScripts/PythonHost/audit_contracts.py": "155b10200982c879f3bd0226ea8f26c00e15118f8b5f3df532c7937ac3e8f035",
+              "PythonPartsScripts/PythonHost/column_layer.py": "a1476471d37d029d9447c96d40a3cebdb3acbe7d793885c416a51b14785b5c1b",
+              "PythonPartsScripts/PythonHost/mark_numbering.py": "dc6f7b87ba26aed1db1b50c6925b35df9509fb8b841e17fdb9d6e791666b51f4",
+              "PythonPartsScripts/PythonHost/model_audit.py": "50c74918d1b23d93f182ff01ea5859e0ea2b39ee54a70a13f0d8ee2346acbcd0",
+              "PythonPartsScripts/PythonHost/model_context.py": "8af4dfa1ac72523bb4b5fb4a068e5e202276118a95cf378d734082465e88d013",
+              "PythonPartsScripts/PythonHost/model_metadata.py": "c1339766382fd52de47fb66e11d87106942b67cf5dc743088739473738802d4a",
+              "PythonPartsScripts/PythonHost/model_properties.py": "812ee879e7926f6ed0356c678e1529b506284863fd1c7f02e46175464f5bc3e1",
+              "PythonPartsScripts/PythonHost/model_query.py": "6228264afcb8aabba77f53973b7dc47324125d88f7291ae72be078a18f2ea71f",
+              "PythonPartsScripts/PythonHost/model_repair.py": "f07dbcfd301f96a34ba638955b8cba74c7f87ebb608f4b5f1f72b193b17009bb",
+              "PythonPartsScripts/PythonHost/model_scope.py": "a80b72eda1ddac1563bdbdf73aafce9164c21304c82bfb72a2adb9e1f2c5f2b9",
+              "PythonPartsScripts/PythonHost/model_selection.py": "ebd904379f6704a211dd3e0a3a74c6b0290d07c31c7f067e8d29e1b65b6e839e",
+              "PythonPartsScripts/PythonHost/native_readers.py": "15c62a3c295bbeda4722bc54a6d36a4ada04fba866f0f1eb7aacd3a7f6c48cd0",
+              "PythonPartsScripts/PythonHost/native_repairs.py": "0123ba4946e92a2eeb4eb2a8e6960e4a4227924d3d31526834888f2b0bc2f87d",
+              "PythonPartsScripts/PythonHost/profile_contracts.py": "bed1c0099c2dfdc5fc48374cd78c16ea1ea0a6df3309deb919322b060d7a46b6",
+              "PythonPartsScripts/PythonHost/property_contracts.py": "60cfd1e1fa4b204aab7a75d469cd07bce3b34dc407c53bd0e1c122959c57c1e8",
+              "PythonPartsScripts/PythonHost/property_probe.py": "151476574845e05fe6dbbb3d4a7b9de8d2faec996f330ed2594c104c5bfacc2a",
+              "PythonPartsScripts/PythonHost/PythonHostHandler.py": "9c652c7a5d0870e8ec58c33e4045b4ac1bca4ef1e0e3f477ecab2d496fb78642",
+              "PythonPartsScripts/PythonHost/query_contracts.py": "5c27eebe084abe383de1e1330a0f5b46db08d097e00aaca171c9e8f49e396513",
+              "PythonPartsScripts/PythonHost/repair_contracts.py": "46469c0447c91e60b21cdcf6af47bb2946f066367e8c712e9e91110072f7f6b0",
+              "PythonPartsScripts/PythonHost/repair_execution.py": "ae467619e68699dc8ad9867ec58a6efc94bff39cb2055140d4804d7ad1f12e32",
+              "PythonPartsScripts/PythonHost/runtime_info.py": "6d46a44d0c8e8d3c1d757a22b4012a9919eb782bb8ea60577a1e229acfde91a2",
+              "PythonPartsScripts/PythonHost/sandbox/__init__.py": "b895513c191ba9ea7a8748f3aef1c6c9d74875b990d8ef41e10faf3904e0e586",
+              "PythonPartsScripts/PythonHost/sandbox/const.py": "168b93f376d54ddaf67ac62ffc5fb7e94570ab24e1f828d0732effa097e659d4",
+              "PythonPartsScripts/PythonHost/sandbox/executor.py": "c06f9810291a1c9e6f3deb7939d4b6615905d15c6662a6e69d7973b3fcbf0f6a",
+              "PythonPartsScripts/PythonHost/sandbox/validator.py": "5a4d3bf2bb6d2556512285a778083385c5c5049a398bc7a77cdaab9c5d8ddaec",
+              "PythonPartsScripts/PythonHost/spatial_contracts.py": "40820192b5500782cab4fb3fe837244989283861c143079b245f8f2e223ee086",
+              "PythonPartsScripts/PythonHost/StartPythonHost.py": "c3d5ee42531d2621e9d3055214ff8fc8fb25b29a1a9dc3790e3feb00ac609e51",
+              "PythonPartsScripts/PythonHost/transport.py": "f9e5985567631346d84b612898f6cc306cc0d0729624053aab823ea1f14db9dd",
+              "PythonPartsScripts/PythonHost/wall_filter.py": "dbc96f807153783837ce33dac114e866e1fb5993e490aa429889dce3fc333dee",
+              "PythonPartsScripts/PythonHost/wall_probe.py": "539cf24dfcf1e6e1355105f34a8fcbc32df6f42b143d02128c65f202a0cdb97b"
+            }
+          },
+          "installed_bridge_integrity": {
+            "status": "verified",
+            "mismatches": []
+          },
+          "compatibility": {
+            "target_major": "2026",
+            "major_matches": true,
+            "runtime_verified": false
+          },
+          "request_id": "31b9e12d-bdd4-463d-9d37-e73b2727a818",
+          "host_session_id": "d68ec7d3-4418-41ca-aa67-c6d3e17c7541",
+          "ui_dispatch_exception_boundary": "contained_result_error_v1",
+          "ui_dispatch_mode": "timer_queue_v1"
+        },
+        "external_python": "3.14.8",
+        "mcp_package_version": "0.19.0",
+        "request_id": "31b9e12d-bdd4-463d-9d37-e73b2727a818",
+        "allplan_host_url": "http://127.0.0.1:5679"
+      }
+    },
+    {
+      "name": "wall_thickness_filter",
+      "tool": "model_wall_filter",
+      "request": {
+        "action": "highlight",
+        "drawing_file": 101,
+        "threshold": {
+          "value": 24,
+          "unit": "cm"
+        },
+        "max_walls": 20,
+        "exclude_model_uuids": []
+      },
+      "state": "response_received",
+      "response": {
+        "schema_version": "m4-wall-filter-1",
+        "action": "highlight",
+        "state": "submitted",
+        "probe_id": "379ec4530123407c960cda7eb7537e16",
+        "trace_file": "Local/.allplan-mcp/logs/m4-native-probe.jsonl",
+        "read_only": true,
+        "model_data_changed": false,
+        "usable_for_write": false,
+        "runtime_verified": false,
+        "is_full_wall_filter": true,
+        "exclude_model_uuids": [],
+        "material_write_available": false,
+        "native_selection": "unsupported",
+        "ui_visibility": "requires_owner_observation",
+        "units_runtime_verified": false,
+        "native_length_unit": "mm",
+        "native_calls_not_automatically_retried": true,
+        "ui_calls_started": true,
+        "threshold": {
+          "property": "wall.total_thickness",
+          "operator": "lt",
+          "value": 240.0,
+          "unit": "mm"
+        },
+        "scope": {
+          "requested": {
+            "drawing_files": [
+              101
+            ],
+            "include_passive": false,
+            "visibility": "api_select_all"
+          },
+          "included_files": [
+            {
+              "drawing_file": 101,
+              "state": "active_foreground",
+              "write_eligibility": "not_checked"
+            }
+          ]
+        },
+        "coverage": {
+          "m1_complete": true,
+          "criteria_complete": true,
+          "read_complete": true
+        },
+        "criterion_complete": true,
+        "walls": [
+          {
+            "ref": {
+              "query_session_id": "3d156986e9584f03852e5cfa19f013b9",
+              "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+              "document_id": 0,
+              "drawing_file": 101,
+              "model_uuid": "06d71e4d-193b-483e-8a32-344ade3d612c",
+              "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+              "durable_identity_verified": false,
+              "component_kind": "top_level_component"
+            },
+            "status": "observed",
+            "tier_count": 1,
+            "thickness_mm": 240.0,
+            "criterion": {
+              "operator": "lt",
+              "threshold_mm": 240.0
+            },
+            "match": false,
+            "source": "single_tier_native_Thickness"
+          },
+          {
+            "ref": {
+              "query_session_id": "3d156986e9584f03852e5cfa19f013b9",
+              "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+              "document_id": 0,
+              "drawing_file": 101,
+              "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+              "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+              "durable_identity_verified": false,
+              "component_kind": "top_level_component"
+            },
+            "status": "observed",
+            "tier_count": 1,
+            "thickness_mm": 200.0,
+            "criterion": {
+              "operator": "lt",
+              "threshold_mm": 240.0
+            },
+            "match": true,
+            "source": "single_tier_native_Thickness"
+          }
+        ],
+        "omissions": [],
+        "counts": {
+          "walls": 2,
+          "matched": 1,
+          "excluded": 0,
+          "unreadable": 0,
+          "unprocessed": 0,
+          "not_editable": null,
+          "requested_model_identities": 1,
+          "requested_adapters": 1,
+          "submitted_model_identities": 1,
+          "submitted_adapters": 1,
+          "selected": null,
+          "highlighted": null,
+          "not_visible": null
+        },
+        "clear_scope": "all_highlights_in_current_document_including_other_sources",
+        "request_id": "e20ed50c-65a2-4f79-af2e-f59a5fdfb3b4",
+        "host_session_id": "d68ec7d3-4418-41ca-aa67-c6d3e17c7541"
+      }
+    },
+    {
+      "name": "health_after",
+      "tool": "allplan_health",
+      "request": null,
+      "state": "response_received",
+      "response": {
+        "ok": true,
+        "allplan_version": "2026.1",
+        "runtime": {
+          "version": "2026.1",
+          "allplan_release": {
+            "Version": "2026.1",
+            "MainReleaseName": "2026",
+            "SubReleaseName": "2026.1",
+            "WindowsReleaseName": ""
+          },
+          "executable_versions": {
+            "status": "observed",
+            "file_version": "16.1617.8659.814",
+            "product_version": "2026.0.1.0",
+            "source": "running_process_executable"
+          },
+          "hotfix": {
+            "status": "not_checked",
+            "value": null
+          },
+          "embedded_python": {
+            "version": "3.13.13",
+            "implementation": "CPython"
+          },
+          "bridge_package": {
+            "version": "0.19.0",
+            "source_commit": "e455f35cf4d546d9b77cf6ae5f59edcc026cc875",
+            "integrity": "sha256-verified",
+            "bridge_files": {
+              "Library/PythonHost/StartPythonHost.pyp": "b1aba49ed554eeefa9e44f4e9a6f06992e74d4f2916277ef451de11d72167813",
+              "PythonPartsScripts/PythonHost/audit_contracts.py": "155b10200982c879f3bd0226ea8f26c00e15118f8b5f3df532c7937ac3e8f035",
+              "PythonPartsScripts/PythonHost/column_layer.py": "a1476471d37d029d9447c96d40a3cebdb3acbe7d793885c416a51b14785b5c1b",
+              "PythonPartsScripts/PythonHost/mark_numbering.py": "dc6f7b87ba26aed1db1b50c6925b35df9509fb8b841e17fdb9d6e791666b51f4",
+              "PythonPartsScripts/PythonHost/model_audit.py": "50c74918d1b23d93f182ff01ea5859e0ea2b39ee54a70a13f0d8ee2346acbcd0",
+              "PythonPartsScripts/PythonHost/model_context.py": "8af4dfa1ac72523bb4b5fb4a068e5e202276118a95cf378d734082465e88d013",
+              "PythonPartsScripts/PythonHost/model_metadata.py": "c1339766382fd52de47fb66e11d87106942b67cf5dc743088739473738802d4a",
+              "PythonPartsScripts/PythonHost/model_properties.py": "812ee879e7926f6ed0356c678e1529b506284863fd1c7f02e46175464f5bc3e1",
+              "PythonPartsScripts/PythonHost/model_query.py": "6228264afcb8aabba77f53973b7dc47324125d88f7291ae72be078a18f2ea71f",
+              "PythonPartsScripts/PythonHost/model_repair.py": "f07dbcfd301f96a34ba638955b8cba74c7f87ebb608f4b5f1f72b193b17009bb",
+              "PythonPartsScripts/PythonHost/model_scope.py": "a80b72eda1ddac1563bdbdf73aafce9164c21304c82bfb72a2adb9e1f2c5f2b9",
+              "PythonPartsScripts/PythonHost/model_selection.py": "ebd904379f6704a211dd3e0a3a74c6b0290d07c31c7f067e8d29e1b65b6e839e",
+              "PythonPartsScripts/PythonHost/native_readers.py": "15c62a3c295bbeda4722bc54a6d36a4ada04fba866f0f1eb7aacd3a7f6c48cd0",
+              "PythonPartsScripts/PythonHost/native_repairs.py": "0123ba4946e92a2eeb4eb2a8e6960e4a4227924d3d31526834888f2b0bc2f87d",
+              "PythonPartsScripts/PythonHost/profile_contracts.py": "bed1c0099c2dfdc5fc48374cd78c16ea1ea0a6df3309deb919322b060d7a46b6",
+              "PythonPartsScripts/PythonHost/property_contracts.py": "60cfd1e1fa4b204aab7a75d469cd07bce3b34dc407c53bd0e1c122959c57c1e8",
+              "PythonPartsScripts/PythonHost/property_probe.py": "151476574845e05fe6dbbb3d4a7b9de8d2faec996f330ed2594c104c5bfacc2a",
+              "PythonPartsScripts/PythonHost/PythonHostHandler.py": "9c652c7a5d0870e8ec58c33e4045b4ac1bca4ef1e0e3f477ecab2d496fb78642",
+              "PythonPartsScripts/PythonHost/query_contracts.py": "5c27eebe084abe383de1e1330a0f5b46db08d097e00aaca171c9e8f49e396513",
+              "PythonPartsScripts/PythonHost/repair_contracts.py": "46469c0447c91e60b21cdcf6af47bb2946f066367e8c712e9e91110072f7f6b0",
+              "PythonPartsScripts/PythonHost/repair_execution.py": "ae467619e68699dc8ad9867ec58a6efc94bff39cb2055140d4804d7ad1f12e32",
+              "PythonPartsScripts/PythonHost/runtime_info.py": "6d46a44d0c8e8d3c1d757a22b4012a9919eb782bb8ea60577a1e229acfde91a2",
+              "PythonPartsScripts/PythonHost/sandbox/__init__.py": "b895513c191ba9ea7a8748f3aef1c6c9d74875b990d8ef41e10faf3904e0e586",
+              "PythonPartsScripts/PythonHost/sandbox/const.py": "168b93f376d54ddaf67ac62ffc5fb7e94570ab24e1f828d0732effa097e659d4",
+              "PythonPartsScripts/PythonHost/sandbox/executor.py": "c06f9810291a1c9e6f3deb7939d4b6615905d15c6662a6e69d7973b3fcbf0f6a",
+              "PythonPartsScripts/PythonHost/sandbox/validator.py": "5a4d3bf2bb6d2556512285a778083385c5c5049a398bc7a77cdaab9c5d8ddaec",
+              "PythonPartsScripts/PythonHost/spatial_contracts.py": "40820192b5500782cab4fb3fe837244989283861c143079b245f8f2e223ee086",
+              "PythonPartsScripts/PythonHost/StartPythonHost.py": "c3d5ee42531d2621e9d3055214ff8fc8fb25b29a1a9dc3790e3feb00ac609e51",
+              "PythonPartsScripts/PythonHost/transport.py": "f9e5985567631346d84b612898f6cc306cc0d0729624053aab823ea1f14db9dd",
+              "PythonPartsScripts/PythonHost/wall_filter.py": "dbc96f807153783837ce33dac114e866e1fb5993e490aa429889dce3fc333dee",
+              "PythonPartsScripts/PythonHost/wall_probe.py": "539cf24dfcf1e6e1355105f34a8fcbc32df6f42b143d02128c65f202a0cdb97b"
+            }
+          },
+          "installed_bridge_integrity": {
+            "status": "verified",
+            "mismatches": []
+          },
+          "compatibility": {
+            "target_major": "2026",
+            "major_matches": true,
+            "runtime_verified": false
+          },
+          "request_id": "7a2b1c29-0962-424c-935a-86820bcae60d",
+          "host_session_id": "d68ec7d3-4418-41ca-aa67-c6d3e17c7541",
+          "ui_dispatch_exception_boundary": "contained_result_error_v1",
+          "ui_dispatch_mode": "timer_queue_v1"
+        },
+        "external_python": "3.14.8",
+        "mcp_package_version": "0.19.0",
+        "request_id": "7a2b1c29-0962-424c-935a-86820bcae60d",
+        "allplan_host_url": "http://127.0.0.1:5679"
+      }
+    }
+  ],
+  "allplan_acceptance": "not_run",
+  "model_setters_requested": false,
+  "automatic_retry": false,
+  "native_selection": "highlight_only",
+  "native_trace_required": "Local/.allplan-mcp/logs/m4-native-probe.jsonl",
+  "message": "Sciany <24 cm: dopasowania 1, wykluczenia 0. Do podswietlenia wyslano 1 scian. Porownaj wynik z UI: 20 cm pasuje, 24 cm nie pasuje. Model nie zostal zmieniony."
+}

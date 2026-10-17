@@ -41,11 +41,20 @@ Only `PythonHostHandler.py` and the new `wall_filter.py` change in the native
 payload. [Verification](package-verification.json), [script](verify_package.py),
 [log](package-verification.log).
 
-Native Allplan testing is **not_run / ready_for_owner_test**, limited to this
-new bounded observation. Earlier 0.18.2 single-Wall and Column/M3 evidence retain their
-original scopes.
+**Native PASS / accepted_on_build 0.19.0**, observed 2026-10-17 Europe/Warsaw:
+two single-tier foreground-101 Walls read 200 mm (match) and 240 mm (nonmatch),
+one submitted adapter, complete coverage and no exclusions/omissions. The owner
+confirmed correct 20 cm highlighting, explicit clear and uninterrupted host
+operation; four health replies share one session.
+[Observation and original uploads](../../docs/m4-wall-filter-observation-0.19.0.md).
+Original JSON/delivery flags retain `not_run`/`ready_for_owner_test` as build-time
+or pre-confirmation records. Frozen artifacts are unchanged. No general unit,
+native selection, write/Undo or full K2/M4 acceptance is inferred. Earlier
+0.18.2 single-Wall and Column/M3 evidence retain their original scopes.
 
-## Owner observation
+## Completed owner observation — retained procedure
+
+The scoped trial is complete and needs no repeat. The following records its procedure.
 
 Install the complete ZIP to the same Local folder using Setup, with Allplan and
 MCP closed; then restart the host and MCP from this package. On the retained

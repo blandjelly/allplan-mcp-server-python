@@ -1,0 +1,64 @@
+{
+  "status": "PASS",
+  "acceptance": "accepted_on_build",
+  "package_version": "0.19.0",
+  "source_commit": "e455f35cf4d546d9b77cf6ae5f59edcc026cc875",
+  "observed_on": "2026-10-17",
+  "timezone": "Europe/Warsaw",
+  "scope": "Two single-tier Wall roots in active foreground drawing 101; strict <240 mm filter, one highlight, explicit clear and same-session health.",
+  "drawing_file": 101,
+  "wall_records": [
+    {
+      "model_uuid": "06d71e4d-193b-483e-8a32-344ade3d612c",
+      "thickness_mm": 240.0,
+      "match": false
+    },
+    {
+      "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+      "thickness_mm": 200.0,
+      "match": true
+    }
+  ],
+  "coverage": {
+    "m1_complete": true,
+    "criteria_complete": true,
+    "read_complete": true
+  },
+  "counts": {
+    "walls": 2,
+    "matched": 1,
+    "excluded": 0,
+    "unreadable": 0,
+    "unprocessed": 0,
+    "not_editable": null,
+    "requested_model_identities": 1,
+    "requested_adapters": 1,
+    "submitted_model_identities": 1,
+    "submitted_adapters": 1,
+    "selected": null,
+    "highlighted": null,
+    "not_visible": null
+  },
+  "highlight_state": "submitted",
+  "clear_state": "submitted",
+  "health_responses": 4,
+  "all_health_ok": true,
+  "host_sessions": [
+    "d68ec7d3-4418-41ca-aa67-c6d3e17c7541"
+  ],
+  "all_installed_integrity_reported_verified": true,
+  "owner_confirmation_pl": "sciana o gr. 20cm zostala prawidlowo podswietlona, a nastepnie odznaczona. Host nie zostal przerwany.",
+  "model_setters_requested": false,
+  "model_data_changed_reported": false,
+  "raw_reports_unchanged": true,
+  "raw_report_acceptance_flags": "not_run / awaiting_owner_observation; retained as originally uploaded",
+  "native_trace_and_bridge_log_uploaded": false,
+  "not_accepted": [
+    "native UI selection",
+    "general runtime/unit verification",
+    "material binding and writes/readback/Undo",
+    "multi-tier/rotated Walls",
+    "exceptions, zero-match clear and large-result/multiple-drawing cases",
+    "complete K2 or M4"
+  ]
+}

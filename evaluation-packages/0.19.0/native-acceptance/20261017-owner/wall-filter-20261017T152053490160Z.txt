@@ -1,0 +1,6 @@
+M4 Wall thickness filter: awaiting_owner_observation
+No model setters requested.
+health_before: response_received
+wall_thickness_filter: response_received
+health_after: response_received
+Sciany <24 cm: dopasowania 1, wykluczenia 0. Do podswietlenia wyslano 1 scian. Porownaj wynik z UI: 20 cm pasuje, 24 cm nie pasuje. Model nie zostal zmieniony.
