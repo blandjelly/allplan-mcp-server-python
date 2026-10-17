@@ -1,5 +1,16 @@
 # Current handoff
 
+**Owner agent trial, 2026-10-17:** the owner confirms fire-classification edits,
+highlighting and query operations worked. The transcript reports F120, then
+F60/F90 for separate Column sets, and correct 11-root/22-identity counts in
+foreground 101. It also records two unsuccessful thin-Wall layer writes
+(readback stayed 3735), numeric `Wartość U` previews blocked on an undefined
+string, and an unsupported native material request. This is owner-reported
+evidence without raw payloads or an exact installed build, not full M4/native
+acceptance. [Retained log and scope](test-results/m4-agent-observation-2026-10-17.md).
+Do not repeat the successful fire/query/highlight slice; investigate only the
+reported failed operations and keep all journal/revalidation guards.
+
 **Canonical M4 branch: `develop/m4`.** Created from `cf3c4bb`; all heads of
 `codex/m4-property-discovery`, `codex/m4-0.18.0`, `fix/m4-host-timeout` and
 `fix/m4-wall-sample` are included. New topic branches/PRs target develop/m4.
@@ -21,7 +32,39 @@ from the default branch as well. [Verification](test-results/testing-policy-2026
 records the one-time six-job workflow check, one build and the confirmed M4
 draft skip. M4 runtime integration remains separate.
 
-**New source candidate: 0.20.0 — typed criterion `model_edit`, native acceptance pending.**
+**New source candidate: 0.20.1 — fixes from the owner agent log.**
+Branch `fix/m4-undefined-values-wall-layer` starts from develop/m4 `7493ed3`;
+PRs still target develop/m4 and main remains separate. Typed numeric/boolean
+replacements accept only the exact observed undefined strings with a bound
+old_value_state marker; original raw values/fingerprints remain intact.
+The preview and low-level executor/adapter enforce the same narrow policy.
+Wall layer changes bind real WallTier owners, check all tiers before setters
+and read them freshly afterward, instead of treating the Wall root's raw layer
+as proof of its component layer. Existing journal set_layer semantics remain
+unchanged. New query layer_resolution=component is explicit and semantic-only;
+the default adapter reader and successful owner fire/query/highlight slice
+remain preserved. Mixed-tier layers/unknown hierarchy block before mutation.
+Native single-tier wall.total_thickness_mm is now a direct query/edit criterion;
+the `< 240` edit plan binds all Wall peers and catches thickness changes before
+writing. Multi-tier/unknown thickness remains not_checked; no geometry fallback.
+
+Runtime source **a0321dc40b52544b88e0f21724e523ab0c7bbb13** passed
+[CI 39057801089](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39057801089):
+**414 tests on each Windows/Ubuntu Python 3.12 job**, followed by one successful
+package job. Workspace transfer of the CI artifact returned HTTP 403; one
+allowed local fallback build used that exact clean source. The delivered ZIP
+passed checksum/payload, fresh registration, frozen sync/import, upgrade from
+0.20.0 and restore, verifying **35 bridge hashes** and preserving journal,
+native trace and bridge log. [Package and evidence](../evaluation-packages/0.20.1/README.md).
+Focused numeric, hierarchy, replay/recovery, target-writability, stale-thickness
+and MCP HTTP regressions pass with native fakes. These portable checks do not
+establish native acceptance; **new native behavior is not_run**. Next owner
+trial is only the numeric Wartość U from undefined and the Wall tier layer path.
+Do not repeat accepted fire/query/highlight or historical read gates. Native
+material edits remain unavailable and must not be substituted with an arbitrary
+attribute. [Short trial and limits](m4-agent-fixes-0.20.1.pl.md).
+
+**Previous source candidate: 0.20.0 — typed criterion `model_edit`, native acceptance pending.**
 Topic `topic/m4-universal-attribute-edit` starts from develop/m4 `cc062bc` and
 must target develop/m4; main integration remains separate. The new MCP route
 plans direct attribute/layer edits without audit findings, resolves exact

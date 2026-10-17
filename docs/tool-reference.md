@@ -397,3 +397,31 @@ identify 935 as Fire resistance classification (String), and the
 sets it to F30. The [attribute tutorial](https://pythonparts.allplan.com/2026/manual/features/attributes/element_attributes/)
 instead illustrates 1398 as Fire risk factor with A1/A2. These distinguish the
 fields; runtime project resources still determine the binding.
+
+## M4 0.20.1 — undefined numeric attributes and Wall layer owners
+
+`model_edit` retains raw undefined strings in old_value. For exact
+`<niezdefiniowany>` / `<undefined>` and metadata-bound integer/real/boolean
+fields, a hash-bound old_value_state=undefined permits replace/upsert. Other
+strings, computed-only values, failed reads and ReadAll omissions remain blocked.
+The policy is reported in preview; it does not parse or normalize raw text.
+
+Wall layer changes use internal operation `set_wall_layer` with a reviewed
+resource.wall_layer_ownership manifest of the root and its directly owned
+WallTier identities/layers. Every tier is checked before journal/setters; one
+ChangeLayer targets tiers only, followed by fresh owner/aggregate layer readback.
+Mixed tier layers and missing/conflicting ownership block the plan. Historical
+set_layer journal records retain their legacy root-adapter readback.
+
+`model_query` adds optional layer_resolution=adapter (default) or component.
+Component resolution requires semantic_component and reads Wall layer_id from
+the directly owned tiers, returning not_checked for mixed/unknown layers.
+Other component families use their existing layer reader. model_edit selects
+component resolution for layer predicates/edits automatically. Neither mode
+changes the native model. [Focused owner guide](m4-agent-fixes-0.20.1.pl.md).
+
+`wall.total_thickness_mm` is a query/edit criterion read from native single-tier
+Wall properties in mm, without geometry approximation. Multi-tier or unknown
+representations return not_checked. A model_edit predicate such as `< 240`
+binds thickness for the full Wall peer set and revalidates it before writing,
+including previously nonmatching peers; use it instead of a separate UUID handoff.

@@ -179,6 +179,15 @@ def model_query(request: QueryRequest) -> dict[str, Any]:
     positive drawing_files, include_passive and visibility=api_select_all.
     Use observed type GUID/name, layer ID or
     attribute:<ID> predicates with all/any/not. Missing/failed reads are distinct.
+    layer_resolution=component with component_kind=semantic_component reads a
+    Wall's effective layer from all directly owned WallTier adapters; mixed or
+    unreadable tier layers are not_checked. Default adapter resolution preserves
+    the raw layer on the queried adapter. Query/highlight can still satisfy the
+    independent presentation part of an unsupported native-material request;
+    never silently replace native material with a different attribute target.
+    wall.total_thickness_mm reads the real single-tier Wall Thickness in native
+    mm; it never substitutes axis-aligned bounding-box extents. Unsupported
+    multi-tier/unknown representations remain not_checked.
     Pages and summaries revalidate query fields; stale selections are rejected.
     Selections expire after five minutes or host restart, count model UUIDs rather
     than components by default, and cannot authorize writes. Explicit
@@ -266,12 +275,21 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     attribute_read_mode=all_and_computable establishes absence only after a complete
     documented read; is_unset then includes absent and not exists matches absence.
     No broad definition/enum discovery; enum keys/units must already be resolved.
+    Metadata-bound numeric/boolean attributes can replace exact old undefined
+    strings <niezdefiniowany> or <undefined>, with their raw old value preserved.
+    Arbitrary old strings are never parsed/coerced. Wall layer edits bind all
+    directly owned tiers and use their agreed layer, rather than a root-only
+    setter/readback. Mixed tier layers or unknown ownership block the plan.
+    Use wall.total_thickness_mm < 240 for walls thinner than 24 cm: the native
+    criterion and the complete Wall peer set are bound/revalidated in the plan,
+    including changes into or out of the match, without a separate UUID handoff.
 
     highlight presents all matches including no-ops; native select stays unsupported.
     Apply is experimental, limited to 32 setters in one foreground drawing, with
     exact highlighted plan/hash, execution_id and disposable_copy_reviewed_plan.
-    Persist the exact Apply request before sending. Lost replies require recover
-    with the same execution ID; never create a new ID or automatically retry writes.
+    Persist the exact Apply request before sending. Use a 32-character lowercase
+    hexadecimal execution_id (uuid.uuid4().hex). Lost replies require recover
+    with that same execution ID; never create a new ID or automatically retry writes.
     Shared journal, fresh scope/resource checks, native writability and readback
     remain enforced. Native acceptance of this new path is pending.
     """

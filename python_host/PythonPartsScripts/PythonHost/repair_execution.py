@@ -239,7 +239,7 @@ class RepairExecutor:
     @staticmethod
     def model_edit_scope(plan):
         """Separate evaluation contract; does not broaden historical M3 permissions."""
-        from .native_model_edit import value_matches
+        from .native_model_edit import replaceable_attribute_value, value_matches
         from .native_readers import COMPONENT_TYPES
         changes, files = plan["changes"], plan["scope"]["included_files"]
         if (plan.get("schema_version") != "m4-model-edit-1" or plan["state"] != "preview_ready"
@@ -257,17 +257,21 @@ class RepairExecutor:
                     or change.get("native_type") not in COMPONENT_TYPES):
                 return False
             seen.add(key)
-            symbol = ("ElementsLayerService.ChangeLayer" if change["operation"] == "set_layer"
+            symbol = ("ElementsLayerService.ChangeLayer" if change["operation"] in {"set_layer", "set_wall_layer"}
                       else "ElementsAttributeService.ChangeAttributes")
             capability = plan["capabilities"]["symbols"].get(symbol, {})
             if capability.get("status") != "observed" or capability.get("callable") is not True:
                 return False
-            if change["operation"] == "set_layer":
+            if change["operation"] in {"set_layer", "set_wall_layer"}:
                 if (old.get("status") != "observed" or change["field"] != "layer_id"
                         or change.get("property_role") != "layer" or type(resource.get("layer_id")) is not int
                         or change["new_value"] != resource["layer_id"]
                         or not isinstance(resource.get("short_name"), str) or not resource["short_name"]):
                     return False
+                if change["operation"] == "set_wall_layer":
+                    from .wall_layer import valid_change
+                    if not valid_change(change):
+                        return False
             elif change["operation"] in {"set_attribute", "add_attribute"}:
                 if (change.get("property_role") != "attribute" or type(resource.get("attribute_id")) is not int
                         or change["field"] != f"attribute:{resource['attribute_id']}"
@@ -280,7 +284,7 @@ class RepairExecutor:
                             or resource.get("read_mode") != "all_and_computable"
                             or change.get("mode") not in {"add", "upsert"}):
                         return False
-                elif old.get("status") != "observed" or change.get("mode") not in {"replace", "upsert"}:
+                elif not replaceable_attribute_value(change) or change.get("mode") not in {"replace", "upsert"}:
                     return False
             else:
                 return False

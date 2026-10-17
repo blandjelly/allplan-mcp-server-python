@@ -3,12 +3,13 @@ from __future__ import annotations
 
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 Scalar = str | int | float | bool | None
 QueryField = Literal["display_name", "type_name", "type_uuid", "layer_id", "drawing_file", "file_state",
                      "bounding_box_mm", "size_x_mm", "size_y_mm", "size_z_mm", "center_x_mm", "center_y_mm",
-                     "center_z_mm", "min_z_mm", "max_z_mm", "hierarchy", "family", "opening_kind", "mark", "status"]
+                     "center_z_mm", "min_z_mm", "max_z_mm", "hierarchy", "family", "opening_kind", "mark", "status",
+                     "wall.total_thickness_mm"]
 
 
 class ContractModel(BaseModel):
@@ -53,9 +54,16 @@ class QueryInput(ContractModel):
     page_size: int = Field(default=100, ge=1, le=200)
     max_adapters: int = Field(default=5000, ge=1, le=10000)
     component_kind: Literal["model_identity", "top_level_component", "semantic_component"] = "model_identity"
+    layer_resolution: Literal["adapter", "component"] = "adapter"
     coordinate_frame: Literal["model_local", "project_global"] = "model_local"
     spatial_box: SpatialBox | None = None
     profile_id: Literal["native-model-qa-demo"] | None = None
+
+    @model_validator(mode="after")
+    def component_layer_owner(self):
+        if self.layer_resolution == "component" and self.component_kind != "semantic_component":
+            raise ValueError("Component layer resolution requires component_kind=semantic_component.")
+        return self
 
 
 class PageInput(ContractModel):

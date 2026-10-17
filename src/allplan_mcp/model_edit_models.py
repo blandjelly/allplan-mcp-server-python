@@ -58,7 +58,7 @@ Edit = AttributeEdit | LayerEdit
 
 _QUERY_FIELDS = {"display_name", "type_name", "type_uuid", "layer_id", "drawing_file", "file_state",
                  "bounding_box_mm", "size_x_mm", "size_y_mm", "size_z_mm", "center_x_mm", "center_y_mm",
-                 "center_z_mm", "min_z_mm", "max_z_mm", "hierarchy", "family", "opening_kind"}
+                 "center_z_mm", "min_z_mm", "max_z_mm", "hierarchy", "family", "opening_kind", "wall.total_thickness_mm"}
 _QUERY_OPS = {"eq", "ne", "lt", "lte", "gt", "gte", "in", "contains", "exists", "is_null", "is_unset"}
 
 

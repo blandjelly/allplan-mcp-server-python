@@ -16,6 +16,26 @@ class NativeModelEditTests(unittest.TestCase):
     def edit_adapter(self):
         return importlib.import_module("test_allplan_host.native_model_edit")
 
+    def test_numeric_undefined_replacement_requires_the_exact_reviewed_marker(self):
+        element = self.element()
+        self.native([element])
+        self.adapter_module.BaseElementAdapterList = list
+        change = {"adapter_version": "m4-model-edit-1", "operation": "set_attribute",
+                  "resource": {"attribute_id": 83, "data_type": "real"},
+                  "new_value": 0.2, "old_value": {"status": "observed", "value": "<niezdefiniowany>"}}
+        adapter = self.edit_adapter()
+        with self.assertRaises(self.module.BridgeError):
+            adapter.write(self.base, element, change)
+        change["old_value_state"] = "undefined"
+        adapter.write(self.base, element, change)
+        self.base.ElementsAttributeService.ChangeAttributes.assert_called_once_with([(83, 0.2)], [element], False, False)
+        self.base.ElementsAttributeService.ChangeAttributes.reset_mock()
+        for raw in ("abc", "0,2", 0.1):
+            change["old_value"]["value"] = raw
+            with self.assertRaises(self.module.BridgeError):
+                adapter.write(self.base, element, change)
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
     def test_attribute_fields_distinguishes_stored_missing_from_computed_complete_absence(self):
         element = self.element(attrs=[])
         self.native([element])

@@ -12,6 +12,15 @@ DEFAULT_NATIVE_TYPES = ["Column_TypeUUID", "Beam_TypeUUID", "SkeletonBeam_TypeUU
                        "Wall_TypeUUID", "Slab_TypeUUID", "MultiSlab_TypeUUID", "WindowDoor_TypeUUID"]
 EDIT_TYPES = {"text", "integer", "real", "boolean"}
 MODES = {"replace", "upsert", "add"}
+# Exact values emitted by Allplan for an explicitly undefined stored attribute.
+# Never normalize arbitrary strings or parse them as numbers.
+UNDEFINED_ATTRIBUTE_VALUES = frozenset({"<niezdefiniowany>", "<undefined>"})
+
+
+def is_undefined_attribute_value(value):
+    return isinstance(value, str) and value in UNDEFINED_ATTRIBUTE_VALUES
+
+
 UUID = re.compile(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}")
 
 

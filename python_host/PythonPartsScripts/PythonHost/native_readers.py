@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from .model_context import boolean, guid, integer, observation, text
 from .spatial_contracts import box, convert_point, vector
+from .transport import BridgeError
 
 # Root families observed/read through native adapters. Child axes/tiers resolve
 # to these roots; unrelated Structural Framing families remain unsupported.
@@ -29,6 +30,56 @@ def adapter_ref(adapter):
             "model_uuid": guid(adapter.GetModelElementUUID()),
             "view_uuid": guid(adapter.GetElementUUID()),
             "type_name": text(adapter.GetElementAdapterType().GetTypeName())}
+
+
+class _WallThicknessUnavailable(Exception):
+    """A native wall thickness read failed without failing its caller's budget."""
+
+
+def wall_total_thickness(adapter, base, check=lambda: None):
+    """Read total thickness only for a represented, single-tier native Wall.
+
+    This intentionally does not approximate thickness from geometry. Budget
+    exceptions raised by ``check`` propagate unchanged.
+    """
+    def read_native(reader):
+        check()
+        try:
+            value = reader()
+            failure = None
+        except BridgeError:
+            raise
+        except Exception as exc:
+            value, failure = None, type(exc).__name__
+        check()
+        if failure is not None:
+            raise _WallThicknessUnavailable(failure)
+        return value
+
+    try:
+        type_name = read_native(lambda: text(adapter.GetElementAdapterType().GetTypeName()))
+        if type_name != "Wall_TypeUUID":
+            return {"status": "not_checked", "value": None, "reason": "not_a_wall_root"}
+        import importlib
+        architecture = read_native(lambda: importlib.import_module("NemAll_Python_ArchElements"))
+        wall = read_native(lambda: base.GetElement(adapter))
+        wall_type = getattr(architecture, "WallElement", None)
+        if not isinstance(wall_type, type) or not isinstance(wall, wall_type):
+            return {"status": "not_checked", "value": None, "reason": "unsupported_wall_representation"}
+        properties = read_native(lambda: wall.Properties)
+        tier_count = read_native(lambda: integer(properties.TierCount))
+        if tier_count != 1:
+            return {"status": "not_checked", "value": None, "reason": "requires_exactly_one_wall_tier"}
+        tier = read_native(lambda: properties.GetWallTierProperties(1))
+        from .wall_probe import positive_length
+        thickness = read_native(lambda: positive_length(tier.Thickness))
+        return {"status": "observed", "value": thickness}
+    except BridgeError:
+        raise
+    except _WallThicknessUnavailable as exc:
+        return {"status": "not_checked", "value": None, "reason": str(exc)}
+    except Exception as exc:
+        return {"status": "not_checked", "value": None, "reason": type(exc).__name__}
 
 
 def root_adapter(adapter, check_budget, stop_types=None):
