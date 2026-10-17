@@ -65,13 +65,17 @@ the model before retrying. Never mix files from different versioned packages.
 
 ## Source development
 
+Follow the [testing and package policy](docs/testing-policy.md) for checks,
+CI selection, and builds. During implementation, run focused affected and
+dependent tests; for example:
+
 ```bash
-uv sync --frozen
-uv run --frozen allplan-mcp
-uv run --frozen python -m unittest discover -s tests -v
-uv build
-uv run --frozen python utils/build_windows_package.py
+uv run --frozen python -m unittest discover -s tests -p 'test_transport.py' -v
 ```
+
+Full candidate validation and package production run in GitHub CI; use its
+artifact for package installation checks. See the policy for when full CI or
+the six-job matrix is required.
 
 For source registration on Windows, use `utils\register_python_host.cmd`.
 External-server dependencies stay outside Allplan's embedded Python. Environment

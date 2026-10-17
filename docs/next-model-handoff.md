@@ -1,11 +1,23 @@
 # Current project handoff
 
+At the start of each chat, read the [testing and package policy](testing-policy.md)
+along with this handoff; it defines the required checks for future changes.
+
+For current **M4** work, continue the separate development line
+[`fix/m4-wall-sample`, PR #8](https://github.com/blandjelly/allplan-mcp-server-python/pull/8),
+package **0.18.2**. Its [current handoff](https://github.com/blandjelly/allplan-mcp-server-python/blob/fix/m4-wall-sample/docs/next-model-handoff.md)
+and [owner-confirmed single-Wall read](https://github.com/blandjelly/allplan-mcp-server-python/blob/fix/m4-wall-sample/docs/m4-wall-observation-0.18.2.md)
+are separate from the accepted main baseline below. Choose the branch appropriate
+to the requested work; the testing-policy update does not integrate M3/M4 into main.
+
 Updated 2026-10-09 (Europe/Warsaw). **`main` contains accepted M0–M2**, package
 **0.6.1**, M1 read profile **1.0.2** and M2 audit profile **2.0.0**.
 M2 was merged through [PR #3](https://github.com/blandjelly/allplan-mcp-server-python/pull/3)
 at `73b704fd3054b29c4e7c741a7891b8cc53e1b7cd`.
 
 ## Checkout and reading order
+
+To inspect the accepted main baseline only:
 
 ```sh
 git fetch origin

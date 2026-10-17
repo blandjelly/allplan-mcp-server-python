@@ -1,23 +1,74 @@
-name: Portable M0, M1 and M2 checks
+name: Final candidate checks
 on:
-  push:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
+    paths-ignore:
+      - 'AGENTS.md'
+      - 'docs/**'
+      - 'README.md'
+      - 'evaluation-packages/**'
+  workflow_dispatch:
+    inputs:
+      full_matrix:
+        description: 'Full compatibility/release check (false for an ordinary package candidate)'
+        type: boolean
+        default: true
 permissions:
   contents: read
+concurrency:
+  group: portable-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
+  configuration:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.policy.outputs.matrix }}
+      run_portable: ${{ steps.policy.outputs.run_portable }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - id: policy
+        name: Select final-candidate checks
+        run: python utils/ci_policy.py
   portable:
+    needs: configuration
+    if: needs.configuration.outputs.run_portable == 'true'
     strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        python: ['3.11', '3.12', '3.13']
+      matrix: ${{ fromJSON(needs.configuration.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
       - run: python -m pip install uv==0.12.19
       - run: uv sync --frozen
       - run: uv run --frozen python -m unittest discover -s tests -v
+  package:
+    needs: [configuration, portable]
+    if: needs.configuration.outputs.run_portable == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install uv==0.12.19
+      - run: uv sync --frozen
       - run: uv build
       - run: uv run --frozen python utils/build_windows_package.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: candidate-${{ github.event.pull_request.head.sha || github.sha }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 14
