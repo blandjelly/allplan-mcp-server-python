@@ -1,5 +1,16 @@
 # Current handoff
 
+Updated 2026-10-17 Europe/Warsaw: **0.18.1 transport candidate** on
+`fix/m4-host-timeout`, based on `codex/m4-0.18.0` at `0dbe7cf`.
+The supplied MCP and bridge logs correlate a health timeout with an incomplete
+HTTP 200 response. A timer-driven Python UI queue, cooperative worker scheduling,
+pre-start cancellation and stage timing replace the synchronous CLR dispatch
+round trip. The underlying native scheduling/socket cause remains unproven.
+[Incident evidence, changes and short Polish health-only check](mcp-timeout-0.18.1.md).
+Automated validation and delivery are pending; native recovery is **not_run**.
+All original 0.18.0 artifacts remain frozen. The preceding Wall/Columns work and
+its limits below remain applicable after transport verification.
+
 Updated 2026-10-15 Europe/Warsaw. Current candidate **0.18.0**, **ready_for_owner_test**.
 Clean source **5ea4bcfd88f500bbf137e361ba5d6cc3d83710b5** passed **289 portable
 tests**, six Windows/Ubuntu × Python 3.11–3.13 CI jobs, frozen sync, builds and

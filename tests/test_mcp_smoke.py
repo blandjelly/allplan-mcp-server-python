@@ -41,6 +41,28 @@ class FakeBridge:
 
 
 class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
+    async def test_ui_stall_returns_explicit_error_and_same_mcp_session_recovers(self):
+        dispatcher = transport.UIRequestDispatcher(start_timeout=0.1)
+        self.bridge.dispatch = dispatcher
+        async with Client(self.url, timeout=5) as client:
+            result = await client.call_tool("allplan_health", raise_on_error=False)
+            self.assertTrue(result.is_error)
+            self.assertIn("ui_dispatch_unavailable", str(result.content))
+            self.assertEqual(self.bridge_handler.calls, [])
+            dispatcher.process_pending()  # Expired health must never execute later.
+            self.assertEqual(self.bridge_handler.calls, [])
+            self.assertTrue(await client.list_tools())
+            dispatcher.start_timeout = 2
+            request = asyncio.create_task(client.call_tool("allplan_health"))
+            deadline = asyncio.get_running_loop().time() + 2
+            while dispatcher.pending.empty() and asyncio.get_running_loop().time() < deadline:
+                await asyncio.sleep(0.001)
+            dispatcher.process_pending()
+            health = (await request).data
+            self.assertTrue(health["ok"])
+            self.assertEqual(health["runtime"]["ui_dispatch_mode"], "timer_queue_v1")
+            self.assertEqual(self.bridge_handler.calls, [("/get-allplan-version", {})])
+
     async def test_m4_isolated_probe_quarantine_and_validation_over_http(self):
         from test_model_properties import PropertyTests
         from allplan_mcp.property_diagnostics import collect_property_probe

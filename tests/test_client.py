@@ -31,6 +31,18 @@ class ClientErrorTests(unittest.TestCase):
         self.assertEqual(error.exception.code, "session_unavailable")
         self.assertEqual(error.exception.request_id, "from-host")
 
+    def test_health_timeout_identifies_host_read_without_implying_a_write(self):
+        for cause in (TimeoutError(), URLError(TimeoutError())):
+            with patch.object(self.client.opener, "open", side_effect=cause) as request:
+                with self.assertRaises(AllplanHostError) as error:
+                    self.client.post("/get-allplan-version")
+            self.assertEqual(error.exception.code, "host_timeout")
+            self.assertIn("http://127.0.0.1:5679/get-allplan-version", str(error.exception))
+            self.assertIn("read-only", str(error.exception))
+            self.assertIn("bridge.log", str(error.exception))
+            self.assertNotIn("Inspect the model", str(error.exception))
+            request.assert_called_once()
+
     def test_nonfinite_payload_is_rejected_before_http(self):
         with patch.object(self.client.opener, "open") as request:
             with self.assertRaises(AllplanHostError) as error:

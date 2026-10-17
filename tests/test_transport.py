@@ -44,6 +44,99 @@ class TransportTests(unittest.TestCase):
         self.addCleanup(stop_test_server, self, server)
         return server
 
+    def test_stalled_ui_returns_error_and_never_executes_expired_write_on_resume(self):
+        dispatcher = transport.UIRequestDispatcher(start_timeout=0.03)
+        server = self.server(dispatch=dispatcher)
+        request = Request(f"http://127.0.0.1:{server.server_port}/create-box", data=b"{}")
+        with self.assertRaises(HTTPError) as error:
+            build_opener(ProxyHandler({})).open(request, timeout=2)
+        self.assertEqual(error.exception.code, 503)
+        body = json.loads(error.exception.read())
+        self.assertEqual(body["error"]["code"], "ui_dispatch_unavailable")
+        dispatcher.process_pending()
+        self.assertEqual(server.handler.calls, [])
+
+    def test_timer_runs_handler_on_ui_and_records_response_stages(self):
+        dispatcher = transport.UIRequestDispatcher(start_timeout=2)
+        main_thread = threading.get_ident()
+        ran_on = []
+        class UIHandler(Handler):
+            def handle(self, path, payload):
+                ran_on.append(threading.get_ident())
+                return super().handle(path, payload)
+        server = self.server(UIHandler(), dispatcher)
+        responses = []
+        worker = threading.Thread(target=lambda: responses.append(self.request(server).read()))
+        with self.assertLogs("allplan.bridge", level="INFO") as logs:
+            worker.start()
+            deadline = time.monotonic() + 2
+            while dispatcher.pending.empty() and time.monotonic() < deadline:
+                time.sleep(0.001)
+            dispatcher.process_pending()
+            worker.join(2)
+        self.assertFalse(worker.is_alive())
+        self.assertEqual(ran_on, [main_thread])
+        self.assertEqual(json.loads(responses[0])["ui_dispatch_mode"], "timer_queue_v1")
+        stages = "\n".join(logs.output)
+        for name in ("ui_dispatch_queued", "ui_dispatch_started", "ui_dispatch_finished", "response_started", "response_sent"):
+            self.assertIn(name + " request_id=test-id", stages)
+
+    def test_started_callback_outlives_queue_budget_without_retry_or_ui_exception(self):
+        dispatcher = transport.UIRequestDispatcher(start_timeout=0.1)
+        results, calls = [], []
+        def callback():
+            calls.append(threading.get_ident())
+            time.sleep(0.15)
+            return "done"
+        worker = threading.Thread(target=lambda: results.append(dispatcher(callback)))
+        worker.start()
+        deadline = time.monotonic() + 2
+        while dispatcher.pending.empty() and time.monotonic() < deadline:
+            time.sleep(0.001)
+        dispatcher.process_pending()
+        worker.join(2)
+        self.assertEqual(results, ["done"])
+        self.assertEqual(calls, [threading.get_ident()])
+
+    def test_stop_releases_waiting_worker_and_rejects_new_work(self):
+        dispatcher = transport.UIRequestDispatcher(start_timeout=2)
+        errors, calls = [], []
+        def request():
+            try:
+                dispatcher(lambda: calls.append(True))
+            except transport.BridgeError as exc:
+                errors.append(exc.code)
+        worker = threading.Thread(target=request)
+        worker.start()
+        deadline = time.monotonic() + 2
+        while dispatcher.pending.empty() and time.monotonic() < deadline:
+            time.sleep(0.001)
+        dispatcher.close()
+        dispatcher.process_pending()
+        worker.join(2)
+        self.assertFalse(worker.is_alive())
+        request()
+        self.assertEqual(errors, ["session_unavailable", "session_unavailable"])
+        self.assertEqual(calls, [])
+
+    def test_timer_contains_callback_exit_and_dispatcher_recovers(self):
+        dispatcher = transport.UIRequestDispatcher(start_timeout=2)
+        errors = []
+        def request():
+            try:
+                dispatcher(lambda: (_ for _ in ()).throw(SystemExit("exit")))
+            except BaseException as exc:
+                errors.append(type(exc).__name__)
+        worker = threading.Thread(target=request)
+        worker.start()
+        deadline = time.monotonic() + 2
+        while dispatcher.pending.empty() and time.monotonic() < deadline:
+            time.sleep(0.001)
+        dispatcher.process_pending()  # No exception may escape into the UI timer.
+        worker.join(2)
+        self.assertFalse(worker.is_alive())
+        self.assertEqual(errors, ["SystemExit"])
+
     def test_typed_errors_stay_inside_managed_callback_and_preserve_http_status(self):
         class RejectingHandler(Handler):
             def handle(self, path, payload):

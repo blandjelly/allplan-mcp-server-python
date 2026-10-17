@@ -1,9 +1,11 @@
 # Allplan MCP Server
 
 A local MCP bridge between Codex and Allplan 2026 for model queries, audits and
-reviewed attribute/layer repairs. Current candidate: **0.18.0**, **ready_for_owner_test**.
-289 portable tests, six CI configurations and exact package installation passed;
-native wall observation remains pending.
+reviewed attribute/layer repairs. Current source: **0.18.1 transport candidate**;
+automated validation/delivery and native recovery observation are pending.
+[Health timeout investigation and Polish check](docs/mcp-timeout-0.18.1.md).
+The frozen **0.18.0** Wall package passed 289 portable tests, six CI configurations
+and exact package installation; native wall observation remains pending.
 
 0.18.0 retains the 0.17.2 Columns runtime unchanged and adds one isolated,
 read-only native wall-property sample plus **M4 Wall Properties.cmd**. It reads

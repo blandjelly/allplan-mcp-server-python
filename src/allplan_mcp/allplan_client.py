@@ -35,6 +35,13 @@ class AllplanHostClient:
             raise AllplanHostError("Request must contain finite JSON values.", code="invalid_payload", request_id=request_id) from exc
         request = Request(urljoin(self.base_url, path.lstrip("/")), data=body,
                           headers=request_headers, method="POST")
+        read_only = path in {"/get-allplan-version", "/get-runtime-info", "/get-model-context",
+                             "/get-all-object-names", "/model-query", "/model-audit"}
+        timeout_code = "host_timeout" if read_only else "execution_unknown"
+        timeout_message = (f"Allplan host at {request.full_url} did not respond within {self.timeout:g}s. "
+                           + ("This was a read-only request. Check StartPythonHost, modal dialogs and "
+                              "Local/.allplan-mcp/logs/bridge.log. The MCP connection itself may still be healthy."
+                              if read_only else "Execution may have occurred. Inspect the model before retrying a write."))
         try:
             with self.opener.open(request, timeout=self.timeout) as response:
                 raw_body = response.read().decode("utf-8")
@@ -49,10 +56,10 @@ class AllplanHostClient:
                 code, message = "host_error", f"Allplan host returned HTTP {exc.code} for {path}. Restart the host or collect diagnostics."
             raise AllplanHostError(message, code=code, request_id=request_id) from exc
         except (TimeoutError, socket.timeout) as exc:
-            raise AllplanHostError("Allplan host timed out. Execution may have occurred. Inspect the model before retrying a write.", code="execution_unknown", request_id=request_id) from exc
+            raise AllplanHostError(timeout_message, code=timeout_code, request_id=request_id) from exc
         except URLError as exc:
             if isinstance(exc.reason, (TimeoutError, socket.timeout)):
-                code, message = "execution_unknown", "Allplan host timed out. Inspect the model before retrying a write."
+                code, message = timeout_code, timeout_message
             else:
                 code, message = "host_absent", "Could not reach the Allplan host. Open a project and start StartPythonHost in the Library palette."
             raise AllplanHostError(message, code=code, request_id=request_id) from exc

@@ -5,7 +5,7 @@ Local Windows MCP client
   → FastMCP, 127.0.0.1:8888/mcp
   → AllplanHostClient, JSON POST (default 30-second timeout)
   → PythonPart HTTP bridge, 127.0.0.1:5679
-  → UI-thread dispatcher → typed handler → Allplan 2026 API
+  → Python queue → 50 ms UI timer → typed handler → Allplan 2026 API
   → JSON observations/outcomes
 ```
 

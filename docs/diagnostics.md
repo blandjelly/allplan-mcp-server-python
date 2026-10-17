@@ -4,6 +4,13 @@ Use local Windows Codex with StartPythonHost and **Launch Allplan MCP.cmd**
 running. **Diagnostics.cmd** saves read-only discovery/version/integrity/context
 data under package logs. [Windows setup](windows-setup.md).
 
+For 0.18.0 health timeouts with a running host, see the
+[0.18.1 transport investigation and health-only check](mcp-timeout-0.18.1.md).
+`ui_dispatch_unavailable` means the queued operation was cancelled before native
+execution. `host_timeout` identifies a lost read-only host response; a lost write
+still returns `execution_unknown`. OAuth discovery 404s alone do not diagnose
+the downstream host. A host access-log `200` is not proof that its reply arrived.
+
 Read health/context and a fresh explicit-scope audit before planning a change.
 Historical execution results do not establish current values after Undo/Redo.
 Unknown data remains not_checked.

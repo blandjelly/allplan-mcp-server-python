@@ -1,6 +1,7 @@
 from __future__ import annotations
 import sys
 import os
+import time
 import clr
 from pathlib import Path
 
@@ -9,7 +10,7 @@ from typing import List
 import NemAll_Python_IFW_Input as AllplanIFW
 
 from .PythonHostHandler import RequestHandler
-from .transport import BridgeServer
+from .transport import BridgeServer, UIRequestDispatcher
 from BuildingElement import BuildingElement
 from BuildingElementComposite import BuildingElementComposite
 from BuildingElementControlProperties import BuildingElementControlProperties
@@ -17,8 +18,7 @@ from BuildingElementPaletteService import BuildingElementPaletteService
 from StringTableService import StringTableService
 from TypeCollections.ModificationElementList import ModificationElementList
 
-from System import Object, Func, TimeSpan
-from System.Windows import Application
+from System import TimeSpan
 from System.Windows.Threading import DispatcherTimer
 
 os.environ["LIBRARY_ROOTS"] = ";".join(sys.path)
@@ -39,19 +39,6 @@ def check_allplan_version(_build_ele: BuildingElement,
     """
 
     return True
-
-def invoke_in_ui_thread(func):
-    """ Executes provided function on UI thread
-
-    Args:
-        func: Function to execute
-
-    Returns:
-        The same object that func returns
-    """
-
-    return Application.Current.Dispatcher.Invoke(Func[Object](func))
-
 
 # entry point
 
@@ -131,9 +118,10 @@ class PythonHostInteractor():
         # start http server
         address = "127.0.0.1"
         port = 5679
+        self.ui_dispatch = UIRequestDispatcher()
         try:
             log_path = Path(__file__).resolve().parents[2] / ".allplan-mcp" / "logs" / "bridge.log"
-            self.server = BridgeServer((address, port), RequestHandler(self.coord_input), invoke_in_ui_thread, log_path=log_path)
+            self.server = BridgeServer((address, port), RequestHandler(self.coord_input), self.ui_dispatch, log_path=log_path)
             self.server.start()
         except Exception:
             self.palette_service.close_palette()
@@ -141,16 +129,20 @@ class PythonHostInteractor():
 
         print("Python Host is started")
 
-        # this timer pushes python thread to process requests if user minimized main window
+        # The timer is created on Allplan's UI thread. It owns all native calls;
+        # HTTP workers only enqueue and wait, without a blocking CLR Invoke.
         self.timer = DispatcherTimer()
         self.timer.Interval = TimeSpan.FromMilliseconds(50)
         self.timer.Tick += self.push_python_thread
         self.timer.Start()
 
-    @staticmethod
-    def push_python_thread(sender, args):
-        # do nothing
-        return
+    def push_python_thread(self, sender, args):
+        try:
+            self.ui_dispatch.process_pending()
+        finally:
+            # Embedded Python can otherwise return straight to a native UI wait
+            # holding the GIL. Give HTTP workers a turn to read/send their data.
+            time.sleep(0.001)
 
     def on_cancel_function(self) -> bool:
         """ Handles the cancel function event (e.g. by ESC, ...)
@@ -160,6 +152,7 @@ class PythonHostInteractor():
         """
 
         self.server.stop()
+        self.ui_dispatch.close()
         self.palette_service.close_palette()
         self.timer.Stop()
         self.timer.Tick -= self.push_python_thread

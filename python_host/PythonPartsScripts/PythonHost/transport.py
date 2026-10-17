@@ -5,9 +5,11 @@ import json
 import logging
 import time
 import traceback
+from concurrent.futures import CancelledError, Future, TimeoutError as FutureTimeout
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
+from queue import Empty, Full, Queue
 from threading import Event, Lock, Thread
 from uuid import uuid4
 
@@ -16,6 +18,80 @@ class BridgeError(Exception):
     def __init__(self, code: str, message: str, status: int = 400):
         super().__init__(message)
         self.code, self.status = code, status
+
+
+class UIRequestDispatcher:
+    """Workers wait in Python; only the existing Allplan UI timer runs callbacks.
+
+    A request that has not started within the budget is cancelled atomically.
+    Running native work is never cancelled or retried by this dispatcher.
+    """
+    def __init__(self, start_timeout=3.0):
+        self.start_timeout = start_timeout
+        self.pending = Queue(maxsize=32)
+        self._lock = Lock()
+        self._closed = False
+        self._processing = False
+
+    @staticmethod
+    def unavailable():
+        return BridgeError("ui_dispatch_unavailable",
+                           "Allplan UI did not start the request; no operation was executed. "
+                           "Close modal dialogs, restore Allplan and restart StartPythonHost. "
+                           "Collect Local/.allplan-mcp/logs/bridge.log if this persists.", 503)
+
+    def __call__(self, callback):
+        future = Future()
+        with self._lock:
+            if self._closed:
+                raise BridgeError("session_unavailable", "Restart StartPythonHost in the current project.", 503)
+            try:
+                self.pending.put_nowait((future, time.monotonic() + self.start_timeout, callback))
+            except Full:
+                raise self.unavailable()
+        try:
+            return future.result(timeout=self.start_timeout)
+        except FutureTimeout:
+            if future.cancel():
+                raise self.unavailable()
+            # The UI has already claimed this request. Preserve its result/error;
+            # a client-side lost reply still means execution_unknown for writes.
+            return future.result()
+        except CancelledError:
+            raise self.unavailable()
+
+    def process_pending(self):
+        """Run at most one live callback per UI tick; never raise into WPF."""
+        if self._processing:
+            return  # Native code may pump a nested UI message loop.
+        while True:
+            try:
+                future, deadline, callback = self.pending.get_nowait()
+            except Empty:
+                return
+            if time.monotonic() >= deadline:
+                future.cancel()
+            if not future.set_running_or_notify_cancel():
+                continue
+            self._processing = True
+            try:
+                future.set_result(callback())
+            except BaseException as exc:
+                future.set_exception(exc)
+            finally:
+                self._processing = False
+            return
+
+    def close(self):
+        with self._lock:
+            self._closed = True
+            while True:
+                try:
+                    future, _, _ = self.pending.get_nowait()
+                except Empty:
+                    return
+                if future.set_running_or_notify_cancel():
+                    future.set_exception(BridgeError("session_unavailable", "The host was stopped. Restart StartPythonHost.", 503))
 
 
 def configure_bridge_logging(path):
@@ -56,7 +132,8 @@ class BridgeServer(ThreadingHTTPServer):
 
     def start(self):
         self.thread.start()
-        self.logger.info("host_started host_session_id=%s", self.session_id)
+        self.logger.info("host_started host_session_id=%s ui_dispatch_mode=%s", self.session_id,
+                         "timer_queue_v1" if isinstance(self.dispatch, UIRequestDispatcher) else "custom")
 
     def _serve(self):
         try:
@@ -76,6 +153,8 @@ class BridgeServer(ThreadingHTTPServer):
             self.logger.info("host_stopped host_session_id=%s", self.session_id)
 
     def execute(self, path, payload, request_id=None):
+        queued_at = time.monotonic()
+        self.logger.info("ui_dispatch_queued request_id=%s path=%s", request_id, path)
         def on_ui():
             # Do not let a Python exception cross Func[Object] into WPF's UI
             # exception handling. Marshal only results or primitive error data;
@@ -83,6 +162,8 @@ class BridgeServer(ThreadingHTTPServer):
             try:
                 if not self.active.is_set():
                     raise BridgeError("session_unavailable", "The host was stopped. Restart StartPythonHost in the current project.", 503)
+                self.logger.info("ui_dispatch_started request_id=%s path=%s wait_ms=%.1f", request_id, path,
+                                 (time.monotonic() - queued_at) * 1000)
                 return {"result": self.handler.handle(path, payload), "error": None}
             except BridgeError as exc:
                 return {"result": None, "error": {"code": exc.code, "message": str(exc), "status": exc.status}}
@@ -93,6 +174,9 @@ class BridgeServer(ThreadingHTTPServer):
                 return {"result": None, "error": {"code": "host_error", "status": 500,
                         "message": "The Allplan operation failed. Keep this request ID and run Diagnostics."},
                         "traceback": traceback.format_exc()}
+            finally:
+                self.logger.info("ui_dispatch_finished request_id=%s path=%s elapsed_ms=%.1f", request_id, path,
+                                 (time.monotonic() - queued_at) * 1000)
         outcome = self.dispatch(on_ui)
         if outcome["error"] is not None:
             error = outcome["error"]
@@ -134,6 +218,7 @@ class WebRequestHandler(BaseHTTPRequestHandler):
                 # This marker comes from the loaded transport, not metadata on
                 # disk that may have been replaced while old modules are live.
                 result["ui_dispatch_exception_boundary"] = "contained_result_error_v1"
+                result["ui_dispatch_mode"] = "timer_queue_v1" if isinstance(self.server.dispatch, UIRequestDispatcher) else "custom"
             json.dumps(result, allow_nan=False)
         except BridgeError as exc:
             status = exc.status
@@ -145,6 +230,8 @@ class WebRequestHandler(BaseHTTPRequestHandler):
             result = {"ok": False, "error": {"code": "host_error", "message": "The Allplan operation failed. Keep this request ID and run Diagnostics."}, "request_id": request_id}
         result["host_session_id"] = self.server.session_id
         data = json.dumps(result, allow_nan=False).encode("utf-8")
+        send_started = time.monotonic()
+        self.server.logger.info("response_started request_id=%s status=%s bytes=%s", request_id, status, len(data))
         try:
             self.send_response(status)
             self.send_header("Content-Type", "application/json")
@@ -152,6 +239,9 @@ class WebRequestHandler(BaseHTTPRequestHandler):
             self.send_header("X-Request-ID", request_id)
             self.end_headers()
             self.wfile.write(data)
-            self.server.logger.info("response_sent request_id=%s status=%s", request_id, status)
-        except (OSError, TimeoutError):
-            logging.getLogger("allplan.bridge").warning("Response lost request_id=%s; do not retry a write without inspecting the model", request_id)
+            self.server.logger.info("response_sent request_id=%s status=%s send_ms=%.1f", request_id, status,
+                                    (time.monotonic() - send_started) * 1000)
+        except (OSError, TimeoutError) as exc:
+            logging.getLogger("allplan.bridge").warning(
+                "Response lost request_id=%s path=%s send_ms=%.1f error=%s; do not retry a write without inspecting the model",
+                request_id, self.path, (time.monotonic() - send_started) * 1000, type(exc).__name__)
