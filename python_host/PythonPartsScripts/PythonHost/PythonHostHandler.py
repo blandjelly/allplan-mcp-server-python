@@ -30,6 +30,8 @@ class RequestHandler:
         self.model_queries = ModelQueryService()
         from .property_probe import PropertyProbeService
         self.property_probes = PropertyProbeService(self.model_queries)
+        from .wall_filter import WallFilterService
+        self.wall_filters = WallFilterService(self.model_queries)
         from .model_repair import RepairPlanService
         self.repair_plans = RepairPlanService(self.model_queries)
 
@@ -48,6 +50,9 @@ class RequestHandler:
         if path == "/column-layer":
             from .column_layer import validate_request as validate_column_layer
             validate_column_layer(request)
+        if path == "/model-wall-filter":
+            from .wall_filter import validate_request as validate_wall_filter
+            validate_wall_filter(request)
         if path == "/model-selection":
             from .property_contracts import validate_selection
             validate_selection(request)
@@ -90,6 +95,12 @@ class RequestHandler:
 
             case "/model-property-probe":
                 return self.property_probes.handle(self.current_document, AllplanBaseEle, AllplanSettings, request)
+
+            case "/model-wall-filter":
+                if request["action"] == "highlight":
+                    for entry in self.repair_plans.plans.values():
+                        entry.pop("presentation", None)
+                return self.wall_filters.handle(self.current_document, AllplanBaseEle, AllplanSettings, AllplanIFW, request)
 
             case "/model-selection":
                 if request["action"] != "select":

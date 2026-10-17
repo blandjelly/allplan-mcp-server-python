@@ -1,8 +1,10 @@
 # Read and audit tools
 
 Native acceptance is bounded to the [recorded fixture/build](validation-status.md).
-Query/audit/property tools do not write or load/activate files. UI presentation
-uses the separate `model_selection` tool described below.
+Query/audit/property tools do not write or load/activate files. General query
+selection presentation uses `model_selection`; the bounded M4
+`model_wall_filter` action combines its own fresh Wall scan/read with highlight
+submission as described below.
 Use typed MCP requests; the wrapper supplies host schema versions.
 
 ## Context, scope and identity
@@ -220,6 +222,52 @@ API basis checked against Allplan 2026:
 [AttributeService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/AttributeService/),
 [HighlightService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/HighlightService/),
 [CoordinateInput](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/CoordinateInput/).
+
+## model_wall_filter — M4 wall thickness filter
+
+Schema `m4-wall-filter-1`, bridge `/model-wall-filter`; 0.19.0 candidate with
+source/CI/package verification and native observation pending. The request
+contains `action=query|highlight`, one explicit `drawing_file`, optional
+`threshold={value,unit}` (`mm`, `cm`, `m`; default 24 cm), optional up to 100
+distinct canonical nonzero `exclude_model_uuids`, and `max_walls` (default 20,
+maximum 100).
+
+```json
+{"action":"highlight","drawing_file":101,"threshold":{"value":24,"unit":"cm"},"max_walls":20,"exclude_model_uuids":[]}
+```
+
+The handler freshly scans exactly one active foreground drawing with M1's
+`Wall_TypeUUID` native type gate and `top_level_component` roots. It requires
+complete requested-scope and returned-field coverage, and caps the full Wall
+set before reading properties. Exclusions must be members of that full Wall
+set; excluded roots are not read. It resolves all required root adapters before
+the first property read, then reads each nonexcluded root once. Only
+`NemAll_Python_ArchElements.WallElement` with exactly one tier is supported;
+the only property read is tier 1 `Thickness`. Conversion is to millimetres,
+then a strict `< threshold_mm` comparison is used. Threshold default is 240 mm.
+
+Any incomplete M1 coverage, over-limit set, unresolved adapter, unsupported
+type/tier, failed read, or exhausted budget stops before UI dispatch, so no
+partial highlight is submitted. One fresh scan/read and, for `highlight`, one
+UI dispatch occur per request; no cached selection or saved write plan is
+created. `query` returns `state=observed` without UI calls. A complete
+`highlight` result calls `CancelAllHighlightedElements` for the current
+document, then submits matches if any. Thus zero matches clears prior document
+highlights. This replaces all highlights in that document, including ones
+from other sources. A UI exception after calls begin returns `state=unknown`;
+do not retry automatically.
+
+Responses report `criterion_complete`, coverage, per-Wall `status`,
+`thickness_mm`, `match`, and counts for total/matched/excluded/unreadable and
+unprocessed Walls. Highlight submission reports requested/submitted model and
+adapter counts only. Native visible/selected/not-visible counts remain null;
+they require owner observation. `native_selection=unsupported`,
+`units_runtime_verified=false`, `model_data_changed=false`,
+`usable_for_write=false`, and `material_write_available=false`. The handler
+does not read material, attributes, or metadata and invokes no setters. The
+owner workflow saves a pending record and fsyncs it before each MCP call,
+brackets the filter call with same-session health, and never retries a lost
+reply. See the [0.19.0 owner guide](m4-wall-filter-0.19.0.pl.md).
 
 ## column_layer (0.17.2 candidate)
 

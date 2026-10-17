@@ -29,6 +29,7 @@ def payload_files(repo: Path) -> dict[str, bytes]:
                          "M4 Columns to W1.cmd": "m4-column-layer", "M4 Columns Recover.cmd": "m4-column-layer-recover",
                          "M4 Properties.cmd": "m4-properties", "M4 Clear Highlight.cmd": "m4-clear-highlight",
                          "M4 Wall Properties.cmd": "m4-wall-properties",
+                         "M4 Thin Walls.cmd": "m4-thin-walls",
                          "M3 Workflow Recover.cmd": "m3-workflow-recover",
                          "M3 Numbering.cmd": "m3-numbering",
                          "M3 Numbering Recover.cmd": "m3-numbering-recover",

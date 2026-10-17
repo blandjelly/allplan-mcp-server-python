@@ -21,7 +21,20 @@ from the default branch as well. [Verification](test-results/testing-policy-2026
 records the one-time six-job workflow check, one build and the confirmed M4
 draft skip. M4 runtime integration remains separate.
 
-Current runtime: **0.18.2** on `develop/m4`, originally delivered through
+**Current candidate: 0.19.0, `model_wall_filter`, source/CI/package checks
+PENDING.** This candidate adds bounded read-only thickness filtering and
+document-wide highlighting for single-tier Walls in one explicit foreground
+drawing. Do not describe 0.19.0 as CI-passed, packaged or natively accepted until
+the source-bound CI, build and exact ZIP checks and owner observation are
+recorded. The native test is limited to the existing `MCP_QA_DEMO` foreground
+drawing 101 containing 20 cm and 24 cm Walls: only the 20 cm Wall should
+highlight; preserve both reported values/exclusions and same-session health,
+then clear with **M4 Clear Highlight.cmd**. The guide is
+[M4 Wall thickness filter](m4-wall-filter-0.19.0.pl.md). This trial does not
+complete K2 or accept all of M4. No need to repeat the accepted one-Wall sample,
+Column, or M3 gates. See [tool contract](tool-reference.md#model_wall_filter--m4-wall-thickness-filter).
+
+Last verified package/runtime: **0.18.2** on `develop/m4`, originally delivered through
 `fix/m4-wall-sample`, based on the verified
 0.18.1 delivery at `0860438`. The documentation/evidence update was committed
 first (`194088c`), before runtime edits. `wall_sample` now accepts distinct

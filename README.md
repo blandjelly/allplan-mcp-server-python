@@ -5,9 +5,19 @@ New M4 PRs target this shared branch. Main remains a separate accepted baseline;
 legacy M4 branches/PRs are historical references. [Branch layout and workflow](docs/branch-layout.md).
 
 A local MCP bridge between Codex and Allplan 2026 for model queries, audits and
-reviewed attribute/layer repairs. Current candidate: **0.18.2**, correcting the
-blocked single-Wall sample when M1 resolves multiple Python wrappers of the same
-native root. Conflicting identities/fields and multiple views still block reads.
+reviewed attribute/layer repairs. Current source candidate: **0.19.0** adds
+`model_wall_filter`, a bounded read-only filter and highlight for single-tier
+Walls in one explicit foreground drawing. Its source/CI/package checks and
+native observation are **PENDING**; do not treat it as a validated delivery.
+The required owner trial uses the exact candidate package after build, then
+checks the 20 cm and 24 cm Walls in `MCP_QA_DEMO` drawing 101, same-session
+health, visible highlighting, and clear. See the
+[0.19.0 owner guide](docs/m4-wall-filter-0.19.0.pl.md) and
+[tool contract](docs/tool-reference.md#model_wall_filter--m4-wall-thickness-filter).
+
+The latest verified package remains **0.18.2**, correcting the blocked
+single-Wall sample when M1 resolves multiple Python wrappers of the same native
+root. Conflicting identities/fields and multiple views still block reads.
 [Windows package and checks](evaluation-packages/0.18.2/README.md),
 [short Polish Wall check](docs/m4-wall-sample-0.18.2.pl.md).
 The owner confirmed **PASS / accepted_on_build 0.18.2** for one native Wall
@@ -58,8 +68,10 @@ use is planned. [Acceptance, tests and limits](docs/validation-status.md).
 
 ## Local Windows setup
 
-Use the [0.18.2 evaluation package](evaluation-packages/0.18.2/README.md) on
-the machine running Allplan. External
+The [0.18.2 evaluation package](evaluation-packages/0.18.2/README.md) is the
+latest verified delivery. For the pending 0.19.0 owner trial, use its exact
+CI-built package after the handoff records package verification; do not run the
+trial against 0.18.2. On the machine running Allplan, external
 Python **3.11+** and internet access for locked dependencies are required;
 Allplan, Python and Codex are not bundled.
 

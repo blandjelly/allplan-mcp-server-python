@@ -1,9 +1,24 @@
 # Validation status and limits
 
 Current development branch: **develop/m4**, consolidated from `cf3c4bb` with
-all earlier M4 heads already included. This branch/PR/documentation cleanup
-does not change runtime, frozen packages or the source scopes below. Main is
-separate. [Branch layout](branch-layout.md).
+all earlier M4 heads already included. Main is separate.
+[Branch layout](branch-layout.md).
+
+**0.19.0 candidate: PENDING source CI, build/exact ZIP verification and native
+observation.** `model_wall_filter` scans one explicit active foreground drawing,
+requires complete M1 Wall coverage, and filters only single-tier native Walls by
+strict thickness `<` threshold. It defaults to 24 cm and 20 Walls; the maximum
+is 100. Exclusions must be UUIDs in the full Wall set, and excluded Walls are
+not read. The first unsupported or failed read, incomplete coverage, or budget
+failure prevents all highlighting. Complete results may submit highlights for
+matches; zero matches clears existing document highlights. This is a read-only
+query/presentation action with no saved write plan. Runtime units remain
+unverified, and submitted counts do not establish visible counts. Owner trial
+is limited to `MCP_QA_DEMO` drawing 101's 20 cm and 24 cm Walls, same-session
+health, reported values/exclusions, visible 20 cm highlight, and explicit clear.
+It does not complete K2 or all of M4. See the
+[owner guide](m4-wall-filter-0.19.0.pl.md) and
+[tool contract](tool-reference.md#model_wall_filter--m4-wall-thickness-filter).
 
 **0.18.2 correction:** the single-Wall read resolves consistent M1 root
 wrappers by native file/model/view identity rather than Python object identity.

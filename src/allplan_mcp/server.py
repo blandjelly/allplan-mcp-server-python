@@ -18,6 +18,7 @@ from allplan_mcp.standard_models import OfficeStandardRequest, RuleBasedRequest
 from allplan_mcp.office_standard import load_office_standard
 from allplan_mcp.column_layer_models import ColumnLayerRequest
 from allplan_mcp.property_models import PropertiesRequest, SelectionRequest, PropertyProbeRequest
+from allplan_mcp.wall_filter_models import WallFilterRequest
 
 
 DEFAULT_ALLPLAN_HOST_URL = "http://127.0.0.1:5679"
@@ -295,6 +296,32 @@ def model_property_probe(request: PropertyProbeRequest) -> dict[str, Any]:
     payload = request.model_dump(exclude_unset=True)
     payload["schema_version"] = "m4-property-probe-1"
     return _allplan_client().post("/model-property-probe", payload)
+
+
+@mcp.tool
+def model_wall_filter(request: WallFilterRequest) -> dict[str, Any]:
+    """Find and optionally highlight Walls by native total thickness, strictly less than a threshold.
+
+    Supply one explicit active foreground drawing. The default threshold is
+    24 cm (240 mm); exactly 240 mm does not match. Only single-tier native Walls
+    are supported, using tier Thickness rather than an axis-aligned bounding box.
+    mm/cm/m convert to native mm; runtime units still require owner observation.
+    Every nonexcluded Wall must be resolved and read within the bounded budget;
+    incomplete scope, unsupported multi-tier Walls or a failed read block all UI
+    calls. Results include all Walls up to max_walls (default 20, maximum 100),
+    without paging. UUID exceptions must name members of that drawing's Wall set.
+
+    query reads only. highlight evaluates a fresh full scope in one UI dispatch
+    and replaces document highlights, also clearing stale highlights for zero
+    matches. It reports submitted adapters, with visibility/counts pending owner
+    observation. This is highlighting; native selection remains unsupported.
+    No material/attribute reads, setters, resources, edit plans or Apply IDs.
+    Preserve the pending request before sending; never retry a lost native reply.
+    This new Wall filter/highlight requires a bounded native Allplan test.
+    """
+    payload = request.model_dump(exclude_unset=True)
+    payload["schema_version"] = "m4-wall-filter-1"
+    return _allplan_client().post("/model-wall-filter", payload)
 
 
 @mcp.tool
