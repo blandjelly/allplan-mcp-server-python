@@ -40,15 +40,23 @@ def sample_wall(queries, doc, base, settings, request, trace, budget):
     element = candidates[0]  # M1 orders by drawing file, then model UUID.
     ref = element["ref"]
     views = live.get((ref["drawing_file"], ref["model_uuid"]), {})
-    if element["view_identity_not_checked"] or len(views) != 1:
+    if (element["view_identity_not_checked"] or len(views) != 1
+            or set(views) != set(element["view_uuids"])):
         raise BridgeError("probe_scope_unavailable", "Wall sample requires one unambiguous root view.", 409)
     adapters = next(iter(views.values()))
-    if not adapters or any(a is not adapters[0] for a in adapters):
+    if not adapters:
         raise BridgeError("probe_scope_unavailable", "Wall sample has ambiguous adapter representations.", 409)
+    # M1 resolves axes/tiers to roots, groups by drawing file/model/view UUID
+    # and rejects conflicting root fields. Native calls may return distinct
+    # Python wrappers for that same root. Python `is` cannot identify a native
+    # Wall; choose one wrapper only after complete, single-view M1 evidence.
     adapter = adapters[0]
     report = {"state": "not_checked", "scope": snapshot["scope"], "coverage": snapshot["coverage"],
               "counts": {**snapshot["counts"], "sampled_walls": 1},
-              "sample": {"ref": ref, "fields": element["fields"], "native_reads": []},
+              "sample": {"ref": ref, "fields": element["fields"], "native_reads": [],
+                         "adapter_resolution": {"method": "consistent_m1_root_identity",
+                                                "view_uuid": next(iter(views)),
+                                                "representations": len(adapters)}},
               "sample_order": "drawing_file_then_model_uuid", "is_full_wall_filter": False,
               "native_length_unit": "mm", "units_runtime_verified": False,
               "geometry_kind": "not_checked", "material_target_binding": "not_checked",

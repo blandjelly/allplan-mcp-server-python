@@ -1,5 +1,13 @@
 # Validation status and limits
 
+**0.18.2 correction:** the single-Wall read resolves consistent M1 root
+wrappers by native file/model/view identity rather than Python object identity.
+One Wall is read once; multiple views, conflicting fields and incomplete
+hierarchy remain blocked. Native validation is **not_run / ready_for_owner_test**;
+the 0.18.1 owner observations below retain their original scope.
+[Change and Polish check](m4-wall-sample-0.18.2.pl.md),
+[automated and exact-package evidence](../evaluation-packages/0.18.2/README.md).
+
 Updated **2026-10-17 Europe/Warsaw**. **0.18.1** transport owner check passed
 for health/response delivery; scoped Columns highlight visibility is owner
 confirmed, while the Wall sample was blocked before native read. Clean source

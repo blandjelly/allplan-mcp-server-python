@@ -76,6 +76,63 @@ class WallProbeTests(unittest.TestCase):
         self.assertEqual(self.props.GetWallTierProperties.call_args.args, (1,))
         self.assertFalse(self.handler.model_queries.selections)
 
+    def duplicate_wall_fixture(self):
+        self.wall_fixture()
+        root = self.elements[1]
+        wrapper = self.element(2, name='Wall_TypeUUID')
+        tier = self.element(3, name='WallTier_TypeUUID')
+        axis = self.element(4, name='WallAxis_TypeUUID')
+        self.parents[id(tier)] = wrapper
+        self.parents[id(axis)] = root
+        self.elements[:] = [tier, axis, root]
+        return root, wrapper, tier, axis
+
+    def test_distinct_wrappers_of_same_root_read_one_wall_not_tier_or_axis(self):
+        root, wrapper, tier, axis = self.duplicate_wall_fixture()
+        self.assertIsNot(root, wrapper)
+        result = self.wall_probe()
+        self.assertEqual(result['state'], 'observed')
+        self.assertEqual(result['counts']['matched_model_identities'], 1)
+        self.assertEqual(result['counts']['duplicate_representations'], 2)
+        self.assertEqual(result['sample']['adapter_resolution'], {
+            'method': 'consistent_m1_root_identity',
+            'view_uuid': root.GetElementUUID(), 'representations': 3})
+        self.base.GetElement.assert_called_once_with(wrapper)
+        self.props.GetWallTierProperties.assert_called_once_with(1)
+        self.tier.read_material.assert_called_once()
+        for adapter in (root, wrapper, tier, axis):
+            adapter.GetAttributes.assert_not_called()
+            adapter.GetModelGeometry.assert_not_called()
+
+    def test_different_views_of_same_wall_still_block_before_native_property_read(self):
+        root, wrapper, tier, axis = self.duplicate_wall_fixture()
+        wrapper.GetElementUUID.return_value = '10000000-0000-4000-8000-000000000099'
+        self.assert_code('probe_scope_unavailable', self.wall_probe)
+        self.base.GetElement.assert_not_called()
+        self.tier.read_material.assert_not_called()
+
+    def test_conflicting_same_identity_fields_still_block_before_native_property_read(self):
+        for method, value in (('name', 'Different wall'), ('type_uuid', '20000000-0000-4000-8000-000000000099')):
+            with self.subTest(field=method):
+                root, wrapper, tier, axis = self.duplicate_wall_fixture()
+                if method == 'name':
+                    wrapper.GetDisplayName.return_value = value
+                else:
+                    wrapper.GetElementAdapterType.return_value.GetGuid.return_value = value
+                self.assert_code('probe_scope_unavailable', self.wall_probe)
+                self.base.GetElement.assert_not_called()
+
+    def test_unresolved_view_or_cross_file_parent_still_block_before_native_property_read(self):
+        for failure in ('missing_view', 'cross_file_parent'):
+            with self.subTest(failure=failure):
+                root, wrapper, tier, axis = self.duplicate_wall_fixture()
+                if failure == 'missing_view':
+                    wrapper.GetElementUUID.return_value = None
+                else:
+                    wrapper.GetDrawingfileNumber.return_value = 102
+                self.assert_code('probe_scope_unavailable', self.wall_probe)
+                self.base.GetElement.assert_not_called()
+
     def test_strict_threshold_and_native_lengths_ignore_UI_units(self):
         self.wall_fixture()
         for value, matches in ((180, True), (239.9, True), (240, False), (250, False)):
@@ -148,7 +205,7 @@ class WallProbeTests(unittest.TestCase):
         self.base.GetElement.assert_called_once()
 
     def test_native_enumeration_owner_retained_through_material_read_and_released(self):
-        self.wall_fixture()
+        self.duplicate_wall_fixture()
         class Owner(list):
             pass
         refs = []

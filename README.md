@@ -1,11 +1,15 @@
 # Allplan MCP Server
 
 A local MCP bridge between Codex and Allplan 2026 for model queries, audits and
-reviewed attribute/layer repairs. Current package: **0.18.1**. The owner confirmed
-responsive host transport and the retained Columns no-op highlighting behavior.
-**306 portable tests, 6/6 CI jobs and exact package installation/upgrade/restore PASS**.
-[Download and checks](evaluation-packages/0.18.1/README.md),
-[health timeout investigation and Polish check](docs/mcp-timeout-0.18.1.md).
+reviewed attribute/layer repairs. Current candidate: **0.18.2**, correcting the
+blocked single-Wall sample when M1 resolves multiple Python wrappers of the same
+native root. Conflicting identities/fields and multiple views still block reads.
+[Windows package and checks](evaluation-packages/0.18.2/README.md),
+[short Polish Wall check](docs/m4-wall-sample-0.18.2.pl.md).
+Native verification of the correction remains **ready_for_owner_test**.
+The owner confirmed responsive host transport and Columns no-op highlighting
+on **0.18.1**; its 306 tests, six CI jobs and package checks remain recorded
+with the [previous delivery](evaluation-packages/0.18.1/README.md).
 The frozen **0.18.0** Wall package passed 289 portable tests, six CI configurations
 and exact package installation. The Wall sample on 0.18.1 was **BLOCKED** by
 ambiguous adapter representations before its native property read.
@@ -46,7 +50,7 @@ use is planned. [Acceptance, tests and limits](docs/validation-status.md).
 
 ## Local Windows setup
 
-Use the [0.18.1 evaluation package](evaluation-packages/0.18.1/README.md) on
+Use the [0.18.2 evaluation package](evaluation-packages/0.18.2/README.md) on
 the machine running Allplan. External
 Python **3.11+** and internet access for locked dependencies are required;
 Allplan, Python and Codex are not bundled.

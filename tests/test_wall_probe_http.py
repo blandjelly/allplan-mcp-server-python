@@ -64,6 +64,37 @@ class WallProbeHTTPTests(unittest.IsolatedAsyncioTestCase):
             native.base.GetElement.assert_called_once()
             self.assertFalse(report['automatic_retry'])
 
+    async def test_same_wall_wrappers_complete_one_request_with_health_after(self):
+        native = self.native_bridge()
+        root = native.elements[1]
+        wrapper = native.element(2, name='Wall_TypeUUID')
+        tier = native.element(3, name='WallTier_TypeUUID')
+        native.parents[id(tier)] = wrapper
+        native.elements[:] = [tier, root]
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'wall.json'
+            report = await run(self.url, path)
+            self.assertEqual(report['state'], 'awaiting_owner_observation', report.get('message'))
+            self.assertEqual(json.loads(path.read_text(encoding='utf-8')), report)
+        self.assertEqual(report['steps'][-1]['name'], 'health_after')
+        sample = report['steps'][1]['response']['sample']
+        self.assertEqual(sample['adapter_resolution']['representations'], 2)
+        native.base.GetElement.assert_called_once_with(wrapper)
+        self.assertEqual(sum(route == '/model-property-probe' for route, _ in self.bridge_handler.calls), 1)
+
+    async def test_ambiguous_wall_views_block_without_native_read_or_retry(self):
+        native = self.native_bridge()
+        other_view = native.element(2, name='Wall_TypeUUID')
+        other_view.GetElementUUID.return_value = '10000000-0000-4000-8000-000000000099'
+        native.elements.append(other_view)
+        with tempfile.TemporaryDirectory() as directory:
+            report = await run(self.url, Path(directory) / 'wall.json')
+        self.assertEqual(report['state'], 'blocked')
+        self.assertIn('probe_scope_unavailable', report['message'])
+        self.assertFalse(report['automatic_retry'])
+        native.base.GetElement.assert_not_called()
+        self.assertEqual(sum(route == '/model-property-probe' for route, _ in self.bridge_handler.calls), 1)
+
     async def test_multitier_is_blocked_with_health_after_and_no_material_read(self):
         native = self.native_bridge()
         native.props.TierCount = 2

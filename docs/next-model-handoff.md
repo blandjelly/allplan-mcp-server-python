@@ -1,5 +1,15 @@
 # Current handoff
 
+Current correction: **0.18.2**, `fix/m4-wall-sample`, based on the verified
+0.18.1 delivery at `0860438`. The documentation/evidence update was committed
+first (`194088c`), before runtime edits. `wall_sample` now accepts distinct
+Python wrappers only within one complete, consistent M1 root identity and view.
+It still rejects multiple views, conflicting fields and incomplete hierarchy.
+No other native handler changes; no material setter or Wall highlight is added.
+The native gate is **ready_for_owner_test** after automated/package validation;
+[short Polish guide](m4-wall-sample-0.18.2.pl.md) and
+[delivery evidence](../evaluation-packages/0.18.2/README.md).
+
 Updated 2026-10-17 Europe/Warsaw: **0.18.1 transport candidate** on
 `fix/m4-host-timeout`, based on `codex/m4-0.18.0` at `0dbe7cf`.
 The supplied MCP and bridge logs correlate a health timeout with an incomplete
