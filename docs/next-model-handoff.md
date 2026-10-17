@@ -1,5 +1,16 @@
 # Current handoff
 
+**Owner agent trial, 2026-10-17:** the owner confirms fire-classification edits,
+highlighting and query operations worked. The transcript reports F120, then
+F60/F90 for separate Column sets, and correct 11-root/22-identity counts in
+foreground 101. It also records two unsuccessful thin-Wall layer writes
+(readback stayed 3735), numeric `Wartość U` previews blocked on an undefined
+string, and an unsupported native material request. This is owner-reported
+evidence without raw payloads or an exact installed build, not full M4/native
+acceptance. [Retained log and scope](test-results/m4-agent-observation-2026-10-17.md).
+Do not repeat the successful fire/query/highlight slice; investigate only the
+reported failed operations and keep all journal/revalidation guards.
+
 **Canonical M4 branch: `develop/m4`.** Created from `cf3c4bb`; all heads of
 `codex/m4-property-discovery`, `codex/m4-0.18.0`, `fix/m4-host-timeout` and
 `fix/m4-wall-sample` are included. New topic branches/PRs target develop/m4.
