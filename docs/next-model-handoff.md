@@ -3,6 +3,13 @@
 At the start of each chat, read the [testing and package policy](testing-policy.md)
 along with this handoff; it defines the required checks for future changes.
 
+The approved procedure is enforced by root AGENTS.md and final-candidate CI:
+focused iteration, draft PRs, full CI instead of a duplicate full local run,
+and one package build. [Verification](test-results/testing-policy-2026-10-17.md)
+records 23 focused policy tests, six successful full CI jobs on the main
+baseline (144 tests each), one build and the confirmed M4 draft skip. No
+native gate needs repeating for this procedural change.
+
 For current **M4** work, continue the separate development line
 [`fix/m4-wall-sample`, PR #8](https://github.com/blandjelly/allplan-mcp-server-python/pull/8),
 package **0.18.2**. Its [current handoff](https://github.com/blandjelly/allplan-mcp-server-python/blob/fix/m4-wall-sample/docs/next-model-handoff.md)
@@ -50,7 +57,7 @@ No further M1/M2 owner batch is pending for the accepted fixture/build.
 [Draft PR #2](https://github.com/blandjelly/allplan-mcp-server-python/pull/2),
 branch `codex/m3-repair-preview`, contains the **0.7.0 read-only M3 preview**
 and its delivered owner-test package. Its reported 134 portable tests are
-separate from main's 121-test suite. Native owner verification is pending;
+separate from main's historical 121-test suite. Native owner verification is pending;
 apply/readback/Undo remain unavailable. Continue that PR for M3 work; do not
 restart its implementation from main or treat the preview as accepted repairs.
 
