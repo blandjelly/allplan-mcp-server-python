@@ -53,6 +53,9 @@ and recovery log; they no longer imply that a health check may have written.
 
 ## Owner check — Polish
 
+The [0.18.1 delivery](../evaluation-packages/0.18.1/README.md) passed 306 portable
+tests, six source CI configurations and exact ZIP installation/upgrade/restore.
+
 1. Zamknij Allplana i konsolę MCP. Rozpakuj pełny nowy pakiet **0.18.1** do
    osobnego folderu. Uruchom **Setup.cmd** i wybierz ten sam folder Local.
 2. Otwórz projekt, uruchom **StartPythonHost**, potem **Launch Allplan MCP.cmd**

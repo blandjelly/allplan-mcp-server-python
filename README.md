@@ -1,9 +1,11 @@
 # Allplan MCP Server
 
 A local MCP bridge between Codex and Allplan 2026 for model queries, audits and
-reviewed attribute/layer repairs. Current source: **0.18.1 transport candidate**;
-automated validation/delivery and native recovery observation are pending.
-[Health timeout investigation and Polish check](docs/mcp-timeout-0.18.1.md).
+reviewed attribute/layer repairs. Current candidate: **0.18.1**, **ready_for_owner_test**
+for host transport. **306 portable tests, 6/6 CI jobs and exact package
+installation/upgrade/restore PASS**; native recovery remains **not_run**.
+[Download and checks](evaluation-packages/0.18.1/README.md),
+[health timeout investigation and Polish check](docs/mcp-timeout-0.18.1.md).
 The frozen **0.18.0** Wall package passed 289 portable tests, six CI configurations
 and exact package installation; native wall observation remains pending.
 
@@ -42,7 +44,7 @@ use is planned. [Acceptance, tests and limits](docs/validation-status.md).
 
 ## Local Windows setup
 
-Use the [0.18.0 evaluation package](evaluation-packages/0.18.0/README.md) on
+Use the [0.18.1 evaluation package](evaluation-packages/0.18.1/README.md) on
 the machine running Allplan. External
 Python **3.11+** and internet access for locked dependencies are required;
 Allplan, Python and Codex are not bundled.

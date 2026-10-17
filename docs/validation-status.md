@@ -1,6 +1,16 @@
 # Validation status and limits
 
-Updated **2026-10-15 Europe/Warsaw**. Current candidate **0.18.0**, **ready_for_owner_test**;
+Updated **2026-10-17 Europe/Warsaw**. Current **0.18.1** transport candidate is
+**ready_for_owner_test** for health/response delivery only. Clean source
+`f477f138231f2a8f45690c03bd761364c7e94ab6` passed **306 portable tests**, frozen
+sync, builds, exact ZIP installation/upgrade from 0.18.0/restore and
+[6/6 Windows/Ubuntu × Python 3.11–3.13 CI jobs](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39026387338).
+Thirty bridge hashes verified; journal, trace and bridge log preserved. Native
+recovery remains **not_run**. [Delivery](../evaluation-packages/0.18.1/README.md),
+[incident evidence and health-only observation](mcp-timeout-0.18.1.md).
+The logs establish incomplete host replies, not a proven native root cause.
+
+Prior 2026-10-15 record: **0.18.0**, **ready_for_owner_test** for the Wall read;
 its source, CI and package checks passed. Its native wall observation has not run. The owner deferred
 native checks for both 0.17.2 and 0.18.0; either can be tested first, without a
 dependency between them. The 0.17.2 source, artifacts and prior automated

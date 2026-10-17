@@ -7,11 +7,18 @@ HTTP 200 response. A timer-driven Python UI queue, cooperative worker scheduling
 pre-start cancellation and stage timing replace the synchronous CLR dispatch
 round trip. The underlying native scheduling/socket cause remains unproven.
 [Incident evidence, changes and short Polish health-only check](mcp-timeout-0.18.1.md).
-Automated validation and delivery are pending; native recovery is **not_run**.
+Clean source **f477f138231f2a8f45690c03bd761364c7e94ab6** passed **306 portable
+tests**, frozen sync, builds, exact ZIP installation/upgrade from 0.18.0/restore,
+and [source CI 39026387338](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39026387338),
+**6/6 Windows/Ubuntu × Python 3.11–3.13**. Thirty bridge hashes verified;
+journal/trace/bridge log preserved. [Frozen delivery](../evaluation-packages/0.18.1/README.md).
+Status **ready_for_owner_test** for health/response delivery only; native recovery
+is **not_run**. [Draft PR #7](https://github.com/blandjelly/allplan-mcp-server-python/pull/7)
+targets `codex/m4-0.18.0`, without main integration.
 All original 0.18.0 artifacts remain frozen. The preceding Wall/Columns work and
 its limits below remain applicable after transport verification.
 
-Updated 2026-10-15 Europe/Warsaw. Current candidate **0.18.0**, **ready_for_owner_test**.
+Prior 2026-10-15 Europe/Warsaw record: **0.18.0**, **ready_for_owner_test** for its Wall read.
 Clean source **5ea4bcfd88f500bbf137e361ba5d6cc3d83710b5** passed **289 portable
 tests**, six Windows/Ubuntu × Python 3.11–3.13 CI jobs, frozen sync, builds and
 exact ZIP install/upgrade from 0.17.2/restore verification (30 bridge hashes;
