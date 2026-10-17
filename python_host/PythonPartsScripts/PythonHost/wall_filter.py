@@ -94,6 +94,7 @@ class WallFilterService:
             report["message"] = reason
             report["coverage"]["criteria_complete"] = False
             report["criterion_complete"] = False
+            report["is_full_wall_filter"] = False
             report["counts"]["matched"] = sum(w.get("match") is True for w in report["walls"])
             report["counts"]["excluded"] = sum(w.get("status") == "excluded" for w in report["walls"])
             report["counts"]["unreadable"] = sum(w.get("status") == "unreadable" for w in report["walls"])
@@ -240,7 +241,8 @@ class WallFilterService:
                 cancel = getattr(highlight_service, "CancelAllHighlightedElements", None)
                 submit = getattr(highlight_service, "HighlightElements", None)
                 if not callable(cancel) or (target_adapters and not callable(submit)):
-                    return blocked("The loaded build lacks a required highlight API symbol.")
+                    report.update(state="blocked", message="The loaded build lacks a required highlight API symbol.")
+                    return report  # Completed filter evidence remains valid; no UI call started.
                 report["clear_scope"] = "all_highlights_in_current_document_including_other_sources"
                 adapter_module = call("Python.import.NemAll_Python_IFW_ElementAdapter",
                                       lambda: importlib.import_module("NemAll_Python_IFW_ElementAdapter"))

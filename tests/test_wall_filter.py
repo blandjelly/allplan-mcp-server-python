@@ -265,6 +265,8 @@ class WallFilterTests(unittest.TestCase):
         result = self.run_filter(action="highlight")
         self.assertEqual(result["state"], "blocked")
         self.assertFalse(result["ui_calls_started"])
+        self.assertTrue(result["criterion_complete"])
+        self.assertTrue(result["is_full_wall_filter"])
         self.ifw.HighlightService.CancelAllHighlightedElements.assert_not_called()
 
     def test_final_trace_failure_after_highlight_reports_unknown_with_ui_started(self):
