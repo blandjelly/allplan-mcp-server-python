@@ -1,0 +1,18 @@
+{
+  "source_commit": "47ec1ad5ccc494452d2bdcd5c7252f8969facbd5",
+  "source_modified": false,
+  "payload_files": 153,
+  "bridge_hashes_verified": 30,
+  "zip_checksum": "pass",
+  "payload_integrity": "pass",
+  "exact_zip_registration": "pass",
+  "exact_zip_frozen_sync_and_import": "pass",
+  "upgrade_from_0181": "pass",
+  "restore_to_0181": "pass",
+  "journal_trace_and_bridge_log_preserved": "pass",
+  "wheel_and_sdist_contents": "pass",
+  "only_native_payload_changes": [
+    "wall_probe.py"
+  ],
+  "native_Allplan": "not_run"
+}

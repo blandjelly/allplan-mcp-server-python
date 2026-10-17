@@ -7,6 +7,11 @@ hierarchy remain blocked. Native validation is **not_run / ready_for_owner_test*
 the 0.18.1 owner observations below retain their original scope.
 [Change and Polish check](m4-wall-sample-0.18.2.pl.md),
 [automated and exact-package evidence](../evaluation-packages/0.18.2/README.md).
+Clean source **47ec1ad5ccc494452d2bdcd5c7252f8969facbd5** passed **312 portable
+tests**, frozen sync/builds and exact ZIP installation/upgrade from 0.18.1/restore.
+Thirty bridge hashes verified; journal, trace and bridge log preserved.
+[Source CI 39027996719](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39027996719)
+passed **6/6 Windows/Ubuntu × Python 3.11–3.13** jobs with tests/builds.
 
 Updated **2026-10-17 Europe/Warsaw**. **0.18.1** transport owner check passed
 for health/response delivery; scoped Columns highlight visibility is owner

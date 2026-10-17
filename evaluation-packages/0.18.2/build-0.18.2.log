@@ -1,0 +1,12 @@
+   Building allplan-mcp-server @ file:///workspace/allplan-mcp-server-python
+      Built allplan-mcp-server @ file:///workspace/allplan-mcp-server-python
+Prepared 1 package in 207ms
+Uninstalled 1 package in 0.33ms
+Installed 1 package in 0.99ms
+ - allplan-mcp-server==0.18.1 (from file:///workspace/allplan-mcp-server-python)
+ + allplan-mcp-server==0.18.2 (from file:///workspace/allplan-mcp-server-python)
+Building source distribution...
+Building wheel from source distribution...
+Successfully built dist/allplan_mcp_server-0.18.2.tar.gz
+Successfully built dist/allplan_mcp_server-0.18.2-py3-none-any.whl
+/workspace/allplan-mcp-server-python/dist/allplan-mcp-0.18.2-windows-evaluation.zip

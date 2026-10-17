@@ -1,0 +1,38 @@
+{
+  "version": "0.18.2",
+  "source_commit": "47ec1ad5ccc494452d2bdcd5c7252f8969facbd5",
+  "source_modified": false,
+  "documentation_first_commit": "194088c",
+  "portable_tests": {
+    "result": "pass",
+    "count": 312,
+    "python": "3.12.14",
+    "seconds": 103.714
+  },
+  "frozen_sync": "pass",
+  "wheel_sdist_zip_builds": "pass",
+  "exact_zip_install_upgrade_restore": "pass",
+  "source_ci": {
+    "run_id": 39027996719,
+    "url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39027996719",
+    "status": "completed",
+    "conclusion": "success",
+    "compatibility_jobs_passed": 6
+  },
+  "native_Allplan": "not_run",
+  "artifacts": {
+    "allplan-mcp-0.18.2-windows-evaluation.zip": {
+      "sha256": "997b5fa0646466576df4f48dd74704b7fcadf0d5a0c9dc43d8ddc354b67d8829",
+      "bytes": 344623
+    },
+    "allplan_mcp_server-0.18.2-py3-none-any.whl": {
+      "sha256": "de1deca4ccca5dc42f2b12f97c10b4b2a5a6608094ee7a891947dea5aa013d7a",
+      "bytes": 90545
+    },
+    "allplan_mcp_server-0.18.2.tar.gz": {
+      "sha256": "fe100bddbe1b610da20461083912fca77385660412dcf8722afe542913b73817",
+      "bytes": 318295
+    }
+  },
+  "status": "ready_for_owner_test"
+}

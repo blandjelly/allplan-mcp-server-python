@@ -9,8 +9,16 @@ No other native handler changes; no material setter or Wall highlight is added.
 The native gate is **ready_for_owner_test** after automated/package validation;
 [short Polish guide](m4-wall-sample-0.18.2.pl.md) and
 [delivery evidence](../evaluation-packages/0.18.2/README.md).
+Clean runtime source **47ec1ad5ccc494452d2bdcd5c7252f8969facbd5** passed
+**312 portable tests**, frozen sync, builds and exact ZIP installation/upgrade
+from 0.18.1/restore (30 bridge hashes; journal/trace/bridge log preserved).
+Only `wall_probe.py` changes in the native payload.
+[Source CI 39027996719](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39027996719)
+passed **6/6 Windows/Ubuntu × Python 3.11–3.13** jobs, including tests/builds.
+[Draft PR #8](https://github.com/blandjelly/allplan-mcp-server-python/pull/8)
+targets `fix/m4-host-timeout`; main integration remains separate.
 
-Updated 2026-10-17 Europe/Warsaw: **0.18.1 transport candidate** on
+Previous transport delivery, 2026-10-17 Europe/Warsaw: **0.18.1** on
 `fix/m4-host-timeout`, based on `codex/m4-0.18.0` at `0dbe7cf`.
 The supplied MCP and bridge logs correlate a health timeout with an incomplete
 HTTP 200 response. A timer-driven Python UI queue, cooperative worker scheduling,
