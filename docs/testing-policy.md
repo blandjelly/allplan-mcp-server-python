@@ -1,47 +1,65 @@
-# Testing policy
+# Testing and package policy
 
-Preserve meaningful regression coverage and test according to the change.
-An explicit owner pause overrides the schedule; do not run tests/builds/native
-gates or manually dispatch CI while paused. The prior M3 closure pause was
-superseded by the owner's resumed, fixture-bounded work.
+This policy is the source of truth for choosing checks and package builds.
+At the start of each chat, read this file and [the current handoff](next-model-handoff.md).
+First identify the checkout and branch, source state, and scope of the proposed
+change. Keep focused test passes, full CI passes, and native Allplan passes
+separate when reporting results. The model owns automated tests and GitHub CI;
+the owner is asked only for a brief Allplan trial when a candidate needs it.
+An explicit owner pause takes precedence over this procedure.
 
-| Change | Required validation |
-| --- | --- |
-| Iterative implementation | Focused affected tests, including dependent read/audit modules; HTTP tests for MCP/transport/launcher changes. |
-| Documentation only | Read/diff formatting and links. No runtime tests, builds or old artifact/evidence hash reruns. |
-| New owner-test package | One final full portable suite, frozen sync, wheel/sdist build and exact package/installation verification; source CI evidence for the tested commit. |
-| Dependency/installer/builder/workflow change | Full suite and six-configuration compatibility matrix. |
-| Main integration/release | Full suite and full Windows/Ubuntu × Python 3.11–3.13 matrix for the final candidate; native acceptance remains separate. |
-| Native observation | New/materially affected behavior only; retain unchanged completed-gate evidence and scope. |
+## During implementation
 
-Repeat a full final-candidate run only after relevant new changes/failures or
-unresolved concerns. Focused PASS is not full PASS. The model owns automated
-checks, diagnostics and packages; the owner receives a small version/build-bound
-walkthrough with expected results, reset/recovery and PASS/FAIL/BLOCKED reporting.
-Use ready_for_owner_test before observations, accepted_on_build only with evidence.
-[Source commands](../README.md#source-development).
+Run only focused affected tests and their dependent tests as you iterate. Use
+HTTP checks for changes to MCP, transport, or launcher behavior. Do not run the
+full local suite or build packages after every change. For documentation,
+logs, or AGENTS-only changes, review the diff and links; skip runtime tests,
+builds, hash checks, and reruns.
 
-## CI
+## Candidate and CI selection
 
-[portable.yml](../.github/workflows/portable.yml) runs PR updates once; pushes
-trigger only on main. Docs/README/evaluation-packages-only updates skip product
-jobs; a mixed PR may still run its lightweight configuration job to detect this.
-Routine code updates use Windows/Ubuntu Python 3.12. Dependency, installer,
-package-builder or workflow changes select the full **six-job** matrix.
-Synchronize compares the latest update; missing comparison history selects the
-full matrix conservatively. Superseded runs cancel; cancellation is not PASS.
+For each new candidate or package, run the full GitHub CI matrix on Windows
+and Ubuntu with Python 3.12. This full CI result replaces a full local test
+run. Keep a pull request in draft while iterating and return it to draft when
+development resumes. Mark it ready once the final candidate is ready for
+review. A passing run for an earlier source revision does not validate later
+runtime changes.
 
-Before main integration/release use workflow_dispatch with full_matrix=true,
-even without matching paths. Results remain scoped to their tested source;
-[current evidence](validation-status.md#portable-verification-and-delivery).
+The workflow runs full jobs for ready pull requests or `workflow_dispatch`.
+Draft pull requests run configuration checks only. On `synchronize`, CI checks
+the latest push's diff; on `opened`, `ready_for_review`, or `reopened`, it
+checks the full pull request diff. A docs-only update to a mixed pull request
+skips product jobs. A ready pull request targeting the default `main` branch runs
+the full six-job matrix before integration; code changes to a feature branch use two jobs, and
+critical changes use six. `workflow_dispatch` has `full_matrix` defaulting to
+true: use false for a standard two-platform draft-candidate run, and true
+for main or release validation. There is no push trigger, so merging does not
+duplicate pull-request CI. A direct push to `main` requires manual full CI.
 
-## Retained checks and hashes
+Use the full six-job matrix only for true dependency, interpreter, install,
+builder, or workflow changes, and for `main` integration or release. A
+`project.version` bump in `pyproject.toml` together with the self editable
+package version in `uv.lock` does not by itself require six jobs. Changes to
+actual dependencies or other `pyproject.toml`/lock settings conservatively
+require six jobs. Use six jobs when the relevant change history is incomplete.
+For manual runs, the model must choose true for compatibility-sensitive changes;
+false is only for an ordinary package candidate. Do not repeatedly dispatch an
+unchanged candidate, or rerun passed checks without a relevant change or failure.
 
-Keep reviewed plan/request hashes, fresh source checks before Apply, journal
-integrity/identity validation and installer/health hashes. Old PASS never replaces
-fresh model authorization. No runtime protection is removed by this schedule.
-For a new delivery, record manifest/checksum and verify the actual extracted
-installation once. Later docs refer to that result without rebuilding old archives.
-The existing package test already covers deterministic ZIP builds/registration;
-do not redundantly repeat those checks on every job. Independent hash review is
-appropriate for a suspected mismatch/corruption or explicit review request.
+## Package build and installation
+
+After all tests finish, run one separate build job to produce wheel, sdist,
+and ZIP. Use that same source's CI artifact for installation or upgrade and,
+if applicable, restore of the exact ZIP, once. Do not rebuild or repeat these
+checks after the artifact succeeds. If the artifact is unavailable, one local
+build may replace package production.
+
+## Native Allplan checks
+
+Request an owner trial only for new or materially changed native behavior.
+Do not repeat observations already accepted in the handoff or expand their
+acceptance scope. Keep native PASS distinct from automated test and CI PASS;
+record the tested scope and evidence in the handoff after a completed stage.
+
+Preserve all existing runtime write guards, revalidation, journaling, and hash
+safeguards. Testing or packaging changes do not authorize weakening them.

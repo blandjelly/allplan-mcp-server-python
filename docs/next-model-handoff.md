@@ -1,5 +1,16 @@
 # Current handoff
 
+**Testing procedure approved 2026-10-17:** read [AGENTS.md](../AGENTS.md) and
+[the testing policy](testing-policy.md) at the start of every chat. Iterate with
+affected/dependent tests and draft PRs; do not repeat the full local suite or
+builds after each edit. Ready candidates use full CI instead of a full local
+run: two Python 3.12 platforms normally, six for compatibility/main integration.
+Project-version-only bumps do not expand the matrix. Build once after tests;
+documentation/evidence updates skip product checks. Preserve accepted native
+observations. [Procedure PR #9](https://github.com/blandjelly/allplan-mcp-server-python/pull/9)
+also installs these instructions on main for future chats; M4 runtime integration
+remains separate.
+
 Current correction: **0.18.2**, `fix/m4-wall-sample`, based on the verified
 0.18.1 delivery at `0860438`. The documentation/evidence update was committed
 first (`194088c`), before runtime edits. `wall_sample` now accepts distinct

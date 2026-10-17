@@ -71,13 +71,18 @@ execution identity and use read-only recovery; do not send a new Apply.
 
 ## Source development
 
+Read [AGENTS.md](AGENTS.md), the [testing policy](docs/testing-policy.md) and the
+[current handoff](docs/next-model-handoff.md) before choosing checks. During
+iteration, use focused affected/dependent tests, for example:
+
 ```bash
-uv sync --frozen
-uv run --frozen allplan-mcp
-uv run --frozen python -m unittest discover -s tests -v
-uv build
-uv run --frozen python utils/build_windows_package.py
+uv run --frozen python -m unittest discover -s tests -p 'test_wall_probe*.py' -v
 ```
+
+Keep PRs in draft while iterating. Full candidate CI replaces a duplicate full
+local run; one dependent job builds the package. Use its source-bound artifact
+for the once-per-delivery installation check. See the policy for the two-job
+standard candidate and six-job compatibility/main-integration gates.
 
 Settings: ALLPLAN_HOST_URL, ALLPLAN_HOST_TIMEOUT, MCP_HOST, MCP_PORT and MCP_PATH.
 Development Python execution requires opt-in on both runtimes. The evaluation
