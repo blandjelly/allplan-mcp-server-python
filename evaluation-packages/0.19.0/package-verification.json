@@ -1,0 +1,19 @@
+{
+  "source_commit": "e455f35cf4d546d9b77cf6ae5f59edcc026cc875",
+  "source_modified": false,
+  "payload_files": 163,
+  "bridge_hashes_verified": 31,
+  "zip_checksum": "pass",
+  "payload_integrity": "pass",
+  "exact_zip_registration": "pass",
+  "exact_zip_frozen_sync_and_import": "pass",
+  "upgrade_from_0182": "pass",
+  "restore_to_0182": "pass",
+  "journal_trace_and_bridge_log_preserved": "pass",
+  "wheel_and_sdist_contents": "pass",
+  "only_native_payload_changes": [
+    "PythonHostHandler.py",
+    "wall_filter.py"
+  ],
+  "native_Allplan": "not_run"
+}

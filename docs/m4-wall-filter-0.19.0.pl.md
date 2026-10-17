@@ -64,6 +64,11 @@ zweryfikowana w Allplan. Liczby zgłoszone jako wysłane nie potwierdzają liczb
 widocznych podświetleń. Zero dopasowań czyści dotychczasowe podświetlenia.
 Pełna akceptacja M4 i obsługa zapisów/materiałów pozostają poza tą próbą.
 
-Status 0.19.0: dokumentacja opisuje kandydata źródłowego; testy, CI, budowa,
-walidacja dokładnego ZIP i próba natywna są **PENDING** do odnotowania po ich
-wykonaniu.
+Status 0.19.0: **ready_for_owner_test**. Źródło `e455f35` przeszło 356 testów
+w każdej z sześciu konfiguracji Windows/Ubuntu; dokładny dostarczany ZIP
+przeszedł instalację, aktualizację z 0.18.2 i wycofanie, kontrolę 31 plików bridge
+oraz zachowania dziennika i logów. [Dowody i sumy kontrolne](../evaluation-packages/0.19.0/README.md).
+Pobranie artefaktu CI do środowiska zablokowało proxy, więc zgodnie z polityką
+wykonano jedną lokalną budowę z czystego checkoutu tego samego commitu.
+Próba natywna pozostaje **not_run**. Zawartość zamrożonego ZIP powstała przed
+uzupełnieniem tych wyników; dołączone tam wzmianki PENDING dotyczą chwili budowy.

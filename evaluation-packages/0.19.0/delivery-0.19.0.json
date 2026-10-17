@@ -1,0 +1,25 @@
+{
+  "version": "0.19.0",
+  "source_commit": "e455f35cf4d546d9b77cf6ae5f59edcc026cc875",
+  "source_modified": false,
+  "build_kind": "single_local_fallback_after_final_CI",
+  "build_reason": "CI artifact downloaded by connector, but workspace transfer blocked by proxy CONNECT HTTP 403; testing-policy permits one clean local fallback build.",
+  "build_worktree": "clean detached e455f35",
+  "built_with": {
+    "python": "3.12.14",
+    "uv": "0.12.19"
+  },
+  "ci_run": 39033571910,
+  "portable_matrix": "6/6 PASS Windows/Ubuntu Python 3.11–3.13",
+  "portable_tests_per_job": 356,
+  "ci_package_job": "PASS",
+  "delivered_artifact_sha256": {
+    "allplan_mcp_server-0.19.0-py3-none-any.whl": "0c1df3a8adadadf6ac323b7a9ea1efa63bad3b41dec59220ea97f75425d54ae9",
+    "allplan_mcp_server-0.19.0.tar.gz": "6bd5da4b1c8bc15fef469711c6f5238e7dad65e34fd00e2a3520c7a4784d79f6",
+    "allplan-mcp-0.19.0-windows-evaluation.zip": "91439c865d8054565e807e10fa98d2f80ed4525d6441c747927af2d17ed6dcd9"
+  },
+  "verification": "package-verification.json",
+  "native_Allplan": "not_run",
+  "status": "ready_for_owner_test",
+  "created_at_utc": "2026-10-17T12:51:14.801649+00:00"
+}
