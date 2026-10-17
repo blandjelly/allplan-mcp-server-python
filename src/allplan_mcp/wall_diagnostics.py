@@ -27,7 +27,8 @@ def save(path, report):
             os.fsync(descriptor)
         finally:
             os.close(descriptor)
-    lines = ['M4 Wall native properties: ' + report['state'], 'No model setters requested.']
+    title = 'M4 Wall thickness filter' if report['schema_version'] == 'm4-wall-filter-owner-1' else 'M4 Wall native properties'
+    lines = [title + ': ' + report['state'], 'No model setters requested.']
     lines.extend(step['name'] + ': ' + step['state'] for step in report['steps'])
     if report.get('message'):
         lines.append(report['message'])

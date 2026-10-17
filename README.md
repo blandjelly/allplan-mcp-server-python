@@ -5,9 +5,21 @@ New M4 PRs target this shared branch. Main remains a separate accepted baseline;
 legacy M4 branches/PRs are historical references. [Branch layout and workflow](docs/branch-layout.md).
 
 A local MCP bridge between Codex and Allplan 2026 for model queries, audits and
-reviewed attribute/layer repairs. Current candidate: **0.18.2**, correcting the
-blocked single-Wall sample when M1 resolves multiple Python wrappers of the same
-native root. Conflicting identities/fields and multiple views still block reads.
+reviewed attribute/layer repairs. Current source candidate: **0.19.0** adds
+`model_wall_filter`, a bounded read-only filter and highlight for single-tier
+Walls in one explicit foreground drawing. Source **e455f35** passed **356 tests**
+in each of six Windows/Ubuntu CI configurations; the exact delivered ZIP passed
+installation, upgrade/restore and 31 bridge hashes. Native observation is
+**PENDING / ready_for_owner_test**.
+The required owner trial uses the [verified 0.19.0 package](evaluation-packages/0.19.0/README.md), then
+checks the 20 cm and 24 cm Walls in `MCP_QA_DEMO` drawing 101, same-session
+health, visible highlighting, and clear. See the
+[0.19.0 owner guide](docs/m4-wall-filter-0.19.0.pl.md) and
+[tool contract](docs/tool-reference.md#model_wall_filter--m4-wall-thickness-filter).
+
+The previous **0.18.2** package corrected the blocked
+single-Wall sample when M1 resolves multiple Python wrappers of the same native
+root. Conflicting identities/fields and multiple views still block reads.
 [Windows package and checks](evaluation-packages/0.18.2/README.md),
 [short Polish Wall check](docs/m4-wall-sample-0.18.2.pl.md).
 The owner confirmed **PASS / accepted_on_build 0.18.2** for one native Wall
@@ -58,8 +70,10 @@ use is planned. [Acceptance, tests and limits](docs/validation-status.md).
 
 ## Local Windows setup
 
-Use the [0.18.2 evaluation package](evaluation-packages/0.18.2/README.md) on
-the machine running Allplan. External
+Use the [0.19.0 evaluation package](evaluation-packages/0.19.0/README.md) for the
+pending Wall filter/highlight owner trial. Its delivery records the single clean
+local fallback build after CI artifact transfer was blocked by the workspace
+proxy. On the machine running Allplan, external
 Python **3.11+** and internet access for locked dependencies are required;
 Allplan, Python and Codex are not bundled.
 

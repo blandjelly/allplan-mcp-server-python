@@ -1,0 +1,908 @@
+﻿2026-10-17T12:42:57.8028863Z Current runner version: '2.337.0'
+2026-10-17T12:42:57.8068629Z ##[group]Runner Image Provisioner
+2026-10-17T12:42:57.8070241Z Hosted Compute Agent
+2026-10-17T12:42:57.8070971Z Version: 20261012.601
+2026-10-17T12:42:57.8071739Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+2026-10-17T12:42:57.8072464Z Build Date: 2026-10-12T17:48:21Z
+2026-10-17T12:42:57.8073401Z Worker ID: {ab25c8b6-a050-4c9b-96c4-69bbe6af74a2}
+2026-10-17T12:42:57.8074124Z Region: westus3
+2026-10-17T12:42:57.8074744Z Cloud: Azure
+2026-10-17T12:42:57.8075321Z ##[endgroup]
+2026-10-17T12:42:57.8076817Z ##[group]Operating System
+2026-10-17T12:42:57.8077665Z Ubuntu
+2026-10-17T12:42:57.8078194Z 24.04.5
+2026-10-17T12:42:57.8078770Z LTS
+2026-10-17T12:42:57.8079334Z ##[endgroup]
+2026-10-17T12:42:57.8080220Z ##[group]Runner Image
+2026-10-17T12:42:57.8080968Z Image: ubuntu-24.04
+2026-10-17T12:42:57.8081554Z Version: 20261012.334.1
+2026-10-17T12:42:57.8083136Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-17T12:42:57.8084944Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+2026-10-17T12:42:57.8086030Z ##[endgroup]
+2026-10-17T12:42:57.8087339Z ##[group]GITHUB_TOKEN Permissions
+2026-10-17T12:42:57.8090734Z Contents: read
+2026-10-17T12:42:57.8091371Z Metadata: read
+2026-10-17T12:42:57.8091975Z ##[endgroup]
+2026-10-17T12:42:57.8094890Z Secret source: Actions
+2026-10-17T12:42:57.8095964Z Cache mode: write
+2026-10-17T12:42:57.8096940Z Prepare workflow directory
+2026-10-17T12:42:57.8492025Z Prepare all required actions
+2026-10-17T12:42:57.8540943Z Getting action download info
+2026-10-17T12:42:58.1441756Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-17T12:42:58.2504015Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-10-17T12:42:58.4541436Z Complete job name: portable (ubuntu-latest, 3.12)
+2026-10-17T12:42:58.5220715Z ##[group]Run actions/checkout@v4
+2026-10-17T12:42:58.5221362Z with:
+2026-10-17T12:42:58.5221701Z   ref: e455f35cf4d546d9b77cf6ae5f59edcc026cc875
+2026-10-17T12:42:58.5222150Z   repository: blandjelly/allplan-mcp-server-python
+2026-10-17T12:42:58.5224914Z   token: ***
+2026-10-17T12:42:58.5225202Z   ssh-strict: true
+2026-10-17T12:42:58.5225494Z   ssh-user: git
+2026-10-17T12:42:58.5225794Z   persist-credentials: true
+2026-10-17T12:42:58.5226108Z   clean: true
+2026-10-17T12:42:58.5226406Z   sparse-checkout-cone-mode: true
+2026-10-17T12:42:58.5226751Z   fetch-depth: 1
+2026-10-17T12:42:58.5227038Z   fetch-tags: false
+2026-10-17T12:42:58.5227331Z   show-progress: true
+2026-10-17T12:42:58.5227622Z   lfs: false
+2026-10-17T12:42:58.5227893Z   submodules: false
+2026-10-17T12:42:58.5228188Z   set-safe-directory: true
+2026-10-17T12:42:58.5228523Z   allow-unsafe-pr-checkout: false
+2026-10-17T12:42:58.5228944Z ##[endgroup]
+2026-10-17T12:42:58.6121337Z Syncing repository: blandjelly/allplan-mcp-server-python
+2026-10-17T12:42:58.6123591Z ##[group]Getting Git version info
+2026-10-17T12:42:58.6124217Z Working directory is '/home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python'
+2026-10-17T12:42:58.6125030Z [command]/usr/bin/git version
+2026-10-17T12:42:58.6196179Z git version 2.55.0
+2026-10-17T12:42:58.6217472Z ##[endgroup]
+2026-10-17T12:42:58.6234713Z Temporarily overriding HOME='/home/runner/work/_temp/09fbc302-a5d6-4142-9297-440f820f045e' before making global git config changes
+2026-10-17T12:42:58.6235930Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-17T12:42:58.6240868Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python
+2026-10-17T12:42:58.6313863Z Deleting the contents of '/home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python'
+2026-10-17T12:42:58.6319415Z ##[group]Initializing the repository
+2026-10-17T12:42:58.6324165Z [command]/usr/bin/git init /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python
+2026-10-17T12:42:58.6501512Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-17T12:42:58.6502654Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-17T12:42:58.6503334Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-17T12:42:58.6504091Z hint: call:
+2026-10-17T12:42:58.6504445Z hint:
+2026-10-17T12:42:58.6504971Z hint: 	git config --global init.defaultBranch <name>
+2026-10-17T12:42:58.6505634Z hint:
+2026-10-17T12:42:58.6506056Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-17T12:42:58.6506857Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-17T12:42:58.6507568Z hint:
+2026-10-17T12:42:58.6507975Z hint: 	git branch -m <name>
+2026-10-17T12:42:58.6508393Z hint:
+2026-10-17T12:42:58.6508858Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-17T12:42:58.6510118Z Initialized empty Git repository in /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/.git/
+2026-10-17T12:42:58.6520544Z [command]/usr/bin/git remote add origin https://github.com/blandjelly/allplan-mcp-server-python
+2026-10-17T12:42:58.6582247Z ##[endgroup]
+2026-10-17T12:42:58.6582869Z ##[group]Disabling automatic garbage collection
+2026-10-17T12:42:58.6588576Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-17T12:42:58.6678240Z ##[endgroup]
+2026-10-17T12:42:58.6678881Z ##[group]Setting up auth
+2026-10-17T12:42:58.6687962Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-17T12:42:58.6743277Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-17T12:42:58.7139914Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-17T12:42:58.7180995Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-17T12:42:58.7414811Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-17T12:42:58.7455862Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-17T12:42:58.7685859Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-17T12:42:58.7727116Z ##[endgroup]
+2026-10-17T12:42:58.7727787Z ##[group]Fetching the repository
+2026-10-17T12:42:58.7734828Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin e455f35cf4d546d9b77cf6ae5f59edcc026cc875
+2026-10-17T12:43:01.2742914Z From https://github.com/blandjelly/allplan-mcp-server-python
+2026-10-17T12:43:01.2744538Z  * branch            e455f35cf4d546d9b77cf6ae5f59edcc026cc875 -> FETCH_HEAD
+2026-10-17T12:43:01.2746909Z ##[endgroup]
+2026-10-17T12:43:01.2747804Z ##[group]Determining the checkout info
+2026-10-17T12:43:01.2751347Z ##[endgroup]
+2026-10-17T12:43:01.2760258Z [command]/usr/bin/git sparse-checkout disable
+2026-10-17T12:43:01.2840393Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-17T12:43:01.2928480Z ##[group]Checking out the ref
+2026-10-17T12:43:01.2934996Z [command]/usr/bin/git checkout --progress --force e455f35cf4d546d9b77cf6ae5f59edcc026cc875
+2026-10-17T12:43:01.4276633Z Note: switching to 'e455f35cf4d546d9b77cf6ae5f59edcc026cc875'.
+2026-10-17T12:43:01.4277666Z 
+2026-10-17T12:43:01.4278263Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-17T12:43:01.4279842Z changes and commit them, and you can discard any commits you make in this
+2026-10-17T12:43:01.4281264Z state without impacting any branches by switching back to a branch.
+2026-10-17T12:43:01.4282371Z 
+2026-10-17T12:43:01.4282929Z If you want to create a new branch to retain commits you create, you may
+2026-10-17T12:43:01.4284151Z do so (now or later) by using -c with the switch command. Example:
+2026-10-17T12:43:01.4284850Z 
+2026-10-17T12:43:01.4285167Z   git switch -c <new-branch-name>
+2026-10-17T12:43:01.4285639Z 
+2026-10-17T12:43:01.4285964Z Or undo this operation with:
+2026-10-17T12:43:01.4286412Z 
+2026-10-17T12:43:01.4286682Z   git switch -
+2026-10-17T12:43:01.4287054Z 
+2026-10-17T12:43:01.4287629Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-17T12:43:01.4288470Z 
+2026-10-17T12:43:01.4289209Z HEAD is now at e455f35 fix: preserve complete Wall read evidence when highlight API is unavailable
+2026-10-17T12:43:01.4316507Z ##[endgroup]
+2026-10-17T12:43:01.4370482Z [command]/usr/bin/git log -1 --format=%H
+2026-10-17T12:43:01.4401463Z e455f35cf4d546d9b77cf6ae5f59edcc026cc875
+2026-10-17T12:43:01.4739202Z ##[group]Run actions/setup-python@v5
+2026-10-17T12:43:01.4740227Z with:
+2026-10-17T12:43:01.4740905Z   python-version: 3.12
+2026-10-17T12:43:01.4741632Z   check-latest: false
+2026-10-17T12:43:01.4748020Z   token: ***
+2026-10-17T12:43:01.4748685Z   update-environment: true
+2026-10-17T12:43:01.4749512Z   allow-prereleases: false
+2026-10-17T12:43:01.4750299Z   freethreaded: false
+2026-10-17T12:43:01.4750992Z ##[endgroup]
+2026-10-17T12:43:01.6039833Z ##[group]Installed versions
+2026-10-17T12:43:01.6134218Z (node:2086) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-17T12:43:01.6136596Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-17T12:43:01.6137778Z Successfully set up CPython (3.12.15)
+2026-10-17T12:43:01.6139224Z ##[endgroup]
+2026-10-17T12:43:01.6430645Z ##[group]Run python -m pip install uv==0.12.19
+2026-10-17T12:43:01.6432577Z [36;1mpython -m pip install uv==0.12.19[0m
+2026-10-17T12:43:01.6724356Z shell: /usr/bin/bash -e {0}
+2026-10-17T12:43:01.6725245Z env:
+2026-10-17T12:43:01.6726061Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-17T12:43:01.6727336Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-17T12:43:01.6728548Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-17T12:43:01.6729882Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-17T12:43:01.6731066Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-17T12:43:01.6732232Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-17T12:43:01.6733175Z ##[endgroup]
+2026-10-17T12:43:02.7548144Z Collecting uv==0.12.19
+2026-10-17T12:43:02.8337721Z   Downloading uv-0.12.19-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (11 kB)
+2026-10-17T12:43:02.8480576Z Downloading uv-0.12.19-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (20.5 MB)
+2026-10-17T12:43:03.3424136Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 20.5/20.5 MB 43.7 MB/s  0:00:00
+2026-10-17T12:43:03.3940779Z Installing collected packages: uv
+2026-10-17T12:43:03.5892467Z Successfully installed uv-0.12.19
+2026-10-17T12:43:03.7194061Z ##[group]Run uv sync --frozen
+2026-10-17T12:43:03.7194353Z [36;1muv sync --frozen[0m
+2026-10-17T12:43:03.7265202Z shell: /usr/bin/bash -e {0}
+2026-10-17T12:43:03.7265432Z env:
+2026-10-17T12:43:03.7265666Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-17T12:43:03.7265983Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-17T12:43:03.7266300Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-17T12:43:03.7266566Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-17T12:43:03.7266840Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-17T12:43:03.7267151Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-17T12:43:03.7267383Z ##[endgroup]
+2026-10-17T12:43:03.7878115Z Using CPython 3.12.15 interpreter at: /opt/hostedtoolcache/Python/3.12.15/x64/bin/python3
+2026-10-17T12:43:03.7879111Z Creating virtual environment at: .venv
+2026-10-17T12:43:03.8072517Z    Building allplan-mcp-server @ file:///home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python
+2026-10-17T12:43:03.8644761Z Downloading beartype (1.3MiB)
+2026-10-17T12:43:03.8645468Z Downloading cryptography (4.5MiB)
+2026-10-17T12:43:03.8666613Z Downloading pydantic-core (2.0MiB)
+2026-10-17T12:43:03.8667121Z Downloading pygments (1.2MiB)
+2026-10-17T12:43:03.9992053Z  Downloaded pygments
+2026-10-17T12:43:03.9993151Z  Downloaded pydantic-core
+2026-10-17T12:43:04.0035173Z  Downloaded beartype
+2026-10-17T12:43:04.0133164Z  Downloaded cryptography
+2026-10-17T12:43:04.3500488Z       Built allplan-mcp-server @ file:///home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python
+2026-10-17T12:43:04.3510171Z Prepared 71 packages in 560ms
+2026-10-17T12:43:04.3981275Z Installed 71 packages in 46ms
+2026-10-17T12:43:04.3982231Z  + aiofile==3.9.0
+2026-10-17T12:43:04.3983268Z  + allplan-mcp-server==0.19.0 (from file:///home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python)
+2026-10-17T12:43:04.3984098Z  + annotated-types==0.7.0
+2026-10-17T12:43:04.3984348Z  + anyio==4.13.0
+2026-10-17T12:43:04.3984559Z  + attrs==26.1.0
+2026-10-17T12:43:04.3984765Z  + authlib==1.7.2
+2026-10-17T12:43:04.3984980Z  + beartype==0.22.9
+2026-10-17T12:43:04.3985202Z  + cachetools==7.1.1
+2026-10-17T12:43:04.3985421Z  + caio==0.9.25
+2026-10-17T12:43:04.3985675Z  + certifi==2026.4.22
+2026-10-17T12:43:04.3985894Z  + cffi==2.0.0
+2026-10-17T12:43:04.3986115Z  + click==8.3.3
+2026-10-17T12:43:04.3986341Z  + cryptography==48.0.0
+2026-10-17T12:43:04.3986573Z  + cyclopts==4.11.2
+2026-10-17T12:43:04.3986833Z  + dnspython==2.8.0
+2026-10-17T12:43:04.3987063Z  + docstring-parser==0.18.0
+2026-10-17T12:43:04.3987455Z  + docutils==0.22.4
+2026-10-17T12:43:04.3987693Z  + email-validator==2.3.0
+2026-10-17T12:43:04.3988275Z  + exceptiongroup==1.3.1
+2026-10-17T12:43:04.3988509Z  + fastmcp==3.2.4
+2026-10-17T12:43:04.3988732Z  + griffelib==2.0.2
+2026-10-17T12:43:04.3988945Z  + h11==0.16.0
+2026-10-17T12:43:04.3989145Z  + httpcore==1.0.9
+2026-10-17T12:43:04.3989359Z  + httpx==0.28.1
+2026-10-17T12:43:04.3989703Z  + httpx-sse==0.4.3
+2026-10-17T12:43:04.3989911Z  + idna==3.13
+2026-10-17T12:43:04.3990142Z  + importlib-metadata==8.7.1
+2026-10-17T12:43:04.3990406Z  + jaraco-classes==3.4.0
+2026-10-17T12:43:04.3990656Z  + jaraco-context==6.1.2
+2026-10-17T12:43:04.3990905Z  + jaraco-functools==4.4.0
+2026-10-17T12:43:04.3991150Z  + jeepney==0.9.0
+2026-10-17T12:43:04.3991368Z  + joserfc==1.6.5
+2026-10-17T12:43:04.3991581Z  + jsonref==1.1.0
+2026-10-17T12:43:04.3991801Z  + jsonschema==4.26.0
+2026-10-17T12:43:04.3992045Z  + jsonschema-path==0.4.6
+2026-10-17T12:43:04.3992327Z  + jsonschema-specifications==2025.9.1
+2026-10-17T12:43:04.3992621Z  + keyring==25.7.0
+2026-10-17T12:43:04.3992845Z  + markdown-it-py==4.2.0
+2026-10-17T12:43:04.3993081Z  + mcp==1.27.1
+2026-10-17T12:43:04.3993288Z  + mdurl==0.1.2
+2026-10-17T12:43:04.3993510Z  + more-itertools==11.0.2
+2026-10-17T12:43:04.3993812Z  + openapi-pydantic==0.5.1
+2026-10-17T12:43:04.3994077Z  + opentelemetry-api==1.41.1
+2026-10-17T12:43:04.3994583Z  + packaging==26.2
+2026-10-17T12:43:04.3994794Z  + pathable==0.5.0
+2026-10-17T12:43:04.3995026Z  + platformdirs==4.9.6
+2026-10-17T12:43:04.3995275Z  + py-key-value-aio==0.4.4
+2026-10-17T12:43:04.3995530Z  + pycparser==3.0
+2026-10-17T12:43:04.3995749Z  + pydantic==2.13.4
+2026-10-17T12:43:04.3995979Z  + pydantic-core==2.46.4
+2026-10-17T12:43:04.3996241Z  + pydantic-settings==2.14.1
+2026-10-17T12:43:04.3996494Z  + pygments==2.20.0
+2026-10-17T12:43:04.3996714Z  + pyjwt==2.12.1
+2026-10-17T12:43:04.3996937Z  + pyperclip==1.11.0
+2026-10-17T12:43:04.3997188Z  + python-dotenv==1.2.2
+2026-10-17T12:43:04.3997437Z  + python-multipart==0.0.27
+2026-10-17T12:43:04.3997679Z  + pyyaml==6.0.3
+2026-10-17T12:43:04.3997889Z  + referencing==0.37.0
+2026-10-17T12:43:04.3998123Z  + rich==15.0.0
+2026-10-17T12:43:04.3998342Z  + rich-rst==1.3.2
+2026-10-17T12:43:04.3998573Z  + rpds-py==0.30.0
+2026-10-17T12:43:04.3998811Z  + secretstorage==3.5.0
+2026-10-17T12:43:04.3999353Z  + sse-starlette==3.4.2
+2026-10-17T12:43:04.3999802Z  + starlette==1.0.0
+2026-10-17T12:43:04.4000043Z  + typing-extensions==4.15.0
+2026-10-17T12:43:04.4000312Z  + typing-inspection==0.4.2
+2026-10-17T12:43:04.4000586Z  + uncalled-for==0.3.2
+2026-10-17T12:43:04.4000804Z  + uvicorn==0.46.0
+2026-10-17T12:43:04.4001056Z  + watchfiles==1.1.1
+2026-10-17T12:43:04.4001285Z  + websockets==16.0
+2026-10-17T12:43:04.4001515Z  + zipp==3.23.1
+2026-10-17T12:43:04.4191672Z ##[group]Run uv run --frozen python -m unittest discover -s tests -v
+2026-10-17T12:43:04.4192021Z [36;1muv run --frozen python -m unittest discover -s tests -v[0m
+2026-10-17T12:43:04.4255181Z shell: /usr/bin/bash -e {0}
+2026-10-17T12:43:04.4255369Z env:
+2026-10-17T12:43:04.4255557Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-17T12:43:04.4255844Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-17T12:43:04.4256126Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-17T12:43:04.4256392Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-17T12:43:04.4256639Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-17T12:43:04.4256890Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-17T12:43:04.4257097Z ##[endgroup]
+2026-10-17T12:43:07.0430592Z test_draft_needs_no_comparison_history (test_ci_policy.OutputTests.test_draft_needs_no_comparison_history) ... ok
+2026-10-17T12:43:07.1164092Z test_real_git_docs_update_to_mixed_pr_emits_skip (test_ci_policy.OutputTests.test_real_git_docs_update_to_mixed_pr_emits_skip) ... ok
+2026-10-17T12:43:07.1874275Z test_real_git_main_integration_emits_six_jobs (test_ci_policy.OutputTests.test_real_git_main_integration_emits_six_jobs) ... ok
+2026-10-17T12:43:07.2858565Z test_real_git_missing_history_fails_to_full_checks (test_ci_policy.OutputTests.test_real_git_missing_history_fails_to_full_checks) ... ok
+2026-10-17T12:43:07.3674387Z test_real_git_version_change_emits_two_jobs (test_ci_policy.OutputTests.test_real_git_version_change_emits_two_jobs) ... ok
+2026-10-17T12:43:07.3682710Z test_critical_install_and_ci_paths_require_full_matrix (test_ci_policy.SelectionTests.test_critical_install_and_ci_paths_require_full_matrix) ... ok
+2026-10-17T12:43:07.3684576Z test_documentation_and_owner_logs_skip_product_jobs_even_on_main (test_ci_policy.SelectionTests.test_documentation_and_owner_logs_skip_product_jobs_even_on_main) ... ok
+2026-10-17T12:43:07.3685818Z test_draft_skips_product_jobs_even_with_critical_changes_or_missing_history (test_ci_policy.SelectionTests.test_draft_skips_product_jobs_even_with_critical_changes_or_missing_history) ... ok
+2026-10-17T12:43:07.3686751Z test_invalid_manual_mode_and_unknown_event_are_errors (test_ci_policy.SelectionTests.test_invalid_manual_mode_and_unknown_event_are_errors) ... ok
+2026-10-17T12:43:07.3692406Z test_locked_dependency_or_python_change_requires_six_jobs (test_ci_policy.SelectionTests.test_locked_dependency_or_python_change_requires_six_jobs) ... ok
+2026-10-17T12:43:07.3713308Z test_main_integration_requires_six_even_for_version_only_change (test_ci_policy.SelectionTests.test_main_integration_requires_six_even_for_version_only_change) ... ok
+2026-10-17T12:43:07.3714589Z test_manual_standard_candidate_and_release_override (test_ci_policy.SelectionTests.test_manual_standard_candidate_and_release_override) ... ok
+2026-10-17T12:43:07.3715908Z test_missing_history_or_invalid_metadata_cannot_downgrade_checks (test_ci_policy.SelectionTests.test_missing_history_or_invalid_metadata_cannot_downgrade_checks) ... ok
+2026-10-17T12:43:07.3717086Z test_missing_zero_or_invalid_revisions_are_unavailable (test_ci_policy.SelectionTests.test_missing_zero_or_invalid_revisions_are_unavailable) ... ok
+2026-10-17T12:43:07.3718153Z test_new_code_alongside_documentation_still_runs_tests (test_ci_policy.SelectionTests.test_new_code_alongside_documentation_still_runs_tests) ... ok
+2026-10-17T12:43:07.3719260Z test_ordinary_ready_candidate_uses_two_python312_platforms (test_ci_policy.SelectionTests.test_ordinary_ready_candidate_uses_two_python312_platforms) ... ok
+2026-10-17T12:43:07.3720962Z test_other_configuration_changes_require_full_compatibility (test_ci_policy.SelectionTests.test_other_configuration_changes_require_full_compatibility) ... ok
+2026-10-17T12:43:07.3722212Z test_project_version_only_in_both_files_does_not_expand_matrix (test_ci_policy.SelectionTests.test_project_version_only_in_both_files_does_not_expand_matrix) ... ok
+2026-10-17T12:43:07.3722891Z test_ready_open_reopen_use_pr_base_and_synchronize_uses_latest_push (test_ci_policy.SelectionTests.test_ready_open_reopen_use_pr_base_and_synchronize_uses_latest_push) ... ok
+2026-10-17T12:43:07.3723554Z test_registry_package_named_like_project_is_not_exempt (test_ci_policy.SelectionTests.test_registry_package_named_like_project_is_not_exempt) ... ok
+2026-10-17T12:43:07.3724126Z test_repository_default_branch_is_respected (test_ci_policy.SelectionTests.test_repository_default_branch_is_respected) ... ok
+2026-10-17T12:43:07.3724680Z test_version_only_pyproject_and_lock_are_each_exempt (test_ci_policy.SelectionTests.test_version_only_pyproject_and_lock_are_each_exempt) ... ok
+2026-10-17T12:43:07.3725228Z test_virtual_self_package_version_is_exempt (test_ci_policy.SelectionTests.test_virtual_self_package_version_is_exempt) ... ok
+2026-10-17T12:43:07.3877555Z test_connection_refused_and_timeout_have_different_recovery (test_client.ClientErrorTests.test_connection_refused_and_timeout_have_different_recovery) ... ok
+2026-10-17T12:43:07.4018459Z test_health_timeout_identifies_host_read_without_implying_a_write (test_client.ClientErrorTests.test_health_timeout_identifies_host_read_without_implying_a_write) ... ok
+2026-10-17T12:43:07.4150869Z test_nonfinite_payload_is_rejected_before_http (test_client.ClientErrorTests.test_nonfinite_payload_is_rejected_before_http) ... ok
+2026-10-17T12:43:07.4281931Z test_structured_host_failure_keeps_code_and_request_id (test_client.ClientErrorTests.test_structured_host_failure_keeps_code_and_request_id) ... ok
+2026-10-17T12:43:07.6241714Z test_all_no_op_highlight_rejects_changed_criterion_before_UI (test_column_layer.ColumnLayerTests.test_all_no_op_highlight_rejects_changed_criterion_before_UI) ... ok
+2026-10-17T12:43:07.6906081Z test_apply_requires_highlight_and_rechecks_full_source_including_nonmatch (test_column_layer.ColumnLayerTests.test_apply_requires_highlight_and_rechecks_full_source_including_nonmatch) ... ok
+2026-10-17T12:43:07.7034054Z test_classification_name_round_trip_mismatch_never_scans_or_writes (test_column_layer.ColumnLayerTests.test_classification_name_round_trip_mismatch_never_scans_or_writes) ... ok
+2026-10-17T12:43:07.7724773Z test_english_classification_name_resolves_by_exact_round_trip (test_column_layer.ColumnLayerTests.test_english_classification_name_resolves_by_exact_round_trip) ... ok
+2026-10-17T12:43:07.8698332Z test_exception_is_excluded_but_existing_W1_matches_without_write (test_column_layer.ColumnLayerTests.test_exception_is_excluded_but_existing_W1_matches_without_write) ... ok
+2026-10-17T12:43:07.9318317Z test_explicit_custom_name_binds_catalog_id_without_assuming_935 (test_column_layer.ColumnLayerTests.test_explicit_custom_name_binds_catalog_id_without_assuming_935) ... ok
+2026-10-17T12:43:09.1787930Z test_full_large_result_highlights_only_plan_targets_and_clear_invalidates_submission (test_column_layer.ColumnLayerTests.test_full_large_result_highlights_only_plan_targets_and_clear_invalidates_submission) ... ok
+2026-10-17T12:43:09.2823698Z test_full_workflow_highlights_exact_changing_targets_apply_replay_and_no_op (test_column_layer.ColumnLayerTests.test_full_workflow_highlights_exact_changing_targets_apply_replay_and_no_op) ... ok
+2026-10-17T12:43:09.2911836Z test_invalid_payload_rejected_before_any_native_access (test_column_layer.ColumnLayerTests.test_invalid_payload_rejected_before_any_native_access) ... ok
+2026-10-17T12:43:09.3548846Z test_legacy_attribute_values_cannot_change_classification_matches (test_column_layer.ColumnLayerTests.test_legacy_attribute_values_cannot_change_classification_matches) ... ok
+2026-10-17T12:43:09.4000728Z test_missing_classification_stays_unknown_even_when_legacy_field_is_blank (test_column_layer.ColumnLayerTests.test_missing_classification_stays_unknown_even_when_legacy_field_is_blank) ... ok
+2026-10-17T12:43:09.4167588Z test_missing_or_ambiguous_names_fail_before_scan_or_UI (test_column_layer.ColumnLayerTests.test_missing_or_ambiguous_names_fail_before_scan_or_UI) ... ok
+2026-10-17T12:43:09.7483538Z test_native_container_lives_through_target_reads_and_setter (test_column_layer.ColumnLayerTests.test_native_container_lives_through_target_reads_and_setter) ... ok
+2026-10-17T12:43:09.8411161Z test_native_failure_journal_unknown_recovery_restart_and_undo_do_not_repeat (test_column_layer.ColumnLayerTests.test_native_failure_journal_unknown_recovery_restart_and_undo_do_not_repeat) ... ok
+2026-10-17T12:43:09.9537163Z test_new_column_resource_changes_and_expiry_conflict_before_write (test_column_layer.ColumnLayerTests.test_new_column_resource_changes_and_expiry_conflict_before_write) ... ok
+2026-10-17T12:43:09.9880603Z test_no_matches_clear_old_highlights_without_setters (test_column_layer.ColumnLayerTests.test_no_matches_clear_old_highlights_without_setters) ... ok
+2026-10-17T12:43:10.1721982Z test_noncolumns_never_receive_new_attribute_or_geometry_reads (test_column_layer.ColumnLayerTests.test_noncolumns_never_receive_new_attribute_or_geometry_reads) ... ok
+2026-10-17T12:43:10.1853430Z test_only_legacy_catalog_fails_before_scan_ui_or_writes (test_column_layer.ColumnLayerTests.test_only_legacy_catalog_fails_before_scan_ui_or_writes) ... ok
+2026-10-17T12:43:10.3461735Z test_over_limit_and_passive_scope_are_not_applicable (test_column_layer.ColumnLayerTests.test_over_limit_and_passive_scope_are_not_applicable) ... ok
+2026-10-17T12:43:10.4682337Z test_owner_six_columns_highlight_all_missing_but_write_only_two_then_no_op (test_column_layer.ColumnLayerTests.test_owner_six_columns_highlight_all_missing_but_write_only_two_then_no_op) ... ok
+2026-10-17T12:43:10.5455583Z test_six_columns_use_classification_when_legacy_attribute_is_omitted (test_column_layer.ColumnLayerTests.test_six_columns_use_classification_when_legacy_attribute_is_omitted) ... ok
+2026-10-17T12:43:10.5942906Z test_unwritable_later_target_prevents_all_setters (test_column_layer.ColumnLayerTests.test_unwritable_later_target_prevents_all_setters) ... ok
+2026-10-17T12:43:10.7569728Z test_unwritable_trace_or_UI_failure_prevents_apply_and_native_retries (test_column_layer.ColumnLayerTests.test_unwritable_trace_or_UI_failure_prevents_apply_and_native_retries) ... ok
+2026-10-17T12:43:10.7936424Z test_value_states_are_distinct_and_omission_is_unknown_not_a_write_target (test_column_layer.ColumnLayerTests.test_value_states_are_distinct_and_omission_is_unknown_not_a_write_target) ... ok
+2026-10-17T12:43:12.2768989Z test_highlight_count_mismatch_blocks_apply (test_column_layer_http.ColumnLayerHTTPTests.test_highlight_count_mismatch_blocks_apply) ... ok
+2026-10-17T12:43:14.2788424Z test_launcher_completes_exact_changes_and_health_without_broad_discovery (test_column_layer_http.ColumnLayerHTTPTests.test_launcher_completes_exact_changes_and_health_without_broad_discovery) ... ok
+2026-10-17T12:43:16.0247294Z test_legacy_catalog_blocks_launcher_before_scan_highlight_or_apply (test_column_layer_http.ColumnLayerHTTPTests.test_legacy_catalog_blocks_launcher_before_scan_highlight_or_apply) ... ok
+2026-10-17T12:43:17.8697409Z test_lost_response_preserves_exact_execution_and_recover_never_reapplies (test_column_layer_http.ColumnLayerHTTPTests.test_lost_response_preserves_exact_execution_and_recover_never_reapplies) ... ok
+2026-10-17T12:43:18.8892012Z test_mismatched_bridge_stops_before_any_plan (test_column_layer_http.ColumnLayerHTTPTests.test_mismatched_bridge_stops_before_any_plan) ... Executing <Task pending name='Task-787' coro=<ColumnLayerHTTPTests.test_mismatched_bridge_stops_before_any_plan() running at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/tests/test_column_layer_http.py:184> cb=[_run_until_complete_cb() at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/base_events.py:181] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/runners.py:100> took 0.129 seconds
+2026-10-17T12:43:19.2058139Z ok
+2026-10-17T12:43:20.5045157Z test_missing_classification_blocks_launcher_without_treating_legacy_blank_as_missing (test_column_layer_http.ColumnLayerHTTPTests.test_missing_classification_blocks_launcher_without_treating_legacy_blank_as_missing) ... ok
+2026-10-17T12:43:21.9954052Z test_no_matches_clear_highlights_without_asking_apply (test_column_layer_http.ColumnLayerHTTPTests.test_no_matches_clear_highlights_without_asking_apply) ... ok
+2026-10-17T12:43:23.7913131Z test_preview_only_and_typed_validation_never_send_apply (test_column_layer_http.ColumnLayerHTTPTests.test_preview_only_and_typed_validation_never_send_apply) ... ok
+2026-10-17T12:43:23.8025341Z test_context_is_read_only_includes_empty_loaded_files_and_honest_limits (test_host_handler.HostHandlerTests.test_context_is_read_only_includes_empty_loaded_files_and_honest_limits) ... ok
+2026-10-17T12:43:23.8147268Z test_context_missing_reads_are_not_empty_success_and_project_is_fresh (test_host_handler.HostHandlerTests.test_context_missing_reads_are_not_empty_success_and_project_is_fresh) ... ok
+2026-10-17T12:43:23.8218117Z test_context_rejects_invalid_parameters_without_selecting_or_writing (test_host_handler.HostHandlerTests.test_context_rejects_invalid_parameters_without_selecting_or_writing) ... ok
+2026-10-17T12:43:23.8317587Z test_current_document_is_resolved_for_each_box (test_host_handler.HostHandlerTests.test_current_document_is_resolved_for_each_box) ... ok
+2026-10-17T12:43:23.8399339Z test_identity_sample_is_bounded_raw_and_separates_model_and_view (test_host_handler.HostHandlerTests.test_identity_sample_is_bounded_raw_and_separates_model_and_view) ... ok
+2026-10-17T12:43:23.8459148Z test_invalid_dimensions_never_write (test_host_handler.HostHandlerTests.test_invalid_dimensions_never_write) ... ok
+2026-10-17T12:43:23.8558170Z test_missing_session_and_disabled_exec_do_not_write (test_host_handler.HostHandlerTests.test_missing_session_and_disabled_exec_do_not_write) ... ok
+2026-10-17T12:43:23.8652398Z test_path_exception_and_boolean_status_do_not_hide_project_or_create_key (test_host_handler.HostHandlerTests.test_path_exception_and_boolean_status_do_not_hide_project_or_create_key) ... ok
+2026-10-17T12:43:23.8735182Z test_project_path_order_fallback_is_read_only_and_retains_failed_attempt (test_host_handler.HostHandlerTests.test_project_path_order_fallback_is_read_only_and_retains_failed_attempt) ... ok
+2026-10-17T12:43:24.0079360Z test_runtime_reports_embedded_python_and_missing_hotfix_honestly (test_host_handler.HostHandlerTests.test_runtime_reports_embedded_python_and_missing_hotfix_honestly) ... ok
+2026-10-17T12:43:24.0148824Z test_wrong_major_allows_diagnostics_but_rejects_model_operations (test_host_handler.HostHandlerTests.test_wrong_major_allows_diagnostics_but_rejects_model_operations) ... ok
+2026-10-17T12:43:24.0854022Z test_actual_unknown_marker_reports_original_id_without_recovering_it (test_journal_inspection.JournalInspectionTests.test_actual_unknown_marker_reports_original_id_without_recovering_it) ... ok
+2026-10-17T12:43:24.5439258Z test_capacity_preserves_exact_replay_and_reports_incomplete_over_capacity (test_journal_inspection.JournalInspectionTests.test_capacity_preserves_exact_replay_and_reports_incomplete_over_capacity) ... ok
+2026-10-17T12:43:24.7540489Z test_completed_and_undone_history_is_inspected_without_reconciliation (test_journal_inspection.JournalInspectionTests.test_completed_and_undone_history_is_inspected_without_reconciliation) ... ok
+2026-10-17T12:43:24.7780976Z test_empty_inspection_does_not_access_native_context (test_journal_inspection.JournalInspectionTests.test_empty_inspection_does_not_access_native_context) ... ok
+2026-10-17T12:43:24.8479757Z test_invalid_and_hashed_structurally_invalid_records_fail_closed (test_journal_inspection.JournalInspectionTests.test_invalid_and_hashed_structurally_invalid_records_fail_closed) ... ok
+2026-10-17T12:43:24.8682054Z test_schema_extra_fields_and_competing_lock_fail_before_model_access (test_journal_inspection.JournalInspectionTests.test_schema_extra_fields_and_competing_lock_fail_before_model_access) ... ok
+2026-10-17T12:43:25.0243408Z test_combined_dimension_and_spatial_filter_observes_one_c01 (test_m1_completion.M1CompletionTests.test_combined_dimension_and_spatial_filter_observes_one_c01) ... ok
+2026-10-17T12:43:25.0355578Z test_conversion_scales_then_applies_offset_once_and_round_trips (test_m1_completion.M1CompletionTests.test_conversion_scales_then_applies_offset_once_and_round_trips) ... ok
+2026-10-17T12:43:25.0462019Z test_geometry_budget_failure_never_creates_selection (test_m1_completion.M1CompletionTests.test_geometry_budget_failure_never_creates_selection) ... ok
+2026-10-17T12:43:25.0623616Z test_geometry_change_in_rejected_candidate_invalidates_selection (test_m1_completion.M1CompletionTests.test_geometry_change_in_rejected_candidate_invalidates_selection) ... ok
+2026-10-17T12:43:25.0744477Z test_geometry_fields_are_mm_and_independent_of_display_units (test_m1_completion.M1CompletionTests.test_geometry_fields_are_mm_and_independent_of_display_units) ... ok
+2026-10-17T12:43:25.0852718Z test_global_box_and_center_apply_offset_without_scaling_dimensions (test_m1_completion.M1CompletionTests.test_global_box_and_center_apply_offset_without_scaling_dimensions) ... ok
+2026-10-17T12:43:25.0968428Z test_hierarchy_cycle_and_cross_file_parent_do_not_become_components (test_m1_completion.M1CompletionTests.test_hierarchy_cycle_and_cross_file_parent_do_not_become_components) ... ok
+2026-10-17T12:43:25.1042187Z test_invalid_spatial_frames_and_aliases_are_rejected_before_native_reads (test_m1_completion.M1CompletionTests.test_invalid_spatial_frames_and_aliases_are_rejected_before_native_reads) ... ok
+2026-10-17T12:43:25.1134837Z test_missing_geometry_excludes_spatial_candidate_as_not_checked (test_m1_completion.M1CompletionTests.test_missing_geometry_excludes_spatial_candidate_as_not_checked) ... ok
+2026-10-17T12:43:25.1247961Z test_negating_failed_dimension_read_never_turns_unknown_into_pass (test_m1_completion.M1CompletionTests.test_negating_failed_dimension_read_never_turns_unknown_into_pass) ... ok
+2026-10-17T12:43:25.1357939Z test_nonfinite_geometry_and_service_failure_are_not_checked (test_m1_completion.M1CompletionTests.test_nonfinite_geometry_and_service_failure_are_not_checked) ... ok
+2026-10-17T12:43:25.1468962Z test_offset_change_invalidates_global_geometry_selection (test_m1_completion.M1CompletionTests.test_offset_change_invalidates_global_geometry_selection) ... ok
+2026-10-17T12:43:25.1562875Z test_owner_profile_uses_distinct_unicode_existing_layers_and_old_profile_still_validates (test_m1_completion.M1CompletionTests.test_owner_profile_uses_distinct_unicode_existing_layers_and_old_profile_still_validates) ... ok
+2026-10-17T12:43:25.1666920Z test_parent_root_views_stay_separate_without_false_component_conflict (test_m1_completion.M1CompletionTests.test_parent_root_views_stay_separate_without_false_component_conflict) ... ok
+2026-10-17T12:43:25.3123438Z test_profile_aliases_and_family_filter_return_two_s02_columns (test_m1_completion.M1CompletionTests.test_profile_aliases_and_family_filter_return_two_s02_columns) ... ok
+2026-10-17T12:43:25.3293893Z test_profile_metadata_change_and_hierarchy_change_invalidate_reuse (test_m1_completion.M1CompletionTests.test_profile_metadata_change_and_hierarchy_change_invalidate_reuse) ... ok
+2026-10-17T12:43:25.3437337Z test_profile_missing_resource_and_wrong_native_type_code_block_query (test_m1_completion.M1CompletionTests.test_profile_missing_resource_and_wrong_native_type_code_block_query) ... ok
+2026-10-17T12:43:25.3531960Z test_profile_rejects_unbound_or_unknown_schema_and_invalid_rule_reference (test_m1_completion.M1CompletionTests.test_profile_rejects_unbound_or_unknown_schema_and_invalid_rule_reference) ... ok
+2026-10-17T12:43:25.3665689Z test_profile_resolves_exact_names_types_layers_and_configured_levels (test_m1_completion.M1CompletionTests.test_profile_resolves_exact_names_types_layers_and_configured_levels) ... ok
+2026-10-17T12:43:25.3804876Z test_profile_resource_alias_collision_and_nonstring_values_are_rejected (test_m1_completion.M1CompletionTests.test_profile_resource_alias_collision_and_nonstring_values_are_rejected) ... ok
+2026-10-17T12:43:25.3913924Z test_profile_type_mismatch_and_native_exception_preserve_safe_diagnostics (test_m1_completion.M1CompletionTests.test_profile_type_mismatch_and_native_exception_preserve_safe_diagnostics) ... ok
+2026-10-17T12:43:25.4006951Z test_profile_unresolved_ids_preserve_lookup_stage_and_do_not_scan (test_m1_completion.M1CompletionTests.test_profile_unresolved_ids_preserve_lookup_stage_and_do_not_scan) ... ok
+2026-10-17T12:43:25.4101271Z test_spatial_touching_inclusive_exclusive_and_containment_tolerance (test_m1_completion.M1CompletionTests.test_spatial_touching_inclusive_exclusive_and_containment_tolerance) ... ok
+2026-10-17T12:43:25.4357461Z test_top_level_counts_ten_fixture_components_without_children_or_labels (test_m1_completion.M1CompletionTests.test_top_level_counts_ten_fixture_components_without_children_or_labels) ... ok
+2026-10-17T12:43:25.4478189Z test_unrequested_or_outside_scope_geometry_is_never_read (test_m1_completion.M1CompletionTests.test_unrequested_or_outside_scope_geometry_is_never_read) ... ok
+2026-10-17T12:43:25.4605502Z test_wall_bounds_union_all_tiers_and_do_not_require_parent_geometry (test_m1_completion.M1CompletionTests.test_wall_bounds_union_all_tiers_and_do_not_require_parent_geometry) ... ok
+2026-10-17T12:43:26.1829233Z test_absent_cross_file_or_over_budget_slab_tiers_fail_closed (test_m1_native_families.NativeFamilyTests.test_absent_cross_file_or_over_budget_slab_tiers_fail_closed) ... ok
+2026-10-17T12:43:26.1982763Z test_aggregate_slab_unions_hidden_tiers_and_ignores_axis_geometry (test_m1_native_families.NativeFamilyTests.test_aggregate_slab_unions_hidden_tiers_and_ignores_axis_geometry) ... ok
+2026-10-17T12:43:26.2412451Z test_observed_native_tree_counts_ten_components_and_one_passive_reference (test_m1_native_families.NativeFamilyTests.test_observed_native_tree_counts_ten_components_and_one_passive_reference) ... ok
+2026-10-17T12:43:26.2528002Z test_other_framing_roots_remain_outside_supported_families (test_m1_native_families.NativeFamilyTests.test_other_framing_roots_remain_outside_supported_families) ... ok
+2026-10-17T12:43:26.2904383Z test_slab_tier_change_invalidates_reusable_selection (test_m1_native_families.NativeFamilyTests.test_slab_tier_change_invalidates_reusable_selection) ... ok
+2026-10-17T12:43:26.5433415Z test_unavailable_beam_solid_never_uses_axis_or_passes_spatial_filter (test_m1_native_families.NativeFamilyTests.test_unavailable_beam_solid_never_uses_axis_or_passes_spatial_filter) ... ok
+2026-10-17T12:43:26.6888228Z test_active_and_invalidated_evidence_share_capacity_ttl_and_restart_limits (test_mark_execution.MarkExecutionTests.test_active_and_invalidated_evidence_share_capacity_ttl_and_restart_limits) ... ok
+2026-10-17T12:43:26.7194293Z test_changed_definition_or_missing_rules_reject_before_native_context (test_mark_execution.MarkExecutionTests.test_changed_definition_or_missing_rules_reject_before_native_context) ... ok
+2026-10-17T12:43:26.9068427Z test_collisions_unknown_and_absent_attribute_cannot_start_setters (test_mark_execution.MarkExecutionTests.test_collisions_unknown_and_absent_attribute_cannot_start_setters) ... ok
+2026-10-17T12:43:26.9457259Z test_excluded_duplicate_is_keeper_and_all_peers_reserve_normalized_numbers (test_mark_execution.MarkExecutionTests.test_excluded_duplicate_is_keeper_and_all_peers_reserve_normalized_numbers) ... ok
+2026-10-17T12:43:27.0195903Z test_explicit_mark_assignment_reuses_readback_and_exact_replay_after_undo (test_mark_execution.MarkExecutionTests.test_explicit_mark_assignment_reuses_readback_and_exact_replay_after_undo) ... ok
+2026-10-17T12:43:27.2032214Z test_invalidated_evidence_keeps_original_lifetime_and_byte_budget (test_mark_execution.MarkExecutionTests.test_invalidated_evidence_keeps_original_lifetime_and_byte_budget) ... ok
+2026-10-17T12:43:27.2814737Z test_invalidated_unchanged_source_cannot_renew_authorization_even_after_undo (test_mark_execution.MarkExecutionTests.test_invalidated_unchanged_source_cannot_renew_authorization_even_after_undo) ... ok
+2026-10-17T12:43:27.4521818Z test_mark_failure_stops_remaining_targets_and_recovery_does_not_resume (test_mark_execution.MarkExecutionTests.test_mark_failure_stops_remaining_targets_and_recovery_does_not_resume) ... ok
+2026-10-17T12:43:27.5585571Z test_numbering_is_stable_across_adapter_order_preserves_valid_and_applies_once (test_mark_execution.MarkExecutionTests.test_numbering_is_stable_across_adapter_order_preserves_valid_and_applies_once) ... ok
+2026-10-17T12:43:27.6372505Z test_same_session_write_invalidates_peer_plan_but_preserves_read_only_source_conflict (test_mark_execution.MarkExecutionTests.test_same_session_write_invalidates_peer_plan_but_preserves_read_only_source_conflict) ... ok
+2026-10-17T12:43:27.8147968Z test_absent_compliant_or_wrong_rule_targets_are_stale_not_ignored (test_mark_preview.MarkPreviewTests.test_absent_compliant_or_wrong_rule_targets_are_stale_not_ignored) ... ok
+2026-10-17T12:43:27.8434500Z test_collision_normalization_uses_the_explicit_audit_policy (test_mark_preview.MarkPreviewTests.test_collision_normalization_uses_the_explicit_audit_policy) ... ok
+2026-10-17T12:43:27.8766158Z test_collision_with_an_excluded_peer_and_between_proposals_blocks_readiness (test_mark_preview.MarkPreviewTests.test_collision_with_an_excluded_peer_and_between_proposals_blocks_readiness) ... ok
+2026-10-17T12:43:27.9006950Z test_distinct_explicit_targets_can_share_a_unique_mark_rule (test_mark_preview.MarkPreviewTests.test_distinct_explicit_targets_can_share_a_unique_mark_rule) ... ok
+2026-10-17T12:43:27.9255970Z test_invalid_mark_choices_reject_in_public_and_host_before_context (test_mark_preview.MarkPreviewTests.test_invalid_mark_choices_reject_in_public_and_host_before_context) ... ok
+2026-10-17T12:43:28.0899044Z test_mark_metadata_keeps_legacy_ack_blocked_when_only_layer_status_proposals_remain (test_mark_preview.MarkPreviewTests.test_mark_metadata_keeps_legacy_ack_blocked_when_only_layer_status_proposals_remain) ... ok
+2026-10-17T12:43:28.1227268Z test_missing_and_one_duplicate_mark_are_explicit_fresh_and_revalidate_without_writes (test_mark_preview.MarkPreviewTests.test_missing_and_one_duplicate_mark_are_explicit_fresh_and_revalidate_without_writes) ... ok
+2026-10-17T12:43:28.1591969Z test_unchecked_peer_blocks_validation_and_excluded_peer_edits_conflict (test_mark_preview.MarkPreviewTests.test_unchecked_peer_blocks_validation_and_excluded_peer_edits_conflict) ... ok
+2026-10-17T12:43:30.2621451Z test_conflict_gate_cancel_or_changed_source_during_review_never_writes (test_mcp_smoke.MCPSmokeTests.test_conflict_gate_cancel_or_changed_source_during_review_never_writes) ... ok
+2026-10-17T12:43:32.1280013Z test_conflict_gate_lost_reply_preserves_identity_and_recovers_without_new_apply (test_mcp_smoke.MCPSmokeTests.test_conflict_gate_lost_reply_preserves_identity_and_recovers_without_new_apply) ... Executing <Task pending name='Task-1629' coro=<MCPSmokeTests.test_conflict_gate_lost_reply_preserves_identity_and_recovers_without_new_apply() running at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/tests/test_mcp_smoke.py:375> cb=[_run_until_complete_cb() at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/base_events.py:181] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/runners.py:100> took 0.258 seconds
+2026-10-17T12:43:32.6378105Z ok
+2026-10-17T12:43:33.6864186Z test_conflict_gate_over_real_http_checks_excluded_peer_without_second_write (test_mcp_smoke.MCPSmokeTests.test_conflict_gate_over_real_http_checks_excluded_peer_without_second_write) ... Executing <Task pending name='Task-1859' coro=<MCPSmokeTests.test_conflict_gate_over_real_http_checks_excluded_peer_without_second_write() running at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/tests/test_mcp_smoke.py:344> cb=[_run_until_complete_cb() at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/base_events.py:181] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/runners.py:100> took 0.149 seconds
+2026-10-17T12:43:34.7753416Z ok
+2026-10-17T12:43:36.8776546Z test_conflict_stale_rejection_lost_reply_retains_both_identities_and_blocks_rerun (test_mcp_smoke.MCPSmokeTests.test_conflict_stale_rejection_lost_reply_retains_both_identities_and_blocks_rerun) ... ok
+2026-10-17T12:43:39.2180056Z test_controlled_unknown_lost_reply_keeps_original_id_for_read_only_recovery (test_mcp_smoke.MCPSmokeTests.test_controlled_unknown_lost_reply_keeps_original_id_for_read_only_recovery) ... ok
+2026-10-17T12:43:40.6730795Z test_diagnostic_repeated_cursor_is_bounded_and_preserves_partial_evidence (test_mcp_smoke.MCPSmokeTests.test_diagnostic_repeated_cursor_is_bounded_and_preserves_partial_evidence) ... ok
+2026-10-17T12:43:42.8023401Z test_discovery_health_version_names_box_and_diagnostic_bundle (test_mcp_smoke.MCPSmokeTests.test_discovery_health_version_names_box_and_diagnostic_bundle) ... ok
+2026-10-17T12:43:43.4252470Z test_explicit_apply_rejection_is_not_unknown_and_recovery_never_replays_it (test_mcp_smoke.MCPSmokeTests.test_explicit_apply_rejection_is_not_unknown_and_recovery_never_replays_it) ... Executing <Task pending name='mcp.client.streamable_http.StreamableHTTPTransport.post_writer.<locals>.handle_request_async' coro=<StreamableHTTPTransport.post_writer.<locals>.handle_request_async() running at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/.venv/lib/python3.12/site-packages/mcp/client/streamable_http.py:565> wait_for=<Future pending cb=[Task.task_wakeup()] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/base_events.py:448> cb=[TaskGroup._spawn.<locals>.task_done() at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:821] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/tasks.py:420> took 0.119 seconds
+2026-10-17T12:43:44.4911576Z ok
+2026-10-17T12:43:45.8429422Z test_final_batch_transports_geometry_profile_and_saves_summaries (test_mcp_smoke.MCPSmokeTests.test_final_batch_transports_geometry_profile_and_saves_summaries) ... ok
+2026-10-17T12:43:47.5559084Z test_lost_workflow_reply_preserves_identity_and_recovery_does_not_apply (test_mcp_smoke.MCPSmokeTests.test_lost_workflow_reply_preserves_identity_and_recovery_does_not_apply) ... ok
+2026-10-17T12:43:49.9220668Z test_m3_apply_cli_and_recovery_use_real_transport_with_persisted_execution (test_mcp_smoke.MCPSmokeTests.test_m3_apply_cli_and_recovery_use_real_transport_with_persisted_execution) ... ok
+2026-10-17T12:43:50.0524088Z test_m3_lost_apply_response_saves_identity_and_recovery_does_not_retry (test_mcp_smoke.MCPSmokeTests.test_m3_lost_apply_response_saves_identity_and_recovery_does_not_retry) ... Executing <Task pending name='Task-4071' coro=<Client._session_runner() running at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/.venv/lib/python3.12/site-packages/fastmcp/client/client.py:690> wait_for=<Future pending cb=[Task.task_wakeup()] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/base_events.py:448> created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/tasks.py:420> took 0.110 seconds
+2026-10-17T12:43:51.9162470Z ok
+2026-10-17T12:43:54.8888718Z test_m3_preview_gate_real_transport_and_cli_preserve_two_changes_and_five_findings (test_mcp_smoke.MCPSmokeTests.test_m3_preview_gate_real_transport_and_cli_preserve_two_changes_and_five_findings) ... ok
+2026-10-17T12:43:55.3001422Z test_m3_preview_gate_stops_after_lost_response_without_retry_or_audit (test_mcp_smoke.MCPSmokeTests.test_m3_preview_gate_stops_after_lost_response_without_retry_or_audit) ... Executing <Task pending name='mcp.client.streamable_http.StreamableHTTPTransport.post_writer.<locals>.handle_request_async' coro=<StreamableHTTPTransport.post_writer.<locals>.handle_request_async() running at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/.venv/lib/python3.12/site-packages/mcp/client/streamable_http.py:565> wait_for=<Future pending cb=[Task.task_wakeup()] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/base_events.py:448> cb=[TaskGroup._spawn.<locals>.task_done() at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:821] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/tasks.py:420> took 0.140 seconds
+2026-10-17T12:43:56.3480849Z ok
+2026-10-17T12:43:57.9616314Z test_m4_failed_native_request_is_saved_before_send_and_not_retried (test_mcp_smoke.MCPSmokeTests.test_m4_failed_native_request_is_saved_before_send_and_not_retried) ... ok
+2026-10-17T12:44:00.1471201Z test_m4_isolated_probe_quarantine_and_validation_over_http (test_mcp_smoke.MCPSmokeTests.test_m4_isolated_probe_quarantine_and_validation_over_http) ... ok
+2026-10-17T12:44:01.3636173Z test_m4_probe_stops_on_mismatched_loaded_bridge_before_queries (test_mcp_smoke.MCPSmokeTests.test_m4_probe_stops_on_mismatched_loaded_bridge_before_queries) ... ok
+2026-10-17T12:44:03.4473684Z test_mark_owner_gate_reports_expected_collision_without_any_write_over_real_transport (test_mcp_smoke.MCPSmokeTests.test_mark_owner_gate_reports_expected_collision_without_any_write_over_real_transport) ... ok
+2026-10-17T12:44:04.9051383Z test_mark_public_rule_preview_uses_exact_targets_and_cannot_bypass_apply (test_mcp_smoke.MCPSmokeTests.test_mark_public_rule_preview_uses_exact_targets_and_cannot_bypass_apply) ... ok
+2026-10-17T12:44:06.4366253Z test_metadata_inspect_diagnostics_capture_and_invalid_request_no_native_call (test_mcp_smoke.MCPSmokeTests.test_metadata_inspect_diagnostics_capture_and_invalid_request_no_native_call) ... ok
+2026-10-17T12:44:07.8313057Z test_model_audit_errors_are_captured_and_invalid_inputs_do_not_connect (test_mcp_smoke.MCPSmokeTests.test_model_audit_errors_are_captured_and_invalid_inputs_do_not_connect) ... ok
+2026-10-17T12:44:10.7017230Z test_model_audit_full_host_contract_transport_and_cli_reports (test_mcp_smoke.MCPSmokeTests.test_model_audit_full_host_contract_transport_and_cli_reports) ... ok
+2026-10-17T12:44:12.3032997Z test_model_query_schema_transport_predicates_pages_and_summary (test_mcp_smoke.MCPSmokeTests.test_model_query_schema_transport_predicates_pages_and_summary) ... ok
+2026-10-17T12:44:13.6757533Z Repair preview: 1 proposed changes; 4 excluded findings.
+2026-10-17T12:44:13.6758291Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:13.6759234Z QA-001: file 101, mark '<niezdefiniowany>', model 00000000-0000-4000-8000-000000000003, center [12000.0, 0.0, 1500.0] mm: attribute:20001 '<niezdefiniowany>' -> 'S03'.
+2026-10-17T12:44:13.6760487Z Selection: 1 selected; 5 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:44:13.6761156Z Mark validation: validated; 0 proposed collision groups; 1 remaining duplicate groups; 0 remaining missing marks.
+2026-10-17T12:44:13.6761804Z Numbering preserve-valid-fill-gaps 1.0.0: 1 exact assignments.
+2026-10-17T12:44:13.6762351Z Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:44:13.6762961Z Zapiszemy tylko C03 (12000,0): niezdefiniowany -> S03. C04 pozostanie S02.
+2026-10-17T12:44:13.6763569Z Starszy plan C04 -> S03 ma zostac odrzucony. Nie edytuj modelu ani nie koncz hosta podczas testu.
+2026-10-17T12:44:13.6764115Z Repair preview: 1 proposed changes; 4 excluded findings.
+2026-10-17T12:44:13.6764669Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:13.6765594Z QA-001: file 101, mark '<niezdefiniowany>', model 00000000-0000-4000-8000-000000000003, center [12000.0, 0.0, 1500.0] mm: attribute:20001 '<niezdefiniowany>' -> 'S03'.
+2026-10-17T12:44:13.6766381Z Selection: 1 selected; 5 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:44:13.6767480Z Mark validation: validated; 0 proposed collision groups; 1 remaining duplicate groups; 0 remaining missing marks.
+2026-10-17T12:44:13.6768143Z Numbering preserve-valid-fill-gaps 1.0.0: 1 exact assignments.
+2026-10-17T12:44:13.6768710Z Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:44:13.6769774Z Zapiszemy tylko C03 (12000,0): niezdefiniowany -> S03. C04 pozostanie S02.
+2026-10-17T12:44:13.6770661Z Starszy plan C04 -> S03 ma zostac odrzucony. Nie edytuj modelu ani nie koncz hosta podczas testu.
+2026-10-17T12:44:13.6771259Z Repair preview: 1 proposed changes; 4 excluded findings.
+2026-10-17T12:44:13.6771811Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:13.6772771Z QA-001: file 101, mark '<niezdefiniowany>', model 00000000-0000-4000-8000-000000000003, center [12000.0, 0.0, 1500.0] mm: attribute:20001 '<niezdefiniowany>' -> 'S03'.
+2026-10-17T12:44:13.6773624Z Selection: 1 selected; 5 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:44:13.6774317Z Mark validation: validated; 0 proposed collision groups; 1 remaining duplicate groups; 0 remaining missing marks.
+2026-10-17T12:44:13.6775049Z Numbering preserve-valid-fill-gaps 1.0.0: 1 exact assignments.
+2026-10-17T12:44:13.6775652Z Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:44:13.6776342Z Zapiszemy tylko C03 (12000,0): niezdefiniowany -> S03. C04 pozostanie S02.
+2026-10-17T12:44:13.6776995Z Starszy plan C04 -> S03 ma zostac odrzucony. Nie edytuj modelu ani nie koncz hosta podczas testu.
+2026-10-17T12:44:13.6777585Z Repair preview: 1 proposed changes; 4 excluded findings.
+2026-10-17T12:44:13.6778130Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:13.6779015Z QA-001: file 101, mark '<niezdefiniowany>', model 00000000-0000-4000-8000-000000000003, center [12000.0, 0.0, 1500.0] mm: attribute:20001 '<niezdefiniowany>' -> 'S03'.
+2026-10-17T12:44:13.6780007Z Selection: 1 selected; 5 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:44:13.6780635Z Mark validation: validated; 0 proposed collision groups; 1 remaining duplicate groups; 0 remaining missing marks.
+2026-10-17T12:44:13.6781255Z Numbering preserve-valid-fill-gaps 1.0.0: 1 exact assignments.
+2026-10-17T12:44:13.6781795Z Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:44:13.6782377Z Zapiszemy tylko C03 (12000,0): niezdefiniowany -> S03. C04 pozostanie S02.
+2026-10-17T12:44:13.6782954Z Starszy plan C04 -> S03 ma zostac odrzucony. Nie edytuj modelu ani nie koncz hosta podczas testu.
+2026-10-17T12:44:13.6783496Z Repair preview: 1 proposed changes; 4 excluded findings.
+2026-10-17T12:44:13.6784128Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:13.6785191Z QA-001: file 101, mark '<niezdefiniowany>', model 00000000-0000-4000-8000-000000000003, center [12000.0, 0.0, 1500.0] mm: attribute:20001 '<niezdefiniowany>' -> 'S03'.
+2026-10-17T12:44:13.6786081Z Selection: 1 selected; 5 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:44:13.6786737Z Mark validation: validated; 0 proposed collision groups; 1 remaining duplicate groups; 0 remaining missing marks.
+2026-10-17T12:44:13.6787444Z Numbering preserve-valid-fill-gaps 1.0.0: 1 exact assignments.
+2026-10-17T12:44:13.6788059Z Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:44:13.6788662Z Zapiszemy tylko C03 (12000,0): niezdefiniowany -> S03. C04 pozostanie S02.
+2026-10-17T12:44:13.6789273Z Starszy plan C04 -> S03 ma zostac odrzucony. Nie edytuj modelu ani nie koncz hosta podczas testu.
+2026-10-17T12:44:13.6790028Z Repair preview: 2 proposed changes; 1 excluded findings.
+2026-10-17T12:44:13.6790619Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:13.6791948Z QA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm: attribute:20001 '<niezdefiniowany>' -> 'S03'.
+2026-10-17T12:44:13.6792958Z QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:44:13.6793977Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 0 remaining missing marks.
+2026-10-17T12:44:13.6794633Z Numbering preserve-valid-fill-gaps 1.0.0: 2 exact assignments.
+2026-10-17T12:44:13.6795206Z Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:44:13.6795882Z Test zapisze tylko C03=S03 i zatrzyma sie przed odczytem wyniku. C04 pozostanie S02.
+2026-10-17T12:44:13.6796523Z Potem wymagany restart StartPythonHost i osobna inspekcja. Nie uzywaj Undo przed inspekcja.
+2026-10-17T12:44:13.6797082Z Repair preview: 2 proposed changes; 3 excluded findings.
+2026-10-17T12:44:13.6797663Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:13.6798424Z QA-003: file 101, mark 'S05', model 00000000-0000-4000-8000-000000000005, center [6000.0, 6000.0, 1500.0] mm: layer_id 8 -> 7.
+2026-10-17T12:44:13.6799249Z QA-004: file 101, mark 'S06', model 00000000-0000-4000-8000-000000000006, center [12000.0, 6000.0, 1500.0] mm: attribute:20002 'NWE' -> 'NEW'.
+2026-10-17T12:44:13.6801096Z Sprawdz cele w UI: C05/S05 warstwa SZ_OGÓ02 -> SZ_OGÓ01; C06/S06 status NWE -> NEW.
+2026-10-17T12:44:13.6801777Z Tylko jednorazowa kopia projektu, plik 101 na pierwszym planie. Undo dwoch napraw wymaga dwoch osobnych krokow w UI.
+2026-10-17T12:44:13.6802462Z Repair preview: 1 proposed changes; 4 excluded findings.
+2026-10-17T12:44:13.6803074Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:13.6803978Z QA-003: file 101, mark 'S05', model 00000000-0000-4000-8000-000000000005, center [6000.0, 6000.0, 1500.0] mm: layer_id 8 -> 7.
+2026-10-17T12:44:13.6804701Z Selection: 5 selected; 1 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:44:13.6805300Z Standard: native-model-qa-demo-layer-status 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:44:13.6805961Z Tylko sprawdzona jednorazowa kopia projektu. Ten krok zapisze jedna wyswietlona zmiane.
+2026-10-17T12:44:13.6806512Z Repair preview: 2 proposed changes; 3 excluded findings.
+2026-10-17T12:44:13.6807107Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:13.6807912Z QA-003: file 101, mark 'S05', model 00000000-0000-4000-8000-000000000005, center [6000.0, 6000.0, 1500.0] mm: layer_id 8 -> 7.
+2026-10-17T12:44:13.6808743Z QA-004: file 101, mark 'S06', model 00000000-0000-4000-8000-000000000006, center [12000.0, 6000.0, 1500.0] mm: attribute:20002 'NWE' -> 'NEW'.
+2026-10-17T12:44:13.6809948Z Sprawdz cele w UI: C05/S05 warstwa SZ_OGÓ02 -> SZ_OGÓ01; C06/S06 status NWE -> NEW.
+2026-10-17T12:44:13.6810656Z Tylko jednorazowa kopia projektu, plik 101 na pierwszym planie. Undo dwoch napraw wymaga dwoch osobnych krokow w UI.
+2026-10-17T12:44:13.6811254Z Repair preview: 2 proposed changes; 3 excluded findings.
+2026-10-17T12:44:13.6811858Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:13.6812671Z QA-003: file 101, mark 'S05', model 00000000-0000-4000-8000-000000000005, center [6000.0, 6000.0, 1500.0] mm: layer_id 8 -> 7.
+2026-10-17T12:44:13.6813530Z QA-004: file 101, mark 'S06', model 00000000-0000-4000-8000-000000000006, center [12000.0, 6000.0, 1500.0] mm: attribute:20002 'NWE' -> 'NEW'.
+2026-10-17T12:44:13.6814396Z Sprawdz cele w UI: C05/S05 warstwa SZ_OGÓ02 -> SZ_OGÓ01; C06/S06 status NWE -> NEW.
+2026-10-17T12:44:13.6815109Z Tylko jednorazowa kopia projektu, plik 101 na pierwszym planie. Undo dwoch napraw wymaga dwoch osobnych krokow w UI.
+2026-10-17T12:44:13.6816053Z Repair preview: 2 proposed changes; 3 excluded findings.
+2026-10-17T12:44:13.6816636Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:13.6817387Z QA-003: file 101, mark 'S05', model 00000000-0000-4000-8000-000000000005, center [6000.0, 6000.0, 1500.0] mm: layer_id 8 -> 7.
+2026-10-17T12:44:13.6818423Z QA-004: file 101, mark 'S06', model 00000000-0000-4000-8000-000000000006, center [12000.0, 6000.0, 1500.0] mm: attribute:20002 'NWE' -> 'NEW'.
+2026-10-17T12:44:13.6819333Z Sprawdz cele w UI: C05/S05 warstwa SZ_OGÓ02 -> SZ_OGÓ01; C06/S06 status NWE -> NEW.
+2026-10-17T12:44:13.6820192Z Tylko jednorazowa kopia projektu, plik 101 na pierwszym planie. Undo dwoch napraw wymaga dwoch osobnych krokow w UI.
+2026-10-17T12:44:13.6820826Z Repair preview: 2 proposed changes; 3 excluded findings.
+2026-10-17T12:44:13.6821438Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:13.6822377Z QA-001: file 101, mark '<niezdefiniowany>', model 00000000-0000-4000-8000-000000000003, center [12000.0, 0.0, 1500.0] mm: attribute:20001 '<niezdefiniowany>' -> 'S03'.
+2026-10-17T12:44:13.6823393Z QA-002: file 101, mark 'S02', model 00000000-0000-4000-8000-000000000004, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:44:13.6824258Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 0 remaining missing marks.
+2026-10-17T12:44:13.6824919Z Numbering preserve-valid-fill-gaps 1.0.0: 2 exact assignments.
+2026-10-17T12:44:14.1047368Z test_numbering_cancellation_and_changed_marks_do_not_send_apply (test_mcp_smoke.MCPSmokeTests.test_numbering_cancellation_and_changed_marks_do_not_send_apply) ... ok
+2026-10-17T12:44:15.9766659Z test_numbering_gate_over_real_http_applies_exact_marks_and_then_noops (test_mcp_smoke.MCPSmokeTests.test_numbering_gate_over_real_http_applies_exact_marks_and_then_noops) ... ok
+2026-10-17T12:44:17.8357491Z test_numbering_lost_reply_recovers_without_replaying_apply (test_mcp_smoke.MCPSmokeTests.test_numbering_lost_reply_recovers_without_replaying_apply) ... ok
+2026-10-17T12:44:18.9905553Z test_partial_snapshot_collateral_change_blocks_gate_and_preserves_unknown (test_mcp_smoke.MCPSmokeTests.test_partial_snapshot_collateral_change_blocks_gate_and_preserves_unknown) ... Executing <Task pending name='Task-6921' coro=<MCPSmokeTests.test_partial_snapshot_collateral_change_blocks_gate_and_preserves_unknown() running at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/tests/test_mcp_smoke.py:331> cb=[_run_until_complete_cb() at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/base_events.py:181] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/runners.py:100> took 0.136 seconds
+2026-10-17T12:44:19.9453067Z ok
+2026-10-17T12:44:21.9895751Z test_recovery_gate_cancel_and_source_change_during_review_never_write (test_mcp_smoke.MCPSmokeTests.test_recovery_gate_cancel_and_source_change_during_review_never_write) ... ok
+2026-10-17T12:44:23.9021448Z test_recovery_gate_retains_separate_lost_probe_identity_and_blocks_inspection (test_mcp_smoke.MCPSmokeTests.test_recovery_gate_retains_separate_lost_probe_identity_and_blocks_inspection) ... ok
+2026-10-17T12:44:26.3995484Z test_recovery_preview_wrong_order_blocks_before_apply_and_allows_corrected_gate (test_mcp_smoke.MCPSmokeTests.test_recovery_preview_wrong_order_blocks_before_apply_and_allows_corrected_gate) ... ok
+2026-10-17T12:44:28.2139429Z test_recovery_test_pre_setter_rejection_is_explicit_and_inspection_sends_no_recover (test_mcp_smoke.MCPSmokeTests.test_recovery_test_pre_setter_rejection_is_explicit_and_inspection_sends_no_recover) ... ok
+2026-10-17T12:44:29.4286581Z test_stability_cli_runs_two_reads_and_protected_host_rejection_then_health (test_mcp_smoke.MCPSmokeTests.test_stability_cli_runs_two_reads_and_protected_host_rejection_then_health) ... Executing <Task pending name='Task-8164' coro=<MCPSmokeTests.test_stability_cli_runs_two_reads_and_protected_host_rejection_then_health() running at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/tests/test_mcp_smoke.py:969> wait_for=<Future pending cb=[_chain_future.<locals>._call_check_cancel() at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/futures.py:389, Task.task_wakeup()] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/base_events.py:448> cb=[_run_until_complete_cb() at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/base_events.py:181] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/runners.py:100> took 0.183 seconds
+2026-10-17T12:44:31.1222806Z ok
+2026-10-17T12:44:32.8811758Z test_stability_requires_loaded_boundary_and_matching_install_before_model_reads (test_mcp_smoke.MCPSmokeTests.test_stability_requires_loaded_boundary_and_matching_install_before_model_reads) ... ok
+2026-10-17T12:44:34.6567962Z test_stability_stops_after_second_read_failure_and_never_retries (test_mcp_smoke.MCPSmokeTests.test_stability_stops_after_second_read_failure_and_never_retries) ... ok
+2026-10-17T12:44:36.1804312Z test_standard_and_rule_previews_share_native_plans_and_reject_legacy_apply (test_mcp_smoke.MCPSmokeTests.test_standard_and_rule_previews_share_native_plans_and_reject_legacy_apply) ... ok
+2026-10-17T12:44:37.2138150Z test_standard_owner_gate_is_read_only_over_real_transport_and_keeps_full_audit (test_mcp_smoke.MCPSmokeTests.test_standard_owner_gate_is_read_only_over_real_transport_and_keeps_full_audit) ... Executing <Task pending name='Task-8782' coro=<MCPSmokeTests.test_standard_owner_gate_is_read_only_over_real_transport_and_keeps_full_audit() running at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/tests/test_mcp_smoke.py:690> cb=[_run_until_complete_cb() at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/base_events.py:181] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/runners.py:100> took 0.132 seconds
+2026-10-17T12:44:37.9544404Z ok
+2026-10-17T12:44:39.4278753Z test_ui_stall_returns_explicit_error_and_same_mcp_session_recovers (test_mcp_smoke.MCPSmokeTests.test_ui_stall_returns_explicit_error_and_same_mcp_session_recovers) ... ok
+2026-10-17T12:44:40.6733052Z Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:44:40.6733796Z Sprawdz jednorazowa kopie i cele: C03 (12000,0) -> S03, C04 (0,6000) -> S04.
+2026-10-17T12:44:40.6734335Z Zmiana dotyczy danych atrybutu oznaczenia. Sprawdz oba pola w UI po tescie.
+2026-10-17T12:44:40.6734813Z Repair preview: 2 proposed changes; 3 excluded findings.
+2026-10-17T12:44:40.6735374Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:40.6736281Z QA-001: file 101, mark '<niezdefiniowany>', model 00000000-0000-4000-8000-000000000003, center [12000.0, 0.0, 1500.0] mm: attribute:20001 '<niezdefiniowany>' -> 'S03'.
+2026-10-17T12:44:40.6737250Z QA-002: file 101, mark 'S02', model 00000000-0000-4000-8000-000000000004, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:44:40.6738026Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 0 remaining missing marks.
+2026-10-17T12:44:40.6738633Z Numbering preserve-valid-fill-gaps 1.0.0: 2 exact assignments.
+2026-10-17T12:44:40.6739200Z Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:44:40.6739991Z Sprawdz jednorazowa kopie i cele: C03 (12000,0) -> S03, C04 (0,6000) -> S04.
+2026-10-17T12:44:40.6740508Z Zmiana dotyczy danych atrybutu oznaczenia. Sprawdz oba pola w UI po tescie.
+2026-10-17T12:44:40.6740964Z Repair preview: 2 proposed changes; 3 excluded findings.
+2026-10-17T12:44:40.6741516Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:40.6742413Z QA-001: file 101, mark '<niezdefiniowany>', model 00000000-0000-4000-8000-000000000003, center [12000.0, 0.0, 1500.0] mm: attribute:20001 '<niezdefiniowany>' -> 'S03'.
+2026-10-17T12:44:40.6743668Z QA-002: file 101, mark 'S02', model 00000000-0000-4000-8000-000000000004, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:44:40.6744472Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 0 remaining missing marks.
+2026-10-17T12:44:40.6745285Z Numbering preserve-valid-fill-gaps 1.0.0: 2 exact assignments.
+2026-10-17T12:44:40.6745838Z Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:44:40.6746447Z Sprawdz jednorazowa kopie i cele: C03 (12000,0) -> S03, C04 (0,6000) -> S04.
+2026-10-17T12:44:40.6746956Z Zmiana dotyczy danych atrybutu oznaczenia. Sprawdz oba pola w UI po tescie.
+2026-10-17T12:44:40.6747434Z Repair preview: 2 proposed changes; 1 excluded findings.
+2026-10-17T12:44:40.6747976Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:40.6748870Z QA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm: attribute:20001 '<niezdefiniowany>' -> 'S03'.
+2026-10-17T12:44:40.6750000Z QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:44:40.6750808Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 0 remaining missing marks.
+2026-10-17T12:44:40.6751421Z Numbering preserve-valid-fill-gaps 1.0.0: 2 exact assignments.
+2026-10-17T12:44:40.6751955Z Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:44:40.6752578Z Test zapisze tylko C03=S03 i zatrzyma sie przed odczytem wyniku. C04 pozostanie S02.
+2026-10-17T12:44:40.6753195Z Potem wymagany restart StartPythonHost i osobna inspekcja. Nie uzywaj Undo przed inspekcja.
+2026-10-17T12:44:40.6753738Z Repair preview: 2 proposed changes; 1 excluded findings.
+2026-10-17T12:44:40.6754299Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:40.6755196Z QA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm: attribute:20001 '<niezdefiniowany>' -> 'S03'.
+2026-10-17T12:44:40.6756174Z QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:44:40.6756998Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 0 remaining missing marks.
+2026-10-17T12:44:40.6757627Z Numbering preserve-valid-fill-gaps 1.0.0: 2 exact assignments.
+2026-10-17T12:44:40.6758178Z Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:44:40.6758774Z Test zapisze tylko C03=S03 i zatrzyma sie przed odczytem wyniku. C04 pozostanie S02.
+2026-10-17T12:44:40.6759383Z Potem wymagany restart StartPythonHost i osobna inspekcja. Nie uzywaj Undo przed inspekcja.
+2026-10-17T12:44:40.6760060Z Repair preview: 2 proposed changes; 1 excluded findings.
+2026-10-17T12:44:40.6760621Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:40.6761499Z QA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm: attribute:20001 '<niezdefiniowany>' -> 'S03'.
+2026-10-17T12:44:40.6762473Z QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:44:40.6763293Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 0 remaining missing marks.
+2026-10-17T12:44:40.6763935Z Numbering preserve-valid-fill-gaps 1.0.0: 2 exact assignments.
+2026-10-17T12:44:40.6764468Z Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:44:40.6765273Z Test zapisze tylko C03=S03 i zatrzyma sie przed odczytem wyniku. C04 pozostanie S02.
+2026-10-17T12:44:40.6765860Z Potem wymagany restart StartPythonHost i osobna inspekcja. Nie uzywaj Undo przed inspekcja.
+2026-10-17T12:44:40.6766365Z Repair preview: 2 proposed changes; 1 excluded findings.
+2026-10-17T12:44:40.6768758Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:40.6769930Z QA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm: attribute:20001 '<niezdefiniowany>' -> 'S03'.
+2026-10-17T12:44:40.6770895Z QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:44:40.6771729Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 0 remaining missing marks.
+2026-10-17T12:44:40.6772365Z Numbering preserve-valid-fill-gaps 1.0.0: 2 exact assignments.
+2026-10-17T12:44:40.6772927Z Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:44:40.6773542Z Test zapisze tylko C03=S03 i zatrzyma sie przed odczytem wyniku. C04 pozostanie S02.
+2026-10-17T12:44:40.6774142Z Potem wymagany restart StartPythonHost i osobna inspekcja. Nie uzywaj Undo przed inspekcja.
+2026-10-17T12:44:40.6774662Z Repair preview: 2 proposed changes; 1 excluded findings.
+2026-10-17T12:44:40.6775230Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:40.6776105Z QA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm: attribute:20001 '<niezdefiniowany>' -> 'S03'.
+2026-10-17T12:44:40.6777075Z QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:44:40.6777906Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 0 remaining missing marks.
+2026-10-17T12:44:40.6778524Z Numbering preserve-valid-fill-gaps 1.0.0: 2 exact assignments.
+2026-10-17T12:44:40.6779065Z Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:44:40.6779830Z Test zapisze tylko C03=S03 i zatrzyma sie przed odczytem wyniku. C04 pozostanie S02.
+2026-10-17T12:44:40.6780447Z Potem wymagany restart StartPythonHost i osobna inspekcja. Nie uzywaj Undo przed inspekcja.
+2026-10-17T12:44:40.6780982Z Repair preview: 2 proposed changes; 1 excluded findings.
+2026-10-17T12:44:40.6781509Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:40.6782403Z QA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm: attribute:20001 '<niezdefiniowany>' -> 'S03'.
+2026-10-17T12:44:40.6783380Z QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:44:40.6784194Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 0 remaining missing marks.
+2026-10-17T12:44:40.6784827Z Numbering preserve-valid-fill-gaps 1.0.0: 2 exact assignments.
+2026-10-17T12:44:40.6785365Z Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:44:40.6785974Z Test zapisze tylko C03=S03 i zatrzyma sie przed odczytem wyniku. C04 pozostanie S02.
+2026-10-17T12:44:40.6786577Z Potem wymagany restart StartPythonHost i osobna inspekcja. Nie uzywaj Undo przed inspekcja.
+2026-10-17T12:44:40.6787100Z Repair preview: 2 proposed changes; 1 excluded findings.
+2026-10-17T12:44:40.6787646Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:44:40.6788535Z QA-001: file 101, mark '<niezdefiniowany>', model 65ab07fe-d37a-4adf-b1b6-3040fdde84a2, center [12000.0, 0.0, 1500.0] mm: attribute:20001 '<niezdefiniowany>' -> 'S03'.
+2026-10-17T12:44:40.6789972Z QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:44:40.6790799Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 0 remaining missing marks.
+2026-10-17T12:44:40.6791563Z Numbering preserve-valid-fill-gaps 1.0.0: 2 exact assignments.
+2026-10-17T12:44:40.6792108Z Standard: native-model-qa-demo-mark-numbering 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:44:41.9995493Z test_unknown_recovery_gate_restart_inspection_undo_and_replays_never_resume (test_mcp_smoke.MCPSmokeTests.test_unknown_recovery_gate_restart_inspection_undo_and_replays_never_resume) ... ok
+2026-10-17T12:44:43.6819217Z test_workflow_gate_stops_on_wrong_fixture_and_second_write_needs_separate_confirmation (test_mcp_smoke.MCPSmokeTests.test_workflow_gate_stops_on_wrong_fixture_and_second_write_needs_separate_confirmation) ... ok
+2026-10-17T12:44:44.7105456Z test_workflow_owner_gate_writes_two_separate_single_targets_and_deduplicates (test_mcp_smoke.MCPSmokeTests.test_workflow_owner_gate_writes_two_separate_single_targets_and_deduplicates) ... Executing <Task pending name='Task-9851' coro=<MCPSmokeTests.test_workflow_owner_gate_writes_two_separate_single_targets_and_deduplicates() running at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/tests/test_mcp_smoke.py:517> cb=[_run_until_complete_cb() at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/base_events.py:181] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/runners.py:100> took 0.145 seconds
+2026-10-17T12:44:45.5727631Z ok
+2026-10-17T12:44:47.0506542Z test_workflow_rejection_is_explicit_and_sends_no_recovery (test_mcp_smoke.MCPSmokeTests.test_workflow_rejection_is_explicit_and_sends_no_recovery) ... ok
+2026-10-17T12:44:47.2388335Z test_absent_null_empty_literal_and_types_have_explicit_semantics (test_model_audit.AuditTests.test_absent_null_empty_literal_and_types_have_explicit_semantics) ... ok
+2026-10-17T12:44:47.2757758Z test_changed_source_reruns_and_updates_evidence_no_cached_finding_authority (test_model_audit.AuditTests.test_changed_source_reruns_and_updates_evidence_no_cached_finding_authority) ... ok
+2026-10-17T12:44:47.3026767Z test_demo_five_findings_with_raw_evidence_scope_and_locators (test_model_audit.AuditTests.test_demo_five_findings_with_raw_evidence_scope_and_locators) ... ok
+2026-10-17T12:44:47.3343454Z test_dimension_rules_use_mm_tolerance_and_preserve_unknown (test_model_audit.AuditTests.test_dimension_rules_use_mm_tolerance_and_preserve_unknown) ... ok
+2026-10-17T12:44:47.4951261Z test_duplicates_deduplicate_views_and_conflicting_identity_degrades_coverage (test_model_audit.AuditTests.test_duplicates_deduplicate_views_and_conflicting_identity_degrades_coverage) ... ok
+2026-10-17T12:44:47.5156050Z test_empty_and_unloaded_scope_distinguish_not_applicable_and_not_checked (test_model_audit.AuditTests.test_empty_and_unloaded_scope_distinguish_not_applicable_and_not_checked) ... ok
+2026-10-17T12:44:47.5384918Z test_failed_reads_and_unknown_peer_never_become_unique_pass (test_model_audit.AuditTests.test_failed_reads_and_unknown_peer_never_become_unique_pass) ... ok
+2026-10-17T12:44:47.6209105Z test_incident_scope_returns_http_error_without_escaping_ui_or_reading_model (test_model_audit.AuditTests.test_incident_scope_returns_http_error_without_escaping_ui_or_reading_model) ... ok
+2026-10-17T12:44:47.6386108Z test_invalid_profiles_and_scope_never_call_native_read (test_model_audit.AuditTests.test_invalid_profiles_and_scope_never_call_native_read) ... ok
+2026-10-17T12:44:47.7512727Z test_malformed_dimension_rules_are_rejected_before_resources (test_model_audit.AuditTests.test_malformed_dimension_rules_are_rejected_before_resources) ... ok
+2026-10-17T12:44:47.7758101Z test_missing_locator_geometry_does_not_invent_rule_failure (test_model_audit.AuditTests.test_missing_locator_geometry_does_not_invent_rule_failure) ... ok
+2026-10-17T12:44:47.7921884Z test_profile_resource_failure_blocks_audit_before_enumeration (test_model_audit.AuditTests.test_profile_resource_failure_blocks_audit_before_enumeration) ... ok
+2026-10-17T12:44:47.8128040Z test_read_and_report_budgets_fail_without_partial_selection (test_model_audit.AuditTests.test_read_and_report_budgets_fail_without_partial_selection) ... ok
+2026-10-17T12:44:47.8188596Z test_read_profile_kept_byte_identical_and_m2_resource_matches_example (test_model_audit.AuditTests.test_read_profile_kept_byte_identical_and_m2_resource_matches_example) ... ok
+2026-10-17T12:44:47.8392816Z test_rules_share_the_scan_time_budget (test_model_audit.AuditTests.test_rules_share_the_scan_time_budget) ... ok
+2026-10-17T12:44:48.0043715Z test_rules_subsets_validate_and_use_complete_snapshot (test_model_audit.AuditTests.test_rules_subsets_validate_and_use_complete_snapshot) ... ok
+2026-10-17T12:44:48.0355934Z test_string_normalization_is_declared_and_preserves_raw_case (test_model_audit.AuditTests.test_string_normalization_is_declared_and_preserves_raw_case) ... ok
+2026-10-17T12:44:48.0658397Z test_uniqueness_is_per_file_and_family_with_explicit_larger_profile (test_model_audit.AuditTests.test_uniqueness_is_per_file_and_family_with_explicit_larger_profile) ... ok
+2026-10-17T12:44:48.0756117Z test_budget_failure_returns_no_selection_or_partial_success (test_model_metadata.MetadataTests.test_budget_failure_returns_no_selection_or_partial_success) ... ok
+2026-10-17T12:44:48.0848813Z test_failed_resource_fields_do_not_erase_observed_values_or_bind (test_model_metadata.MetadataTests.test_failed_resource_fields_do_not_erase_observed_values_or_bind) ... ok
+2026-10-17T12:44:48.0911956Z test_invalid_inspect_contract_never_reads_native_resources (test_model_metadata.MetadataTests.test_invalid_inspect_contract_never_reads_native_resources) ... ok
+2026-10-17T12:44:48.1004602Z test_native_api_arguments_and_raw_passive_omission_are_distinct (test_model_metadata.MetadataTests.test_native_api_arguments_and_raw_passive_omission_are_distinct) ... ok
+2026-10-17T12:44:48.1096149Z test_resource_change_affects_probe_fingerprint_not_element_source (test_model_metadata.MetadataTests.test_resource_change_affects_probe_fingerprint_not_element_source) ... ok
+2026-10-17T12:44:48.1200083Z test_sample_is_bounded_sorted_and_layers_cover_only_sample (test_model_metadata.MetadataTests.test_sample_is_bounded_sorted_and_layers_cover_only_sample) ... ok
+2026-10-17T12:44:48.1285635Z test_unloaded_requested_scope_is_omitted_and_empty_layers_are_not_invented (test_model_metadata.MetadataTests.test_unloaded_requested_scope_is_omitted_and_empty_layers_are_not_invented) ... ok
+2026-10-17T12:44:48.2710019Z test_absent_null_empty_undefined_failed_and_passive_values_remain_distinct (test_model_properties.PropertyTests.test_absent_null_empty_undefined_failed_and_passive_values_remain_distinct) ... ok
+2026-10-17T12:44:48.2761963Z test_crashing_discovery_route_is_quarantined_before_all_native_access (test_model_properties.PropertyTests.test_crashing_discovery_route_is_quarantined_before_all_native_access) ... ok
+2026-10-17T12:44:48.2863519Z test_differing_attribute_representations_are_not_first_view_success (test_model_properties.PropertyTests.test_differing_attribute_representations_are_not_first_view_success) ... ok
+2026-10-17T12:44:48.2994226Z test_discovery_exact_native_names_types_units_enums_and_separate_properties (test_model_properties.PropertyTests.test_discovery_exact_native_names_types_units_enums_and_separate_properties) ... ok
+2026-10-17T12:44:48.3147529Z test_discovery_over_budget_and_duplicate_inventory_have_no_partial_success (test_model_properties.PropertyTests.test_discovery_over_budget_and_duplicate_inventory_have_no_partial_success) ... ok
+2026-10-17T12:44:48.8947658Z test_highlight_uses_full_selection_all_pages_and_excludes_only_explicit_member (test_model_properties.PropertyTests.test_highlight_uses_full_selection_all_pages_and_excludes_only_explicit_member) ... ok
+2026-10-17T12:44:48.9006007Z test_invalid_contracts_reject_before_native_document_and_enumeration (test_model_properties.PropertyTests.test_invalid_contracts_reject_before_native_document_and_enumeration) ... ok
+2026-10-17T12:44:48.9143596Z test_metadata_budget_reports_unsampled_definitions_and_failure_does_not_erase_value (test_model_properties.PropertyTests.test_metadata_budget_reports_unsampled_definitions_and_failure_does_not_erase_value) ... ok
+2026-10-17T12:44:48.9277154Z test_mismatched_name_and_layer_round_trips_never_bind (test_model_properties.PropertyTests.test_mismatched_name_and_layer_round_trips_never_bind) ... ok
+2026-10-17T12:44:48.9385726Z test_native_select_is_unsupported_and_does_not_substitute_highlight (test_model_properties.PropertyTests.test_native_select_is_unsupported_and_does_not_substitute_highlight) ... ok
+2026-10-17T12:44:48.9527658Z test_open_default_passive_known_unknown_and_inventory_change_invalidate (test_model_properties.PropertyTests.test_open_default_passive_known_unknown_and_inventory_change_invalidate) ... ok
+2026-10-17T12:44:48.9680739Z test_stale_expired_during_scan_and_absent_exception_never_touch_ui (test_model_properties.PropertyTests.test_stale_expired_during_scan_and_absent_exception_never_touch_ui) ... ok
+2026-10-17T12:44:48.9814912Z test_ui_exception_is_unknown_without_retry_and_clear_is_document_wide (test_model_properties.PropertyTests.test_ui_exception_is_unknown_without_retry_and_clear_is_document_wide) ... ok
+2026-10-17T12:44:48.9968626Z test_change_to_rejected_candidate_new_identity_and_deletion_invalidate_selection (test_model_query.QueryTests.test_change_to_rejected_candidate_new_identity_and_deletion_invalidate_selection) ... ok
+2026-10-17T12:44:49.0071016Z test_composition_numeric_tolerance_and_string_normalization (test_model_query.QueryTests.test_composition_numeric_tolerance_and_string_normalization) ... ok
+2026-10-17T12:44:49.0182106Z test_duplicate_views_collapse_but_differing_values_do_not_pick_an_arbitrary_representation (test_model_query.QueryTests.test_duplicate_views_collapse_but_differing_values_do_not_pick_an_arbitrary_representation) ... ok
+2026-10-17T12:44:49.0370066Z test_expiry_eviction_restart_and_cross_selection_cursors (test_model_query.QueryTests.test_expiry_eviction_restart_and_cross_selection_cursors) ... ok
+2026-10-17T12:44:49.2642797Z test_fields_are_read_only_when_requested_or_used_by_predicate (test_model_query.QueryTests.test_fields_are_read_only_when_requested_or_used_by_predicate) ... ok
+2026-10-17T12:44:49.2712450Z test_invalid_requests_never_enumerate_and_unknown_geometry_is_rejected (test_model_query.QueryTests.test_invalid_requests_never_enumerate_and_unknown_geometry_is_rejected) ... ok
+2026-10-17T12:44:49.2795980Z test_loaded_empty_scope_has_zero_observed_identities_without_whole_project_claim (test_model_query.QueryTests.test_loaded_empty_scope_has_zero_observed_identities_without_whole_project_claim) ... ok
+2026-10-17T12:44:49.2968686Z test_missing_null_empty_zero_and_failed_reads_are_distinct (test_model_query.QueryTests.test_missing_null_empty_zero_and_failed_reads_are_distinct) ... ok
+2026-10-17T12:44:49.3128984Z test_pages_are_stable_and_summary_uses_all_targets_not_just_the_first_page (test_model_query.QueryTests.test_pages_are_stable_and_summary_uses_all_targets_not_just_the_first_page) ... ok
+2026-10-17T12:44:49.3232025Z test_passive_sign_conflicts_and_duplicate_attribute_ids_are_not_silently_resolved (test_model_query.QueryTests.test_passive_sign_conflicts_and_duplicate_attribute_ids_are_not_silently_resolved) ... ok
+2026-10-17T12:44:49.3300622Z test_predicate_structure_and_depth_are_bounded (test_model_query.QueryTests.test_predicate_structure_and_depth_are_bounded) ... ok
+2026-10-17T12:44:49.3412068Z test_project_document_and_scoped_file_state_changes_invalidate (test_model_query.QueryTests.test_project_document_and_scoped_file_state_changes_invalidate) ... ok
+2026-10-17T12:44:49.3487089Z test_scalar_types_are_not_coerced_and_ordered_type_mismatch_is_unknown (test_model_query.QueryTests.test_scalar_types_are_not_coerced_and_ordered_type_mismatch_is_unknown) ... ok
+2026-10-17T12:44:49.3571305Z test_scan_budget_and_read_failures_do_not_create_partial_selections (test_model_query.QueryTests.test_scan_budget_and_read_failures_do_not_create_partial_selections) ... ok
+2026-10-17T12:44:49.3677055Z test_scope_reports_unloaded_and_passive_omissions_and_normalizes_signed_identity (test_model_query.QueryTests.test_scope_reports_unloaded_and_passive_omissions_and_normalizes_signed_identity) ... ok
+2026-10-17T12:44:49.3769329Z test_selection_is_unverifiable_when_context_or_enumeration_fails (test_model_query.QueryTests.test_selection_is_unverifiable_when_context_or_enumeration_fails) ... ok
+2026-10-17T12:44:49.3873012Z test_selection_responses_cannot_mutate_cached_state (test_model_query.QueryTests.test_selection_responses_cannot_mutate_cached_state) ... ok
+2026-10-17T12:44:49.3957000Z test_snapshot_and_time_budgets_do_not_leave_partial_selections (test_model_query.QueryTests.test_snapshot_and_time_budgets_do_not_leave_partial_selections) ... ok
+2026-10-17T12:44:49.4057343Z test_unknown_identity_is_omitted_and_invalid_file_identity_is_reported (test_model_query.QueryTests.test_unknown_identity_is_omitted_and_invalid_file_identity_is_reported) ... ok
+2026-10-17T12:44:49.4119932Z test_unreadable_context_fails_before_enumeration (test_model_query.QueryTests.test_unreadable_context_fails_before_enumeration) ... ok
+2026-10-17T12:44:49.5424232Z test_unrequested_attributes_and_outside_scope_changes_do_not_invalidate (test_model_query.QueryTests.test_unrequested_attributes_and_outside_scope_changes_do_not_invalidate) ... ok
+2026-10-17T12:44:49.5596791Z test_apply_and_invalid_host_inputs_reject_before_native_reads (test_model_repair.RepairTests.test_apply_and_invalid_host_inputs_reject_before_native_reads) ... ok
+2026-10-17T12:44:49.5922927Z test_exact_two_change_preview_revalidates_without_writes_or_selection_cache (test_model_repair.RepairTests.test_exact_two_change_preview_revalidates_without_writes_or_selection_cache) ... ok
+2026-10-17T12:44:49.6201933Z test_incomplete_or_inactive_scope_never_claims_ready_changes (test_model_repair.RepairTests.test_incomplete_or_inactive_scope_never_claims_ready_changes) ... ok
+2026-10-17T12:44:50.0430363Z test_manual_edits_additions_resource_context_and_layer_changes_conflict (test_model_repair.RepairTests.test_manual_edits_additions_resource_context_and_layer_changes_conflict) ... ok
+2026-10-17T12:44:50.0764975Z test_noop_when_selected_rules_already_pass (test_model_repair.RepairTests.test_noop_when_selected_rules_already_pass) ... ok
+2026-10-17T12:44:50.1005738Z test_overlapping_rules_never_plan_two_values_for_one_property (test_model_repair.RepairTests.test_overlapping_rules_never_plan_two_values_for_one_property) ... ok
+2026-10-17T12:44:50.1287427Z test_plan_cannot_expire_during_slow_revalidation_and_report_unchanged (test_model_repair.RepairTests.test_plan_cannot_expire_during_slow_revalidation_and_report_unchanged) ... ok
+2026-10-17T12:44:50.3566111Z test_plan_hash_expiry_eviction_and_restart_require_new_preview (test_model_repair.RepairTests.test_plan_hash_expiry_eviction_and_restart_require_new_preview) ... ok
+2026-10-17T12:44:50.3736225Z test_public_choice_validation_rejects_apply_coercion_and_unsupported_rules (test_model_repair.RepairTests.test_public_choice_validation_rejects_apply_coercion_and_unsupported_rules) ... ok
+2026-10-17T12:44:50.4117072Z test_selected_finding_is_exact_and_stale_ids_reject (test_model_repair.RepairTests.test_selected_finding_is_exact_and_stale_ids_reject) ... ok
+2026-10-17T12:44:50.4373824Z test_unknown_symbols_never_imply_writability_and_oversize_plan_not_cached (test_model_repair.RepairTests.test_unknown_symbols_never_imply_writability_and_oversize_plan_not_cached) ... ok
+2026-10-17T12:44:50.4394899Z test_codex_setup_preserves_settings_and_is_idempotent (test_package.PackageTests.test_codex_setup_preserves_settings_and_is_idempotent) ... ok
+2026-10-17T12:44:50.8100687Z test_deterministic_archive_integrity_and_fresh_install_from_extracted_payload (test_package.PackageTests.test_deterministic_archive_integrity_and_fresh_install_from_extracted_payload) ... ok
+2026-10-17T12:44:50.8956766Z test_missing_or_extra_payload_is_rejected (test_package.PackageTests.test_missing_or_extra_payload_is_rejected) ... ok
+2026-10-17T12:44:50.9154360Z test_version_and_lock_agree (test_package.PackageTests.test_version_and_lock_agree) ... ok
+2026-10-17T12:44:50.9298921Z test_definition_stops_at_failed_method_and_preserves_native_boundary (test_property_probe.PropertyProbeTests.test_definition_stops_at_failed_method_and_preserves_native_boundary) ... ok
+2026-10-17T12:44:50.9437766Z test_invalid_phase_fields_and_passive_scope_reject_without_attribute_reads (test_property_probe.PropertyProbeTests.test_invalid_phase_fields_and_passive_scope_reject_without_attribute_reads) ... ok
+2026-10-17T12:44:50.9588237Z test_name_round_trip_mismatch_cannot_bind_semantic_alias (test_property_probe.PropertyProbeTests.test_name_round_trip_mismatch_cannot_bind_semantic_alias) ... ok
+2026-10-17T12:44:51.0924101Z test_native_base_exception_leaves_failed_call_trace_and_never_continues (test_property_probe.PropertyProbeTests.test_native_base_exception_leaves_failed_call_trace_and_never_continues) ... ok
+2026-10-17T12:44:51.1067669Z test_native_enumeration_owner_lives_through_reader_and_not_in_JSON_cache (test_property_probe.PropertyProbeTests.test_native_enumeration_owner_lives_through_reader_and_not_in_JSON_cache) ... ok
+2026-10-17T12:44:51.1217853Z test_sample_reads_one_foreground_column_without_metadata_enum_or_UI (test_property_probe.PropertyProbeTests.test_sample_reads_one_foreground_column_without_metadata_enum_or_UI) ... ok
+2026-10-17T12:44:51.1321910Z test_trace_capacity_blocks_following_calls_without_pruning_old_evidence (test_property_probe.PropertyProbeTests.test_trace_capacity_blocks_following_calls_without_pruning_old_evidence) ... ok
+2026-10-17T12:44:51.1408582Z test_unwritable_trace_rejects_before_document_or_property_call (test_property_probe.PropertyProbeTests.test_unwritable_trace_rejects_before_document_or_property_call) ... ok
+2026-10-17T12:44:51.2050459Z test_actual_native_exception_uses_normal_stopped_unknown_path (test_recovery_control.RecoveryControlTests.test_actual_native_exception_uses_normal_stopped_unknown_path) ... ok
+2026-10-17T12:44:51.3470769Z test_control_contract_pairing_rejected_before_document_access (test_recovery_control.RecoveryControlTests.test_control_contract_pairing_rejected_before_document_access) ... ok
+2026-10-17T12:44:51.4138166Z test_spatial_write_order_with_owner_uuids_still_interrupts_only_c03 (test_recovery_control.RecoveryControlTests.test_spatial_write_order_with_owner_uuids_still_interrupts_only_c03) ... ok
+2026-10-17T12:44:51.4717258Z test_stop_scope_and_request_hash_cannot_change_reviewed_authority (test_recovery_control.RecoveryControlTests.test_stop_scope_and_request_hash_cannot_change_reviewed_authority) ... ok
+2026-10-17T12:44:51.6883859Z test_unknown_marker_survives_restart_and_reconciles_without_second_setter (test_recovery_control.RecoveryControlTests.test_unknown_marker_survives_restart_and_reconciles_without_second_setter) ... ok
+2026-10-17T12:44:51.6998245Z test_dry_run_does_not_create_installation_or_state (test_registration.RegistrationTests.test_dry_run_does_not_create_installation_or_state) ... ok
+2026-10-17T12:44:51.7410144Z test_failed_copy_rolls_back_both_trees (test_registration.RegistrationTests.test_failed_copy_rolls_back_both_trees) ... ok
+2026-10-17T12:44:51.7679114Z test_fresh_install_contains_imported_sandbox_and_excludes_caches (test_registration.RegistrationTests.test_fresh_install_contains_imported_sandbox_and_excludes_caches) ... ok
+2026-10-17T12:44:51.8067645Z test_incomplete_backup_does_not_replace_current_installation (test_registration.RegistrationTests.test_incomplete_backup_does_not_replace_current_installation) ... ok
+2026-10-17T12:44:51.8291308Z test_incomplete_package_does_not_touch_existing_installation (test_registration.RegistrationTests.test_incomplete_package_does_not_touch_existing_installation) ... ok
+2026-10-17T12:44:51.8358366Z test_missing_user_path_and_invalid_restore_are_rejected (test_registration.RegistrationTests.test_missing_user_path_and_invalid_restore_are_rejected) ... ok
+2026-10-17T12:44:51.8862917Z test_repeat_install_removes_stale_files_and_restores_previous_package (test_registration.RegistrationTests.test_repeat_install_removes_stale_files_and_restores_previous_package) ... ok
+2026-10-17T12:44:51.9115292Z test_runtime_diagnostic_checks_actual_installed_files (test_registration.RegistrationTests.test_runtime_diagnostic_checks_actual_installed_files) ... ok
+2026-10-17T12:44:51.9401250Z test_upgrade_moves_legacy_library_item_and_restore_recovers_previous_layout (test_registration.RegistrationTests.test_upgrade_moves_legacy_library_item_and_restore_recovers_previous_layout) ... ok
+2026-10-17T12:44:52.2635025Z test_all_targets_checked_before_first_write_and_manual_change_conflicts (test_repair_execution.ExecutionTests.test_all_targets_checked_before_first_write_and_manual_change_conflicts) ... ok
+2026-10-17T12:44:52.3441674Z test_apply_readback_three_findings_replay_restart_and_undo_never_repeat (test_repair_execution.ExecutionTests.test_apply_readback_three_findings_replay_restart_and_undo_never_repeat) ... ok
+2026-10-17T12:44:52.5695240Z test_collateral_audited_change_is_reported_as_verification_failure (test_repair_execution.ExecutionTests.test_collateral_audited_change_is_reported_as_verification_failure) ... ok
+2026-10-17T12:44:52.6574941Z test_corrupt_journal_and_persistence_failure_block_writes (test_repair_execution.ExecutionTests.test_corrupt_journal_and_persistence_failure_block_writes) ... ok
+2026-10-17T12:44:52.8398988Z test_crash_after_write_ahead_marker_recovery_never_resumes (test_repair_execution.ExecutionTests.test_crash_after_write_ahead_marker_recovery_never_resumes) ... ok
+2026-10-17T12:44:52.9056378Z test_macro_or_unknown_ancestor_cannot_become_a_writable_column_root (test_repair_execution.ExecutionTests.test_macro_or_unknown_ancestor_cannot_become_a_writable_column_root) ... ok
+2026-10-17T12:44:53.0543102Z test_native_column_parent_flag_does_not_mean_macro_and_is_retained (test_repair_execution.ExecutionTests.test_native_column_parent_flag_does_not_mean_macro_and_is_retained) ... ok
+2026-10-17T12:44:53.1968586Z test_no_change_and_exception_stop_without_second_write_or_rollback (test_repair_execution.ExecutionTests.test_no_change_and_exception_stop_without_second_write_or_rollback) ... ok
+2026-10-17T12:44:53.3844370Z test_post_write_journal_failure_retains_unknown_marker_and_blocks_replay (test_repair_execution.ExecutionTests.test_post_write_journal_failure_retains_unknown_marker_and_blocks_replay) ... ok
+2026-10-17T12:44:53.4142991Z test_public_apply_requires_exact_acknowledgement_and_execution_identity (test_repair_execution.ExecutionTests.test_public_apply_requires_exact_acknowledgement_and_execution_identity) ... ok
+2026-10-17T12:44:53.4925522Z test_serialized_writers_and_journal_capacity_do_not_evict_deduplication (test_repair_execution.ExecutionTests.test_serialized_writers_and_journal_capacity_do_not_evict_deduplication) ... ok
+2026-10-17T12:44:53.6917213Z test_unknown_recovery_and_wrong_project_are_read_only (test_repair_execution.ExecutionTests.test_unknown_recovery_and_wrong_project_are_read_only) ... ok
+2026-10-17T12:44:55.7081575Z test_cancel_changed_excluded_peer_and_invalid_journal_never_write (test_selected_mark_http.SelectedMarkHTTPTests.test_cancel_changed_excluded_peer_and_invalid_journal_never_write) ... ok
+2026-10-17T12:44:56.8993264Z test_collateral_change_stops_inspection_and_keeps_original_identity (test_selected_mark_http.SelectedMarkHTTPTests.test_collateral_change_stops_inspection_and_keeps_original_identity) ... Executing <Task pending name='Task-10536' coro=<SelectedMarkHTTPTests.test_collateral_change_stops_inspection_and_keeps_original_identity() running at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/tests/test_selected_mark_http.py:84> cb=[_run_until_complete_cb() at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/base_events.py:181] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/runners.py:100> took 0.184 seconds
+2026-10-17T12:44:58.2220235Z ok
+2026-10-17T12:45:00.6105191Z test_lost_write_reply_keeps_id_and_recover_never_replays_apply (test_selected_mark_http.SelectedMarkHTTPTests.test_lost_write_reply_keeps_id_and_recover_never_replays_apply) ... ok
+2026-10-17T12:45:02.7785035Z test_pre_setter_rejection_retains_identity_and_persistence_failure_sends_no_apply (test_selected_mark_http.SelectedMarkHTTPTests.test_pre_setter_rejection_retains_identity_and_persistence_failure_sends_no_apply) ... ok
+2026-10-17T12:45:03.9542988Z test_selected_write_keeps_excluded_peer_journal_and_undo_snapshot (test_selected_mark_http.SelectedMarkHTTPTests.test_selected_write_keeps_excluded_peer_journal_and_undo_snapshot) ... Executing <Task pending name='Task-11459' coro=<SelectedMarkHTTPTests.test_selected_write_keeps_excluded_peer_journal_and_undo_snapshot() running at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/tests/test_selected_mark_http.py:24> cb=[_run_until_complete_cb() at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/base_events.py:181] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/runners.py:100> took 0.164 seconds
+2026-10-17T12:45:05.2995329Z ok
+2026-10-17T12:45:06.5201975Z test_successful_final_slot_reports_full_journal_without_invalidating_gate (test_selected_mark_http.SelectedMarkHTTPTests.test_successful_final_slot_reports_full_journal_without_invalidating_gate) ... Executing <Task pending name='Task-11804' coro=<SelectedMarkHTTPTests.test_successful_final_slot_reports_full_journal_without_invalidating_gate() running at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/tests/test_selected_mark_http.py:128> cb=[_run_until_complete_cb() at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/base_events.py:181] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/runners.py:100> took 0.334 seconds
+2026-10-17T12:45:07.7221110Z ok
+2026-10-17T12:45:07.7497809Z test_invalid_selectors_are_validated_before_context_and_absent_exceptions_reject (test_standard_preview.StandardSelectionTests.test_invalid_selectors_are_validated_before_context_and_absent_exceptions_reject) ... ok
+2026-10-17T12:45:07.7927489Z test_selection_and_exceptions_use_one_full_scan_and_excluded_edits_still_conflict (test_standard_preview.StandardSelectionTests.test_selection_and_exceptions_use_one_full_scan_and_excluded_edits_still_conflict) ... ok
+2026-10-17T12:45:07.9373855Z test_unknown_predicate_survives_negation_and_blocks_plan_readiness (test_standard_preview.StandardSelectionTests.test_unknown_predicate_survives_negation_and_blocks_plan_readiness) ... ok
+2026-10-17T12:45:07.9678728Z test_workflow_metadata_is_hashed_immutable_and_cannot_use_legacy_acknowledgement (test_standard_preview.StandardSelectionTests.test_workflow_metadata_is_hashed_immutable_and_cannot_use_legacy_acknowledgement) ... ok
+2026-10-17T12:45:08.0300756Z test_bound_foreground_file_and_explicit_status_value_are_not_hardcoded (test_supported_execution.SupportedExecutionTests.test_bound_foreground_file_and_explicit_status_value_are_not_hardcoded) ... ok
+2026-10-17T12:45:08.0593675Z test_empty_oversize_unknown_and_non_column_plans_are_not_executable (test_supported_execution.SupportedExecutionTests.test_empty_oversize_unknown_and_non_column_plans_are_not_executable) ... ok
+2026-10-17T12:45:08.2189699Z test_excluded_peer_change_invalidates_selected_plan_before_any_setter (test_supported_execution.SupportedExecutionTests.test_excluded_peer_change_invalidates_selected_plan_before_any_setter) ... ok
+2026-10-17T12:45:08.3017597Z test_office_standard_uses_same_executor_and_workflow_mismatch_rejects (test_supported_execution.SupportedExecutionTests.test_office_standard_uses_same_executor_and_workflow_mismatch_rejects) ... ok
+2026-10-17T12:45:08.3477318Z test_old_acknowledgement_does_not_expand_to_single_status_or_mark_plans (test_supported_execution.SupportedExecutionTests.test_old_acknowledgement_does_not_expand_to_single_status_or_mark_plans) ... ok
+2026-10-17T12:45:08.5463499Z test_one_status_repair_has_readback_four_findings_recovery_and_exact_replay (test_supported_execution.SupportedExecutionTests.test_one_status_repair_has_readback_four_findings_recovery_and_exact_replay) ... ok
+2026-10-17T12:45:08.5746020Z test_public_workflow_actions_require_reviewed_identity_and_host_rejects_bad_ack_before_reads (test_supported_execution.SupportedExecutionTests.test_public_workflow_actions_require_reviewed_identity_and_host_rejects_bad_ack_before_reads) ... ok
+2026-10-17T12:45:08.6341197Z test_selected_single_layer_retains_exception_and_full_source_verification (test_supported_execution.SupportedExecutionTests.test_selected_single_layer_retains_exception_and_full_source_verification) ... ok
+2026-10-17T12:45:08.8052719Z test_three_changes_verify_the_full_snapshot_and_replay_without_setters (test_supported_execution.SupportedExecutionTests.test_three_changes_verify_the_full_snapshot_and_replay_without_setters) ... ok
+2026-10-17T12:45:08.9348515Z test_cancel_does_not_wait_for_ui_and_rejects_queued_request (test_transport.TransportTests.test_cancel_does_not_wait_for_ui_and_rejects_queued_request) ... ok
+2026-10-17T12:45:09.0010863Z test_http_dispatch_and_request_id (test_transport.TransportTests.test_http_dispatch_and_request_id) ... ok
+2026-10-17T12:45:09.0943930Z test_invalid_json_and_nonobject_never_reach_dispatch (test_transport.TransportTests.test_invalid_json_and_nonobject_never_reach_dispatch) ... ok
+2026-10-17T12:45:09.1060310Z test_persistent_log_is_bounded_shared_and_failure_to_open_does_not_prevent_service (test_transport.TransportTests.test_persistent_log_is_bounded_shared_and_failure_to_open_does_not_prevent_service) ... ok
+2026-10-17T12:45:09.1716703Z test_stalled_ui_returns_error_and_never_executes_expired_write_on_resume (test_transport.TransportTests.test_stalled_ui_returns_error_and_never_executes_expired_write_on_resume) ... ok
+2026-10-17T12:45:09.3224890Z test_started_callback_outlives_queue_budget_without_retry_or_ui_exception (test_transport.TransportTests.test_started_callback_outlives_queue_budget_without_retry_or_ui_exception) ... ok
+2026-10-17T12:45:09.3228463Z test_stop_releases_waiting_worker_and_rejects_new_work (test_transport.TransportTests.test_stop_releases_waiting_worker_and_rejects_new_work) ... ok
+2026-10-17T12:45:09.3231002Z test_timer_contains_callback_exit_and_dispatcher_recovers (test_transport.TransportTests.test_timer_contains_callback_exit_and_dispatcher_recovers) ... ok
+2026-10-17T12:45:09.3893784Z test_timer_runs_handler_on_ui_and_records_response_stages (test_transport.TransportTests.test_timer_runs_handler_on_ui_and_records_response_stages) ... ok
+2026-10-17T12:45:09.4679950Z test_typed_errors_stay_inside_managed_callback_and_preserve_http_status (test_transport.TransportTests.test_typed_errors_stay_inside_managed_callback_and_preserve_http_status) ... ok
+2026-10-17T12:45:09.5740874Z test_unexpected_and_exit_errors_are_marshaled_logged_and_do_not_escape_ui (test_transport.TransportTests.test_unexpected_and_exit_errors_are_marshaled_logged_and_do_not_escape_ui) ... ok
+2026-10-17T12:45:09.5956722Z test_ambiguous_identity_incomplete_scope_and_stale_exception_do_not_read_properties (test_wall_filter.WallFilterTests.test_ambiguous_identity_incomplete_scope_and_stale_exception_do_not_read_properties) ... ok
+2026-10-17T12:45:09.6131776Z test_budget_expiry_stops_before_following_wall_native_calls (test_wall_filter.WallFilterTests.test_budget_expiry_stops_before_following_wall_native_calls) ... ok
+2026-10-17T12:45:09.6303362Z test_empty_wall_scope_is_complete_and_highlight_still_clears (test_wall_filter.WallFilterTests.test_empty_wall_scope_is_complete_and_highlight_still_clears) ... ok
+2026-10-17T12:45:09.6528265Z test_exclusions_are_members_of_full_scope_and_skip_native_read (test_wall_filter.WallFilterTests.test_exclusions_are_members_of_full_scope_and_skip_native_read) ... ok
+2026-10-17T12:45:09.6744218Z test_final_trace_failure_after_highlight_reports_unknown_with_ui_started (test_wall_filter.WallFilterTests.test_final_trace_failure_after_highlight_reports_unknown_with_ui_started) ... ok
+2026-10-17T12:45:09.7213685Z test_highlight_clears_when_no_match_and_submits_only_matched_roots (test_wall_filter.WallFilterTests.test_highlight_clears_when_no_match_and_submits_only_matched_roots) ... ok
+2026-10-17T12:45:09.8254634Z test_incomplete_foreground_scope_blocks_before_native_properties (test_wall_filter.WallFilterTests.test_incomplete_foreground_scope_blocks_before_native_properties) ... ok
+2026-10-17T12:45:09.8379944Z test_invalid_contract_rejects_before_document_and_native_access (test_wall_filter.WallFilterTests.test_invalid_contract_rejects_before_document_and_native_access) ... ok
+2026-10-17T12:45:09.8591058Z test_missing_highlight_symbol_is_detected_before_clearing_existing_highlights (test_wall_filter.WallFilterTests.test_missing_highlight_symbol_is_detected_before_clearing_existing_highlights) ... ok
+2026-10-17T12:45:09.8932216Z test_mm_m_and_max_wall_count_guard_precedes_native_reads (test_wall_filter.WallFilterTests.test_mm_m_and_max_wall_count_guard_precedes_native_reads) ... ok
+2026-10-17T12:45:09.9160000Z test_multitier_or_failed_thickness_stops_before_later_wall_and_ui (test_wall_filter.WallFilterTests.test_multitier_or_failed_thickness_stops_before_later_wall_and_ui) ... ok
+2026-10-17T12:45:09.9394307Z test_native_enumeration_owner_lives_through_all_thickness_reads (test_wall_filter.WallFilterTests.test_native_enumeration_owner_lives_through_all_thickness_reads) ... ok
+2026-10-17T12:45:09.9661959Z test_same_root_wrappers_share_one_single_view_and_one_native_thickness_read (test_wall_filter.WallFilterTests.test_same_root_wrappers_share_one_single_view_and_one_native_thickness_read) ... ok
+2026-10-17T12:45:09.9980436Z test_strict_threshold_and_unit_conversion_read_thickness_only (test_wall_filter.WallFilterTests.test_strict_threshold_and_unit_conversion_read_thickness_only) ... ok
+2026-10-17T12:45:10.0207678Z test_ui_failure_reports_unknown_and_trace_failure_prevents_ui_calls (test_wall_filter.WallFilterTests.test_ui_failure_reports_unknown_and_trace_failure_prevents_ui_calls) ... ok
+2026-10-17T12:45:10.1680091Z test_unreadable_thickness_stops_and_reports_completed_unprocessed (test_wall_filter.WallFilterTests.test_unreadable_thickness_stops_and_reports_completed_unprocessed) ... ok
+2026-10-17T12:45:11.4556819Z test_highlight_full_filter_persisted_request_and_same_session_health (test_wall_filter_http.WallFilterHTTPTests.test_highlight_full_filter_persisted_request_and_same_session_health) ... ok
+2026-10-17T12:45:13.0916298Z test_invalid_mcp_inputs_are_rejected_before_host_and_old_package_blocks (test_wall_filter_http.WallFilterHTTPTests.test_invalid_mcp_inputs_are_rejected_before_host_and_old_package_blocks) ... ok
+2026-10-17T12:45:14.5473030Z test_lost_reply_stops_without_health_after_or_repeat (test_wall_filter_http.WallFilterHTTPTests.test_lost_reply_stops_without_health_after_or_repeat) ... ok
+2026-10-17T12:45:15.8623377Z test_new_highlight_invalidates_old_repair_presentation (test_wall_filter_http.WallFilterHTTPTests.test_new_highlight_invalidates_old_repair_presentation) ... ok
+2026-10-17T12:45:16.8704948Z test_query_never_highlights_and_unknown_wall_blocks_with_health_after (test_wall_filter_http.WallFilterHTTPTests.test_query_never_highlights_and_unknown_wall_blocks_with_health_after) ... Executing <Task pending name='Task-12646' coro=<WallFilterHTTPTests.test_query_never_highlights_and_unknown_wall_blocks_with_health_after() running at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/tests/test_wall_filter_http.py:76> cb=[_run_until_complete_cb() at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/base_events.py:181] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/runners.py:100> took 0.132 seconds
+2026-10-17T12:45:17.4882955Z ok
+2026-10-17T12:45:17.5162148Z test_conflicting_same_identity_fields_still_block_before_native_property_read (test_wall_probe.WallProbeTests.test_conflicting_same_identity_fields_still_block_before_native_property_read) ... ok
+2026-10-17T12:45:17.5362213Z test_different_views_of_same_wall_still_block_before_native_property_read (test_wall_probe.WallProbeTests.test_different_views_of_same_wall_still_block_before_native_property_read) ... ok
+2026-10-17T12:45:17.5553979Z test_distinct_wrappers_of_same_root_read_one_wall_not_tier_or_axis (test_wall_probe.WallProbeTests.test_distinct_wrappers_of_same_root_read_one_wall_not_tier_or_axis) ... ok
+2026-10-17T12:45:17.5781073Z test_explicit_wall_identity_reads_only_that_root_from_multiple_walls (test_wall_probe.WallProbeTests.test_explicit_wall_identity_reads_only_that_root_from_multiple_walls) ... ok
+2026-10-17T12:45:17.6363038Z test_invalid_thickness_stops_before_material_without_fallback (test_wall_probe.WallProbeTests.test_invalid_thickness_stops_before_material_without_fallback) ... ok
+2026-10-17T12:45:17.6538473Z test_material_failure_preserves_thickness_and_failed_native_boundary (test_wall_probe.WallProbeTests.test_material_failure_preserves_thickness_and_failed_native_boundary) ... ok
+2026-10-17T12:45:17.8052531Z test_missing_requested_root_passive_and_invalid_payload_never_read_native_wall (test_wall_probe.WallProbeTests.test_missing_requested_root_passive_and_invalid_payload_never_read_native_wall) ... ok
+2026-10-17T12:45:17.8351297Z test_multi_tier_stops_before_any_tier_is_chosen (test_wall_probe.WallProbeTests.test_multi_tier_stops_before_any_tier_is_chosen) ... ok
+2026-10-17T12:45:17.8599408Z test_native_enumeration_owner_retained_through_material_read_and_released (test_wall_probe.WallProbeTests.test_native_enumeration_owner_retained_through_material_read_and_released) ... ok
+2026-10-17T12:45:17.8787071Z test_single_wall_native_fields_not_attributes_geometry_or_C35_binding (test_wall_probe.WallProbeTests.test_single_wall_native_fields_not_attributes_geometry_or_C35_binding) ... ok
+2026-10-17T12:45:17.9142693Z test_strict_threshold_and_native_lengths_ignore_UI_units (test_wall_probe.WallProbeTests.test_strict_threshold_and_native_lengths_ignore_UI_units) ... ok
+2026-10-17T12:45:17.9276602Z test_trace_failure_blocks_before_new_native_calls_and_base_exception_stops (test_wall_probe.WallProbeTests.test_trace_failure_blocks_before_new_native_calls_and_base_exception_stops) ... ok
+2026-10-17T12:45:17.9519589Z test_unresolved_view_or_cross_file_parent_still_block_before_native_property_read (test_wall_probe.WallProbeTests.test_unresolved_view_or_cross_file_parent_still_block_before_native_property_read) ... ok
+2026-10-17T12:45:17.9664025Z test_wrong_native_type_does_not_access_properties (test_wall_probe.WallProbeTests.test_wrong_native_type_does_not_access_properties) ... ok
+2026-10-17T12:45:18.9732621Z test_ambiguous_wall_views_block_without_native_read_or_retry (test_wall_probe_http.WallProbeHTTPTests.test_ambiguous_wall_views_block_without_native_read_or_retry) ... Executing <Task pending name='Task-12835' coro=<WallProbeHTTPTests.test_ambiguous_wall_views_block_without_native_read_or_retry() running at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/tests/test_wall_probe_http.py:91> cb=[_run_until_complete_cb() at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/base_events.py:181] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/runners.py:100> took 0.130 seconds
+2026-10-17T12:45:19.5339227Z ok
+2026-10-17T12:45:21.0012425Z test_lost_reply_is_saved_not_retried_or_followed_by_native_health (test_wall_probe_http.WallProbeHTTPTests.test_lost_reply_is_saved_not_retried_or_followed_by_native_health) ... ok
+2026-10-17T12:45:22.2933071Z test_multitier_is_blocked_with_health_after_and_no_material_read (test_wall_probe_http.WallProbeHTTPTests.test_multitier_is_blocked_with_health_after_and_no_material_read) ... ok
+2026-10-17T12:45:23.6308561Z test_old_bridge_and_invalid_requests_never_start_wall_read (test_wall_probe_http.WallProbeHTTPTests.test_old_bridge_and_invalid_requests_never_start_wall_read) ... ok
+2026-10-17T12:45:24.9271894Z test_one_native_sample_with_pending_report_and_same_session_health (test_wall_probe_http.WallProbeHTTPTests.test_one_native_sample_with_pending_report_and_same_session_health) ... ok
+2026-10-17T12:45:26.1991179Z test_same_wall_wrappers_complete_one_request_with_health_after (test_wall_probe_http.WallProbeHTTPTests.test_same_wall_wrappers_complete_one_request_with_health_after) ... Executing <Task pending name='mcp.client.streamable_http.StreamableHTTPTransport.post_writer.<locals>.handle_request_async' coro=<StreamableHTTPTransport.post_writer.<locals>.handle_request_async() running at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/.venv/lib/python3.12/site-packages/mcp/client/streamable_http.py:565> cb=[TaskGroup._spawn.<locals>.task_done() at /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:821] created at /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/tasks.py:420> took 0.143 seconds
+2026-10-17T12:45:26.4664892Z ok
+2026-10-17T12:45:26.5417962Z test_cli_runs_without_dependencies_or_network_and_never_overwrites_input (test_wall_report_analysis.WallReportAnalysisTests.test_cli_runs_without_dependencies_or_network_and_never_overwrites_input) ... ok
+2026-10-17T12:45:26.5421133Z test_exact_native_material_label_is_conditional_and_has_no_aliases (test_wall_report_analysis.WallReportAnalysisTests.test_exact_native_material_label_is_conditional_and_has_no_aliases) ... ok
+2026-10-17T12:45:26.5422627Z test_exclusion_uses_file_and_uuid_and_cannot_create_a_write_plan (test_wall_report_analysis.WallReportAnalysisTests.test_exclusion_uses_file_and_uuid_and_cannot_create_a_write_plan) ... ok
+2026-10-17T12:45:26.5424131Z test_forged_acceptance_flags_never_promote_saved_evidence (test_wall_report_analysis.WallReportAnalysisTests.test_forged_acceptance_flags_never_promote_saved_evidence) ... ok
+2026-10-17T12:45:26.5425422Z test_invalid_target_and_exceptions_are_rejected (test_wall_report_analysis.WallReportAnalysisTests.test_invalid_target_and_exceptions_are_rejected) ... ok
+2026-10-17T12:45:26.5432738Z test_invalid_values_units_and_sources_remain_unknown (test_wall_report_analysis.WallReportAnalysisTests.test_invalid_values_units_and_sources_remain_unknown) ... ok
+2026-10-17T12:45:26.5538216Z test_json_reader_rejects_ambiguous_nonfinite_and_oversized_data (test_wall_report_analysis.WallReportAnalysisTests.test_json_reader_rejects_ambiguous_nonfinite_and_oversized_data) ... ok
+2026-10-17T12:45:26.5539891Z test_multitier_partial_or_failed_reads_do_not_become_candidates (test_wall_report_analysis.WallReportAnalysisTests.test_multitier_partial_or_failed_reads_do_not_become_candidates) ... ok
+2026-10-17T12:45:26.5542044Z test_schema_root_scope_request_and_session_must_agree (test_wall_report_analysis.WallReportAnalysisTests.test_schema_root_scope_request_and_session_must_agree) ... ok
+2026-10-17T12:45:26.5545235Z test_strict_boundary_recomputed_and_input_not_modified (test_wall_report_analysis.WallReportAnalysisTests.test_strict_boundary_recomputed_and_input_not_modified) ... ok
+2026-10-17T12:45:26.5545902Z 
+2026-10-17T12:45:26.5546077Z ----------------------------------------------------------------------
+2026-10-17T12:45:26.5546412Z Ran 356 tests in 139.590s
+2026-10-17T12:45:26.5546515Z 
+2026-10-17T12:45:26.5546573Z OK
+2026-10-17T12:45:26.5547306Z Test zapisze tylko C03=S03 i zatrzyma sie przed odczytem wyniku. C04 pozostanie S02.
+2026-10-17T12:45:26.5547912Z Potem wymagany restart StartPythonHost i osobna inspekcja. Nie uzywaj Undo przed inspekcja.
+2026-10-17T12:45:26.5548352Z Repair preview: 1 proposed changes; 4 excluded findings.
+2026-10-17T12:45:26.5548697Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:45:26.5549169Z QA-003: file 101, mark 'S05', model 00000000-0000-4000-8000-000000000005, center [6000.0, 6000.0, 1500.0] mm: layer_id 8 -> 7.
+2026-10-17T12:45:26.5549756Z Selection: 5 selected; 1 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:45:26.5550102Z Standard: native-model-qa-demo-layer-status 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:45:26.5550934Z Tylko sprawdzona jednorazowa kopia projektu. Ten krok zapisze jedna wyswietlona zmiane.
+2026-10-17T12:45:26.5551244Z Repair preview: 1 proposed changes; 3 excluded findings.
+2026-10-17T12:45:26.5551578Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:45:26.5552202Z QA-004: file 101, mark 'S06', model 00000000-0000-4000-8000-000000000006, center [12000.0, 6000.0, 1500.0] mm: attribute:20002 'NWE' -> 'NEW'.
+2026-10-17T12:45:26.5552620Z Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:45:26.5552950Z Tylko sprawdzona jednorazowa kopia projektu. Ten krok zapisze jedna wyswietlona zmiane.
+2026-10-17T12:45:26.5553292Z Repair preview: 1 proposed changes; 4 excluded findings.
+2026-10-17T12:45:26.5553622Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:45:26.5554078Z QA-003: file 101, mark 'S05', model 00000000-0000-4000-8000-000000000005, center [6000.0, 6000.0, 1500.0] mm: layer_id 8 -> 7.
+2026-10-17T12:45:26.5554465Z Selection: 5 selected; 1 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:45:26.5554809Z Standard: native-model-qa-demo-layer-status 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:45:26.5555192Z Tylko sprawdzona jednorazowa kopia projektu. Ten krok zapisze jedna wyswietlona zmiane.
+2026-10-17T12:45:26.5555511Z Repair preview: 1 proposed changes; 3 excluded findings.
+2026-10-17T12:45:26.5555847Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:45:26.5556334Z QA-004: file 101, mark 'S06', model 00000000-0000-4000-8000-000000000006, center [12000.0, 6000.0, 1500.0] mm: attribute:20002 'NWE' -> 'NEW'.
+2026-10-17T12:45:26.5556748Z Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:45:26.5557082Z Tylko sprawdzona jednorazowa kopia projektu. Ten krok zapisze jedna wyswietlona zmiane.
+2026-10-17T12:45:26.5557399Z Repair preview: 1 proposed changes; 4 excluded findings.
+2026-10-17T12:45:26.5557734Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:45:26.5558185Z QA-003: file 101, mark 'S05', model 00000000-0000-4000-8000-000000000005, center [6000.0, 6000.0, 1500.0] mm: layer_id 8 -> 7.
+2026-10-17T12:45:26.5558574Z Selection: 5 selected; 1 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:45:26.5558910Z Standard: native-model-qa-demo-layer-status 1.0.0. Reviewed apply is a separate action.
+2026-10-17T12:45:26.5559297Z Tylko sprawdzona jednorazowa kopia projektu. Ten krok zapisze jedna wyswietlona zmiane.
+2026-10-17T12:45:26.5559730Z Repair preview: 1 proposed changes; 2 excluded findings.
+2026-10-17T12:45:26.5560071Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:45:26.5560564Z QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:45:26.5560984Z Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:45:26.5561367Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 1 remaining missing marks.
+2026-10-17T12:45:26.5561782Z Tylko zachowana kopia projektu: C04 S02 -> S04. C02 pozostaje S02, C03 niezdefiniowany.
+2026-10-17T12:45:26.5562087Z Repair preview: 1 proposed changes; 2 excluded findings.
+2026-10-17T12:45:26.5562418Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:45:26.5562898Z QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:45:26.5563307Z Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:45:26.5563689Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 1 remaining missing marks.
+2026-10-17T12:45:26.5564320Z Tylko zachowana kopia projektu: C04 S02 -> S04. C02 pozostaje S02, C03 niezdefiniowany.
+2026-10-17T12:45:26.5564621Z Repair preview: 1 proposed changes; 2 excluded findings.
+2026-10-17T12:45:26.5564953Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:45:26.5565536Z QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:45:26.5565974Z Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:45:26.5566351Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 1 remaining missing marks.
+2026-10-17T12:45:26.5566762Z Tylko zachowana kopia projektu: C04 S02 -> S04. C02 pozostaje S02, C03 niezdefiniowany.
+2026-10-17T12:45:26.5567063Z Repair preview: 1 proposed changes; 2 excluded findings.
+2026-10-17T12:45:26.5567396Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:45:26.5567870Z QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:45:26.5568275Z Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:45:26.5568660Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 1 remaining missing marks.
+2026-10-17T12:45:26.5569071Z Tylko zachowana kopia projektu: C04 S02 -> S04. C02 pozostaje S02, C03 niezdefiniowany.
+2026-10-17T12:45:26.5569372Z Repair preview: 1 proposed changes; 2 excluded findings.
+2026-10-17T12:45:26.5569899Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:45:26.5570372Z QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:45:26.5570782Z Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:45:26.5571157Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 1 remaining missing marks.
+2026-10-17T12:45:26.5571569Z Tylko zachowana kopia projektu: C04 S02 -> S04. C02 pozostaje S02, C03 niezdefiniowany.
+2026-10-17T12:45:26.5571868Z Repair preview: 1 proposed changes; 2 excluded findings.
+2026-10-17T12:45:26.5572201Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:45:26.5572674Z QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:45:26.5573081Z Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:45:26.5573459Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 1 remaining missing marks.
+2026-10-17T12:45:26.5573874Z Tylko zachowana kopia projektu: C04 S02 -> S04. C02 pozostaje S02, C03 niezdefiniowany.
+2026-10-17T12:45:26.5574178Z Repair preview: 1 proposed changes; 2 excluded findings.
+2026-10-17T12:45:26.5574512Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:45:26.5574993Z QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:45:26.5575406Z Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:45:26.5575785Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 1 remaining missing marks.
+2026-10-17T12:45:26.5576199Z Tylko zachowana kopia projektu: C04 S02 -> S04. C02 pozostaje S02, C03 niezdefiniowany.
+2026-10-17T12:45:26.5576499Z Repair preview: 1 proposed changes; 2 excluded findings.
+2026-10-17T12:45:26.5576833Z Audit complete: True. Preview requests no writes; evaluation apply requires a reviewed disposable copy.
+2026-10-17T12:45:26.5577512Z QA-002: file 101, mark 'S02', model 4f3cc27e-5224-403d-939d-7b4e0cedf9a2, center [0.0, 6000.0, 1500.0] mm: attribute:20001 'S02' -> 'S04'.
+2026-10-17T12:45:26.5577919Z Selection: 1 selected; 1 explicit exceptions; 0 unchecked predicates.
+2026-10-17T12:45:26.5578299Z Mark validation: validated; 0 proposed collision groups; 0 remaining duplicate groups; 1 remaining missing marks.
+2026-10-17T12:45:26.5578802Z Tylko zachowana kopia projektu: C04 S02 -> S04. C02 pozostaje S02, C03 niezdefiniowany.
+2026-10-17T12:45:26.9632062Z Post job cleanup.
+2026-10-17T12:45:27.0666954Z (node:3184) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-17T12:45:27.0667688Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-17T12:45:27.0865058Z Post job cleanup.
+2026-10-17T12:45:27.1710503Z [command]/usr/bin/git version
+2026-10-17T12:45:27.1760641Z git version 2.55.0
+2026-10-17T12:45:27.1799111Z Temporarily overriding HOME='/home/runner/work/_temp/50693d38-ccc9-4b4d-9672-b926e1bedd42' before making global git config changes
+2026-10-17T12:45:27.1799857Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-17T12:45:27.1806020Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/allplan-mcp-server-python/allplan-mcp-server-python
+2026-10-17T12:45:27.1863002Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-17T12:45:27.1916237Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-17T12:45:27.2250950Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-17T12:45:27.2291147Z http.https://github.com/.extraheader
+2026-10-17T12:45:27.2303957Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-17T12:45:27.2353587Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-17T12:45:27.2658780Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-17T12:45:27.2710017Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-17T12:45:27.3218582Z Cleaning up orphan processes
+2026-10-17T12:45:27.3555650Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+

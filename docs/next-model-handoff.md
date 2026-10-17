@@ -21,7 +21,27 @@ from the default branch as well. [Verification](test-results/testing-policy-2026
 records the one-time six-job workflow check, one build and the confirmed M4
 draft skip. M4 runtime integration remains separate.
 
-Current runtime: **0.18.2** on `develop/m4`, originally delivered through
+**Current candidate: 0.19.0, `model_wall_filter`, ready_for_owner_test.**
+Runtime source **e455f35cf4d546d9b77cf6ae5f59edcc026cc875** passed
+[CI 39033571910](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39033571910):
+**6/6 Windows/Ubuntu × Python 3.11–3.13**, **356 tests** per job and one
+package job. Workspace transfer of the CI artifact was blocked by proxy
+CONNECT HTTP 403; the permitted single local fallback build used a clean
+detached checkout of the same source. Exact delivered ZIP installation,
+frozen sync/import, upgrade from 0.18.2 and restore passed, with **31 bridge
+hashes** and journal/trace/bridge-log preservation.
+[Delivery, hashes and evidence](../evaluation-packages/0.19.0/README.md).
+Native observation remains **not_run**. This candidate adds bounded read-only thickness filtering and
+document-wide highlighting for single-tier Walls in one explicit foreground
+drawing. The native test is limited to the existing `MCP_QA_DEMO` foreground
+drawing 101 containing 20 cm and 24 cm Walls: only the 20 cm Wall should
+highlight; preserve both reported values/exclusions and same-session health,
+then clear with **M4 Clear Highlight.cmd**. The guide is
+[M4 Wall thickness filter](m4-wall-filter-0.19.0.pl.md). This trial does not
+complete K2 or accept all of M4. No need to repeat the accepted one-Wall sample,
+Column, or M3 gates. See [tool contract](tool-reference.md#model_wall_filter--m4-wall-thickness-filter).
+
+Last native single-Wall read acceptance: **0.18.2**, originally delivered through
 `fix/m4-wall-sample`, based on the verified
 0.18.1 delivery at `0860438`. The documentation/evidence update was committed
 first (`194088c`), before runtime edits. `wall_sample` now accepts distinct
