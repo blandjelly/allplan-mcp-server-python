@@ -1,13 +1,20 @@
 # M4 — filtr ścian według grubości, 0.19.0
 
-Ta próba sprawdza odczyt wszystkich ścian w jednym jawnym rysunku i ich
-podświetlenie według kryterium **grubość < 24 cm**. Uruchom ją na lokalnym
-Windowsie z Allplan 2026. Użyj istniejącego projektu `MCP_QA_DEMO` i
-rysunku pierwszoplanowego **101**, w którym są ściany 20 cm i 24 cm. Nie
-zmieniaj geometrii ani nie zamykaj innych otwartych rysunków; żądanie obejmuje
-wyłącznie rysunek 101.
+Zakończona próba sprawdziła odczyt wszystkich ścian w jednym jawnym rysunku
+i ich podświetlenie według kryterium **grubość < 24 cm**. Procedura poniżej
+dotyczy lokalnego Allplan 2026, istniejącego projektu `MCP_QA_DEMO`
+i rysunku pierwszoplanowego **101**, w którym są ściany 20 cm i 24 cm.
+Żądanie obejmuje wyłącznie rysunek 101.
 
-## Próba
+**Próba zakończona: PASS / accepted_on_build 0.19.0, 17 października 2026.**
+Odczytano 200 mm (`match=true`) i 240 mm (`match=false`); właściciel potwierdził
+prawidłowe podświetlenie ściany 20 cm, jego wyczyszczenie i brak przerwania hosta.
+Wszystkie cztery odpowiedzi health należą do jednej sesji.
+[Wynik i oryginalne raporty](m4-wall-filter-observation-0.19.0.md).
+Zakończonej próby nie trzeba powtarzać. Poniżej zachowano jej procedurę;
+nie stanowi ona odbioru zapisu materiału ani całego K2/M4.
+
+## Zachowana procedura próby
 
 1. Zamknij Allplan i MCP, a następnie rozpakuj kompletny, zweryfikowany pakiet
    0.19.0 do nowego folderu. W tym folderze uruchom **Setup.cmd**, wskazując
@@ -64,11 +71,12 @@ zweryfikowana w Allplan. Liczby zgłoszone jako wysłane nie potwierdzają liczb
 widocznych podświetleń. Zero dopasowań czyści dotychczasowe podświetlenia.
 Pełna akceptacja M4 i obsługa zapisów/materiałów pozostają poza tą próbą.
 
-Status 0.19.0: **ready_for_owner_test**. Źródło `e455f35` przeszło 356 testów
+Status 0.19.0: **PASS / accepted_on_build** w opisanym wyżej zakresie. Źródło `e455f35` przeszło 356 testów
 w każdej z sześciu konfiguracji Windows/Ubuntu; dokładny dostarczany ZIP
 przeszedł instalację, aktualizację z 0.18.2 i wycofanie, kontrolę 31 plików bridge
 oraz zachowania dziennika i logów. [Dowody i sumy kontrolne](../evaluation-packages/0.19.0/README.md).
 Pobranie artefaktu CI do środowiska zablokowało proxy, więc zgodnie z polityką
 wykonano jedną lokalną budowę z czystego checkoutu tego samego commitu.
-Próba natywna pozostaje **not_run**. Zawartość zamrożonego ZIP powstała przed
+Oryginalne flagi JSON `not_run` pozostają niezmienione; potwierdzenie właściciela
+uzupełnia odbiór UI. Zawartość zamrożonego ZIP powstała przed
 uzupełnieniem tych wyników; dołączone tam wzmianki PENDING dotyczą chwili budowy.

@@ -21,7 +21,7 @@ from the default branch as well. [Verification](test-results/testing-policy-2026
 records the one-time six-job workflow check, one build and the confirmed M4
 draft skip. M4 runtime integration remains separate.
 
-**Current candidate: 0.19.0, `model_wall_filter`, ready_for_owner_test.**
+**Current runtime: 0.19.0, `model_wall_filter`, scoped native PASS / accepted_on_build.**
 Runtime source **e455f35cf4d546d9b77cf6ae5f59edcc026cc875** passed
 [CI 39033571910](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39033571910):
 **6/6 Windows/Ubuntu × Python 3.11–3.13**, **356 tests** per job and one
@@ -31,15 +31,27 @@ detached checkout of the same source. Exact delivered ZIP installation,
 frozen sync/import, upgrade from 0.18.2 and restore passed, with **31 bridge
 hashes** and journal/trace/bridge-log preservation.
 [Delivery, hashes and evidence](../evaluation-packages/0.19.0/README.md).
-Native observation remains **not_run**. This candidate adds bounded read-only thickness filtering and
-document-wide highlighting for single-tier Walls in one explicit foreground
-drawing. The native test is limited to the existing `MCP_QA_DEMO` foreground
-drawing 101 containing 20 cm and 24 cm Walls: only the 20 cm Wall should
-highlight; preserve both reported values/exclusions and same-session health,
-then clear with **M4 Clear Highlight.cmd**. The guide is
-[M4 Wall thickness filter](m4-wall-filter-0.19.0.pl.md). This trial does not
-complete K2 or accept all of M4. No need to repeat the accepted one-Wall sample,
-Column, or M3 gates. See [tool contract](tool-reference.md#model_wall_filter--m4-wall-thickness-filter).
+Native observation on **2026-10-17 Europe/Warsaw** is **PASS / accepted_on_build
+0.19.0** for the two single-tier Walls in active foreground drawing 101:
+**200 mm matches `<240 mm`; 240 mm does not**. Complete M1/read/criterion
+coverage, two Walls, one match, no exclusions/omissions/unreadable/unprocessed
+records, and one submitted highlight adapter. The owner confirmed the 20 cm
+Wall highlighted correctly, then cleared, with no host interruption. Separate
+filter/clear reports contain **four healthy replies in the same host session**.
+[Observation and four original uploads](m4-wall-filter-observation-0.19.0.md).
+The original JSON flags (`not_run`, `awaiting_owner_observation`, null visible
+counts and runtime/unit flags) remain unchanged; owner confirmation supplies
+scoped UI acceptance. Reports request no setters and report no model data change;
+there was no independent geometry comparison or write/Undo test.
+
+**Do not repeat this completed trial or the accepted one-Wall/Column/M3 slices.**
+The [Polish guide](m4-wall-filter-0.19.0.pl.md) is retained as a historical procedure.
+This does not complete K2 or M4: native selection, exceptions/zero-match and
+rotated/multi-tier/large/multiple-drawing cases remain unaccepted. Next Wall work
+is material target binding and a separately validated native update/readback
+path under the [editing plan](office-editing-development-plan.pl.md), without
+inferring write support from this read-only PASS.
+See [tool contract](tool-reference.md#model_wall_filter--m4-wall-thickness-filter).
 
 Last native single-Wall read acceptance: **0.18.2**, originally delivered through
 `fix/m4-wall-sample`, based on the verified
@@ -178,9 +190,10 @@ guards remain. The old isolated probe launcher remains available, but the new
 task uses **M4 Columns to W1.cmd** and **M4 Columns Recover.cmd**.
 
 The bounded single-Wall observation is complete; do not ask the owner to repeat
-it. Preserve its reports, bridge/native traces and repair journal. Full-Wall
-filtering/highlighting and material binding/write/readback remain separate,
-unverified work; the 0.18.2 sample does not accept the broader M4 workflow.
+it. The scoped two-Wall filter/highlight/clear trial is also complete on 0.19.0;
+see the current acceptance above. Preserve reports, existing traces and repair
+journal. Broader filtering cases and material binding/write/readback remain
+unverified; the 0.18.2 sample alone does not accept the broader M4 workflow.
 See the [corrected guide](m4-wall-sample-0.18.2.pl.md).
 
 M3 acceptance remains limited to its historical fixture/build/single- and

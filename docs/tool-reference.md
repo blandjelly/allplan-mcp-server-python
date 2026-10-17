@@ -226,7 +226,7 @@ API basis checked against Allplan 2026:
 ## model_wall_filter — M4 wall thickness filter
 
 Schema `m4-wall-filter-1`, bridge `/model-wall-filter`; 0.19.0 source, CI and exact
-package checks passed; [native observation pending](../evaluation-packages/0.19.0/README.md). The request
+package checks passed; [scoped native filter/highlight/clear PASS](m4-wall-filter-observation-0.19.0.md). The request
 contains `action=query|highlight`, one explicit `drawing_file`, optional
 `threshold={value,unit}` (`mm`, `cm`, `m`; default 24 cm), optional up to 100
 distinct canonical nonzero `exclude_model_uuids`, and `max_walls` (default 20,

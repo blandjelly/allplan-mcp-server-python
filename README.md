@@ -10,11 +10,12 @@ reviewed attribute/layer repairs. Current source candidate: **0.19.0** adds
 Walls in one explicit foreground drawing. Source **e455f35** passed **356 tests**
 in each of six Windows/Ubuntu CI configurations; the exact delivered ZIP passed
 installation, upgrade/restore and 31 bridge hashes. Native observation is
-**PENDING / ready_for_owner_test**.
-The required owner trial uses the [verified 0.19.0 package](evaluation-packages/0.19.0/README.md), then
-checks the 20 cm and 24 cm Walls in `MCP_QA_DEMO` drawing 101, same-session
-health, visible highlighting, and clear. See the
-[0.19.0 owner guide](docs/m4-wall-filter-0.19.0.pl.md) and
+**PASS / accepted_on_build 0.19.0** for the two-Wall foreground-101 `<240 mm` workflow:
+200 mm matches, 240 mm does not; the owner confirmed the 20 cm highlight,
+its clear and uninterrupted host operation. All four health replies share one
+session. [Observation and original uploads](docs/m4-wall-filter-observation-0.19.0.md).
+This scoped trial is complete and needs no repeat. See the
+[0.19.0 guide](docs/m4-wall-filter-0.19.0.pl.md) and
 [tool contract](docs/tool-reference.md#model_wall_filter--m4-wall-thickness-filter).
 
 The previous **0.18.2** package corrected the blocked
@@ -70,8 +71,8 @@ use is planned. [Acceptance, tests and limits](docs/validation-status.md).
 
 ## Local Windows setup
 
-Use the [0.19.0 evaluation package](evaluation-packages/0.19.0/README.md) for the
-pending Wall filter/highlight owner trial. Its delivery records the single clean
+Use the [0.19.0 evaluation package](evaluation-packages/0.19.0/README.md), with
+the scoped Wall filter/highlight/clear trial accepted. Its delivery records the single clean
 local fallback build after CI artifact transfer was blocked by the workspace
 proxy. On the machine running Allplan, external
 Python **3.11+** and internet access for locked dependencies are required;

@@ -4,7 +4,7 @@ Current development branch: **develop/m4**, consolidated from `cf3c4bb` with
 all earlier M4 heads already included. Main is separate.
 [Branch layout](branch-layout.md).
 
-**0.19.0: ready_for_owner_test; native observation not_run.** Runtime source
+**0.19.0: PASS / accepted_on_build for the scoped Wall filter/highlight/clear.** Runtime source
 **e455f35cf4d546d9b77cf6ae5f59edcc026cc875** passed
 [CI 39033571910](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39033571910),
 **6/6 Windows/Ubuntu × Python 3.11–3.13**, **356 tests** per job, plus the
@@ -13,7 +13,7 @@ CONNECT HTTP 403; the allowed single clean local fallback build used the same
 commit. Exact ZIP install, frozen sync/import, upgrade from 0.18.2 and restore
 passed: **31 bridge hashes**, journal/trace/bridge log preserved.
 [Delivery and source-bound evidence](../evaluation-packages/0.19.0/README.md).
-These portable checks use native fakes; no new native PASS is inferred.
+These portable checks use native fakes; native evidence is recorded separately below.
 `model_wall_filter` scans one explicit active foreground drawing,
 requires complete M1 Wall coverage, and filters only single-tier native Walls by
 strict thickness `<` threshold. It defaults to 24 cm and 20 Walls; the maximum
@@ -22,10 +22,18 @@ not read. The first unsupported or failed read, incomplete coverage, or budget
 failure prevents all highlighting. Complete results may submit highlights for
 matches; zero matches clears existing document highlights. This is a read-only
 query/presentation action with no saved write plan. Runtime units remain
-unverified, and submitted counts do not establish visible counts. Owner trial
-is limited to `MCP_QA_DEMO` drawing 101's 20 cm and 24 cm Walls, same-session
-health, reported values/exclusions, visible 20 cm highlight, and explicit clear.
-It does not complete K2 or all of M4. See the
+unverified, and submitted counts alone do not establish visibility.
+On **2026-10-17 Europe/Warsaw**, the complete two-Wall result in foreground
+101 read **200 mm / match=true** and **240 mm / match=false**, with one match,
+zero exclusions, no omissions and no unreadable/unprocessed records. One
+adapter was submitted to highlight; separate clear returned submitted. The owner
+confirmed correct 20 cm highlighting, removal and uninterrupted host operation.
+All four health replies share session `d68ec7d3-4418-41ca-aa67-c6d3e17c7541`.
+[Observation and original uploads](m4-wall-filter-observation-0.19.0.md).
+Original automatic acceptance/runtime flags remain unchanged; no setters were
+requested and responses report no model data change. This trial needs no repeat.
+It does not accept writes/Undo, native selection, rotated/multi-tier Walls,
+exceptions/zero-match, large/multiple-drawing cases, all K2 or all M4. See the
 [owner guide](m4-wall-filter-0.19.0.pl.md) and
 [tool contract](tool-reference.md#model_wall_filter--m4-wall-thickness-filter).
 
@@ -37,8 +45,10 @@ for the observed single-tier Wall read: **240 mm**, **`Beton`**, owner-confirmed
 against UI. M1 found two Wall identities and intentionally sampled one; the
 strict `<240 mm` criterion correctly returned false. Both health replies were
 healthy in one session, with no requested setters or reported model change.
-The 20 cm Wall's properties, full-Wall filtering, Wall highlighting, material
-binding and writes remain unverified. The original JSON's automatic acceptance
+Those 0.18.2 results did not read the 20 cm Wall or accept full-Wall filtering
+and highlighting; the later scoped 0.19.0 observation above supplies that
+additional evidence. Material binding and writes remain unverified.
+The original JSON's automatic acceptance
 and runtime-unit flags remain unchanged. [Observation and original uploads](m4-wall-observation-0.18.2.md).
 The 0.18.1 owner observations below retain their original scope.
 [Change and Polish check](m4-wall-sample-0.18.2.pl.md),
