@@ -8,6 +8,11 @@ separate when reporting results. The model owns automated tests and GitHub CI;
 the owner is asked only for a brief Allplan trial when a candidate needs it.
 An explicit owner pause takes precedence over this procedure.
 
+M4 topic branches and PRs use **develop/m4** as their base; main integration
+is a separate task. Ref/PR consolidation with unchanged runtime follows the
+documentation-only checks, without repeating accepted product or native gates.
+[Branch layout](branch-layout.md).
+
 ## During implementation
 
 Run only focused affected tests and their dependent tests as you iterate. Use

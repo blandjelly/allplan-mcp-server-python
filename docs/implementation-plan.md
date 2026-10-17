@@ -2,6 +2,8 @@
 
 Current acceptance and limits: [validation status](validation-status.md).
 Use the [testing policy](testing-policy.md); stage IDs remain stable.
+All further M4 work and topic PRs use **develop/m4**; main remains separate.
+See the [branch layout and superseded PRs](branch-layout.md).
 
 ## Accepted fixture MVP
 

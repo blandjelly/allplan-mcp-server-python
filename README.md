@@ -1,5 +1,9 @@
 # Allplan MCP Server
 
+**M4 development: [`develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/tree/develop/m4).**
+New M4 PRs target this shared branch. Main remains a separate accepted baseline;
+legacy M4 branches/PRs are historical references. [Branch layout and workflow](docs/branch-layout.md).
+
 A local MCP bridge between Codex and Allplan 2026 for model queries, audits and
 reviewed attribute/layer repairs. Current candidate: **0.18.2**, correcting the
 blocked single-Wall sample when M1 resolves multiple Python wrappers of the same
@@ -43,6 +47,7 @@ use is planned. [Acceptance, tests and limits](docs/validation-status.md).
 | Read | Purpose |
 | --- | --- |
 | [Current handoff](docs/next-model-handoff.md) | Current state and next action. |
+| [Branch layout](docs/branch-layout.md) | Shared M4 branch, PR targets and retained historical refs. |
 | [Validation status](docs/validation-status.md) | Accepted scope, test results, limits and original evidence. |
 | [Implementation plan](docs/implementation-plan.md) | Completed stages and planned workflows. |
 | [Owner development plan (Polish)](docs/office-editing-development-plan.pl.md) | M3 review and proposed query, selection and editing milestones for six element families. |

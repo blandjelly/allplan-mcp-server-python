@@ -1,5 +1,10 @@
 # Instructions for future work
 
+The canonical M4 development branch is **develop/m4**. Start M4 topic branches
+from it and target PRs to it. Legacy `codex/m4-*` and `fix/m4-*` refs preserve
+history/links; do not resume separate development there. Keep main separate.
+See [branch layout](docs/branch-layout.md) before switching or opening a PR.
+
 At the start of each chat, read [the testing policy](docs/testing-policy.md) and
 [the current handoff](docs/next-model-handoff.md). Identify the checkout and
 branch, source state, and change scope before choosing checks. Keep focused,
