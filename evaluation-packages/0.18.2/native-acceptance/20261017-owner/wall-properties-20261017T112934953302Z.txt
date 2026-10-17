@@ -1,0 +1,6 @@
+M4 Wall native properties: awaiting_owner_observation
+No model setters requested.
+health_before: response_received
+one_wall_sample: response_received
+health_after: response_received
+Sciana 06d71e4d-193b-483e-8a32-344ade3d612c: grubosc API 240.0 mm; material natywny: 'Beton'. Porownaj z UI. Nie zmieniono modelu; zapis C35 pozostaje niedostepny.

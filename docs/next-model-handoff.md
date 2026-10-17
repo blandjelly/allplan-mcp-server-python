@@ -6,7 +6,13 @@ first (`194088c`), before runtime edits. `wall_sample` now accepts distinct
 Python wrappers only within one complete, consistent M1 root identity and view.
 It still rejects multiple views, conflicting fields and incomplete hierarchy.
 No other native handler changes; no material setter or Wall highlight is added.
-The native gate is **ready_for_owner_test** after automated/package validation;
+The native gate is **PASS / accepted_on_build 0.18.2** for the single Wall read:
+the owner confirmed **240 mm** and raw material **`Beton`** against UI. M1 found
+two Walls and sampled one, the first in model UUID order. Both health replies
+were healthy in one session; no setters were requested or model changes reported.
+The selected root had four adapter representations. The strict `<240 mm`
+criterion correctly returned false. The 20 cm Wall's properties were not read.
+[Observation and original uploads](m4-wall-observation-0.18.2.md),
 [short Polish guide](m4-wall-sample-0.18.2.pl.md) and
 [delivery evidence](../evaluation-packages/0.18.2/README.md).
 Clean runtime source **47ec1ad5ccc494452d2bdcd5c7252f8969facbd5** passed
@@ -68,16 +74,18 @@ step. The supported material setter remains blocked pending native evidence.
 The 0.17.2 artifacts, README, source and CI evidence remain unchanged. Its
 deferred native observation was later run through the same Column handler in
 0.18.1; the 0.18.1 report records the result and owner-confirmed UI visibility.
-The wall sample is still pending after a blocked request.
+The blocked 0.18.1 Wall request was followed by the successful, scoped 0.18.2
+observation recorded above.
 
 The new `wall_sample` phase is limited to one existing, single-tier native Wall
 in foreground drawing 101. It reads the first tier's thickness and raw material
-after confirming the object type and `TierCount == 1`. For the fixture wall,
-expect 200 mm under the API-mm assumption and
-`sample.criterion.matches_assuming_native_mm=true` only when both fields are
-valid. Runtime unit verification and material
-target binding remain false/not checked; no material write is available. A
-native wall read must be observed before material writes can be enabled.
+after confirming the object type and `TierCount == 1`. Without an explicit
+UUID it selects the first model UUID, not the thinnest Wall. A valid 200 mm
+sample yields `matches_assuming_native_mm=true`; the observed 240 mm sample
+correctly yielded false. The guide's earlier expectation of always sampling
+200 mm was incorrect. Runtime unit verification and material target binding
+remain false/not checked; no material write is available. This one confirmed
+sample does not establish full-Wall filtering or material-write support.
 
 The owner requested the full first scenario and explicitly accepted highlighting:
 Columns without fire resistance classification → matching targets highlighted →
@@ -127,14 +135,11 @@ source/resource revalidation, native writability, readback and bounded journal
 guards remain. The old isolated probe launcher remains available, but the new
 task uses **M4 Columns to W1.cmd** and **M4 Columns Recover.cmd**.
 
-The next wall observation is a corrected, bounded single read using **M4 Wall Properties.cmd**. Bracket the request
-with `health_before` and `health_after` in the same MCP session; preserve
-`logs/wall-properties-*.json` and `.txt`, `bridge.log`,
-`Local/.allplan-mcp/logs/m4-native-probe.jsonl`, and
-`Local/.allplan-mcp/repairs`. The pending request must be saved before sending;
-lost replies do not trigger another native call. If Allplan crashes, retain the
-trace and do not rerun. See the [wall guide](m4-wall-properties-0.18.0.pl.md).
-This bounded read does not accept material writes or the broader M4 workflow.
+The bounded single-Wall observation is complete; do not ask the owner to repeat
+it. Preserve its reports, bridge/native traces and repair journal. Full-Wall
+filtering/highlighting and material binding/write/readback remain separate,
+unverified work; the 0.18.2 sample does not accept the broader M4 workflow.
+See the [corrected guide](m4-wall-sample-0.18.2.pl.md).
 
 M3 acceptance remains limited to its historical fixture/build/single- and
 two-change cases. See [validation](validation-status.md) and [testing policy](testing-policy.md).

@@ -55,6 +55,12 @@ checks passed ([evidence](../evaluation-packages/0.18.0/README.md)). A later
 `probe_scope_unavailable` (“Wall sample has ambiguous adapter representations”);
 no sample was returned and the cause is not established by the observation.
 See the [0.18.1 observation report](m4-native-observation-0.18.1-2026-10-17.md).
+The corrected **0.18.2** owner observation subsequently recorded
+**PASS / accepted_on_build 0.18.2** for one single-tier Wall read: **240 mm**, **`Beton`**,
+matching UI, with healthy replies before/after and no reported model change.
+Two Walls were found; one was sampled by model UUID order. The 20 cm Wall's
+properties and full-Wall filtering/highlighting/material writes remain
+unverified. [Observation and original logs](m4-wall-observation-0.18.2.md).
 The intended observation is limited to one Wall in foreground file
 101. M1 uses required type/identity fields plus display name/file state, counts
 matched Wall roots, and reads no attributes or geometry. The host selects one
@@ -65,8 +71,8 @@ reads `Properties` and `TierCount`, and proceeds to tier 1 only when
 `sample.criterion.matches_assuming_native_mm` uses an explicitly unverified API
 millimetre assumption. It does not read thickness from every matched Wall or read
 metadata/enums, highlight, or write. Read acceptance is required before any
-material write support is enabled. The 0.18.0 observation can be performed
-without first testing 0.17.2. See the [wall guide](m4-wall-properties-0.18.0.pl.md)
+material write support is enabled. This bounded read gate is now complete on
+0.18.2 and needs no repeat. See the [corrected wall guide](m4-wall-sample-0.18.2.pl.md)
 and the pinned official SDK example at
 [ModifyWall.py, 8e2c252477e20bc9afac8918f78a8eeabd473a81](https://github.com/NemetschekAllplan/PythonPartsExamples/blob/8e2c252477e20bc9afac8918f78a8eeabd473a81/PythonPartsExampleScripts/ArchitectureExamples/ModifyObjects/ModifyWall.py).
 

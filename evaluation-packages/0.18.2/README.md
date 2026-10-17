@@ -34,20 +34,33 @@ Validation of clean source **47ec1ad5ccc494452d2bdcd5c7252f8969facbd5**:
 Artifacts are frozen from the clean source above. Later documentation/delivery
 commits do not rebuild them. All older archives remain unchanged.
 
-**ready_for_owner_test** for one native single-tier Wall property read;
-native Allplan verification of this correction is **not_run**. The owner already
-confirmed 0.18.1 host recovery and retained Columns no-op highlighting; those
+**PASS / accepted_on_build 0.18.2** for the observed single-tier Wall property
+read on 2026-10-17: **240 mm**, raw material **`Beton`**, owner-confirmed against
+UI. M1 found two Walls and intentionally sampled one by model UUID order;
+`240 < 240` correctly returned false. Both health replies were healthy in one
+session, with no requested setters or reported model change. The 20 cm Wall's
+properties, full-Wall filtering/highlighting and material writes remain unverified.
+[Observation and original JSON/TXT](../../docs/m4-wall-observation-0.18.2.md).
+The original delivery/verification JSON files retain their pre-observation
+`not_run` and `ready_for_owner_test` values; they are frozen build records.
+The owner also confirmed 0.18.1 host recovery and Columns no-op highlighting; those
 [observations and uploads](../../docs/m4-native-observation-0.18.1-2026-10-17.md)
-do not accept the new Wall read or full M4/write workflow.
+retain their separate scope. Neither observation accepts the full M4/write workflow.
 
 ## Krótka próba
+
+Próba zakończona wynikiem PASS dla jednej ściany; nie trzeba jej powtarzać.
+Poniżej poprawiony opis przebiegu. Dokumentacja w zamrożonym ZIP-ie zawiera
+wcześniejsze oczekiwanie 200 mm; aktualna instrukcja uwzględnia wybór według UUID.
 
 Zamknij Allplan i MCP. Rozpakuj pełny ZIP 0.18.2, uruchom **Setup.cmd** z tym
 samym katalogiem Local i otwórz zachowaną kopię MCP_QA_DEMO, rysunek 101
 foreground. Uruchom host i MCP z nowego pakietu, a potem raz
-**M4 Wall Properties.cmd**. Oczekuj jednej próbki, jednej warstwy, grubości
-200 mm i surowego materiału do porównania z UI oraz obu odpowiedzi health
-w tej samej sesji. Próba nie zmienia modelu i nie wymaga Undo.
+**M4 Wall Properties.cmd**. Próba odczytuje jedną ścianę jednowarstwową,
+pierwszą według UUID modelu. Grubość i surowy materiał porównuje się z UI;
+nie ma gwarancji wyboru ściany 200 mm. W wykonanej próbie poprawnie odczytano
+240 mm i „Beton”, a obie odpowiedzi health pochodziły z tej samej sesji.
+Próba nie zmienia modelu i nie wymaga Undo.
 
 Przy błędzie zakończ próbę i zachowaj raporty oraz natywny trace; bez ponawiania.
 [Pełna krótka instrukcja i wycofanie](../../docs/m4-wall-sample-0.18.2.pl.md).

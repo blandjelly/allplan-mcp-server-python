@@ -3,8 +3,15 @@
 **0.18.2 correction:** the single-Wall read resolves consistent M1 root
 wrappers by native file/model/view identity rather than Python object identity.
 One Wall is read once; multiple views, conflicting fields and incomplete
-hierarchy remain blocked. Native validation is **not_run / ready_for_owner_test**;
-the 0.18.1 owner observations below retain their original scope.
+hierarchy remain blocked. Native validation is **PASS / accepted_on_build 0.18.2**
+for the observed single-tier Wall read: **240 mm**, **`Beton`**, owner-confirmed
+against UI. M1 found two Wall identities and intentionally sampled one; the
+strict `<240 mm` criterion correctly returned false. Both health replies were
+healthy in one session, with no requested setters or reported model change.
+The 20 cm Wall's properties, full-Wall filtering, Wall highlighting, material
+binding and writes remain unverified. The original JSON's automatic acceptance
+and runtime-unit flags remain unchanged. [Observation and original uploads](m4-wall-observation-0.18.2.md).
+The 0.18.1 owner observations below retain their original scope.
 [Change and Polish check](m4-wall-sample-0.18.2.pl.md),
 [automated and exact-package evidence](../evaluation-packages/0.18.2/README.md).
 Clean source **47ec1ad5ccc494452d2bdcd5c7252f8969facbd5** passed **312 portable

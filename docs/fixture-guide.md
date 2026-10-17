@@ -43,6 +43,15 @@ roots are SkeletonBeam; slab is MultiSlab with Slab tiers. Expected:
 **10 top-level components** in 101. Child representations must not inflate counts.
 Add an S02 reference column to each of 102/103; those are outside audit uniqueness.
 
+Later owner observation, **2026-10-17**, found two Walls in drawing 101,
+described as **24 cm and 20 cm**. The 0.18.2 probe counted both and intentionally
+read only the first Wall in model UUID order: **240 mm**, raw material
+**`Beton`**, owner-confirmed against UI. The 20 cm Wall's properties were not
+read. The ten-component baseline above remains historical evidence, not a
+fresh count of this later fixture state. Keep both Walls; do not alter the
+fixture to force selection of the 200 mm Wall.
+[Observation and original reports](m4-wall-observation-0.18.2.md).
+
 ## Accepted observations and current state
 
 Read counts: **10/6/2/1** components/columns/S02/spatial-height C01 matches.

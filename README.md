@@ -6,7 +6,10 @@ blocked single-Wall sample when M1 resolves multiple Python wrappers of the same
 native root. Conflicting identities/fields and multiple views still block reads.
 [Windows package and checks](evaluation-packages/0.18.2/README.md),
 [short Polish Wall check](docs/m4-wall-sample-0.18.2.pl.md).
-Native verification of the correction remains **ready_for_owner_test**.
+The owner confirmed **PASS / accepted_on_build 0.18.2** for one native Wall
+read: **240 mm**, material **`Beton`**, matching the UI. Two Walls were found;
+only the first in model UUID order was sampled, as intended.
+[Observation and original logs](docs/m4-wall-observation-0.18.2.md).
 The owner confirmed responsive host transport and Columns no-op highlighting
 on **0.18.1**; its 306 tests, six CI jobs and package checks remain recorded
 with the [previous delivery](evaluation-packages/0.18.1/README.md).
@@ -28,7 +31,7 @@ and [short Polish wall guide](docs/m4-wall-properties-0.18.0.pl.md).
 Source development also includes an [offline saved-wall-report analyzer](docs/m4-wall-report-analysis.md).
 It checks conditional thickness/material conclusions and missing evidence without
 contacting Allplan. It is not in the frozen 0.18.0 ZIP and cannot authorize writes;
-the blocked Wall property read still needs a corrected native observation.
+the 0.18.2 observation accepts one Wall read, not full-Wall filtering or writes.
 
 **M0–M3 are accepted within the retained test project**, Allplan **2026-1-7**
 with local Windows Codex. M3 covers recorded one-/two-change Column scenarios
