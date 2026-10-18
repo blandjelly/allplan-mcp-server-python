@@ -81,3 +81,12 @@ class ComputableQueryTests(unittest.TestCase):
         with self.assertRaises(self.module.BridgeError):
             self.contracts.validate_request(self.request(attribute_read_mode="computed"))
 
+    def test_mode_binds_source_even_when_both_modes_return_identical_values(self):
+        adapter = self.adapter()
+        adapter.GetAttributes.return_value = [(83, "same")]
+        self.prepare([adapter])
+        stored = self.query(attribute_ids=[83])
+        complete = self.query(attribute_ids=[83], attribute_read_mode="all_and_computable")
+        self.assertEqual(stored["elements"][0]["fields"], complete["elements"][0]["fields"])
+        self.assertNotEqual(stored["source_fingerprint"], complete["source_fingerprint"])
+

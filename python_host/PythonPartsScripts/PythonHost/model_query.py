@@ -330,7 +330,8 @@ class ModelQueryService:
                              "supported_component_types": sorted(COMPONENT_TYPES),
                              "geometry_units_offset": "implemented_runtime_pending" if needed & GEOMETRY_FIELDS else "not_checked"},
                 "profile_binding": profile_binding,
-                "source_fingerprint": fingerprint({"binding": binding, "included": included, "omissions": omitted, "source": source})}
+                "source_fingerprint": fingerprint({"binding": binding, "included": included, "omissions": omitted, "source": source,
+                    **({"attribute_read_mode": attribute_read_mode} if attribute_read_mode != "stored" else {})})}
 
     @staticmethod
     def _fields(adapter, base, needed, number, state):
