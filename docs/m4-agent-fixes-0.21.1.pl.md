@@ -74,8 +74,11 @@ z tym samym ID, bez ponawiania Apply.
 
 ## Walidacja kandydata
 
-- Automatyczne CI 0.21.1: **oczekuje na wynik**.
-- Paczka 0.21.1 i weryfikacja instalacji/dostawy: **oczekuje na wynik**.
+- Automatyczne CI 0.21.1: **PASS**, Windows/Ubuntu Python 3.12, po 448 testów,
+  dla źródła `41e0cabf1352ffc54b5e35b68adbf3fed498e8d4`.
+- Paczka 0.21.1 i weryfikacja instalacji/dostawy: **PASS** — dokładny ZIP,
+  36 sum plików mostu, aktualizacja z 0.21.0 i restore, z zachowaniem dziennika
+  i logów. [Paczka i dowody](../evaluation-packages/0.21.1/README.md).
 - Próba natywna 0.21.1: **not_run** do czasu obserwacji właściciela.
 
 Nie aktualizuj tych statusów na podstawie testów przenośnych ani opisu API.

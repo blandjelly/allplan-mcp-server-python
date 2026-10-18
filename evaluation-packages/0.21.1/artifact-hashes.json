@@ -1,0 +1,19 @@
+{
+  "source_commit": "41e0cabf1352ffc54b5e35b68adbf3fed498e8d4",
+  "provenance": "single_local_fallback_after_ci_artifact_transfer_http_403",
+  "files": {
+    "allplan-mcp-0.21.1-windows-evaluation.zip": {
+      "sha256": "a522ef686e596f36cf957f5be74c92d246663b0177d8e70e703d27da9ca20c21",
+      "size_bytes": 448134
+    },
+    "allplan_mcp_server-0.21.1-py3-none-any.whl": {
+      "sha256": "1c8f88d91cc40d68d89335756eabf26ba1d159d1f03546cffd1bfaba251fb03c",
+      "size_bytes": 99240
+    },
+    "allplan_mcp_server-0.21.1.tar.gz": {
+      "sha256": "289a000db059b7898e1f94ec21d94981ab46848cee3189e5668d0305c38ec567",
+      "size_bytes": 426350
+    }
+  },
+  "wheel_and_sdist_payload": "pass"
+}

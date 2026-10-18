@@ -9,8 +9,16 @@ Do not repeat the accepted U/fire/query/highlight observations. Candidate 0.21.1
 works on equivalent Wall wrappers, raw attribute/pagination preservation,
 project-name roundtrip and target-scoped completeness diagnostics. Unknown Wall
 tier behavior remains guarded; `Poziom_Górny` is unsupported/unverified, and
-the log cannot establish the cause of the W1 refusal. CI, package/delivery and
-new native acceptance are pending. Next owner trial is only Wall listing and
+the log cannot establish the cause of the W1 refusal.
+Source **41e0cabf1352ffc54b5e35b68adbf3fed498e8d4** passed
+[CI 39146255209](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39146255209):
+**448 tests on each Windows/Ubuntu Python 3.12 job**, then one package job.
+CI artifact transfer returned HTTP 403; one permitted local fallback build used
+the same clean source. The exact delivered ZIP passed checksum/payload checks,
+fresh registration, frozen sync/import, upgrade from 0.21.0 and restore, with
+**36 bridge hashes** and preserved journal/trace/bridge log.
+[Package and evidence](../evaluation-packages/0.21.1/README.md).
+New native acceptance remains pending. Next owner trial is only Wall listing and
 lower-initial `materiał` lookup, optional read-only Beam/Slab samples, then W1
 Wall `<240 mm` preview/diagnostics and Apply/UI/readback/Undo only if enabled.
 [Short 0.21.1 trial](m4-agent-fixes-0.21.1.pl.md) · [Owner observation](test-results/m4-agent-observation-2026-10-18.md) · [Original log](test-results/evidence/m4-agent-test-2026-10-18.md).
