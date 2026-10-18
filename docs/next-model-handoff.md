@@ -15,7 +15,17 @@ absence, preserving read-only provenance. Dates/opaque types, native material
 properties and production/multi-file writes remain unsupported. New native paths
 are not_run; do not repeat historical accepted fire/query/highlight observations.
 [Focused trial](m4-agent-fixes-0.21.0.pl.md) · [API/type coverage](m4-attribute-type-coverage.md).
-Focused tests and final CI/package evidence will be recorded with delivery.
+Runtime source **39405be16a2ba9916b05a564702e89e1ff12d1cf** passed
+[CI 39121935578](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39121935578):
+**437 tests per Windows/Ubuntu Python 3.12 job**, followed by one package job.
+CI artifact workspace transfer was blocked by proxy tunnel HTTP 403; the single
+permitted local fallback build used the exact clean source. Its delivered ZIP
+passed payload/checksum, registration, frozen sync/import, upgrade from 0.20.1
+and restore, with **36 bridge hashes** and journal/trace/bridge-log preservation.
+[Package and evidence](../evaluation-packages/0.21.0/README.md). Five focused
+MCP HTTP flows pass with native fakes, including exact next-action Apply,
+undefined U, Material attribute add/recovery/replay, Wall tiers, catalog and
+computed query. Native acceptance remains pending the focused owner trial.
 
 **Owner agent trial, 2026-10-17:** the owner confirms fire-classification edits,
 highlighting and query operations worked. The transcript reports F120, then

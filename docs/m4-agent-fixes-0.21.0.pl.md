@@ -1,5 +1,7 @@
 # M4 0.21.0 — krótka próba Wartości U, atrybutu Materiał i warstwy ściany
 
+[Zweryfikowana paczka 0.21.0, CI i instalacja](../evaluation-packages/0.21.0/README.md).
+
 Nowa ścieżka `model_edit` i faza `element_attributes` wymagają ograniczonej
 próby właściciela w kopii projektu. Natywna akceptacja pozostaje `not_run`.
 Log agenta z 2026-10-18 opisuje podglądy Wartości U i atrybutu Materiał oraz

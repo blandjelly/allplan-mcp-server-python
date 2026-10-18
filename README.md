@@ -11,6 +11,7 @@ component, infers scalar types from SDK metadata, accepts verified enum labels,
 and queries computed attributes explicitly. Arbitrary existing project attribute
 IDs are supported through these codecs; computed-only and unknown types remain
 read-only/unsupported. Native material properties and date writes remain separate.
+[Package and CI evidence](evaluation-packages/0.21.0/README.md) ·
 [Focused workflow and native trial](docs/m4-agent-fixes-0.21.0.pl.md).
 The previous **0.20.1** fixed typed numeric undefined values and bound Wall layer
 edits to their actual tiers with a revalidated thickness criterion.
