@@ -10,7 +10,7 @@ from .repair_contracts import validate_repair_request
 SCHEMA = "m4-model-edit-1"
 DEFAULT_NATIVE_TYPES = ["Column_TypeUUID", "Beam_TypeUUID", "SkeletonBeam_TypeUUID",
                        "Wall_TypeUUID", "Slab_TypeUUID", "MultiSlab_TypeUUID", "WindowDoor_TypeUUID"]
-EDIT_TYPES = {"text", "integer", "real", "boolean"}
+EDIT_TYPES = {"auto", "text", "integer", "real", "boolean", "enum"}
 MODES = {"replace", "upsert", "add"}
 # Exact values emitted by Allplan for an explicitly undefined stored attribute.
 # Never normalize arbitrary strings or parse them as numbers.
@@ -70,7 +70,7 @@ def _preview(request):
         if not isinstance(target, dict):
             invalid("Each change requires a target object.")
         if target.get("kind") == "attribute":
-            keys(change, {"target", "value_type", "value", "mode"}, {"target", "value_type", "value"})
+            keys(change, {"target", "value_type", "value", "mode"}, {"target", "value"})
             keys(target, {"kind", "attribute_id", "name"}, {"kind"})
             if "attribute_id" not in target and "name" not in target:
                 invalid("Attribute target requires an attribute_id or exact name.")
@@ -79,11 +79,13 @@ def _preview(request):
                 referenced_ids.add(ident)
             if "name" in target and (not isinstance(target["name"], str) or not target["name"].strip() or len(target["name"]) > 128):
                 invalid("Attribute name must be a bounded nonempty exact name.")
-            value_type = change["value_type"]
+            value_type = change.get("value_type", "auto")
             value = change["value"]
             if not isinstance(value_type, str) or value_type not in EDIT_TYPES or not scalar(value):
                 invalid("Attribute value must be a bounded JSON scalar with a supported value_type.")
-            valid = ((value_type == "text" and isinstance(value, str))
+            valid = ((value_type == "auto" and value is not None)
+                     or (value_type == "text" and isinstance(value, str))
+                     or (value_type == "enum" and isinstance(value, str) and bool(value))
                      or (value_type == "integer" and isinstance(value, int) and not isinstance(value, bool))
                      or (value_type == "real" and isinstance(value, (int, float)) and not isinstance(value, bool))
                      or (value_type == "boolean" and isinstance(value, bool)))

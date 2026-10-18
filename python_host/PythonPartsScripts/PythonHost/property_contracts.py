@@ -10,7 +10,9 @@ PROBE_SCHEMA = "m4-property-probe-1"
 
 
 def validate_probe(request):
-    keys(request, {"schema_version", "phase", "drawing_file", "attribute_name", "attribute_id", "layer_short_name", "model_uuid"}, {"schema_version", "phase"})
+    keys(request, {"schema_version", "phase", "drawing_file", "attribute_name", "attribute_id", "layer_short_name",
+                   "model_uuid", "view_uuid", "name_contains", "offset", "limit"},
+         {"schema_version", "phase"})
     if request["schema_version"] != PROBE_SCHEMA:
         invalid(f"schema_version must be {PROBE_SCHEMA}.")
     if request["phase"] == "wall_sample":
@@ -20,6 +22,24 @@ def validate_probe(request):
                 or not re.fullmatch(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}", request["model_uuid"])
                 or request["model_uuid"] == "00000000-0000-0000-0000-000000000000"):
             invalid("model_uuid must name one canonical nonzero model UUID.")
+        return
+    if request["phase"] == "element_attributes":
+        keys(request, {"schema_version", "phase", "drawing_file", "model_uuid", "view_uuid",
+                       "name_contains", "offset", "limit"},
+             {"schema_version", "phase", "drawing_file", "model_uuid", "view_uuid"})
+        bounded_int(request["drawing_file"], 1, 2147483647, "drawing_file")
+        for field in ("model_uuid", "view_uuid"):
+            value = request[field]
+            if (not isinstance(value, str)
+                    or not re.fullmatch(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}", value)
+                    or value == "00000000-0000-0000-0000-000000000000"):
+                invalid(f"{field} must be one canonical nonzero UUID.")
+        contains = request.get("name_contains", "")
+        if (not isinstance(contains, str) or len(contains) > 64
+                or any(ord(char) < 32 for char in contains)):
+            invalid("name_contains must be bounded text without control characters.")
+        bounded_int(request.get("offset", 0), 0, 255, "offset")
+        bounded_int(request.get("limit", 32), 1, 32, "limit")
         return
     required = {"column_sample": "drawing_file", "attribute_name": "attribute_name",
                 "attribute_definition": "attribute_id", "layer_name": "layer_short_name"}.get(request["phase"] if isinstance(request["phase"], str) else "")

@@ -67,6 +67,14 @@ Null, empty, absent and failed reads remain distinct. Unknown stays unknown unde
 not; all/any use three-valued logic. exists=false requires observed absence,
 not a failed/passive attribute read.
 
+Query `attribute_read_mode=all_and_computable` opts into a paired
+`ReadAll`/`ReadAllAndComputable` read for requested attribute IDs; `stored` stays
+the default and the legacy path is unchanged. It can expose a value present only
+in the computed-inclusive read as `computed_only=true`, which is read evidence,
+not an editable stored value. Proven absence requires successful agreement and
+complete coverage in both reads. The mode is included in source fingerprints so
+revalidation cannot reuse evidence from the other mode. Query remains read-only.
+
 Page size is **1–200** (default 100). page.complete means the last page;
 is_full_selection means that page contains the whole selection. Neither proves
 scope coverage. page/summary rerun the original relevant-source query, including
@@ -144,6 +152,7 @@ is required, with only its declared parameters:
 | column_sample | drawing_file: one explicit foreground file; existing M1 Column scan, then raw GetAttributes(ReadAll) on one unambiguous root adapter. |
 | attribute_name | attribute_name: one exact project name; GetAttributeID and, if observed, GetAttributeName round trip. |
 | attribute_definition | attribute_id: one ID observed from project metadata/sample; name/type/unit/control readers, stopping at first unavailable value. |
+| element_attributes | drawing_file, model_uuid, view_uuid; optional name_contains, offset, limit: one exact foreground semantic component, paged ReadAll values and targeted name/ID roundtrip plus SDK scalar type metadata. |
 | layer_name | layer_short_name: one exact short name; native ID/name round trip, no creation. |
 | wall_sample | drawing_file (required integer) and optional model_uuid: one foreground file and one exact native Wall root; reads tier count and, only for a single-tier Wall, tier 1 thickness and raw material. |
 
@@ -177,6 +186,20 @@ be observed before enabling material writes.
 No batch or automatic continuation is invoked. Raw absence/null/empty/undefined/
 error values retain their distinction. Adapters and containers are never saved
 in the JSON query cache.
+
+`element_attributes` requires one active foreground drawing and exact nonzero
+`model_uuid`/`view_uuid`; it resolves one unambiguous semantic root adapter
+across the supported component families. `name_contains` is a case-insensitive
+substring filter over names returned by `ReadAll` (maximum 64 characters).
+`offset` is 0–255 and `limit` is 1–32 (default 32). Each returned row includes
+the raw value, attribute ID, observed name and name/ID roundtrip, and targeted
+`GetAttributeType` metadata when available. `supported_scalar_value_types`
+contains only text/integer/real/boolean types matching loaded SDK members
+directly. If any name roundtrip or page type is unavailable, completeness and
+the total match count are unknown and `next_offset` is omitted. Omissions from
+`ReadAll` remain unknown; this phase is not a project definition catalog and
+does not establish attribute applicability or writability. It makes no writes
+and does not read enum, control, or unit metadata.
 
 Before every new native reader a started record is appended, flushed and fsynced
 in **Local/.allplan-mcp/logs/m4-native-probe.jsonl**; returned/failed records follow.
@@ -278,11 +301,14 @@ reply. See the [0.19.0 owner guide](m4-wall-filter-0.19.0.pl.md).
 Schema `m4-model-edit-1`, bridge `/model-edit`. This is an experimental
 preview/apply path for edits selected by a criterion, independent of audit
 findings. It supports exact attribute targets with `text`, `integer`, `real`,
-or `boolean` values and modes `replace`, `add`, or `upsert`, plus a separate
-existing organizational layer target. Attribute values such as `Beton C37`
-are distinct from a wall's native material and visual surface; this route does
-not modify native element properties. Enum/date conversion and general
-attribute catalog discovery are outside this contract.
+`boolean`, or explicitly selected `enum` values and modes `replace`, `add`, or
+`upsert`, plus a separate existing organizational layer target.
+`value_type=auto` (the default) infers the type from the exact bound attribute's
+loaded SDK type. It never parses or coerces a string to infer a type. Values
+such as `Beton C37` are distinct from a wall's native material and visual
+surface; this route does not
+modify native element properties. Dates and general attribute catalog discovery
+are outside this contract.
 
 The default native type list is Column, Beam, SkeletonBeam, Wall, Slab,
 MultiSlab, and the documented `WindowDoor_TypeUUID` opening adapter. Without
@@ -302,14 +328,25 @@ drawings, while Apply is limited to one active foreground drawing. A predicate
 can use a resolved `attribute:<id>` field with `is_unset`. The default
 `attribute_read_mode=stored` treats `ReadAll` omissions as unknown. The
 explicit opt-in `all_and_computable` mode is required to treat an omission as
-absent, and only after a complete read. A failed, partial, or unsupported read
-still blocks the decision. Existing `model_query`, `column_layer`, and other
-accepted routes retain their prior read behavior.
+absent, and only after a complete read. A value found only by the computed read
+is returned with `computed_only=true` and cannot be treated as an editable
+stored attribute. A failed, partial, or unsupported read still blocks the
+decision. Existing routes using the default `stored` mode retain prior
+ReadAll behavior.
 
 Resolve attribute names against the current document's metadata before
 planning; never invent numeric IDs. The native path checks name/ID round trips
 and compares targeted `GetAttributeType` results with actual loaded SDK enum
 members for supported scalar values; it uses no guessed numeric type codes.
+`value_type=auto` infers only these primitive scalar types. Enum writes require
+explicit `value_type=enum` and an exact display label. The host verifies the
+loaded SDK attribute type is `Enum`, `Integer`, or `String`, resolves the label
+with `GetEnumIDFromValueString`, roundtrips key to label with
+`GetEnumValueStringFromID`, and verifies label to key again. It does not call
+`GetEnumValues` or enumerate an enum catalog. The stored setter value and
+readback remain the exact label; the hash-bound resource also records the
+resolved `enum_binding` key/label and is rebound during preflight. Dates remain
+unsupported because a safe `ChangeAttributes` payload is not documented.
 Allplan's published metadata API does not itself establish that an arbitrary
 attribute is writable. `ChangeAttributes` can append an existing attribute
 definition to an element, but this route does not create project attribute
@@ -346,6 +383,27 @@ automatic batching or hidden partial multi-drawing Apply. Lost replies remain
 unknown and require recovery with the same execution ID. This is not full K6
 acceptance. See the [Polish operator guide](m4-model-edit.pl.md) and [Allplan
 2026 API evidence](m4-attribute-api-evidence.md).
+
+For this evaluation route, public `apply_available` reports whether the
+evaluation Apply is offered. `evaluation_apply_available` is a compatibility
+alias; `production_apply_available=false` separately records that production
+write capability is unavailable. Pending native acceptance does not disable an
+otherwise eligible evaluation Apply. Do not present an experimental Apply as
+natively accepted. After the user authorizes the write, continue when
+`apply_available=true` and the exact highlighted plan/hash, explicit
+`disposable_copy_reviewed_plan` acknowledgement, fresh revalidation, execution
+ID, and other Apply guards are satisfied. If a guard is missing, explain that
+specific requirement; do not cite production unavailability or pending native
+acceptance as the reason.
+
+Preview/highlight responses distinguish evaluation from production through
+`write_mode`, `usable_for_write`, `write_blockers`, and
+`native_acceptance_blocks_evaluation=false`. They provide `required_steps` and
+an actionable `next_action`; use its exact `model_edit` request after the user
+has authorized the write and all listed requirements are satisfied. For Apply,
+`next_action.required_request_fields` requires a newly generated UUID4 hex
+`execution_id`, persisted before sending. Revalidate carries eligibility
+forward only while the original plan remains eligible and unchanged.
 
 ## column_layer (0.17.2 candidate)
 

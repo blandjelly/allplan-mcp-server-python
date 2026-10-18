@@ -1,5 +1,22 @@
 # Current handoff
 
+**2026-10-18 source candidate 0.21.0:** owner [v2 agent observation](test-results/m4-agent-observation-v2-2026-10-18.md)
+reports live host/highlighting and prepared U/Material/Wall-layer plans, but no
+write attempts; raw payloads/exact build are missing. Agent treated a generic
+false capability/native not_run as a hard block. model_edit now reports offered
+evaluation Apply consistently at top-level and capability level, separate
+production flag, blockers and exact next-action hints. Evaluation guards remain.
+New isolated element_attributes lists/filter/pages actual stored fields on one
+known foreground model/view identity, without reopening broad metadata discovery.
+Arbitrary project attributes use SDK-bound scalar codecs with default auto typing;
+explicit enum labels bind targeted key/label round trips and retain label setters.
+Optional all_and_computable model_query reads computed-only values and proven
+absence, preserving read-only provenance. Dates/opaque types, native material
+properties and production/multi-file writes remain unsupported. New native paths
+are not_run; do not repeat historical accepted fire/query/highlight observations.
+[Focused trial](m4-agent-fixes-0.21.0.pl.md) · [API/type coverage](m4-attribute-type-coverage.md).
+Focused tests and final CI/package evidence will be recorded with delivery.
+
 **Owner agent trial, 2026-10-17:** the owner confirms fire-classification edits,
 highlighting and query operations worked. The transcript reports F120, then
 F60/F90 for separate Column sets, and correct 11-root/22-identity counts in

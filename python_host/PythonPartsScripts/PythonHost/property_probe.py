@@ -114,6 +114,96 @@ class PropertyProbeService:
             result.update(scope=snapshot["scope"], counts=snapshot["counts"], sample={"ref": ref, "fields": element["fields"], "attributes": attrs},
                           owner="root_adapter_native_owner_not_verified", definition_reads="not_requested",
                           enum_reads="not_requested", presence_semantics="absence_from_ReadAll_not_proven_native_absence")
+        elif phase == "element_attributes":
+            # Locate one explicitly identified semantic component across the
+            # documented/readable root families. Keep the M1 native container
+            # alive until the exact root adapter has been read below.
+            query = {"schema_version": SCHEMA, "action": "query",
+                     "scope": {"drawing_files": [request["drawing_file"]], "include_passive": False,
+                               "visibility": "api_select_all"},
+                     "component_kind": "semantic_component",
+                     "fields": ["display_name", "file_state"], "max_adapters": 10000}
+            live, native_owners = {}, []
+            snapshot = trace.call("M1.semantic_component_scan",
+                                  lambda: self.queries._scan(doc, base, settings, query,
+                                                             adapter_sink=live, adapter_owners=native_owners))
+            budget()
+            if (not snapshot["coverage"]["requested_scope_complete"]
+                    or snapshot["scope"]["included_files"][0]["state"] != "active_foreground"):
+                raise BridgeError("probe_scope_unavailable", "Attribute listing requires a complete scan of one active foreground drawing.", 409)
+            matches = [item for item in snapshot["elements"]
+                       if item["ref"]["drawing_file"] == request["drawing_file"]
+                       and item["ref"]["model_uuid"] == request["model_uuid"]
+                       and request["view_uuid"] in item["view_uuids"]]
+            if len(matches) != 1 or matches[0]["view_identity_not_checked"]:
+                raise BridgeError("probe_scope_unavailable", "The requested model/view identity did not resolve to exactly one complete semantic component.", 409)
+            element = matches[0]
+            ref = element["ref"]
+            representations = live.get((ref["drawing_file"], ref["model_uuid"]), {})
+            views = representations.get(request["view_uuid"], [])
+            if len(representations) != 1 or len(views) != 1:
+                raise BridgeError("probe_scope_unavailable", "The requested component has ambiguous root adapter representations; no attributes were read.", 409)
+            adapter = views[0]
+            attrs = read("BaseElementAdapter.GetAttributes(ReadAll)",
+                         lambda: attribute_values(adapter, base, budget),
+                         drawing_file=ref["drawing_file"], model_uuid=ref["model_uuid"], view_uuid=request["view_uuid"])
+            if attrs["status"] != "observed":
+                result.update(scope=snapshot["scope"], ref=ref, attributes=attrs,
+                              listing_complete=False, presence_semantics="ReadAll_only_omissions_unknown",
+                              writable="not_established")
+            else:
+                service = base.AttributeService
+                sdk_types = getattr(service, "AttributeType", None)
+                scalar_types = (("text", "String"), ("integer", "Integer"),
+                                ("real", "Double"), ("boolean", "Boolean"))
+                candidates, metadata_issues = [], 0
+                for item in attrs["value"]:
+                    ident = item["attribute_id"]
+                    name = read("AttributeService.GetAttributeName",
+                                lambda ident=ident: bounded_text(service.GetAttributeName(doc, ident)),
+                                attribute_id=ident)
+                    roundtrip = {"status": "not_checked", "value": None, "reason": "name_unavailable"}
+                    if name["status"] == "observed":
+                        roundtrip = read("AttributeService.GetAttributeID",
+                                         lambda name=name["value"]: positive_id(service.GetAttributeID(doc, name)),
+                                         attribute_id=ident)
+                        if roundtrip["status"] == "observed" and roundtrip["value"] != ident:
+                            roundtrip = {"status": "not_checked", "value": roundtrip["value"],
+                                         "reason": "name_id_round_trip_mismatch"}
+                    if name["status"] != "observed" or roundtrip["status"] != "observed":
+                        metadata_issues += 1
+                    if (name["status"] == "observed" and roundtrip["status"] == "observed"
+                            and request.get("name_contains", "").casefold() in name["value"].casefold()):
+                        candidates.append({"attribute_id": ident, "name": name,
+                                           "name_id_round_trip": roundtrip, "value": item["value"]})
+                total = len(candidates)
+                page = candidates[request.get("offset", 0):request.get("offset", 0) + request.get("limit", 32)]
+                for item in page:
+                    ident = item["attribute_id"]
+                    def inspect_type(ident=ident):
+                        value = service.GetAttributeType(doc, ident)
+                        supported = [value_type for value_type, member in scalar_types
+                                     if sdk_types is not None and getattr(sdk_types, member, None) is not None
+                                     and value == getattr(sdk_types, member)]
+                        return {"type_code": enum_code(value), "supported_scalar_value_types": supported}
+                    type_result = read("AttributeService.GetAttributeType", inspect_type, attribute_id=ident)
+                    item["type"] = ({"status": "observed", "value": type_result["value"]["type_code"]}
+                                    if type_result["status"] == "observed" else type_result)
+                    item["supported_scalar_value_types"] = (type_result["value"]["supported_scalar_value_types"]
+                                                             if type_result["status"] == "observed" else [])
+                    if type_result["status"] != "observed":
+                        metadata_issues += 1
+                offset = request.get("offset", 0)
+                result.update(scope=snapshot["scope"], counts=snapshot["counts"], ref=ref,
+                              attributes=page, total_matches=total, offset=offset,
+                              total_matches_status="observed" if metadata_issues == 0 else "not_checked",
+                              next_offset=(offset + len(page) if metadata_issues == 0 and offset + len(page) < total else None),
+                              listing_complete=metadata_issues == 0 and offset + len(page) >= total,
+                              metadata_complete=metadata_issues == 0,
+                              metadata_not_checked_count=metadata_issues,
+                              presence_semantics="values_present_in_ReadAll_only; omissions_unknown",
+                              writable="not_established", enum_values="not_read",
+                              filter={"name_contains": request.get("name_contains", ""), "case_sensitive": False})
         elif phase == "attribute_name":
             name = request["attribute_name"]
             ident = read("AttributeService.GetAttributeID", lambda: positive_id(base.AttributeService.GetAttributeID(doc, name)))

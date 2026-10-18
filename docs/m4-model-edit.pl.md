@@ -1,6 +1,8 @@
 # M4 — typowana edycja modelu: przewodnik operatora
 
 Poprawki **0.20.1** po próbie użytkownika: [Wartość U i warstwa ściany](m4-agent-fixes-0.20.1.pl.md).
+Nowszy, ograniczony owner trial **0.21.0**: [Wartość U, jawny atrybut Materiał,
+warstwa ściany i odczyt atrybutów](m4-agent-fixes-0.21.0.pl.md).
 
 Stan dokumentu: 2026-10-17. Ten przewodnik opisuje nową, eksperymentalną
 ścieżkę `model_edit` i nie oznacza jej akceptacji w Allplanie. Przeczytaj też
@@ -15,6 +17,13 @@ pojedynczy `model_property_probe` w fazie `attribute_name`, a następnie użyć
 zwróconego ID i potwierdzić roundtrip nazwa–ID. Nie wolno zgadywać ID ani
 wybierać podobnie brzmiącego pola. Jeśli dokładne pole, jego typ lub właściciel
 nie zostaną potwierdzone, agent ma zatrzymać plan bez zapisu.
+
+Do przeglądu wartości atrybutów na jednym elemencie służy osobna faza
+`element_attributes`: wymaga aktywnego rysunku oraz dokładnych, niezerowych
+`model_uuid` i `view_uuid`; zwraca stronicowane wartości `ReadAll` i celowane
+metadane nazw/typów. To nie jest katalog definicji projektu. Brak atrybutu w
+`ReadAll` pozostaje nieznany, a lista nie dowodzi zapisywalności. Szczegóły
+stronicowania i odpowiedzi są w [kontrakcie fazy](tool-reference.md#model_property_probe--isolated-read-phases).
 
 Przykładowe polecenia użytkownika:
 
@@ -39,6 +48,10 @@ wyraźną opcją tej ścieżki. Dotychczasowe ścieżki `ReadAll` pozostają bez
 `ReadAllAndComputable`; nie utożsamia błędu odczytu z brakiem. Znana wartość
 `<niezdefiniowany>` jest tekstem, dopóki jawna reguła nie określi jej inaczej.
 Kryterium musi osobno ustalić, czy taka wartość ma znaczyć brak.
+`model_query` także udostępnia jawny, tylko-odczytowy
+`attribute_read_mode=all_and_computable` dla wskazanych ID. Może zwrócić
+`computed_only=true`; taki wynik nie jest zapisywalnym atrybutem. Tryb
+`stored` pozostaje domyślny, a tryb odczytu jest częścią fingerprintu źródła.
 
 ## Cele i rozdzielenie pól
 
@@ -55,13 +68,18 @@ wizualnej i warstwy organizacyjnej. Natywny materiał ściany pozostaje
 `unsupported` w `model_edit`. Odczyt ściany przez `model_property_probe` jest
 tylko odczytem i nie zezwala na jego zapis.
 
-Wartość ma jawny typ `text`, `integer`, `real` albo `boolean`. Adapter pyta
-`GetAttributeType` o dokładnie związany ID i porównuje zwrócony enum z
-rzeczywistym członkiem SDK (`String`, `Integer`, `Double` albo `Boolean`);
-nie używa zgadywanych kodów liczbowych. Enumy, daty i inne formaty nie są
-obecnie obsługiwane. Zgodny typ nadal nie potwierdza, że Allplan dopuszcza
-zapis. Nie traktuj metadanych kontrolki palety jako uprawnienia do zapisu;
-nieznany albo sprzeczny typ ma zatrzymać plan.
+Wartość ma typ `text`, `integer`, `real` albo `boolean`. Domyślne
+`value_type=auto` dobiera go na podstawie typu dokładnie związanego atrybutu i
+załadowanego SDK; teksty nie są parsowane ani konwertowane. Ręczny typ również
+wiąże się z `GetAttributeType` dla dokładnego ID i rzeczywistym członkiem SDK
+(`String`, `Integer`, `Double` albo `Boolean`); nie ma zgadywanych kodów.
+Enumy obsługuje wyłącznie jawne `value_type=enum` z dokładną etykietą. SDK musi
+potwierdzić typ `Enum`, `Integer` albo `String`; etykieta jest rozwiązywana
+wywołaniami `GetEnumIDFromValueString` i `GetEnumValueStringFromID` z powrotnym
+sprawdzeniem etykiety i klucza. Nie ma `GetEnumValues` ani enumeracji katalogu;
+wartość settera i readback pozostają etykietą, a hash wiąże też klucz i etykietę
+enum. `auto` nie wnioskuje enumu z wejściowego tekstu. Daty pozostają
+nieobsługiwane. Zgodny typ nie potwierdza zapisywalności w Allplanie.
 
 Tryby atrybutu:
 
@@ -108,6 +126,18 @@ ponownie rozwiązuje każdy cel i sprawdza stare wartości; zapisuje trwały
 rekord z wyprzedzeniem, po setterze wykonuje świeży odczyt zwrotny. Replay
 tego samego `execution_id` nie ponawia setterów. Niepowodzenie lub utrata
 odpowiedzi daje `unknown` do czasu jawnego recovery i odczytu.
+
+Po podglądzie agent ocenia możliwość Apply na podstawie publicznego
+`apply_available`. `evaluation_apply_available` jest jego aliasem zgodności;
+`production_apply_available=false` osobno informuje, że zapis produkcyjny nie
+jest dostępny. Brak natywnej akceptacji nie wyłącza same przez się
+kwalifikującego się Apply w tej eksperymentalnej ścieżce. Nie wolno
+przedstawiać takiego zapisu jako natywnie zaakceptowanego. Po zgodzie
+użytkownika agent kontynuuje, gdy `apply_available=true` oraz spełniono
+dokładne powiązanie planu, potwierdzenie `disposable_copy_reviewed_plan`,
+świeżą rewalidację, ID wykonania i pozostałe straże Apply. Jeśli któryś
+warunek nie jest spełniony, agent wskazuje ten konkretny brak; nie uzasadnia
+blokady brakiem zapisu produkcyjnego ani akceptacji natywnej.
 
 Zapis jest ograniczony do jednej aktywnej, foregroundowej tablicy rysunkowej.
 Przy wielu otwartych plikach odczyt może objąć więcej plików, lecz wieloplikowy

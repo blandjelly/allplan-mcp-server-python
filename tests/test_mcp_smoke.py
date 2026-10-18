@@ -1250,6 +1250,11 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(preview["action"], "preview")
             self.assertEqual(preview["counts"]["changes"], 1)
             self.assertEqual(preview["changes"][0]["new_value"], "F120")
+            self.assertTrue(preview["apply_available"])
+            self.assertEqual(preview["apply_available"], preview["evaluation_apply_available"])
+            self.assertFalse(preview["production_apply_available"])
+            self.assertEqual(preview["allplan_acceptance"], "not_run")
+            self.assertEqual(preview["next_action"]["request"]["plan_hash"], preview["plan_hash"])
             plan_request = {"schema_version": "m4-model-edit-1", "action": "highlight",
                             "plan_id": preview["plan_id"], "plan_hash": preview["plan_hash"]}
             highlighted = (await client.call_tool("model_edit", {"request": plan_request})).data
@@ -1310,7 +1315,7 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
         request.pop("schema_version")
         async with Client(self.url, timeout=5) as client:
             preview = (await client.call_tool("model_edit", {"request": request})).data
-            self.assertEqual(preview["state"], "preview_ready")
+            self.assertEqual(preview["state"], "preview_ready", preview)
             self.assertEqual(preview["counts"]["changes"], 1)
             self.assertEqual(len(preview["changes"]), 1)
             change = preview["changes"][0]
@@ -1318,6 +1323,8 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(change["resource"]["name"], "Wartość U")
             self.assertEqual(change["old_value"], {"status": "observed", "value": "<niezdefiniowany>"})
             self.assertEqual(change["new_value"], 0.2)
+            self.assertTrue(preview["apply_available"])
+            self.assertTrue(preview["capabilities"]["apply_available"])
             plan_request = {"schema_version": "m4-model-edit-1", "action": "highlight",
                             "plan_id": preview["plan_id"], "plan_hash": preview["plan_hash"]}
             highlighted = (await client.call_tool("model_edit", {"request": plan_request})).data
@@ -1384,3 +1391,81 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(root.GetCommonProperties.return_value.Layer, 3735)
         self.assertTrue(all(tier.GetCommonProperties.return_value.Layer == 8 for tier in tiers))
         self.assertEqual(native.base.ElementsLayerService.ChangeLayer.call_count, 1)
+
+    async def test_model_edit_material_attribute_auto_add_and_recover_over_http(self):
+        from test_model_edit import ModelEditTests
+        native = ModelEditTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        elements = native.fixture(("",))
+        wall = elements[0]
+        wall.GetElementAdapterType.return_value.GetTypeName.return_value = "Wall_TypeUUID"
+        wall.GetElementAdapterType.return_value.GetGuid.return_value = "20000000-0000-4000-8000-000000000201"
+        native.attribute_catalog({935: "Klasa odporności ogniowej", 20017: "Materiał"})
+        native.setter_fakes(elements)
+        original = self.bridge_handler.handle
+        def handle(path, payload):
+            if path == "/model-edit":
+                self.bridge_handler.calls.append((path, payload))
+                try:
+                    return native.handler.handle(path, payload)
+                except native.module.BridgeError as exc:
+                    raise transport.BridgeError(exc.code, str(exc), exc.status) from exc
+            return original(path, payload)
+        self.bridge_handler.handle = handle
+        request = native.request(native_types=["Wall_TypeUUID"], predicate=None,
+            attribute_read_mode="all_and_computable",
+            changes=[{"target": {"kind": "attribute", "name": "Materiał"},
+                      "value": "bloczki gazobetonowe", "mode": "upsert"}])
+        async with Client(self.url, timeout=5) as client:
+            preview = (await client.call_tool("model_edit", {"request": request})).data
+            self.assertTrue(preview["apply_available"])
+            self.assertEqual(preview["changes"][0]["operation"], "add_attribute")
+            self.assertEqual(preview["changes"][0]["resource"]["data_type"], "string")
+            self.assertEqual(preview["changes"][0]["old_value"]["status"], "absent")
+            highlight = (await client.call_tool("model_edit", {"request": preview["next_action"]["request"]})).data
+            apply_request = {**highlight["next_action"]["request"], "execution_id": "a1" * 16}
+            applied = (await client.call_tool("model_edit", {"request": apply_request})).data
+            self.assertEqual(applied["state"], "completed")
+            recovery = (await client.call_tool("model_edit", {"request": {
+                "action": "recover", "execution_id": apply_request["execution_id"]}})).data
+            self.assertEqual(recovery["outcomes"][0]["state"], "applied")
+            replay = (await client.call_tool("model_edit", {"request": apply_request})).data
+            self.assertTrue(replay["replayed"])
+        self.assertEqual(dict(wall.GetAttributes.return_value)[20017], "bloczki gazobetonowe")
+        native.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+        native.base.ElementsLayerService.ChangeLayer.assert_not_called()
+
+    async def test_element_attribute_catalog_and_computed_query_over_http(self):
+        from test_element_attributes_probe import ElementAttributesProbeTests
+        native = ElementAttributesProbeTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        native.setup_element()
+        original = self.bridge_handler.handle
+        def handle(path, payload):
+            if path in {"/model-property-probe", "/model-query"}:
+                self.bridge_handler.calls.append((path, payload))
+                try:
+                    return native.handler.handle(path, payload)
+                except native.module.BridgeError as exc:
+                    raise transport.BridgeError(exc.code, str(exc), exc.status) from exc
+            return original(path, payload)
+        self.bridge_handler.handle = handle
+        async with Client(self.url, timeout=5) as client:
+            request = native.request(name_contains="odp")
+            request.pop("schema_version")
+            catalog = (await client.call_tool("model_property_probe", {"request": request})).data
+            self.assertTrue(catalog["listing_complete"])
+            self.assertEqual(catalog["attributes"][0]["attribute_id"], 83)
+            native.base.eAttibuteReadState.ReadAll = "stored"
+            native.base.eAttibuteReadState.ReadAllAndComputable = "computed"
+            native.root.GetAttributes.side_effect = lambda mode: [(83, "R60")] if mode == "stored" else [(83, "R60"), (20017, "derived")]
+            query = (await client.call_tool("model_query", {"request": {
+                "action": "query", "scope": {"drawing_files": [101], "include_passive": False, "visibility": "api_select_all"},
+                "attribute_read_mode": "all_and_computable", "attribute_ids": [20017],
+                "predicate": {"field": "attribute:20017", "op": "eq", "value": "derived"}}})).data
+            self.assertEqual(query["counts"]["matched_model_identities"], 1)
+            self.assertTrue(query["elements"][0]["fields"]["attribute:20017"]["computed_only"])
+        native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+        native.base.AttributeService.GetEnumValues.assert_not_called()

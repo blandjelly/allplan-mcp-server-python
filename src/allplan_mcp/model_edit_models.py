@@ -29,14 +29,16 @@ EditTarget = Annotated[AttributeEditTarget | LayerEditTarget, Field(discriminato
 
 class AttributeEdit(ContractModel):
     target: AttributeEditTarget
-    value_type: Literal["text", "integer", "real", "boolean"]
+    value_type: Literal["auto", "text", "integer", "real", "boolean", "enum"] = "auto"
     value: str | int | float | bool
     mode: Literal["replace", "upsert", "add"] = "replace"
 
     @model_validator(mode="after")
     def value_matches_type(self):
         valid = {
+            "auto": isinstance(self.value, (str, int, float, bool)),
             "text": isinstance(self.value, str),
+            "enum": isinstance(self.value, str) and bool(self.value),
             "integer": isinstance(self.value, int) and not isinstance(self.value, bool),
             "real": isinstance(self.value, (int, float)) and not isinstance(self.value, bool),
             "boolean": isinstance(self.value, bool),

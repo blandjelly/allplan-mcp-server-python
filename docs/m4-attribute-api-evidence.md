@@ -33,6 +33,20 @@ reads and successful completeness is reported. It does not justify changing an
 existing `ReadAll` route or converting errors, applicability uncertainty, or
 missing adapter coverage into “absent.”
 
+The isolated `element_attributes` probe now provides bounded search of values
+present on one explicitly identified foreground component. It requires the
+drawing file, model UUID, and view UUID; scans only the existing six supported
+component adapter families; and reads `GetAttributes(ReadAll)` from exactly one
+retained root adapter. It resolves each returned ID through targeted
+`GetAttributeName` and reverse `GetAttributeID` calls, then reads
+`GetAttributeType` only for the requested result page. Runtime scalar type
+labels are reported only when equal to the loaded SDK's corresponding enum
+member. Pages are capped at 32 and the raw response at 256 attribute IDs. Search
+is case-insensitive over these names. This lists fields returned on that one
+element; it is not a project-wide definition catalog, does not prove omitted or
+inapplicable attributes, and does not establish write support. Control, unit,
+and enum readers remain outside this probe.
+
 ## Opening adapter boundary
 
 The 2026 read-access manual demonstrates one `WindowDoor_TypeUUID` adapter
@@ -109,7 +123,9 @@ The current handoff records 0.19.0 as accepted for a scoped two-Wall filter and
 highlight observation. That run had no setters and reported no model change;
 material target binding, writes, readback, and undo remain unverified. The
 0.16.0 broad property-discovery native crash remains `FAIL_CRASH` with unknown
-root cause, and broad discovery remains blocked. These API findings do not
+root cause, and broad discovery remains blocked. The one-element probe is a
+separate bounded route and has portable fake-adapter coverage only; native crash
+containment and Allplan acceptance remain unverified. These API findings do not
 change either native record or authorize weakening current write guards.
 
 Keep existing accepted `ReadAll` paths and field bindings unchanged. Any new

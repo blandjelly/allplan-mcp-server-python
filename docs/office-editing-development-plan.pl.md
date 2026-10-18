@@ -1,6 +1,24 @@
 # Allplan MCP 2026 — ocena M3 i plan edycji modelu
 
-## Aktualizacja statusu — 17 października 2026
+## Aktualizacja statusu — 18 października 2026
+
+Kandydat **0.21.0** usuwa niejednoznaczność dostępności zapisu z logu v2:
+`apply_available` opisuje faktycznie oferowany zapis ewaluacyjny, a osobna flaga
+produkcji i status akceptacji opisują pozostałe ograniczenia. Plan daje następny
+krok, wymagania i konkretne blokady; nie usuwa rewalidacji, podświetlenia ani
+historii wykonania. Dodano izolowany odczyt atrybutów wskazanego komponentu,
+automatyczne typowanie według SDK, jawne etykiety enum z powiązaniem klucza oraz
+opcjonalne wyszukiwanie także wartości wyliczanych (bez ich zapisu).
+Dowolne istniejące ID/nazwy projektu są obsługiwane przez te kodeki, bez listy
+wybranych atrybutów. To nadal nie oznacza zapisu wszystkich typów API: brak
+udokumentowanego kodowania daty dla tej ścieżki, aktualizacji natywnych
+właściwości/materiału oraz wieloplikowego Apply. Nowe zachowanie wymaga krótkiej
+próby natywnej; pełne M4 i K1–K6 pozostają nieukończone.
+[Zakres typów](m4-attribute-type-coverage.md) ·
+[Krótki scenariusz](m4-agent-fixes-0.21.0.pl.md) ·
+[Obserwacja v2](test-results/m4-agent-observation-v2-2026-10-18.md).
+
+## Poprzednia aktualizacja — 17 października 2026
 
 Od historycznej oceny poniżej powstał eksperymentalny, typowany kontrakt
 `model_edit` dla zmian atrybutu i istniejącej warstwy, wybieranych kryterium

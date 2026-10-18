@@ -74,3 +74,12 @@ class ModelEditContractTests(unittest.TestCase):
                                                     "visibility": "api_select_all"}))
         self.assert_both_reject(self.request(changes=[{"target": {"kind": "attribute", "attribute_id": i + 1},
                                                        "value_type": "text", "value": "x"} for i in range(17)]))
+
+    def test_auto_type_default_parity_and_invalid_scalars(self):
+        for value in ("custom", 7, 0.2, True):
+            request = self.request(changes=[{"target": {"kind": "attribute", "attribute_id": 20001}, "value": value}])
+            parsed = TypeAdapter(ModelEditRequest).validate_python(request)
+            self.assertEqual(parsed.changes[0].value_type, "auto")
+            self.contracts.validate_request(request)
+        for value in (None, [], {}, float("nan")):
+            self.assert_both_reject(self.request(changes=[{"target": {"kind": "attribute", "attribute_id": 20001}, "value": value}]))

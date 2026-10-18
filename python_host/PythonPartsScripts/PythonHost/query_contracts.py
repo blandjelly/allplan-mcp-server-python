@@ -108,7 +108,7 @@ def validate_request(request):
         bounded_int(request.get("sample_limit", 10), 1, 20, "sample_limit")
         validate_request({**{k: v for k, v in request.items() if k != "sample_limit"}, "action": "query"})
         return
-    extensions = {"component_kind", "coordinate_frame", "spatial_box", "profile", "layer_resolution"}
+    extensions = {"component_kind", "coordinate_frame", "spatial_box", "profile", "layer_resolution", "attribute_read_mode"}
     keys(request, {"schema_version", "action", "scope", "predicate", "fields", "attribute_ids", "page_size", "max_adapters", "selection_id", "cursor"} | extensions, {"schema_version", "action"})
     if request["schema_version"] != SCHEMA:
         invalid(f"schema_version must be {SCHEMA}.")
@@ -124,6 +124,9 @@ def validate_request(request):
             invalid("Component layer resolution requires component_kind=semantic_component.")
         if request.get("coordinate_frame", "model_local") not in ("model_local", "project_global"):
             invalid("coordinate_frame must be model_local or project_global.")
+        if (not isinstance(request.get("attribute_read_mode", "stored"), str)
+                or request.get("attribute_read_mode", "stored") not in {"stored", "all_and_computable"}):
+            invalid("attribute_read_mode must be stored or all_and_computable.")
         if "spatial_box" in request:
             from .spatial_contracts import validate_spatial
             validate_spatial(request["spatial_box"])
@@ -199,6 +202,14 @@ def evaluate(node, fields):
     observed = fields[node["field"]]
     status, actual, op = observed["status"], observed.get("value"), node["op"]
     if status == "not_checked":
+        return None
+    if status == "absent" and observed.get("presence_proven") is True:
+        if op == "exists":
+            return False
+        if op == "is_null":
+            return False
+        if op == "is_unset":
+            return True
         return None
     if op == "exists":
         return True if status == "observed" else None

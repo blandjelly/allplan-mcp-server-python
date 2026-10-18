@@ -239,7 +239,7 @@ class RepairExecutor:
     @staticmethod
     def model_edit_scope(plan):
         """Separate evaluation contract; does not broaden historical M3 permissions."""
-        from .native_model_edit import replaceable_attribute_value, value_matches
+        from .native_model_edit import replaceable_attribute_value, value_matches, valid_enum_binding
         from .native_readers import COMPONENT_TYPES
         changes, files = plan["changes"], plan["scope"]["included_files"]
         if (plan.get("schema_version") != "m4-model-edit-1" or plan["state"] != "preview_ready"
@@ -276,6 +276,7 @@ class RepairExecutor:
                 if (change.get("property_role") != "attribute" or type(resource.get("attribute_id")) is not int
                         or change["field"] != f"attribute:{resource['attribute_id']}"
                         or old.get("computed_only") is True
+                        or not valid_enum_binding(change)
                         or not value_matches(change["new_value"], resource.get("data_type"))):
                     return False
                 if change["operation"] == "add_attribute":
