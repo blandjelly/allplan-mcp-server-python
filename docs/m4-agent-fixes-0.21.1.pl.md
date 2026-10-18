@@ -64,7 +64,8 @@ z tym samym ID, bez ponawiania Apply.
    odczytaj po jednym Beam i Slab, zapisując kompletność i diagnostykę. Nie
    traktuj tego jako nowej natywnej akceptacji rodziny.
 3. **Warstwa ściany.** Przygotuj kryterium
-   `wall.total_thickness_mm < 240` i cel W1. Sprawdź raporty
+   `wall.total_thickness_mm < 240` z jawnym zakresem `native_types=["Wall_TypeUUID"]`
+   (lub warunkiem AND `family=wall`) i cel W1. Sprawdź raporty
    `required_field_failures` / `criterion_failures`, wynik dla ściany 200 mm
    oraz wykluczenie 240 mm. Jeśli pełna rewalidacja, plan i odpowiedź wyraźnie
    dopuszczają Apply, wykonaj pojedynczą próbę i sprawdź warstwę w UI, świeży

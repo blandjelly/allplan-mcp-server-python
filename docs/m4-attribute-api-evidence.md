@@ -36,13 +36,18 @@ missing adapter coverage into “absent.”
 The isolated `element_attributes` probe now provides bounded search of values
 present on one explicitly identified foreground component. It requires the
 drawing file, model UUID, and view UUID; scans only the existing six supported
-component adapter families; and reads `GetAttributes(ReadAll)` from exactly one
-retained root adapter. It resolves each returned ID through targeted
+component adapter families; and reads `GetAttributes(ReadAll)` once per distinct
+retained wrapper for that exact root/view. Candidate 0.21.1 requires those
+attribute lists to agree, rather than rejecting equivalent wrappers. It resolves each returned ID through targeted
 `GetAttributeName` and reverse `GetAttributeID` calls, then reads
 `GetAttributeType` only for the requested result page. Runtime scalar type
 labels are reported only when equal to the loaded SDK's corresponding enum
 member. Pages are capped at 32 and the raw response at 256 attribute IDs. Search
-is case-insensitive over these names. This lists fields returned on that one
+is case-insensitive over these names. Unfiltered pages retain raw IDs/values
+even when metadata fails, with separate metadata and listing coverage; a name
+filter reports unknown-name omissions explicitly. Initial-letter spelling
+fallbacks are bounded and verified against the project's returned name/ID;
+they do not translate labels or enumerate definitions. This lists fields returned on that one
 element; it is not a project-wide definition catalog, does not prove omitted or
 inapplicable attributes, and does not establish write support. Control, unit,
 and enum readers remain outside this probe.
