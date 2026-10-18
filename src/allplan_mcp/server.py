@@ -179,6 +179,10 @@ def model_query(request: QueryRequest) -> dict[str, Any]:
     positive drawing_files, include_passive and visibility=api_select_all.
     Use observed type GUID/name, layer ID or
     attribute:<ID> predicates with all/any/not. Missing/failed reads are distinct.
+    attribute_read_mode=all_and_computable is an opt-in read of requested
+    attribute IDs with computed attributes included; it preserves computed_only
+    provenance, is read-only, and binds the mode into the source fingerprint.
+    The stored ReadAll default and its callers remain unchanged.
     layer_resolution=component with component_kind=semantic_component reads a
     Wall's effective layer from all directly owned WallTier adapters; mixed or
     unreadable tier layers are not_checked. Default adapter resolution preserves
@@ -268,13 +272,20 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     old/new values and resources. Choose native_types or a family predicate and
     component owners are resolved without redirecting doors/windows to their wall.
     Attribute targets accept text/integer/real/boolean values with replace/add/upsert;
-    layer targets resolve an existing short name. Attribute material is distinct
-    from native material and surface; this route does not update native properties.
+    value_type=auto infers only loaded-SDK scalar types. Explicit enum labels use
+    targeted label/key roundtrips and a runtime-bound Enum/Integer/String type;
+    no enum catalog is enumerated. Dates remain unsupported. Layer targets resolve
+    an existing short name. Attribute material is distinct from native material
+    and surface; this route does not update native properties.
     is_unset matches observed null/blank. Combine explicit undefined values with any.
     Stored ReadAll omissions are unknown, never absence. The new opt-in
     attribute_read_mode=all_and_computable establishes absence only after a complete
     documented read; is_unset then includes absent and not exists matches absence.
-    No broad definition/enum discovery; enum keys/units must already be resolved.
+    No broad definition/enum discovery. all_and_computable explicitly includes
+    computed values in targeted reads; computed_only values remain marked and
+    cannot be edited. model_query stays read-only; model_edit applies only under
+    its separate safeguards. Stored remains default; existing ReadAll routes
+    are unchanged.
     Metadata-bound numeric/boolean attributes can replace exact old undefined
     strings <niezdefiniowany> or <undefined>, with their raw old value preserved.
     Arbitrary old strings are never parsed/coerced. Wall layer edits bind all
@@ -287,6 +298,16 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     highlight presents all matches including no-ops; native select stays unsupported.
     Apply is experimental, limited to 32 setters in one foreground drawing, with
     exact highlighted plan/hash, execution_id and disposable_copy_reviewed_plan.
+    The public apply_available reports this offered evaluation Apply;
+    evaluation_apply_available is its compatibility alias, while
+    production_apply_available remains false. Pending native acceptance does
+    not disable an otherwise eligible evaluation Apply. Never claim that
+    experimental Apply has native acceptance. Continue only when the user has
+    authorized the write and the exact plan, acknowledgement and safety checks
+    are satisfied. Preview/highlight responses expose write_mode, blockers,
+    required_steps and next_action; follow the returned exact model_edit request.
+    Before apply, persist the new UUID4 hex execution_id named by
+    next_action.required_request_fields.
     Persist the exact Apply request before sending. Use a 32-character lowercase
     hexadecimal execution_id (uuid.uuid4().hex). Lost replies require recover
     with that same execution ID; never create a new ID or automatically retry writes.
@@ -340,6 +361,13 @@ def model_property_probe(request: PropertyProbeRequest) -> dict[str, Any]:
     calls. M1 scan is logged as one existing service phase, not an individual API
     trace. Review one phase's evidence before requesting another; no automatic
     batch, retries, GetEnumValues, highlighting, writes or resource creation.
+    element_attributes requires one exact foreground drawing/model UUID/view UUID;
+    it pages ReadAll values and targeted name/ID roundtrip and SDK type metadata
+    for that root adapter across supported semantic families. Name search is
+    case-insensitive. Incomplete name/type metadata makes total_matches unknown
+    and suppresses next_offset. This is not a project definition catalog, does
+    not prove omissions, applicability or writability, and never probes
+    enum/control/unit metadata.
     The broad model_properties route stays blocked. Native acceptance is pending.
     """
     payload = request.model_dump(exclude_unset=True)

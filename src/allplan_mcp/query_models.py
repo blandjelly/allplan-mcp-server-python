@@ -51,6 +51,7 @@ class QueryInput(ContractModel):
     predicate: Predicate | None = None
     fields: list[QueryField] = Field(default_factory=lambda: ["display_name", "layer_id"])
     attribute_ids: list[Annotated[int, Field(ge=1, le=2147483647)]] = Field(default_factory=list, max_length=32)
+    attribute_read_mode: Literal["stored", "all_and_computable"] = "stored"
     page_size: int = Field(default=100, ge=1, le=200)
     max_adapters: int = Field(default=5000, ge=1, le=10000)
     component_kind: Literal["model_identity", "top_level_component", "semantic_component"] = "model_identity"

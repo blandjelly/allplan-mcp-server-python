@@ -12,7 +12,7 @@ from .native_readers import COMPONENT_TYPES, adapter_ref, root_adapter
 from .transport import BridgeError
 
 
-_TYPES = {"text", "string", "integer", "real", "boolean"}
+_TYPES = {"text", "string", "integer", "real", "boolean", "enum"}
 _READ_ALL = "ReadAll"
 _READ_ALL_COMPUTABLE = "ReadAllAndComputable"
 _ADD_EVIDENCE = "absent_from_ReadAllAndComputable"
@@ -31,7 +31,7 @@ def _data_type(change):
 
 
 def _typed_value(value, data_type):
-    if data_type == "text":
+    if data_type in {"text", "enum"}:
         valid = isinstance(value, str) and len(value) <= 8192
     elif data_type == "integer":
         valid = type(value) is int
@@ -226,6 +226,17 @@ def value_matches(value, data_type):
         return False
 
 
+def valid_enum_binding(change):
+    resource = change.get("resource") or {}
+    if resource.get("data_type") != "enum":
+        return True
+    bound = resource.get("enum_binding") or {}
+    return (resource.get("native_type_member") in {"Enum", "Integer", "String"}
+            and type(bound.get("enum_id")) is int and 0 <= bound["enum_id"] <= 2147483647
+            and isinstance(bound.get("value"), str) and bool(bound["value"])
+            and bound["value"] == change.get("new_value"))
+
+
 def replaceable_attribute_value(change):
     """A typed replacement may start from a known native undefined marker."""
     from .model_edit_contracts import is_undefined_attribute_value
@@ -268,6 +279,8 @@ def write(base, element, change):
     if type(ident) is not int or not 1 <= ident <= 2147483647:
         raise BridgeError("target_not_writable", "Bound attribute ID is unavailable.", 409)
     value = _typed_value(change.get("new_value"), _data_type(change))
+    if not valid_enum_binding(change):
+        raise BridgeError("target_not_writable", "Enum change requires the reviewed exact label/key binding.", 409)
     if operation == "add_attribute":
         old = change.get("old_value") or {}
         if (old.get("status") != "absent" or old.get("presence_proven") is not True

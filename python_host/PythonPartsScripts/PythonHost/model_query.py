@@ -150,6 +150,7 @@ class ModelQueryService:
             needed.add(f"attribute:{profile_binding['attributes'][role]['value']['attribute_id']}")
         if len({f for f in needed if attribute_id(f) is not None}) > 32:
             raise BridgeError("invalid_payload", "Profile aliases and requested attributes exceed the 32-attribute budget.")
+        attribute_read_mode = request.get("attribute_read_mode", "stored")
         files = {f["drawing_file"] for f in included}
         groups, source, samples = {}, [], []
         source_bytes = 0
@@ -217,8 +218,16 @@ class ModelQueryService:
                         # Criterion workflow must not read attributes/geometry of
                         # walls, beams or unknown native families while finding Columns.
                         read_needed = {f for f in needed if f not in GEOMETRY_FIELDS and attribute_id(f) is None}
-                basic_needed = {f for f in read_needed if f in BASIC_FIELDS or f in {"family", "opening_kind"} or attribute_id(f) is not None}
+                basic_needed = {f for f in read_needed if f in BASIC_FIELDS or f in {"family", "opening_kind"}
+                                or (attribute_id(f) is not None and attribute_read_mode == "stored")}
                 values = self._fields(adapter, base, basic_needed, number, states[number])
+                requested_attribute_ids = {attribute_id(f) for f in read_needed if attribute_id(f) is not None}
+                if requested_attribute_ids and attribute_read_mode == "all_and_computable":
+                    # Use the shared native reader so computed-only observations
+                    # retain their provenance and cannot be mistaken for writable
+                    # stored attributes. Keep the legacy ReadAll path untouched.
+                    from .native_model_edit import attribute_fields
+                    values.update(attribute_fields(adapter, base, requested_attribute_ids, "all_and_computable"))
                 if "wall.total_thickness_mm" in read_needed:
                     from .native_readers import wall_total_thickness
                     values["wall.total_thickness_mm"] = wall_total_thickness(adapter, base, check_budget)
@@ -312,6 +321,7 @@ class ModelQueryService:
                 "counts": dict(counts), "elements": elements, "omissions": omitted, "not_checked_samples": samples,
                 "coverage": {"scan_complete": True, "requested_scope_complete": complete,
                              "layer_resolution": request.get("layer_resolution", "adapter"),
+                             "attribute_read_mode": attribute_read_mode,
                              "returned_fields_complete": failed_fields == 0, "returned_fields_not_checked": failed_fields,
                              "whole_project": False, "unloaded_files": "not_enumerated",
                              "visibility": "api_select_all_screen_and_occlusion_not_checked",
@@ -320,7 +330,8 @@ class ModelQueryService:
                              "supported_component_types": sorted(COMPONENT_TYPES),
                              "geometry_units_offset": "implemented_runtime_pending" if needed & GEOMETRY_FIELDS else "not_checked"},
                 "profile_binding": profile_binding,
-                "source_fingerprint": fingerprint({"binding": binding, "included": included, "omissions": omitted, "source": source})}
+                "source_fingerprint": fingerprint({"binding": binding, "included": included, "omissions": omitted, "source": source,
+                    **({"attribute_read_mode": attribute_read_mode} if attribute_read_mode != "stored" else {})})}
 
     @staticmethod
     def _fields(adapter, base, needed, number, state):

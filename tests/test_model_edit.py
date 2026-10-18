@@ -92,6 +92,14 @@ class ModelEditTests(unittest.TestCase):
         elements = self.fixture(("", "F60", "<niezdefiniowany>"))
         self.setter_fakes(elements)
         plan = self.preview()
+        self.assertTrue(plan["apply_available"])
+        self.assertTrue(plan["usable_for_write"])
+        self.assertTrue(plan["capabilities"]["apply_available"])
+        self.assertFalse(plan["production_apply_available"])
+        self.assertEqual(plan["allplan_acceptance"], "not_run")
+        self.assertFalse(plan["native_acceptance_blocks_evaluation"])
+        self.assertEqual(plan["next_action"]["request"], self.plan_request(plan))
+        self.assertEqual(plan["write_blockers"], [])
         self.assertEqual(plan["counts"]["matched"], 1)
         self.assertEqual(plan["counts"]["changes"], 2)
         self.assertEqual(plan["changes"][0]["ref"]["model_uuid"], elements[0].GetModelElementUUID())
@@ -152,7 +160,7 @@ class ModelEditTests(unittest.TestCase):
         self.fixture(("",))
         plan = self.request(changes=[{"target": {"kind": "attribute", "attribute_id": 935},
                                       "value_type": "integer", "value": 120}])
-        self.assert_code("property_binding_unavailable", lambda: self.call(plan))
+        self.assert_code("attribute_type_unsupported", lambda: self.call(plan))
         self.base.ElementsSelectService.SelectAllElements.assert_not_called()
         self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
 
@@ -161,7 +169,7 @@ class ModelEditTests(unittest.TestCase):
         self.attribute_type_names[935] = "Unsupported"
         plan = self.request(changes=[{"target": {"kind": "attribute", "attribute_id": 935},
                                       "value_type": "text", "value": "F120"}])
-        self.assert_code("property_binding_unavailable", lambda: self.call(plan))
+        self.assert_code("attribute_type_unsupported", lambda: self.call(plan))
         self.base.ElementsSelectService.SelectAllElements.assert_not_called()
 
     def test_nonexistent_attribute_binding_fails_before_scan(self):
@@ -287,6 +295,9 @@ class ModelEditTests(unittest.TestCase):
         self.assertEqual(plan["counts"]["changes"], 34)
         self.assertEqual(plan["state"], "not_checked")
         self.assertFalse(plan["evaluation_apply_available"])
+        self.assertFalse(plan["apply_available"])
+        self.assertIn("change_limit_exceeded", plan["write_blockers"])
+        self.assertIsNone(plan["next_action"])
         self.assert_code("repair_scope_unavailable", lambda: self.highlight(plan))
         self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
 
@@ -402,3 +413,104 @@ class ModelEditTests(unittest.TestCase):
         self.assertEqual(self.apply(plan)["state"], "completed")
         self.assertEqual(wall.GetAttributes.return_value, [(20017, "Stone")])
         wall.GetModelGeometry.assert_not_called()
+
+    def test_auto_type_uses_metadata_for_arbitrary_attributes_across_component_families(self):
+        for native_type in ("Column_TypeUUID", "Wall_TypeUUID", "Slab_TypeUUID", "MultiSlab_TypeUUID",
+                            "Beam_TypeUUID", "SkeletonBeam_TypeUUID", "WindowDoor_TypeUUID"):
+            with self.subTest(native_type=native_type):
+                elements = self.fixture(("",))
+                element = elements[0]
+                element.GetElementAdapterType.return_value.GetTypeName.return_value = native_type
+                element.GetAttributes.return_value = [(20001, 1), (20002, False), (20017, "old")]
+                self.attribute_catalog({20001: "Custom integer", 20002: "Custom boolean", 20017: "Custom text"})
+                self.setter_fakes(elements)
+                plan = self.preview(native_types=[native_type], predicate=None, changes=[
+                    {"target": {"kind": "attribute", "attribute_id": 20001}, "value": 7},
+                    {"target": {"kind": "attribute", "attribute_id": 20002}, "value_type": "auto", "value": True},
+                    {"target": {"kind": "attribute", "name": "Custom text"}, "value": "new"}])
+                self.assertTrue(plan["apply_available"], plan)
+                shown = self.highlight(plan)
+                self.assertEqual(shown["next_action"]["request"]["action"], "apply")
+                self.assertIn("execution_id", shown["next_action"]["required_request_fields"])
+                self.assertTrue(self.call({**self.plan_request(plan), "action": "revalidate"})["apply_available"])
+                self.assertEqual(self.apply(plan)["state"], "completed")
+                self.assertEqual(dict(element.GetAttributes.return_value), {20001: 7, 20002: True, 20017: "new"})
+
+    def test_unresolved_exact_attribute_name_gives_a_discovery_path_before_scan(self):
+        self.fixture(("",))
+        self.base.AttributeService.GetAttributeID.side_effect = ValueError("unknown project name")
+        request = self.request(changes=[{"target": {"kind": "attribute", "name": "Przenikalność cieplna U"},
+                                         "value": 0.2}])
+        with self.assertRaises(self.module.BridgeError) as caught:
+            self.call(request)
+        self.assertEqual(caught.exception.code, "attribute_name_unresolved")
+        self.assertIn("element_attributes", str(caught.exception))
+        self.base.ElementsSelectService.SelectAllElements.assert_not_called()
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+    def test_auto_type_never_converts_text_numbers_or_boolean_to_integer(self):
+        elements = self.fixture(("",))
+        elements[0].GetAttributes.return_value.extend([(20001, 1)])
+        self.attribute_catalog({935: "Fire", 20001: "Integer"})
+        for value in (True, "0,2", "7"):
+            with self.subTest(value=value):
+                self.assert_code("attribute_type_unsupported", lambda: self.preview(
+                    predicate=None, changes=[{"target": {"kind": "attribute", "attribute_id": 20001}, "value": value}]))
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+    def test_explicit_enum_label_roundtrip_apply_replay_and_noop(self):
+        elements = self.fixture(("",))
+        elements[0].GetAttributes.return_value = [(20001, "Existing building")]
+        self.attribute_catalog({20001: "Construction category"})
+        self.attribute_type_names[20001] = "Integer"
+        enum_values = {"New building": 0, "Existing building": 1}
+        self.base.AttributeService.GetEnumIDFromValueString.side_effect = lambda ident, label: enum_values[label]
+        self.base.AttributeService.GetEnumValueStringFromID.side_effect = lambda ident, key: next(
+            label for label, value in enum_values.items() if value == key)
+        self.setter_fakes(elements)
+        request = self.request(predicate=None, changes=[{
+            "target": {"kind": "attribute", "attribute_id": 20001}, "value_type": "enum", "value": "New building"}])
+        plan = self.call(request)
+        self.assertTrue(plan["apply_available"])
+        self.assertEqual(plan["changes"][0]["resource"]["enum_binding"], {"enum_id": 0, "value": "New building"})
+        self.highlight(plan)
+        execution = uuid4().hex
+        self.assertEqual(self.apply(plan, execution)["state"], "completed")
+        self.assertTrue(self.apply(plan, execution)["replayed"])
+        self.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+        self.assertEqual(self.base.ElementsAttributeService.ChangeAttributes.call_args.args[0], [(20001, "New building")])
+        self.assertEqual(self.call(request)["state"], "no_op")
+        self.base.AttributeService.GetEnumValues.assert_not_called()
+
+    def test_enum_mapping_change_or_invalid_label_stops_before_any_setter(self):
+        self.fixture(("old",))
+        self.base.AttributeService.GetEnumIDFromValueString.return_value = 0
+        self.base.AttributeService.GetEnumValueStringFromID.return_value = "new"
+        request = self.request(predicate=None, changes=[{
+            "target": {"kind": "attribute", "attribute_id": 935}, "value_type": "enum", "value": "new"}])
+        plan = self.call(request)
+        self.highlight(plan)
+        self.base.AttributeService.GetEnumIDFromValueString.return_value = 1
+        self.assert_code("repair_conflict", lambda: self.apply(plan))
+        self.base.AttributeService.GetEnumValueStringFromID.return_value = "different"
+        self.assert_code("attribute_enum_unresolved", lambda: self.call(request))
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+        self.base.AttributeService.GetEnumValues.assert_not_called()
+
+    def test_enum_binding_marker_is_required_by_executor_and_native_adapter(self):
+        import copy
+        from unittest.mock import patch
+        from types import SimpleNamespace
+        self.fixture(("old",))
+        self.base.AttributeService.GetEnumIDFromValueString.return_value = 0
+        self.base.AttributeService.GetEnumValueStringFromID.return_value = "new"
+        plan = self.preview(predicate=None, changes=[{
+            "target": {"kind": "attribute", "attribute_id": 935}, "value_type": "enum", "value": "new"}])
+        damaged = copy.deepcopy(plan)
+        damaged["changes"][0]["resource"].pop("enum_binding")
+        execution = importlib.import_module(self.module.__package__ + ".repair_execution")
+        native = importlib.import_module(self.module.__package__ + ".native_model_edit")
+        self.assertFalse(execution.RepairExecutor.model_edit_scope(damaged))
+        with patch.dict("sys.modules", {"NemAll_Python_IFW_ElementAdapter": SimpleNamespace(BaseElementAdapterList=list)}):
+            self.assert_code("target_not_writable", lambda: native.write(self.base, object(), damaged["changes"][0]))
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()

@@ -18,6 +18,42 @@ from .transport import BridgeError
 KIND = "typed_model_edit"
 
 
+def write_availability(plan, highlighted=False, valid=True):
+    """Describe the executable route separately from its native acceptance."""
+    available = valid and plan["evaluation_apply_available"]
+    reasons = []
+    if not valid:
+        reasons.append("plan_conflict")
+    if plan["state"] != "preview_ready":
+        reasons.append(plan["state"])
+    if plan.get("blocked"):
+        reasons.append("blocked_properties")
+    if not plan["coverage"].get("criteria_complete"):
+        reasons.append("incomplete_criteria_or_fields")
+    if len(plan["changes"]) > plan["limits"]["changes"]:
+        reasons.append("change_limit_exceeded")
+    files = plan["scope"]["included_files"]
+    if len(files) != 1 or files[0]["state"] != "active_foreground":
+        reasons.append("requires_one_active_foreground_drawing")
+    if not available and not reasons:
+        reasons.append("evaluation_scope_or_api_capability_unavailable")
+    action = ("apply" if highlighted else "highlight") if available else None
+    if valid and not highlighted and plan.get("evaluation_highlight_available"):
+        action = "highlight"
+    return {"apply_available": available, "evaluation_apply_available": available,
+            "production_apply_available": False, "usable_for_write": available,
+            "write_mode": "disposable_copy_evaluation", "write_blockers": reasons,
+            "native_acceptance_blocks_evaluation": False,
+            "required_steps": ["review_exact_plan_in_disposable_copy", "highlight_exact_plan",
+                               "persist_apply_request_with_new_execution_id", "apply_with_acknowledgement"],
+            "next_action": ({"tool": "model_edit", "request": {
+                "schema_version": SCHEMA, "action": action, "plan_id": plan["plan_id"],
+                **({"plan_hash": plan["plan_hash"]} if "plan_hash" in plan else {}),
+                **({"acknowledgement": "disposable_copy_reviewed_plan"} if highlighted else {})},
+                **({"required_request_fields": {"execution_id": "persist_new_uuid4_hex_before_sending"}}
+                   if highlighted else {})} if action else None)}
+
+
 def evaluate_criterion(node, fields):
     """Only a complete explicit presence read can prove an absent attribute."""
     if node is None:
@@ -61,27 +97,55 @@ def bind_changes(doc, base, request, check, trace):
         else:
             ident = target.get("attribute_id")
             if ident is None:
-                ident = positive_id(read("AttributeService.GetAttributeID", lambda: base.AttributeService.GetAttributeID(doc, target["name"])))
+                try:
+                    ident = positive_id(read("AttributeService.GetAttributeID", lambda: base.AttributeService.GetAttributeID(doc, target["name"])))
+                except BridgeError:
+                    raise
+                except Exception as exc:
+                    raise BridgeError("attribute_name_unresolved", "Exact project attribute name was not resolved. Use model_property_probe phase=element_attributes on a known target to find its actual names/IDs; then bind the chosen ID. Do not guess an attribute or substitute native material.", 409) from exc
             name = bounded_text(read("AttributeService.GetAttributeName", lambda: base.AttributeService.GetAttributeName(doc, ident)))
             if not name or (target.get("name") is not None and name != target["name"]):
-                raise ValueError("Attribute name/ID round trip differs")
+                raise BridgeError("attribute_name_mismatch", "Attribute name and ID do not agree exactly. Inspect element_attributes or an explicit attribute_definition, then use the verified ID/name.", 409)
             if positive_id(read("AttributeService.GetAttributeID", lambda: base.AttributeService.GetAttributeID(doc, name))) != ident:
                 raise ValueError("Attribute ID/name round trip differs")
             # Compare real enum members from the loaded SDK, never guessed codes.
             # A readable/computed field still does not imply native writability.
             type_value = read("AttributeService.GetAttributeType", lambda: base.AttributeService.GetAttributeType(doc, ident))
-            type_name = {"text": "String", "integer": "Integer", "real": "Double", "boolean": "Boolean"}[choice["value_type"]]
             enum_type = base.AttributeService.AttributeType
-            expected_type = getattr(enum_type, type_name, None)
-            if expected_type is None or type_value != expected_type:
-                raise ValueError("Declared value type differs from the project attribute type or SDK type is unsupported")
+            members = {"text": "String", "integer": "Integer", "real": "Double", "boolean": "Boolean"}
+            from .attribute_codecs import supported_scalar_type, bind_enum_label
+            scalar_binding = supported_scalar_type(base, type_value)
+            value_type = choice.get("value_type", "auto")
+            if value_type == "auto":
+                value_type = scalar_binding[0] if scalar_binding else None
+            from .native_model_edit import value_matches
+            enum_binding = None
+            if value_type == "enum":
+                compatible_members = [member for member in ("Enum", "Integer", "String")
+                                      if getattr(enum_type, member, None) is not None
+                                      and type_value == getattr(enum_type, member)]
+                if not compatible_members:
+                    raise BridgeError("attribute_type_unsupported", "Enum editing requires a runtime-bound Enum/Integer/String type and an exact project enum label.", 409)
+                try:
+                    enum_binding = bind_enum_label(base, ident, choice["value"], read)
+                except BridgeError:
+                    raise
+                except Exception as exc:
+                    raise BridgeError("attribute_enum_unresolved", "Enum label/key round trip failed. No value was guessed and no enum catalog was enumerated.", 409) from exc
+                type_name = compatible_members[0]
+            elif not scalar_binding or value_type != scalar_binding[0] or not value_matches(choice["value"], value_type):
+                raise BridgeError("attribute_type_unsupported", "Requested value_type does not match the loaded SDK attribute type. Inspect attribute_definition or element_attributes; use a supported metadata-bound codec, without coercing display text.", 409)
+            else:
+                type_name = members[value_type]
             item = {"field": f"attribute:{ident}", "operation": "set_attribute", "property_role": "attribute",
                     "resource": {"attribute_id": ident, "name": name,
-                                 "data_type": {"text": "string"}.get(choice["value_type"], choice["value_type"]),
+                                 "data_type": {"text": "string"}.get(value_type, value_type),
                                  "native_type_member": type_name,
                                  "read_mode": request.get("attribute_read_mode", "stored")},
-                    "new_value": float(choice["value"]) if choice["value_type"] == "real" else choice["value"],
+                    "new_value": float(choice["value"]) if value_type == "real" else choice["value"],
                     "mode": choice.get("mode", "replace")}
+            if enum_binding is not None:
+                item["resource"]["enum_binding"] = enum_binding
         if item["field"] in fields:
             raise BridgeError("property_binding_unavailable", "Two changes resolve to the same property.", 409)
         fields.add(item["field"])
@@ -274,6 +338,12 @@ def preview(plans, doc, base, settings, request):
     }
     plan["evaluation_apply_available"] = plans.executor.evaluation_scope(plan)
     plan["evaluation_highlight_available"] = ready
+    # Symbol inspection is not a production gate and must not contradict the
+    # route's actual evaluation eligibility in a nested capability flag.
+    plan["capabilities"]["production_apply_available"] = plan["capabilities"].pop("apply_available", False)
+    plan.update(write_availability(plan))
+    plan["capabilities"]["apply_available"] = plan["apply_available"]
+    plan["capabilities"]["durable_retry_deduplication"] = "execution_id_journal_replay_without_setters"
     plan["plan_hash"] = fingerprint({"plan": plan, "request": request})
     entry = {"created": plans.queries.clock(), "request": copy.deepcopy(request), "plan": plan}
     entry["size"] = len(json.dumps(entry, ensure_ascii=False, allow_nan=False).encode())
@@ -284,7 +354,10 @@ def preview(plans, doc, base, settings, request):
         cache = min((c for c in (plans.plans, plans.invalidated_plans) if c), key=lambda c: next(iter(c.values()))["created"])
         cache.popitem(last=False)
     plans.plans[plan["plan_id"]] = entry
-    return copy.deepcopy(plan)
+    response = copy.deepcopy(plan)
+    # The action hint carries the final hash without creating a hash cycle.
+    response.update(write_availability(plan))
+    return response
 
 
 def revalidate(plans, doc, base, settings, request):
@@ -305,7 +378,8 @@ def revalidate(plans, doc, base, settings, request):
     if not valid:
         del cache[ident]
     return {"schema_version": SCHEMA, "action": "revalidate", "read_only": True,
-            "state": "unchanged" if valid else "conflict", "plan_id": ident, "plan_hash": plan["plan_hash"]}
+            "state": "unchanged" if valid else "conflict", "plan_id": ident, "plan_hash": plan["plan_hash"],
+            **write_availability(plan, highlighted=entry.get("presentation", {}).get("state") == "submitted", valid=valid)}
 
 
 def highlight(plans, doc, base, settings, ifw, request):
@@ -334,4 +408,5 @@ def highlight(plans, doc, base, settings, ifw, request):
         plans.queries.selections.pop(ident, None)
     if result["state"] == "submitted":
         entry["presentation"] = {"state": "submitted", "plan_hash": entry["plan"]["plan_hash"]}
-    return {**result, "plan_id": request["plan_id"], "plan_hash": request["plan_hash"]}
+    return {**result, "plan_id": request["plan_id"], "plan_hash": request["plan_hash"],
+            **write_availability(entry["plan"], highlighted=result["state"] == "submitted")}
