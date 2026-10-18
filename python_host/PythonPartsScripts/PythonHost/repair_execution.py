@@ -246,7 +246,9 @@ class RepairExecutor:
                 or plan.get("blocked") or not 1 <= len(changes) <= RepairExecutor.MAX_CHANGES
                 or len(files) != 1 or files[0]["state"] != "active_foreground"
                 or not all(plan["coverage"].get(k) is True for k in
-                           ("criteria_complete", "requested_scope_complete", "returned_fields_complete"))):
+                           ("criteria_complete", "requested_scope_complete"))
+                or plan["coverage"].get("required_destination_fields_complete",
+                                        plan["coverage"].get("returned_fields_complete")) is not True):
             return False
         seen = set()
         for change in changes:

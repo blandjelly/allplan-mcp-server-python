@@ -164,6 +164,26 @@ class ModelEditTests(unittest.TestCase):
         self.base.ElementsSelectService.SelectAllElements.assert_not_called()
         self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
 
+    def test_lowercase_polish_attribute_name_binds_actual_project_spelling(self):
+        self.fixture(("",))
+        self.attribute_catalog({935: "Materiał"})
+        plan = self.preview(predicate=None, changes=[{
+            "target": {"kind": "attribute", "name": "materiał"},
+            "value": "bloczki gazobetonowe"}])
+        self.assertTrue(plan["apply_available"], plan)
+        self.assertEqual(plan["changes"][0]["resource"]["name"], "Materiał")
+        self.assertEqual(plan["changes"][0]["resource"]["attribute_id"], 935)
+        self.assert_code("attribute_name_unresolved", lambda: self.preview(
+            predicate=None, changes=[{"target": {"kind": "attribute", "name": "Material"},
+                                      "value": "concrete"}]))
+
+    def test_name_lookup_runtime_failure_is_not_retried_with_other_spellings(self):
+        self.fixture(("",))
+        self.base.AttributeService.GetAttributeID.side_effect = RuntimeError("native failure")
+        self.assert_code("attribute_name_unresolved", lambda: self.preview(
+            changes=[{"target": {"kind": "attribute", "name": "materiał"}, "value": "x"}]))
+        self.assertEqual(self.base.AttributeService.GetAttributeID.call_count, 1)
+
     def test_unsupported_native_attribute_type_fails_before_scan(self):
         self.fixture(("",))
         self.attribute_type_names[935] = "Unsupported"

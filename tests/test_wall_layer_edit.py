@@ -176,3 +176,30 @@ class WallLayerEditTests(unittest.TestCase):
         self.assertTrue(native.apply(plan, execution)["replayed"])
         self.assertEqual(native.base.ElementsLayerService.ChangeLayer.call_count, 1)
         self.assertEqual(tiers[0].GetCommonProperties.return_value.Layer, 8)
+
+    def test_nonwall_unknown_thickness_does_not_block_decisive_wall_criterion(self):
+        root, tiers, *_ = self.fixture()
+        native = self.native
+        column = native.element(80, name="Column_TypeUUID")
+        native.base.ElementsSelectService.SelectAllElements.return_value.append(column)
+        self.thickness({id(root): 200})
+        plan = native.preview(predicate={"all": [
+            {"field": "family", "op": "eq", "value": "wall"},
+            {"field": "wall.total_thickness_mm", "op": "lt", "value": 240}]},
+            changes=[{"target": {"kind": "layer", "short_name": "W1"}}])
+        self.assertTrue(plan["evaluation_apply_available"], plan)
+        self.assertFalse(plan["coverage"]["returned_fields_complete"])
+        self.assertTrue(plan["coverage"]["required_destination_fields_complete"])
+        native.highlight(plan)
+        self.assertEqual(native.apply(plan)["state"], "completed")
+        self.assertEqual(tiers[0].GetCommonProperties.return_value.Layer, 8)
+
+    def test_matched_wall_unknown_layer_has_actionable_diagnostic_and_no_apply(self):
+        root, *_ = self.fixture()
+        self.native.children[id(root)] = []
+        plan = self.preview()
+        self.assertFalse(plan["evaluation_apply_available"])
+        failure = plan["criteria"]["required_field_failures"][0]
+        self.assertEqual(failure["field"], "layer_id")
+        self.assertEqual(failure["observation"]["status"], "not_checked")
+        self.native.base.ElementsLayerService.ChangeLayer.assert_not_called()

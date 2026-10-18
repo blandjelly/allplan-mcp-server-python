@@ -141,22 +141,56 @@ class PropertyProbeService:
             ref = element["ref"]
             representations = live.get((ref["drawing_file"], ref["model_uuid"]), {})
             views = representations.get(request["view_uuid"], [])
-            if len(representations) != 1 or len(views) != 1:
+            # M1 has already grouped these adapters by root model/view identity
+            # and rejected disagreement in the fields it reads. Distinct Python
+            # wrappers can represent that same native root, so verify their
+            # attributes too before choosing a representation.
+            if (len(element["view_uuids"]) != 1
+                    or element["view_uuids"] != [request["view_uuid"]]
+                    or set(representations) != {request["view_uuid"]}
+                    or not views):
                 raise BridgeError("probe_scope_unavailable", "The requested component has ambiguous root adapter representations; no attributes were read.", 409)
-            adapter = views[0]
-            attrs = read("BaseElementAdapter.GetAttributes(ReadAll)",
-                         lambda: attribute_values(adapter, base, budget),
-                         drawing_file=ref["drawing_file"], model_uuid=ref["model_uuid"], view_uuid=request["view_uuid"])
-            if attrs["status"] != "observed":
+            unique_views = []
+            seen_adapter_objects = set()
+            for adapter in views:
+                if id(adapter) not in seen_adapter_objects:
+                    seen_adapter_objects.add(id(adapter))
+                    unique_views.append(adapter)
+            adapter_attributes = [
+                read("BaseElementAdapter.GetAttributes(ReadAll)",
+                     lambda adapter=adapter: attribute_values(adapter, base, budget),
+                     drawing_file=ref["drawing_file"], model_uuid=ref["model_uuid"],
+                     view_uuid=request["view_uuid"], representation_index=index + 1,
+                     representation_count=len(unique_views))
+                for index, adapter in enumerate(unique_views)
+            ]
+            attrs = adapter_attributes[0]
+            if any(item["status"] != "observed" for item in adapter_attributes):
+                failed = next(item for item in adapter_attributes if item["status"] != "observed")
+                attrs = {"status": "not_checked", "value": None,
+                         "reason": "adapter_attributes_unavailable",
+                         "representation_count": len(unique_views),
+                         "failed_representation": failed.get("reason")}
                 result.update(scope=snapshot["scope"], ref=ref, attributes=attrs,
+                              adapter_attribute_consistency="not_checked",
                               listing_complete=False, presence_semantics="ReadAll_only_omissions_unknown",
+                              writable="not_established")
+            elif len({fingerprint(item["value"]) for item in adapter_attributes}) != 1:
+                attrs = {"status": "not_checked", "value": None,
+                         "reason": "conflicting_adapter_attributes",
+                         "representation_count": len(unique_views)}
+                result.update(scope=snapshot["scope"], ref=ref, attributes=attrs,
+                              adapter_attribute_consistency="conflicting",
+                              listing_complete=False,
+                              presence_semantics="ReadAll_only_omissions_unknown",
                               writable="not_established")
             else:
                 service = base.AttributeService
                 sdk_types = getattr(service, "AttributeType", None)
                 scalar_types = (("text", "String"), ("integer", "Integer"),
                                 ("real", "Double"), ("boolean", "Boolean"))
-                candidates, metadata_issues = [], 0
+                candidates, metadata_issues, unknown_filter_names = [], 0, 0
+                name_filter = request.get("name_contains", "").casefold()
                 for item in attrs["value"]:
                     ident = item["attribute_id"]
                     name = read("AttributeService.GetAttributeName",
@@ -172,10 +206,19 @@ class PropertyProbeService:
                                          "reason": "name_id_round_trip_mismatch"}
                     if name["status"] != "observed" or roundtrip["status"] != "observed":
                         metadata_issues += 1
-                    if (name["status"] == "observed" and roundtrip["status"] == "observed"
-                            and request.get("name_contains", "").casefold() in name["value"].casefold()):
-                        candidates.append({"attribute_id": ident, "name": name,
-                                           "name_id_round_trip": roundtrip, "value": item["value"]})
+                    row = {"attribute_id": ident, "name": name,
+                           "name_id_round_trip": roundtrip, "value": item["value"]}
+                    if not name_filter:
+                        # ReadAll is the source of listing membership. Metadata
+                        # failures must not erase an observed ID or raw value.
+                        candidates.append(row)
+                    elif name["status"] == "observed":
+                        if name_filter in name["value"].casefold():
+                            candidates.append(row)
+                    else:
+                        # We cannot determine whether this row matches a name
+                        # filter, so disclose the gap in coverage below.
+                        unknown_filter_names += 1
                 total = len(candidates)
                 page = candidates[request.get("offset", 0):request.get("offset", 0) + request.get("limit", 32)]
                 for item in page:
@@ -196,23 +239,41 @@ class PropertyProbeService:
                 offset = request.get("offset", 0)
                 result.update(scope=snapshot["scope"], counts=snapshot["counts"], ref=ref,
                               attributes=page, total_matches=total, offset=offset,
-                              total_matches_status="observed" if metadata_issues == 0 else "not_checked",
-                              next_offset=(offset + len(page) if metadata_issues == 0 and offset + len(page) < total else None),
-                              listing_complete=metadata_issues == 0 and offset + len(page) >= total,
+                              adapter_attribute_consistency="consistent",
+                              adapter_attribute_representation_count=len(unique_views),
+                              total_matches_status="not_checked" if unknown_filter_names else "observed",
+                              next_offset=(offset + len(page) if offset + len(page) < total else None),
+                              listing_complete=(offset + len(page) >= total and unknown_filter_names == 0),
                               metadata_complete=metadata_issues == 0,
                               metadata_not_checked_count=metadata_issues,
+                              filter_unknown_name_count=unknown_filter_names,
                               presence_semantics="values_present_in_ReadAll_only; omissions_unknown",
                               writable="not_established", enum_values="not_read",
                               filter={"name_contains": request.get("name_contains", ""), "case_sensitive": False})
         elif phase == "attribute_name":
             name = request["attribute_name"]
             ident = read("AttributeService.GetAttributeID", lambda: positive_id(base.AttributeService.GetAttributeID(doc, name)))
+            # A spelling miss is recoverable; a runtime/API failure is not an
+            # invitation to retry native calls or broaden metadata discovery.
+            if ident.get("reason") in {"ValueError", "TypeError"}:
+                from .model_properties import resolve_attribute_name
+                def lookup(api, callback):
+                    budget()
+                    value = trace.call(api, callback)
+                    budget()
+                    return value
+                resolved = read("AttributeService.ResolveAttributeSpelling",
+                                lambda: resolve_attribute_name(doc, base, name, lookup))
+                if resolved["status"] == "observed":
+                    ident = {"status": "observed", "value": resolved["value"][0]}
             result["requested_name"] = name
             result["attribute_id"] = ident
             if ident["status"] == "observed":
                 actual = read("AttributeService.GetAttributeName", lambda: bounded_text(base.AttributeService.GetAttributeName(doc, ident["value"])), attribute_id=ident["value"])
                 result["name"] = actual
                 result["exact_name_round_trip"] = actual["status"] == "observed" and actual["value"] == name
+                result["case_insensitive_name_round_trip"] = (actual["status"] == "observed"
+                    and actual["value"].casefold() == name.strip().casefold())
             result["semantic_alias_verified"] = False
         elif phase == "attribute_definition":
             ident = request["attribute_id"]

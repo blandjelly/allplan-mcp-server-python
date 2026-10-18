@@ -1,5 +1,20 @@
 # Current handoff
 
+**Current work: candidate 0.21.1, native acceptance pending.** The owner
+identifies the 2026-10-18 Allplan observations as version **0.21.0**; no exact
+build hash or raw MCP payloads are available. The owner confirms Column U=0.2,
+Wall U=0.15 and fire class F60→F90; `Poziom_Górny` stayed 500 after a partial
+write, and the requested Wall layer change to W1 was refused without a write.
+Do not repeat the accepted U/fire/query/highlight observations. Candidate 0.21.1
+works on equivalent Wall wrappers, raw attribute/pagination preservation,
+project-name roundtrip and target-scoped completeness diagnostics. Unknown Wall
+tier behavior remains guarded; `Poziom_Górny` is unsupported/unverified, and
+the log cannot establish the cause of the W1 refusal. CI, package/delivery and
+new native acceptance are pending. Next owner trial is only Wall listing and
+lower-initial `materiał` lookup, optional read-only Beam/Slab samples, then W1
+Wall `<240 mm` preview/diagnostics and Apply/UI/readback/Undo only if enabled.
+[Short 0.21.1 trial](m4-agent-fixes-0.21.1.pl.md) · [Owner observation](test-results/m4-agent-observation-2026-10-18.md) · [Original log](test-results/evidence/m4-agent-test-2026-10-18.md).
+
 **2026-10-18 source candidate 0.21.0:** owner [v2 agent observation](test-results/m4-agent-observation-v2-2026-10-18.md)
 reports live host/highlighting and prepared U/Material/Wall-layer plans, but no
 write attempts; raw payloads/exact build are missing. Agent treated a generic

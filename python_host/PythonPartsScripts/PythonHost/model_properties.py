@@ -11,6 +11,34 @@ from .runtime_info import runtime_info
 from .transport import BridgeError
 
 
+def resolve_attribute_name(doc, base, name, read):
+    """Try bounded spelling variants, verifying each ID against project metadata.
+
+    No aliases, transliteration or definition enumeration: an English label
+    must not silently resolve to a different Polish/native property.
+    """
+    import unicodedata
+    normalized = unicodedata.normalize("NFC", name.strip())
+    variants = dict.fromkeys((name, normalized, normalized[:1].upper() + normalized[1:]))
+    for spelling in variants:
+        try:
+            ident = positive_id(read("AttributeService.GetAttributeID",
+                                     lambda: base.AttributeService.GetAttributeID(doc, spelling)))
+        except BridgeError:
+            raise
+        except (ValueError, TypeError):
+            continue
+        actual = bounded_text(read("AttributeService.GetAttributeName",
+                                   lambda: base.AttributeService.GetAttributeName(doc, ident)))
+        if unicodedata.normalize("NFC", actual).casefold() != normalized.casefold():
+            raise ValueError("Resolved attribute name differs from the requested spelling")
+        if positive_id(read("AttributeService.GetAttributeID",
+                            lambda: base.AttributeService.GetAttributeID(doc, actual))) != ident:
+            raise ValueError("Attribute ID/name round trip differs")
+        return ident, actual
+    raise ValueError("Attribute name was not found; inspect element_attributes")
+
+
 def attribute_values(adapter, base, check):
     check()
     result = []

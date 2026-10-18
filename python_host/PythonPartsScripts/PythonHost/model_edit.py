@@ -98,13 +98,17 @@ def bind_changes(doc, base, request, check, trace):
             ident = target.get("attribute_id")
             if ident is None:
                 try:
-                    ident = positive_id(read("AttributeService.GetAttributeID", lambda: base.AttributeService.GetAttributeID(doc, target["name"])))
+                    from .model_properties import resolve_attribute_name
+                    ident, _ = resolve_attribute_name(doc, base, target["name"], read)
                 except BridgeError:
                     raise
                 except Exception as exc:
                     raise BridgeError("attribute_name_unresolved", "Exact project attribute name was not resolved. Use model_property_probe phase=element_attributes on a known target to find its actual names/IDs; then bind the chosen ID. Do not guess an attribute or substitute native material.", 409) from exc
             name = bounded_text(read("AttributeService.GetAttributeName", lambda: base.AttributeService.GetAttributeName(doc, ident)))
-            if not name or (target.get("name") is not None and name != target["name"]):
+            import unicodedata
+            if not name or (target.get("name") is not None and
+                            unicodedata.normalize("NFC", name).casefold() !=
+                            unicodedata.normalize("NFC", target["name"].strip()).casefold()):
                 raise BridgeError("attribute_name_mismatch", "Attribute name and ID do not agree exactly. Inspect element_attributes or an explicit attribute_definition, then use the verified ID/name.", 409)
             if positive_id(read("AttributeService.GetAttributeID", lambda: base.AttributeService.GetAttributeID(doc, name))) != ident:
                 raise ValueError("Attribute ID/name round trip differs")
@@ -244,10 +248,26 @@ def observe(plans, doc, base, settings, request):
         decision = ("excluded" if element["ref"]["model_uuid"] in excluded else
                     "unknown" if match is None else "matched" if match else "nonmatching")
         checks.append({"ref": element["ref"], "decision": decision})
-    field_complete = all(v.get("status") in {"observed", "absent", "missing"}
-                         for e in snapshot["elements"] for v in e["fields"].values())
+    # A decisive false criterion does not require destination properties on
+    # non-targets (e.g. wall thickness on a Column). Keep every peer in the
+    # source fingerprint so a newly matching peer still invalidates Apply.
+    decisions = {fingerprint(c["ref"]): c["decision"] for c in checks}
+    destination_fields = {item["field"] for item in binding}
+    required_failures = [
+        {"ref": element["ref"], "field": field, "observation": copy.deepcopy(value)}
+        for element in snapshot["elements"]
+        for field, value in element["fields"].items()
+        if decisions[fingerprint(element["ref"])] == "matched"
+        and field in destination_fields
+        and value.get("status") not in {"observed", "absent", "missing"}
+    ]
+    field_complete = not required_failures
     complete = snapshot["coverage"]["requested_scope_complete"] and field_complete and not any(c["decision"] == "unknown" for c in checks)
-    snapshot["coverage"]["returned_fields_complete"] = field_complete
+    snapshot["coverage"]["returned_fields_not_checked"] = sum(
+        value.get("status") == "not_checked"
+        for element in snapshot["elements"] for value in element["fields"].values())
+    snapshot["coverage"]["returned_fields_complete"] = snapshot["coverage"]["returned_fields_not_checked"] == 0
+    snapshot["coverage"]["required_destination_fields_complete"] = field_complete
     snapshot["source_fingerprint"] = fingerprint({"m1_source": snapshot["source_fingerprint"],
                                                    "elements": snapshot["elements"], "binding": binding})
     report = {"schema_version": SCHEMA, "read_only": True, "checks": checks, "binding": binding,
@@ -255,6 +275,14 @@ def observe(plans, doc, base, settings, request):
               "coverage": {**snapshot["coverage"], "criteria_complete": complete},
               "counts": dict(Counter(c["decision"] for c in checks)), "omissions": snapshot["omissions"],
               "attribute_read_mode": request.get("attribute_read_mode", "stored"),
+              "required_field_failures": required_failures,
+              "criterion_failures": [
+                  {"ref": element["ref"], "fields": {
+                      field: copy.deepcopy(element["fields"][field])
+                      for field in predicate_fields(request.get("predicate"))
+                      if element["fields"][field].get("status") != "observed"}}
+                  for element in snapshot["elements"]
+                  if decisions[fingerprint(element["ref"])] == "unknown"],
               "native_acceptance": "not_run", "runtime_verified": False}
     report["report_fingerprint"] = fingerprint(report)
     check()

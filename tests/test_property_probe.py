@@ -113,6 +113,17 @@ class PropertyProbeTests(unittest.TestCase):
         self.assertEqual(self.records()[-1]["exception_type"], "SystemExit")
         self.base.AttributeService.GetAttributeType.assert_not_called()
 
+    def test_polish_initial_case_miss_resolves_without_alias_or_catalog(self):
+        self.fixture()
+        self.base.AttributeService.GetAttributeID.side_effect = lambda doc, name: 981 if name == "Wartość U" else -1
+        self.base.AttributeService.GetAttributeName.side_effect = lambda doc, ident: "Wartość U"
+        result = self.probe(phase="attribute_name", attribute_name="wartość U")
+        self.assertEqual(result["attribute_id"], {"status": "observed", "value": 981})
+        self.assertFalse(result["exact_name_round_trip"])
+        self.assertTrue(result["case_insensitive_name_round_trip"])
+        self.assertFalse(result["semantic_alias_verified"])
+        self.base.ElementsSelectService.SelectAllElements.assert_not_called()
+
     def test_invalid_phase_fields_and_passive_scope_reject_without_attribute_reads(self):
         self.fixture()
         for request in ({"phase": "attribute_definition", "attribute_id": True},
