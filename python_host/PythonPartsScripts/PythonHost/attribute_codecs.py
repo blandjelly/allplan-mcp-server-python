@@ -33,6 +33,20 @@ def supported_scalar_type(base, native_type):
     return matches[0]
 
 
+def checkbox_integer_boolean_binding(base, control_type):
+    """Bind checkbox semantics to an Integer attribute using SDK enum members.
+
+    The control type describes the actual targeted attribute definition. It is
+    useful semantic evidence for the conventional 0/1 checkbox representation,
+    but is never inferred from the attribute name or stored value.
+    """
+    controls = base.AttributeService.AttributeControlType
+    member = getattr(controls, "CheckBox", None)
+    if member is None or control_type != member:
+        return None
+    return {"control_type_member": "CheckBox", "false_value": 0, "true_value": 1}
+
+
 def bind_enum_label(base, attribute_id, label, read):
     """Resolve an exact enum label through targeted SDK helpers and round-trip it.
 

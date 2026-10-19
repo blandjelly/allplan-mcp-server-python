@@ -153,7 +153,8 @@ is required, with only its declared parameters:
 | attribute_name | attribute_name: one exact project name; GetAttributeID and, if observed, GetAttributeName round trip. |
 | attribute_definition | attribute_id: one ID observed from project metadata/sample; name/type/unit/control readers, stopping at first unavailable value. |
 | element_attributes | drawing_file, model_uuid, view_uuid; optional name_contains, offset, limit: one exact foreground semantic component, paged ReadAll values and targeted name/ID roundtrip plus SDK scalar type metadata. |
-| layer_name | layer_short_name: one exact short name; native ID/name round trip, no creation. |
+| layer_name | layer_name or legacy layer_short_name: exact full/short name lookup with fresh ID/name round trips; requests catalog search when the SDK lacks full-name lookup. |
+| layer_catalog | layer_name, optional offset/limit (default/max 8192 IDs): read-only Allplan 2026 name search over bounded ID pages, with a 3-second soft page budget, continuation and user-confirmation candidates. |
 | wall_sample | drawing_file (required integer) and optional model_uuid: one foreground file and one exact native Wall root; reads tier count and, only for a single-tier Wall, tier 1 thickness and raw material. |
 
 The historical isolated Column observation invoked only `column_sample` in file
@@ -304,7 +305,11 @@ findings. It supports exact attribute targets with `text`, `integer`, `real`,
 `boolean`, or explicitly selected `enum` values and modes `replace`, `add`, or
 `upsert`, plus a separate existing organizational layer target.
 `value_type=auto` (the default) infers the type from the exact bound attribute's
-loaded SDK type. It never parses or coerces a string to infer a type. Values
+loaded SDK type, including Enum when an exact display label passes the targeted
+label/key round trip. JSON booleans for Integer fields are encoded as 1/0 only
+when targeted SDK metadata confirms `AttributeControlType.CheckBox`; this codec
+is hash-bound and rebound before Apply. Other integers do not accept booleans.
+It never parses a string to infer a type. Values
 such as `Beton C37` are distinct from a wall's native material and visual
 surface; this route does not
 modify native element properties. Dates and general attribute catalog discovery
@@ -338,8 +343,9 @@ Resolve attribute names against the current document's metadata before
 planning; never invent numeric IDs. The native path checks name/ID round trips
 and compares targeted `GetAttributeType` results with actual loaded SDK enum
 members for supported scalar values; it uses no guessed numeric type codes.
-`value_type=auto` infers only these primitive scalar types. Enum writes require
-explicit `value_type=enum` and an exact display label. The host verifies the
+`value_type=auto` infers primitive scalar types and exact SDK Enum labels.
+Integer/String-backed enumerations require explicit `value_type=enum` and an
+exact display label. The host verifies the
 loaded SDK attribute type is `Enum`, `Integer`, or `String`, resolves the label
 with `GetEnumIDFromValueString`, roundtrips key to label with
 `GetEnumValueStringFromID`, and verifies label to key again. It does not call
@@ -353,6 +359,28 @@ definition to an element, but this route does not create project attribute
 definitions or layers. Apply additionally re-resolves resources, checks old
 values, records the request before setters, and performs a fresh readback.
 Native acceptance of this new setter path is pending.
+
+Layer targets accept either legacy `short_name` or `name` (full or short),
+never both. Search both names with `model_property_probe` before declaring a
+user-supplied name unresolved. Allplan 2026 lacks a documented direct full-name
+lookup, so follow the `layer_catalog` page requests returned by `layer_name`.
+The catalog verifies candidate IDs through short-name round trips, preserves
+Polish diacritics, and reports range coverage and read errors separately.
+When it requests confirmation, show the actual full name, short name and ID,
+then use the user's confirmed exact short name in a fresh preview. A partial
+scan never authorizes an edit or proves absence. No layer is created or renamed.
+
+M4 recovery verifies the current project key and document ID, then observes
+only the journal's exact targets. An unrelated incomplete criterion scan cannot
+prevent that read-only reconciliation. It never resumes, retries or rolls back
+setters. A known old/new value reconciles an unknown outcome; unreadable or
+conflicting outcomes keep the journal block. Recovery reports blockers for the
+whole journal and a next action. For SDK-bound real attributes, finite numeric
+`5`/`5.0` compare equally during verification/recovery; raw values remain retained,
+and boolean/integer identity is unchanged. Positive null/deleted wrappers are
+counted and skipped before component hierarchy traversal; unknown hierarchy
+remains incomplete. These changes also support recovery of retained 0.21.1
+records without changing their execution IDs.
 
 Example shape for a simple Column: the `attribute:<ID_FROM_PROBE>` token below
 is a placeholder for the numeric ID actually resolved in the current

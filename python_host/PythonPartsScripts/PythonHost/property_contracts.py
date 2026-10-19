@@ -11,6 +11,7 @@ PROBE_SCHEMA = "m4-property-probe-1"
 
 def validate_probe(request):
     keys(request, {"schema_version", "phase", "drawing_file", "attribute_name", "attribute_id", "layer_short_name",
+                   "layer_name", "offset", "limit", "candidate_ids",
                    "model_uuid", "view_uuid", "name_contains", "offset", "limit"},
          {"schema_version", "phase"})
     if request["schema_version"] != PROBE_SCHEMA:
@@ -41,8 +42,29 @@ def validate_probe(request):
         bounded_int(request.get("offset", 0), 0, 255, "offset")
         bounded_int(request.get("limit", 32), 1, 32, "limit")
         return
+    if request["phase"] == "layer_catalog":
+        keys(request, {"schema_version", "phase", "layer_name", "offset", "limit", "candidate_ids"},
+             {"schema_version", "phase", "layer_name"})
+        names([request["layer_name"]], 1, 128, "layer_name")
+        bounded_int(request.get("offset", 0), 0, 65536, "offset")
+        bounded_int(request.get("limit", 8192), 1, 8192, "limit")
+        ids = request.get("candidate_ids", [])
+        if (not isinstance(ids, list) or len(ids) > 8192
+                or any(isinstance(item, bool) or not isinstance(item, int) or not 0 <= item <= 65535 for item in ids)
+                or len(set(ids)) != len(ids)):
+            invalid("candidate_ids must contain at most 8192 distinct documented layer IDs.")
+        return
     required = {"column_sample": "drawing_file", "attribute_name": "attribute_name",
-                "attribute_definition": "attribute_id", "layer_name": "layer_short_name"}.get(request["phase"] if isinstance(request["phase"], str) else "")
+                "attribute_definition": "attribute_id"}.get(request["phase"] if isinstance(request["phase"], str) else "")
+    if request["phase"] == "layer_name":
+        keys(request, {"schema_version", "phase", "layer_short_name", "layer_name"},
+             {"schema_version", "phase"})
+        has_short, has_name = "layer_short_name" in request, "layer_name" in request
+        if has_short == has_name:
+            invalid("Provide exactly one of layer_short_name or layer_name.")
+        field = "layer_short_name" if has_short else "layer_name"
+        names([request[field]], 1, 16 if has_short else 128, field)
+        return
     if required is None:
         invalid("Unknown isolated property probe phase.")
     keys(request, {"schema_version", "phase", required}, {"schema_version", "phase", required})
@@ -61,7 +83,7 @@ def names(value, limit, length, label):
 
 
 def validate_properties(request):
-    keys(request, {"schema_version", "scope", "native_types", "attribute_names", "layer_short_names",
+    keys(request, {"schema_version", "scope", "native_types", "attribute_names", "layer_short_names", "layer_names",
                    "sample_limit", "metadata_limit", "max_adapters"}, {"schema_version"})
     if request["schema_version"] != PROPERTIES_SCHEMA:
         invalid(f"schema_version must be {PROPERTIES_SCHEMA}.")
@@ -74,6 +96,7 @@ def validate_properties(request):
         invalid("native_types must name distinct supported native variants.")
     names(request.get("attribute_names", []), 16, 128, "attribute_names")
     names(request.get("layer_short_names", []), 16, 16, "layer_short_names")
+    names(request.get("layer_names", []), 16, 128, "layer_names")
     bounded_int(request.get("sample_limit", 10), 1, 20, "sample_limit")
     bounded_int(request.get("metadata_limit", 64), 1, 128, "metadata_limit")
 

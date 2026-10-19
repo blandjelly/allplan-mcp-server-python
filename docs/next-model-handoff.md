@@ -1,6 +1,26 @@
 # Current handoff
 
-**Current work: candidate 0.21.1, native acceptance pending.** The owner
+**2026-10-19 candidate 0.22.0:** the owner confirms that the
+[0.21.1 agent log](test-results/m4-agent-observation-0.21.1-2026-10-19.md)
+agrees with Allplan: the 200 mm Wall moved to W1; full layer-name lookup failed;
+the first Beam attribute edit left an unresolved readback and blocked subsequent
+Beam/Slab writes. No raw native payload/manifest was supplied, so the exact
+incident cause remains unproven. The 0.21.1 source was still in PR #16; this
+topic includes its exact history and targets develop/m4 through PR #17.
+
+The candidate improves exact native target resolution, skips only positively
+null/deleted wrappers, uses SDK-bound real numeric equivalence without changing
+raw evidence, and reconciles M4 journal targets after a fresh project/document
+identity check without a global criterion scan. It retains unknown-result
+blocking and no-retry guards. Integer CheckBox booleans bind 0/1 from targeted
+SDK metadata; auto Enum labels use targeted round trips. Full/short layer names
+use verified lookup and an Allplan 2026 paginated catalog with explicit user
+confirmation for uncertain matches. Dates/vectors, computed-only writes and
+native geometry edits remain unsupported. New native behavior is pending the
+[short 0.22.0 trial](m4-agent-fixes-0.22.0.pl.md); retain all accepted historical
+observations and the original journal.
+
+**Previous candidate 0.21.1, native acceptance pending.** The owner
 identifies the 2026-10-18 Allplan observations as version **0.21.0**; no exact
 build hash or raw MCP payloads are available. The owner confirms Column U=0.2,
 Wall U=0.15 and fire class F60→F90; `Poziom_Górny` stayed 500 after a partial

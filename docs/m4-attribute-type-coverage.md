@@ -10,8 +10,10 @@ boundaries; it is not native Allplan acceptance.
 `model_edit.bind_changes` resolves an explicitly named or numbered attribute,
 round-trips its ID and name, and compares `GetAttributeType` with members on
 the loaded SDK. `value_type="auto"` selects a matching text, integer, real, or
-boolean scalar type from that targeted metadata. Explicit scalar types are
-also accepted when they match the same runtime members. At native execution,
+boolean scalar type from that targeted metadata. If the SDK reports its `Enum`
+member, auto mode also accepts a string only after the explicit enum label/key
+round-trip. Explicit scalar types are also accepted when they match the same
+runtime members. At native execution,
 the attribute read must also be a bounded JSON scalar and replacement must
 agree with the bound type (with the existing narrow undefined-value
 exception). The setter sends one `(attribute ID, value)` pair through
@@ -20,7 +22,12 @@ exception). The setter sends one `(attribute ID, value)` pair through
 The four current value types therefore have a generic route only when the
 runtime SDK exposes the corresponding `String`, `Integer`, `Double`, or
 `Boolean` member and the observed old value can be handled under the same
-contract. The code compares actual SDK members; it does not assume numeric enum
+contract. An `Integer` attribute can also accept a JSON boolean when targeted
+`GetAttributeControlType` equals the loaded SDK's `CheckBox` member. The
+official AttributeService example permits `CheckBox` for Integer user
+attributes; the codec records that evidence and maps false/true to 0/1. An
+integer attribute without that control stays strictly integer, and its name
+or current value never implies checkbox semantics. The code compares actual SDK members; it does not assume numeric enum
 codes. The generated API reference documents `GetAttributeType` as returning
 `AttributeType`, but does not publish its members or numeric values. Thus the
 four names are an implementation binding to the installed SDK, not a complete
@@ -51,10 +58,10 @@ all those families.
 | Value family | Evidence and representation | Safe generic status |
 | --- | --- | --- |
 | Text/string | Manual documents `AttributeString`; route compares to SDK `String` and supports bounded strings. | Representable under the current type and readback checks. |
-| Integer | Manual documents `AttributeInteger`; route compares to SDK `Integer` and requires an exact Python `int` (not `bool`). | Representable under current checks. |
+| Integer | Manual documents `AttributeInteger`; route compares to SDK `Integer` and requires an exact Python `int` (not `bool`). Targeted Integer+CheckBox definitions also support JSON booleans encoded as 0/1 after an SDK-member check. | Representable under current checks. |
 | Real/double | Manual documents `AttributeDouble`; route compares to SDK `Double`, requires finite numeric input, and supports numeric scalar reads. | Representable under current checks. |
 | Boolean | Auto mode supports it only if the installed SDK exposes `AttributeType.Boolean`; the generated docs do not publish the complete enum member mapping. | Runtime-gated scalar support; do not claim universal availability. |
-| Enumeration | Read value is display text, not enum key. The implementation accepts explicit `value_type="enum"` only when the targeted runtime type matches a loaded SDK `Enum`, `Integer`, or `String` member and the label/key helper round-trip succeeds. The manual's `ChangeAttributes` example passes the display label in the `(attribute ID, value)` pair. | Implemented as an explicit label codec. It retains the label as the setter payload, stores the key as binding evidence, and requires exact native readback. Auto mode does not infer enumeration values from strings. |
+| Enumeration | Read value is display text, not enum key. The implementation accepts explicit `value_type="enum"` for targeted runtime `Enum`, `Integer`, or `String` members; auto mode accepts only the actual runtime `Enum` member. Both use the exact label/key helper round-trip. `ChangeAttributes` receives the display label. | Implemented as an exact label codec with SDK key binding evidence and exact readback. It does not enumerate the enum catalog. |
 | Date | Manual names `AttributeDate`, but this route's JSON scalar schema and setter have no date format, timezone, calendar, or SDK-object conversion contract. | Not representable by the current scalar contract. Needs an explicit date codec and native evidence. |
 | Other/unknown SDK types | `GetAttributeType` is targeted, but the generated docs provide no full member/value inventory; control type is UI metadata and does not prove writability. | Fail closed; never infer type from display text, control type, numeric code, or a failed lookup. |
 
@@ -77,12 +84,13 @@ remain failures and must not trigger a fallback to another property route.
 
 ## Practical expansion boundary
 
-Automatic type selection is limited to the four scalar codecs gated by the
-actual SDK member and a fresh, type-compatible observed value or explicit
-computed-inclusive absence evidence. Enumeration remains an explicit codec
-because strings alone do not distinguish text from an enum label. Keep both
-paths target-specific: resolve only requested IDs or exact names and never
-scan the project's attribute definitions or enum tables.
+Automatic type selection is limited to four scalar codecs gated by the actual
+SDK member and a fresh, type-compatible observed value or explicit
+computed-inclusive absence evidence. The semantic exceptions also bind
+targeted SDK metadata: Integer+CheckBox booleans and string labels for the
+actual SDK `Enum` member. Keep these paths target-specific: resolve only
+requested IDs or exact names and never scan the project's attribute
+definitions or enum tables.
 
 The [attribute codec module](../python_host/PythonPartsScripts/PythonHost/attribute_codecs.py)
 provides targeted scalar type resolution and the label→key→label→key binding

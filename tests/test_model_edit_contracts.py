@@ -55,6 +55,16 @@ class ModelEditContractTests(unittest.TestCase):
         TypeAdapter(ModelEditRequest).validate_python(request)
         self.contracts.validate_request(request)
 
+    def test_layer_exact_name_and_legacy_short_name_validate_exclusively(self):
+        for target in ({"kind": "layer", "short_name": "W1"},
+                       {"kind": "layer", "name": "Structural level one"}):
+            request = self.request(changes=[{"target": target}])
+            TypeAdapter(ModelEditRequest).validate_python(request)
+            self.contracts.validate_request(request)
+        for target in ({"kind": "layer", "name": "Full name", "short_name": "W1"},
+                       {"kind": "layer"}, {"kind": "layer", "name": "x" * 129}):
+            self.assert_both_reject(self.request(changes=[{"target": target}]))
+
     def test_invalid_type_values_unknown_keys_predicates_and_missing_bindings_fail_parity(self):
         cases = [
             self.request(changes=[{"target": {"kind": "attribute", "attribute_id": 1}, "value_type": "integer", "value": True}]),

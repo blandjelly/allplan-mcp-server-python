@@ -286,17 +286,69 @@ class PropertyProbeService:
                 if value["status"] != "observed":
                     break  # stop this phase at the first unavailable API value
             result["enum_values"] = {"status": "not_checked", "value": None, "reason": "native_enum_probe_not_accepted"}
-        else:
-            name = request["layer_short_name"]
-            result["requested_short_name"] = name
-            ident = read("LayerService.GetIDByShortName", lambda: positive_id(base.LayerService.GetIDByShortName(name, doc)))
-            result["layer_id"] = ident
-            if ident["status"] == "observed":
-                doc_id = read("DocumentAdapter.GetDocumentID", lambda: integer(doc.GetDocumentID()))
-                if doc_id["status"] == "observed":
-                    actual = read("LayerService.GetShortNameByID", lambda: bounded_text(base.LayerService.GetShortNameByID(ident["value"], doc_id["value"])), layer_id=ident["value"])
-                    result["short_name"] = actual
-                    result["exact_name_round_trip"] = actual["status"] == "observed" and actual["value"] == name
+        elif phase in ("layer_name", "layer_catalog"):
+            from .layer_names import resolve_direct_layer_name, scan_layer_name_page
+            requested_name = request.get("layer_name", request.get("layer_short_name"))
+            result["requested_layer_name"] = requested_name
+            doc_id = read("DocumentAdapter.GetDocumentID", lambda: integer(doc.GetDocumentID()))
+            if doc_id["status"] == "observed":
+                def native_read(api, callback):
+                    budget()
+                    value = trace.call(api, callback)
+                    budget()
+                    return value
+
+                if phase == "layer_catalog":
+                    scan_started = self.queries.clock()
+                    calls = [0]
+                    def catalog_read(api, callback):
+                        budget()
+                        calls[0] += 1
+                        return callback()
+                    trace.record("LayerService.layer_catalog_page", "started",
+                                 offset=request.get("offset", 0), limit=request.get("limit", 8192))
+                    catalog = scan_layer_name_page(
+                        base, doc, doc_id["value"], requested_name, request.get("offset", 0),
+                        request.get("limit", 8192), catalog_read,
+                        request.get("candidate_ids", []),
+                        should_continue=lambda: self.queries.clock() - scan_started < min(3.0, self.queries.SCAN_SECONDS))
+                    result["catalog"] = catalog
+                    trace.record("LayerService.layer_catalog_page", "returned",
+                                 offset=catalog["scan"]["start"], end_exclusive=catalog["scan"]["end_exclusive"],
+                                 read_calls=calls[0], read_errors=catalog["scan"]["page_read_errors"],
+                                 candidates=len(catalog["candidate_ids"]))
+                    if catalog["status"] == "confirmation_required":
+                        result["next_action"] = {"action": "ask_user_confirmation", "candidates": catalog["candidates"],
+                                                  "prompt": "Confirm the intended layer by its exact full name and short_name. Do not substitute another candidate."}
+                    elif catalog["scan"]["next_offset"] is not None:
+                        result["next_action"] = {"tool": "model_property_probe", "request": {
+                            "phase": "layer_catalog",
+                            "layer_name": requested_name, "offset": catalog["scan"]["next_offset"],
+                            "limit": request.get("limit", 8192),
+                            "candidate_ids": catalog["candidate_ids"]}}
+                    elif catalog["status"] == "scan_exhausted_no_match":
+                        result["next_action"] = {"action": "ask_user_for_exact_short_name",
+                                                  "prompt": "No exact layer candidate was found in the scanned ID range. Ask the user for the exact short name shown by Allplan before planning an edit."}
+                    else:
+                        result["next_action"] = None
+                    result["catalog_policy"] = (
+                        "A partial scan never authorizes an edit. Confirm an exact candidate with the user, then send its verified short_name to model_edit. "
+                        "Read errors are counted per page and the lookup never proves absence; when the ID range is exhausted without a candidate, ask for the exact short name.")
+                else:
+                    result["resolution"] = resolve_direct_layer_name(
+                        base, doc, doc_id["value"], requested_name, native_read)
+                    if result["resolution"]["status"] == "catalog_scan_required":
+                        result["next_action"] = {"tool": "model_property_probe", "request": {
+                            "phase": "layer_catalog",
+                            "layer_name": requested_name, "offset": 0, "limit": 8192}}
+                    elif result["resolution"]["status"] == "ambiguous":
+                        result["next_action"] = {"action": "ask_user_confirmation",
+                                                  "candidates": result["resolution"]["candidates"],
+                                                  "prompt": "Confirm the intended layer by its exact full name and short_name. Do not substitute another candidate."}
+                    else:
+                        result["next_action"] = None
+            else:
+                result["resolution"] = {"status": "not_checked", "reason": "document_id_unavailable"}
         result["probe_fingerprint"] = fingerprint(result)
         trace.record("probe", "completed")
         budget()

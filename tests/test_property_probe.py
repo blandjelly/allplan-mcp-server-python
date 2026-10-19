@@ -142,3 +142,33 @@ class PropertyProbeTests(unittest.TestCase):
         self.assert_code("probe_trace_unavailable", lambda: self.probe(phase="layer_name", layer_short_name="W1"))
         self.assertEqual(self.path.read_bytes(), data)
         self.base.LayerService.GetIDByShortName.assert_not_called()
+
+    def test_layer_name_probe_preserves_legacy_short_lookup_and_full_name_guidance(self):
+        self.fixture()
+        result = self.probe(phase="layer_name", layer_short_name="W1")
+        self.assertEqual(result["resolution"]["status"], "resolved")
+        self.assertEqual(result["resolution"]["candidates"][0]["short_name"], "W1")
+        result = self.probe(phase="layer_name", layer_name="Ogólne03")
+        self.assertEqual(result["resolution"]["status"], "catalog_scan_required")
+        self.assertEqual(result["next_action"]["request"]["phase"], "layer_catalog")
+        self.assertEqual(result["next_action"]["request"]["layer_name"], "Ogólne03")
+
+    def test_layer_catalog_page_emits_all_exact_candidates_and_confirmation(self):
+        self.fixture()
+        result = self.probe(phase="layer_catalog", layer_name="Columns", offset=7, limit=2)
+        catalog = result["catalog"]
+        self.assertEqual(catalog["status"], "confirmation_required")
+        self.assertEqual(catalog["candidate_ids"], [7])
+        self.assertEqual(catalog["candidates"][0]["short_name"], "COL")
+        self.assertEqual(result["next_action"]["action"], "ask_user_confirmation")
+        self.assertFalse(catalog["scan"]["complete"])
+
+    def test_layer_name_contract_rejects_multiple_spellings_and_oversized_catalog_page(self):
+        self.fixture()
+        for request in (
+            {"phase": "layer_name", "layer_name": "W1", "layer_short_name": "W1"},
+            {"phase": "layer_name"},
+            {"phase": "layer_catalog", "layer_name": "W1", "limit": 8193},
+        ):
+            self.assert_code("invalid_payload", lambda request=request: self.probe(**request))
+        self.coord.GetInputViewDocument.assert_not_called()

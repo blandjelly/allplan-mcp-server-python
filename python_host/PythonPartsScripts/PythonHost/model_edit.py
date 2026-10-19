@@ -86,14 +86,33 @@ def bind_changes(doc, base, request, check, trace):
         check()
         target = choice["target"]
         if target["kind"] == "layer":
-            name = target["short_name"]
-            ident = positive_id(read("LayerService.GetIDByShortName", lambda: base.LayerService.GetIDByShortName(name, doc)))
+            from .layer_names import bounded_layer_id
             doc_id = integer(read("DocumentAdapter.GetDocumentID", doc.GetDocumentID))
-            actual = bounded_text(read("LayerService.GetShortNameByID", lambda: base.LayerService.GetShortNameByID(ident, doc_id)))
-            if actual != name:
-                raise ValueError("Layer name/ID round trip differs")
+            if "name" in target:
+                from .layer_names import resolve_direct_layer_name
+                resolution = resolve_direct_layer_name(base, doc, doc_id, target["name"], read)
+                if resolution["status"] != "resolved":
+                    code = "layer_name_ambiguous" if resolution["status"] == "ambiguous" else "layer_name_catalog_required"
+                    message = ("Exact layer name matches multiple layer IDs; use a unique exact short name."
+                               if code == "layer_name_ambiguous" else
+                               "Exact full layer name needs the paginated layer_catalog probe before it can be edited; use a verified unique short_name.")
+                    raise BridgeError(code, message, 409)
+                candidate = resolution["candidates"][0]
+                ident = bounded_layer_id(candidate["layer_id"])
+                actual = candidate["short_name"]
+                requested_name = target["name"]
+            else:
+                requested_name = target["short_name"]
+                ident = bounded_layer_id(read("LayerService.GetIDByShortName",
+                                               lambda: base.LayerService.GetIDByShortName(requested_name, doc)))
+                actual = bounded_text(read("LayerService.GetShortNameByID",
+                                           lambda: base.LayerService.GetShortNameByID(ident, doc_id)))
+                if actual != requested_name:
+                    raise ValueError("Layer name/ID round trip differs")
             item = {"field": "layer_id", "operation": "set_layer", "property_role": "layer",
-                    "resource": {"layer_id": ident, "short_name": actual}, "new_value": ident}
+                    "resource": {"layer_id": ident, "short_name": actual,
+                                 **({"requested_name": requested_name} if "name" in target else {})},
+                    "new_value": ident}
         else:
             ident = target.get("attribute_id")
             if ident is None:
@@ -119,11 +138,33 @@ def bind_changes(doc, base, request, check, trace):
             members = {"text": "String", "integer": "Integer", "real": "Double", "boolean": "Boolean"}
             from .attribute_codecs import supported_scalar_type, bind_enum_label
             scalar_binding = supported_scalar_type(base, type_value)
-            value_type = choice.get("value_type", "auto")
+            requested_type = choice.get("value_type", "auto")
+            value_type = requested_type
             if value_type == "auto":
-                value_type = scalar_binding[0] if scalar_binding else None
+                enum_member = getattr(enum_type, "Enum", None)
+                value_type = (scalar_binding[0] if scalar_binding else
+                              "enum" if (enum_member is not None and type_value == enum_member
+                                         and isinstance(choice["value"], str) and choice["value"]) else None)
             from .native_model_edit import value_matches
             enum_binding = None
+            boolean_binding = None
+            new_value = choice["value"]
+            # Some Allplan integer attributes expose a genuine checkbox
+            # control. Only that SDK-bound metadata authorizes the documented
+            # checkbox 0/1 representation; a field name or integer value alone
+            # never turns JSON booleans into integers.
+            if (isinstance(choice["value"], bool) and scalar_binding
+                    and scalar_binding[0] == "integer"
+                    and requested_type in {"auto", "boolean"}):
+                from .attribute_codecs import checkbox_integer_boolean_binding
+                control_type = read("AttributeService.GetAttributeControlType",
+                                    lambda: base.AttributeService.GetAttributeControlType(doc, ident))
+                boolean_binding = checkbox_integer_boolean_binding(base, control_type)
+                if boolean_binding is not None:
+                    boolean_binding = {**boolean_binding, "value": choice["value"],
+                                       "encoded_value": int(choice["value"])}
+                    value_type = "integer"
+                    new_value = boolean_binding["encoded_value"]
             if value_type == "enum":
                 compatible_members = [member for member in ("Enum", "Integer", "String")
                                       if getattr(enum_type, member, None) is not None
@@ -137,7 +178,7 @@ def bind_changes(doc, base, request, check, trace):
                 except Exception as exc:
                     raise BridgeError("attribute_enum_unresolved", "Enum label/key round trip failed. No value was guessed and no enum catalog was enumerated.", 409) from exc
                 type_name = compatible_members[0]
-            elif not scalar_binding or value_type != scalar_binding[0] or not value_matches(choice["value"], value_type):
+            elif not scalar_binding or value_type != scalar_binding[0] or not value_matches(new_value, value_type):
                 raise BridgeError("attribute_type_unsupported", "Requested value_type does not match the loaded SDK attribute type. Inspect attribute_definition or element_attributes; use a supported metadata-bound codec, without coercing display text.", 409)
             else:
                 type_name = members[value_type]
@@ -146,10 +187,13 @@ def bind_changes(doc, base, request, check, trace):
                                  "data_type": {"text": "string"}.get(value_type, value_type),
                                  "native_type_member": type_name,
                                  "read_mode": request.get("attribute_read_mode", "stored")},
-                    "new_value": float(choice["value"]) if value_type == "real" else choice["value"],
+                    "new_value": float(new_value) if value_type == "real" else new_value,
                     "mode": choice.get("mode", "replace")}
             if enum_binding is not None:
                 item["resource"]["enum_binding"] = enum_binding
+            if boolean_binding is not None:
+                item["resource"]["boolean_binding"] = boolean_binding
+                item["resource"]["value_codec"] = "integer_checkbox_boolean"
         if item["field"] in fields:
             raise BridgeError("property_binding_unavailable", "Two changes resolve to the same property.", 409)
         fields.add(item["field"])

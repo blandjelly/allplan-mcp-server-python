@@ -89,6 +89,14 @@ class PropertyTests(unittest.TestCase):
         self.assertEqual(result["attribute_name_resolution"][0]["resolution"]["status"], "not_checked")
         self.assertEqual(result["layer_name_resolution"][0]["resolution"]["status"], "not_checked")
 
+    def test_full_layer_name_without_sdk_lookup_reports_catalog_followup(self):
+        self.fixture()
+        result = self.discover(layer_names=["Ogólne03"])
+        resolved = result["layer_full_name_resolution"][0]
+        self.assertEqual(resolved["requested_name"], "Ogólne03")
+        self.assertTrue(resolved["catalog_scan_required"])
+        self.assertEqual(resolved["resolution"]["value"]["status"], "catalog_scan_required")
+
     def test_absent_null_empty_undefined_failed_and_passive_values_remain_distinct(self):
         elements = [self.element(i, attrs=attrs) for i, attrs in enumerate(([], [(83, None)], [(83, "")], [(83, "<niezdefiniowany>")]), 1)]
         elements += [self.element(5), self.element(6, number=-102)]

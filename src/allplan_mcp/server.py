@@ -272,10 +272,19 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     old/new values and resources. Choose native_types or a family predicate and
     component owners are resolved without redirecting doors/windows to their wall.
     Attribute targets accept text/integer/real/boolean values with replace/add/upsert;
-    value_type=auto infers only loaded-SDK scalar types. Explicit enum labels use
+    value_type=auto infers loaded-SDK scalar types and exact SDK Enum labels.
+    JSON booleans for Integer attributes require the loaded SDK CheckBox control;
+    the reviewed resource binds true/false to native 1/0. Other integers never
+    silently accept booleans. Explicit enum labels use
     targeted label/key roundtrips and a runtime-bound Enum/Integer/String type;
-    no enum catalog is enumerated. Dates remain unsupported. Layer targets resolve
-    an existing short name. Attribute material is distinct from native material
+    no enum catalog is enumerated. Dates remain unsupported. Layer targets accept
+    an existing short_name or name. Search both full and short layer names;
+    model_property_probe layer_catalog paginates Allplan 2026's layer IDs when
+    direct lookup is insufficient. Follow its continuation and confirmation hints.
+    If a name is ambiguous or a catalog match is uncertain, show the actual full
+    and short names and ask the user to confirm the target before using its exact
+    short_name in a new preview. Never translate or invent a layer short name.
+    Attribute material is distinct from native material
     and surface; this route does not update native properties.
     is_unset matches observed null/blank. Combine explicit undefined values with any.
     Stored ReadAll omissions are unknown, never absence. The new opt-in
@@ -312,7 +321,11 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     hexadecimal execution_id (uuid.uuid4().hex). Lost replies require recover
     with that same execution ID; never create a new ID or automatically retry writes.
     Shared journal, fresh scope/resource checks, native writability and readback
-    remain enforced. Native acceptance of this new path is pending.
+    remain enforced. Recover M4 executions by exact journal targets in the original
+    project/document, without requiring a new global criterion scan. Recovery
+    never repeats setters. Follow its journal blockers and next action; if the
+    outcome remains unreadable, preserve the journal and do not create a new
+    execution ID to bypass it. Native acceptance of this new path is pending.
     """
     payload = request.model_dump(by_alias=True, exclude_unset=True)
     payload["schema_version"] = "m4-model-edit-1"
@@ -368,6 +381,14 @@ def model_property_probe(request: PropertyProbeRequest) -> dict[str, Any]:
     and suppresses next_offset. This is not a project definition catalog, does
     not prove omissions, applicability or writability, and never probes
     enum/control/unit metadata.
+    layer_name accepts layer_name for a full or short name, or the legacy
+    layer_short_name. If the SDK cannot resolve the full name, follow the returned
+    layer_catalog continuation. That read-only phase scans bounded ID pages and
+    searches full and short names without removing Polish diacritics. Its page
+    trace records the batch before native reads. Ask the user to confirm the
+    returned full name and short_name whenever confirmation_required is returned;
+    use the confirmed short_name for a new model_edit preview. An incomplete
+    scan or an API error never proves a layer absent or authorizes a write.
     The broad model_properties route stays blocked. Native acceptance is pending.
     """
     payload = request.model_dump(exclude_unset=True)

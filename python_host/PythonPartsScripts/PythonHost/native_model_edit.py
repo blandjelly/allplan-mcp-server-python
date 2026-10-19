@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import math
 
-from .model_context import boolean, guid, integer, observation
+from .model_context import boolean, guid, integer, observation, text
 from .native_readers import COMPONENT_TYPES, adapter_ref, root_adapter
 from .transport import BridgeError
 
@@ -16,6 +16,16 @@ _TYPES = {"text", "string", "integer", "real", "boolean", "enum"}
 _READ_ALL = "ReadAll"
 _READ_ALL_COMPUTABLE = "ReadAllAndComputable"
 _ADD_EVIDENCE = "absent_from_ReadAllAndComputable"
+
+
+def _explicitly_stale(adapter):
+    for method in ("IsNull", "IsDeleted"):
+        try:
+            if boolean(getattr(adapter, method)()):
+                return True
+        except Exception:
+            continue
+    return False
 
 
 def _conflict(message):
@@ -56,6 +66,7 @@ def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapte
         _conflict("Target reference is incomplete.")
 
     started = queries.clock()
+    seen_models, seen_roots = [], []
 
     def budget():
         if queries.clock() - started >= queries.SCAN_SECONDS:
@@ -69,24 +80,70 @@ def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapte
         budget()
         if index >= 10000:
             raise BridgeError("scan_limit_exceeded", "Edit resolution adapter budget exceeded.", 409)
+        candidate_model_uuid = None
+        candidate_type = None
         try:
             signed_file = integer(candidate.GetDrawingfileNumber())
             if signed_file <= 0 or signed_file != ref["drawing_file"]:
+                continue
+            # Filter the enumeration by its direct model identity before
+            # walking parent adapters. SelectAllElements can contain adapters
+            # from unrelated element families whose hierarchy is unavailable;
+            # an unrelated candidate must not poison an otherwise exact
+            # target resolution.
+            candidate_model_uuid = guid(candidate.GetModelElementUUID())
+            if candidate_model_uuid not in seen_models and len(seen_models) < 8:
+                seen_models.append(candidate_model_uuid)
+            if candidate_model_uuid != ref["model_uuid"]:
+                # The documented enumeration can contain child adapters
+                # whose model UUID differs from their component root. Exact
+                # component roots of other supported families can be excluded
+                # directly; unsupported child wrappers still need the parent
+                # walk to establish whether they belong to the target.
+                candidate_type = text(candidate.GetElementAdapterType().GetTypeName())
+                if candidate_type in COMPONENT_TYPES:
+                    continue
+            # Explicitly stale wrappers can coexist with a current wrapper in
+            # the same enumeration. Their direct target identity is known;
+            # skip only positive null/deleted evidence.
+            if _explicitly_stale(candidate):
                 continue
             root, _chain = root_adapter(candidate, budget, stop_types=COMPONENT_TYPES)
             current = adapter_ref(root)
         except BridgeError:
             raise
         except Exception as exc:
-            raise BridgeError("repair_conflict", "Target identity or component hierarchy could not be resolved.", 409) from exc
+            # Allplan may retain an explicitly deleted/null adapter wrapper
+            # during a write refresh. It cannot be a live target. Skip it only
+            # after its direct model identity was proven to be this target;
+            # unknown lifecycle or hierarchy failures remain conflicts.
+            if candidate_model_uuid == ref["model_uuid"] and _explicitly_stale(candidate):
+                continue
+            detail = {"reason": "candidate_hierarchy_unavailable",
+                      "candidate_model_uuid": candidate_model_uuid,
+                      "candidate_type": candidate_type,
+                      "expected_model_uuid": ref["model_uuid"],
+                      "expected_type": native_type}
+            if diagnostics is not None:
+                diagnostics["resolution"] = detail
+            raise BridgeError("repair_conflict", "Edit target resolution failed: " + str(detail), 409) from exc
         if current["model_uuid"] != ref["model_uuid"]:
             continue
+        if len(seen_roots) < 8:
+            seen_roots.append({"model_uuid": current["model_uuid"], "view_uuid": current["view_uuid"],
+                               "type_name": current["type_name"]})
         if (current["type_name"] != native_type
                 or guid(root.GetElementAdapterType().GetGuid()) != ref["type_uuid"]):
             _conflict("Resolved target type changed.")
         matches[current["view_uuid"]] = root
     if len(matches) != 1:
-        _conflict("Edit target is missing or has multiple root representations; no arbitrary representation selected.")
+        reason = "target_missing" if not matches else "multiple_views"
+        detail = {"reason": reason, "expected_model_uuid": ref["model_uuid"],
+                  "expected_type": native_type, "candidate_model_uuids": seen_models,
+                  "matching_roots": seen_roots}
+        if diagnostics is not None:
+            diagnostics["resolution"] = detail
+        _conflict("Edit target resolution failed: " + str(detail))
     element = next(iter(matches.values()))
     if writable:
         flags = {}
@@ -237,6 +294,30 @@ def valid_enum_binding(change):
             and bound["value"] == change.get("new_value"))
 
 
+def valid_boolean_binding(change):
+    """Validate optional SDK-bound CheckBox-to-Integer encoding evidence."""
+    resource = change.get("resource") or {}
+    marker = "boolean_binding" in resource
+    codec = resource.get("value_codec")
+    if not marker and codec is None:
+        return True
+    bound = resource.get("boolean_binding")
+    if (codec != "integer_checkbox_boolean" or not marker
+            or resource.get("data_type") != "integer"
+            or resource.get("native_type_member") != "Integer"
+            or not isinstance(bound, dict)
+            or set(bound) != {"control_type_member", "false_value", "true_value", "value", "encoded_value"}):
+        return False
+    if (bound.get("control_type_member") != "CheckBox"
+            or type(bound.get("false_value")) is not int or bound["false_value"] != 0
+            or type(bound.get("true_value")) is not int or bound["true_value"] != 1
+            or type(bound.get("value")) is not bool
+            or type(bound.get("encoded_value")) is not int):
+        return False
+    encoded = 1 if bound["value"] else 0
+    return bound["encoded_value"] == encoded and type(change.get("new_value")) is int and change["new_value"] == encoded
+
+
 def replaceable_attribute_value(change):
     """A typed replacement may start from a known native undefined marker."""
     from .model_edit_contracts import is_undefined_attribute_value
@@ -281,6 +362,8 @@ def write(base, element, change):
     value = _typed_value(change.get("new_value"), _data_type(change))
     if not valid_enum_binding(change):
         raise BridgeError("target_not_writable", "Enum change requires the reviewed exact label/key binding.", 409)
+    if not valid_boolean_binding(change):
+        raise BridgeError("target_not_writable", "Integer checkbox change requires the reviewed CheckBox zero/one binding.", 409)
     if operation == "add_attribute":
         old = change.get("old_value") or {}
         if (old.get("status") != "absent" or old.get("presence_proven") is not True
