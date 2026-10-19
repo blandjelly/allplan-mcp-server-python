@@ -1,0 +1,53 @@
+{
+  "source_commit": "35d4744bec47bf765116956a68a23bed1b6b199f",
+  "full_local_suite": "not_run; replaced by final CI",
+  "final_focused_runs": [
+    {
+      "modules": [
+        "test_native_model_edit",
+        "test_multiview_recovery"
+      ],
+      "tests": 19,
+      "result": "pass",
+      "source_commit": "8c8aa1e9f719a8ab1d04fc7114115d353cc96183"
+    },
+    {
+      "modules": [
+        "test_repair_execution",
+        "test_model_edit",
+        "test_wall_layer_edit",
+        "test_model_edit_recovery_http"
+      ],
+      "tests": 57,
+      "result": "pass",
+      "source_commit": "8c8aa1e9f719a8ab1d04fc7114115d353cc96183"
+    },
+    {
+      "modules": [
+        "test_wall_filter"
+      ],
+      "tests": 16,
+      "result": "pass",
+      "source_commit": "35d4744bec47bf765116956a68a23bed1b6b199f"
+    }
+  ],
+  "coverage": [
+    "legacy unbound journal: unanimous old/new multiple-view recovery without setters",
+    "divergent/unreadable/wrong-type roots and integer/bool differences remain blocked",
+    "distinct wrappers sharing a view UUID must agree",
+    "new view-bound writes use one setter and all-view readback",
+    "missing reviewed view rejects before journal or setter",
+    "64 large observations retain common raw value and bounded per-view hashes",
+    "HTTP lost reply adds a second view; recovery, remaining Beam writes, later layer move",
+    "full Polish layer-name lookup and confirmed short-name apply unchanged"
+  ],
+  "native_Allplan": "not_run",
+  "initial_ci": {
+    "run_id": 39306267478,
+    "source_commit": "8c8aa1e9f719a8ab1d04fc7114115d353cc96183",
+    "ubuntu": "486 pass",
+    "windows": "485 pass, 1 failure in existing Wall exclusion behavior test; execution exceeded five-second budget",
+    "package": "skipped; no build produced",
+    "resolution": "test fixture clock injected; dedicated explicit-expiry test retained; production runtime unchanged"
+  }
+}

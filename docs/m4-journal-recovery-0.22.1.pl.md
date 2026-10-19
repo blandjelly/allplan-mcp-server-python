@@ -7,7 +7,9 @@ ponawia zapisu. Nowy podgląd wiąże konkretny widok do wykonania zmiany.
 Testy automatyczne używają atrap API; wynik natywny wymaga poniższej próby.
 
 1. Zainstaluj 0.22.1 przez `Setup.cmd`, zachowując oryginalny dziennik. Otwórz
-   ten sam projekt i dokument 101; sprawdź `allplan_health`.
+   ten sam projekt i dokument 101. Uruchom ponownie `StartPythonHost` i połączenie
+   MCP, aby załadować nowe moduły. Sprawdź `allplan_health` i zachowaj informację
+   o wersji/paczce 0.22.1 razem z wynikiem próby.
 2. Poproś agenta: „Odzyskaj wykonanie 4388b04e39a14fac811db4f58723d01f bez
    ponawiania zapisów. Pokaż wynik oraz pozostałe blokery”. Zachowaj pełny JSON.
 3. Jeżeli blokada została rozliczona, wydaj jedno z oczekujących poleceń, np.

@@ -16,7 +16,23 @@ New previews hash-bind one exact enumerated view for the setter; all representat
 must agree first, foreground/native guards remain, and a vanished bound view is
 never replaced silently. There is one setter per change. Layer lookup is unchanged.
 
-Automated verification and package evidence will be recorded with the final source.
+Source **35d4744bec47bf765116956a68a23bed1b6b199f** passed
+[CI 39307523821](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39307523821):
+**486 tests on each Windows/Ubuntu Python 3.12 job**, then one successful package
+job. The original CI artifact was transferred and its GitHub SHA-256 verified,
+without a local rebuild. The exact ZIP passed checksum/payload integrity,
+registration, frozen sync/import, upgrade from 0.22.0 and restore, with **37 bridge
+hashes** and preserved journal/trace/bridge-log markers.
+[0.22.1 package and evidence](../evaluation-packages/0.22.1/README.md).
+
+Focused checks cover 76 recovery/model-edit/native/HTTP tests plus 16 Wall-filter
+tests. Initial CI passed Ubuntu but exposed a Windows filesystem-latency failure
+in the existing Wall-exclusion behavior test (over six seconds against a five-second
+budget); no package was built. Behavior tests now inject a deterministic clock,
+while the dedicated expiry test explicitly advances time and production guards
+remain unchanged. Delivery-only documentation adds an explicit host/MCP restart
+to the short trial; no runtime changes follow the verified source.
+
 Native acceptance of this change is pending the [recovery-only trial](m4-journal-recovery-0.22.1.pl.md).
 Preserve the original journal and accepted layer-name/UI observations; do not ask
 the owner to repeat those tests.
