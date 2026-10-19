@@ -1,0 +1,56 @@
+{
+  "source_commit": "8c71de958c47ab4cb418a62fbd2d55ce76cbc4db",
+  "full_local_suite": "not_run; final CI replaces full local suite",
+  "affected_dependent_unique_tests": 140,
+  "runs": [
+    {
+      "modules": [
+        "test_journal_cleanup_http",
+        "test_trace_cleanup",
+        "test_journal_cleanup",
+        "test_property_probe",
+        "test_journal_inspection",
+        "test_repair_execution"
+      ],
+      "tests": 51,
+      "result": "pass before final archive-state guard"
+    },
+    {
+      "modules": [
+        "test_model_edit",
+        "test_column_layer",
+        "test_wall_filter",
+        "test_wall_probe",
+        "test_model_edit_recovery_http"
+      ],
+      "tests": 88,
+      "result": "pass"
+    },
+    {
+      "modules": [
+        "test_trace_cleanup",
+        "test_journal_cleanup",
+        "test_journal_cleanup_http"
+      ],
+      "tests": 18,
+      "result": "pass after binary-open/validation changes"
+    },
+    {
+      "modules": [
+        "test_journal_cleanup"
+      ],
+      "tests": 8,
+      "result": "pass after final archived-unresolved guard; adds one test"
+    }
+  ],
+  "coverage": [
+    "explicit confirmation and exact snapshot before any archival",
+    "full 1 MiB trace -> MCP preview hint -> no ack rejected -> byte-preserved archive -> normal preview",
+    "record capacity -> confirmed archive -> original-ID replay without setters",
+    "restart archived replay and history-only recover",
+    "unknown/running/corrupt/oversize/symlink/collision protected",
+    "stale snapshot, partial rename, bounded inventory over128, archive metadata bounds",
+    "existing guarded query/property/model-edit/recovery workflows"
+  ],
+  "native_Allplan": "not_run for new maintenance"
+}

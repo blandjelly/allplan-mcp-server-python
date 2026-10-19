@@ -14,9 +14,14 @@ konkretnego artefaktu lub rewizji.
 M4 pozostaje częściowo odebrane. Dowody nie zamykają pełnej ścieżki natywnej
 dla wszystkich rodzin, materialnych właściwości natywnych, selekcji UI,
 bezpiecznej obsługi pełnego dziennika ani pracy wieloplikowej. Kandydat 0.23.0
-dodaje archiwizację dziennika sterowaną przez agenta; jej CI i akceptacja
-natywna pozostają pending; brak końcowych wyników CI, liczników testów i
-hasha źródła kandydata. Niedawny zapis
+dodaje archiwizację dziennika sterowaną przez agenta. Źródło
+`8c71de958c47ab4cb418a62fbd2d55ce76cbc4db` przeszło pełne CI: **505 testów
+na Windows i 505 na Ubuntu, Python 3.12**, następnie jeden build. Dokładny ZIP
+z CI przeszedł instalację, aktualizację z 0.22.1 i przywrócenie, z zachowaniem
+znaczników dzienników oraz nowych archiwów i zgodnością 38 plików mostka.
+[Pakiet i wyniki](../evaluation-packages/0.23.0/README.md).
+Natywna akceptacja nowej obsługi dziennika pozostaje do wykonania w
+[krótkiej próbie](m4-journal-cleanup-0.23.0.pl.md). Niedawny zapis
 `Materiał = beton zbrojony` jest zapisem atrybutu; nie dowodzi zmiany natywnego
 materiału konstrukcyjnego.
 
@@ -37,7 +42,7 @@ odbioru natywnego. Poniższy status dotyczy wyłącznie dostępnych dowodów.
 | K3 — edycja niezależna od audytu; słupy i W1 | Edycja atrybutu słupa potwierdzona dla sześciu celów. Połączona ścieżka „brak odporności ogniowej → F120 oraz W1” i natywny zapis warstwy nie są potwierdzone przez tę próbę. |
 | K4 — typowane atrybuty i natywny materiał | Konkretne zapisy atrybutów potwierdzone. Próba nie dotyczy natywnego materiału ściany ani odrębnego potwierdzenia właściwości natywnej. |
 | K5 — sześć rodzin | Nieodebrane jako całość. Log obejmuje słupy oraz wyniki zapytania stropów. Nie potwierdza rodziny ścian, belek, drzwi i okien ani wszystkich wariantów i właścicieli pól. |
-| K6 — wiele rysunków i praca biurowa | Nieodebrane. Ograniczenia jednego aktywnego rysunku, limitów zmian, braku gwarancji atomowości i cyklu życia dziennika pozostają. Kandydat 0.23.0 implementuje jawne archiwizowanie; CI i próba akceptacyjna są pending. |
+| K6 — wiele rysunków i praca biurowa | Nieodebrane. Ograniczenia jednego aktywnego rysunku, limitów zmian, braku gwarancji atomowości i cyklu życia dziennika pozostają. Kandydat 0.23.0 implementuje jawne archiwizowanie; CI przeszło, próba z hostem pozostaje do wykonania. |
 | K7 — cały projekt | Poza odbiorem; brak dowodu enumeracji i bezpiecznej obsługi niezaładowanych plików. |
 
 Zbieżne współrzędne i granice przestrzenne wyników `Slab_TypeUUID` oraz
@@ -73,8 +78,8 @@ pozostają chronione. Archiwizacja nie wykonuje wywołań modelu ani setterów.
 Globalny współdzielony dziennik można sprzątać bez lookup projektu/dokumentu;
 identity projektu/dokumentu nadal obowiązuje przy Apply i Recover.
 
-Status: implementacja w kandydacie 0.23.0; pełne CI i natywna akceptacja
-pozostają pending. Nie ma dokładnego błędu, stanu licznika ani rozmiaru pliku
+Status: implementacja, pełne CI i sprawdzenie dokładnego pakietu 0.23.0
+przeszły; natywna akceptacja nowego przepływu pozostaje do wykonania. Nie ma dokładnego błędu, stanu licznika ani rozmiaru pliku
 z incydentu właściciela, więc źródło blokady nadal nie jest ustalone. Osobno
 diagnozować 1 MiB aktywnego trace, limit 128 aktywnych rekordów i limit 1 MiB
 na rekord. Archiwum zachowuje dane, ale nie jest polityką retencji ani

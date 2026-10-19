@@ -67,7 +67,7 @@ execution IDs for replay. Running, unresolved, corrupt, or oversized records
 remain protected. Cleanup performs no native model calls or setters; Apply and
 Recover retain their project/document identity checks, while cleanup of the
 global shared journal does not require a project/document lookup. This
-candidate's CI and native acceptance are still pending. Archival is not a disk
+candidate passed 505 tests per Windows/Ubuntu Python 3.12 job and exact ZIP verification; native maintenance acceptance remains pending. Archival is not a disk
 retention policy and does not promise unlimited storage reclamation.
 
 ## What this observation does not accept

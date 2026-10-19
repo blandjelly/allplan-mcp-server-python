@@ -18,8 +18,17 @@ execution-ID replay through archived history. Unknown/running, corrupt and
 oversized records stay protected and blocking. No model retry, deletion or silent
 pruning; archive disk retention is separate. Changed snapshots require new consent.
 
-Final automated/packaging evidence will be recorded below. Native maintenance
-acceptance is pending the [short 0.23.0 trial](m4-journal-cleanup-0.23.0.pl.md).
+Source **8c71de958c47ab4cb418a62fbd2d55ce76cbc4db** passed
+[CI 39336895867](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39336895867):
+**505 tests on each Windows/Ubuntu Python 3.12 job**, then one package job.
+The original artifact transferred with GitHub digest verified; no rebuild.
+The exact ZIP passed checksum/payload, registration, frozen sync/import, upgrade
+from 0.22.1 and restore, with **38 bridge hashes** and preserved active journal,
+trace/log and archived-execution/trace markers. Focused tests cover 140 unique
+affected/dependent cases, including 19 new maintenance tests through native fakes
+and real MCP HTTP. [0.23.0 package/evidence](../evaluation-packages/0.23.0/README.md).
+The final delivery commit only adds docs/artifacts; no runtime change follows
+that verified source. Native maintenance acceptance is pending the [short 0.23.0 trial](m4-journal-cleanup-0.23.0.pl.md).
 See the [M4 completion assessment](m4-completion-status-2026-10-20.pl.md) for
 prioritized identity, selection, native material, family and multi-file gaps.
 
