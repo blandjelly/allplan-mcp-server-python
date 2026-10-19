@@ -1,0 +1,12 @@
+{
+  "source_commit": "4cc0a752960c6f05293891208c4122b4e21f00c7",
+  "focused_tests": 131,
+  "focused_mcp_http_flows": 6,
+  "last_default_layer_followup_tests": 13,
+  "local_markdown_links_checked": 74,
+  "native_Allplan": "not_run",
+  "owner_observation": "docs/test-results/m4-agent-observation-0.21.1-2026-10-19.md",
+  "runtime_commit": "4cc0a752960c6f05293891208c4122b4e21f00c7",
+  "wall_trace_timing_followup_tests": 19,
+  "layer_confirmation_followup_tests": 61
+}

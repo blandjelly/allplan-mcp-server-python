@@ -20,6 +20,20 @@ native geometry edits remain unsupported. New native behavior is pending the
 [short 0.22.0 trial](m4-agent-fixes-0.22.0.pl.md); retain all accepted historical
 observations and the original journal.
 
+Source **4cc0a752960c6f05293891208c4122b4e21f00c7** passed
+[CI 39294288929](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39294288929):
+**480 tests on each Windows/Ubuntu Python 3.12 job**, then one package job.
+The original CI artifact transferred successfully; its SHA-256 matched GitHub's
+digest and no local rebuild was made. The exact delivered ZIP passed payload,
+checksum, registration, frozen sync/import, upgrade from 0.21.1 and restore,
+with **37 bridge hashes** verified and journal/trace/bridge-log preservation.
+[0.22.0 package and evidence](../evaluation-packages/0.22.0/README.md).
+Initial CI exposed an existing Windows disk-latency dependency in the final
+Wall-filter trace-failure test; its clock is now injected for that failure
+scenario, while native time budgets are unchanged. The final layer review also
+retains continuation after a partial match and binds user-confirmed ID/names.
+Native 0.22.0 behavior remains pending the short trial above.
+
 **Previous candidate 0.21.1, native acceptance pending.** The owner
 identifies the 2026-10-18 Allplan observations as version **0.21.0**; no exact
 build hash or raw MCP payloads are available. The owner confirms Column U=0.2,
