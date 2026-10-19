@@ -271,6 +271,9 @@ class WallFilterTests(unittest.TestCase):
 
     def test_final_trace_failure_after_highlight_reports_unknown_with_ui_started(self):
         self.setUp_filter()
+        # Exercise the final trace failure independently of Windows fsync
+        # latency. The native time-budget guards have separate clock tests.
+        self.service.queries.clock = lambda: 0.0
         module = importlib.import_module("test_allplan_host.wall_filter")
         original = module.NativeProbeTrace.record
         def fail_completion(trace, api, state, **details):
@@ -280,6 +283,7 @@ class WallFilterTests(unittest.TestCase):
         with patch.object(module.NativeProbeTrace, "record", fail_completion):
             result = self.run_filter(action="highlight")
         self.assertEqual(result["state"], "unknown")
+        self.assertIn("final trace record failed", result["message"])
         self.assertTrue(result["ui_calls_started"])
         self.ifw.HighlightService.HighlightElements.assert_called_once()
         self.assertTrue(result["criterion_complete"])
