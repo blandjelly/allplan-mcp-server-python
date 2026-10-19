@@ -1,5 +1,6 @@
 """Recover a lost Beam write and continue through the real MCP HTTP contract."""
 import unittest
+import copy
 from pathlib import Path
 from unittest.mock import patch
 from uuid import uuid4
@@ -31,11 +32,26 @@ class BeamRecoveryHTTPTests(unittest.IsolatedAsyncioTestCase):
 
         def lose_first_reply(attributes, targets, *flags):
             setter(attributes, targets, *flags)
+            for wrapper in native.base.ElementsSelectService.SelectAllElements.return_value:
+                if wrapper.GetModelElementUUID() == targets[0].GetModelElementUUID():
+                    wrapper.GetAttributes.return_value = targets[0].GetAttributes.return_value
             if first[0]:
                 first[0] = False
+                # Native refresh exposes a second live view of the same Beam.
+                # This was the persistent blocker in the owner's follow-up.
+                view = copy.deepcopy(targets[0])
+                view.GetElementUUID.return_value = str(uuid4())
+                native.base.ElementsSelectService.SelectAllElements.return_value.append(view)
                 raise RuntimeError("lost response after the first Beam setter")
 
         native.base.ElementsAttributeService.ChangeAttributes.side_effect = lose_first_reply
+        layer_setter = native.base.ElementsLayerService.ChangeLayer.side_effect
+        def set_model_layer(targets, name):
+            layer_setter(targets, name)
+            for wrapper in native.base.ElementsSelectService.SelectAllElements.return_value:
+                if wrapper.GetModelElementUUID() == targets[0].GetModelElementUUID():
+                    wrapper.GetCommonProperties.return_value.Layer = targets[0].GetCommonProperties.return_value.Layer
+        native.base.ElementsLayerService.ChangeLayer.side_effect = set_model_layer
         original = self.bridge_handler.handle
 
         def handle(path, payload):
@@ -72,6 +88,9 @@ class BeamRecoveryHTTPTests(unittest.IsolatedAsyncioTestCase):
                 recovered = (await client.call_tool("model_edit", {"request": {
                     "action": "recover", "execution_id": stopped["execution_id"]}})).data
             self.assertEqual(recovered["outcomes"][0]["state"], "reconciled")
+            evidence = recovered["recovery"]["observations"][0]["representation_consensus"]
+            self.assertEqual(len(evidence["representations"]), 2)
+            self.assertTrue(evidence["agreed"])
             self.assertTrue(recovered["read_only"])
             self.assertEqual(native.base.ElementsAttributeService.ChangeAttributes.call_count, 1)
 

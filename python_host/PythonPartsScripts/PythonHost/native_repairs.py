@@ -4,10 +4,12 @@ from .native_readers import adapter_ref, root_adapter
 from .transport import BridgeError
 
 
-def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapter_owners=None):
+def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapter_owners=None,
+            all_representations=False):
     if change.get("adapter_version") == "m4-model-edit-1":
         from . import native_model_edit
-        return native_model_edit.resolve(doc, base, queries, change, writable, diagnostics, adapter_owners)
+        return native_model_edit.resolve(doc, base, queries, change, writable, diagnostics, adapter_owners,
+                                         all_representations=all_representations)
     ref = change["ref"]
     matches = {}
     started = queries.clock()
@@ -55,6 +57,16 @@ def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapte
         if element.GetDrawingfileNumber() != ref["drawing_file"]:
             raise BridgeError("target_not_writable", "Passive target cannot be changed.", 409)
     return element
+
+
+def observe(doc, base, queries, change, diagnostics=None):
+    owners = []
+    if change.get("adapter_version") == "m4-model-edit-1":
+        from .native_model_edit import read_consensus
+        roots = resolve(doc, base, queries, change, adapter_owners=owners, all_representations=True)
+        return read_consensus(base, queries, roots, change, diagnostics)
+    element = resolve(doc, base, queries, change, adapter_owners=owners)
+    return read(base, queries, element, change)
 
 
 def read(base, queries, element, change):

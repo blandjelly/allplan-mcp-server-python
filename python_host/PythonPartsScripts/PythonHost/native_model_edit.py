@@ -9,6 +9,7 @@ import math
 
 from .model_context import boolean, guid, integer, observation, text
 from .native_readers import COMPONENT_TYPES, adapter_ref, root_adapter
+from .query_contracts import fingerprint
 from .transport import BridgeError
 
 
@@ -54,7 +55,8 @@ def _typed_value(value, data_type):
     return value
 
 
-def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapter_owners=None):
+def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapter_owners=None,
+            all_representations=False):
     """Resolve one exact native component root from the current M1 enumeration."""
     ref = change.get("ref") or {}
     native_type = change.get("native_type")
@@ -135,8 +137,29 @@ def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapte
         if (current["type_name"] != native_type
                 or guid(root.GetElementAdapterType().GetGuid()) != ref["type_uuid"]):
             _conflict("Resolved target type changed.")
-        matches[current["view_uuid"]] = root
-    if len(matches) != 1:
+        wrappers = matches.setdefault(current["view_uuid"], [])
+        if all(root is not wrapper for wrapper in wrappers):
+            wrappers.append(root)
+    if all_representations and writable:
+        _conflict("A consensus enumeration is read-only.")
+    if matches and all_representations:
+        return tuple(root for view in sorted(matches) for root in matches[view])
+    selected_view = change.get("target_view_uuid")
+    if selected_view is not None:
+        try:
+            valid_view = isinstance(selected_view, str) and guid(selected_view) == selected_view and selected_view in matches
+        except Exception:
+            valid_view = False
+        if not valid_view:
+            _conflict("The exact reviewed target view is missing or changed.")
+        evidence = {}
+        observed = read_consensus(base, queries,
+            tuple(root for view in sorted(matches) for root in matches[view]), change, evidence)
+        if observed.get("status") not in {"observed", "absent"}:
+            _conflict("Reviewed target representations do not agree: " + str(evidence))
+        if diagnostics is not None:
+            diagnostics["representation_consensus"] = evidence
+    elif len(matches) != 1:
         reason = "target_missing" if not matches else "multiple_views"
         detail = {"reason": reason, "expected_model_uuid": ref["model_uuid"],
                   "expected_type": native_type, "candidate_model_uuids": seen_models,
@@ -144,31 +167,82 @@ def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapte
         if diagnostics is not None:
             diagnostics["resolution"] = detail
         _conflict("Edit target resolution failed: " + str(detail))
-    element = next(iter(matches.values()))
+    selected = matches[selected_view] if selected_view is not None else next(iter(matches.values()))
+    element = selected[0]
     if writable:
-        flags = {}
-        if diagnostics is not None:
-            diagnostics.update(resolved_root=adapter_ref(element), native_flags=flags,
-                               hierarchy_check="terminal_component_root_matches_reviewed_model_and_type")
-        flags["IsInMacro"] = observation(lambda: boolean(element.IsInMacro()))
-        flags["active_drawing_file"] = observation(
-            lambda: integer(base.DrawingFileService.GetActiveFileNumber()))
-        if (flags["active_drawing_file"].get("status") != "observed"
-                or flags["active_drawing_file"].get("value") != ref["drawing_file"]):
-            raise BridgeError("target_not_writable", "Target is outside the active foreground drawing.", 409)
-        for method, expected in (("IsNull", False), ("IsDeleted", False), ("IsValid", True),
-                                 ("IsInActiveDocument", True), ("IsInActiveLayer", True),
-                                 ("IsLabelElement", False)):
-            flags[method] = observation(lambda method=method: boolean(getattr(element, method)()))
-            if flags[method].get("status") != "observed" or flags[method].get("value") != expected:
-                raise BridgeError("target_not_writable", f"Target fails {method}; no write requested.", 409)
-        if integer(element.GetDrawingfileNumber()) != ref["drawing_file"]:
-            raise BridgeError("target_not_writable", "Passive target cannot be changed.", 409)
-        if change.get("operation") == "set_wall_layer":
-            import NemAll_Python_IFW_ElementAdapter as native_adapters
-            from .wall_layer import preflight
-            preflight(base, element, change, native_adapters, budget)
+        for wrapper in selected:
+            _writable(doc, base, queries, wrapper, change, diagnostics, budget)
     return element
+
+
+def _writable(doc, base, queries, element, change, diagnostics, budget):
+    ref = change["ref"]
+    flags = {}
+    if diagnostics is not None:
+        diagnostics.update(resolved_root=adapter_ref(element), native_flags=flags,
+                           hierarchy_check="terminal_component_root_matches_reviewed_model_and_type")
+    flags["IsInMacro"] = observation(lambda: boolean(element.IsInMacro()))
+    flags["active_drawing_file"] = observation(
+        lambda: integer(base.DrawingFileService.GetActiveFileNumber()))
+    if (flags["active_drawing_file"].get("status") != "observed"
+            or flags["active_drawing_file"].get("value") != ref["drawing_file"]):
+        raise BridgeError("target_not_writable", "Target is outside the active foreground drawing.", 409)
+    for method, expected in (("IsNull", False), ("IsDeleted", False), ("IsValid", True),
+                             ("IsInActiveDocument", True), ("IsInActiveLayer", True),
+                             ("IsLabelElement", False)):
+        flags[method] = observation(lambda method=method: boolean(getattr(element, method)()))
+        if flags[method].get("status") != "observed" or flags[method].get("value") != expected:
+            raise BridgeError("target_not_writable", f"Target fails {method}; no write requested.", 409)
+    if integer(element.GetDrawingfileNumber()) != ref["drawing_file"]:
+        raise BridgeError("target_not_writable", "Passive target cannot be changed.", 409)
+    if change.get("operation") == "set_wall_layer":
+        import NemAll_Python_IFW_ElementAdapter as native_adapters
+        from .wall_layer import preflight
+        preflight(base, element, change, native_adapters, budget)
+
+
+def read_consensus(base, queries, elements, change, diagnostics=None):
+    """Observe every exact live root, preserving read evidence and never setting values."""
+    from .repair_execution import same_observation
+    started = queries.clock()
+    evidence = {"method": "all_exact_live_root_representations", "representations": [],
+                "complete": False, "agreed": False}
+    if diagnostics is not None:
+        diagnostics.update(evidence)
+    if not elements or len(elements) > 64:
+        return {"status": "not_checked", "value": None, "reason": "representation_count_unavailable_or_over_limit"}
+    observations = []
+    for element in elements:
+        if queries.clock() - started >= queries.SCAN_SECONDS:
+            raise BridgeError("scan_limit_exceeded", "Consensus read time budget exceeded.", 409)
+        lifecycle = {method: observation(lambda method=method: boolean(getattr(element, method)()))
+                     for method in ("IsNull", "IsDeleted", "IsValid")}
+        valid = all(lifecycle[method].get("status") == "observed"
+                    and lifecycle[method].get("value") is expected
+                    for method, expected in (("IsNull", False), ("IsDeleted", False), ("IsValid", True)))
+        value = (read(base, queries, element, change) if valid else
+                 {"status": "not_checked", "value": None, "reason": "representation_lifecycle_unavailable"})
+        # Retain raw agreed readback in the outcome, but do not duplicate up to
+        # 8192 characters per view into the bounded durable journal.
+        evidence["representations"].append({"view_uuid": guid(element.GetElementUUID()),
+            "lifecycle": {key: item["value"] if item.get("status") == "observed" else item
+                          for key, item in lifecycle.items()},
+            "readback_status": value.get("status"), "readback_sha256": fingerprint(value)})
+        observations.append(value)
+        if queries.clock() - started >= queries.SCAN_SECONDS:
+            raise BridgeError("scan_limit_exceeded", "Consensus read time budget exceeded.", 409)
+    evidence["complete"] = True
+    first = observations[0]
+    readable = all(value.get("status") == "observed" or (
+        value.get("status") == "absent" and value.get("presence_proven") is True
+        and value.get("evidence") == _ADD_EVIDENCE) for value in observations)
+    evidence["agreed"] = readable and all(same_observation(change, first, value) for value in observations[1:])
+    if diagnostics is not None:
+        diagnostics.update(evidence)
+    if not evidence["agreed"]:
+        return {"status": "not_checked", "value": None,
+                "reason": "representation_values_disagree" if readable else "representation_read_unavailable"}
+    return first
 
 
 def read(base, queries, element, change):

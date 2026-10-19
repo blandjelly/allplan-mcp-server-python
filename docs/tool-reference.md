@@ -386,6 +386,17 @@ counted and skipped before component hierarchy traversal; unknown hierarchy
 remains incomplete. These changes also support recovery of retained 0.21.1
 records without changing their execution IDs.
 
+For multiple views, M4 recovery and post-write verification read all exact live
+model/type/drawing roots, including distinct wrappers with the same view UUID.
+`representation_consensus` records completeness, lifecycle/read evidence and
+agreement. Per-representation readbacks use typed-observation hashes to bound
+journal size; the common raw observation remains in the outcome. Only unanimous
+typed values can reconcile a journal outcome; no view
+is chosen to hide a conflicting read. New previews bind `target_view_uuid` into
+the plan hash for one exact setter target, after agreement across representations.
+A missing reviewed view or a disagreeing/unreadable representation blocks writes.
+Legacy records need no view binding for read-only recovery.
+
 Example shape for a simple Column: the `attribute:<ID_FROM_PROBE>` token below
 is a placeholder for the numeric ID actually resolved in the current
 document. An agent should derive this request from the user's natural-language
