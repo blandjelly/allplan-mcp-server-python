@@ -1,5 +1,26 @@
 # Current handoff
 
+**2026-10-19 candidate 0.22.1:** the owner reports that full/short layer lookup
+now works, but writes still block. The [follow-up log](test-results/m4-agent-followup-2026-10-19.md)
+identifies `multiple_views` while recovering execution
+`4388b04e39a14fac811db4f58723d01f`. The installed manifest was not supplied;
+the follow-up is associated with the 0.22.0 delivery, without an exact build claim.
+
+The query/planner already merges agreeing views of one model root, while native
+write/recovery resolution required one view. Recovery and post-write verification
+now read every exact live representation of the journal target, including distinct
+wrappers sharing a view UUID. Only unanimous typed old/new observations reconcile
+an unknown outcome. Missing, unreadable, conflicting or wrong-type roots retain
+the block. Recovery remains read-only and checks the original project/document.
+New previews hash-bind one exact enumerated view for the setter; all representations
+must agree first, foreground/native guards remain, and a vanished bound view is
+never replaced silently. There is one setter per change. Layer lookup is unchanged.
+
+Automated verification and package evidence will be recorded with the final source.
+Native acceptance of this change is pending the [recovery-only trial](m4-journal-recovery-0.22.1.pl.md).
+Preserve the original journal and accepted layer-name/UI observations; do not ask
+the owner to repeat those tests.
+
 **2026-10-19 candidate 0.22.0:** the owner confirms that the
 [0.21.1 agent log](test-results/m4-agent-observation-0.21.1-2026-10-19.md)
 agrees with Allplan: the 200 mm Wall moved to W1; full layer-name lookup failed;

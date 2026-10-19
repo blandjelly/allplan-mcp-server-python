@@ -395,6 +395,10 @@ def preview(plans, doc, base, settings, request):
                     continue
                 change["operation"] = "set_wall_layer"
                 change["resource"]["wall_layer_ownership"] = copy.deepcopy(ownership)
+            if element.get("view_identity_not_checked") or not element.get("view_uuids"):
+                blocked.append({"ref": element["ref"], "field": bound["field"], "reason": "target_view_unavailable"})
+                continue
+            change["target_view_uuid"] = sorted(element["view_uuids"])[0]
             changes.append(change)
     ready = report["coverage"]["criteria_complete"] and not blocked and len(changes) <= plans.executor.MAX_CHANGES
     plan = {"schema_version": SCHEMA, "action": "preview", "read_only": True, "plan_id": uuid4().hex,

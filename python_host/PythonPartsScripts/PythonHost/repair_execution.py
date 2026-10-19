@@ -500,11 +500,12 @@ class RepairExecutor:
                     # Exact-ID replay and Recover use the normal journal route.
                     return self.result(record)
                 # Never trust returned/stale adapters or setter return values as success.
-                fresh_owners = []
                 stage = "fresh_resolve"
-                fresh = native_repairs.resolve(doc, base, self.plans.queries, change, adapter_owners=fresh_owners)
+                resolution = {}
+                observed = native_repairs.observe(doc, base, self.plans.queries, change, resolution)
                 stage = "readback"
-                observed = native_repairs.read(base, self.plans.queries, fresh, change)
+                if resolution:
+                    outcome["representation_consensus"] = resolution
                 outcome["readback"] = observed
                 if new_value_observed(change, observed):
                     outcome.update(state="applied", reason="readback_matches")
@@ -575,11 +576,10 @@ class RepairExecutor:
         observations = []
         for index, change in enumerate(record["changes"]):
             stage = "recovery_resolve"
+            resolution = {}
             try:
-                native_owners = []
-                element = native_repairs.resolve(doc, base, self.plans.queries, change, adapter_owners=native_owners)
+                value = native_repairs.observe(doc, base, self.plans.queries, change, resolution)
                 stage = "recovery_read"
-                value = native_repairs.read(base, self.plans.queries, element, change)
                 state = ("new_value_observed" if new_value_observed(change, value)
                          else "old_value_observed" if same_observation(change, value, change["old_value"]) else "conflict")
             except Exception as exc:
@@ -587,7 +587,8 @@ class RepairExecutor:
                 value, state = {"status": "not_checked", **details}, "unknown"
             else:
                 details = {}
-            observations.append({"state": state, "readback": value, "stage": stage, **details})
+            observations.append({"state": state, "readback": value, "stage": stage,
+                                 **({"representation_consensus": resolution} if resolution else {}), **details})
             if record["outcomes"][index]["state"] == "unknown" and state in {"new_value_observed", "old_value_observed"}:
                 record["outcomes"][index].update(state="reconciled", reason=state, readback=value)
         record["state"] = "stopped" if record["state"] == "running" else record["state"]
