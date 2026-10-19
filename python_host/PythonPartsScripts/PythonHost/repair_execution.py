@@ -113,12 +113,30 @@ class RepairExecutor:
             stream.close()
 
     def load(self, execution_id):
-        file = self.path / (execution_id + ".json")
-        if not file.exists():
+        from .journal_maintenance import archive_path
+        if not isinstance(execution_id, str) or not re.fullmatch(r"[0-9a-f]{32}", execution_id):
+            raise BridgeError("repair_journal_unavailable", "Invalid stored execution ID; no write requested.", 409)
+        active = self.path / (execution_id + ".json")
+        archived = archive_path(self) / active.name
+        for file in (active, archived):
+            if file.is_symlink():
+                raise BridgeError("repair_journal_unavailable", "Mutation record is a symbolic link; no write requested.", 409)
+        existing = [file for file in (active, archived) if file.exists()]
+        if not existing:
             return None
+        records = [self._load_file(file, execution_id) for file in existing]
+        for file, record in zip(existing, records):
+            if file == archived and (record["state"] == "running" or any(
+                    outcome["state"] == "unknown" for outcome in record["outcomes"])):
+                raise BridgeError("repair_journal_unavailable", "Archived execution is unresolved; preserve it for inspection.", 409)
+        if len(records) == 2 and fingerprint(records[0]) != fingerprint(records[1]):
+            raise BridgeError("repair_journal_unavailable", "Active and archived execution records disagree.", 409)
+        return records[0]
+
+    def _load_file(self, file, execution_id):
         try:
-            if file.stat().st_size > self.MAX_RECORD_BYTES:
-                raise ValueError("oversize record")
+            if not file.is_file() or file.stat().st_size > self.MAX_RECORD_BYTES:
+                raise ValueError("oversize or nonregular record")
             record = json.loads(file.read_text(encoding="utf-8"))
             content = record.pop("record_hash")
             if (content != fingerprint(record) or record["execution_id"] != execution_id
@@ -128,6 +146,17 @@ class RepairExecutor:
             return record
         except (OSError, ValueError, KeyError, TypeError, AttributeError) as exc:
             raise BridgeError("repair_journal_unavailable", "Mutation record cannot be verified; do not retry writes.", 409) from exc
+
+    def archived(self, execution_id):
+        from .journal_maintenance import archive_path
+        return (not (self.path / (execution_id + ".json")).exists()
+                and (archive_path(self) / (execution_id + ".json")).exists())
+
+    def journal_maintenance(self, request):
+        from .journal_maintenance import preview, cleanup
+        if request["action"] == "preview_journal_cleanup":
+            return preview(self, request["target"])
+        return cleanup(self, request)
 
     @staticmethod
     def validate_record(record):
@@ -199,7 +228,7 @@ class RepairExecutor:
                         blockers.append("invalid_record")
             if len(files) >= self.MAX_RECORDS and "capacity_exceeded" not in blockers:
                 blockers.append("journal_full")
-            return {"schema_version": "m3-journal-inspection-1", "action": "inspect_journal",
+            result = {"schema_version": "m3-journal-inspection-1", "action": "inspect_journal",
                     "state": "blocked" if blockers else "available", "read_only": True,
                     "native_model_access": False, "records_modified": False,
                     "complete": len(files) <= self.MAX_RECORDS, "record_limit": self.MAX_RECORDS,
@@ -211,6 +240,17 @@ class RepairExecutor:
                     "report_text": "Repair journal: " + str(len(records)) + " inspected records; " +
                                    (", ".join(blockers) if blockers else "storage checks passed") +
                                    ". Historical records only; model values and write eligibility are not checked."}
+            from .property_probe import NativeProbeTrace
+            try:
+                result["native_trace"] = NativeProbeTrace.inspect_storage(self.plans.trace_path)
+            except BridgeError as exc:
+                result["native_trace"] = {"state": "unavailable", "reason": exc.code}
+            result["cleanup_options"] = [
+                {"tool": "fix_model_issues", "request": {"action": "preview_journal_cleanup", "target": target},
+                 "user_confirmation_required": True} for target in ("native_trace", "repair_records")]
+            result["record_byte_limit"] = self.MAX_RECORD_BYTES
+            result["archive_replay_preserved"] = True
+            return result
 
     def save(self, record):
         payload = json.dumps({**record, "record_hash": fingerprint(record)}, ensure_ascii=False, allow_nan=False).encode()
@@ -389,15 +429,19 @@ class RepairExecutor:
             if request["action"] == "recover":
                 if record is None:
                     raise BridgeError("execution_not_found", "No mutation record exists for this execution ID.", 404)
+                if self.archived(request["execution_id"]):
+                    return {**self.result(record, replayed=True), "action": "recover", "archived": True,
+                            "current_model_values": "not_checked", "recovery_required": False,
+                            "report_text": "Archived resolved execution; history only. No current model values read or setters repeated."}
                 return self.recover(doc, base, settings, record)
             if record is not None:
                 if record["request_hash"] != fingerprint(request):
                     raise BridgeError("execution_id_conflict", "Execution ID belongs to a different apply request.", 409)
                 # Even after restart or UI Undo, a retry never invokes setters.
-                return self.result(record, replayed=True)
+                return {**self.result(record, replayed=True), "archived": self.archived(request["execution_id"])}
             files = list(self.path.glob("*.json"))
             if len(files) >= self.MAX_RECORDS:
-                raise BridgeError("repair_journal_full", "Journal is full; records are never automatically evicted.", 409)
+                raise BridgeError("repair_journal_full", "Journal is full. Use fix_model_issues preview_journal_cleanup target=repair_records; ask the user to confirm archival. No records are silently evicted.", 409)
             for file in files:
                 previous = self.load(file.stem)
                 if previous["state"] == "running" or any(o["state"] == "unknown" for o in previous["outcomes"]):

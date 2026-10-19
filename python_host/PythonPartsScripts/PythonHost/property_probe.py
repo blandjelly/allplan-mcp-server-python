@@ -2,7 +2,11 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
+import re
+import stat
+from contextlib import contextmanager
 from pathlib import Path
 from uuid import uuid4
 
@@ -16,6 +20,255 @@ from .transport import BridgeError
 
 class NativeProbeTrace:
     MAX_BYTES = 1024 * 1024
+    MAX_INSPECT_BYTES = 16 * 1024 * 1024
+    CHUNK_BYTES = 64 * 1024
+    MAX_ARCHIVE_PREVIEW = 128
+    MAX_ARCHIVE_RETRY_SCAN = 1024
+
+    @staticmethod
+    def _fail(code, message, exc=None):
+        error = BridgeError(code, message, 409)
+        if exc is None:
+            raise error
+        raise error from exc
+
+    @staticmethod
+    def _check_path(path):
+        path = Path(path).absolute()
+        # The caller supplies the one configured trace path. Reject symlinked
+        # ancestors too, so the fixed filename cannot be redirected elsewhere.
+        for part in (path, *path.parents):
+            try:
+                if part.is_symlink():
+                    raise ValueError("symlink path")
+            except OSError as exc:
+                raise ValueError("unreadable path") from exc
+        return path
+
+    @staticmethod
+    def _open_regular(path, flags, mode=0o600):
+        nofollow = getattr(os, "O_NOFOLLOW", 0)
+        descriptor = os.open(path, flags | nofollow | getattr(os, "O_BINARY", 0), mode)
+        try:
+            if not stat.S_ISREG(os.fstat(descriptor).st_mode):
+                raise ValueError("not a regular file")
+            if flags & os.O_APPEND:
+                open_mode = "ab"
+            elif flags & os.O_RDWR:
+                open_mode = "r+b"
+            else:
+                open_mode = "rb"
+            return os.fdopen(descriptor, open_mode)
+        except BaseException:
+            os.close(descriptor)
+            raise
+
+    @staticmethod
+    @contextmanager
+    def _storage_lock(path):
+        lock_path = path.with_name(path.name + ".lock")
+        if lock_path.is_symlink():
+            raise ValueError("lock is a symlink")
+        stream = NativeProbeTrace._open_regular(lock_path, os.O_CREAT | os.O_RDWR)
+        try:
+            stream.seek(0, os.SEEK_END)
+            if stream.tell() == 0:
+                stream.write(b"0")
+                stream.flush()
+                os.fsync(stream.fileno())
+            stream.seek(0)
+            if os.name == "nt":
+                import msvcrt
+                msvcrt.locking(stream.fileno(), msvcrt.LK_NBLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(stream.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            try:
+                yield
+            finally:
+                if os.name != "nt":
+                    import fcntl
+                    fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
+        finally:
+            stream.close()
+
+    @classmethod
+    def _digest_file(cls, path):
+        info = path.lstat()
+        if not stat.S_ISREG(info.st_mode) or info.st_size > cls.MAX_INSPECT_BYTES:
+            raise ValueError("trace is not a bounded regular file")
+        digest = hashlib.sha256()
+        with cls._open_regular(path, os.O_RDONLY) as stream:
+            before = os.fstat(stream.fileno())
+            size = 0
+            while True:
+                block = stream.read(cls.CHUNK_BYTES)
+                if not block:
+                    break
+                size += len(block)
+                if size > cls.MAX_INSPECT_BYTES:
+                    raise ValueError("trace exceeds inspection limit")
+                digest.update(block)
+            after = os.fstat(stream.fileno())
+        if (before.st_ino != after.st_ino or before.st_size != after.st_size
+                or before.st_mtime_ns != after.st_mtime_ns or size != after.st_size):
+            raise ValueError("trace changed while hashing")
+        return size, digest.hexdigest()
+
+    @classmethod
+    def _snapshot(cls, path):
+        if path.exists():
+            size, content_hash = cls._digest_file(path)
+            exists = True
+        else:
+            size, content_hash, exists = 0, None, False
+        from .query_contracts import fingerprint
+        snapshot_hash = fingerprint({"target": "native_trace", "exists": exists,
+                                     "bytes": size, "content_sha256": content_hash})
+        return {"target": "native_trace", "snapshot_hash": snapshot_hash,
+                "bytes": size, "byte_limit": cls.MAX_BYTES,
+                "full": size >= cls.MAX_BYTES, "exists": exists,
+                "content_sha256": content_hash}
+
+    @classmethod
+    def _archives_info(cls, archive_dir):
+        if archive_dir.is_symlink():
+            raise ValueError("archive directory is a symlink")
+        if not archive_dir.exists():
+            return {"directory": archive_dir.name, "count": 0, "bytes": 0,
+                    "complete": True, "archives": []}
+        if not archive_dir.is_dir():
+            raise ValueError("archive path is not a directory")
+        files, total, complete = [], 0, True
+        with os.scandir(archive_dir) as entries:
+            for entry in entries:
+                if not entry.name.endswith(".jsonl"):
+                    continue
+                if len(files) >= cls.MAX_ARCHIVE_PREVIEW:
+                    complete = False
+                    break
+                info = entry.stat(follow_symlinks=False)
+                if not stat.S_ISREG(info.st_mode):
+                    raise ValueError("archive entry is not a regular file")
+                content_id = Path(entry.name).stem
+                if not re.fullmatch(r"[0-9a-f]{64}", content_id):
+                    raise ValueError("archive entry has an invalid content ID")
+                files.append({"name": entry.name, "bytes": info.st_size,
+                              "content_id": content_id, "integrity": "not_rehashed"})
+                total += info.st_size
+        return {"directory": archive_dir.name,
+                "count": len(files) if complete else None,
+                "bytes": total if complete else None,
+                "complete": complete, "archives": files}
+
+    @classmethod
+    def inspect_storage(cls, path):
+        """Return a bounded, read-only snapshot of the fixed trace and archives."""
+        try:
+            path = cls._check_path(path)
+            if not path.parent.exists():
+                snapshot = cls._snapshot(path)
+                snapshot.update(cleanup_available=False,
+                                archive={"directory": path.stem + "-archive", "count": 0,
+                                         "bytes": 0, "complete": True, "archives": []},
+                                read_only=True, native_model_access=False,
+                                records_modified=False)
+                return snapshot
+            with cls._storage_lock(path):
+                snapshot = cls._snapshot(path)
+                snapshot["archive"] = cls._archives_info(path.parent / (path.stem + "-archive"))
+                snapshot["cleanup_available"] = snapshot["exists"] and snapshot["bytes"] > 0
+                snapshot.update(read_only=True, native_model_access=False, records_modified=False)
+                return snapshot
+        except (OSError, ValueError, TypeError) as exc:
+            cls._fail("cleanup_inspection_unavailable", "Native trace storage cannot be inspected safely.", exc)
+        except Exception as exc:
+            cls._fail("cleanup_inspection_unavailable", "Native trace storage lock is unavailable.", exc)
+
+    @classmethod
+    def rotate(cls, path, expected_snapshot_hash):
+        """Atomically preserve the reviewed trace in a fixed archive directory."""
+        try:
+            path = cls._check_path(path)
+            if not path.parent.exists():
+                snapshot = cls._snapshot(path)
+                if snapshot["snapshot_hash"] != expected_snapshot_hash:
+                    cls._fail("cleanup_snapshot_stale", "Native trace changed after inspection; inspect it again.")
+                return {"target": "native_trace", "state": "unchanged_empty",
+                        "snapshot_hash": snapshot["snapshot_hash"], "bytes": 0,
+                        "byte_limit": cls.MAX_BYTES, "archive": None}
+            with cls._storage_lock(path):
+                snapshot = cls._snapshot(path)
+                # A retry after a completed rename is idempotent if that exact
+                # content already occupies its deterministic archive name.
+                archive_dir = path.parent / (path.stem + "-archive")
+                if snapshot["snapshot_hash"] != expected_snapshot_hash:
+                    archived = None
+                    if not snapshot["exists"] and isinstance(expected_snapshot_hash, str):
+                        if archive_dir.is_symlink():
+                            raise ValueError("archive directory is a symlink")
+                        if archive_dir.is_dir():
+                            from .query_contracts import fingerprint
+                            with os.scandir(archive_dir) as entries:
+                                for index, entry in enumerate(entries):
+                                    if index >= cls.MAX_ARCHIVE_RETRY_SCAN:
+                                        break
+                                    if not entry.name.endswith(".jsonl"):
+                                        continue
+                                    info = entry.stat(follow_symlinks=False)
+                                    digest = Path(entry.name).stem
+                                    if (not stat.S_ISREG(info.st_mode)
+                                            or not re.fullmatch(r"[0-9a-f]{64}", digest)):
+                                        raise ValueError("archive entry is unsafe")
+                                    archive_snapshot = fingerprint({"target": "native_trace", "exists": True,
+                                                                     "bytes": info.st_size, "content_sha256": digest})
+                                    if archive_snapshot == expected_snapshot_hash:
+                                        candidate = archive_dir / entry.name
+                                        actual_size, actual_digest = cls._digest_file(candidate)
+                                        if actual_size == info.st_size and actual_digest == digest:
+                                            archived = candidate
+                                        break
+                    if archived is None:
+                        cls._fail("cleanup_snapshot_stale", "Native trace changed after inspection; inspect it again.")
+                    return {"target": "native_trace", "state": "already_archived",
+                            "snapshot_hash": expected_snapshot_hash, "bytes": 0,
+                            "byte_limit": cls.MAX_BYTES, "archive": archived.name,
+                            "read_only": True, "native_model_access": False,
+                            "records_modified": False}
+                if not snapshot["exists"] or snapshot["bytes"] == 0:
+                    return {"target": "native_trace", "state": "unchanged_empty",
+                            "snapshot_hash": snapshot["snapshot_hash"], "bytes": snapshot["bytes"],
+                            "byte_limit": cls.MAX_BYTES, "archive": None,
+                            "read_only": True, "native_model_access": False,
+                            "records_modified": False}
+                if archive_dir.is_symlink():
+                    raise ValueError("archive directory is a symlink")
+                archive_dir.mkdir(mode=0o700, exist_ok=True)
+                if archive_dir.is_symlink() or not archive_dir.is_dir():
+                    raise ValueError("archive directory is unsafe")
+                archive_name = snapshot["content_sha256"] + ".jsonl"
+                destination = archive_dir / archive_name
+                if destination.is_symlink() or destination.exists():
+                    cls._fail("cleanup_archive_conflict", "Native trace archive destination already exists; both files were preserved.")
+                os.replace(path, destination)
+                if os.name != "nt":
+                    for directory in (archive_dir, path.parent):
+                        descriptor = os.open(directory, os.O_RDONLY)
+                        try:
+                            os.fsync(descriptor)
+                        finally:
+                            os.close(descriptor)
+                return {"target": "native_trace", "state": "archived",
+                        "snapshot_hash": snapshot["snapshot_hash"], "bytes": snapshot["bytes"],
+                        "byte_limit": cls.MAX_BYTES, "archive": archive_name,
+                        "read_only": False, "native_model_access": False,
+                        "records_modified": True}
+        except BridgeError:
+            raise
+        except (OSError, ValueError, TypeError) as exc:
+            cls._fail("cleanup_rotation_unavailable", "Native trace could not be rotated safely; preserve the trace and inspect again.", exc)
+        except Exception as exc:
+            cls._fail("cleanup_rotation_unavailable", "Native trace lock or rotation is unavailable; preserve the trace.", exc)
 
     def __init__(self, path, phase):
         self.path, self.phase, self.probe_id = Path(path), phase, uuid4().hex
@@ -26,15 +279,19 @@ class NativeProbeTrace:
                   "at_utc": datetime.now(timezone.utc).isoformat(), **details}
         data = (json.dumps(record, ensure_ascii=False, allow_nan=False) + "\n").encode()
         try:
-            self.path.parent.mkdir(parents=True, exist_ok=True)
-            with self.path.open("ab") as stream:
-                if stream.tell() + len(data) > self.MAX_BYTES:
-                    raise OSError("Trace capacity exceeded")
-                stream.write(data)
-                stream.flush()
-                os.fsync(stream.fileno())
+            path = self._check_path(self.path)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with self._storage_lock(path):
+                with self._open_regular(path, os.O_CREAT | os.O_APPEND | os.O_WRONLY) as stream:
+                    if os.fstat(stream.fileno()).st_size + len(data) > self.MAX_BYTES:
+                        raise OSError("Trace capacity exceeded")
+                    stream.write(data)
+                    stream.flush()
+                    os.fsync(stream.fileno())
         except OSError as exc:
-            raise BridgeError("probe_trace_unavailable", "M4 native trace is full or unwritable; no further native call may start. Preserve the trace.", 409) from exc
+            raise BridgeError("probe_trace_unavailable", "M4 native trace is full or unwritable; no further native call may start. Run preview_journal_cleanup for target=native_trace, review its snapshot, then ask the user before cleanup_journal.", 409) from exc
+        except (ValueError, TypeError) as exc:
+            raise BridgeError("probe_trace_unavailable", "M4 native trace path is unsafe or unavailable; no further native call may start. Run preview_journal_cleanup for target=native_trace, review its snapshot, then ask the user before cleanup_journal.", 409) from exc
 
     def call(self, api, reader, **details):
         self.record(api, "started", **details)

@@ -12,8 +12,23 @@ def validate_repair_request(request):
     if not isinstance(request, dict):
         invalid("Repair request must be an object.")
     action = request.get("action")
+    if not isinstance(action, str):
+        invalid("Repair action must be a string.")
     if action == "inspect_journal":
         keys(request, {"schema_version", "action"}, {"schema_version", "action"})
+    elif action in {"preview_journal_cleanup", "cleanup_journal"}:
+        required = {"schema_version", "action", "target"}
+        if action == "cleanup_journal":
+            required |= {"snapshot_hash", "acknowledgement"}
+        keys(request, required, required)
+        if request["target"] not in ("native_trace", "repair_records"):
+            invalid("Cleanup target must be native_trace or repair_records; arbitrary paths are forbidden.")
+        if action == "cleanup_journal":
+            if (not isinstance(request["snapshot_hash"], str)
+                    or not re.fullmatch(r"[0-9a-f]{64}", request["snapshot_hash"])):
+                invalid("Cleanup requires the exact reviewed snapshot hash.")
+            if request["acknowledgement"] != "confirmed_journal_cleanup":
+                invalid("Ask the user before cleanup; confirmed_journal_cleanup is required.")
     elif action in {"revalidate", "apply", "recover"}:
         required = {"schema_version", "action", "plan_id", "plan_hash"}
         if action == "recover":
@@ -140,7 +155,7 @@ def validate_repair_request(request):
                     or len(set(ids)) != len(ids)):
                 invalid("finding_ids must contain 1..100 distinct finding hashes.")
     else:
-        invalid("Repair action must be preview, revalidate, apply, recover or inspect_journal.")
+        invalid("Repair action must be preview, revalidate, apply, recover, inspect_journal, preview_journal_cleanup or cleanup_journal.")
     if request["schema_version"] != SCHEMA:
         invalid(f"schema_version must be {SCHEMA}.")
 

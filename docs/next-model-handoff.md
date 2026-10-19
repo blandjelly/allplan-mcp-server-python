@@ -1,5 +1,37 @@
 # Current handoff
 
+**2026-10-20 candidate 0.23.0:** owner confirms the latest agent-reported results
+match Allplan, including slab attributes/Priority and ordered column marks.
+The [scoped observation](test-results/m4-agent-observation-2026-10-20.md) retains
+the supplied log; earlier replies and the exact installed manifest are absent.
+Do not repeat those accepted outcomes. Slab/MultiSlab equal bounds do not prove
+shared ownership or two distinct physical targets.
+
+The owner had to clear a size-full journal manually. The supplied log omits the
+exact error, so do not assert which limit caused it: diagnostic append-only trace
+1 MiB, active execution history 128 records, or one execution record 1 MiB.
+New `fix_model_issues` preview_journal_cleanup/cleanup_journal actions inspect a
+fixed target, require a reviewed snapshot and explicit user confirmation, and
+archive bytes without model/document access. Trace rotation restarts active
+logging; record archival only moves verified resolved records and preserves
+execution-ID replay through archived history. Unknown/running, corrupt and
+oversized records stay protected and blocking. No model retry, deletion or silent
+pruning; archive disk retention is separate. Changed snapshots require new consent.
+
+Source **8c71de958c47ab4cb418a62fbd2d55ce76cbc4db** passed
+[CI 39336895867](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39336895867):
+**505 tests on each Windows/Ubuntu Python 3.12 job**, then one package job.
+The original artifact transferred with GitHub digest verified; no rebuild.
+The exact ZIP passed checksum/payload, registration, frozen sync/import, upgrade
+from 0.22.1 and restore, with **38 bridge hashes** and preserved active journal,
+trace/log and archived-execution/trace markers. Focused tests cover 140 unique
+affected/dependent cases, including 19 new maintenance tests through native fakes
+and real MCP HTTP. [0.23.0 package/evidence](../evaluation-packages/0.23.0/README.md).
+The final delivery commit only adds docs/artifacts; no runtime change follows
+that verified source. Native maintenance acceptance is pending the [short 0.23.0 trial](m4-journal-cleanup-0.23.0.pl.md).
+See the [M4 completion assessment](m4-completion-status-2026-10-20.pl.md) for
+prioritized identity, selection, native material, family and multi-file gaps.
+
 **2026-10-19 candidate 0.22.1:** the owner reports that full/short layer lookup
 now works, but writes still block. The [follow-up log](test-results/m4-agent-followup-2026-10-19.md)
 identifies `multiple_views` while recovering execution

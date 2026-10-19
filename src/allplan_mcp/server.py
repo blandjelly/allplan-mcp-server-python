@@ -328,10 +328,29 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     never repeats setters. Follow its journal blockers and next action; if the
     outcome remains unreadable, preserve the journal and do not create a new
     execution ID to bypass it. Native acceptance of this new path is pending.
+    If a trace/journal fills, follow next_action to fix_model_issues
+    preview_journal_cleanup. Ask for user confirmation before cleanup_journal;
+    no shell deletion or automatic retry of Apply. Cleanup preserves unresolved
+    executions and the archived execution-ID replay guard.
     """
     payload = request.model_dump(by_alias=True, exclude_unset=True)
     payload["schema_version"] = "m4-model-edit-1"
-    return _allplan_client().post("/model-edit", payload)
+    try:
+        return _allplan_client().post("/model-edit", payload)
+    except AllplanHostError as exc:
+        if exc.code not in {"repair_journal_full", "probe_trace_unavailable"}:
+            raise
+        target = "repair_records" if exc.code == "repair_journal_full" else "native_trace"
+        # A trace error can occur after native work. Do not infer that retrying
+        # an Apply is safe merely because maintenance is available.
+        return {"action": payload["action"], "state": "journal_maintenance_required",
+                "error": {"code": exc.code, "message": str(exc)}, "request_id": exc.request_id,
+                "execution_id": payload.get("execution_id"), "automatic_retry": False,
+                "outcome": "not_established", "user_confirmation_required": True,
+                "next_action": {"tool": "fix_model_issues", "request": {
+                    "action": "preview_journal_cleanup", "target": target}},
+                "report_text": "Show the cleanup preview and ask the user before archival. "
+                    "After an attempted Apply, inspect/recover its original execution ID; never repeat setters automatically."}
 
 
 @mcp.tool
@@ -486,6 +505,15 @@ def fix_model_issues(request: RepairRequest) -> dict[str, Any]:
     inspect_journal returns verified historical record summaries, capacity and
     unresolved/invalid record blockers without reading or changing the model.
     It neither reconciles records nor establishes current values after Undo.
+    For a full diagnostic trace or execution journal, use preview_journal_cleanup
+    with target=native_trace or repair_records. Show the returned scope/counts and
+    ask the user whether to clean it. Only after their confirmation send
+    cleanup_journal with that exact snapshot_hash and acknowledgement
+    confirmed_journal_cleanup. It archives bytes, never deletes unresolved,
+    corrupt or oversized execution records, and preserves archived execution IDs
+    for setter-free replay. Trace rotation and record archival do not edit Allplan.
+    Changed snapshots require a fresh preview and confirmation. Cleanup is never
+    automatic without user consent and never retries the interrupted model edit.
     The retained mark-numbering gate has bounded native acceptance. The diagnostic
     evaluation_stop control requires disposable_copy_reviewed_recovery_test and
     only the retained unselected two-mark numbering fixture. It stops after the
