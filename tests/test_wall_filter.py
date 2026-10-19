@@ -24,6 +24,10 @@ class WallFilterTests(unittest.TestCase):
         fixtures.WallProbeTests.wall_fixture(self)
         service_type = importlib.import_module("test_allplan_host.wall_filter").WallFilterService
         self.service = service_type(self.handler.model_queries, self.path)
+        # Behavior tests use a deterministic clock so Windows trace fsync
+        # latency cannot turn exclusions/highlights into a budget test.
+        # The dedicated expiry test below advances its own clock explicitly.
+        self.service.queries.clock = lambda: 0.0
         self.ifw = self.module.AllplanIFW
 
     def request(self, **changes):
@@ -88,7 +92,7 @@ class WallFilterTests(unittest.TestCase):
         adapters, native_walls = self.add_walls([200, 220])
         excluded = adapters[0].GetModelElementUUID()
         result = self.run_filter(exclude_model_uuids=[excluded])
-        self.assertEqual(result["coverage"]["criteria_complete"], True)
+        self.assertTrue(result["coverage"]["criteria_complete"], result)
         self.assertEqual(result["counts"]["excluded"], 1)
         self.assertEqual(result["walls"][0]["status"], "excluded")
         self.assertEqual(result["counts"]["matched"], 1)
@@ -271,9 +275,6 @@ class WallFilterTests(unittest.TestCase):
 
     def test_final_trace_failure_after_highlight_reports_unknown_with_ui_started(self):
         self.setUp_filter()
-        # Exercise the final trace failure independently of Windows fsync
-        # latency. The native time-budget guards have separate clock tests.
-        self.service.queries.clock = lambda: 0.0
         module = importlib.import_module("test_allplan_host.wall_filter")
         original = module.NativeProbeTrace.record
         def fail_completion(trace, api, state, **details):
