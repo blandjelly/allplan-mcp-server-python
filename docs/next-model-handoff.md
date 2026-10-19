@@ -1,5 +1,28 @@
 # Current handoff
 
+**2026-10-20 candidate 0.23.0:** owner confirms the latest agent-reported results
+match Allplan, including slab attributes/Priority and ordered column marks.
+The [scoped observation](test-results/m4-agent-observation-2026-10-20.md) retains
+the supplied log; earlier replies and the exact installed manifest are absent.
+Do not repeat those accepted outcomes. Slab/MultiSlab equal bounds do not prove
+shared ownership or two distinct physical targets.
+
+The owner had to clear a size-full journal manually. The supplied log omits the
+exact error, so do not assert which limit caused it: diagnostic append-only trace
+1 MiB, active execution history 128 records, or one execution record 1 MiB.
+New `fix_model_issues` preview_journal_cleanup/cleanup_journal actions inspect a
+fixed target, require a reviewed snapshot and explicit user confirmation, and
+archive bytes without model/document access. Trace rotation restarts active
+logging; record archival only moves verified resolved records and preserves
+execution-ID replay through archived history. Unknown/running, corrupt and
+oversized records stay protected and blocking. No model retry, deletion or silent
+pruning; archive disk retention is separate. Changed snapshots require new consent.
+
+Final automated/packaging evidence will be recorded below. Native maintenance
+acceptance is pending the [short 0.23.0 trial](m4-journal-cleanup-0.23.0.pl.md).
+See the [M4 completion assessment](m4-completion-status-2026-10-20.pl.md) for
+prioritized identity, selection, native material, family and multi-file gaps.
+
 **2026-10-19 candidate 0.22.1:** the owner reports that full/short layer lookup
 now works, but writes still block. The [follow-up log](test-results/m4-agent-followup-2026-10-19.md)
 identifies `multiple_views` while recovering execution

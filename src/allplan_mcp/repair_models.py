@@ -113,5 +113,17 @@ class RepairJournalInspection(ContractModel):
     action: Literal["inspect_journal"]
 
 
-RepairRequest = Annotated[RepairPreview | RepairRevalidate | RepairApply | RepairRecover | RepairJournalInspection,
-                          Field(discriminator="action")]
+class RepairJournalCleanupPreview(ContractModel):
+    action: Literal["preview_journal_cleanup"]
+    target: Literal["native_trace", "repair_records"]
+
+
+class RepairJournalCleanup(ContractModel):
+    action: Literal["cleanup_journal"]
+    target: Literal["native_trace", "repair_records"]
+    snapshot_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    acknowledgement: Literal["confirmed_journal_cleanup"]
+
+
+RepairRequest = Annotated[RepairPreview | RepairRevalidate | RepairApply | RepairRecover | RepairJournalInspection
+                          | RepairJournalCleanupPreview | RepairJournalCleanup, Field(discriminator="action")]

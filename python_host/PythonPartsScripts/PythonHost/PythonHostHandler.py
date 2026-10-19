@@ -70,6 +70,8 @@ class RequestHandler:
             validate_repair_request(request)
             if request["action"] == "inspect_journal":
                 return self.repair_plans.executor.inspect_journal()
+            if request["action"] in {"preview_journal_cleanup", "cleanup_journal"}:
+                return self.repair_plans.executor.journal_maintenance(request)
         if path not in {"/get-allplan-version", "/get-runtime-info"}:
             major = AllplanSettings.AllplanVersion.MainReleaseName()
             if str(major) != "2026":

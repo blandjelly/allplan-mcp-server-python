@@ -526,3 +526,46 @@ Wall properties in mm, without geometry approximation. Multi-tier or unknown
 representations return not_checked. A model_edit predicate such as `< 240`
 binds thickness for the full Wall peer set and revalidates it before writing,
 including previously nonmatching peers; use it instead of a separate UUID handoff.
+
+## Confirmed journal maintenance — M4 0.23.0
+
+The shared `fix_model_issues` tool offers storage maintenance without native
+model/document access. Keep the three limits distinct: active diagnostic trace
+`m4-native-probe.jsonl` is 1 MiB; active execution history holds 128 records;
+each execution record has a separate 1 MiB verification/persistence limit.
+A full trace can block a model-edit preview before any setters. A full execution
+journal blocks new IDs while retained-ID replay remains available.
+
+1. On a capacity error, call `preview_journal_cleanup` with `target=native_trace`
+   or `target=repair_records`. The model-edit response provides the tool/request
+   hint. `inspect_journal` also reports trace usage and both cleanup options.
+2. Show the active bytes/count, archival scope and protected records; **ask the
+   user whether to clean that journal**. Preview never modifies journal data.
+3. Only after confirmation send the returned `after_user_confirmation` request:
+   `cleanup_journal`, the same target and `snapshot_hash`, and
+   `acknowledgement=confirmed_journal_cleanup`. No caller paths or delete flags.
+   A changed snapshot requires a new preview and confirmation.
+
+`native_trace` atomically moves the exact reviewed bytes into a sibling
+`m4-native-probe-archive/<sha256>.jsonl`; subsequent trace events start a new file.
+Appenders and rotation share an OS lock. No model operation is retried. Trace
+archives are preserved; preview uses bounded metadata samples, explicitly
+reporting incomplete archive coverage. They are not automatically expired.
+
+`repair_records` moves only verified, resolved records to `repairs/archive/`.
+Running/unknown, corrupt, oversized, unsafe and colliding entries stay active.
+Their blockers remain; cleanup never reconciles them. Archived IDs remain
+available for exact-request replay without setters, even after restart. Archived
+Recover returns historical resolved state and does not claim current UI values.
+Active+archived conflicts fail closed. A partial batch preserves every ID in one
+location; inspect/preview again to see remaining candidates. A lost cleanup reply
+can be resolved by fresh inspection; never retry the interrupted model edit
+blindly. Archive retention/export and disk-space policy are separate work.
+
+A cleanup inventory covers up to 1024 active records / 64 MiB. Trace inspection
+accepts up to 16 MiB of legacy oversized data. Beyond these bounds or on I/O
+failure, maintenance fails safely and keeps the data. Oversized/unverifiable
+execution records are not deleted to unblock writes.
+
+[Owner trial](m4-journal-cleanup-0.23.0.pl.md) ·
+[M4 completion assessment](m4-completion-status-2026-10-20.pl.md).
