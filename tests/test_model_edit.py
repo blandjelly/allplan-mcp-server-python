@@ -116,6 +116,22 @@ class ModelEditTests(unittest.TestCase):
         self.assertEqual(next_plan["state"], "no_op")
         self.assertNotIn("matched", [check["decision"] for check in next_plan["criteria"]["checks"]])
 
+    def test_layer_exact_name_resolves_only_verified_unique_short_name(self):
+        elements = self.fixture(("",))
+        self.setter_fakes(elements)
+        plan = self.preview(predicate=None, changes=[{"target": {"kind": "layer", "name": "W1"}}])
+        self.assertEqual(plan["changes"][0]["resource"]["short_name"], "W1")
+        self.assertEqual(plan["changes"][0]["resource"]["requested_name"], "W1")
+        self.highlight(plan)
+        self.assertEqual(self.apply(plan)["state"], "completed")
+
+    def test_layer_full_name_without_unique_sdk_lookup_requires_catalog_probe(self):
+        self.fixture(("",))
+        self.assert_code("layer_name_catalog_required", lambda: self.preview(predicate=None, changes=[
+            {"target": {"kind": "layer", "name": "Structural layer"}},
+        ]))
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
     def test_excluded_target_stays_out_of_changes_and_highlight(self):
         elements = self.fixture(("", "", "F60"))
         self.setter_fakes(elements)
@@ -164,6 +180,26 @@ class ModelEditTests(unittest.TestCase):
         self.base.ElementsSelectService.SelectAllElements.assert_not_called()
         self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
 
+    def test_lowercase_polish_attribute_name_binds_actual_project_spelling(self):
+        self.fixture(("",))
+        self.attribute_catalog({935: "Materiał"})
+        plan = self.preview(predicate=None, changes=[{
+            "target": {"kind": "attribute", "name": "materiał"},
+            "value": "bloczki gazobetonowe"}])
+        self.assertTrue(plan["apply_available"], plan)
+        self.assertEqual(plan["changes"][0]["resource"]["name"], "Materiał")
+        self.assertEqual(plan["changes"][0]["resource"]["attribute_id"], 935)
+        self.assert_code("attribute_name_unresolved", lambda: self.preview(
+            predicate=None, changes=[{"target": {"kind": "attribute", "name": "Material"},
+                                      "value": "concrete"}]))
+
+    def test_name_lookup_runtime_failure_is_not_retried_with_other_spellings(self):
+        self.fixture(("",))
+        self.base.AttributeService.GetAttributeID.side_effect = RuntimeError("native failure")
+        self.assert_code("attribute_name_unresolved", lambda: self.preview(
+            changes=[{"target": {"kind": "attribute", "name": "materiał"}, "value": "x"}]))
+        self.assertEqual(self.base.AttributeService.GetAttributeID.call_count, 1)
+
     def test_unsupported_native_attribute_type_fails_before_scan(self):
         self.fixture(("",))
         self.attribute_type_names[935] = "Unsupported"
@@ -193,6 +229,44 @@ class ModelEditTests(unittest.TestCase):
         self.assertEqual(self.apply(plan)["state"], "completed")
         self.assertEqual(elements[0].GetAttributes.return_value,
                          [(935, ""), (20001, 7), (20002, True)])
+
+    def test_integer_checkbox_boolean_uses_sdk_bound_zero_one_encoding(self):
+        elements = self.fixture(("",))
+        elements[0].GetAttributes.return_value.extend([(20001, 0)])
+        self.attribute_catalog({935: "Fire", 20001: "Element nośny"})
+        self.attribute_type_names[20001] = "Integer"
+        controls = SimpleNamespace(CheckBox=41, Edit=42)
+        self.base.AttributeService.AttributeControlType = controls
+        self.base.AttributeService.GetAttributeControlType.return_value = controls.CheckBox
+        self.setter_fakes(elements)
+
+        plan = self.preview(predicate=None, changes=[{
+            "target": {"kind": "attribute", "attribute_id": 20001}, "value": True,
+        }])
+        change = plan["changes"][0]
+        self.assertEqual(change["new_value"], 1)
+        self.assertEqual(change["resource"]["native_type_member"], "Integer")
+        self.assertEqual(change["resource"]["boolean_binding"], {
+            "control_type_member": "CheckBox", "false_value": 0, "true_value": 1,
+            "value": True, "encoded_value": 1,
+        })
+        self.assertEqual(change["resource"]["value_codec"], "integer_checkbox_boolean")
+        self.highlight(plan)
+        self.assertEqual(self.apply(plan)["state"], "completed")
+        self.assertEqual(elements[0].GetAttributes.return_value, [(935, ""), (20001, 1)])
+
+    def test_integer_boolean_requires_runtime_checkbox_control_member(self):
+        self.fixture(("",))
+        self.attribute_catalog({935: "Fire", 20001: "Element nośny"})
+        self.attribute_type_names[20001] = "Integer"
+        controls = SimpleNamespace(Edit=42)
+        self.base.AttributeService.AttributeControlType = controls
+        self.base.AttributeService.GetAttributeControlType.return_value = controls.Edit
+
+        self.assert_code("attribute_type_unsupported", lambda: self.preview(predicate=None, changes=[{
+            "target": {"kind": "attribute", "attribute_id": 20001}, "value": True,
+        }]))
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
 
     def test_exact_undefined_numeric_old_value_is_preserved_through_apply_recovery_and_noop(self):
         elements = self.fixture(("",))
@@ -458,6 +532,18 @@ class ModelEditTests(unittest.TestCase):
                     predicate=None, changes=[{"target": {"kind": "attribute", "attribute_id": 20001}, "value": value}]))
         self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
 
+    def test_integer_element_nośny_does_not_guess_boolean_encoding(self):
+        elements = self.fixture(("",))
+        elements[0].GetAttributes.return_value.extend([(20001, 0)])
+        self.attribute_catalog({935: "Fire", 20001: "Element nośny"})
+
+        for value_type, value in (("auto", True), ("boolean", True)):
+            with self.subTest(value_type=value_type):
+                self.assert_code("attribute_type_unsupported", lambda: self.preview(
+                    predicate=None, changes=[{"target": {"kind": "attribute", "attribute_id": 20001},
+                                             "value_type": value_type, "value": value}]))
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
     def test_explicit_enum_label_roundtrip_apply_replay_and_noop(self):
         elements = self.fixture(("",))
         elements[0].GetAttributes.return_value = [(20001, "Existing building")]
@@ -495,6 +581,28 @@ class ModelEditTests(unittest.TestCase):
         self.base.AttributeService.GetEnumValueStringFromID.return_value = "different"
         self.assert_code("attribute_enum_unresolved", lambda: self.call(request))
         self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+        self.base.AttributeService.GetEnumValues.assert_not_called()
+
+    def test_auto_sdk_enum_type_binds_exact_label_without_enumerating_catalog(self):
+        elements = self.fixture(("old",))
+        elements[0].GetAttributes.return_value.extend([(20001, "Existing")])
+        self.attribute_catalog({935: "Fire", 20001: "Construction category"})
+        self.attribute_type_enum.Enum = 105
+        self.attribute_type_names[20001] = "Enum"
+        enum_values = {"New": 0, "Existing": 1}
+        self.base.AttributeService.GetEnumIDFromValueString.side_effect = lambda ident, label: enum_values[label]
+        self.base.AttributeService.GetEnumValueStringFromID.side_effect = lambda ident, key: next(
+            label for label, value in enum_values.items() if value == key)
+        self.setter_fakes(elements)
+
+        plan = self.preview(predicate=None, changes=[{
+            "target": {"kind": "attribute", "attribute_id": 20001}, "value": "New",
+        }])
+        self.assertEqual(plan["changes"][0]["resource"]["data_type"], "enum")
+        self.assertEqual(plan["changes"][0]["resource"]["enum_binding"], {"enum_id": 0, "value": "New"})
+        self.highlight(plan)
+        self.assertEqual(self.apply(plan)["state"], "completed")
+        self.assertEqual(self.base.ElementsAttributeService.ChangeAttributes.call_args.args[0], [(20001, "New")])
         self.base.AttributeService.GetEnumValues.assert_not_called()
 
     def test_enum_binding_marker_is_required_by_executor_and_native_adapter(self):

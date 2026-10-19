@@ -1,5 +1,62 @@
 # Current handoff
 
+**2026-10-19 candidate 0.22.0:** the owner confirms that the
+[0.21.1 agent log](test-results/m4-agent-observation-0.21.1-2026-10-19.md)
+agrees with Allplan: the 200 mm Wall moved to W1; full layer-name lookup failed;
+the first Beam attribute edit left an unresolved readback and blocked subsequent
+Beam/Slab writes. No raw native payload/manifest was supplied, so the exact
+incident cause remains unproven. The 0.21.1 source was still in PR #16; this
+topic includes its exact history and targets develop/m4 through PR #17.
+
+The candidate improves exact native target resolution, skips only positively
+null/deleted wrappers, uses SDK-bound real numeric equivalence without changing
+raw evidence, and reconciles M4 journal targets after a fresh project/document
+identity check without a global criterion scan. It retains unknown-result
+blocking and no-retry guards. Integer CheckBox booleans bind 0/1 from targeted
+SDK metadata; auto Enum labels use targeted round trips. Full/short layer names
+use verified lookup and an Allplan 2026 paginated catalog with explicit user
+confirmation for uncertain matches. Dates/vectors, computed-only writes and
+native geometry edits remain unsupported. New native behavior is pending the
+[short 0.22.0 trial](m4-agent-fixes-0.22.0.pl.md); retain all accepted historical
+observations and the original journal.
+
+Source **4cc0a752960c6f05293891208c4122b4e21f00c7** passed
+[CI 39294288929](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39294288929):
+**480 tests on each Windows/Ubuntu Python 3.12 job**, then one package job.
+The original CI artifact transferred successfully; its SHA-256 matched GitHub's
+digest and no local rebuild was made. The exact delivered ZIP passed payload,
+checksum, registration, frozen sync/import, upgrade from 0.21.1 and restore,
+with **37 bridge hashes** verified and journal/trace/bridge-log preservation.
+[0.22.0 package and evidence](../evaluation-packages/0.22.0/README.md).
+Initial CI exposed an existing Windows disk-latency dependency in the final
+Wall-filter trace-failure test; its clock is now injected for that failure
+scenario, while native time budgets are unchanged. The final layer review also
+retains continuation after a partial match and binds user-confirmed ID/names.
+Native 0.22.0 behavior remains pending the short trial above.
+
+**Previous candidate 0.21.1, native acceptance pending.** The owner
+identifies the 2026-10-18 Allplan observations as version **0.21.0**; no exact
+build hash or raw MCP payloads are available. The owner confirms Column U=0.2,
+Wall U=0.15 and fire class F60→F90; `Poziom_Górny` stayed 500 after a partial
+write, and the requested Wall layer change to W1 was refused without a write.
+Do not repeat the accepted U/fire/query/highlight observations. Candidate 0.21.1
+works on equivalent Wall wrappers, raw attribute/pagination preservation,
+project-name roundtrip and target-scoped completeness diagnostics. Unknown Wall
+tier behavior remains guarded; `Poziom_Górny` is unsupported/unverified, and
+the log cannot establish the cause of the W1 refusal.
+Source **41e0cabf1352ffc54b5e35b68adbf3fed498e8d4** passed
+[CI 39146255209](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39146255209):
+**448 tests on each Windows/Ubuntu Python 3.12 job**, then one package job.
+CI artifact transfer returned HTTP 403; one permitted local fallback build used
+the same clean source. The exact delivered ZIP passed checksum/payload checks,
+fresh registration, frozen sync/import, upgrade from 0.21.0 and restore, with
+**36 bridge hashes** and preserved journal/trace/bridge log.
+[Package and evidence](../evaluation-packages/0.21.1/README.md).
+New native acceptance remains pending. Next owner trial is only Wall listing and
+lower-initial `materiał` lookup, optional read-only Beam/Slab samples, then W1
+Wall `<240 mm` preview/diagnostics and Apply/UI/readback/Undo only if enabled.
+[Short 0.21.1 trial](m4-agent-fixes-0.21.1.pl.md) · [Owner observation](test-results/m4-agent-observation-2026-10-18.md) · [Original log](test-results/evidence/m4-agent-test-2026-10-18.md).
+
 **2026-10-18 source candidate 0.21.0:** owner [v2 agent observation](test-results/m4-agent-observation-v2-2026-10-18.md)
 reports live host/highlighting and prepared U/Material/Wall-layer plans, but no
 write attempts; raw payloads/exact build are missing. Agent treated a generic

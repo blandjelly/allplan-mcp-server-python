@@ -21,7 +21,18 @@ class AttributeEditTarget(ContractModel):
 
 class LayerEditTarget(ContractModel):
     kind: Literal["layer"]
-    short_name: Annotated[str, Field(min_length=1, max_length=16)]
+    short_name: Annotated[str, Field(min_length=1, max_length=16)] | None = None
+    name: Annotated[str, Field(min_length=1, max_length=128)] | None = None
+    expected_layer_id: int | None = Field(default=None, ge=0, le=65535)
+    expected_name: str | None = Field(default=None, min_length=1, max_length=512)
+
+    @model_validator(mode="after")
+    def has_one_name_binding(self):
+        if (self.short_name is None) == (self.name is None):
+            raise ValueError("Layer edits require exactly one short_name or exact name.")
+        if (self.expected_layer_id is None) != (self.expected_name is None):
+            raise ValueError("A confirmed layer requires both expected_layer_id and expected_name.")
+        return self
 
 
 EditTarget = Annotated[AttributeEditTarget | LayerEditTarget, Field(discriminator="kind")]

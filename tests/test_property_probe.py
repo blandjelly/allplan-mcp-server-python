@@ -113,6 +113,17 @@ class PropertyProbeTests(unittest.TestCase):
         self.assertEqual(self.records()[-1]["exception_type"], "SystemExit")
         self.base.AttributeService.GetAttributeType.assert_not_called()
 
+    def test_polish_initial_case_miss_resolves_without_alias_or_catalog(self):
+        self.fixture()
+        self.base.AttributeService.GetAttributeID.side_effect = lambda doc, name: 981 if name == "Wartość U" else -1
+        self.base.AttributeService.GetAttributeName.side_effect = lambda doc, ident: "Wartość U"
+        result = self.probe(phase="attribute_name", attribute_name="wartość U")
+        self.assertEqual(result["attribute_id"], {"status": "observed", "value": 981})
+        self.assertFalse(result["exact_name_round_trip"])
+        self.assertTrue(result["case_insensitive_name_round_trip"])
+        self.assertFalse(result["semantic_alias_verified"])
+        self.base.ElementsSelectService.SelectAllElements.assert_not_called()
+
     def test_invalid_phase_fields_and_passive_scope_reject_without_attribute_reads(self):
         self.fixture()
         for request in ({"phase": "attribute_definition", "attribute_id": True},
@@ -131,3 +142,38 @@ class PropertyProbeTests(unittest.TestCase):
         self.assert_code("probe_trace_unavailable", lambda: self.probe(phase="layer_name", layer_short_name="W1"))
         self.assertEqual(self.path.read_bytes(), data)
         self.base.LayerService.GetIDByShortName.assert_not_called()
+
+    def test_layer_name_probe_preserves_legacy_short_lookup_and_full_name_guidance(self):
+        self.fixture()
+        result = self.probe(phase="layer_name", layer_short_name="W1")
+        self.assertEqual(result["resolution"]["status"], "resolved")
+        self.assertEqual(result["resolution"]["candidates"][0]["short_name"], "W1")
+        result = self.probe(phase="layer_name", layer_name="Ogólne03")
+        self.assertEqual(result["resolution"]["status"], "catalog_scan_required")
+        self.assertEqual(result["next_action"]["request"]["phase"], "layer_catalog")
+        self.assertEqual(result["next_action"]["request"]["layer_name"], "Ogólne03")
+
+    def test_layer_catalog_page_emits_all_exact_candidates_and_confirmation(self):
+        self.fixture()
+        result = self.probe(phase="layer_catalog", layer_name="Columns", offset=7, limit=2)
+        catalog = result["catalog"]
+        self.assertEqual(catalog["status"], "confirmation_required")
+        self.assertEqual(catalog["candidate_ids"], [7])
+        self.assertEqual(catalog["candidates"][0]["short_name"], "COL")
+        self.assertEqual(result["next_action"]["action"], "ask_user_confirmation")
+        self.assertTrue(result["next_action"]["search_incomplete"])
+        continuation = result["next_action"]["continue_search"]
+        self.assertEqual(continuation["request"]["offset"], 9)
+        self.assertEqual(continuation["request"]["candidate_ids"], [7])
+        self.assertNotIn("schema_version", continuation["request"])
+        self.assertFalse(catalog["scan"]["complete"])
+
+    def test_layer_name_contract_rejects_multiple_spellings_and_oversized_catalog_page(self):
+        self.fixture()
+        for request in (
+            {"phase": "layer_name", "layer_name": "W1", "layer_short_name": "W1"},
+            {"phase": "layer_name"},
+            {"phase": "layer_catalog", "layer_name": "W1", "limit": 8193},
+        ):
+            self.assert_code("invalid_payload", lambda request=request: self.probe(**request))
+        self.coord.GetInputViewDocument.assert_not_called()

@@ -14,6 +14,7 @@ class PropertiesRequest(ContractModel):
     native_types: list[NativeFamily] = Field(default_factory=lambda: ["Column_TypeUUID", "Wall_TypeUUID"], min_length=1, max_length=6)
     attribute_names: list[Annotated[str, Field(min_length=1, max_length=128)]] = Field(default_factory=list, max_length=16)
     layer_short_names: list[Annotated[str, Field(min_length=1, max_length=16)]] = Field(default_factory=list, max_length=16)
+    layer_names: list[Annotated[str, Field(min_length=1, max_length=128)]] = Field(default_factory=list, max_length=16)
     sample_limit: int = Field(default=10, ge=1, le=20)
     metadata_limit: int = Field(default=64, ge=1, le=128)
     max_adapters: int = Field(default=5000, ge=1, le=10000)
@@ -74,7 +75,28 @@ class ElementAttributesProbeInput(ContractModel):
 
 class LayerNameProbeInput(ContractModel):
     phase: Literal["layer_name"]
-    layer_short_name: str = Field(min_length=1, max_length=16)
+    layer_short_name: str | None = Field(default=None, min_length=1, max_length=16)
+    layer_name: str | None = Field(default=None, min_length=1, max_length=128)
+
+    @model_validator(mode="after")
+    def exactly_one_layer_spelling(self):
+        if (self.layer_short_name is None) == (self.layer_name is None):
+            raise ValueError("Provide exactly one of layer_short_name or layer_name.")
+        return self
 
 
-PropertyProbeRequest = Annotated[ColumnProbeInput | WallProbeInput | AttributeNameProbeInput | AttributeDefinitionProbeInput | ElementAttributesProbeInput | LayerNameProbeInput, Field(discriminator="phase")]
+class LayerCatalogProbeInput(ContractModel):
+    phase: Literal["layer_catalog"]
+    layer_name: str = Field(min_length=1, max_length=128)
+    offset: int = Field(default=0, ge=0, le=65536)
+    limit: int = Field(default=8192, ge=1, le=8192)
+    candidate_ids: list[Annotated[int, Field(ge=0, le=65535)]] = Field(default_factory=list, max_length=8192)
+
+    @model_validator(mode="after")
+    def distinct_candidate_ids(self):
+        if len(set(self.candidate_ids)) != len(self.candidate_ids):
+            raise ValueError("candidate_ids must be distinct.")
+        return self
+
+
+PropertyProbeRequest = Annotated[ColumnProbeInput | WallProbeInput | AttributeNameProbeInput | AttributeDefinitionProbeInput | ElementAttributesProbeInput | LayerNameProbeInput | LayerCatalogProbeInput, Field(discriminator="phase")]

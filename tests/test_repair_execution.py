@@ -5,10 +5,12 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 from uuid import uuid4
 
 import test_model_repair as fixtures
+import test_model_edit as model_edit_fixtures
 from allplan_mcp.repair_models import RepairRequest
 from pydantic import TypeAdapter, ValidationError
 
@@ -94,7 +96,10 @@ class ExecutionTests(unittest.TestCase):
                 elements = self.writable_fixture()
                 request = self.apply_request(self.preview())
                 getattr(elements[5], method).return_value = value
-                self.assert_code("target_not_writable", lambda: self.call(request))
+                # The query layer now excludes an explicitly deleted adapter
+                # before execution and correctly invalidates this plan.
+                expected_code = "repair_conflict" if method == "IsDeleted" else "target_not_writable"
+                self.assert_code(expected_code, lambda: self.call(request))
                 self.base.ElementsLayerService.ChangeLayer.assert_not_called()
                 self.assertFalse(list(Path(self.directory.name).glob("*.json")))
         elements = self.writable_fixture()
@@ -249,8 +254,131 @@ class ExecutionTests(unittest.TestCase):
         self.assertEqual(self.call(request)["outcomes"][0]["state"], "unknown")
         recovery = self.recover(request)
         self.assertEqual(recovery["outcomes"][0]["reason"], "new_value_observed")
+        self.assertFalse(recovery["write_blocked"])
+        self.assertEqual(recovery["blockers"], [])
+        self.assertEqual(recovery["next_action"]["action"], "preview")
         self.base.ElementsLayerService.ChangeLayer.assert_called_once()
         self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+
+class ModelEditRecoveryTests(unittest.TestCase):
+    """M4 recovery uses only current project/document identity and exact targets."""
+
+    element = model_edit_fixtures.ModelEditTests.element
+    adapter = model_edit_fixtures.ModelEditTests.adapter
+    native = model_edit_fixtures.ModelEditTests.native
+    prepare = model_edit_fixtures.ModelEditTests.prepare
+    prepare_context = model_edit_fixtures.ModelEditTests.prepare_context
+    request = model_edit_fixtures.ModelEditTests.request
+    plan_request = model_edit_fixtures.ModelEditTests.plan_request
+    preview = model_edit_fixtures.ModelEditTests.preview
+    highlight = model_edit_fixtures.ModelEditTests.highlight
+    attribute_catalog = model_edit_fixtures.ModelEditTests.attribute_catalog
+
+    def setUp(self):
+        model_edit_fixtures.ModelEditTests.setUp(self)
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.handler.repair_plans.executor.path = Path(self.directory.name)
+
+    def call(self, request):
+        return self.handler.handle("/model-edit", request)
+
+    def test_known_old_value_recovery_avoids_failed_global_criterion_scan(self):
+        elements = model_edit_fixtures.ModelEditTests.fixture(self, ("old",))
+        model_edit_fixtures.ModelEditTests.setter_fakes(self, elements)
+        plan = model_edit_fixtures.ModelEditTests.preview(
+            self, predicate=None,
+            changes=[{"target": {"kind": "attribute", "attribute_id": 935},
+                      "value_type": "text", "value": "new", "mode": "replace"}])
+        model_edit_fixtures.ModelEditTests.highlight(self, plan)
+        self.base.ElementsAttributeService.ChangeAttributes.side_effect = RuntimeError("reply lost")
+        execution_id = uuid4().hex
+        result = self.call({"schema_version": "m4-model-edit-1", "action": "apply",
+                            "plan_id": plan["plan_id"], "plan_hash": plan["plan_hash"],
+                            "execution_id": execution_id,
+                            "acknowledgement": "disposable_copy_reviewed_plan"})
+        self.assertEqual(result["outcomes"][0]["state"], "unknown")
+        executor = self.handler.repair_plans.executor
+        second_id = uuid4().hex
+        second_record = copy.deepcopy(executor.load(execution_id))
+        second_record.update(execution_id=second_id, request_hash="f" * 64)
+        executor.save(second_record)
+
+        # A full predicate/model scan can fail on stale wrappers. Recovery
+        # must still observe the exact journal target under matching project
+        # and document identity, without ever retrying the setter.
+        self.handler.repair_plans.source_observation = lambda *args: (_ for _ in ()).throw(
+            AssertionError("global source scan must not run during M4 recover"))
+        recovered = self.call({"schema_version": "m4-model-edit-1", "action": "recover",
+                              "execution_id": execution_id})
+        self.assertEqual(recovered["recovery"]["observations"][0]["state"], "old_value_observed")
+        self.assertEqual(recovered["outcomes"][0]["state"], "reconciled")
+        self.assertTrue(recovered["write_blocked"])
+        self.assertEqual(recovered["blockers"], ["recovery_required"])
+        self.assertEqual(recovered["next_action"], {"action": "recover", "execution_id": second_id})
+        self.assertEqual(recovered["recovery"]["identity"]["method"], "context_probe_no_model_scan")
+
+        second_recovery = self.call({"schema_version": "m4-model-edit-1", "action": "recover",
+                                     "execution_id": second_id})
+        self.assertFalse(second_recovery["write_blocked"])
+        self.assertEqual(second_recovery["blockers"], [])
+        self.assertEqual(second_recovery["next_action"]["action"], "preview")
+        self.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+
+    def test_executor_scope_requires_integer_checkbox_binding_marker(self):
+        elements = model_edit_fixtures.ModelEditTests.fixture(self, ("old",))
+        elements[0].GetAttributes.return_value.extend([(20001, 0)])
+        self.attribute_catalog({20001: "Element nośny"})
+        self.attribute_type_names[20001] = "Integer"
+        controls = SimpleNamespace(CheckBox=41, Edit=42)
+        self.base.AttributeService.AttributeControlType = controls
+        self.base.AttributeService.GetAttributeControlType.return_value = controls.CheckBox
+        self.base.ElementsAttributeService.ChangeAttributes.side_effect = lambda *args: args[1]
+        plan = model_edit_fixtures.ModelEditTests.preview(self, predicate=None, changes=[{
+            "target": {"kind": "attribute", "attribute_id": 20001}, "value": True}])
+        executor = self.handler.repair_plans.executor
+        self.assertTrue(executor.model_edit_scope(plan))
+
+        missing = copy.deepcopy(plan)
+        missing["changes"][0]["resource"].pop("boolean_binding")
+        self.assertFalse(executor.model_edit_scope(missing))
+        tampered = copy.deepcopy(plan)
+        tampered["changes"][0]["resource"]["boolean_binding"]["encoded_value"] = 0
+        self.assertFalse(executor.model_edit_scope(tampered))
+
+    def test_real_attribute_integer_native_readback_reconciles_without_retry(self):
+        elements = model_edit_fixtures.ModelEditTests.fixture(self, (3,))
+        self.attribute_type_names[935] = "Double"
+        def writes_integer_payload(attributes, targets, *flags):
+            self.assertEqual(attributes, [(935, 5.0)])
+            targets[0].GetAttributes.return_value = [(935, 5)]
+            return targets
+        self.base.ElementsAttributeService.ChangeAttributes.side_effect = writes_integer_payload
+        plan = model_edit_fixtures.ModelEditTests.preview(self, predicate=None, changes=[{
+            "target": {"kind": "attribute", "attribute_id": 935},
+            "value_type": "real", "value": 5.0, "mode": "replace"}])
+        model_edit_fixtures.ModelEditTests.highlight(self, plan)
+
+        native_repairs = importlib.import_module("test_allplan_host.native_repairs")
+        original_resolve = native_repairs.resolve
+        calls = [0]
+        def fail_first_fresh_resolve(*args, **kwargs):
+            if kwargs.get("writable") is not True:
+                calls[0] += 1
+                if calls[0] == 1:
+                    raise self.module.BridgeError("repair_conflict", "synthetic fresh root conflict", 409)
+            return original_resolve(*args, **kwargs)
+        with patch.object(native_repairs, "resolve", side_effect=fail_first_fresh_resolve):
+            result = model_edit_fixtures.ModelEditTests.apply(self, plan)
+            self.assertEqual(result["outcomes"][0]["state"], "unknown")
+            recovered = model_edit_fixtures.ModelEditTests.recover(self, result["execution_id"])
+
+        self.assertEqual(recovered["recovery"]["observations"][0]["state"], "new_value_observed")
+        self.assertEqual(recovered["outcomes"][0]["state"], "reconciled")
+        self.assertEqual(recovered["outcomes"][0]["readback"]["value"], 5)
+        self.assertFalse(recovered["write_blocked"])
+        self.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
 
 
 if __name__ == "__main__":

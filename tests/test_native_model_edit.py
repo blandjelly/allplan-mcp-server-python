@@ -1,5 +1,6 @@
 """Generic native attribute/layer adapter boundaries with fake Allplan APIs."""
 import importlib
+import types
 import unittest
 
 import test_m1_completion as fixtures
@@ -104,6 +105,32 @@ class NativeModelEditTests(unittest.TestCase):
         self.edit_adapter().write(self.base, element, change)
         self.base.ElementsAttributeService.ChangeAttributes.assert_called_once_with([(83, "R30")], [element], False, False)
 
+    def test_integer_checkbox_binding_is_exact_and_optional(self):
+        element = self.element(attrs=[(83, 0)])
+        self.native([element])
+        self.adapter_module.BaseElementAdapterList = list
+        adapter = self.edit_adapter()
+        change = {"adapter_version": "m4-model-edit-1", "operation": "set_attribute",
+                  "resource": {"attribute_id": 83, "data_type": "integer",
+                               "native_type_member": "Integer", "value_codec": "integer_checkbox_boolean",
+                               "boolean_binding": {"control_type_member": "CheckBox", "false_value": 0,
+                                                   "true_value": 1, "value": True, "encoded_value": 1}},
+                  "old_value": {"status": "observed", "value": 0}, "new_value": 1}
+        adapter.write(self.base, element, change)
+        self.base.ElementsAttributeService.ChangeAttributes.assert_called_once_with([(83, 1)], [element], False, False)
+
+        self.base.ElementsAttributeService.ChangeAttributes.reset_mock()
+        change["resource"]["boolean_binding"]["encoded_value"] = 0
+        with self.assertRaises(self.module.BridgeError):
+            adapter.write(self.base, element, change)
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+        change["resource"].pop("boolean_binding")
+        change["resource"].pop("value_codec")
+        change["new_value"] = 7
+        adapter.write(self.base, element, change)
+        self.base.ElementsAttributeService.ChangeAttributes.assert_called_once_with([(83, 7)], [element], False, False)
+
     def test_add_rejects_stored_read_omission_and_replace_rejects_unknown_old_value(self):
         element = self.element()
         self.native([element])
@@ -155,6 +182,53 @@ class NativeModelEditTests(unittest.TestCase):
         change["native_type"] = "Wall_TypeUUID"
         self.assert_code("repair_conflict", lambda: adapter.resolve(
             self.coord.GetInputViewDocument(), self.base, query, change))
+
+    def test_unrelated_broken_hierarchy_cannot_poison_exact_target_resolution(self):
+        target = self.element(1, name="Beam_TypeUUID")
+        unrelated = self.element(2, name="Wall_TypeUUID")
+        self.native([target, unrelated])
+        # A stale/unrelated adapter can fail while walking its parent chain.
+        # Direct model identity lets resolution safely exclude it first.
+        self.adapter_module.BaseElementAdapterParentElementService.GetParentElement = (
+            lambda element: (_ for _ in ()).throw(RuntimeError("unrelated parent unavailable"))
+            if element is unrelated else types.SimpleNamespace(IsNull=lambda: True))
+        change = {"native_type": "Beam_TypeUUID", "ref": {
+            "drawing_file": 101, "model_uuid": target.GetModelElementUUID.return_value,
+            "type_uuid": target.GetElementAdapterType.return_value.GetGuid.return_value}}
+        resolved = self.edit_adapter().resolve(self.coord.GetInputViewDocument(), self.base,
+                                               self.handler.model_queries, change)
+        self.assertIs(resolved, target)
+        self.assertEqual(unrelated.GetElementUUID.call_count, 0)
+
+    def test_child_only_enumeration_resolves_its_component_root(self):
+        target = self.element(1, name="Beam_TypeUUID")
+        child = self.element(2, name="BeamAxis_TypeUUID")
+        self.native([child])
+        self.adapter_module.BaseElementAdapterParentElementService.GetParentElement = (
+            lambda element: target if element is child else types.SimpleNamespace(IsNull=lambda: True))
+        change = {"native_type": "Beam_TypeUUID", "ref": {
+            "drawing_file": 101, "model_uuid": target.GetModelElementUUID.return_value,
+            "type_uuid": target.GetElementAdapterType.return_value.GetGuid.return_value}}
+        resolved = self.edit_adapter().resolve(self.coord.GetInputViewDocument(), self.base,
+                                               self.handler.model_queries, change)
+        self.assertIs(resolved, target)
+
+    def test_deleted_same_identity_wrapper_is_skipped_only_when_lifecycle_is_known(self):
+        target = self.element(1, name="Beam_TypeUUID")
+        deleted = self.element(1, name="Beam_TypeUUID")
+        deleted.GetElementUUID.return_value = "10000000-0000-4000-8000-000000000002"
+        deleted.IsDeleted.return_value = True
+        self.native([deleted, target])
+        self.adapter_module.BaseElementAdapterParentElementService.GetParentElement = (
+            lambda element: (_ for _ in ()).throw(RuntimeError("deleted wrapper has no parent"))
+            if element is deleted else types.SimpleNamespace(IsNull=lambda: True))
+        change = {"native_type": "Beam_TypeUUID", "ref": {
+            "drawing_file": 101, "model_uuid": target.GetModelElementUUID.return_value,
+            "type_uuid": target.GetElementAdapterType.return_value.GetGuid.return_value}}
+        resolved = self.edit_adapter().resolve(self.coord.GetInputViewDocument(), self.base,
+                                               self.handler.model_queries, change)
+        self.assertIs(resolved, target)
+        self.assertEqual(deleted.GetElementUUID.call_count, 0)
 
     def assert_code(self, code, callback):
         with self.assertRaises(self.module.BridgeError) as error:

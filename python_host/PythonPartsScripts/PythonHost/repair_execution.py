@@ -13,8 +13,21 @@ from .query_contracts import fingerprint
 from .transport import BridgeError
 
 
+def _error_details(exc):
+    # Include only host-generated BridgeError text. Native exception strings
+    # can contain object representations or local paths, so expose their type.
+    message = str(exc) if isinstance(exc, BridgeError) else type(exc).__name__
+    return {"reason": getattr(exc, "code", type(exc).__name__),
+            "message": message[:512]}
+
+
 def same_observation(change, observed, expected):
     if change.get("adapter_version") == "m4-model-edit-1":
+        if change.get("resource", {}).get("data_type") == "real":
+            if (isinstance(observed, dict) and isinstance(expected, dict)
+                    and type(observed.get("value")) in (int, float)
+                    and type(expected.get("value")) in (int, float)):
+                return _real_observation_equal(observed, expected)
         return fingerprint(observed) == fingerprint(expected)
     return observed == expected
 
@@ -23,9 +36,45 @@ def new_value_observed(change, observed):
     if observed.get("status") != "observed":
         return False
     if change.get("adapter_version") == "m4-model-edit-1":
+        if change.get("resource", {}).get("data_type") == "real":
+            return _finite_real_equal(observed.get("value"), change.get("new_value"))
         return (type(observed.get("value")) is type(change["new_value"])
                 and observed.get("value") == change["new_value"])
     return observed.get("value") == change["new_value"]
+
+
+def _finite_real_equal(left, right):
+    import math
+    return (type(left) in (int, float) and type(right) in (int, float)
+            and math.isfinite(left) and math.isfinite(right) and left == right)
+
+
+def _real_observation_equal(left, right):
+    if not isinstance(left, dict) or not isinstance(right, dict):
+        return False
+    if {k: v for k, v in left.items() if k != "value"} != {k: v for k, v in right.items() if k != "value"}:
+        return False
+    return _finite_real_equal(left.get("value"), right.get("value"))
+
+
+def _model_edit_fields_match(actual, expected, changes):
+    """Compare final fields with type-aware equality for explicitly bound Real attributes."""
+    actual = copy.deepcopy(actual)
+    expected = copy.deepcopy(expected)
+    for change in changes:
+        if change.get("resource", {}).get("data_type") != "real":
+            continue
+        model_uuid, field = change["ref"]["model_uuid"], change["field"]
+        if model_uuid not in actual or model_uuid not in expected:
+            return False
+        if field not in actual[model_uuid] or field not in expected[model_uuid]:
+            return False
+        if not _real_observation_equal(actual[model_uuid][field], expected[model_uuid][field]):
+            return False
+        # Other unedited values and all observation metadata retain exact
+        # fingerprint comparison below.
+        actual[model_uuid][field] = copy.deepcopy(expected[model_uuid][field])
+    return fingerprint(actual) == fingerprint(expected)
 
 
 class RepairExecutor:
@@ -239,14 +288,17 @@ class RepairExecutor:
     @staticmethod
     def model_edit_scope(plan):
         """Separate evaluation contract; does not broaden historical M3 permissions."""
-        from .native_model_edit import replaceable_attribute_value, value_matches, valid_enum_binding
+        from .native_model_edit import (replaceable_attribute_value, value_matches,
+                                        valid_boolean_binding, valid_enum_binding)
         from .native_readers import COMPONENT_TYPES
         changes, files = plan["changes"], plan["scope"]["included_files"]
         if (plan.get("schema_version") != "m4-model-edit-1" or plan["state"] != "preview_ready"
                 or plan.get("blocked") or not 1 <= len(changes) <= RepairExecutor.MAX_CHANGES
                 or len(files) != 1 or files[0]["state"] != "active_foreground"
                 or not all(plan["coverage"].get(k) is True for k in
-                           ("criteria_complete", "requested_scope_complete", "returned_fields_complete"))):
+                           ("criteria_complete", "requested_scope_complete"))
+                or plan["coverage"].get("required_destination_fields_complete",
+                                        plan["coverage"].get("returned_fields_complete")) is not True):
             return False
         seen = set()
         for change in changes:
@@ -277,6 +329,7 @@ class RepairExecutor:
                         or change["field"] != f"attribute:{resource['attribute_id']}"
                         or old.get("computed_only") is True
                         or not valid_enum_binding(change)
+                        or not valid_boolean_binding(change)
                         or not value_matches(change["new_value"], resource.get("data_type"))):
                     return False
                 if change["operation"] == "add_attribute":
@@ -421,9 +474,11 @@ class RepairExecutor:
             if self.plans.queries.clock() - started >= 20:
                 outcome["reason"] = "execution_time_budget"
                 break
+            stage = "pre_set_resolve"
             try:
                 native_owners = []
                 element = native_repairs.resolve(doc, base, self.plans.queries, change, writable=True, adapter_owners=native_owners)
+                stage = "pre_set_read"
                 old = native_repairs.read(base, self.plans.queries, element, change)
                 if not same_observation(change, old, change["old_value"]):
                     outcome.update(state="conflict", reason="old_value_changed", readback=old)
@@ -432,10 +487,11 @@ class RepairExecutor:
                     outcome["reason"] = "execution_time_budget"
                     break
             except Exception as exc:
-                outcome.update(state="conflict", reason=getattr(exc, "code", type(exc).__name__))
+                outcome.update(state="conflict", **_error_details(exc), stage=stage)
                 break
             outcome.update(state="unknown", reason="setter_may_have_run")
             self.save(record)  # Write-ahead marker: a crash cannot authorize replay.
+            stage = "setter"
             try:
                 native_repairs.write(base, element, change)
                 if index == 0 and request.get("evaluation_stop"):
@@ -445,7 +501,9 @@ class RepairExecutor:
                     return self.result(record)
                 # Never trust returned/stale adapters or setter return values as success.
                 fresh_owners = []
+                stage = "fresh_resolve"
                 fresh = native_repairs.resolve(doc, base, self.plans.queries, change, adapter_owners=fresh_owners)
+                stage = "readback"
                 observed = native_repairs.read(base, self.plans.queries, fresh, change)
                 outcome["readback"] = observed
                 if new_value_observed(change, observed):
@@ -455,7 +513,7 @@ class RepairExecutor:
                 else:
                     outcome.update(state="unknown", reason="readback_differs_or_unavailable")
             except Exception as exc:
-                outcome.update(state="unknown", reason=getattr(exc, "code", type(exc).__name__))
+                outcome.update(state="unknown", **_error_details(exc), stage=stage)
             self.save(record)
             if outcome["state"] != "applied":
                 break
@@ -465,8 +523,8 @@ class RepairExecutor:
             record[report_key], after = self.plans.source_observation(doc, base, settings,
                 record.get("criterion_request", record.get("audit_request")))
             actual = {e["ref"]["model_uuid"]: e["fields"] for e in after["elements"]}
-            fields_match = (fingerprint(actual) == fingerprint(expected) if plan.get("source_kind") == "typed_model_edit"
-                            else actual == expected)
+            fields_match = (_model_edit_fields_match(actual, expected, record["changes"])
+                            if plan.get("source_kind") == "typed_model_edit" else actual == expected)
             record["audited_fields_match_plan"] = (after["coverage"]["requested_scope_complete"]
                                                     and after["scope"] == before["scope"] and fields_match)
             if record["state"] == "completed" and (not record["audited_fields_match_plan"]
@@ -482,33 +540,89 @@ class RepairExecutor:
 
     def recover(self, doc, base, settings, record):
         # Recovery is observation only; session-local refs are never resumed.
-        report, _ = self.plans.source_observation(doc, base, settings,
-            record.get("criterion_request", record.get("audit_request")))
-        if not report["coverage"]["criteria_complete" if "criterion_request" in record else "audit_complete"]:
-            raise BridgeError("repair_recovery_unavailable", "Recovery audit is incomplete.", 409)
-        current = report["checks"][0]["ref"] if report["checks"] else None
         reference = record["changes"][0]["ref"]
+        criterion_request = record.get("criterion_request", {})
+        if criterion_request.get("schema_version") == "m4-model-edit-1":
+            # A global criterion scan can be incomplete because Allplan still
+            # exposes stale/unrelated wrappers after a setter. Recovery only
+            # needs to prove project/document identity, then read each exact
+            # journal target. This remains read-only and cannot authorize a
+            # retry or bypass the original project/document guard.
+            from .model_context import context_probe
+            context = context_probe(doc, base, settings, {})
+            project = context.get("project", {})
+            document = context.get("document_id", {})
+            if (project.get("status") != "observed"
+                    or project.get("value", {}).get("key_status") != "observed"
+                    or document.get("status") != "observed"):
+                raise BridgeError("repair_recovery_unavailable", "Current project/document identity is unavailable.", 409)
+            current = {"project_key": project["value"]["key"],
+                       "document_id": document["value"]}
+            identity = {"state": "observed", "project_key": current["project_key"],
+                        "document_id": current["document_id"],
+                        "method": "context_probe_no_model_scan"}
+            report = {"state": "identity_verified", "coverage": "exact_journal_targets_only"}
+        else:
+            report, _ = self.plans.source_observation(doc, base, settings,
+                record.get("criterion_request", record.get("audit_request")))
+            if not report["coverage"]["criteria_complete" if "criterion_request" in record else "audit_complete"]:
+                raise BridgeError("repair_recovery_unavailable", "Recovery audit is incomplete.", 409)
+            current = report["checks"][0]["ref"] if report["checks"] else None
+            identity = {"state": "observed" if current else "not_checked",
+                        "method": "recovery_audit"}
         if current is None or any(current[k] != reference[k] for k in ("project_key", "document_id")):
             raise BridgeError("repair_conflict", "Open the original disposable project/document for recovery.", 409)
         observations = []
         for index, change in enumerate(record["changes"]):
+            stage = "recovery_resolve"
             try:
                 native_owners = []
                 element = native_repairs.resolve(doc, base, self.plans.queries, change, adapter_owners=native_owners)
+                stage = "recovery_read"
                 value = native_repairs.read(base, self.plans.queries, element, change)
                 state = ("new_value_observed" if new_value_observed(change, value)
                          else "old_value_observed" if same_observation(change, value, change["old_value"]) else "conflict")
             except Exception as exc:
-                value, state = {"status": "not_checked", "reason": getattr(exc, "code", type(exc).__name__)}, "unknown"
-            observations.append({"state": state, "readback": value})
+                details = _error_details(exc)
+                value, state = {"status": "not_checked", **details}, "unknown"
+            else:
+                details = {}
+            observations.append({"state": state, "readback": value, "stage": stage, **details})
             if record["outcomes"][index]["state"] == "unknown" and state in {"new_value_observed", "old_value_observed"}:
                 record["outcomes"][index].update(state="reconciled", reason=state, readback=value)
         record["state"] = "stopped" if record["state"] == "running" else record["state"]
         record["recovery"] = {"observations": observations, ("criteria" if "criterion_request" in record else "audit"): report,
+                              "identity": identity,
                               "identity_limit": "project/document/model match; copy identity and mutation causality not proven"}
         self.save(record)
         result = self.result(record)
         result.update(action="recover", read_only=True)
+        blockers, blocking_ids = [], []
+        journal_files = sorted(self.path.glob("*.json"))
+        if len(journal_files) > self.MAX_RECORDS:
+            blockers.append("capacity_exceeded")
+        for file in journal_files[:self.MAX_RECORDS]:
+            try:
+                saved = self.load(file.stem)
+            except BridgeError:
+                if "invalid_record" not in blockers:
+                    blockers.append("invalid_record")
+                continue
+            if saved is not None and (saved["state"] == "running"
+                    or any(o["state"] == "unknown" for o in saved["outcomes"])):
+                blocking_ids.append(saved["execution_id"])
+        if blocking_ids:
+            blockers.insert(0, "recovery_required")
+        if "capacity_exceeded" in blockers and "journal_full" not in blockers:
+            blockers.append("journal_full")
+        if blocking_ids:
+            next_action = {"action": "recover", "execution_id": blocking_ids[0]}
+        elif blockers:
+            next_action = {"action": "inspect_journal"}
+        else:
+            next_action = {"action": "preview", "reason": "fresh_preview_required_before_apply"}
+        result.update(write_blocked=bool(blockers), blockers=blockers,
+                      blocking_execution_ids=blocking_ids, next_action=next_action)
         return result
 
     @staticmethod

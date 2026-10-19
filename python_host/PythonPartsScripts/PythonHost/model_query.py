@@ -8,7 +8,7 @@ from collections import Counter, OrderedDict
 from uuid import uuid4
 
 from .native_readers import COMPONENT_TYPES, semantic_family
-from .model_context import context_probe, guid, integer, observation, text
+from .model_context import boolean, context_probe, guid, integer, observation, text
 from .query_contracts import BASIC_FIELDS, GEOMETRY_FIELDS, SCHEMA, attribute_id, evaluate, fingerprint, predicate_fields, scalar, validate_request
 from .transport import BridgeError
 
@@ -167,7 +167,8 @@ class ModelQueryService:
                           "nonmatching_model_identities": 0, "predicate_not_checked": 0,
                           "identity_not_checked": 0, "conflicting_model_identities": 0,
                           "duplicate_representations": 0, "file_identity_not_checked": 0, "file_state_conflicts": 0,
-                          "hierarchy_not_checked": 0, "non_component_adapters": 0})
+                          "hierarchy_not_checked": 0, "stale_adapters_skipped": 0,
+                          "non_component_adapters": 0})
         try:
             adapters = base.ElementsSelectService.SelectAllElements(doc) if files else []
             if adapter_owners is not None:
@@ -196,6 +197,25 @@ class ModelQueryService:
                 counts["in_scope_adapters"] += 1
                 chain = None
                 if request.get("component_kind") in {"top_level_component", "semantic_component"} or "hierarchy" in needed:
+                    # SelectAllElements may retain deleted/null wrappers. Drop
+                    # one only on positive lifecycle evidence; unavailable or
+                    # malformed lifecycle reads leave the existing hierarchy
+                    # path unchanged and do not create a new completeness gate.
+                    stale = False
+                    for method in ("IsNull", "IsDeleted"):
+                        try:
+                            if boolean(getattr(adapter, method)()):
+                                stale = True
+                                break
+                        except Exception:
+                            pass
+                    if stale:
+                        counts["stale_adapters_skipped"] += 1
+                        record = {"signed_drawing_file_number": signed["value"],
+                                  "lifecycle": "positively_null_or_deleted"}
+                        add_source(record)
+                        sample("stale_adapter_skipped", record)
+                        continue
                     from .native_readers import root_adapter
                     try:
                         stop_types = COMPONENT_TYPES if request.get("component_kind") == "semantic_component" else None

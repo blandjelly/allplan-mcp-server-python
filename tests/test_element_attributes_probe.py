@@ -78,6 +78,93 @@ class ElementAttributesProbeTests(unittest.TestCase):
         self.assertEqual(error.exception.code, "probe_scope_unavailable")
         self.root.GetAttributes.assert_not_called()
 
+    def test_equivalent_wrappers_for_one_root_view_are_accepted(self):
+        self.setup_element()
+        wrapper = self.element(ident=9, attrs=[(83, "R60"), (20001, 7), (20002, True)])
+        wrapper.GetModelElementUUID.return_value = self.root.GetModelElementUUID.return_value
+        wrapper.GetElementUUID.return_value = self.root.GetElementUUID.return_value
+        wrapper.GetElementAdapterType.return_value.GetGuid.return_value = self.root.GetElementAdapterType.return_value.GetGuid.return_value
+        wrapper.GetDisplayName.return_value = self.root.GetDisplayName.return_value
+        self.base.ElementsSelectService.SelectAllElements.return_value.append(wrapper)
+        result = self.probe()
+        self.assertEqual(result["total_matches"], 3)
+        self.assertEqual([row["attribute_id"] for row in result["attributes"]], [83, 20001, 20002])
+        self.assertEqual(result["adapter_attribute_consistency"], "consistent")
+        self.root.GetAttributes.assert_called_once()
+        wrapper.GetAttributes.assert_called_once()
+
+    def test_distinct_wrappers_with_different_attributes_are_not_used(self):
+        self.setup_element()
+        wrapper = self.element(ident=9, attrs=[(83, "R30"), (20001, 7), (20002, True)])
+        wrapper.GetModelElementUUID.return_value = self.root.GetModelElementUUID.return_value
+        wrapper.GetElementUUID.return_value = self.root.GetElementUUID.return_value
+        wrapper.GetElementAdapterType.return_value.GetGuid.return_value = self.root.GetElementAdapterType.return_value.GetGuid.return_value
+        wrapper.GetDisplayName.return_value = self.root.GetDisplayName.return_value
+        self.base.ElementsSelectService.SelectAllElements.return_value.append(wrapper)
+        result = self.probe()
+        self.assertEqual(result["attributes"]["status"], "not_checked")
+        self.assertEqual(result["attributes"]["reason"], "conflicting_adapter_attributes")
+        self.assertEqual(result["adapter_attribute_consistency"], "conflicting")
+        self.assertFalse(result["listing_complete"])
+        self.root.GetAttributes.assert_called_once()
+        wrapper.GetAttributes.assert_called_once()
+
+    def test_repeated_same_adapter_instance_is_read_once(self):
+        self.setup_element()
+        self.base.ElementsSelectService.SelectAllElements.return_value.append(self.root)
+        result = self.probe()
+        self.assertEqual(result["adapter_attribute_representation_count"], 1)
+        self.assertEqual(result["attributes"][0]["attribute_id"], 83)
+        self.root.GetAttributes.assert_called_once()
+
+    def test_multiple_views_or_conflicting_root_fields_still_block(self):
+        for conflict in ("view", "display_name"):
+            with self.subTest(conflict=conflict):
+                self.setup_element()
+                wrapper = self.element(ident=9, attrs=[(83, "R60"), (20001, 7), (20002, True)])
+                wrapper.GetModelElementUUID.return_value = self.root.GetModelElementUUID.return_value
+                wrapper.GetElementAdapterType.return_value.GetGuid.return_value = self.root.GetElementAdapterType.return_value.GetGuid.return_value
+                if conflict == "view":
+                    wrapper.GetElementUUID.return_value = "10000000-0000-4000-8000-000000000099"
+                else:
+                    wrapper.GetElementUUID.return_value = self.root.GetElementUUID.return_value
+                    wrapper.GetDisplayName.return_value = "Different component"
+                self.base.ElementsSelectService.SelectAllElements.return_value.append(wrapper)
+                with self.assertRaises(self.module.BridgeError) as error:
+                    self.probe()
+                self.assertEqual(error.exception.code, "probe_scope_unavailable")
+                self.root.GetAttributes.assert_not_called()
+                wrapper.GetAttributes.assert_not_called()
+
+    def test_unfiltered_metadata_failures_keep_raw_rows_and_allow_pagination(self):
+        self.setup_element()
+        self.base.AttributeService.GetAttributeName.side_effect = lambda doc, ident: (
+            (_ for _ in ()).throw(RuntimeError("unavailable")) if ident == 20001
+            else {83: "Klasa odporności ogniowej", 20002: "Aktywny"}[ident])
+        first = self.probe(limit=2)
+        self.assertEqual([row["attribute_id"] for row in first["attributes"]], [83, 20001])
+        self.assertEqual(first["attributes"][1]["value"], 7)
+        self.assertEqual(first["attributes"][1]["name"]["status"], "not_checked")
+        self.assertEqual(first["total_matches_status"], "observed")
+        self.assertEqual(first["next_offset"], 2)
+        self.assertFalse(first["listing_complete"])
+        second = self.probe(offset=2, limit=2)
+        self.assertEqual([row["attribute_id"] for row in second["attributes"]], [20002])
+        self.assertIsNone(second["next_offset"])
+        self.assertTrue(second["listing_complete"])
+        self.assertFalse(second["metadata_complete"])
+
+    def test_filtered_listing_reports_unknown_name_coverage(self):
+        self.setup_element()
+        self.base.AttributeService.GetAttributeName.side_effect = lambda doc, ident: (
+            (_ for _ in ()).throw(RuntimeError("unavailable")) if ident == 20001
+            else {83: "Klasa odporności ogniowej", 20002: "Aktywny"}[ident])
+        result = self.probe(name_contains="not-present")
+        self.assertEqual(result["attributes"], [])
+        self.assertEqual(result["filter_unknown_name_count"], 1)
+        self.assertEqual(result["total_matches_status"], "not_checked")
+        self.assertFalse(result["listing_complete"])
+
     def test_invalid_identity_and_unbounded_page_reject_before_document_access(self):
         self.setup_element()
         self.coord.GetInputViewDocument.reset_mock()

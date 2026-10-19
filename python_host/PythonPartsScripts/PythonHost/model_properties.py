@@ -11,6 +11,34 @@ from .runtime_info import runtime_info
 from .transport import BridgeError
 
 
+def resolve_attribute_name(doc, base, name, read):
+    """Try bounded spelling variants, verifying each ID against project metadata.
+
+    No aliases, transliteration or definition enumeration: an English label
+    must not silently resolve to a different Polish/native property.
+    """
+    import unicodedata
+    normalized = unicodedata.normalize("NFC", name.strip())
+    variants = dict.fromkeys((name, normalized, normalized[:1].upper() + normalized[1:]))
+    for spelling in variants:
+        try:
+            ident = positive_id(read("AttributeService.GetAttributeID",
+                                     lambda: base.AttributeService.GetAttributeID(doc, spelling)))
+        except BridgeError:
+            raise
+        except (ValueError, TypeError):
+            continue
+        actual = bounded_text(read("AttributeService.GetAttributeName",
+                                   lambda: base.AttributeService.GetAttributeName(doc, ident)))
+        if unicodedata.normalize("NFC", actual).casefold() != normalized.casefold():
+            raise ValueError("Resolved attribute name differs from the requested spelling")
+        if positive_id(read("AttributeService.GetAttributeID",
+                            lambda: base.AttributeService.GetAttributeID(doc, actual))) != ident:
+            raise ValueError("Attribute ID/name round trip differs")
+        return ident, actual
+    raise ValueError("Attribute name was not found; inspect element_attributes")
+
+
 def attribute_values(adapter, base, check):
     check()
     result = []
@@ -119,13 +147,38 @@ def discover_properties(service, doc, base, settings, request):
         if resolved["status"] == "observed":
             layer_ids.add(resolved["value"]["layer_id"])
         layer_resolution.append({"requested_short_name": name, "resolution": resolved})
+    named_layer_resolution = []
+    if doc_id["status"] == "observed":
+        from .layer_names import resolve_direct_layer_name
+        def layer_read(api, callback):
+            result = read(callback)
+            if result["status"] != "observed":
+                raise ValueError("Layer lookup API did not return a verified value")
+            return result["value"]
+        for name in request.get("layer_names", []):
+            resolution = read(lambda name=name: resolve_direct_layer_name(
+                base, doc, doc_id["value"], name, layer_read))
+            if resolution["status"] == "observed" and resolution["value"]["status"] == "resolved":
+                layer_ids.add(resolution["value"]["candidates"][0]["layer_id"])
+            named_layer_resolution.append({"requested_name": name, "resolution": resolution,
+                                           "catalog_scan_required": resolution.get("value", {}).get("status") == "catalog_scan_required"})
+    else:
+        named_layer_resolution = [{"requested_name": name, "resolution": {
+            "status": "not_checked", "value": None, "reason": "document_id_unavailable"},
+            "catalog_scan_required": True} for name in request.get("layer_names", [])]
     layers = []
     for ident in sorted(layer_ids):
         def layer_field(method):
             if doc_id["status"] != "observed":
                 return {"status": "not_checked", "value": None, "reason": "document_id_unavailable"}
             return read(lambda: bounded_text(getattr(base.LayerService, method)(ident, doc_id["value"])))
-        layers.append({"layer_id": ident, "name": layer_field("GetNameByID"), "short_name": layer_field("GetShortNameByID"),
+        from .layer_names import _long_name
+        name_read = layer_field("GetNameByID")
+        short_read = layer_field("GetShortNameByID")
+        long_read = {"status": "not_checked", "value": None, "reason": "layer_name_unavailable"}
+        if name_read["status"] == "observed" and short_read["status"] == "observed":
+            long_read = {"status": "observed", "value": _long_name(name_read["value"], short_read["value"])}
+        layers.append({"layer_id": ident, "name": name_read, "short_name": short_read, "long_name": long_read,
                        "write_eligibility": "not_checked", "create": "unsupported_by_this_tool"})
 
     registry = []
@@ -163,10 +216,13 @@ def discover_properties(service, doc, base, settings, request):
               "sample": {"limit": request.get("sample_limit", 10), "returned": len(samples),
                          "is_full_selection": len(samples) == len(snapshot["elements"]), "elements": samples},
               "attribute_name_resolution": name_resolution, "attribute_metadata": attributes,
-              "layer_name_resolution": layer_resolution, "layer_metadata": layers,
+              "layer_name_resolution": layer_resolution, "layer_full_name_resolution": named_layer_resolution,
+              "layer_metadata": layers,
               "support_registry": registry, "source_fingerprint": snapshot["source_fingerprint"],
               "api_symbols": {name: callable(getattr(base.AttributeService, name, None)) for name in (
                   "GetAttributeID", "GetAttributeName", "GetAttributeType", "GetAttributeUnit", "GetEnumValues")},
+              "layer_api_symbols": {name: callable(getattr(base.LayerService, name, None)) for name in (
+                  "GetIDByShortName", "GetNameByID", "GetShortNameByID", "GetAllLayerNames", "GetIDByName")},
               "semantics": {"attribute_material": "separate_from_native.material",
                             "organizational.layer": "separate_from_wall_tier_and_visual.surface",
                             "concrete_class": "requires_actual_project_catalog_no_C35_substitution",
