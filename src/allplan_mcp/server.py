@@ -283,7 +283,9 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     direct lookup is insufficient. Follow its continuation and confirmation hints.
     If a name is ambiguous or a catalog match is uncertain, show the actual full
     and short names and ask the user to confirm the target before using its exact
-    short_name in a new preview. Never translate or invent a layer short name.
+    confirmed_targets entry in a new preview, including expected_layer_id and
+    expected_name. This keeps the user's choice bound to the same ID and names.
+    Never translate or invent a layer short name.
     Attribute material is distinct from native material
     and surface; this route does not update native properties.
     is_unset matches observed null/blank. Combine explicit undefined values with any.
@@ -387,7 +389,9 @@ def model_property_probe(request: PropertyProbeRequest) -> dict[str, Any]:
     searches full and short names without removing Polish diacritics. Its page
     trace records the batch before native reads. Ask the user to confirm the
     returned full name and short_name whenever confirmation_required is returned;
-    use the confirmed short_name for a new model_edit preview. An incomplete
+    preserve the returned confirmed_targets entry, including expected ID/name,
+    for a new model_edit preview. Continue searching with continue_search when
+    the user needs more candidates. An incomplete
     scan or an API error never proves a layer absent or authorizes a write.
     The broad model_properties route stays blocked. Native acceptance is pending.
     """

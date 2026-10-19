@@ -96,7 +96,14 @@ def _preview(request):
                 invalid("mode must be replace, upsert or add.")
         elif target.get("kind") == "layer":
             keys(change, {"target"}, {"target"})
-            keys(target, {"kind", "short_name", "name"}, {"kind"})
+            keys(target, {"kind", "short_name", "name", "expected_layer_id", "expected_name"}, {"kind"})
+            if ("expected_layer_id" in target) != ("expected_name" in target):
+                invalid("A confirmed layer requires both expected_layer_id and expected_name.")
+            if "expected_layer_id" in target:
+                bounded_int(target["expected_layer_id"], 0, 65535, "expected_layer_id")
+                expected = target["expected_name"]
+                if not isinstance(expected, str) or not expected.strip() or len(expected) > 512:
+                    invalid("expected_name must be the bounded exact API layer name.")
             if ("short_name" in target) == ("name" in target):
                 invalid("Layer target requires exactly one short_name or exact name.")
             field = "short_name" if "short_name" in target else "name"

@@ -367,7 +367,11 @@ lookup, so follow the `layer_catalog` page requests returned by `layer_name`.
 The catalog verifies candidate IDs through short-name round trips, preserves
 Polish diacritics, and reports range coverage and read errors separately.
 When it requests confirmation, show the actual full name, short name and ID,
-then use the user's confirmed exact short name in a fresh preview. A partial
+then use its returned `confirmed_targets` entry in a fresh preview, preserving
+`expected_layer_id` and `expected_name` along with the short name. The binder
+and Apply revalidation check those exact values. `continue_search` remains
+available after a partial page finds a candidate, so later duplicate names can
+be collected; partial search never implies a unique global match. A partial
 scan never authorizes an edit or proves absence. No layer is created or renamed.
 
 M4 recovery verifies the current project key and document ID, then observes

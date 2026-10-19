@@ -24,7 +24,9 @@ wymaga poniższej krótkiej próby na zachowanej kopii roboczej.
   stronicowany, odczytowy `model_property_probe` z fazą `layer_catalog`.
   Agent kontynuuje po `next_action`; po znalezieniu niepewnego dopasowania pokazuje
   pełną nazwę, skrót i ID do potwierdzenia. W podglądzie zmiany używa następnie
-  potwierdzonego skrótu. Nazw nie tłumaczy i nie usuwa polskich znaków.
+  potwierdzonego skrótu razem z oczekiwanym ID i nazwą. Może kontynuować
+  wyszukiwanie kolejnych dopasowań; wynik częściowy nie dowodzi unikalności.
+  Nazw nie tłumaczy i nie usuwa polskich znaków.
 
 ## Krótka próba w Allplanie
 

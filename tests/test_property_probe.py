@@ -161,6 +161,11 @@ class PropertyProbeTests(unittest.TestCase):
         self.assertEqual(catalog["candidate_ids"], [7])
         self.assertEqual(catalog["candidates"][0]["short_name"], "COL")
         self.assertEqual(result["next_action"]["action"], "ask_user_confirmation")
+        self.assertTrue(result["next_action"]["search_incomplete"])
+        continuation = result["next_action"]["continue_search"]
+        self.assertEqual(continuation["request"]["offset"], 9)
+        self.assertEqual(continuation["request"]["candidate_ids"], [7])
+        self.assertNotIn("schema_version", continuation["request"])
         self.assertFalse(catalog["scan"]["complete"])
 
     def test_layer_name_contract_rejects_multiple_spellings_and_oversized_catalog_page(self):

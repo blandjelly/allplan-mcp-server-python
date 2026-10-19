@@ -134,8 +134,9 @@ class BeamRecoveryHTTPTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual((candidate["short_name"], candidate["long_name"]), ("SZ_OGÓ03", "Ogólne03"))
             native.base.ElementsLayerService.ChangeLayer.assert_not_called()
             # This simulates the user's explicit choice of the displayed pair.
+            target = page["next_action"]["confirmed_targets"][0]
             preview = (await client.call_tool("model_edit", {"request": native.request(
-                predicate=None, changes=[{"target": {"kind": "layer", "short_name": candidate["short_name"]}}])})).data
+                predicate=None, changes=[{"target": target}])})).data
             highlighted = (await client.call_tool("model_edit", {
                 "request": preview["next_action"]["request"]})).data
             applied = (await client.call_tool("model_edit", {"request": {

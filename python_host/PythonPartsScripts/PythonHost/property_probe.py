@@ -317,22 +317,30 @@ class PropertyProbeService:
                                  offset=catalog["scan"]["start"], end_exclusive=catalog["scan"]["end_exclusive"],
                                  read_calls=calls[0], read_errors=catalog["scan"]["page_read_errors"],
                                  candidates=len(catalog["candidate_ids"]))
+                    continuation = None
+                    if catalog["scan"]["next_offset"] is not None:
+                        continuation = {"tool": "model_property_probe", "request": {
+                            "phase": "layer_catalog", "layer_name": requested_name,
+                            "offset": catalog["scan"]["next_offset"], "limit": request.get("limit", 8192),
+                            "candidate_ids": catalog["candidate_ids"]}}
                     if catalog["status"] == "confirmation_required":
                         result["next_action"] = {"action": "ask_user_confirmation", "candidates": catalog["candidates"],
-                                                  "prompt": "Confirm the intended layer by its exact full name and short_name. Do not substitute another candidate."}
-                    elif catalog["scan"]["next_offset"] is not None:
-                        result["next_action"] = {"tool": "model_property_probe", "request": {
-                            "phase": "layer_catalog",
-                            "layer_name": requested_name, "offset": catalog["scan"]["next_offset"],
-                            "limit": request.get("limit", 8192),
-                            "candidate_ids": catalog["candidate_ids"]}}
+                            "search_incomplete": (not catalog["scan"]["range_scanned_complete"]
+                                                  or catalog["scan"]["page_read_errors"] > 0),
+                            "confirmed_targets": [{"kind": "layer", "short_name": item["short_name"],
+                                "expected_layer_id": item["layer_id"], "expected_name": item["name"]}
+                                for item in catalog["candidates"]],
+                            "continue_search": continuation,
+                            "prompt": "Other matching layers may exist outside this page or at unreadable IDs. Continue the search, or ask the user to explicitly confirm the displayed full name, unique short_name and ID. Do not imply that this is the only matching layer."}
+                    elif continuation is not None:
+                        result["next_action"] = continuation
                     elif catalog["status"] == "scan_exhausted_no_match":
                         result["next_action"] = {"action": "ask_user_for_exact_short_name",
                                                   "prompt": "No exact layer candidate was found in the scanned ID range. Ask the user for the exact short name shown by Allplan before planning an edit."}
                     else:
                         result["next_action"] = None
                     result["catalog_policy"] = (
-                        "A partial scan never authorizes an edit. Confirm an exact candidate with the user, then send its verified short_name to model_edit. "
+                        "A partial scan never authorizes an edit. Confirm an exact candidate with the user, then send its confirmed_targets entry to model_edit without dropping the expected ID/name. "
                         "Read errors are counted per page and the lookup never proves absence; when the ID range is exhausted without a candidate, ask for the exact short name.")
                 else:
                     result["resolution"] = resolve_direct_layer_name(
@@ -344,6 +352,9 @@ class PropertyProbeService:
                     elif result["resolution"]["status"] == "ambiguous":
                         result["next_action"] = {"action": "ask_user_confirmation",
                                                   "candidates": result["resolution"]["candidates"],
+                                                  "confirmed_targets": [{"kind": "layer", "short_name": item["short_name"],
+                                                      "expected_layer_id": item["layer_id"], "expected_name": item["name"]}
+                                                      for item in result["resolution"]["candidates"]],
                                                   "prompt": "Confirm the intended layer by its exact full name and short_name. Do not substitute another candidate."}
                     else:
                         result["next_action"] = None

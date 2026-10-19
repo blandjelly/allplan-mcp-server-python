@@ -83,12 +83,37 @@ class LayerNameTests(unittest.TestCase):
         result = self.resolve_direct_layer_name(self.base, self.doc, self.doc_id, "Ogólne03", self.reader)
         self.assertEqual(result["status"], "catalog_scan_required")
 
+    def test_confirmed_layer_rejects_changed_id_or_name_before_planning(self):
+        import importlib
+        editor = importlib.import_module("test_allplan_host.model_edit")
+        self.doc.GetDocumentID.return_value = self.doc_id
+        trace = Mock()
+        trace.call.side_effect = lambda _api, callback: callback()
+        target = {"kind": "layer", "short_name": "SZ_OGÓ03", "expected_layer_id": 3702,
+                  "expected_name": "SZ_OGÓ03 (Ogólne03)"}
+        bound = editor.bind_changes(self.doc, self.base, {"changes": [{"target": target}]}, lambda: None, trace)
+        self.assertEqual(bound[0]["resource"]["confirmed_name"], target["expected_name"])
+        for field, value in (("expected_layer_id", 3703), ("expected_name", "SZ_OGÓ03 (Renamed)")):
+            with self.subTest(field=field), self.assertRaises(editor.BridgeError) as error:
+                editor.bind_changes(self.doc, self.base, {"changes": [{"target": {**target, field: value}}]},
+                                    lambda: None, trace)
+            self.assertEqual(error.exception.code, "layer_confirmation_stale")
+
     def test_catalog_scan_reports_all_exact_full_name_candidates_without_guessing(self):
         result = self.scan_layer_name_page(self.base, self.doc, self.doc_id, "Ogólne03", 3700, 4, self.reader)
         self.assertEqual(result["status"], "confirmation_required")
         self.assertEqual([item["layer_id"] for item in result["candidates"]], [3702, 3703])
         self.assertFalse(result["scan"]["complete"])
-        self.assertIsNone(result["scan"]["next_offset"])
+        self.assertEqual(result["scan"]["next_offset"], 3704)
+
+    def test_candidate_on_first_page_preserves_search_for_later_duplicate_name(self):
+        first = self.scan_layer_name_page(self.base, self.doc, self.doc_id, "Ogólne03", 3702, 1, self.reader)
+        self.assertEqual(first["candidate_ids"], [3702])
+        self.assertEqual(first["scan"]["next_offset"], 3703)
+        second = self.scan_layer_name_page(self.base, self.doc, self.doc_id, "Ogólne03",
+                                           first["scan"]["next_offset"], 1, self.reader,
+                                           prior_candidate_ids=first["candidate_ids"])
+        self.assertEqual(second["candidate_ids"], [3702, 3703])
 
     def test_catalog_scan_is_bounded_and_completes_at_documented_end(self):
         result = self.scan_layer_name_page(self.base, self.doc, self.doc_id, "unknown", 65535, 1, self.reader)

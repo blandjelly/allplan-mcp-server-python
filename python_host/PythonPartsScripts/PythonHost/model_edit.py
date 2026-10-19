@@ -113,6 +113,12 @@ def bind_changes(doc, base, request, check, trace):
                     "resource": {"layer_id": ident, "short_name": actual,
                                  **({"requested_name": requested_name} if "name" in target else {})},
                     "new_value": ident}
+            if "expected_layer_id" in target:
+                current_name = bounded_text(read("LayerService.GetNameByID",
+                    lambda: base.LayerService.GetNameByID(ident, doc_id)))
+                if ident != target["expected_layer_id"] or current_name != target["expected_name"]:
+                    raise BridgeError("layer_confirmation_stale", "The confirmed layer ID or name changed. Resolve and confirm the intended layer again.", 409)
+                item["resource"]["confirmed_name"] = current_name
         else:
             ident = target.get("attribute_id")
             if ident is None:

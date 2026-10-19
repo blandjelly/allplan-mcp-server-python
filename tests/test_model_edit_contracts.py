@@ -67,6 +67,8 @@ class ModelEditContractTests(unittest.TestCase):
 
     def test_invalid_type_values_unknown_keys_predicates_and_missing_bindings_fail_parity(self):
         cases = [
+            self.request(changes=[{"target": {"kind": "layer", "short_name": "W1", "expected_layer_id": 8}}]),
+            self.request(changes=[{"target": {"kind": "layer", "short_name": "W1", "expected_layer_id": True, "expected_name": "W1"}}]),
             self.request(changes=[{"target": {"kind": "attribute", "attribute_id": 1}, "value_type": "integer", "value": True}]),
             self.request(changes=[{"target": {"kind": "attribute"}, "value_type": "text", "value": "x"}]),
             self.request(changes=[{"target": {"kind": "attribute", "attribute_id": 1}, "value_type": "real", "value": math.inf}]),

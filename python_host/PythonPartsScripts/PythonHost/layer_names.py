@@ -148,7 +148,7 @@ def scan_layer_name_page(base, doc, document_id, requested_name, offset, limit, 
                      "time_budget_reached": scanned_to < stop,
                      "range_scanned_complete": complete,
                      "page_read_errors": api_errors, "page_read_calls": api_calls,
-                     "next_offset": None if complete or seen or scanned_to == LAYER_ID_MAX + 1 else scanned_to,
+                     "next_offset": None if complete else scanned_to,
                      "id_range": [LAYER_ID_MIN, LAYER_ID_MAX],
                      "page_size": limit}}
 
