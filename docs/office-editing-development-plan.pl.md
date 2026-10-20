@@ -33,6 +33,11 @@ nieobsługiwanych typów. [Macierz i luki API](m4-single-drawing-coverage-0.24.0
 [krótka próba](m4-single-drawing-0.24.0.pl.md).
 Punkty 2–5 nie mają pełnego odbioru natywnego; selekcja i zapis materiału
 pozostają brakami implementacji, a daty/wektory wymagają osobnych kodeków.
+Pełne CI finalnego źródła przeszło 529 testów na każdym systemie
+Windows/Ubuntu (Python 3.12), po nim wykonano jeden build. Dokładny ZIP z CI
+przeszedł weryfikację i aktualizację/przywrócenie z 0.23.0, zachowując 40 hashy
+mostka oraz znaczniki dzienników i archiwów.
+[Dostawa i wyniki 0.24.0](../evaluation-packages/0.24.0/README.md).
 
 Nie powtarzać zaakceptowanych odczytów, zapytań, podświetleń ani zapisów
 atrybutów słupów i stropów. Identyczne granice przestrzenne wyników

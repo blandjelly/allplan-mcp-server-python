@@ -21,10 +21,12 @@ razem z odpowiedziami poniżej. Nie kasuj dzienników ani archiwów.
    zachowaj błąd i ślad; nie ponawiaj natywnych eksperymentów automatycznie.
 2. **W1 — najpierw odczyt/no-op.** Użyj znanych, jawnie wskazanych słupów i
    zachowanego powiązania istniejącej warstwy W1 (ID, pełna i krótka nazwa).
-   Nie wyszukuj ponownie odebranej warstwy. Zrób pełne zapytanie słupów w tym
-   jednym rysunku. `model_edit preview` nie ma dodatniej listy UUID celów:
-   przy tym samym `native_types`/kryterium wyłącz przez `exclude_model_uuids`
-   wszystkie pozostałe pasujące UUID. Limit wyłączeń wynosi 100; niepełny
+   Nie wyszukuj ponownie odebranej warstwy. Zrób pełne `model_query` w tym
+   jednym rysunku, z `component_kind=semantic_component` i filtrem
+   `type_name=Column_TypeUUID`. `model_edit preview` nie ma dodatniej listy
+   UUID celów: ustaw tę samą jawną `scope`, `native_types=[Column_TypeUUID]`,
+   `predicate=null` i wyłącz przez `exclude_model_uuids` wszystkie pozostałe
+   UUID słupów. Limit wyłączeń wynosi 100; niepełny
    wynik lub przekroczenie limitu oznacza `not_run`, bez Apply. Preview ma
    zawierać wyłącznie zmianę warstwy i dokładne oczekiwane cele po wyłączeniach.
    Jeśli cel już ma W1, oczekiwane są brak zmiany i `no_op`; nie zapisuj go

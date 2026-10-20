@@ -11,7 +11,7 @@ observations remain in [validation status](validation-status.md).
 | Beams / Beam, SkeletonBeam | Typed attributes and organizational layer, exact target resolution; unrelated broken hierarchies do not redirect the owner. | Family/build-specific UI/readback/Undo; fakes and API availability are separate. |
 | Slabs / Slab | Read-only direct identity probe; only standalone Slab permits typed attributes/layer with bound ancestry. | Resolve the owner's two Slab/MultiSlab results read-only. No new attribute trial on previously accepted targets. |
 | Aggregate slab / MultiSlab | Direct parent/child evidence; all aggregate writes blocked pending an explicit property owner. Slab children are blocked independently of the type filter. | Explicit owner contract before enabling any aggregate/tier write. |
-| Doors and windows / WindowDoor | Structural identity probe keeps parents visible; shared supported adapter remains `opening`, without guessing door/window from display name or parent. | Separate door/window, opening/inserted-object ownership and variant evidence. Current attributes/layer use the exact supported adapter, never its wall. |
+| Doors and windows / WindowDoor | Structural identity probe keeps parents visible. Semantic family is `opening`; optional `opening_kind` resolves `door`/`window` only through the loaded DoorOpeningElement/WindowOpeningElement classes. Unknown classes stay not_checked. | Separate native door/window, opening/inserted-object ownership and variant evidence. Current attributes/layer use the exact supported adapter, never its wall. |
 
 `test_edit_ownership.py` adds parent/child blocking, standalone-slab exact
 targets despite equal geometry, late reparenting, unreadable ancestry,

@@ -21,16 +21,27 @@ fresh readback and recovery; drift leaves a conflict/unknown outcome without
 retrying a setter. Exact-ID historical replay remains setter-free. Existing
 accepted Slab attribute outcomes are preserved as historical observations.
 
-201 focused affected/dependent tests passed for identity/probe/HTTP boundaries, slab owner conflicts and
+201 focused affected/dependent tests passed for identity/probe/HTTP boundaries,
+slab owner conflicts and
 W1 targets/exclusions/fresh readback/replay/no-op across supported adapters.
 Native selection returns explicit unsupported with no highlight fallback;
 native material writes and date/vector/object codecs remain unimplemented.
 [Coverage and API evidence](m4-single-drawing-coverage-0.24.0.md) and the
 [short next trial](m4-single-drawing-0.24.0.pl.md) separate those gaps.
 
-Candidate CI/package evidence is recorded in the
-[0.24.0 delivery](../evaluation-packages/0.24.0/README.md). No native 0.24.0
-observation is available in this cloud environment.
+Final source `8e7e16040a80236bac2eca3689a42a75b83659a1` passed
+[CI 39509201386](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39509201386):
+529 tests per Windows/Ubuntu Python 3.12 job, followed by one build. The exact
+original CI ZIP passed payload/checksum, registration, frozen sync/import,
+upgrade from 0.23.0 and restore; all 40 bridge hashes and active/archive history
+markers were preserved. [0.24.0 delivery and evidence](../evaluation-packages/0.24.0/README.md).
+
+The initial CI passed Ubuntu but failed three Windows workflow checks, including
+two read-budget expirations. Functional model-edit tests now use an injected
+clock; a new explicit expiry test still checks the production limit. 57
+dependent tests passed after that test-only fix; 202 unique focused tests
+were covered across both passes. Production budgets and durable trace writes
+are unchanged. No native 0.24.0 observation is available in this environment.
 
 ## Retained 0.23.0 and prior owner evidence
 
