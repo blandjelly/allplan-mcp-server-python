@@ -342,6 +342,9 @@ class PropertyProbeService:
         if phase == "wall_sample":
             from .wall_probe import sample_wall
             result.update(sample_wall(self.queries, doc, base, settings, request, trace, budget))
+        elif phase == "component_identity":
+            from .identity_probe import probe_identity
+            result.update(probe_identity(self.queries, doc, base, settings, request, trace, budget))
         elif phase == "column_sample":
             query = {"schema_version": SCHEMA, "action": "query",
                      "scope": {"drawing_files": [request["drawing_file"]], "include_passive": False, "visibility": "api_select_all"},

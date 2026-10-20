@@ -33,6 +33,7 @@ accept the full M4 workflow.
 | [2026-10-18 observations](test-results/m4-agent-observation-2026-10-18.md) · [v2](test-results/m4-agent-observation-v2-2026-10-18.md) | Owner logs and their interpretation; no exact build claim. |
 | [2026-10-19 observation](test-results/m4-agent-observation-0.21.1-2026-10-19.md) · [follow-up](test-results/m4-agent-followup-2026-10-19.md) | Layer lookup and the multiview recovery blocker; preserve original execution state. |
 | [2026-10-20 observation](test-results/m4-agent-observation-2026-10-20.md) | Owner confirms Slab and Column attribute outcomes; exact installed manifest is absent. |
+| [0.23.0 journal PASS](test-results/m4-journal-cleanup-0.23.0-owner-pass-2026-10-21.md) | Owner-reported preview and confirmed archival of both journals; no exact manifest, native replay/restart or snapshot-conflict evidence supplied. |
 
 Raw owner logs are retained unmodified under
 [test-results/evidence](test-results/evidence/). Source CI and package checks
@@ -46,7 +47,8 @@ are recorded separately in each [evaluation package](../evaluation-packages/).
   execution ID. Do not retry setters or discard journal state to free capacity.
 - The active execution history limit is 128 records; each record and the active
   diagnostic trace have separate 1 MiB limits. Candidate 0.23.0 provides
-  explicit preview and confirmed archival; native acceptance is pending.
+  explicit preview and confirmed archival; its bounded owner-reported trial
+  passed. Preserve the limitations in the linked observation.
 - Native selection, native material writes, the complete six-family matrix,
   multi-file writes, whole-project access, long-term/concurrent stability,
   broader Undo and cross-copy identity remain unaccepted.

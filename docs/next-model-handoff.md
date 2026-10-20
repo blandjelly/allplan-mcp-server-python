@@ -6,7 +6,33 @@ and target pull requests to `develop/m4`. Main remains separate. Read
 implementation. The policy is the source of truth for automated checks and
 package builds.
 
-## Current candidate: 0.23.0
+## Current candidate: 0.24.0
+
+0.24.0 adds the read-only `model_property_probe phase=component_identity`
+for one exact drawing/model/view adapter: bounded parents, direct children,
+and represented native Python type. `model_query fields=[component_ownership]`
+is an opt-in structural read. Neither route derives identity from bounds or
+establishes native property ownership.
+
+Typed edits now bind slab ownership evidence. A Slab with a parent and every
+MultiSlab aggregate are blocked pending an explicit property-owner adapter.
+A standalone Slab rechecks its bound hierarchy at preflight, setter boundary,
+fresh readback and recovery; drift leaves a conflict/unknown outcome without
+retrying a setter. Exact-ID historical replay remains setter-free. Existing
+accepted Slab attribute outcomes are preserved as historical observations.
+
+201 focused affected/dependent tests passed for identity/probe/HTTP boundaries, slab owner conflicts and
+W1 targets/exclusions/fresh readback/replay/no-op across supported adapters.
+Native selection returns explicit unsupported with no highlight fallback;
+native material writes and date/vector/object codecs remain unimplemented.
+[Coverage and API evidence](m4-single-drawing-coverage-0.24.0.md) and the
+[short next trial](m4-single-drawing-0.24.0.pl.md) separate those gaps.
+
+Candidate CI/package evidence is recorded in the
+[0.24.0 delivery](../evaluation-packages/0.24.0/README.md). No native 0.24.0
+observation is available in this cloud environment.
+
+## Retained 0.23.0 and prior owner evidence
 
 The owner confirms the latest reported Allplan results: two queried Slab
 attributes, `Priorytet` on two results, and ordered `MCP_QA_MARK` values on six
@@ -23,8 +49,13 @@ the 1 MiB active diagnostic trace, 128 active execution records, or the 1 MiB
 per-record limit. Candidate 0.23.0 adds preview and confirmed archival for the
 trace or resolved execution records. Unknown/running, corrupt, and oversized
 records remain protected and blocking. Cleanup does not access the model or
-retry a setter. Native acceptance of this maintenance path is pending the
-[short 0.23.0 trial](m4-journal-cleanup-0.23.0.pl.md).
+retry a setter. The owner reports **PASS** for the 0.23.0 preview and confirmed
+archival of both scopes: 614,396 trace bytes and 32 resolved execution records
+totaling 739,786 bytes. The screenshot reports preserved IDs/replay protection,
+no deletion and no model change. Exact installed manifest/build, native replay,
+restart and stale-snapshot observations were not supplied. Preserve the
+[bounded PASS](test-results/m4-journal-cleanup-0.23.0-owner-pass-2026-10-21.md);
+do not repeat this accepted maintenance trial.
 
 Source `8c71de958c47ab4cb418a62fbd2d55ce76cbc4db` passed CI 39336895867:
 505 tests per Windows/Ubuntu Python 3.12 job, then one package job. The original
@@ -37,10 +68,10 @@ native fakes and MCP HTTP. The delivery commit adds docs/artifacts only.
 
 ## Next work
 
-1. Complete only the pending native 0.23.0 journal-maintenance trial; preserve
-   existing journal state and follow its explicit snapshot/confirmation steps.
-2. Resolve Slab/MultiSlab target identity read-only before planning another
-   write to those results.
+1. Resolve Slab/MultiSlab target identity read-only with 0.24.0 before planning
+   another write to those results. Preserve original journal state and archives.
+2. Complete only the unaccepted W1 readback/no-op/Undo gap using the short
+   trial; do not repeat accepted attribute/filter/highlight observations.
 3. Follow the [development plan](office-editing-development-plan.pl.md) for
    remaining single-drawing gaps: layer W1 ownership/readback, native selection,
    native material, remaining families/types, then multi-file and whole-project

@@ -241,6 +241,9 @@ class ModelQueryService:
                 basic_needed = {f for f in read_needed if f in BASIC_FIELDS or f in {"family", "opening_kind"}
                                 or (attribute_id(f) is not None and attribute_read_mode == "stored")}
                 values = self._fields(adapter, base, basic_needed, number, states[number])
+                if "component_ownership" in read_needed:
+                    from .component_ownership import observation as ownership_observation
+                    values["component_ownership"] = ownership_observation(adapter, check_budget)
                 requested_attribute_ids = {attribute_id(f) for f in read_needed if attribute_id(f) is not None}
                 if requested_attribute_ids and attribute_read_mode == "all_and_computable":
                     # Use the shared native reader so computed-only observations

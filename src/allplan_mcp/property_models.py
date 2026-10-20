@@ -73,6 +73,19 @@ class ElementAttributesProbeInput(ContractModel):
         return self
 
 
+class ComponentIdentityProbeInput(ContractModel):
+    phase: Literal["component_identity"]
+    drawing_file: int = Field(ge=1, le=2147483647)
+    model_uuid: str = Field(pattern=r"^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$")
+    view_uuid: str = Field(pattern=r"^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$")
+
+    @model_validator(mode="after")
+    def nonzero_identities(self):
+        if "00000000-0000-0000-0000-000000000000" in (self.model_uuid, self.view_uuid):
+            raise ValueError("model_uuid and view_uuid must be nonzero canonical UUIDs.")
+        return self
+
+
 class LayerNameProbeInput(ContractModel):
     phase: Literal["layer_name"]
     layer_short_name: str | None = Field(default=None, min_length=1, max_length=16)
@@ -99,4 +112,4 @@ class LayerCatalogProbeInput(ContractModel):
         return self
 
 
-PropertyProbeRequest = Annotated[ColumnProbeInput | WallProbeInput | AttributeNameProbeInput | AttributeDefinitionProbeInput | ElementAttributesProbeInput | LayerNameProbeInput | LayerCatalogProbeInput, Field(discriminator="phase")]
+PropertyProbeRequest = Annotated[ColumnProbeInput | WallProbeInput | AttributeNameProbeInput | AttributeDefinitionProbeInput | ElementAttributesProbeInput | ComponentIdentityProbeInput | LayerNameProbeInput | LayerCatalogProbeInput, Field(discriminator="phase")]

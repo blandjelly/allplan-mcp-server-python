@@ -349,6 +349,10 @@ class RepairExecutor:
                     or change.get("native_type") not in COMPONENT_TYPES):
                 return False
             seen.add(key)
+            if change.get("native_type") in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
+                from .component_ownership import slab_write_blocker
+                if slab_write_blocker(resource.get("component_ownership")):
+                    return False
             symbol = ("ElementsLayerService.ChangeLayer" if change["operation"] in {"set_layer", "set_wall_layer"}
                       else "ElementsAttributeService.ChangeAttributes")
             capability = plan["capabilities"]["symbols"].get(symbol, {})

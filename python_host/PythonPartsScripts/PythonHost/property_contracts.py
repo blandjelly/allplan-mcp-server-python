@@ -24,9 +24,9 @@ def validate_probe(request):
                 or request["model_uuid"] == "00000000-0000-0000-0000-000000000000"):
             invalid("model_uuid must name one canonical nonzero model UUID.")
         return
-    if request["phase"] == "element_attributes":
-        keys(request, {"schema_version", "phase", "drawing_file", "model_uuid", "view_uuid",
-                       "name_contains", "offset", "limit"},
+    if request["phase"] in ("element_attributes", "component_identity"):
+        extra = {"name_contains", "offset", "limit"} if request["phase"] == "element_attributes" else set()
+        keys(request, {"schema_version", "phase", "drawing_file", "model_uuid", "view_uuid"} | extra,
              {"schema_version", "phase", "drawing_file", "model_uuid", "view_uuid"})
         bounded_int(request["drawing_file"], 1, 2147483647, "drawing_file")
         for field in ("model_uuid", "view_uuid"):
@@ -35,6 +35,8 @@ def validate_probe(request):
                     or not re.fullmatch(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}", value)
                     or value == "00000000-0000-0000-0000-000000000000"):
                 invalid(f"{field} must be one canonical nonzero UUID.")
+        if request["phase"] == "component_identity":
+            return
         contains = request.get("name_contains", "")
         if (not isinstance(contains, str) or len(contains) > 64
                 or any(ord(char) < 32 for char in contains)):

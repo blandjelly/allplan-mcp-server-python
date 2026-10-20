@@ -195,6 +195,8 @@ def _writable(doc, base, queries, element, change, diagnostics, budget):
             raise BridgeError("target_not_writable", f"Target fails {method}; no write requested.", 409)
     if integer(element.GetDrawingfileNumber()) != ref["drawing_file"]:
         raise BridgeError("target_not_writable", "Passive target cannot be changed.", 409)
+    if change.get("native_type") in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
+        _slab_ownership(element, change, budget)
     if change.get("operation") == "set_wall_layer":
         import NemAll_Python_IFW_ElementAdapter as native_adapters
         from .wall_layer import preflight
@@ -252,6 +254,11 @@ def read(base, queries, element, change):
     attribute read including computed attributes. Missing from ReadAll alone is
     deliberately reported as unknown, because ReadAll omits computed values.
     """
+    if change.get("native_type") in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
+        try:
+            _slab_ownership(element, change)
+        except BridgeError as exc:
+            return {"status": "not_checked", "value": None, "reason": exc.code}
     operation = change.get("operation")
     if operation == "set_wall_layer":
         import NemAll_Python_IFW_ElementAdapter as native_adapters
@@ -408,10 +415,28 @@ def replaceable_attribute_value(change):
     return old.get("value") is None or value_matches(old.get("value"), data_type)
 
 
+def _slab_ownership(element, change, check=lambda: None):
+    from .component_ownership import observation, slab_write_blocker
+    reviewed = (change.get("resource") or {}).get("component_ownership")
+    if slab_write_blocker(reviewed):
+        raise BridgeError("target_not_writable", "Slab needs a reviewed, standalone field owner; use component_identity read-only.", 409)
+    current = observation(element, check)
+    if slab_write_blocker(current) or current != reviewed:
+        _conflict("Slab ownership changed or became unavailable since preview.")
+
+
 def write(base, element, change):
     """Invoke an established setter only for the explicit evaluation adapter."""
     if change.get("adapter_version") != "m4-model-edit-1":
         raise BridgeError("target_not_writable", "Native model edit adapter version is not enabled.", 409)
+    # Also guard the final native boundary, including a missing native_type in
+    # a malformed change. No legacy plan can bypass the new slab owner gate.
+    try:
+        actual_type = text(element.GetElementAdapterType().GetTypeName())
+    except Exception as exc:
+        raise BridgeError("target_not_writable", "Native target type is unavailable.", 409) from exc
+    if actual_type in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
+        _slab_ownership(element, change)
     operation = change.get("operation")
     if operation == "set_wall_layer":
         import NemAll_Python_IFW_ElementAdapter as native_adapters

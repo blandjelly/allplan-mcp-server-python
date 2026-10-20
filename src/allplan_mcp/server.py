@@ -192,6 +192,9 @@ def model_query(request: QueryRequest) -> dict[str, Any]:
     wall.total_thickness_mm reads the real single-tier Wall Thickness in native
     mm; it never substitutes axis-aligned bounding-box extents. Unsupported
     multi-tier/unknown representations remain not_checked.
+    component_ownership is an optional structural read of exact adapter
+    ancestry and direct children. It never merges by bounds, identifies a
+    writable property owner, or serves as a predicate field.
     Pages and summaries revalidate query fields; stale selections are rejected.
     Selections expire after five minutes or host restart, count model UUIDs rather
     than components by default, and cannot authorize writes. Explicit
@@ -387,6 +390,10 @@ def model_property_probe(request: PropertyProbeRequest) -> dict[str, Any]:
     foreground drawing, optionally by model_uuid (otherwise first by model UUID).
     Only a single-tier Wall is read: native Thickness and Material, no attribute
     or surface substitution. Multi-tier/invalid/failed reads stop without fallback.
+    component_identity reads one explicit drawing/model/view adapter's ancestry,
+    direct children and represented native Python type. Use it to distinguish
+    Slab tiers, MultiSlab owners and opening/inserted adapters. It never merges
+    identities by bounds or establishes which adapter owns a writable property.
     The <240 mm comparison is informational pending native units/value observation;
     it neither finds all thin walls nor binds C35 or authorizes material writes.
     Other phases resolve one exact attribute/layer name or read one observed

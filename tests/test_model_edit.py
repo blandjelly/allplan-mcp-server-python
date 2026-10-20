@@ -502,6 +502,11 @@ class ModelEditTests(unittest.TestCase):
                     {"target": {"kind": "attribute", "attribute_id": 20001}, "value": 7},
                     {"target": {"kind": "attribute", "attribute_id": 20002}, "value_type": "auto", "value": True},
                     {"target": {"kind": "attribute", "name": "Custom text"}, "value": "new"}])
+                if native_type == "MultiSlab_TypeUUID":
+                    self.assertFalse(plan["apply_available"])
+                    self.assertEqual({item["reason"] for item in plan["blocked"]},
+                                     {"aggregate_slab_requires_explicit_property_owner"})
+                    continue
                 self.assertTrue(plan["apply_available"], plan)
                 shown = self.highlight(plan)
                 self.assertEqual(shown["next_action"]["request"]["action"], "apply")

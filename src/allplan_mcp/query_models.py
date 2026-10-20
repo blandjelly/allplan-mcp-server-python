@@ -9,7 +9,7 @@ Scalar = str | int | float | bool | None
 QueryField = Literal["display_name", "type_name", "type_uuid", "layer_id", "drawing_file", "file_state",
                      "bounding_box_mm", "size_x_mm", "size_y_mm", "size_z_mm", "center_x_mm", "center_y_mm",
                      "center_z_mm", "min_z_mm", "max_z_mm", "hierarchy", "family", "opening_kind", "mark", "status",
-                     "wall.total_thickness_mm"]
+                     "wall.total_thickness_mm", "component_ownership"]
 
 
 class ContractModel(BaseModel):
