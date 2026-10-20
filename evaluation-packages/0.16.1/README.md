@@ -8,7 +8,7 @@ Do not repeat this trial; consult the [current M4 handoff](../../docs/next-model
 - Runtime CI: [38451275058](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38451275058), Windows/Ubuntu Python 3.12.
 - Package compatibility CI: [38450384581](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38450384581), six Windows/Ubuntu Python 3.11–3.13 jobs.
 - Delivery and exact-package records: `delivery-0.16.1.json`, `package-verification.json`, `source-ci-0.16.1.json`.
-- Its limited owner report is summarized in [validation status](../../docs/validation-status.md).
+- The reported limited owner result is indexed in [validation status](../../docs/validation-status.md).
 
 Portable tests and CI do not establish native acceptance. The frozen package
 artifacts remain unchanged.
