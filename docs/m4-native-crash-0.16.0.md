@@ -44,4 +44,5 @@ containment or repaired property discovery is made.
 The four original uploads are identified by their new upload hashes. Raw crash
 environment/private paths and the full historical bridge log are not published;
 the submitted files remain in the chat/workspace.
-[Next isolated observation](m4-isolated-probe-owner-test.pl.md).
+The broad discovery route remains suspended. The current handoff identifies
+the active M4 candidate and next scoped work.

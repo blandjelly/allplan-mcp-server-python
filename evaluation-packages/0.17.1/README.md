@@ -1,9 +1,8 @@
 # 0.17.1 — correct fire resistance classification binding
 
-Download [the complete Windows ZIP](allplan-mcp-0.17.1-windows-evaluation.zip),
-extract it and follow [the Polish guide](../../docs/m4-column-layer-0.17.1.pl.md).
-Run **Setup.cmd**, restart the Allplan host/MCP, then **M4 Columns to W1.cmd**.
-**Native Allplan acceptance: not_run; ready_for_owner_test.**
+This package is a historical candidate. Its [retained owner observation](../../docs/m4-column-layer-observation-0.17.1.md)
+records two W1 writes and incomplete highlight behavior. It does not accept the
+full workflow or later candidate behavior; do not repeat the trial.
 
 The 0.17.0 owner report was BLOCKED before highlighting or writes: default names
 resolved the unrelated `Odporność ogniowa` attribute (1398), absent on all six

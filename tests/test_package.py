@@ -38,18 +38,18 @@ class PackageTests(unittest.TestCase):
                          "M3 Workflow Recover.cmd", "M3 Numbering.cmd", "M3 Numbering Recover.cmd",
                          "M3 Conflict.cmd", "M3 Conflict Recover.cmd",
                          "M3 Recovery Test.cmd", "M3 Recovery Inspect.cmd", "M3 Recovery Undo Check.cmd", "M3 Journal.cmd", "M3 Selected Mark.cmd",
-                         "M3 Selected Mark Recover.cmd", "M3 Selected Mark Undo Check.cmd", "M4 Columns to W1.cmd", "M4 Columns Recover.cmd", "M4 Properties.cmd", "M4 Clear Highlight.cmd", "M4 Wall Properties.cmd", "M4 Thin Walls.cmd"):
+                         "M3 Selected Mark Recover.cmd", "M3 Selected Mark Undo Check.cmd"):
                 self.assertTrue((package / name).is_file())
             self.assertEqual({p.name for p in package.glob("M*.cmd")},
                              {"M3 Recover.cmd", "M3 Workflow Recover.cmd", "M3 Numbering.cmd", "M3 Numbering Recover.cmd",
                               "M3 Conflict.cmd", "M3 Conflict Recover.cmd",
                               "M3 Recovery Test.cmd", "M3 Recovery Inspect.cmd", "M3 Recovery Undo Check.cmd", "M3 Journal.cmd", "M3 Selected Mark.cmd",
-                              "M3 Selected Mark Recover.cmd", "M3 Selected Mark Undo Check.cmd", "M4 Columns to W1.cmd", "M4 Columns Recover.cmd", "M4 Properties.cmd", "M4 Clear Highlight.cmd", "M4 Wall Properties.cmd", "M4 Thin Walls.cmd"})
+                              "M3 Selected Mark Recover.cmd", "M3 Selected Mark Undo Check.cmd"})
             self.assertEqual({p.name for p in (package / "windows").glob("m*.cmd")},
                              {"m3-recover.cmd", "m3-workflow-recover.cmd", "m3-numbering.cmd", "m3-numbering-recover.cmd",
                               "m3-conflict.cmd", "m3-conflict-recover.cmd",
                               "m3-recovery-test.cmd", "m3-recovery-inspect.cmd", "m3-recovery-undo-check.cmd", "m3-journal.cmd", "m3-selected-mark.cmd",
-                              "m3-selected-mark-recover.cmd", "m3-selected-mark-undo-check.cmd", "m4-column-layer.cmd", "m4-column-layer-recover.cmd", "m4-properties.cmd", "m4-clear-highlight.cmd", "m4-wall-properties.cmd", "m4-thin-walls.cmd"})
+                              "m3-selected-mark-recover.cmd", "m3-selected-mark-undo-check.cmd"})
             # Current testing-policy evidence is shipped with its linked policy.
             self.assertTrue((package / "docs/test-results/testing-policy-2026-10-17.md").is_file())
             for retired in ("probes", "reviews"):

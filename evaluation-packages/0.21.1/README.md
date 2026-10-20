@@ -1,7 +1,7 @@
 # 0.21.1 — attribute discovery and edit coverage fixes
 
 [Complete Windows ZIP](allplan-mcp-0.21.1-windows-evaluation.zip) ·
-[Short Polish trial](../../docs/m4-agent-fixes-0.21.1.pl.md) ·
+[Owner observation](../../docs/test-results/m4-agent-observation-2026-10-18.md) ·
 [PR #16](https://github.com/blandjelly/allplan-mcp-server-python/pull/16).
 
 This candidate fixes equivalent Wall adapter wrappers in attribute listing,

@@ -1,12 +1,8 @@
 # 0.18.0 — one native Wall thickness/material sample
 
-Download [the complete Windows ZIP](allplan-mcp-0.18.0-windows-evaluation.zip).
-Extract it, close Allplan and the old MCP, run **Setup.cmd** and choose the real
-Local folder. Preserve logs and `Local/.allplan-mcp/repairs`. Restart Allplan,
-**StartPythonHost** and the new MCP launcher, then use **M4 Wall Properties.cmd**.
-[Short Polish observation guide](../../docs/m4-wall-properties-0.18.0.pl.md).
-The automated checks below are already performed by Codex; the owner only needs
-installation and the native observation, without rerunning tests or builds.
+This package is a historical single-Wall read candidate. Its read was later
+observed on 0.18.2; see the [retained observation](../../docs/m4-wall-observation-0.18.2.md).
+Do not repeat the earlier candidate trial.
 
 This adds an independent next M4 step towards walls thinner than 240 mm → native
 C35. It reads **one existing single-tier Wall**, not all wall thicknesses:
@@ -49,11 +45,8 @@ Validation for clean source **5ea4bcfd88f500bbf137e361ba5d6cc3d83710b5**:
 Artifacts are frozen from the clean source above. Later documentation/delivery
 commits do not rebuild them or expand the recorded source/test scopes.
 
-**Native 0.18.0 observation: not_run; ready_for_owner_test.** The retained fixture has one
-**200 × 4000 × 3000 mm** single-tier wall in foreground drawing **101**. Compare
-its reported thickness and raw material with UI, and return the JSON/TXT,
-bridge log and native trace. No model reset, Apply or Undo is needed for this
-read. The `.Material` getter and units must be observed in Allplan before
-enabling material edits; project C35 resource binding and the modification
-adapter will require their own subsequent evidence. Main integration/release
-and general M4 acceptance remain separate.
+The delivery's native status fields record `not_run` at build time. A later
+0.18.1 attempt blocked before the Wall read; the corrected 0.18.2 candidate
+returned one single-tier Wall's 240 mm thickness and raw material `Beton`,
+matching UI. See the [scoped observations](../../docs/validation-status.md).
+Material writes, C35 resource binding and general M4 acceptance remain separate.

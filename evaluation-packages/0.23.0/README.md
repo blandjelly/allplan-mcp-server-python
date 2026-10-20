@@ -6,7 +6,7 @@ Runtime source: `8c71de958c47ab4cb418a62fbd2d55ce76cbc4db`.
 [Windows ZIP](allplan-mcp-0.23.0-windows-evaluation.zip) ·
 [Checksum](allplan-mcp-0.23.0-windows-evaluation.zip.sha256) ·
 [Short Polish trial](../../docs/m4-journal-cleanup-0.23.0.pl.md) ·
-[M4 completion assessment](../../docs/m4-completion-status-2026-10-20.pl.md) ·
+[M4 development plan](../../docs/office-editing-development-plan.pl.md) ·
 [Owner observation](../../docs/test-results/m4-agent-observation-2026-10-20.md)
 
 The owner confirms the latest slab/column attribute outcomes match Allplan, but

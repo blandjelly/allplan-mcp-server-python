@@ -3,11 +3,9 @@
 Candidate for a new Allplan 2026-1-7 observation. **Native acceptance: not_run.**
 The owner explicitly accepts highlighting in place of native selection.
 
-Download the complete `allplan-mcp-0.17.0-windows-evaluation.zip` from this directory,
-extract it and follow [the short Polish walkthrough](../../docs/m4-column-layer-0.17.0.pl.md).
-Run **M4 Columns to W1.cmd** for the new workflow and **M4 Columns Recover.cmd**
-for saved-ID read-only recovery. The older **M4 Properties.cmd** still runs only
-the isolated raw-attribute sample; it is not the new workflow.
+This package and its planned owner trial are historical. The later 0.17.1
+observation found that the initial field binding was incorrect; see the retained
+[validation record](../../docs/validation-status.md). Do not repeat this trial.
 
 This candidate builds direct criterion-based plans, resolves exact project names,
 highlights only changing targets and shares the M3 executor/journal. ReadAll

@@ -39,16 +39,7 @@ supports owner-confirmed highlight visibility and same-session health only; the
 Wall sample was blocked before native read. Writes, Undo/recovery and full M4
 acceptance remain pending. The PR remains a draft.
 
-## Krótka próba
-
-1. Zamknij Allplana i konsolę MCP. Rozpakuj pełny ZIP do nowego folderu.
-   Uruchom **Setup.cmd**, wybierając ten sam folder Local.
-2. Uruchom projekt → **StartPythonHost** → **Launch Allplan MCP.cmd** z nowego
-   pakietu. W lokalnym Codexie poproś o samo `allplan_health`, bez innych narzędzi.
-3. Oczekiwane: `ok=true`, pakiet/host **0.18.1**,
-   `runtime.ui_dispatch_mode=timer_queue_v1`. Jeśli działa, sprawdź sam health
-   po zminimalizowaniu i przywróceniu Allplana.
-
-Przy błędzie zachowaj konsolę MCP i **Local/.allplan-mcp/logs/bridge.log**.
-Na tym kończy się próba tej poprawki; wcześniejsze wyniki zapisów pozostają
-w dzienniku. [Szczegóły, obserwacje i wycofanie](../../docs/mcp-timeout-0.18.1.md).
+The owner confirmed host health/response delivery and Columns highlight visibility;
+the Wall sample was blocked before native read. The retained
+[observation record](../../docs/m4-native-observation-0.18.1-2026-10-17.md)
+contains the scope and original reports. Do not repeat this trial.

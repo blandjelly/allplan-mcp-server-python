@@ -1,7 +1,7 @@
 # 0.19.0 — native Wall thickness filter and highlight
 
-[Complete Windows ZIP](allplan-mcp-0.19.0-windows-evaluation.zip) ·
-[Polish owner guide](../../docs/m4-wall-filter-0.19.0.pl.md).
+The scoped native outcome is retained in
+[the owner observation](../../docs/m4-wall-filter-observation-0.19.0.md).
 
 `model_wall_filter` evaluates the complete Wall set of one explicit active
 foreground drawing. It reads single-tier native Thickness and compares strictly
@@ -52,18 +52,13 @@ or pre-confirmation records. Frozen artifacts are unchanged. No general unit,
 native selection, write/Undo or full K2/M4 acceptance is inferred. Earlier
 0.18.2 single-Wall and Column/M3 evidence retain their original scopes.
 
-## Completed owner observation — retained procedure
+## Retained owner outcome
 
-The scoped trial is complete and needs no repeat. The following records its procedure.
-
-Install the complete ZIP to the same Local folder using Setup, with Allplan and
-MCP closed; then restart the host and MCP from this package. On the retained
-MCP_QA_DEMO drawing **101 foreground**, run **M4 Thin Walls.cmd** once.
-Expect both 200/240 mm records, only 200 mm matching, and same-session healthy
-before/after replies. Observe only the 20 cm Wall highlighted, then use
-**M4 Clear Highlight.cmd** and check continued host operation and no model change.
-Save JSON/TXT, native trace and bridge.log. A lost reply stops the trial without
-retry or another native call. Follow the linked guide for details and restore.
+The scoped owner observation is complete: in drawing 101, **200 mm** matched
+`<240 mm`, **240 mm** did not, and the owner confirmed highlight and clear with
+no model change. The record and original reports are in
+[the retained observation](../../docs/m4-wall-filter-observation-0.19.0.md).
+Do not repeat the trial.
 
 The source documentation inside the frozen ZIP was prepared before final CI
 and retains pending automated-check wording. This delivery record holds the

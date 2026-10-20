@@ -1,7 +1,7 @@
 # 0.20.1 — fixes from the owner agent trial
 
 [Complete Windows ZIP](allplan-mcp-0.20.1-windows-evaluation.zip) ·
-[Short Polish trial and limits](../../docs/m4-agent-fixes-0.20.1.pl.md) ·
+[Owner observation](../../docs/test-results/m4-agent-observation-2026-10-17.md) ·
 [PR #14](https://github.com/blandjelly/allplan-mcp-server-python/pull/14).
 
 The owner transcript exposed numeric Wartość U blocked on an undefined string

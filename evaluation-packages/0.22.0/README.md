@@ -7,7 +7,7 @@ was performed. The delivered Windows ZIP contains that clean source.
 
 [Download Windows ZIP](allplan-mcp-0.22.0-windows-evaluation.zip) ·
 [ZIP checksum](allplan-mcp-0.22.0-windows-evaluation.zip.sha256) ·
-[Polish trial](../../docs/m4-agent-fixes-0.22.0.pl.md) ·
+[Owner observation](../../docs/test-results/m4-agent-observation-0.21.1-2026-10-19.md) ·
 [Owner 0.21.1 observation](../../docs/test-results/m4-agent-observation-0.21.1-2026-10-19.md)
 
 This candidate addresses the owner's persistent Beam write/recovery block,

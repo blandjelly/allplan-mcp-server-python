@@ -49,14 +49,5 @@ native material/property writes, and `Poziom_Górny` editing remain unaccepted.
 The 0.21.1 CI and package/delivery checks are pending; the new native trial is
 also pending.
 
-## Next owner trial
-
-Check only new behavior: list attributes on one Wall using the wrapper
-comparison, inspect pagination/raw values and metadata-failure diagnostics,
-and resolve the project name using lower-initial `materiał`. Optionally perform
-representative read-only Beam and Slab listings. Then preview the W1 edit for
-`wall.total_thickness_mm < 240`, inspect completeness diagnostics and verify
-200 mm inclusion / 240 mm exclusion. Apply only if the response explicitly
-allows it after full revalidation; check UI, fresh readback and Undo. If blocked,
-retain the exact response and stop. Do not repeat the confirmed Column/Wall U,
-fire-class, query or highlight observations.
+The proposed next trial in this historical report has been superseded. Current
+scope and pending work are in the [M4 handoff](../next-model-handoff.md).

@@ -47,20 +47,9 @@ The owner also confirmed 0.18.1 host recovery and Columns no-op highlighting; th
 [observations and uploads](../../docs/m4-native-observation-0.18.1-2026-10-17.md)
 retain their separate scope. Neither observation accepts the full M4/write workflow.
 
-## Krótka próba
+## Retained owner outcome
 
-Próba zakończona wynikiem PASS dla jednej ściany; nie trzeba jej powtarzać.
-Poniżej poprawiony opis przebiegu. Dokumentacja w zamrożonym ZIP-ie zawiera
-wcześniejsze oczekiwanie 200 mm; aktualna instrukcja uwzględnia wybór według UUID.
-
-Zamknij Allplan i MCP. Rozpakuj pełny ZIP 0.18.2, uruchom **Setup.cmd** z tym
-samym katalogiem Local i otwórz zachowaną kopię MCP_QA_DEMO, rysunek 101
-foreground. Uruchom host i MCP z nowego pakietu, a potem raz
-**M4 Wall Properties.cmd**. Próba odczytuje jedną ścianę jednowarstwową,
-pierwszą według UUID modelu. Grubość i surowy materiał porównuje się z UI;
-nie ma gwarancji wyboru ściany 200 mm. W wykonanej próbie poprawnie odczytano
-240 mm i „Beton”, a obie odpowiedzi health pochodziły z tej samej sesji.
-Próba nie zmienia modelu i nie wymaga Undo.
-
-Przy błędzie zakończ próbę i zachowaj raporty oraz natywny trace; bez ponawiania.
-[Pełna krótka instrukcja i wycofanie](../../docs/m4-wall-sample-0.18.2.pl.md).
+The completed observation returned **240 mm** and **`Beton`**, matching the UI.
+It sampled one single-tier Wall and made no model changes. The owner record and
+original reports are in [the retained observation](../../docs/m4-wall-observation-0.18.2.md).
+Do not repeat the trial.
