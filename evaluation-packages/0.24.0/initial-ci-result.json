@@ -1,0 +1,211 @@
+{
+  "source_commit": "edcf4e518159c2a9f4746b174cf6ddb1b0b56922",
+  "workflow_run_id": 39507742339,
+  "workflow_url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39507742339",
+  "result": "failed_no_package_built",
+  "tests_per_platform": 528,
+  "jobs": [
+    {
+      "id": 118920817528,
+      "name": "configuration",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 39507742339,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Select final-candidate checks",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        }
+      ]
+    },
+    {
+      "id": 118920893508,
+      "name": "portable (windows-latest, 3.12)",
+      "status": "completed",
+      "conclusion": "failure",
+      "run_id": 39507742339,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Run python -m pip install uv==0.12.19",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run uv sync --frozen",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Run uv run --frozen python -m unittest discover -s tests -v",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 6
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        }
+      ]
+    },
+    {
+      "id": 118920893566,
+      "name": "portable (ubuntu-latest, 3.12)",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 39507742339,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Run python -m pip install uv==0.12.19",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run uv sync --frozen",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Run uv run --frozen python -m unittest discover -s tests -v",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        }
+      ]
+    },
+    {
+      "id": 118924578344,
+      "name": "package",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 39507742339,
+      "logs_url": null,
+      "steps": null
+    }
+  ],
+  "findings": {
+    "ubuntu": "528_pass",
+    "windows": {
+      "errors": [
+        "test_auto_type_uses_metadata_for_arbitrary_attributes_across_component_families (Wall): scan_limit_exceeded",
+        "test_reviewed_manifest_is_required_for_direct_scope_guard: scan_limit_exceeded"
+      ],
+      "failures": [
+        "test_auto_type_uses_metadata_for_arbitrary_attributes_across_component_families (Column): verification_failed"
+      ]
+    }
+  },
+  "resolution": "Inject a deterministic clock in functional ModelEdit fixtures and add an explicit read-budget-expiry regression. Production budgets and trace fsync remain unchanged."
+}

@@ -21,6 +21,13 @@ slabs, stale ownership, exact W1 targets/exclusions/readback/replay/no-op,
 unsupported native selection/material and unsupported SDK codecs. These are
 portable fake/HTTP contracts, not native acceptance.
 
+The [initial CI](initial-ci-result.json) passed Ubuntu but hit two real-clock
+read-budget errors and a workflow verification failure on Windows; it built
+no package. Functional model-edit fixtures now inject a deterministic clock,
+with an explicit expiry regression. [57 dependent tests passed](clock-focused-verification.json)
+after that test-only fix; production time limits and durable trace writes are
+unchanged. Final source CI remains a separate required result.
+
 [Short next trial](../../docs/m4-single-drawing-0.24.0.pl.md) ·
 [Family/type matrix and API gaps](../../docs/m4-single-drawing-coverage-0.24.0.md) ·
 [Development plan](../../docs/office-editing-development-plan.pl.md) ·

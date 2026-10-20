@@ -1,0 +1,17 @@
+{
+  "scope": "dependent_workflows_after_test_clock_fix",
+  "modules": [
+    "test_model_edit",
+    "test_wall_layer_edit",
+    "test_edit_ownership",
+    "test_model_edit_recovery_http",
+    "test_component_identity_http"
+  ],
+  "tests_run": 57,
+  "failures": 0,
+  "errors": 0,
+  "result": "pass",
+  "production_time_limits_changed": false,
+  "new_test": "test_read_budget_expiry_after_metadata_stops_before_scan_or_setter",
+  "native_Allplan": "not_run"
+}
