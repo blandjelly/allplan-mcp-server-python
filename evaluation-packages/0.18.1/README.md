@@ -5,7 +5,7 @@ This candidate addresses HTTP worker/UI scheduling and records where a host
 reply stops. The owner-supplied 0.18.0 logs prove incomplete health replies;
 they do not prove a specific native root cause. The owner later confirmed host
 response on 0.18.1 in scoped M4 observations; see the
-[observation report and original uploads](../../docs/m4-native-observation-0.18.1-2026-10-17.md).
+[observation report and original uploads](../../docs/test-results/m4-native-observation-0.18.1-2026-10-17.md).
 
 The UI timer now processes a Python request queue and briefly yields to HTTP
 workers. Queued work that does not start within three seconds is cancelled;
@@ -41,5 +41,5 @@ acceptance remain pending. The PR remains a draft.
 
 The owner confirmed host health/response delivery and Columns highlight visibility;
 the Wall sample was blocked before native read. The retained
-[observation record](../../docs/m4-native-observation-0.18.1-2026-10-17.md)
+[observation record](../../docs/test-results/m4-native-observation-0.18.1-2026-10-17.md)
 contains the scope and original reports. Do not repeat this trial.

@@ -38,5 +38,5 @@ read acceptance and material writes remain pending.
 
 The files below are preserved byte-for-byte from the owner uploads:
 
-- [Columns JSON](../evaluation-packages/0.18.1/native-acceptance/20261017-owner/m4-column-layer-check-20261017T110217587832Z.json) and [TXT](../evaluation-packages/0.18.1/native-acceptance/20261017-owner/m4-column-layer-check-20261017T110217587832Z.txt)
-- [Wall JSON](../evaluation-packages/0.18.1/native-acceptance/20261017-owner/wall-properties-20261017T110348628132Z.json) and [TXT](../evaluation-packages/0.18.1/native-acceptance/20261017-owner/wall-properties-20261017T110348628132Z.txt)
+- [Columns JSON](../../evaluation-packages/0.18.1/native-acceptance/20261017-owner/m4-column-layer-check-20261017T110217587832Z.json) and [TXT](../../evaluation-packages/0.18.1/native-acceptance/20261017-owner/m4-column-layer-check-20261017T110217587832Z.txt)
+- [Wall JSON](../../evaluation-packages/0.18.1/native-acceptance/20261017-owner/wall-properties-20261017T110348628132Z.json) and [TXT](../../evaluation-packages/0.18.1/native-acceptance/20261017-owner/wall-properties-20261017T110348628132Z.txt)

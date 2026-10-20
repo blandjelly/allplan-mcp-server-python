@@ -50,7 +50,7 @@ read only the first Wall in model UUID order: **240 mm**, raw material
 read. The ten-component baseline above remains historical evidence, not a
 fresh count of this later fixture state. Keep both Walls; do not alter the
 fixture to force selection of the 200 mm Wall.
-[Observation and original reports](m4-wall-observation-0.18.2.md).
+[Observation and original reports](test-results/m4-wall-observation-0.18.2.md).
 
 ## Accepted observations and current state
 

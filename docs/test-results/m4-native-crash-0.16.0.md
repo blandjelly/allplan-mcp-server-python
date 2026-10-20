@@ -40,7 +40,7 @@ host, and the launcher stops after this one sample and health. Definitions,
 enum reads and UI presentation are not automatic. No claim of native fault
 containment or repaired property discovery is made.
 
-[Inspection and relevant bridge excerpt](../evaluation-packages/0.16.0/native-acceptance/20261013-owner/).
+[Inspection and relevant bridge excerpt](../../evaluation-packages/0.16.0/native-acceptance/20261013-owner/).
 The four original uploads are identified by their new upload hashes. Raw crash
 environment/private paths and the full historical bridge log are not published;
 the submitted files remain in the chat/workspace.

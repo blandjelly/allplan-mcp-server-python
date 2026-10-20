@@ -23,12 +23,12 @@ accept the full M4 workflow.
 
 | Evidence | Recorded scope |
 | --- | --- |
-| [0.16.0 crash](m4-native-crash-0.16.0.md) | Broad property discovery crashed; its cause remains unknown and the route stays suspended. |
+| [0.16.0 crash](test-results/m4-native-crash-0.16.0.md) | Broad property discovery crashed; its cause remains unknown and the route stays suspended. |
 | [0.16.1 isolated Column read](https://github.com/blandjelly/allplan-mcp-server-python/blob/96033359842271cc7dd487adca8fcb737042fc95/docs/next-model-handoff.md) | The owner reported one raw Column read between healthy replies in one session; names, layers, UI and writes were not accepted. |
-| [0.17.1 Column observation](m4-column-layer-observation-0.17.1.md) | Original field binding, two W1 writes and incomplete highlight behavior; see the report for exact limits. |
-| [0.18.1 observations](m4-native-observation-0.18.1-2026-10-17.md) | Host response and Columns highlight were observed; the Wall sample was blocked before reading. |
-| [0.18.2 Wall observation](m4-wall-observation-0.18.2.md) | One single-tier Wall read returned 240 mm and `Beton`, matching the UI. |
-| [0.19.0 Wall filter observation](m4-wall-filter-observation-0.19.0.md) | In drawing 101, 200 mm matched `<240 mm`, 240 mm did not, and the owner confirmed highlight and clear. |
+| [0.17.1 Column observation](test-results/m4-column-layer-observation-0.17.1.md) | Original field binding, two W1 writes and incomplete highlight behavior; see the report for exact limits. |
+| [0.18.1 observations](test-results/m4-native-observation-0.18.1-2026-10-17.md) | Host response and Columns highlight were observed; the Wall sample was blocked before reading. |
+| [0.18.2 Wall observation](test-results/m4-wall-observation-0.18.2.md) | One single-tier Wall read returned 240 mm and `Beton`, matching the UI. |
+| [0.19.0 Wall filter observation](test-results/m4-wall-filter-observation-0.19.0.md) | In drawing 101, 200 mm matched `<240 mm`, 240 mm did not, and the owner confirmed highlight and clear. |
 | [2026-10-17 agent observation](test-results/m4-agent-observation-2026-10-17.md) | Owner-reported fire-classification, query and highlight outcomes plus failed/thin-wall and unsupported operations. |
 | [2026-10-18 observations](test-results/m4-agent-observation-2026-10-18.md) · [v2](test-results/m4-agent-observation-v2-2026-10-18.md) | Owner logs and their interpretation; no exact build claim. |
 | [2026-10-19 observation](test-results/m4-agent-observation-0.21.1-2026-10-19.md) · [follow-up](test-results/m4-agent-followup-2026-10-19.md) | Layer lookup and the multiview recovery blocker; preserve original execution state. |

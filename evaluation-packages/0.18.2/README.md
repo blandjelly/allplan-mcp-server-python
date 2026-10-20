@@ -40,16 +40,16 @@ UI. M1 found two Walls and intentionally sampled one by model UUID order;
 `240 < 240` correctly returned false. Both health replies were healthy in one
 session, with no requested setters or reported model change. The 20 cm Wall's
 properties, full-Wall filtering/highlighting and material writes remain unverified.
-[Observation and original JSON/TXT](../../docs/m4-wall-observation-0.18.2.md).
+[Observation and original JSON/TXT](../../docs/test-results/m4-wall-observation-0.18.2.md).
 The original delivery/verification JSON files retain their pre-observation
 `not_run` and `ready_for_owner_test` values; they are frozen build records.
 The owner also confirmed 0.18.1 host recovery and Columns no-op highlighting; those
-[observations and uploads](../../docs/m4-native-observation-0.18.1-2026-10-17.md)
+[observations and uploads](../../docs/test-results/m4-native-observation-0.18.1-2026-10-17.md)
 retain their separate scope. Neither observation accepts the full M4/write workflow.
 
 ## Retained owner outcome
 
 The completed observation returned **240 mm** and **`Beton`**, matching the UI.
 It sampled one single-tier Wall and made no model changes. The owner record and
-original reports are in [the retained observation](../../docs/m4-wall-observation-0.18.2.md).
+original reports are in [the retained observation](../../docs/test-results/m4-wall-observation-0.18.2.md).
 Do not repeat the trial.

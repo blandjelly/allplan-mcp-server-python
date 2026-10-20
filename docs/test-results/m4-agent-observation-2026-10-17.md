@@ -28,4 +28,4 @@ opening ownership and native material edits are not accepted by this log.
 Preserve this successful fire/query/highlight slice without requesting repeat
 owner trials. The next short trial should address only the changed numeric
 undefined-value handling and Wall layer owner path, with fresh readback and
-the actual Undo scope. [API investigation](../m4-agent-test-api-evidence.md).
+the actual Undo scope. [API investigation](m4-agent-test-api-evidence.md).
