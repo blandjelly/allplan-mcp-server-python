@@ -60,10 +60,10 @@ status; this is a documentation/evidence update without tests or rebuilds.
 
 Original uploads and derived inspection:
 
-- [Filter JSON](../evaluation-packages/0.19.0/native-acceptance/20261017-owner/wall-filter-20261017T152053490160Z.json)
-- [Filter TXT](../evaluation-packages/0.19.0/native-acceptance/20261017-owner/wall-filter-20261017T152053490160Z.txt)
-- [Clear JSON](../evaluation-packages/0.19.0/native-acceptance/20261017-owner/m4-properties-clear-20261017T152208657656Z.json)
-- [Clear TXT](../evaluation-packages/0.19.0/native-acceptance/20261017-owner/m4-properties-clear-20261017T152208657656Z.txt)
-- [Inspection](../evaluation-packages/0.19.0/native-acceptance/20261017-owner/inspection.json)
+- [Filter JSON](../../evaluation-packages/0.19.0/native-acceptance/20261017-owner/wall-filter-20261017T152053490160Z.json)
+- [Filter TXT](../../evaluation-packages/0.19.0/native-acceptance/20261017-owner/wall-filter-20261017T152053490160Z.txt)
+- [Clear JSON](../../evaluation-packages/0.19.0/native-acceptance/20261017-owner/m4-properties-clear-20261017T152208657656Z.json)
+- [Clear TXT](../../evaluation-packages/0.19.0/native-acceptance/20261017-owner/m4-properties-clear-20261017T152208657656Z.txt)
+- [Inspection](../../evaluation-packages/0.19.0/native-acceptance/20261017-owner/inspection.json)
 
-[delivery and automated evidence](../evaluation-packages/0.19.0/README.md).
+[delivery and automated evidence](../../evaluation-packages/0.19.0/README.md).

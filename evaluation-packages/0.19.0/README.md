@@ -1,7 +1,7 @@
 # 0.19.0 — native Wall thickness filter and highlight
 
 The scoped native outcome is retained in
-[the owner observation](../../docs/m4-wall-filter-observation-0.19.0.md).
+[the owner observation](../../docs/test-results/m4-wall-filter-observation-0.19.0.md).
 
 `model_wall_filter` evaluates the complete Wall set of one explicit active
 foreground drawing. It reads single-tier native Thickness and compares strictly
@@ -46,7 +46,7 @@ two single-tier foreground-101 Walls read 200 mm (match) and 240 mm (nonmatch),
 one submitted adapter, complete coverage and no exclusions/omissions. The owner
 confirmed correct 20 cm highlighting, explicit clear and uninterrupted host
 operation; four health replies share one session.
-[Observation and original uploads](../../docs/m4-wall-filter-observation-0.19.0.md).
+[Observation and original uploads](../../docs/test-results/m4-wall-filter-observation-0.19.0.md).
 Original JSON/delivery flags retain `not_run`/`ready_for_owner_test` as build-time
 or pre-confirmation records. Frozen artifacts are unchanged. No general unit,
 native selection, write/Undo or full K2/M4 acceptance is inferred. Earlier
@@ -57,7 +57,7 @@ native selection, write/Undo or full K2/M4 acceptance is inferred. Earlier
 The scoped owner observation is complete: in drawing 101, **200 mm** matched
 `<240 mm`, **240 mm** did not, and the owner confirmed highlight and clear with
 no model change. The record and original reports are in
-[the retained observation](../../docs/m4-wall-filter-observation-0.19.0.md).
+[the retained observation](../../docs/test-results/m4-wall-filter-observation-0.19.0.md).
 Do not repeat the trial.
 
 The source documentation inside the frozen ZIP was prepared before final CI

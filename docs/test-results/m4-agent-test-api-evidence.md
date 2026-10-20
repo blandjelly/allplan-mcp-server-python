@@ -94,7 +94,7 @@ that operation.
 
 ## Supplied log: scope of evidence
 
-The uploaded [agent test log](test-results/evidence/m4-agent-test-2026-10-17.md)
+The uploaded [agent test log](evidence/m4-agent-test-2026-10-17.md)
 reports two layer attempts against a 200 mm wall and readback layer 3735 after
 requests for `W1` and `SZ_OGÓ02` (ID 3701). It also reports `<niezdefiniowany>`
 for numeric attribute “Wartość U” on two walls. This supports the investigation

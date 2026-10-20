@@ -1,7 +1,7 @@
 # 0.18.0 — one native Wall thickness/material sample
 
 This package is a historical single-Wall read candidate. Its read was later
-observed on 0.18.2; see the [retained observation](../../docs/m4-wall-observation-0.18.2.md).
+observed on 0.18.2; see the [retained observation](../../docs/test-results/m4-wall-observation-0.18.2.md).
 Do not repeat the earlier candidate trial.
 
 This adds an independent next M4 step towards walls thinner than 240 mm → native

@@ -45,7 +45,7 @@ this is a documentation/evidence update, without a new build.
 
 Original owner uploads, preserved byte-for-byte:
 
-- [JSON](../evaluation-packages/0.18.2/native-acceptance/20261017-owner/wall-properties-20261017T112934953302Z.json)
-- [TXT](../evaluation-packages/0.18.2/native-acceptance/20261017-owner/wall-properties-20261017T112934953302Z.txt)
+- [JSON](../../evaluation-packages/0.18.2/native-acceptance/20261017-owner/wall-properties-20261017T112934953302Z.json)
+- [TXT](../../evaluation-packages/0.18.2/native-acceptance/20261017-owner/wall-properties-20261017T112934953302Z.txt)
 
-[delivery and portable verification](../evaluation-packages/0.18.2/README.md).
+[delivery and portable verification](../../evaluation-packages/0.18.2/README.md).

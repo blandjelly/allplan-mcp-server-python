@@ -2,10 +2,10 @@
 
 This package is retained as a historical candidate. The later 0.18.1 owner
 observation exercised its no-op highlighting behavior; see the
-[retained observation](../../docs/m4-native-observation-0.18.1-2026-10-17.md).
+[retained observation](../../docs/test-results/m4-native-observation-0.18.1-2026-10-17.md).
 Do not repeat the candidate's trial.
 
-The [0.17.1 owner observation](../../docs/m4-column-layer-observation-0.17.1.md)
+The [0.17.1 owner observation](../../docs/test-results/m4-column-layer-observation-0.17.1.md)
 confirmed the correct classification binding, two W1 updates and healthy
 same-session replies. It also exposed the missing highlight for Column 1:
 its fire classification was undefined, but it was already on W1.
@@ -45,5 +45,5 @@ status documentation commits do not rebuild that source or alter old archives.
 
 The delivery's native status fields record `not_run` at build time. The owner
 later confirmed the corrected no-op highlighting through the same handler in
-0.18.1; see the [scoped observation](../../docs/m4-native-observation-0.18.1-2026-10-17.md).
+0.18.1; see the [scoped observation](../../docs/test-results/m4-native-observation-0.18.1-2026-10-17.md).
 That observation does not accept geometry, writes, Undo or M4 overall.

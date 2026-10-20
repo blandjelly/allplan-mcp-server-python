@@ -136,7 +136,7 @@ Bridge `/model-properties`, schema `m4-properties-1`. The 0.16.0 native gate
 failed with an Allplan crash on its first request. Valid requests now return
 native_probe_blocked **before build/document/API reads**. Do not repeat the broad
 experiment. No runtime/writable support may be inferred from its portable tests.
-[Incident and limits](m4-native-crash-0.16.0.md).
+[Incident and limits](test-results/m4-native-crash-0.16.0.md).
 
 The dormant implementation has also stopped unconditional GetEnumValues calls.
 That code issue is not a proven explanation of the crash. The former automatic
@@ -253,7 +253,7 @@ API basis checked against Allplan 2026:
 ## model_wall_filter — M4 wall thickness filter
 
 Schema `m4-wall-filter-1`, bridge `/model-wall-filter`; 0.19.0 source, CI and exact
-package checks passed; [scoped native filter/highlight/clear PASS](m4-wall-filter-observation-0.19.0.md). The request
+package checks passed; [scoped native filter/highlight/clear PASS](test-results/m4-wall-filter-observation-0.19.0.md). The request
 contains `action=query|highlight`, one explicit `drawing_file`, optional
 `threshold={value,unit}` (`mm`, `cm`, `m`; default 24 cm), optional up to 100
 distinct canonical nonzero `exclude_model_uuids`, and `max_walls` (default 20,
@@ -294,7 +294,7 @@ they require owner observation. `native_selection=unsupported`,
 does not read material, attributes, or metadata and invokes no setters. The
 owner workflow saves a pending record and fsyncs it before each MCP call,
 brackets the filter call with same-session health, and never retries a lost
-reply. See the [0.19.0 owner observation](m4-wall-filter-observation-0.19.0.md).
+reply. See the [0.19.0 owner observation](test-results/m4-wall-filter-observation-0.19.0.md).
 
 ## model_edit — typed model attribute/layer edits
 
@@ -479,7 +479,7 @@ checked again. Shared M3 journal/preflight/readback/recovery limits apply (up to
 never invokes setters. This is highlighting, not native selection, as agreed
 for this workflow.
 The historical 0.17.1 native observation is retained in
-[the observation record](m4-column-layer-observation-0.17.1.md).
+[the observation record](test-results/m4-column-layer-observation-0.17.1.md).
 
 The 0.17.1 native observation confirmed the field binding and two writes but
 submitted only two highlight targets, omitting a matching no-op. The owner later

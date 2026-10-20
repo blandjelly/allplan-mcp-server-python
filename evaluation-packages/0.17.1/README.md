@@ -1,6 +1,6 @@
 # 0.17.1 — correct fire resistance classification binding
 
-This package is a historical candidate. Its [retained owner observation](../../docs/m4-column-layer-observation-0.17.1.md)
+This package is a historical candidate. Its [retained owner observation](../../docs/test-results/m4-column-layer-observation-0.17.1.md)
 records two W1 writes and incomplete highlight behavior. It does not accept the
 full workflow or later candidate behavior; do not repeat the trial.
 

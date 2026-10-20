@@ -3,7 +3,7 @@
 This package is retained as historical source and delivery evidence. Its first
 `model_properties` request crashed Allplan. The native cause is unknown and the
 broad route remains suspended; do not install this package or repeat its trial.
-[Crash record](../../docs/m4-native-crash-0.16.0.md).
+[Crash record](../../docs/test-results/m4-native-crash-0.16.0.md).
 
 - Runtime source: `8ac5e97563c881f3427fc47ef752b5c5362786ee`.
 - Source CI: [38299080569](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/38299080569), 6/6 Windows/Ubuntu Python 3.11–3.13 jobs.
