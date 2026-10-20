@@ -16,7 +16,9 @@ def present_selection(service, doc, base, settings, ifw, request, *, target_mode
               "ui_visibility": "requires_owner_observation", "status": "ready_for_owner_test"}
     # Never silently substitute a highlight when native selection was requested.
     if request["action"] == "select":
-        return {**result, "state": "unsupported", "ui_calls_started": False}
+        return {**result, "state": "unsupported", "status": "unsupported", "ui_calls_started": False,
+                "next_action": {"action": "report_unsupported_native_selection",
+                                "automatic_highlight_fallback": False}}
     highlight = getattr(ifw, "HighlightService", None)
     cancel = getattr(highlight, "CancelAllHighlightedElements", None)
     apply = getattr(highlight, "HighlightElements", None)

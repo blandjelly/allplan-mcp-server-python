@@ -245,6 +245,20 @@ def observe(plans, doc, base, settings, request):
     snapshot = trace.call("M1.semantic_component_scan", lambda: plans.queries._scan(
         doc, base, settings, query, adapter_sink=live, adapter_owners=owners))
     check()
+    # Semantic enumeration intentionally retains a Slab and its MultiSlab as
+    # distinct identities. Observe ancestry before deciding which can be edited;
+    # equal geometry is never a reason to merge or redirect them.
+    from .component_ownership import observation as ownership_observation
+    for element in snapshot["elements"]:
+        if element["fields"]["type_name"].get("value") not in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
+            continue
+        representations = live.get((element["ref"]["drawing_file"], element["ref"]["model_uuid"]), {})
+        evidence = [trace.call("Slab.component_ownership", lambda adapter=adapter:
+                    ownership_observation(adapter, check))
+                    for adapters in representations.values() for adapter in adapters]
+        element["component_ownership"] = (evidence[0] if evidence and len({fingerprint(e) for e in evidence}) == 1
+            and not element["view_identity_not_checked"] else
+            {"status": "not_checked", "value": None, "reason": "slab_ownership_representation_conflict"})
     if layer_requested:
         from .wall_layer import observe as observe_wall_layer
         import NemAll_Python_IFW_ElementAdapter as native_adapters
@@ -326,6 +340,8 @@ def observe(plans, doc, base, settings, request):
               "counts": dict(Counter(c["decision"] for c in checks)), "omissions": snapshot["omissions"],
               "attribute_read_mode": request.get("attribute_read_mode", "stored"),
               "required_field_failures": required_failures,
+              "component_ownership": [{"ref": element["ref"], "observation": element["component_ownership"]}
+                                      for element in snapshot["elements"] if "component_ownership" in element],
               "criterion_failures": [
                   {"ref": element["ref"], "fields": {
                       field: copy.deepcopy(element["fields"][field])
@@ -399,6 +415,14 @@ def preview(plans, doc, base, settings, request):
                 blocked.append({"ref": element["ref"], "field": bound["field"], "reason": "target_view_unavailable"})
                 continue
             change["target_view_uuid"] = sorted(element["view_uuids"])[0]
+            if change["native_type"] in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
+                from .component_ownership import slab_write_blocker
+                ownership = element.get("component_ownership")
+                reason = slab_write_blocker(ownership)
+                if reason:
+                    blocked.append({"ref": element["ref"], "field": bound["field"], "reason": reason})
+                    continue
+                change["resource"]["component_ownership"] = copy.deepcopy(ownership)
             changes.append(change)
     ready = report["coverage"]["criteria_complete"] and not blocked and len(changes) <= plans.executor.MAX_CHANGES
     plan = {"schema_version": SCHEMA, "action": "preview", "read_only": True, "plan_id": uuid4().hex,
@@ -412,7 +436,7 @@ def preview(plans, doc, base, settings, request):
             "runtime_verified": False, "allplan_acceptance": "not_run", "usable_for_write": False,
             "expires_after_seconds": plans.TTL_SECONDS,
             "limits": {"changes": plans.executor.MAX_CHANGES, "write_scope": "one_active_foreground_drawing",
-                       "native_material_update": "unsupported_use_explicit_attribute_target"}}
+                       "native_material_update": "unsupported_no_verified_native_material_adapter"}}
     plan["undefined_policy"] = {
         "recognized_raw_values": sorted(UNDEFINED_ATTRIBUTE_VALUES),
         "allowed_metadata_types": ["integer", "real", "boolean"],

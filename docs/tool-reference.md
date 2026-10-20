@@ -153,6 +153,7 @@ is required, with only its declared parameters:
 | attribute_name | attribute_name: one exact project name; GetAttributeID and, if observed, GetAttributeName round trip. |
 | attribute_definition | attribute_id: one ID observed from project metadata/sample; name/type/unit/control readers, stopping at first unavailable value. |
 | element_attributes | drawing_file, model_uuid, view_uuid; optional name_contains, offset, limit: one exact foreground semantic component, paged ReadAll values and targeted name/ID roundtrip plus SDK scalar type metadata. |
+| component_identity | drawing_file, model_uuid, view_uuid: one exact direct foreground adapter, bounded full parent chain and direct children, and represented native Python type from GetElement; no attributes, geometry, metadata, UI or setters. |
 | layer_name | layer_name or legacy layer_short_name: exact full/short name lookup with fresh ID/name round trips; requests catalog search when the SDK lacks full-name lookup. |
 | layer_catalog | layer_name, optional offset/limit (default/max 8192 IDs): read-only Allplan 2026 name search over bounded ID pages, with a 3-second soft page budget, continuation and user-confirmation candidates. |
 | wall_sample | drawing_file (required integer) and optional model_uuid: one foreground file and one exact native Wall root; reads tier count and, only for a single-tier Wall, tier 1 thickness and raw material. |
@@ -161,6 +162,25 @@ The historical isolated Column observation invoked only `column_sample` in file
 101. The later scoped `wall_sample` observation is recorded in the
 [validation index](validation-status.md). No phase is a prerequisite for another
 package's native trial.
+
+`component_identity` retains direct Slab and MultiSlab identities separately.
+It requires consensus across wrappers for the requested model/view pair; other
+views are disclosed without being treated as property-owner evidence. Lineage
+has at most 16 parent reads, children at most 256 entries, wrappers at most 64,
+within the shared 5-second budget. Cycles, cross-file edges, inconsistent child
+owners and unavailable representations fail with `probe_scope_unavailable`.
+The native type, ancestry and children do not prove physical equivalence or
+the owner of an attribute/material/layer. The optional query field
+`component_ownership` returns observed/not_checked structural evidence; it
+cannot be used as a predicate. Default query reads are unchanged.
+
+From 0.24.0, typed model-edit plans include slab ownership evidence. Slab
+children and all MultiSlab aggregate writes are blocked pending an explicit
+property-owner adapter; no automatic redirection or bounds-based merging is
+allowed. A standalone Slab binds its hierarchy into the plan, rechecks it
+before writing, and rejects changed/unavailable ownership at fresh readback
+or recovery. Old slab plans without ownership evidence cannot authorize new
+setters; exact-ID journal replay remains setter-free.
 
 For `wall_sample`, `drawing_file` is required and must identify one foreground
 file. Optional `model_uuid` must be canonical and nonzero; explicit null is

@@ -5,12 +5,12 @@ audits and reviewed model edits. Current M4 development uses
 [`develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/tree/develop/m4);
 main remains separate.
 
-The current candidate is **0.23.0**. It adds reviewed journal and diagnostic
-trace archival. The owner confirmed selected attribute edits on Slabs and
-Columns, but the installed manifest is unavailable; those reports are not
-assigned to an exact package build. Native acceptance of the journal maintenance
-flow is pending. [Package and evidence](evaluation-packages/0.23.0/README.md) ·
-[short native trial](docs/m4-journal-cleanup-0.23.0.pl.md) ·
+The current candidate is **0.24.0**. It adds read-only component identity and
+parent/child evidence, blocks ambiguous Slab/MultiSlab writes, and expands
+single-drawing ownership/W1 contract checks. The owner reports PASS for 0.23.0
+journal preview and confirmed archival; preserve its bounded evidence.
+[Package and evidence](evaluation-packages/0.24.0/README.md) ·
+[short native trial](docs/m4-single-drawing-0.24.0.pl.md) ·
 [current handoff](docs/next-model-handoff.md).
 
 M4 remains partially accepted. Native selection, native material updates,
@@ -35,7 +35,7 @@ remaining development gates.
 
 ## Local Windows setup
 
-Use the [complete 0.23.0 evaluation package](evaluation-packages/0.23.0/README.md)
+Use the [complete 0.24.0 evaluation package](evaluation-packages/0.24.0/README.md)
 on the Windows machine running Allplan and Codex. External Python **3.11+**
 and internet access for locked dependencies are required. Allplan, Python and
 Codex are not bundled.

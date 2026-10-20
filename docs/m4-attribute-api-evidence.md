@@ -116,8 +116,11 @@ This is a plausible isolated route for a simple existing Wall: start with the
 existing object returned from its adapter, change only its intended tier
 material, and submit that same element object. Preserving all untouched fields
 and geometry is an implementation inference from that sequence, not a promise
-of the API documentation. The docs do not explain how a changed tier returned
-by `GetWallTierProperties` is reattached to `WallProperties`; and they warn
+of the API documentation. The official 2026 example, reviewed on 2026-10-21,
+demonstrates mutating a tier obtained by `GetWallTierProperties` and reattaching
+the existing properties with `wall_ele.SetProperties(wall_props)`; see the
+[pinned source and remaining gaps](m4-single-drawing-coverage-0.24.0.md).
+The API docs warn
 that `ModifyElements` does nothing when no internal modification function is
 implemented for the requested change. So this documents an API surface to
 probe, not successful material update, geometry preservation, or undo.

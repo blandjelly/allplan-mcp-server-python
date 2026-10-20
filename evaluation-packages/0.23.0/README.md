@@ -44,8 +44,13 @@ Validation evidence:
 - [Full source CI](source-ci.json) · [Exact ZIP verification](package-verification.json) ·
   [Verification log](package-verification.log) · [Verifier](verify_package.py) ·
   [Artifact hashes](artifact-hashes.json).
-- **Native maintenance acceptance: not_run.** Use only the short new maintenance
-  trial; preserve accepted slab/column attributes, layer lookup and highlights.
+- **Native maintenance acceptance: owner-reported bounded PASS for version
+  0.23.0.** The owner observation records the preview byte/record counts and
+  completed archives. The exact installed manifest/build and ZIP hash were not
+  supplied, so the trial cannot be independently bound to this exact CI ZIP.
+  Native replay, restart and conflicting-snapshot behavior are not established.
+  See [owner trial observation](../../docs/test-results/m4-journal-cleanup-0.23.0-owner-pass-2026-10-21.md).
+  Preserve accepted slab/column attributes, layer lookup and highlights.
 
 Install with `Setup.cmd`, then restart StartPythonHost and the MCP connection.
 Preserve runtime journals and archives. M4 K1–K6 completion gaps are recorded in

@@ -1,0 +1,12 @@
+{
+  "source_commit": "8e7e16040a80236bac2eca3689a42a75b83659a1",
+  "github_artifact_id": 12305720944,
+  "github_artifact_sha256": "8a527f90d2ef6b694aef4879411da60db24ff3f6338b93dcadfa00067858e532",
+  "files": {
+    "allplan_mcp_server-0.24.0-py3-none-any.whl": "485e4eadfd261ffb01986c7ba5d0d47fbba1fa2f0cfc9dd2a950b3b4485cc838",
+    "allplan-mcp-0.24.0-windows-evaluation.zip": "01378661f64db110beb2802a538e76a14e0e6b32a08d38c1f1e020b7e70ddf2f",
+    "allplan_mcp_server-0.24.0.tar.gz": "a88f96b1a0a12f77c01f8f0f3b3e7cabbb0ec79d7363793ea53e722dea6fb7d0"
+  },
+  "origin": "unchanged_original_ci_artifact",
+  "local_rebuild": false
+}

@@ -12,7 +12,7 @@ SCHEMA = "m1-query-1"
 BASIC_FIELDS = {"display_name", "type_name", "type_uuid", "layer_id", "drawing_file", "file_state"}
 GEOMETRY_FIELDS = {"bounding_box_mm", "size_x_mm", "size_y_mm", "size_z_mm",
                    "center_x_mm", "center_y_mm", "center_z_mm", "min_z_mm", "max_z_mm"}
-FIELDS = BASIC_FIELDS | GEOMETRY_FIELDS | {"hierarchy", "family", "opening_kind", "mark", "status", "wall.total_thickness_mm"}
+FIELDS = BASIC_FIELDS | GEOMETRY_FIELDS | {"hierarchy", "component_ownership", "family", "opening_kind", "mark", "status", "wall.total_thickness_mm"}
 OPS = {"eq", "ne", "lt", "lte", "gt", "gte", "in", "contains", "exists", "is_null", "is_unset"}
 
 
@@ -64,7 +64,7 @@ def predicate_fields(node, depth=0, budget=None):
             return result
     keys(node, {"field", "op", "value", "tolerance", "case_sensitive", "trim"}, {"field", "op"})
     field, op = node["field"], node["op"]
-    if not isinstance(field, str) or (field not in FIELDS - {"bounding_box_mm", "hierarchy"} and attribute_id(field) is None):
+    if not isinstance(field, str) or (field not in FIELDS - {"bounding_box_mm", "hierarchy", "component_ownership"} and attribute_id(field) is None):
         invalid("Unknown predicate field; use a supported field or attribute:<positive ID>.")
     if attribute_id(field) is not None:
         bounded_int(attribute_id(field), 1, 2147483647, "attribute ID")

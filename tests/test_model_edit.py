@@ -24,7 +24,26 @@ class ModelEditTests(unittest.TestCase):
         self.base.AttributeService.GetAttributeType.side_effect = lambda doc, ident: getattr(
             self.attribute_type_enum, self.attribute_type_names.get(ident, "Unsupported"), 999)
         elements = fixtures.ColumnLayerTests.fixture(self, values)
+        # These tests verify workflow semantics, not runner disk latency.
+        # Durable trace fsync can consume the 5-second budget on Windows CI;
+        # expiry tests advance the injected clock explicitly below.
+        self.handler.model_queries.clock = lambda: 0.0
         return elements
+
+    def test_read_budget_expiry_after_metadata_stops_before_scan_or_setter(self):
+        self.fixture(("",))
+        now = [0.0]
+        self.handler.model_queries.clock = lambda: now[0]
+        metadata = self.base.AttributeService.GetAttributeType.side_effect
+        def expire(doc, ident):
+            result = metadata(doc, ident)
+            now[0] = 6.0
+            return result
+        self.base.AttributeService.GetAttributeType.side_effect = expire
+        self.assert_code("scan_limit_exceeded", lambda: self.preview(changes=[{
+            "target": {"kind": "attribute", "attribute_id": 935}, "value": "new"}]))
+        self.base.ElementsSelectService.SelectAllElements.assert_not_called()
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
 
     def attribute_catalog(self, names):
         fixtures.ColumnLayerTests.attribute_catalog(self, names)
@@ -502,6 +521,11 @@ class ModelEditTests(unittest.TestCase):
                     {"target": {"kind": "attribute", "attribute_id": 20001}, "value": 7},
                     {"target": {"kind": "attribute", "attribute_id": 20002}, "value_type": "auto", "value": True},
                     {"target": {"kind": "attribute", "name": "Custom text"}, "value": "new"}])
+                if native_type == "MultiSlab_TypeUUID":
+                    self.assertFalse(plan["apply_available"])
+                    self.assertEqual({item["reason"] for item in plan["blocked"]},
+                                     {"aggregate_slab_requires_explicit_property_owner"})
+                    continue
                 self.assertTrue(plan["apply_available"], plan)
                 shown = self.highlight(plan)
                 self.assertEqual(shown["next_action"]["request"]["action"], "apply")
