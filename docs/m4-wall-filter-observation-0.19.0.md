@@ -66,5 +66,4 @@ Original uploads and derived inspection:
 - [Clear TXT](../evaluation-packages/0.19.0/native-acceptance/20261017-owner/m4-properties-clear-20261017T152208657656Z.txt)
 - [Inspection](../evaluation-packages/0.19.0/native-acceptance/20261017-owner/inspection.json)
 
-[Polish guide](m4-wall-filter-0.19.0.pl.md),
 [delivery and automated evidence](../evaluation-packages/0.19.0/README.md).

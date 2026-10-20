@@ -1,11 +1,9 @@
 # M4 — typowana edycja modelu: przewodnik operatora
 
-Poprawki **0.20.1** po próbie użytkownika: [Wartość U i warstwa ściany](m4-agent-fixes-0.20.1.pl.md).
-Nowszy, ograniczony owner trial **0.21.0**: [Wartość U, jawny atrybut Materiał,
-warstwa ściany i odczyt atrybutów](m4-agent-fixes-0.21.0.pl.md).
-
-Stan dokumentu: 2026-10-17. Ten przewodnik opisuje nową, eksperymentalną
-ścieżkę `model_edit` i nie oznacza jej akceptacji w Allplanie. Przeczytaj też
+Ten przewodnik opisuje kontrakt `model_edit` i jego granice; nie stanowi
+akceptacji natywnej. Aktualny stan i priorytety znajdują się w
+[handoffie](next-model-handoff.md) oraz [planie rozwoju](office-editing-development-plan.pl.md).
+Przeczytaj też
 [evidence API Allplan 2026](m4-attribute-api-evidence.md) oraz
 [kontrakt narzędzi](tool-reference.md).
 
@@ -145,33 +143,6 @@ Apply jest zablokowany przed setterami. Nie ma ukrytych częściowych zapisów
 ani automatycznych partii. Dozwolone jest tylko `preview_ready` z 1–32 zmianami.
 K6 — rozliczanie operacji wieloplikowych, partii i wyników powyżej 32 zmian —
 nie jest ukończone.
-
-## Krótka próba operatora w kopii testowej
-
-Nowa ścieżka nie ma jeszcze akceptacji natywnej. Po dostarczeniu kandydata
-owner powinien wykonać jeden krótki, ograniczony scenariusz w kopii projektu:
-
-1. Sprawdź `health`, zapisz identyfikator i hash dostarczonego kandydata oraz
-   potwierdź aktywny foregroundowy plik testowy.
-2. Użyj dokładnej nazwy istniejącego, tekstowego atrybutu na jednym prostym
-   elemencie; obejmij jedną zmianę `replace` i jedną `add` po jawnym
-   `all_and_computable`, jeśli kopia ma odpowiedni brakujący atrybut. Sprawdź
-   nazwę, wartość i typ w UI po każdej zmianie.
-3. Na jednym słupie w tym samym aktywnym pliku sprawdź połączony zapis atrybutu
-   odporności `F120` i istniejącej warstwy `W1`; potwierdź dokładny zakres,
-   odczyt po zapisie i brak zmian w polach poza planem.
-4. Sprawdź ponowne preview jako no-op i rzeczywisty zakres Undo w Allplanie.
-   Nie zakładaj jednego wspólnego Undo dla kilku setterów. Zapisz
-   odpowiedzi `health_before`/`health_after`, plan, wynik Apply i obserwację UI.
-
-Otwór `WindowDoor_TypeUUID` nie jest częścią próby odróżniania drzwi od okien;
-brakuje zaakceptowanego natywnego dyskryminatora i potwierdzonego właściciela
-atrybutu dla tych dwóch podtypów.
-
-Próba jest ograniczona do nowych typowanych setterów i połączonej zmiany
-atrybutu/warstwy. Nie powtarza zaakceptowanych odczytów, podświetlenia Column
-ani filtra dwóch ścian. Wynik ma status `not_run` do czasu tej obserwacji;
-testy przenośne i opisane API nie ustanawiają wsparcia natywnego.
 
 ## Przykłady argumentów MCP
 

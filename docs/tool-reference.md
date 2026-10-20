@@ -158,9 +158,9 @@ is required, with only its declared parameters:
 | wall_sample | drawing_file (required integer) and optional model_uuid: one foreground file and one exact native Wall root; reads tier count and, only for a single-tier Wall, tier 1 thickness and raw material. |
 
 The historical isolated Column observation invoked only `column_sample` in file
-101. The new 0.18.0 wall candidate invokes only `wall_sample` in file 101; its
-289 portable tests, six CI jobs and exact package installation passed, making it
-**ready_for_owner_test**. No phase is a prerequisite for another package's native test.
+101. The later scoped `wall_sample` observation is recorded in the
+[validation index](validation-status.md). No phase is a prerequisite for another
+package's native trial.
 
 For `wall_sample`, `drawing_file` is required and must identify one foreground
 file. Optional `model_uuid` must be canonical and nonzero; explicit null is
@@ -217,14 +217,13 @@ its one MCP call, then records the structured response. The launcher brackets
 that request with `health_before` and `health_after` replies from the same host
 session. A lost reply never causes an automatic retry or following native call.
 Read budgets remain 5 seconds and inherited M1 scan limits; failed native observations do
-not establish support. The 0.18.0 wall observation remains pending; automated
-checks do not establish accepted_on_build. [Source and delivery evidence](../evaluation-packages/0.18.0/README.md).
-[Wall guide](m4-wall-properties-0.18.0.pl.md). Historical isolated Column
-[owner guide](m4-isolated-probe-owner-test.pl.md).
+not establish support. See [retained native observations](validation-status.md)
+for scoped results; superseded trial instructions have been removed.
 
 ## model_selection — M4 UI probe
 
-Bridge `/model-selection`, schema `m4-selection-1`, status **ready_for_owner_test**.
+Bridge `/model-selection`, schema `m4-selection-1`; native selection remains
+unsupported, while scoped highlighting has owner observations.
 `highlight` takes a session-bound query selection_id and optional 0–100 distinct
 model-UUID exceptions. Every exception must belong to the full result. It freshly
 scans the original query including rejected peers, compares full-source evidence
@@ -244,7 +243,7 @@ CoordinateInput.GetSelectedElements describes cursor identification and is not
 proof of an arbitrary native UI selection. Exceptions from highlight/clear return
 state=unknown without retry; submitted counts remain null when completion is unknown.
 Presentation changes no model data, activates no files and grants no write authority.
-See [owner guide](m4-properties-owner-test.pl.md).
+Native selection remains unsupported; highlighting does not prove UI selection.
 
 API basis checked against Allplan 2026:
 [AttributeService](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/AttributeService/),
@@ -295,7 +294,7 @@ they require owner observation. `native_selection=unsupported`,
 does not read material, attributes, or metadata and invokes no setters. The
 owner workflow saves a pending record and fsyncs it before each MCP call,
 brackets the filter call with same-session health, and never retries a lost
-reply. See the [0.19.0 owner guide](m4-wall-filter-0.19.0.pl.md).
+reply. See the [0.19.0 owner observation](m4-wall-filter-observation-0.19.0.md).
 
 ## model_edit — typed model attribute/layer edits
 
@@ -479,14 +478,13 @@ checked again. Shared M3 journal/preflight/readback/recovery limits apply (up to
 32 Column layer changes). `recover` takes only the original execution_id and
 never invokes setters. This is highlighting, not native selection, as agreed
 for this workflow.
-[0.17.2 owner guide](m4-column-layer-0.17.2.pl.md).
+The historical 0.17.1 native observation is retained in
+[the observation record](m4-column-layer-observation-0.17.1.md).
 
 The 0.17.1 native observation confirmed the field binding and two writes but
-submitted only two highlight targets, omitting a matching no-op. See the
-[observation report](m4-column-layer-observation-0.17.1.md). The 0.17.2 candidate
-is **ready_for_owner_test** after 275 portable tests, six CI jobs and exact ZIP
-installation verification passed. Source and evidence scopes are in the
-[delivery README](../evaluation-packages/0.17.2/README.md). Native observation is pending.
+submitted only two highlight targets, omitting a matching no-op. The owner later
+confirmed the corrected no-op highlighting through the same handler in 0.18.1.
+See the [observation index](validation-status.md) for both scoped records.
 
 The 0.17.0 owner run bound the wrong field, 1398, and stopped with six unknown
 ReadAll omissions before setters. A healthy `health_before` and available journal
@@ -519,7 +517,8 @@ Component resolution requires semantic_component and reads Wall layer_id from
 the directly owned tiers, returning not_checked for mixed/unknown layers.
 Other component families use their existing layer reader. model_edit selects
 component resolution for layer predicates/edits automatically. Neither mode
-changes the native model. [Focused owner guide](m4-agent-fixes-0.20.1.pl.md).
+changes the native model. Current scope and next steps are in the
+[M4 handoff](next-model-handoff.md).
 
 `wall.total_thickness_mm` is a query/edit criterion read from native single-tier
 Wall properties in mm, without geometry approximation. Multi-tier or unknown
@@ -568,4 +567,4 @@ failure, maintenance fails safely and keeps the data. Oversized/unverifiable
 execution records are not deleted to unblock writes.
 
 [Owner trial](m4-journal-cleanup-0.23.0.pl.md) ·
-[M4 completion assessment](m4-completion-status-2026-10-20.pl.md).
+[Current development plan](office-editing-development-plan.pl.md).

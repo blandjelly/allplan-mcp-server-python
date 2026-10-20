@@ -1,11 +1,12 @@
-# Windows setup — 0.16.1 evaluation
+# Windows setup — M4 evaluation
 
-Use the [complete 0.16.1 ZIP](../evaluation-packages/0.16.1/README.md) on the
+Use the [complete 0.23.0 ZIP](../evaluation-packages/0.23.0/README.md) on the
 Windows machine running Allplan and Codex. External Python **3.11+** (normal
 distribution with Tcl/Tk/launcher) and internet access for locked dependencies
 are required. Allplan/Python/Codex are not bundled. [Acceptance is fixture-bound](validation-status.md).
-The isolated Column read is ready_for_owner_test; broad discovery is blocked. follow the
-[M4 observation guide](m4-isolated-probe-owner-test.pl.md). Existing M3 writing gates need no repeat.
+The 0.23.0 journal-maintenance trial is pending; follow only its
+[short owner procedure](m4-journal-cleanup-0.23.0.pl.md). Previously accepted
+native observations do not need to be repeated.
 
 1. Extract the whole ZIP into a writable versioned folder; never run inside the ZIP.
 2. Close Allplan/MCP and run **Setup.cmd**. Select the actual existing user Local

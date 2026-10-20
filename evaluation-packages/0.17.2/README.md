@@ -1,10 +1,9 @@
 # 0.17.2 — highlight matching Columns already on W1
 
-Download [the complete Windows ZIP](allplan-mcp-0.17.2-windows-evaluation.zip).
-Extract the whole archive, close Allplan and the old MCP, run **Setup.cmd** and
-select the real Local folder. Preserve logs and `Local/.allplan-mcp/repairs`.
-Restart Allplan, **StartPythonHost** and the new MCP launcher. Follow the
-[short Polish observation guide](../../docs/m4-column-layer-0.17.2.pl.md).
+This package is retained as a historical candidate. The later 0.18.1 owner
+observation exercised its no-op highlighting behavior; see the
+[retained observation](../../docs/m4-native-observation-0.18.1-2026-10-17.md).
+Do not repeat the candidate's trial.
 
 The [0.17.1 owner observation](../../docs/m4-column-layer-observation-0.17.1.md)
 confirmed the correct classification binding, two W1 updates and healthy
@@ -44,9 +43,7 @@ Validation for clean source **6e87f56fc3e200c16d229d23e0bf85c483ce1220**:
 The artifacts were built once from the clean source above. Later delivery and
 status documentation commits do not rebuild that source or alter old archives.
 
-**Native 0.17.2 Allplan observation: not_run; ready_for_owner_test.** Check the changed highlighting
-on the retained post-0.17.1 model first: Columns **1, 5, 6** highlighted,
-**0 changes**, no confirmation and no Apply. The guide includes an optional
-mixed two-change/one-no-op observation and the unconfirmed UI/Undo checks.
-Portable/CI success does not establish native visibility, geometry or Undo.
-Main integration/release and general M4 acceptance remain separate.
+The delivery's native status fields record `not_run` at build time. The owner
+later confirmed the corrected no-op highlighting through the same handler in
+0.18.1; see the [scoped observation](../../docs/m4-native-observation-0.18.1-2026-10-17.md).
+That observation does not accept geometry, writes, Undo or M4 overall.

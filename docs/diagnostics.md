@@ -4,8 +4,6 @@ Use local Windows Codex with StartPythonHost and **Launch Allplan MCP.cmd**
 running. **Diagnostics.cmd** saves read-only discovery/version/integrity/context
 data under package logs. [Windows setup](windows-setup.md).
 
-For 0.18.0 health timeouts with a running host, see the
-[0.18.1 transport investigation and health-only check](mcp-timeout-0.18.1.md).
 `ui_dispatch_unavailable` means the queued operation was cancelled before native
 execution. `host_timeout` identifies a lost read-only host response; a lost write
 still returns `execution_unknown`. OAuth discovery 404s alone do not diagnose
@@ -49,7 +47,12 @@ Original walkthroughs/reports remain in [historical records](validation-status.m
 **M3 Journal.cmd** or fix_model_issues action=inspect_journal reports verified
 historical summaries, slots and invalid/unresolved blockers without native model
 access or reconciliation. It is not a backup or proof of current values.
-At **128 records**, stop new writes. Never delete IDs to gain slots. Before
+The active execution history holds at most **128 records**, and an individual
+record has a separate **1 MiB** limit. The active diagnostic trace also has a
+**1 MiB** limit. At any capacity error, preserve the journal and trace. Never
+delete execution IDs to gain slots. Candidate 0.23.0 provides reviewed,
+confirmed archival through `fix_model_issues`; follow the
+[current owner trial](m4-journal-cleanup-0.23.0.pl.md) before using it. Before
 migration/restoration close Allplan/MCP and preserve the entire journal, original
 project and logs; bridge backups do not include journal history. Use the
 [M3 contract](m3-execution-contract.md#journal-lifecycle-and-inspection) for limits.

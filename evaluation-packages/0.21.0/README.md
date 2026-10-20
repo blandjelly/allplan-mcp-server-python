@@ -1,7 +1,7 @@
 # 0.21.0 — actionable writes and generic attribute support
 
 [Complete Windows ZIP](allplan-mcp-0.21.0-windows-evaluation.zip) ·
-[Short Polish trial](../../docs/m4-agent-fixes-0.21.0.pl.md) ·
+[Owner observation](../../docs/test-results/m4-agent-observation-v2-2026-10-18.md) ·
 [PR #15](https://github.com/blandjelly/allplan-mcp-server-python/pull/15).
 
 The owner’s v2 agent transcript stopped at prepared plans citing a false generic

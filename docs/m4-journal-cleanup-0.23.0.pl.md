@@ -25,4 +25,4 @@ zapełniaj go sztucznie w projekcie. Granice rozmiaru/liczby, przerwania, blokad
 plików i replay po archiwizacji sprawdzają testy automatyczne. Nowy przepływ
 z rzeczywistym hostem wymaga tylko tej krótkiej próby; UI nie powinno się zmienić.
 
-[Raport: co pozostaje do ukończenia M4](m4-completion-status-2026-10-20.pl.md).
+[Bieżący stan i zakres dalszych prac](office-editing-development-plan.pl.md).

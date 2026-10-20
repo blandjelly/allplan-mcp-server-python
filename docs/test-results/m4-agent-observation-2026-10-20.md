@@ -79,5 +79,5 @@ or safe journal cleanup and recovery. It does not replace the earlier
 version-scoped handoff entries or authorize repeating previously accepted
 trials.
 
-See the [M4 completion status](../m4-completion-status-2026-10-20.pl.md) for
-the remaining prioritized acceptance work.
+See the [office editing development plan](../office-editing-development-plan.pl.md)
+for the remaining prioritized acceptance work.

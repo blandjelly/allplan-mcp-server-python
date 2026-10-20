@@ -11,7 +11,7 @@ An explicit owner pause takes precedence over this procedure.
 M4 topic branches and PRs use **develop/m4** as their base; main integration
 is a separate task. Ref/PR consolidation with unchanged runtime follows the
 documentation-only checks, without repeating accepted product or native gates.
-[Branch layout](branch-layout.md).
+See the [current handoff](next-model-handoff.md) for branch and scope.
 
 ## During implementation
 

@@ -5,7 +5,7 @@ Runtime source: `35d4744bec47bf765116956a68a23bed1b6b199f`.
 
 [Windows ZIP](allplan-mcp-0.22.1-windows-evaluation.zip) ·
 [Checksum](allplan-mcp-0.22.1-windows-evaluation.zip.sha256) ·
-[Short Polish trial](../../docs/m4-journal-recovery-0.22.1.pl.md) ·
+[Owner follow-up](../../docs/test-results/m4-agent-followup-2026-10-19.md) ·
 [Owner follow-up](../../docs/test-results/m4-agent-followup-2026-10-19.md)
 
 The follow-up exposes a concrete mismatch: query/preview merges agreeing views
