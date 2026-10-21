@@ -173,8 +173,11 @@ def capability_probe(base):
         except Exception as exc:
             symbols[name] = {"status": "not_checked", "reason": type(exc).__name__}
     for name in ("DeleteElements", "ModifyElements"):
-        member = getattr(base, name, None)
-        symbols[name] = {"status": "observed", "callable": callable(member)}
+        try:
+            member = getattr(base, name)
+            symbols[name] = {"status": "observed", "callable": callable(member)}
+        except Exception as exc:
+            symbols[name] = {"status": "not_checked", "reason": type(exc).__name__}
     return {"method": "symbol_inspection_without_invocation", "symbols": symbols,
             "per_element_writability": "not_checked", "native_write_readback": "not_checked",
             "undo": "not_checked", "durable_retry_deduplication": "not_implemented",
