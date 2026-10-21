@@ -55,7 +55,13 @@ target do natywnego API; brak targetu i potomków oraz pozostanie Wall w wyjątk
 otwarcia muszą potwierdzić świeże pełne skany.
 Materiał przyjmuje dokładny tekst bez sprawdzania katalogu i wiąże dowody
 niezmienników geometrii, hierarchii i pozostałych właściwości. Te ścieżki nie
-mają jeszcze odbioru natywnego. **CI kandydata i dostawa oczekują.**
+mają jeszcze odbioru natywnego. Finalne źródło
+`574ef06ca97fced289b414faa3ba91b78b5b91ef` przeszło pełne CI: **557 testów
+na Windows i 557 na Ubuntu (Python 3.12)**, a następnie jeden build.
+Dokładny ZIP z CI przeszedł weryfikację payloadu/hashów, instalację,
+aktualizację z 0.24.0, frozen sync/import i przywrócenie. Zachowano 42 hashe
+mostka oraz znaczniki aktywnych dzienników, śladów i archiwów.
+[Dostawa i wyniki 0.25.0](../evaluation-packages/0.25.0/README.md).
 [Krótka próba](m4-single-drawing-0.25.0.pl.md) obejmuje wyłącznie te dwie
 ścieżki oraz niezaobserwowane wcześniej W1 no-op/Undo.
 [Podstawa i granice API](m4-editing-api-0.25.0.md) nie odbiera selekcji,

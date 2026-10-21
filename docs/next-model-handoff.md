@@ -27,9 +27,17 @@ The [0.25.0 trial](m4-single-drawing-0.25.0.pl.md) covers only typed deletion,
 the experimental material path, and the unobserved W1 no-op/Undo scope. The
 [API evidence note](m4-editing-api-0.25.0.md) records the documented SDK surfaces
 and remaining date/vector blockers. Native selection remains unsupported;
-date/vector/object attribute writes remain blocked. Candidate CI and package
-evidence are pending. The candidate contracts remain regression-testable, but
-no passing candidate CI is claimed here. A read-only identity-scan adjustment
+date/vector/object attribute writes remain blocked. Final source
+`574ef06ca97fced289b414faa3ba91b78b5b91ef` passed
+[CI 39660850663](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39660850663):
+557 tests on each Windows/Ubuntu Python 3.12 job, then one package build.
+166 unique focused unit/HTTP checks passed across affected iteration runs.
+The exact original CI ZIP passed payload/checksum, registration, frozen
+sync/import, upgrade from 0.24.0 and restore; 42 bridge hashes and active/archive
+journal/trace/log markers were preserved. An initial CI capability-metadata
+failure was corrected before this final run; it produced no package.
+[0.25.0 delivery and evidence](../evaluation-packages/0.25.0/README.md).
+A read-only identity-scan adjustment
 now limits `model_identity` fields to `file_state` and required type identity,
 so differing `layer_id` or display names between wrappers no longer block a
 structural identity result. That does not prove the cause of, or resolve, the
