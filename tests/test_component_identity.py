@@ -103,6 +103,23 @@ class ComponentIdentityTests(unittest.TestCase):
         first.GetAttributes.assert_not_called()
         second.GetAttributes.assert_not_called()
 
+    def test_identity_probe_does_not_require_layer_or_display_name_consensus(self):
+        first, second = self.element(30), self.element(30)
+        first.GetElementUUID.return_value = second.GetElementUUID.return_value = "10000000-0000-4000-8000-000000000030"
+        first.GetCommonProperties.return_value.Layer = 7
+        second.GetCommonProperties.return_value.Layer = 8
+        first.GetDisplayName.return_value = "Slab representation A"
+        second.GetDisplayName.return_value = "Slab representation B"
+        self.fixture([first, second])
+        result = self.identity_probe(first)
+        self.assertEqual(result["state"], "observed")
+        self.assertEqual(result["representation_count"], 2)
+        self.assertFalse(result["property_write_available"])
+        first.GetCommonProperties.assert_not_called()
+        second.GetCommonProperties.assert_not_called()
+        first.GetDisplayName.assert_not_called()
+        second.GetDisplayName.assert_not_called()
+
     def test_query_component_ownership_is_opt_in_and_not_a_predicate_field(self):
         adapter = self.element()
         self.fixture([adapter])

@@ -61,6 +61,9 @@ def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapte
 
 def observe(doc, base, queries, change, diagnostics=None):
     owners = []
+    if change.get("adapter_version") == "m4-model-edit-1" and change.get("operation") == "delete_element":
+        from .model_delete import observe_deleted
+        return observe_deleted(doc, base, queries, change, diagnostics)
     if change.get("adapter_version") == "m4-model-edit-1":
         from .native_model_edit import read_consensus
         roots = resolve(doc, base, queries, change, adapter_owners=owners, all_representations=True)
@@ -77,10 +80,10 @@ def read(base, queries, element, change):
                            "active_foreground")[change["field"]]
 
 
-def write(base, element, change):
+def write(base, element, change, doc=None, check=lambda: None):
     if change.get("adapter_version") == "m4-model-edit-1":
         from . import native_model_edit
-        return native_model_edit.write(base, element, change)
+        return native_model_edit.write(base, element, change, doc, check)
     import NemAll_Python_IFW_ElementAdapter as adapters
     targets = adapters.BaseElementAdapterList()
     targets.append(element)

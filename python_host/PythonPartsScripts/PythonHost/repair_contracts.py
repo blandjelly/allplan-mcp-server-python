@@ -172,6 +172,12 @@ def capability_probe(base):
                              "doc": (getattr(member, "__doc__", None) or "")[:2048]}
         except Exception as exc:
             symbols[name] = {"status": "not_checked", "reason": type(exc).__name__}
+    for name in ("DeleteElements", "ModifyElements"):
+        try:
+            member = getattr(base, name)
+            symbols[name] = {"status": "observed", "callable": callable(member)}
+        except Exception as exc:
+            symbols[name] = {"status": "not_checked", "reason": type(exc).__name__}
     return {"method": "symbol_inspection_without_invocation", "symbols": symbols,
             "per_element_writability": "not_checked", "native_write_readback": "not_checked",
             "undo": "not_checked", "durable_retry_deduplication": "not_implemented",
