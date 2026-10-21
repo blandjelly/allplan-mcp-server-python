@@ -320,8 +320,29 @@ class ModelDeleteTests(unittest.TestCase):
         self.assertEqual(applied["outcomes"][0]["state"], "unknown")
         self.assertTrue(self.apply(plan, execution_id)["replayed"])
         self.assertEqual(attempts, [target.GetModelElementUUID()])
+
         recovered = self.recover(execution_id)
         self.assertTrue(recovered["read_only"])
         self.assertEqual(recovered["outcomes"][0]["state"], "unknown")
         self.assertEqual(attempts, [target.GetModelElementUUID()])
+
+    def test_unavailable_or_passive_file_identity_cannot_prove_deletion(self):
+        for signed_file in (0, -101):
+            with self.subTest(signed_file=signed_file):
+                target = self.fixture(("",))[0]
+                def lose_file_identity(doc, adapters):
+                    target.GetDrawingfileNumber.return_value = signed_file
+                self.base.DeleteElements.reset_mock()
+                self.base.DeleteElements.side_effect = lose_file_identity
+                plan = self.preview(predicate=None, changes=[{"target": {"kind": "delete"}}])
+                self.highlight(plan)
+                execution_id = uuid4().hex
+                result = self.apply(plan, execution_id)
+                self.assertEqual(result["outcomes"][0]["state"], "unknown")
+                self.assertTrue(self.apply(plan, execution_id)["replayed"])
+                self.base.DeleteElements.assert_called_once()
+                recovered = self.recover(execution_id)
+                self.assertEqual(recovered["outcomes"][0]["state"], "unknown")
+                self.assertTrue(recovered["read_only"])
+                self.base.DeleteElements.assert_called_once()
 

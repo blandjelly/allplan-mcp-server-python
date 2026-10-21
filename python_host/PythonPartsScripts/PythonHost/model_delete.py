@@ -107,6 +107,8 @@ def observe_deleted(doc, base, queries, change, diagnostics=None):
             raise BridgeError("scan_limit_exceeded", "Deletion absence scan exceeded budget.", 409)
         # Unreadable candidate identities/lifecycle abort rather than proving absence.
         signed = integer(adapter.GetDrawingfileNumber())
+        if signed == 0 or signed == -ref["drawing_file"]:
+            raise BridgeError("repair_conflict", "Deletion absence scan has unavailable or conflicting drawing-file identity.", 409)
         if abs(signed) != ref["drawing_file"]:
             continue
         model = guid(adapter.GetModelElementUUID())
