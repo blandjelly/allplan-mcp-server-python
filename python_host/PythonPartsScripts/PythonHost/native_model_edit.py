@@ -195,12 +195,19 @@ def _writable(doc, base, queries, element, change, diagnostics, budget):
             raise BridgeError("target_not_writable", f"Target fails {method}; no write requested.", 409)
     if integer(element.GetDrawingfileNumber()) != ref["drawing_file"]:
         raise BridgeError("target_not_writable", "Passive target cannot be changed.", 409)
-    if change.get("native_type") in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
+    if change.get("native_type") in {"Slab_TypeUUID", "MultiSlab_TypeUUID"} and change.get("operation") != "delete_element":
         _slab_ownership(element, change, budget)
     if change.get("operation") == "set_wall_layer":
         import NemAll_Python_IFW_ElementAdapter as native_adapters
         from .wall_layer import preflight
         preflight(base, element, change, native_adapters, budget)
+    if change.get("operation") == "delete_element":
+        from .model_delete import preflight
+        preflight(element, change, budget)
+    if change.get("operation") == "set_native_material":
+        from .wall_material import read as read_material
+        if read_material(base, element, change, budget) != change["old_value"]:
+            _conflict("Wall material or preservation evidence changed before write.")
 
 
 def read_consensus(base, queries, elements, change, diagnostics=None):
@@ -254,6 +261,13 @@ def read(base, queries, element, change):
     attribute read including computed attributes. Missing from ReadAll alone is
     deliberately reported as unknown, because ReadAll omits computed values.
     """
+    if change.get("operation") == "set_native_material":
+        from .wall_material import read as read_material
+        return read_material(base, element, change)
+    if change.get("operation") == "delete_element":
+        from .model_delete import preflight
+        preflight(element, change)
+        return {"status": "observed", "value": True}
     if change.get("native_type") in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
         try:
             _slab_ownership(element, change)
@@ -425,10 +439,16 @@ def _slab_ownership(element, change, check=lambda: None):
         _conflict("Slab ownership changed or became unavailable since preview.")
 
 
-def write(base, element, change):
+def write(base, element, change, doc=None, check=lambda: None):
     """Invoke an established setter only for the explicit evaluation adapter."""
     if change.get("adapter_version") != "m4-model-edit-1":
         raise BridgeError("target_not_writable", "Native model edit adapter version is not enabled.", 409)
+    if change.get("operation") == "delete_element":
+        from .model_delete import write as delete
+        return delete(base, element, change, doc, check)
+    if change.get("operation") == "set_native_material":
+        from .wall_material import write as set_material
+        return set_material(base, element, change, doc, check)
     # Also guard the final native boundary, including a missing native_type in
     # a malformed change. No legacy plan can bypass the new slab owner gate.
     try:

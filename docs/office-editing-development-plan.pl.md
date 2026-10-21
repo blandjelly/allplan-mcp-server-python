@@ -31,13 +31,35 @@ wiąże własność z planem i ponownie sprawdza ją przed zapisem i readback.
 Testy automatyczne rozszerzają W1, wyłączenia, replay/no-op oraz odmowę
 nieobsługiwanych typów. [Macierz i luki API](m4-single-drawing-coverage-0.24.0.md) ·
 [krótka próba](m4-single-drawing-0.24.0.pl.md).
-Punkty 2–5 nie mają pełnego odbioru natywnego; selekcja i zapis materiału
-pozostają brakami implementacji, a daty/wektory wymagają osobnych kodeków.
+Punkty 2–5 nie mają pełnego odbioru natywnego. Selekcja pozostaje
+nieobsługiwana, a daty/wektory wymagają osobnych kodeków.
+Właściciel potwierdził, że najnowszy log odpowiada zachowaniu Allplana przy
+wersji 0.24.0. [Ograniczona obserwacja](test-results/m4-owner-observation-0.24.0-2026-10-21.md)
+zachowuje jej zakres: readback W1 bez próby no-op/Undo, nieudany dokładny
+probe view stropu, odmowę selekcji natywnej i usunięcie przez interfejs
+rozmowy. Nie potwierdza to istnienia typowanego narzędzia MCP delete.
 Pełne CI finalnego źródła przeszło 529 testów na każdym systemie
 Windows/Ubuntu (Python 3.12), po nim wykonano jeden build. Dokładny ZIP z CI
 przeszedł weryfikację i aktualizację/przywrócenie z 0.23.0, zachowując 40 hashy
 mostka oraz znaczniki dzienników i archiwów.
 [Dostawa i wyniki 0.24.0](../evaluation-packages/0.24.0/README.md).
+
+Kandydat **0.25.0** dodaje do `model_edit` dwa odrębne kontrakty: usunięcie
+dokładnego terminalnego root komponentu z pełnym, ograniczonym poddrzewem
+(maks. 256 adapterów łącznie z celem) oraz wyjątek dla `WindowDoor_TypeUUID`
+o dokładnej linii `[opening, Wall root]` bez makro-przodków; nie usuwa to Wall.
+Slab child pozostaje zablokowany, chyba że obejmuje go wybrany pełny root
+MultiSlab. Kandydat dodaje też eksperymentalny zapis natywnego
+materiału tier 1 samodzielnej, jednowarstwowej ściany. Usunięcie wysyła tylko
+target do natywnego API; brak targetu i potomków oraz pozostanie Wall w wyjątku
+otwarcia muszą potwierdzić świeże pełne skany.
+Materiał przyjmuje dokładny tekst bez sprawdzania katalogu i wiąże dowody
+niezmienników geometrii, hierarchii i pozostałych właściwości. Te ścieżki nie
+mają jeszcze odbioru natywnego. **CI kandydata i dostawa oczekują.**
+[Krótka próba](m4-single-drawing-0.25.0.pl.md) obejmuje wyłącznie te dwie
+ścieżki oraz niezaobserwowane wcześniej W1 no-op/Undo.
+[Podstawa i granice API](m4-editing-api-0.25.0.md) nie odbiera selekcji,
+materiału, rodzin ani kodeków. Kandydat nie zamyka priorytetów 1–5.
 
 Nie powtarzać zaakceptowanych odczytów, zapytań, podświetleń ani zapisów
 atrybutów słupów i stropów. Identyczne granice przestrzenne wyników
@@ -72,31 +94,45 @@ wykończenia. Właściciel właściwości oraz dokładny cel muszą być jawne.
    lub zbyt dużego rekordu. Incydent właściciela nie zawiera dokładnego błędu,
    więc osobno rozróżnić limit 1 MiB śladu, 128 aktywnych rekordów i limit 1 MiB
    na rekord; nie przypisywać przyczyny bez dowodu.
-2. **Tożsamość celów stropów — odczyt i blokady wdrożone, obserwacja oczekuje.**
-   Użyć `component_identity` w read-only i zachować typ adaptera,
-   model/view UUID, tożsamość rodzica/dziecka i relację do reprezentanta
-   natywnego. Nie scalać wyników na podstawie samych bounds. Sprawdzić, że
-   zapytanie i plan nie mnożą zmian ani nie zapisują do niewłaściwego właściciela.
-3. **Pojedynczy rysunek — rozszerzone testy automatyczne, odbiór W1 oczekuje.** Zbadać tylko
-   niepotwierdzony zapis istniejącej warstwy W1, pełne rozliczenie celów i
-   wyłączeń, świeży readback, no-op oraz zakres Undo. Nie powtarzać
-   zaakceptowanych filtrów, podświetleń i zapisów atrybutów.
-4. **Selekcja i materiał — oddzielne luki implementacji i odbioru.** Przegląd
-   przykładów SDK 2026 wykazał interaktywny cykl selekcji i ścieżkę
-   `WallElement.SetProperties` → `ModifyElements`, ale nie dowód bezpiecznego
-   ustawienia selekcji zapytania lub zmiany materiału. Nie włączać setterów
-   ani zamiany na inny rodzaj właściwości na podstawie samego API. Podświetlenie
-   nie jest dowodem selekcji Allplana. Próba materiału musi wskazać właściwy
-   obiekt lub warstwę, potwierdzić zmianę w UI i API, zachować geometrię i
-   pozostałe warstwy oraz sprawdzić readback i Undo.
+2. **Tożsamość celów stropów — odczyt i blokady wdrożone, wynik natywny
+   nierozstrzygnięty.** Odczyt `model_identity` ograniczono do `file_state` i
+   wymaganej tożsamości type; różne `layer_id` lub nazwy w wrapperach nie
+   blokują już strukturalnego wyniku. Regresja obejmuje taką rozbieżność, ale
+   nie ustala przyczyny ani nie rozstrzyga natywnego błędu właściciela z 0.24.0.
+   Log 0.24.0 opisuje dwa wyniki `Slab_TypeUUID` i
+   `MultiSlab_TypeUUID`; dokładny probe pierwszego zwrócił
+   `probe_scope_unavailable`, a view UUID płyty potomnej w drugim różnił się
+   od view UUID pierwszego wyniku. Zachować typ adaptera, model/view UUID,
+   rodzica/dziecko i reprezentację natywną. Nie scalać wyników na podstawie
+   bounds ani nie zapisywać do nich przed wyjaśnieniem relacji celu.
+3. **Pojedynczy rysunek — rozszerzone testy automatyczne, brak natywnego W1
+   no-op/Undo.** Log 0.24.0 potwierdza readback warstwy W1 (ID 65535) dla
+   słupa `(12000, 6000 mm)`, ale nie no-op ani Undo. Użyć krótkiej próby 0.25.0
+   wyłącznie dla niezaobserwowanych no-op/Undo na jawnych, odrębnych celach.
+   Nie powtarzać poprzedniego readbacku ani zaakceptowanych zapisów atrybutów.
+4. **Selekcja, usuwanie i materiał — oddzielne stany implementacji i odbioru.**
+   Log 0.24.0 stwierdza, że selekcja programowa jest nieobsługiwana;
+   podświetlenie ma tylko stan `submitted`, bez potwierdzenia widoczności.
+   Usunięcie słupa `MCP_QA_MARK=6` w UI i późniejszy odczyt zera wyników
+   potwierdzają przepływ UI, nie API MCP. Kandydat 0.25.0 dodaje typowane
+   usunięcie dokładnego root z weryfikacją całego poddrzewa; jego obsługa
+   kaskady nie jest zakładana. Dodaje też eksperymentalny setter natywnego
+   materiału dla jednowarstwowej ściany, oparty na udokumentowanych metodach
+   SDK i jawnych dowodach niezmienników. Obie ścieżki wymagają ograniczonej
+   próby właściciela. Selekcja nadal jest nieobsługiwana.
 5. **Macierz rodzin i typów — uzupełniona, odbiór natywny nadal częściowy.**
    [Macierz 0.24.0](m4-single-drawing-coverage-0.24.0.md) rozdziela adaptery,
    właścicieli, testy i nieobsługiwane kodeki. Obecne celowane zapisy obejmują
    tekst, Integer, Double, Boolean, SDK Integer/CheckBox i etykiety Enum.
-   Daty, wektory i inne obiekty SDK nie mają pełnych, odebranych kodeków.
+   Daty, wektory i inne obiekty SDK pozostają zablokowane: brak zaakceptowanego
+   payloadu/settera istniejącego adaptera i dokładnego readbacku w tym
+   kontrakcie. Samo `AttributeDate`, `AttributeDoubleVec` lub
+   `Polyhedron3D.WriteToStream` tego nie ustanawia.
    Sprawdzić osobno ściany, belki, stropy, słupy, drzwi i okna, w tym właściciela
    pola, warianty natywne, otwory i elementy wstawione. API ani atrapowe testy
-   nie zastępują krótkiej próby w konkretnym buildzie Allplana.
+   nie zastępują krótkiej próby w konkretnym buildzie Allplana. Log 0.24.0
+   dodaje ograniczone obserwacje atrybutu ściany REI120 i usuwania słupa przez
+   UI; nie odbiera to pełnej macierzy rodzin ani natywnego materiału.
 6. **Dopiero potem zaprojektować pracę wieloplikową.** Potrzebne są manifest,
    deterministyczne partie, jawne wyniki częściowe, obsługa timeout/restart i
    pomiary dla ponad 32 zmian oraz ponad 200 wyników. Nie deklarować atomowości

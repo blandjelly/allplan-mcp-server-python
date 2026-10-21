@@ -85,7 +85,14 @@ def bind_changes(doc, base, request, check, trace):
     for choice in request["changes"]:
         check()
         target = choice["target"]
-        if target["kind"] == "layer":
+        if target["kind"] == "delete":
+            item = {"field": "element_exists", "operation": "delete_element", "property_role": "element",
+                    "resource": {}, "new_value": False}
+        elif target["kind"] == "native_material":
+            item = {"field": "wall.native_material", "operation": "set_native_material", "property_role": "native_material",
+                    "resource": {"tier_index": 1, "data_type": "text", "binding": "exact_native_material_string"},
+                    "new_value": choice["value"]}
+        elif target["kind"] == "layer":
             from .layer_names import bounded_layer_id
             doc_id = integer(read("DocumentAdapter.GetDocumentID", doc.GetDocumentID))
             if "name" in target:
@@ -239,12 +246,38 @@ def observe(plans, doc, base, settings, request):
                               {"display_name", "layer_id", "file_state", "family"}),
              "attribute_ids": attribute_ids, "max_adapters": request.get("max_adapters", 5000)}
     layer_requested = any(b["operation"] == "set_layer" for b in binding)
+    delete_requested = any(b["operation"] == "delete_element" for b in binding)
+    material_requested = any(b["operation"] == "set_native_material" for b in binding)
+    query["fields"] = [field for field in query["fields"] if field not in {"element_exists", "wall.native_material"}]
     if layer_requested or "layer_id" in predicate_fields(request.get("predicate")):
         query["layer_resolution"] = "component"
     live, owners = {}, []
     snapshot = trace.call("M1.semantic_component_scan", lambda: plans.queries._scan(
         doc, base, settings, query, adapter_sink=live, adapter_owners=owners))
     check()
+    if material_requested:
+        from .wall_material import observation as material_observation
+        for element in snapshot["elements"]:
+            representations = live.get((element["ref"]["drawing_file"], element["ref"]["model_uuid"]), {})
+            values = [trace.call("Wall.native_material_preservation", lambda adapter=adapter:
+                      material_observation(base, adapter, check))
+                      for wrappers in representations.values() for adapter in wrappers]
+            if values and len({fingerprint(value) for value in values}) == 1 and not element["view_identity_not_checked"]:
+                element["fields"]["wall.native_material"], element["wall_material_state"] = values[0]
+            else:
+                element["fields"]["wall.native_material"] = {"status": "not_checked", "value": None,
+                                                            "reason": "native_material_representation_conflict"}
+    if delete_requested:
+        from .model_delete import ownership as delete_ownership
+        for element in snapshot["elements"]:
+            representations = live.get((element["ref"]["drawing_file"], element["ref"]["model_uuid"]), {})
+            evidence = [trace.call("Component.delete_ownership", lambda adapter=adapter:
+                        delete_ownership(adapter, check))
+                        for wrappers in representations.values() for adapter in wrappers]
+            element["delete_ownership"] = (evidence[0] if evidence and len({fingerprint(e) for e in evidence}) == 1
+                and not element["view_identity_not_checked"] else
+                {"status": "not_checked", "value": None, "reason": "delete_ownership_representation_conflict"})
+            element["fields"]["element_exists"] = {"status": "observed", "value": True}
     # Semantic enumeration intentionally retains a Slab and its MultiSlab as
     # distinct identities. Observe ancestry before deciding which can be edited;
     # equal geometry is never a reason to merge or redirect them.
@@ -382,7 +415,7 @@ def preview(plans, doc, base, settings, request):
                 reason = "replace_requires_existing_attribute"
             elif observed and mode == "add":
                 reason = "add_requires_proven_absence"
-            elif observed and bound["operation"] != "set_layer" and old.get("value") is not None and not value_matches(old["value"], bound["resource"]["data_type"]):
+            elif observed and bound["operation"] not in {"set_layer", "delete_element"} and old.get("value") is not None and not value_matches(old["value"], bound["resource"]["data_type"]):
                 data_type = bound["resource"].get("data_type")
                 undefined_numeric_or_boolean = (
                     data_type in {"integer", "real", "boolean"}
@@ -415,7 +448,24 @@ def preview(plans, doc, base, settings, request):
                 blocked.append({"ref": element["ref"], "field": bound["field"], "reason": "target_view_unavailable"})
                 continue
             change["target_view_uuid"] = sorted(element["view_uuids"])[0]
-            if change["native_type"] in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
+            if bound["operation"] == "delete_element":
+                from .model_delete import blocker as delete_blocker
+                ownership = element.get("delete_ownership")
+                reason = delete_blocker(ownership)
+                if reason:
+                    blocked.append({"ref": element["ref"], "field": bound["field"], "reason": reason})
+                    continue
+                descendant_ids = {item["model_uuid"] for item in ownership["value"]["descendants"]}
+                if descendant_ids & set(request.get("exclude_model_uuids", [])):
+                    blocked.append({"ref": element["ref"], "field": bound["field"], "reason": "delete_contains_excluded_descendant"})
+                    continue
+                change["resource"]["delete_ownership"] = copy.deepcopy(ownership)
+            elif bound["operation"] == "set_native_material":
+                if not element.get("wall_material_state"):
+                    blocked.append({"ref": element["ref"], "field": bound["field"], "reason": "native_material_preservation_unavailable"})
+                    continue
+                change["resource"]["wall_material_state"] = copy.deepcopy(element["wall_material_state"])
+            elif change["native_type"] in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
                 from .component_ownership import slab_write_blocker
                 ownership = element.get("component_ownership")
                 reason = slab_write_blocker(ownership)
@@ -424,6 +474,12 @@ def preview(plans, doc, base, settings, request):
                     continue
                 change["resource"]["component_ownership"] = copy.deepcopy(ownership)
             changes.append(change)
+    if any(change["operation"] == "delete_element" for change in changes):
+        descendants = {item["model_uuid"] for change in changes
+                       for item in change["resource"]["delete_ownership"]["value"]["descendants"]}
+        blocked = [item for item in blocked if not (item["reason"] == "delete_parent_requires_explicit_owner"
+                                                   and item["ref"]["model_uuid"] in descendants)]
+        targets = [target for target in targets if target["model_uuid"] not in descendants]
     ready = report["coverage"]["criteria_complete"] and not blocked and len(changes) <= plans.executor.MAX_CHANGES
     plan = {"schema_version": SCHEMA, "action": "preview", "read_only": True, "plan_id": uuid4().hex,
             "state": ("preview_ready" if changes else "no_op") if ready else "not_checked",
@@ -436,7 +492,8 @@ def preview(plans, doc, base, settings, request):
             "runtime_verified": False, "allplan_acceptance": "not_run", "usable_for_write": False,
             "expires_after_seconds": plans.TTL_SECONDS,
             "limits": {"changes": plans.executor.MAX_CHANGES, "write_scope": "one_active_foreground_drawing",
-                       "native_material_update": "unsupported_no_verified_native_material_adapter"}}
+                       "native_material_update": "experimental_single_tier_Wall_without_openings",
+                       "deletion": "exact_component_roots_or_Wall_owned_openings_with_reviewed_subtrees"}}
     plan["undefined_policy"] = {
         "recognized_raw_values": sorted(UNDEFINED_ATTRIBUTE_VALUES),
         "allowed_metadata_types": ["integer", "real", "boolean"],

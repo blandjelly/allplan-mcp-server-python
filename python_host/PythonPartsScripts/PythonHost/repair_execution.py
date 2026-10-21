@@ -349,6 +349,22 @@ class RepairExecutor:
                     or change.get("native_type") not in COMPONENT_TYPES):
                 return False
             seen.add(key)
+            if change.get("operation") == "set_native_material":
+                from .wall_material import valid_change
+                capability = plan["capabilities"]["symbols"].get("ModifyElements", {})
+                if (not valid_change(change) or capability.get("status") != "observed"
+                        or capability.get("callable") is not True
+                        or any(item.get("operation") != "set_native_material" for item in changes)):
+                    return False
+                continue
+            if change.get("operation") == "delete_element":
+                from .model_delete import valid_change
+                capability = plan["capabilities"]["symbols"].get("DeleteElements", {})
+                if (not valid_change(change) or capability.get("status") != "observed"
+                        or capability.get("callable") is not True
+                        or any(item.get("operation") != "delete_element" for item in changes)):
+                    return False
+                continue
             if change.get("native_type") in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
                 from .component_ownership import slab_write_blocker
                 if slab_write_blocker(resource.get("component_ownership")):
@@ -484,6 +500,11 @@ class RepairExecutor:
             raise BridgeError("repair_conflict", "Audited source changed during preflight.", 409)
         expected = {e["ref"]["model_uuid"]: copy.deepcopy(e["fields"]) for e in before["elements"]}
         for change in plan["changes"]:
+            if change.get("operation") == "delete_element":
+                ownership = change["resource"]["delete_ownership"]["value"]
+                for target in [ownership["target"], *ownership["descendants"]]:
+                    expected.pop(target["model_uuid"], None)
+                continue
             fields = expected[change["ref"]["model_uuid"]]
             fields[change["field"]] = {"status": "observed", "value": change["new_value"]}
             role = change.get("property_role")
@@ -541,7 +562,13 @@ class RepairExecutor:
             self.save(record)  # Write-ahead marker: a crash cannot authorize replay.
             stage = "setter"
             try:
-                native_repairs.write(base, element, change)
+                if change.get("operation") in {"delete_element", "set_native_material"}:
+                    def write_budget():
+                        if self.plans.queries.clock() - started >= 20:
+                            raise BridgeError("scan_limit_exceeded", "Native mutation preflight exceeded execution budget.", 409)
+                    native_repairs.write(base, element, change, doc=doc, check=write_budget)
+                else:
+                    native_repairs.write(base, element, change)
                 if index == 0 and request.get("evaluation_stop"):
                     # Leave the actual durable write-ahead marker unchanged. No
                     # readback, final save, second setter or fabricated failure.

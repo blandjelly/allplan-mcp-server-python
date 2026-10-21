@@ -316,23 +316,70 @@ owner workflow saves a pending record and fsyncs it before each MCP call,
 brackets the filter call with same-session health, and never retries a lost
 reply. See the [0.19.0 owner observation](test-results/m4-wall-filter-observation-0.19.0.md).
 
-## model_edit — typed model attribute/layer edits
+## model_edit — typed edits, exact deletion and Wall material
 
 Schema `m4-model-edit-1`, bridge `/model-edit`. This is an experimental
 preview/apply path for edits selected by a criterion, independent of audit
 findings. It supports exact attribute targets with `text`, `integer`, `real`,
 `boolean`, or explicitly selected `enum` values and modes `replace`, `add`, or
-`upsert`, plus a separate existing organizational layer target.
+`upsert`, plus a separate existing organizational layer target. Candidate
+0.25.0 adds two exclusive operations: `target={"kind":"delete"}` with no
+value, or `target={"kind":"native_material","tier_index":1}` with an exact
+material string. Each must be the only change in its plan.
 `value_type=auto` (the default) infers the type from the exact bound attribute's
 loaded SDK type, including Enum when an exact display label passes the targeted
 label/key round trip. JSON booleans for Integer fields are encoded as 1/0 only
 when targeted SDK metadata confirms `AttributeControlType.CheckBox`; this codec
 is hash-bound and rebound before Apply. Other integers do not accept booleans.
-It never parses a string to infer a type. Values
-such as `Beton C37` are distinct from a wall's native material and visual
-surface; this route does not
-modify native element properties. Dates and general attribute catalog discovery
+It never parses a string to infer a type. Attribute values such as
+`Beton C37` remain distinct from a wall's native material and visual surface.
+Date/vector/object attribute codecs and general attribute catalog discovery
 are outside this contract.
+
+### `delete` — exact component root only
+
+The delete target is eligible only for a terminal supported component root in
+one active foreground drawing, with one narrow exception: a `WindowDoor_TypeUUID`
+opening is independently deletable when its complete lineage is exactly
+`[opening, Wall root]` (no macro ancestors). The operation binds only that
+opening and its owned subtree; it never redirects to the parent Wall. Slab
+children remain blocked unless covered by the full subtree of an explicitly
+selected `MultiSlab_TypeUUID` root. Planning binds the exact target identity
+and its complete owned subtree, bounded to 256 adapters including the target.
+A child selected without its owning root is blocked, except for the documented
+opening case. If both a root and a child inside its reviewed subtree match, the
+child is suppressed as covered by the root; an exclusion that crosses that
+subtree blocks deletion of the root. Incomplete hierarchy, cycles, cross-file
+ownership, or an over-budget tree block the plan.
+
+Apply calls `DeleteElements(doc, [target_adapter])` once. Cascade behavior is
+not assumed. Completion requires a fresh complete identity scan of the planned
+target and every bound descendant and confirmation that all are absent. For an
+opening target, its parent Wall must still be present; disappearance of the
+parent makes the result unknown. A partial subtree, unreadable scan, or timeout
+leaves an unknown result; recover the same execution ID without repeating
+deletion. The shared journal, exact target binding, confirmation, and setter-free
+replay/recovery safeguards apply.
+
+### `native_material` — experimental single-tier Wall only
+
+The only accepted form is an exact nonempty string of at most 255 characters
+and explicit `tier_index=1`. The target must resolve to a standalone
+`Wall_TypeUUID` represented by `WallElement`, have exactly one tier, and have
+no `WindowDoor_TypeUUID` children. No material catalog lookup, existence claim,
+alias resolution, surface edit, or attribute substitution occurs.
+
+The plan binds the current material, complete bounded hierarchy, valid tier
+`Polyhedron3D` stream hash, and explicit tier/common scalar and axis/plane/
+surface preservation representations. Apply rechecks this evidence, invokes
+`SetMaterial(exact_string)` on tier 1, reattaches the same `WallProperties`,
+and submits the existing Wall through `ModifyElements`. Fresh readback must
+match the requested material and the bound preservation evidence. Drift or an
+incomplete observation blocks Apply or leaves recovery to the same execution
+ID; setters are never retried. This adapter is experimental and has no native
+Allplan acceptance yet. The narrow trial is in
+[the 0.25.0 owner instructions](m4-single-drawing-0.25.0.pl.md); SDK evidence
+and its limits are in [the API note](m4-editing-api-0.25.0.md).
 
 The default native type list is Column, Beam, SkeletonBeam, Wall, Slab,
 MultiSlab, and the documented `WindowDoor_TypeUUID` opening adapter. Without
@@ -370,8 +417,10 @@ with `GetEnumIDFromValueString`, roundtrips key to label with
 `GetEnumValueStringFromID`, and verifies label to key again. It does not call
 `GetEnumValues` or enumerate an enum catalog. The stored setter value and
 readback remain the exact label; the hash-bound resource also records the
-resolved `enum_binding` key/label and is rebound during preflight. Dates remain
-unsupported because a safe `ChangeAttributes` payload is not documented.
+resolved `enum_binding` key/label and is rebound during preflight. Date and
+vector attribute targets remain blocked: the documented attribute-container
+classes do not establish an accepted existing-adapter setter payload and exact
+fresh-readback codec for this contract.
 Allplan's published metadata API does not itself establish that an arbitrary
 attribute is writable. `ChangeAttributes` can append an existing attribute
 definition to an element, but this route does not create project attribute

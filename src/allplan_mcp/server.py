@@ -268,7 +268,7 @@ def column_layer(request: ColumnLayerRequest) -> dict[str, Any]:
 
 @mcp.tool
 def model_edit(request: ModelEditRequest) -> dict[str, Any]:
-    """Find semantic components and plan typed attribute/layer edits without audit findings.
+    """Find components and plan typed attributes, layers, native material or deletion.
 
     Use exact project attribute names/IDs, never guessed IDs. Preview defaults to
     open_drawings and binds the whole family scope, predicate, explicit exclusions,
@@ -289,8 +289,24 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     confirmed_targets entry in a new preview, including expected_layer_id and
     expected_name. This keeps the user's choice bound to the same ID and names.
     Never translate or invent a layer short name.
-    Attribute material is distinct from native material
-    and surface; this route does not update native properties.
+    Attribute material is distinct from native material and surface.
+    Native material uses changes=[{target:{kind:native_material,tier_index:1},value:EXACT_STRING}]
+    as the only edit. It requires a standalone single-tier Wall without openings,
+    readable native scalar properties and serialized Polyhedron3D tier geometry.
+    The exact string is a native property value, without catalog validation or
+    catalog creation. Geometry and explicit non-material evidence must remain
+    unchanged at preflight and fresh readback; unsupported variants are blocked.
+    Complex property representations provide bounded drift evidence only.
+    Delete with changes=[{target:{kind:delete}}] as the only edit. This binds
+    exact terminal component roots and their full bounded owned subtrees, or a
+    WindowDoor opening directly owned by a Wall; it never uses the current UI
+    selection or redirects an opening to its wall. Other children cannot be
+    deleted independently. A root
+    and matching child become one root deletion; excluded descendants block it.
+    Review the complete cascade scope in resource.delete_ownership before Apply.
+    DeleteElements return values are not success: a complete fresh identity scan
+    must prove every reviewed model identity absent. Partial/unreadable absence
+    stays unknown and blocks further writes. Recovery never repeats deletion.
     is_unset matches observed null/blank. Combine explicit undefined values with any.
     Stored ReadAll omissions are unknown, never absence. The new opt-in
     attribute_read_mode=all_and_computable establishes absence only after a complete

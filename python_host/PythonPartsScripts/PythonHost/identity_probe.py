@@ -10,7 +10,10 @@ def probe_identity(queries, doc, base, settings, request, trace, check):
     query = {"schema_version": SCHEMA, "action": "query",
              "scope": {"drawing_files": [request["drawing_file"]], "include_passive": False,
                        "visibility": "api_select_all"},
-             "component_kind": "model_identity", "fields": ["display_name", "layer_id", "file_state"],
+             # Identity must not depend on property-owner agreement. Slab view
+             # adapters can expose different organizational layers/names while
+             # still having an exact readable model/view identity and lineage.
+             "component_kind": "model_identity", "fields": ["file_state"],
              "max_adapters": 10000}
     live, owners = {}, []
     snapshot = trace.call("M1.direct_identity_scan", lambda: queries._scan(

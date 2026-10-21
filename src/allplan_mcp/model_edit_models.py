@@ -67,7 +67,31 @@ class LayerEdit(ContractModel):
     target: LayerEditTarget
 
 
-Edit = AttributeEdit | LayerEdit
+class DeleteTarget(ContractModel):
+    kind: Literal["delete"]
+
+
+class DeleteEdit(ContractModel):
+    target: DeleteTarget
+
+
+class NativeMaterialTarget(ContractModel):
+    kind: Literal["native_material"]
+    tier_index: Annotated[int, Field(ge=1, le=1)]
+
+
+class NativeMaterialEdit(ContractModel):
+    target: NativeMaterialTarget
+    value: str = Field(min_length=1, max_length=255)
+
+    @model_validator(mode="after")
+    def exact_material(self):
+        if not self.value.strip() or any(ord(character) < 32 for character in self.value):
+            raise ValueError("Native material requires an exact nonempty string without control characters.")
+        return self
+
+
+Edit = AttributeEdit | LayerEdit | DeleteEdit | NativeMaterialEdit
 
 _QUERY_FIELDS = {"display_name", "type_name", "type_uuid", "layer_id", "drawing_file", "file_state",
                  "bounding_box_mm", "size_x_mm", "size_y_mm", "size_z_mm", "center_x_mm", "center_y_mm",
@@ -121,6 +145,10 @@ class ModelEditPreview(ContractModel):
 
     @model_validator(mode="after")
     def distinct_and_scoped(self):
+        if any(isinstance(edit, DeleteEdit) for edit in self.changes) and len(self.changes) != 1:
+            raise ValueError("Deletion must be the only change in a plan.")
+        if any(isinstance(edit, NativeMaterialEdit) for edit in self.changes) and len(self.changes) != 1:
+            raise ValueError("Native material must be the only change in a plan.")
         _validate_predicate(self.predicate.model_dump(by_alias=True, exclude_unset=True) if self.predicate else None)
         if len(set(self.native_types)) != len(self.native_types):
             raise ValueError("native_types must be distinct.")

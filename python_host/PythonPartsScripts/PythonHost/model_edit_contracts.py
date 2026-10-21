@@ -69,7 +69,22 @@ def _preview(request):
         target = change.get("target")
         if not isinstance(target, dict):
             invalid("Each change requires a target object.")
-        if target.get("kind") == "attribute":
+        if target.get("kind") == "delete":
+            keys(change, {"target"}, {"target"})
+            keys(target, {"kind"}, {"kind"})
+            if len(changes) != 1:
+                invalid("Deletion must be the only change in a plan.")
+        elif target.get("kind") == "native_material":
+            keys(change, {"target", "value"}, {"target", "value"})
+            keys(target, {"kind", "tier_index"}, {"kind", "tier_index"})
+            if type(target["tier_index"]) is not int or target["tier_index"] != 1:
+                invalid("Native material requires explicit tier_index=1 of a single-tier Wall.")
+            value = change["value"]
+            if not isinstance(value, str) or not value.strip() or len(value) > 255 or any(ord(c) < 32 for c in value):
+                invalid("Native material must be an exact nonempty string of at most 255 characters.")
+            if len(changes) != 1:
+                invalid("Native material must be the only change in a plan.")
+        elif target.get("kind") == "attribute":
             keys(change, {"target", "value_type", "value", "mode"}, {"target", "value"})
             keys(target, {"kind", "attribute_id", "name"}, {"kind"})
             if "attribute_id" not in target and "name" not in target:
@@ -112,7 +127,7 @@ def _preview(request):
             if not isinstance(name, str) or not name.strip() or len(name) > limit:
                 invalid(f"Layer {field} must be a bounded nonempty string.")
         else:
-            invalid("target.kind must be attribute or layer.")
+            invalid("target.kind must be attribute, layer, native_material or delete.")
     if len(referenced_ids) > 32:
         invalid("At most 32 distinct attribute IDs may be read or edited.")
     exceptions = request.get("exclude_model_uuids", [])
