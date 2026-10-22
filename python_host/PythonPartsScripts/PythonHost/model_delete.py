@@ -1,7 +1,7 @@
 """Exact component deletion; absence requires a complete fresh native scan."""
 from __future__ import annotations
 
-from .component_ownership import identity, observe
+from .component_ownership import ComponentReadError, failure, identity, observe
 from .model_context import boolean, guid, integer
 from .native_readers import COMPONENT_TYPES
 from .query_contracts import fingerprint
@@ -42,7 +42,9 @@ def ownership(adapter, check=lambda: None):
     except BridgeError:
         raise
     except Exception as exc:
-        return {"status": "not_checked", "value": None, "reason": type(exc).__name__}
+        if isinstance(exc, ComponentReadError):
+            return failure(exc)
+        return failure(ComponentReadError("deletion_descendants", "delete_subtree_unavailable", type(exc).__name__))
 
 
 def blocker(evidence):

@@ -16,6 +16,13 @@ def validate_probe(request):
          {"schema_version", "phase"})
     if request["schema_version"] != PROBE_SCHEMA:
         invalid(f"schema_version must be {PROBE_SCHEMA}.")
+    if request["phase"] == "drawing_identity":
+        keys(request, {"schema_version", "phase", "drawing_file", "offset", "limit"},
+             {"schema_version", "phase", "drawing_file"})
+        bounded_int(request["drawing_file"], 1, 2147483647, "drawing_file")
+        bounded_int(request.get("offset", 0), 0, 9999, "offset")
+        bounded_int(request.get("limit", 16), 1, 32, "limit")
+        return
     if request["phase"] == "wall_sample":
         keys(request, {"schema_version", "phase", "drawing_file", "model_uuid"}, {"schema_version", "phase", "drawing_file"})
         bounded_int(request["drawing_file"], 1, 2147483647, "drawing_file")

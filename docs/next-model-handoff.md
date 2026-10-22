@@ -6,7 +6,7 @@ and target pull requests to `develop/m4`. Main remains separate. Read
 implementation. The policy is the source of truth for automated checks and
 package builds.
 
-## Current candidate: 0.25.0
+## Retained candidate: 0.25.0
 
 Candidate 0.25.0 extends `model_edit` with exact component deletion and an
 experimental native-material setter for a standalone single-tier Wall.
@@ -44,6 +44,31 @@ structural identity result. That does not prove the cause of, or resolve, the
 owner's 0.24.0 exact-view probe failure; a same-build native identity read is
 still needed. This candidate does not close priorities 1–5 or the single-drawing
 native acceptance gate.
+
+The owner confirms that the [22 October conversation log](test-results/evidence/log_rozmowy-2026-10-22.md)
+matches Allplan behavior. Preserve its [scoped 0.25.0 observation](test-results/m4-owner-observation-0.25.0-2026-10-22.md):
+read-only `component_identity` PASS for one Wall and one MultiSlab query result;
+one remaining Wall and its children were reported deleted after confirmation
+and a fresh complete scan; one 200 mm Wall was moved from layer 3702 to W1
+(65535) with readback. The log does not contain an exact installed manifest,
+raw MCP responses, or Allplan build identifier, so do not bind these outcomes
+to the exact 0.25.0 ZIP or claim full typed-delete acceptance. Door opening
+deletion and deletion of its owning Wall were blocked; native material and
+hatch 129 were blocked; moving all Walls to W1 was blocked by the 240 mm Wall's
+`repair_conflict`. W1 no-op/Undo remains unobserved. These outcomes do not close
+priorities 1–5 or the single-drawing acceptance gate.
+
+## Current candidate: 0.26.0 — in progress
+
+Candidate 0.26.0 documentation and implementation work is in progress on
+`develop/m4`; do not report CI or package acceptance until the candidate's
+final CI artifact and checks are recorded. The owner trial for it is limited to
+the [0.26.0 short trial](m4-single-drawing-0.26.0.pl.md): paged read-only
+`drawing_identity` for drawing 101, a read-only current-layer-0 check if
+available, missing W1 no-op/Undo, and changed deletion/material diagnostics
+only when they provide new evidence. Do not repeat the scoped 0.25.0 deletion,
+identity reads, or 200 mm Wall W1 readback. The concise per-priority boundaries
+are in the [coverage matrix](m4-single-drawing-coverage-0.24.0.md).
 
 ## Retained 0.24.0 evidence
 
@@ -119,28 +144,35 @@ native fakes and MCP HTTP. The delivery commit adds docs/artifacts only.
 
 ## Next work
 
-1. The 0.24.0 owner log reports a failed exact-view identity probe for the
-   Slab result and a child view UUID mismatch under MultiSlab. Preserve this
-   bounded observation in the [owner record](test-results/m4-owner-observation-0.24.0-2026-10-21.md);
-   resolve Slab/MultiSlab target identity read-only before planning another
-   write. Preserve original journal state and archives.
-2. Complete only the unobserved W1 no-op/Undo scope. The 0.24.0 log reports a
-   W1 readback of layer ID 65535; it does not report no-op or Undo. Do not
-   repeat the readback or accepted attribute outcomes.
-3. Run only the [0.25.0 trial](m4-single-drawing-0.25.0.pl.md): exact typed
-   deletion, the experimental one-tier Wall material route, and the unobserved
-   W1 no-op/Undo scope. The earlier conversation log records deletion through
-   UI only and W1 readback only; do not repeat that deletion, accepted
-   readbacks, or attribute outcomes. Native selection remains unsupported.
-   Preserve each native result as its own scoped observation after the owner
-   supplies the exact package/build and results.
+1. Preserve the 0.24.0 failed exact-view Slab probe and MultiSlab child UUID
+   mismatch in the [0.24.0 owner record](test-results/m4-owner-observation-0.24.0-2026-10-21.md).
+   The 22 October log adds one read-only identity PASS each for a Wall root and
+   a MultiSlab query result. This does not establish the original Slab result's
+   identity, reconcile its view UUID with the MultiSlab child, or establish
+   property ownership. Continue read-only identity work on the exact unresolved
+   targets before planning writes; preserve journal state and archives.
+2. Complete only the unobserved W1 no-op/Undo scope on the explicit, separate
+   test targets defined in the trial. The 0.25.0 log adds a 200 mm Wall W1
+   readback (3702 → 65535), but no no-op or Undo; do not repeat that readback or
+   treat a Wall test as the missing Column no-op/Undo result.
+3. The owner performed a 0.25.0 native trial. Preserve its limited outcomes in
+   the [owner observation](test-results/m4-owner-observation-0.25.0-2026-10-22.md):
+   one remaining Wall subtree was reported removed after confirmation and a
+   fresh complete scan, while opening deletion and deleting its owning Wall
+   were blocked. Native material/hatch changes and bulk move to W1 were blocked.
+   Exact package/build attribution and raw MCP evidence are absent; do not claim
+   exact typed-delete acceptance, native material acceptance, no-op/Undo, or
+   full 0.25.0 acceptance. Do not repeat the accepted single-Wall deletion or
+   200 mm Wall W1 readback. Native selection remains unsupported.
 4. Continue the [development plan](office-editing-development-plan.pl.md) for
    unresolved Slab/MultiSlab identity, selection, unaccepted families/types,
    then multi-file and whole-project work. Priorities 1–5 are not closed by
    candidate implementation or SDK documentation. Do not repeat accepted
    Column/Slab attribute outcomes or historical query/readback observations.
-   The [bounded owner observation](test-results/m4-owner-observation-0.24.0-2026-10-21.md)
-   records the exact scope of the 0.24.0 conversation log.
+   The [bounded 0.24.0 observation](test-results/m4-owner-observation-0.24.0-2026-10-21.md)
+   and [bounded 0.25.0 observation](test-results/m4-owner-observation-0.25.0-2026-10-22.md)
+   record their separate conversation-log scopes. Priorities 1–5 remain open
+   where acceptance criteria are unmet.
 
 M4 remains partially accepted. The latest results do not establish native
 selection, native material updates, all six families, multi-file execution, or

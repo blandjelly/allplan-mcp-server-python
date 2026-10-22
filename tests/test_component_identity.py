@@ -162,6 +162,48 @@ class ComponentIdentityTests(unittest.TestCase):
         result = observation(target)
         self.assertEqual(result["status"], "not_checked")
 
+    def test_native_read_failures_report_bounded_stage_and_exception_type(self):
+        from test_allplan_host.component_ownership import observation
+
+        target = self.element(44)
+        self.fixture([target])
+        self.adapter_module.BaseElementAdapterParentElementService.GetParentElement.side_effect = (
+            lambda _element: (_ for _ in ()).throw(RuntimeError("secret SDK detail")))
+        result = observation(target)
+        self.assertEqual(result, {"status": "not_checked", "value": None,
+                                  "reason": "component_read_unavailable",
+                                  "diagnostic": {"stage": "parent", "error_type": "RuntimeError"}})
+        self.assertNotIn("secret SDK detail", json.dumps(result))
+        json.dumps(result, allow_nan=False)
+
+        self.adapter_module.BaseElementAdapterParentElementService.GetParentElement.side_effect = (
+            lambda _element: self.null_adapter())
+        self.adapter_module.BaseElementAdapterChildElementsService.GetChildModelElements.side_effect = (
+            lambda *_: (_ for _ in ()).throw(LookupError("private detail")))
+        result = observation(target)
+        self.assertEqual(result, {"status": "not_checked", "value": None,
+                                  "reason": "component_read_unavailable",
+                                  "diagnostic": {"stage": "children", "error_type": "LookupError"}})
+        self.assertNotIn("private detail", json.dumps(result))
+
+    def test_structural_validation_failures_have_stable_reasons_and_stages(self):
+        from test_allplan_host.component_ownership import observation
+
+        target, child = self.element(45), self.element(46)
+        self.fixture([target])
+        self.children[id(target)] = [child]
+        self.parents[id(target)] = self.null_adapter()
+        self.parents[id(child)] = self.element(47)
+        result = observation(target)
+        self.assertEqual(result["reason"], "component_child_owner_mismatch")
+        self.assertEqual(result["diagnostic"], {"stage": "child_parent_identity", "error_type": "ValueError"})
+
+        self.parents[id(target)] = target
+        self.children[id(target)] = []
+        result = observation(target)
+        self.assertEqual(result["reason"], "component_parent_cycle")
+        self.assertEqual(result["diagnostic"], {"stage": "parent_identity", "error_type": "ValueError"})
+
     def test_child_budget_overflow_is_not_reported_as_complete(self):
         from test_allplan_host.component_ownership import observation
 

@@ -1,5 +1,11 @@
 # Próba natywna 0.25.0 — usunięcie, materiał Wall i brakujące W1
 
+> **Archiwalna instrukcja.** Wyniki części tej próby z 22 października 2026
+> zapisano w [ograniczonej obserwacji 0.25.0](test-results/m4-owner-observation-0.25.0-2026-10-22.md).
+> Nie powtarzaj odczytów tożsamości, raportowanego usunięcia ściany ani
+> readbacku W1 dla ściany 200 mm. Kontynuuj wyłącznie nieodebrane zakresy z
+> [krótkiej próby 0.26.0](m4-single-drawing-0.26.0.pl.md).
+
 To jest krótka próba na kopii projektu z dokładnym pakietem 0.25.0. CI i
 dostawa kandydata muszą być zakończone przed instalacją. Zachowaj manifest,
 build Allplana, `allplan_health`, odpowiedzi MCP i ślady. Nie czyść dzienników.

@@ -8,7 +8,7 @@ from __future__ import annotations
 import hashlib
 import math
 
-from .component_ownership import observe
+from .component_ownership import ComponentReadError, failure, observe
 from .model_context import boolean, integer, text
 from .query_contracts import fingerprint
 from .transport import BridgeError
@@ -43,35 +43,40 @@ def snapshot(base, adapter, check=lambda: None):
     import NemAll_Python_Geometry as geometry
     import NemAll_Python_IFW_ElementAdapter as adapters
 
-    def read(callback):
+    def read(callback, stage="wall_material"):
         check()
-        result = callback()
+        try:
+            result = callback()
+        except (BridgeError, ComponentReadError):
+            raise
+        except Exception as exc:
+            raise ComponentReadError(stage, "wall_material_read_unavailable", type(exc).__name__) from exc
         check()
         return result
 
     if text(read(lambda: adapter.GetElementAdapterType().GetTypeName())) != "Wall_TypeUUID":
         raise ValueError("Native material requires a Wall root")
-    hierarchy = read(lambda: observe(adapter, check))
+    hierarchy = read(lambda: observe(adapter, check), "material_hierarchy")
     if hierarchy["lineage"] != [hierarchy["target"]]:
         raise ValueError("Native material requires a standalone Wall root")
-    native = read(lambda: base.GetElement(adapter))
+    native = read(lambda: base.GetElement(adapter), "material_native_representation")
     if not isinstance(native, arch.WallElement):
         raise ValueError("Native representation is not WallElement")
-    props = read(lambda: native.Properties)
+    props = read(lambda: native.Properties, "material_properties")
     if integer(read(lambda: props.TierCount)) != 1:
         raise ValueError("Native material requires exactly one tier")
     tier = read(lambda: props.GetWallTierProperties(1))
     if not callable(getattr(tier, "SetMaterial", None)) or not callable(getattr(native, "SetProperties", None)):
         raise ValueError("Native Wall material setters are unavailable")
-    material = read(lambda: tier.Material)
+    material = read(lambda: tier.Material, "material_value")
     if type(material) is not str or len(material) > 255:
         raise ValueError("Native material string is unavailable")
     state = {"hierarchy": hierarchy, "tier_count": 1,
-             "axis": read(lambda: _representation(props.Axis)),
+             "axis": read(lambda: _representation(props.Axis), "material_axis"),
              "path_axis_type": integer(read(lambda: props.PathElementAxisType)),
-             "tier": {name: read(lambda name=name: _scalar(getattr(tier, name))) for name in _SCALARS},
-             "common": {name: read(lambda name=name: _scalar(getattr(tier.CommonProperties, name))) for name in _COMMON},
-             "complex_properties": {name: read(lambda name=name: _representation(getattr(tier, name)))
+             "tier": {name: read(lambda name=name: _scalar(getattr(tier, name)), "material_tier_" + name) for name in _SCALARS},
+             "common": {name: read(lambda name=name: _scalar(getattr(tier.CommonProperties, name)), "material_common_" + name) for name in _COMMON},
+             "complex_properties": {name: read(lambda name=name: _representation(getattr(tier, name)), "material_" + name)
                                     for name in ("PlaneReferences", "SurfaceElementProperties")}}
     if type(state["tier"]["Thickness"]) not in (float, int) or state["tier"]["Thickness"] <= 0:
         raise ValueError("Wall thickness unavailable")
@@ -87,10 +92,10 @@ def snapshot(base, adapter, check=lambda: None):
             raise ValueError("Wall with openings requires a dedicated material adapter")
         if kind != "WallTier_TypeUUID":
             continue
-        solid = read(child.GetModelGeometry)
+        solid = read(child.GetModelGeometry, "material_tier_geometry")
         if not isinstance(solid, geometry.Polyhedron3D) or not boolean(read(solid.IsValid)):
             raise ValueError("Wall material requires valid Polyhedron3D tier geometry")
-        code, stream = read(solid.WriteToStream)
+        code, stream = read(solid.WriteToStream, "material_geometry_stream")
         if code != geometry.eGeometryErrorCode.eOK or type(stream) is not str or not stream or len(stream) > 524288:
             raise ValueError("Wall tier geometry serialization unavailable or over budget")
         tiers.append(hashlib.sha256(stream.encode("utf-8")).hexdigest())
@@ -109,7 +114,7 @@ def observation(base, element, check=lambda: None):
     except BridgeError:
         raise
     except Exception as exc:
-        return {"status": "not_checked", "value": None, "reason": type(exc).__name__}, None
+        return failure(exc, "wall_material_validation"), None
 
 
 def valid_change(change):

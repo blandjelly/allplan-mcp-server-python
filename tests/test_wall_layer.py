@@ -15,9 +15,9 @@ class WallLayerTests(unittest.TestCase):
     native = fixtures.M1CompletionTests.native
     element = fixtures.M1CompletionTests.element
 
-    def setup_wall(self, layers=(3735,), extra=()):
+    def setup_wall(self, layers=(3735,), extra=(), root_layer=3735):
         root = self.element(1, name="Wall_TypeUUID")
-        root.GetCommonProperties.return_value = types.SimpleNamespace(Layer=3735)
+        root.GetCommonProperties.return_value = types.SimpleNamespace(Layer=root_layer)
         root.GetElementAdapterType.return_value.GetGuid.return_value = "20000000-0000-4000-8000-000000000001"
         tiers = []
         for i, layer in enumerate(layers, 2):
@@ -66,6 +66,21 @@ class WallLayerTests(unittest.TestCase):
         evidence = module.observe(root, self.adapter_module)
         self.assertEqual(module.layer_value(evidence), {
             "status": "not_checked", "value": None, "reason": "mixed_wall_tier_layers"})
+
+    def test_default_layer_zero_is_a_valid_observation_and_invalid_ids_fail_closed(self):
+        module, root, _tiers = self.setup_wall((0,), root_layer=0)
+        evidence = module.observe(root, self.adapter_module)
+        self.assertEqual(module.layer_value(evidence), {"status": "observed", "value": 0})
+
+        for invalid in (-1, 65536, True):
+            with self.subTest(layer=invalid):
+                root.GetCommonProperties.return_value.Layer = invalid
+                with self.assertRaises(self.module.BridgeError):
+                    module.observe(root, self.adapter_module)
+                root.GetCommonProperties.return_value.Layer = 0
+                _module, _root, tiers = self.setup_wall((invalid,), root_layer=0)
+                with self.assertRaises(self.module.BridgeError):
+                    module.observe(_root, self.adapter_module)
 
     def test_exact_duplicate_tier_wrapper_is_collapsed_but_conflict_is_rejected(self):
         module, root, tiers = self.setup_wall((3735,))
@@ -162,6 +177,12 @@ class WallLayerTests(unittest.TestCase):
         evidence = module.observe(root, self.adapter_module)
         change = self.change_for(evidence)
         self.assertTrue(module.valid_change(change))
+        for invalid_target in (-1, 0, 65536, True):
+            with self.subTest(target_layer=invalid_target):
+                malformed_target = {**change,
+                    "new_value": invalid_target,
+                    "resource": {**change["resource"], "layer_id": invalid_target}}
+                self.assertFalse(module.valid_change(malformed_target))
         self.adapter_module.BaseElementAdapterChildElementsService.GetChildModelElements = (
             lambda *_args: self.fail("valid_change must not call Allplan"))
         self.assertTrue(module.valid_change(change))

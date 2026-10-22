@@ -2,6 +2,7 @@
 import unittest
 import importlib
 from uuid import uuid4
+from unittest.mock import MagicMock
 
 from pydantic import TypeAdapter, ValidationError
 from allplan_mcp.model_edit_models import ModelEditRequest
@@ -32,6 +33,44 @@ class ModelDeleteTests(unittest.TestCase):
                                changes=[{"target": {"kind": "delete"}}])
         request.update(updates)
         return request
+
+    def _broken_opening_preview(self, *, sdk_failure=False):
+        opening = self.fixture(("",))[0]
+        opening.GetElementAdapterType.return_value.GetTypeName.return_value = "WindowDoor_TypeUUID"
+        tier = self.element(2, name="DoorTier_TypeUUID")
+        null_parent = MagicMock()
+        null_parent.IsNull.return_value = True
+        self.parents[id(opening)] = null_parent
+        if sdk_failure:
+            self.adapter_module.BaseElementAdapterChildElementsService.GetChildModelElements = (
+                lambda *_args: (_ for _ in ()).throw(RuntimeError("private child read detail")))
+        else:
+            unrelated = self.element(3, name="Wall_TypeUUID")
+            self.children[id(opening)] = [tier]
+            self.parents[id(tier)] = unrelated
+        plan = self.preview(predicate=None, native_types=["WindowDoor_TypeUUID"],
+                            changes=[{"target": {"kind": "delete"}}])
+        self.assertFalse(plan["apply_available"])
+        self.assertEqual(len(plan["blocked"]), 1)
+        self.base.DeleteElements.assert_not_called()
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+        self.base.ElementsLayerService.ChangeLayer.assert_not_called()
+        return plan["blocked"][0]
+
+    def test_preview_exposes_bounded_child_owner_diagnostic_without_write(self):
+        blocked = self._broken_opening_preview()
+        self.assertEqual(blocked["reason"], "delete_ownership_unavailable")
+        self.assertEqual(blocked["observation"]["reason"], "component_child_owner_mismatch")
+        self.assertEqual(blocked["observation"]["diagnostic"],
+                         {"stage": "child_parent_identity", "error_type": "ValueError"})
+
+    def test_preview_exposes_bounded_native_read_diagnostic_without_write(self):
+        blocked = self._broken_opening_preview(sdk_failure=True)
+        self.assertEqual(blocked["reason"], "delete_ownership_unavailable")
+        self.assertEqual(blocked["observation"]["reason"], "component_read_unavailable")
+        self.assertEqual(blocked["observation"]["diagnostic"],
+                         {"stage": "children", "error_type": "RuntimeError"})
+        self.assertNotIn("private child read detail", str(blocked))
 
     def live_elements(self):
         # DeleteElements removes the object from the freshly enumerated model.
@@ -180,20 +219,28 @@ class ModelDeleteTests(unittest.TestCase):
         wall = self.fixture(("",))[0]
         wall.GetElementAdapterType.return_value.GetTypeName.return_value = "Wall_TypeUUID"
         opening = self.element(2, name="WindowDoor_TypeUUID")
+        tier = self.element(3, name="DoorTier_TypeUUID")
+        reveal = self.element(4, name="DoorReveal_TypeUUID")
         for method, value in (("IsNull", False), ("IsDeleted", False), ("IsValid", True),
                               ("IsInActiveDocument", True), ("IsInActiveLayer", True),
                               ("IsLabelElement", False)):
-            getattr(opening, method).return_value = value
+            for adapter in (opening, tier, reveal):
+                getattr(adapter, method).return_value = value
         self.parents[id(opening)] = wall
+        self.parents[id(tier)] = opening
+        self.parents[id(reveal)] = opening
         self.children[id(wall)] = [opening]
-        self.elements = [wall, opening]
-        self.base.ElementsSelectService.SelectAllElements.return_value = [wall, opening]
+        self.children[id(opening)] = [tier, reveal]
+        self.elements = [wall, opening, tier, reveal]
+        self.base.ElementsSelectService.SelectAllElements.return_value = self.elements
         self.live_elements()
 
         def delete_opening(doc, adapters):
             self.assertEqual([item.GetModelElementUUID() for item in adapters],
                              [opening.GetModelElementUUID()])
             opening.IsDeleted.return_value = True
+            tier.IsDeleted.return_value = True
+            reveal.IsDeleted.return_value = True
 
         self.base.DeleteElements.side_effect = delete_opening
         plan = self.preview(predicate=None, native_types=["WindowDoor_TypeUUID"],
@@ -208,7 +255,47 @@ class ModelDeleteTests(unittest.TestCase):
         self.assertEqual(result["state"], "completed", result)
         self.assertFalse(wall.IsDeleted.return_value)
         self.assertTrue(opening.IsDeleted.return_value)
+        self.assertTrue(tier.IsDeleted.return_value)
+        self.assertTrue(reveal.IsDeleted.return_value)
         self.base.DeleteElements.assert_called_once()
+
+    def test_delete_ownership_preserves_component_read_failure_diagnostic(self):
+        import importlib
+        ComponentReadError = importlib.import_module(self.module.__package__ + ".component_ownership").ComponentReadError
+        ownership = importlib.import_module(self.module.__package__ + ".model_delete").ownership
+
+        target = self.fixture(("",))[0]
+        target.GetElementAdapterType.return_value.GetTypeName.return_value = "WindowDoor_TypeUUID"
+        self.adapter_module.BaseElementAdapterParentElementService.GetParentElement = (
+            lambda _element: (_ for _ in ()).throw(ComponentReadError(
+                "parent", "component_read_unavailable", "RuntimeError")))
+        result = ownership(target)
+        self.assertEqual(result["status"], "not_checked")
+        self.assertIsNone(result["value"])
+        self.assertEqual(result["reason"], "component_read_unavailable")
+        self.assertEqual(result["diagnostic"], {"stage": "parent", "error_type": "RuntimeError"})
+        self.assertNotIn("message", result["diagnostic"])
+
+    def test_delete_descendant_scan_failure_has_its_own_bounded_diagnostic(self):
+        import importlib
+        ownership = importlib.import_module(self.module.__package__ + ".model_delete").ownership
+        target = self.fixture(("",))[0]
+        child_service = self.adapter_module.BaseElementAdapterChildElementsService
+        calls = [0]
+
+        def get_children(*_args):
+            calls[0] += 1
+            if calls[0] == 1:
+                return []
+            raise RuntimeError("private descendant read detail")
+
+        child_service.GetChildModelElements = get_children
+        result = ownership(target)
+        self.assertEqual(result["status"], "not_checked")
+        self.assertIsNone(result["value"])
+        self.assertEqual(result["reason"], "delete_subtree_unavailable")
+        self.assertEqual(result["diagnostic"], {"stage": "deletion_descendants", "error_type": "RuntimeError"})
+        self.assertNotIn("private descendant read detail", str(result))
 
     def test_windowdoor_delete_is_unknown_when_parent_wall_disappears(self):
         wall = self.fixture(("",))[0]

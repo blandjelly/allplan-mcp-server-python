@@ -10,14 +10,14 @@ import test_model_edit as fixtures
 
 
 class WallLayerEditTests(unittest.TestCase):
-    def fixture(self, layers=(3735,)):
+    def fixture(self, layers=(3735,), root_layer=3735):
         native = self.native = fixtures.ModelEditTests()
         native.setUp()
         self.addCleanup(native.doCleanups)
         root = native.fixture(("",))[0]
         root.GetElementAdapterType.return_value.GetTypeName.return_value = "Wall_TypeUUID"
         root.GetElementAdapterType.return_value.GetGuid.return_value = "20000000-0000-4000-8000-000000000001"
-        root.GetCommonProperties.return_value.Layer = 3735
+        root.GetCommonProperties.return_value.Layer = root_layer
         tiers = [native.element(i + 10, name="WallTier_TypeUUID") for i in range(len(layers))]
         axis = native.element(50, name="WallAxis_TypeUUID")
         opening = native.element(51, name="WindowDoor_TypeUUID")
@@ -92,6 +92,54 @@ class WallLayerEditTests(unittest.TestCase):
         native.base.ModifyElements.assert_not_called()
         native.base.CreateElements.assert_not_called()
         native.base.DeleteElements.assert_not_called()
+
+    def test_default_layer_zero_root_and_tiers_apply_readback_replay_and_no_op(self):
+        root, tiers, *_ = self.fixture((0, 0), root_layer=0)
+        native = self.native
+        plan = self.preview()
+        self.assertTrue(plan["evaluation_apply_available"], plan)
+        change = plan["changes"][0]
+        self.assertEqual(change["old_value"], {"status": "observed", "value": 0})
+        self.assertEqual(change["resource"]["wall_layer_ownership"]["root"]["layer"], 0)
+        self.assertEqual([item["layer"] for item in change["resource"]["wall_layer_ownership"]["tiers"]], [0, 0])
+        native.highlight(plan)
+        execution = uuid4().hex
+        result = native.apply(plan, execution)
+        self.assertEqual(result["state"], "completed", result)
+        self.assertEqual(root.GetCommonProperties.return_value.Layer, 0)
+        self.assertEqual([tier.GetCommonProperties.return_value.Layer for tier in tiers], [8, 8])
+        self.assertEqual(self.query()["elements"][0]["fields"]["layer_id"]["value"], 0)
+        self.assertEqual(self.query(True)["elements"][0]["fields"]["layer_id"]["value"], 8)
+        self.assertTrue(native.apply(plan, execution)["replayed"])
+        self.assertEqual(native.base.ElementsLayerService.ChangeLayer.call_count, 1)
+        self.assertEqual(self.preview()["state"], "no_op")
+
+    def test_default_layer_zero_root_with_positive_tier_layer_is_preserved(self):
+        root, tiers, *_ = self.fixture((3735,), root_layer=0)
+        native = self.native
+        plan = self.preview()
+        self.assertTrue(plan["evaluation_apply_available"], plan)
+        self.assertEqual(plan["changes"][0]["old_value"], {"status": "observed", "value": 3735})
+        self.assertEqual(plan["changes"][0]["resource"]["wall_layer_ownership"]["root"]["layer"], 0)
+        native.highlight(plan)
+        execution = uuid4().hex
+        self.assertEqual(native.apply(plan, execution)["state"], "completed")
+        self.assertEqual(root.GetCommonProperties.return_value.Layer, 0)
+        self.assertEqual(tiers[0].GetCommonProperties.return_value.Layer, 8)
+        self.assertTrue(native.apply(plan, execution)["replayed"])
+        self.assertEqual(self.preview()["state"], "no_op")
+        self.assertEqual(native.base.ElementsLayerService.ChangeLayer.call_count, 1)
+
+    def test_default_layer_zero_old_value_drift_conflicts_before_apply(self):
+        _root, tiers, *_ = self.fixture((0,), root_layer=0)
+        native = self.native
+        plan = self.preview()
+        self.assertTrue(plan["evaluation_apply_available"], plan)
+        native.highlight(plan)
+        tiers[0].GetCommonProperties.return_value.Layer = 3735
+        native.assert_code("repair_conflict", lambda: native.apply(plan))
+        native.base.ElementsLayerService.ChangeLayer.assert_not_called()
+        self.assertEqual(list(native.plans.executor.path.glob("*.json")), [])
 
     def test_mixed_tiers_and_unknown_ownership_block_before_any_setter(self):
         _root, tiers, *_ = self.fixture((3735, 8))

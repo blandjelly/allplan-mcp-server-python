@@ -17,47 +17,71 @@ def identity(adapter):
             "type_name": text(native_type.GetTypeName()), "type_uuid": guid(native_type.GetGuid())}
 
 
-def observe(adapter, check=lambda: None, *, include_children=True):
-    """Read exact ancestry and direct children, retaining native containers locally.
+class ComponentReadError(ValueError):
+    """Bounded failure labels; native exception messages never enter reports."""
+    def __init__(self, stage, reason, error_type="ValueError"):
+        super().__init__(reason)
+        self.stage, self.reason, self.error_type = stage, reason, error_type
 
-    A complete hierarchy is structural evidence only. It does not establish
-    which adapter owns a native material, attribute or organizational layer.
-    """
+
+def failure(exc, stage="component_ownership"):
+    return {"status": "not_checked", "value": None,
+            "reason": exc.reason if isinstance(exc, ComponentReadError) else type(exc).__name__,
+            "diagnostic": {"stage": exc.stage if isinstance(exc, ComponentReadError) else stage,
+                           "error_type": exc.error_type if isinstance(exc, ComponentReadError) else type(exc).__name__}}
+
+
+def observe(adapter, check=lambda: None, *, include_children=True):
+    """Read exact ancestry/direct children; no writable property owner is inferred."""
     import NemAll_Python_IFW_ElementAdapter as adapters
-    check()
-    target = identity(adapter)
+
+    def read(stage, callback):
+        check()
+        try:
+            value = callback()
+        except (BridgeError, ComponentReadError):
+            raise
+        except Exception as exc:
+            raise ComponentReadError(stage, "component_read_unavailable", type(exc).__name__) from exc
+        check()
+        return value
+
+    target = read("target_identity", lambda: identity(adapter))
     lineage, seen, retained = [target], {fingerprint(target)}, [adapter]
     current = adapter
     for _ in range(16):
-        check()
-        parent = adapters.BaseElementAdapterParentElementService.GetParentElement(current)
+        parent = read("parent", lambda: adapters.BaseElementAdapterParentElementService.GetParentElement(current))
         retained.append(parent)
-        if boolean(parent.IsNull()):
+        if read("parent", lambda: boolean(parent.IsNull())):
             break
-        ref = identity(parent)
-        if (ref["signed_drawing_file"] != target["signed_drawing_file"]
-                or fingerprint(ref) in seen):
-            raise ValueError("Cyclic or cross-file hierarchy")
+        ref = read("parent_identity", lambda: identity(parent))
+        if ref["signed_drawing_file"] != target["signed_drawing_file"]:
+            raise ComponentReadError("parent_identity", "component_cross_file")
+        if fingerprint(ref) in seen:
+            raise ComponentReadError("parent_identity", "component_parent_cycle")
         seen.add(fingerprint(ref))
         lineage.append(ref)
         current = parent
     else:
-        raise ValueError("Hierarchy exceeds 16 parents")
+        raise ComponentReadError("parent", "component_parent_limit")
     children = {}
     if include_children:
-        owner = adapters.BaseElementAdapterChildElementsService.GetChildModelElements(adapter, True)
+        owner = read("children", lambda: adapters.BaseElementAdapterChildElementsService.GetChildModelElements(adapter, True))
         retained.append(owner)
         for index, child in enumerate(owner):
             check()
             if index >= 256:
-                raise ValueError("Direct child budget exceeded")
-            child_ref = identity(child)
+                raise ComponentReadError("children", "component_child_limit")
+            child_ref = read("child_identity", lambda: identity(child))
             if child_ref["signed_drawing_file"] != target["signed_drawing_file"]:
-                raise ValueError("Child crosses drawing-file scope")
-            parent = adapters.BaseElementAdapterParentElementService.GetParentElement(child)
+                raise ComponentReadError("child_identity", "component_cross_file")
+            parent = read("child_parent", lambda: adapters.BaseElementAdapterParentElementService.GetParentElement(child))
             retained.append(parent)
-            if boolean(parent.IsNull()) or identity(parent) != target or child_ref == target:
-                raise ValueError("Direct child owner differs")
+            if read("child_parent", lambda: boolean(parent.IsNull())):
+                raise ComponentReadError("child_parent_identity", "component_child_owner_mismatch")
+            parent_ref = read("child_parent_identity", lambda: identity(parent))
+            if parent_ref != target or child_ref == target:
+                raise ComponentReadError("child_parent_identity", "component_child_owner_mismatch")
             children[fingerprint(child_ref)] = child_ref
     check()
     return {"schema_version": "m4-component-ownership-1", "target": target,
@@ -73,7 +97,7 @@ def observation(adapter, check=lambda: None, *, include_children=True):
     except BridgeError:
         raise
     except Exception as exc:
-        return {"status": "not_checked", "value": None, "reason": type(exc).__name__}
+        return failure(exc)
 
 
 def slab_write_blocker(evidence):
