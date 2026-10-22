@@ -19,8 +19,8 @@ from .transport import BridgeError
 
 
 class NativeProbeTrace:
-    MAX_BYTES = 1024 * 1024
-    MAX_INSPECT_BYTES = 16 * 1024 * 1024
+    MAX_BYTES = 8 * 1024 * 1024
+    MAX_INSPECT_BYTES = 32 * 1024 * 1024
     CHUNK_BYTES = 64 * 1024
     MAX_ARCHIVE_PREVIEW = 128
     MAX_ARCHIVE_RETRY_SCAN = 1024

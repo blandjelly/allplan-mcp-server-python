@@ -30,7 +30,7 @@ class JournalInspectionTests(unittest.TestCase):
         self.native.settings.AllplanVersion.MainReleaseName.side_effect = AssertionError('No native API needed')
         result = self.inspect()
         self.assertEqual(result['state'], 'available')
-        self.assertEqual(result['remaining_slots'], 128)
+        self.assertEqual(result['remaining_slots'], self.executor.MAX_RECORDS)
         self.assertEqual(result['records'], [])
         self.assertTrue(result['read_only'])
         self.assertFalse(result['native_model_access'])
@@ -69,10 +69,10 @@ class JournalInspectionTests(unittest.TestCase):
 
     def test_capacity_preserves_exact_replay_and_reports_incomplete_over_capacity(self):
         request, record = self.completed()
-        for _ in range(127):
+        for _ in range(self.executor.MAX_RECORDS - 1):
             self.executor.save({**record, 'execution_id': uuid4().hex})
         full = self.inspect()
-        self.assertEqual(full['record_count'], 128)
+        self.assertEqual(full['record_count'], self.executor.MAX_RECORDS)
         self.assertEqual(full['remaining_slots'], 0)
         self.assertTrue(full['complete'])
         self.assertEqual(full['new_execution_blockers'], ['journal_full'])
@@ -82,8 +82,8 @@ class JournalInspectionTests(unittest.TestCase):
         self.assertFalse(oversized['complete'])
         self.assertIsNone(oversized['record_count'])
         self.assertEqual(oversized['new_execution_blockers'], ['capacity_exceeded'])
-        self.assertEqual(len(oversized['records']), 128)
-        self.assertEqual(len(list(self.executor.path.glob('*.json'))), 129)
+        self.assertEqual(len(oversized['records']), self.executor.MAX_RECORDS)
+        self.assertEqual(len(list(self.executor.path.glob('*.json'))), self.executor.MAX_RECORDS + 1)
 
     def test_invalid_and_hashed_structurally_invalid_records_fail_closed(self):
         request, record = self.completed()

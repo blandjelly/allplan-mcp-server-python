@@ -78,7 +78,9 @@ def _model_edit_fields_match(actual, expected, changes):
 
 
 class RepairExecutor:
-    MAX_RECORDS = 128
+    # Keep enough resolved history for multiple interactive batches before
+    # requiring the existing confirmed archival workflow.
+    MAX_RECORDS = 512
     MAX_RECORD_BYTES = 1024 * 1024
     MAX_CHANGES = 32
 

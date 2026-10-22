@@ -108,7 +108,7 @@ controlled stop is not evidence for native crash/power-loss recovery.
 
 ## Journal lifecycle and inspection
 
-Storage: **Local/.allplan-mcp/repairs**, schema m3-execution-1, maximum **128 records /
+Storage: **Local/.allplan-mcp/repairs**, schema m3-execution-1, maximum **512 records /
 1 MiB each**. Atomic temp/flush/fsync/replace and content/structural hashes detect
 some failures, not authenticated history or power-loss durability. Full/corrupt/
 unwritable history or competing writers blocks new execution; unresolved

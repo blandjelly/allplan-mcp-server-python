@@ -66,14 +66,14 @@ class JournalCleanupTests(unittest.TestCase):
     def test_archival_unblocks_capacity_preserves_bytes_replay_and_restart_history(self):
         request, record = self.completed()
         active_bytes = (self.executor.path / (request['execution_id'] + '.json')).read_bytes()
-        for _ in range(127):
+        for _ in range(self.executor.MAX_RECORDS - 1):
             self.clone_record(record)
         self.native.assert_code('repair_journal_full', lambda: self.call({
             **self.native.apply(self.call(self.native.numbering_request())),
             'execution_id': uuid4().hex}))
         preview = self.preview()
-        self.assertEqual(preview['record_count'], 128)
-        self.assertEqual(preview['eligible_count'], 128)
+        self.assertEqual(preview['record_count'], self.executor.MAX_RECORDS)
+        self.assertEqual(preview['eligible_count'], self.executor.MAX_RECORDS)
         result = self.confirm(preview)
         self.assertEqual(result['state'], 'archived')
         archive = self.executor.path / 'archive'
@@ -122,6 +122,17 @@ class JournalCleanupTests(unittest.TestCase):
                          before[running_id + '.json'])
         self.assertEqual(self.executor.load(completed_request['execution_id']), completed_record)
 
+    def test_cleanup_inventory_accepts_more_than_previous_64_mib_bound_and_protects_oversized_record(self):
+        execution_id = uuid4().hex
+        oversized = self.executor.path / (execution_id + '.json')
+        with oversized.open('wb') as stream:
+            stream.truncate(65 * 1024 * 1024)
+        preview = self.preview()
+        self.assertEqual(preview['record_count'], 1)
+        self.assertEqual(preview['protected_count'], 1)
+        self.assertEqual(preview['records'][0]['reason'], 'unverifiable_or_oversized_record')
+        self.assertEqual(oversized.stat().st_size, 65 * 1024 * 1024)
+
     def test_unresolved_record_manually_placed_in_archive_cannot_claim_resolution(self):
         request, record = self.completed()
         record['state'] = 'running'
@@ -143,15 +154,15 @@ class JournalCleanupTests(unittest.TestCase):
         self.assertFalse((self.executor.path / 'archive').exists())
         self.assertIsNotNone(self.executor.load(added))
 
-    def test_inventory_over_128_and_scan_limit_are_bounded(self):
+    def test_inventory_over_capacity_and_scan_limit_are_bounded(self):
         _, record = self.completed()
-        for _ in range(128):
+        for _ in range(self.executor.MAX_RECORDS):
             self.clone_record(record)
         preview = self.preview()
-        self.assertEqual(preview['record_count'], 129)
-        self.assertEqual(preview['eligible_count'], 129)
+        self.assertEqual(preview['record_count'], self.executor.MAX_RECORDS + 1)
+        self.assertEqual(preview['eligible_count'], self.executor.MAX_RECORDS + 1)
         result = self.confirm(preview)
-        self.assertEqual(result['archived_count'], 129)
+        self.assertEqual(result['archived_count'], self.executor.MAX_RECORDS + 1)
         self.assertEqual(list(self.executor.path.glob('*.json')), [])
 
         # The next scan is refused before presenting a truncated snapshot.

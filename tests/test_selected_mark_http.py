@@ -121,7 +121,7 @@ class SelectedMarkHTTPTests(unittest.IsolatedAsyncioTestCase):
         native.call(request)
         executor = native.handler.repair_plans.executor
         record = executor.load(request['execution_id'])
-        for _ in range(126):
+        for _ in range(executor.MAX_RECORDS - 2):
             executor.save({**record, 'execution_id': uuid4().hex})
         elements[2].GetAttributes.return_value = [(20001, '<niezdefiniowany>'), (20002, 'NEW')]
         with tempfile.TemporaryDirectory() as directory:
@@ -129,5 +129,5 @@ class SelectedMarkHTTPTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(report['state'], 'ready_for_ui_observation', report.get('message'))
             journal = next(s['response'] for s in report['steps'] if s['name'] == 'journal_after')
             self.assertEqual(journal['new_execution_blockers'], ['journal_full'])
-            self.assertEqual(journal['record_count'], 128)
+            self.assertEqual(journal['record_count'], executor.MAX_RECORDS)
         self.assertEqual(native.base.ElementsAttributeService.ChangeAttributes.call_count, 2)

@@ -1,5 +1,6 @@
 """Isolated read/trace ordering and quarantine; no native Allplan acceptance."""
 import json
+import importlib
 import tempfile
 import unittest
 import weakref
@@ -180,7 +181,8 @@ class PropertyProbeTests(unittest.TestCase):
 
     def test_trace_capacity_blocks_following_calls_without_pruning_old_evidence(self):
         self.fixture()
-        data = b'x' * (1024 * 1024)
+        limit = importlib.import_module("test_allplan_host.property_probe").NativeProbeTrace.MAX_BYTES
+        data = b'x' * limit
         self.path.write_bytes(data)
         self.assert_code("probe_trace_unavailable", lambda: self.probe(phase="layer_name", layer_short_name="W1"))
         self.assertEqual(self.path.read_bytes(), data)

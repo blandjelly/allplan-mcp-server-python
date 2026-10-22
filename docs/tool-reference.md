@@ -235,7 +235,7 @@ The wall phase also flushes and fsyncs every new native boundary before moving
 to its next read.
 M1.column_scan / M1.wall_scan are recorded as existing service phases, not every internal API
 call. Each phase has a probe_id and UTC timestamps; values/private environment
-are not logged. Unwritable/full tracing (1 MiB) blocks further calls; it is not
+are not logged. Unwritable/full tracing (8 MiB) blocks further calls; it is not
 pruned automatically and is separate from the M3 execution journal. No native
 crash containment is promised by these file records.
 
@@ -665,7 +665,7 @@ including previously nonmatching peers; use it instead of a separate UUID handof
 
 The shared `fix_model_issues` tool offers storage maintenance without native
 model/document access. Keep the three limits distinct: active diagnostic trace
-`m4-native-probe.jsonl` is 1 MiB; active execution history holds 128 records;
+`m4-native-probe.jsonl` is 8 MiB; active execution history holds 512 records;
 each execution record has a separate 1 MiB verification/persistence limit.
 A full trace can block a model-edit preview before any setters. A full execution
 journal blocks new IDs while retained-ID replay remains available.
@@ -696,8 +696,8 @@ location; inspect/preview again to see remaining candidates. A lost cleanup repl
 can be resolved by fresh inspection; never retry the interrupted model edit
 blindly. Archive retention/export and disk-space policy are separate work.
 
-A cleanup inventory covers up to 1024 active records / 64 MiB. Trace inspection
-accepts up to 16 MiB of legacy oversized data. Beyond these bounds or on I/O
+A cleanup inventory covers up to 1024 active records / 1 GiB. Trace inspection
+accepts up to 32 MiB of legacy oversized data. Beyond these bounds or on I/O
 failure, maintenance fails safely and keeps the data. Oversized/unverifiable
 execution records are not deleted to unblock writes.
 

@@ -1,0 +1,30 @@
+{
+  "version": "0.28.0",
+  "focused_unique_tests": 170,
+  "final_result": "pass",
+  "identity_delete_and_dependent_unit_http": {
+    "tests": 107,
+    "result": "pass",
+    "log": "identity-focused.log"
+  },
+  "journal_trace_probe_repair_unit": {
+    "tests": 54,
+    "result": "pass"
+  },
+  "journal_cleanup_http": {
+    "tests": 2,
+    "result": "pass",
+    "log": "journal-http-initial.log"
+  },
+  "selected_mark_http": {
+    "tests": 6,
+    "result": "pass",
+    "log": "journal-http-rerun.log",
+    "initial_failures": "Installed editable-package metadata remained 0.27.0 after the source version bump. All six passed after frozen sync to 0.28.0; no health gate was weakened."
+  },
+  "version_and_lock": {"tests": 1, "result": "pass"},
+  "environment_setup": "Global Python lacked FastMCP; the repository virtual environment was used. HTTP loopback needed the tool's network permission. UV_CACHE_DIR=/tmp/allplan-uv-cache was used for frozen sync.",
+  "full_local_suite": "not_run_per_testing_policy",
+  "full_ci": "pending",
+  "native_Allplan_0_28_0": "not_run"
+}

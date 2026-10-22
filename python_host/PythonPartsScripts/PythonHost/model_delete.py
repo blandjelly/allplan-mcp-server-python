@@ -1,7 +1,8 @@
 """Exact component deletion; absence requires a complete fresh native scan."""
 from __future__ import annotations
 
-from .component_ownership import ComponentReadError, failure, identity, observe
+from .component_ownership import (ComponentReadError, failure, identity, model_identity_key,
+                                  observe, same_model_identity)
 from .model_context import boolean, guid, integer
 from .native_readers import COMPONENT_TYPES
 from .query_contracts import fingerprint
@@ -12,31 +13,46 @@ def ownership(adapter, check=lambda: None):
     """Bind a component and its bounded entire subtree, retaining native owners."""
     try:
         root = observe(adapter, check)
-        descendants, seen = [], {fingerprint(root["target"])}
+        descendants, edges, seen = [], [], {model_identity_key(root["target"])}
         import NemAll_Python_IFW_ElementAdapter as adapters
         retained = [adapter]
         pending = [adapter]
         while pending:
             parent = pending.pop()
             check()
+            parent_evidence = observe(parent, check)
+            if parent is adapter and parent_evidence != root:
+                raise ValueError("Deletion root hierarchy changed")
             owner = adapters.BaseElementAdapterChildElementsService.GetChildModelElements(parent, True)
             retained.append(owner)
+            enumerated, parent_edges = [], []
             for child in owner:
                 check()
                 ref = identity(child)
-                key = fingerprint(ref)
+                key = model_identity_key(ref)
                 if key in seen or len(seen) >= 256:
                     raise ValueError("Deletion subtree cyclic or over budget")
                 child_evidence = observe(child, check)
-                if child_evidence["lineage"][1:] != [identity(parent)] + observe(parent, check)["lineage"][1:]:
+                actual_lineage = child_evidence["lineage"][1:]
+                expected_lineage = parent_evidence["lineage"]
+                if (len(actual_lineage) != len(expected_lineage)
+                        or not all(same_model_identity(actual, expected)
+                                   for actual, expected in zip(actual_lineage, expected_lineage))):
                     raise ValueError("Deletion child hierarchy changed")
                 if ref["signed_drawing_file"] != root["target"]["signed_drawing_file"]:
                     raise ValueError("Deletion subtree crosses scope")
                 seen.add(key)
                 descendants.append(ref)
+                edges.append({"child": ref, "parent": actual_lineage[0]})
+                enumerated.append(ref)
+                parent_edges.append(edges[-1])
                 pending.append(child)
                 retained.append(child)
+            if (sorted(enumerated, key=fingerprint) != parent_evidence["children"]
+                    or sorted(parent_edges, key=fingerprint) != parent_evidence["child_parent_edges"]):
+                raise ValueError("Deletion child enumeration changed")
         root["descendants"] = sorted(descendants, key=fingerprint)
+        root["descendant_parent_edges"] = sorted(edges, key=fingerprint)
         root["descendants_complete"] = True
         return {"status": "observed", "value": root}
     except BridgeError:
