@@ -62,9 +62,30 @@ może dodać już istniejącą definicję atrybutu do elementu.
 
 Przykład `Beton C37` w tym narzędziu oznacza dokładnie wskazany atrybut tekstowy.
 To oddzielne od natywnego `WallTierProperties.Material`, powierzchni
-wizualnej i warstwy organizacyjnej. Natywny materiał ściany pozostaje
-`unsupported` w `model_edit`. Odczyt ściany przez `model_property_probe` jest
-tylko odczytem i nie zezwala na jego zapis.
+wizualnej i warstwy organizacyjnej. Ścieżka `native_material` pozostaje
+eksperymentalna i fail-closed. Odczytana wartość starego materiału jest osobna
+od dowodu, że ścianę można bezpiecznie zachować podczas zmiany. Preview może
+pokazać starą wartość jako `observed`, a jednocześnie zablokować operację jako
+`native_material_preservation_unavailable`; szczegóły są w
+`criteria.operation_eligibility_failures` (obecnie wyłącznie blokady
+preservation natywnego materiału Wall), a `criteria.required_field_failures`
+wykazuje wyłącznie nieodczytane wymagane pola docelowe i może być puste.
+Błędy kryterium pozostają w `report.criterion_failures`. Zachowanie jest
+kwalifikowane tylko dla dokładnie jednego `WallTier_TypeUUID` z lineage
+`[tier, Wall root]` i bez dzieci. Otwory raportują
+`wall_material_openings_unsupported`; wszystkie inne typy dzieci raportują
+`wall_material_child_type_unsupported`. Nieznany Door/Window/Macro nie jest
+obsługiwany. Post-write readback nadal wymaga pełnego preservation snapshot;
+sam odczyt materiału nie wystarcza. Szczegóły próby 0.27.0 są w
+[krótkim trialu](m4-single-drawing-0.27.0.pl.md).
+
+Resolver 0.27.0 dla każdego `model_edit` bind sprawdza ograniczone warianty
+nazwy: podaną postać, trim/NFC, pierwszą literę wielką, całość wielkimi i
+całość małymi. Każdy znaleziony wynik musi przejść roundtrip rzeczywista
+nazwa–ID; zgodność casefold jest akceptowana tylko przy jednym ID. Konflikt
+odrzuca wiązanie. Nie ma fuzzy search ani katalogu. Odczytowy probe
+`attribute_name` nadal zaczyna od dokładnego lookup i używa wspólnego resolvera
+dopiero po `ValueError`/`TypeError` lookup miss.
 
 Wartość ma typ `text`, `integer`, `real` albo `boolean`. Domyślne
 `value_type=auto` dobiera go na podstawie typu dokładnie związanego atrybutu i

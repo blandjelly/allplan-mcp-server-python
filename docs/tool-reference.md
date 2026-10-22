@@ -151,7 +151,7 @@ is required, with only its declared parameters:
 | --- | --- |
 | drawing_identity | drawing_file, optional offset/limit: bounded paged inventory for one exact foreground drawing; reports each API-enumerated adapter's model/view UUID, bounded lineage, and represented native type. Every page is a new scan; compare its membership/type/state fingerprint. Fingerprint agreement does not guarantee an atomic hierarchy snapshot. No attributes, property-owner inference, UI calls or setters. The page limit is at most 32. |
 | column_sample | drawing_file: one explicit foreground file; existing M1 Column scan, then raw GetAttributes(ReadAll) on one unambiguous root adapter. |
-| attribute_name | attribute_name: one exact project name; GetAttributeID and, if observed, GetAttributeName round trip. |
+| attribute_name | attribute_name: one supplied project name; tries exact lookup first and uses the bounded shared resolver only after `ValueError`/`TypeError` lookup miss. The fallback checks trimmed NFC, first-character-uppercase, all-uppercase and all-lowercase forms and verifies each successful actual-name/ID round trip. Case-fold-equivalent variants must resolve to one ID; differing IDs are rejected as ambiguous. No fuzzy search or catalog enumeration. |
 | attribute_definition | attribute_id: one ID observed from project metadata/sample; name/type/unit/control readers, stopping at first unavailable value. |
 | element_attributes | drawing_file, model_uuid, view_uuid; optional name_contains, offset, limit: one exact foreground semantic component, paged ReadAll values and targeted name/ID roundtrip plus SDK scalar type metadata. |
 | component_identity | drawing_file, model_uuid, view_uuid: one exact direct foreground adapter, bounded full parent chain and direct children, and represented native Python type from GetElement; no attributes, geometry, metadata, UI or setters. |
@@ -379,9 +379,12 @@ unknown-result recovery.
 
 The only accepted form is an exact nonempty string of at most 255 characters
 and explicit `tier_index=1`. The target must resolve to a standalone
-`Wall_TypeUUID` represented by `WallElement`, have exactly one tier, and have
-no `WindowDoor_TypeUUID` children. No material catalog lookup, existence claim,
-alias resolution, surface edit, or attribute substitution occurs.
+`Wall_TypeUUID` represented by `WallElement`, have exactly one tier, and pass
+the bounded preservation snapshot. Starting with candidate 0.27.0, this
+requires exactly one direct `WallTier_TypeUUID` child with lineage
+`[tier, Wall root]`, no children of that tier, and no other Wall children.
+No material catalog lookup, existence claim, alias resolution, surface edit,
+or attribute substitution occurs.
 
 The plan binds the current material, complete bounded hierarchy, valid tier
 `Polyhedron3D` stream hash, and explicit tier/common scalar and axis/plane/
@@ -402,6 +405,41 @@ Wall exposes `blocked[].observation.reason` and
 is needed to inspect this diagnostic. It explains why a guarded path stopped
 and does not authorize bypassing ownership, identity, revalidation, journal, or
 readback guards.
+
+Candidate 0.27.0 separates a readable old material string from eligibility to
+preserve and safely change the Wall. `criteria.required_field_failures` lists
+only unreadable required destination fields (the read side of the proposed
+write); predicate/criterion failures remain in `report.criterion_failures`.
+A complete destination can therefore have an empty list while material remains
+blocked. The new `criteria.operation_eligibility_failures` currently reports
+Wall native-material preservation blockers, including the old value and
+preservation observation. A blocked material entry uses
+`reason=native_material_preservation_unavailable` and includes
+`observation.reason` and bounded `observation.diagnostic` (`stage`,
+`error_type`); the old material can independently remain
+`{"status":"observed","value":"..."}`. Do not interpret an observed
+material value as permission to write or as sufficient post-write validation.
+
+The preservation adapter accepts exactly one `WallTier_TypeUUID` child with
+lineage `[tier, Wall root]` and no children, and requires stable bounded
+enumeration. A `WindowDoor_TypeUUID` child is reported as
+`wall_material_openings_unsupported`. Any other child, including unknown
+Door/Window/Macro adapter types, is reported as
+`wall_material_child_type_unsupported`; unknown types do not become supported.
+Bounded `ComponentReadError` failures expose stable stage and error type, not
+native exception text or object representations. These diagnostics do not
+relax preservation requirements or authorize a material setter.
+
+Candidate 0.27.0 uses the shared bounded attribute-name resolver for every
+`model_edit` bind. The read-only `attribute_name` probe preserves its fast exact
+lookup and uses the resolver only after `ValueError`/`TypeError` lookup miss.
+The fallback checks the supplied spelling, trimmed NFC, first-character
+uppercase, all uppercase and all lowercase. Every successful result is checked
+against the actual project name and ID round trip; case-fold equality is
+accepted only when all successful variants identify one ID. Ambiguity fails
+closed. Neither path performs fuzzy matching or catalog search. This fallback
+is intended to resolve the case-sensitive `mcp_qa_mark` lookup while returning
+the canonical project name and ID.
 
 The default native type list is Column, Beam, SkeletonBeam, Wall, Slab,
 MultiSlab, and the documented `WindowDoor_TypeUUID` opening adapter. Without

@@ -256,17 +256,21 @@ def observe(plans, doc, base, settings, request):
         doc, base, settings, query, adapter_sink=live, adapter_owners=owners))
     check()
     if material_requested:
-        from .wall_material import observation as material_observation
+        from .wall_material import preview_observation as material_observation
         for element in snapshot["elements"]:
             representations = live.get((element["ref"]["drawing_file"], element["ref"]["model_uuid"]), {})
             values = [trace.call("Wall.native_material_preservation", lambda adapter=adapter:
                       material_observation(base, adapter, check))
                       for wrappers in representations.values() for adapter in wrappers]
             if values and len({fingerprint(value) for value in values}) == 1 and not element["view_identity_not_checked"]:
-                element["fields"]["wall.native_material"], element["wall_material_state"] = values[0]
+                (element["fields"]["wall.native_material"], element["wall_material_state"],
+                 element["wall_material_preservation"]) = values[0]
             else:
                 element["fields"]["wall.native_material"] = {"status": "not_checked", "value": None,
                                                             "reason": "native_material_representation_conflict"}
+                element["wall_material_preservation"] = {
+                    "status": "not_checked", "value": None, "reason": "native_material_representation_conflict",
+                    "diagnostic": {"stage": "material_representation_consensus", "error_type": "RepresentationConflict"}}
     if delete_requested:
         from .model_delete import ownership as delete_ownership
         for element in snapshot["elements"]:
@@ -373,6 +377,13 @@ def observe(plans, doc, base, settings, request):
               "counts": dict(Counter(c["decision"] for c in checks)), "omissions": snapshot["omissions"],
               "attribute_read_mode": request.get("attribute_read_mode", "stored"),
               "required_field_failures": required_failures,
+              "operation_eligibility_failures": [
+                  {"ref": element["ref"], "field": "wall.native_material",
+                   "old_value": copy.deepcopy(element["fields"]["wall.native_material"]),
+                   "observation": copy.deepcopy(element["wall_material_preservation"])}
+                  for element in snapshot["elements"]
+                  if decisions[fingerprint(element["ref"])] == "matched"
+                  and element.get("wall_material_preservation", {}).get("status") == "not_checked"],
               "component_ownership": [{"ref": element["ref"], "observation": element["component_ownership"]}
                                       for element in snapshot["elements"] if "component_ownership" in element],
               "criterion_failures": [
@@ -399,6 +410,13 @@ def preview(plans, doc, base, settings, request):
         targets.append(copy.deepcopy(element["ref"]))
         for bound in report["binding"]:
             old = element["fields"][bound["field"]]
+            if bound["operation"] == "set_native_material" and not element.get("wall_material_state"):
+                blocked.append({"ref": element["ref"], "field": bound["field"],
+                                "reason": ("native_material_preservation_unavailable"
+                                           if old.get("status") == "observed" else "old_value_unknown"),
+                                "old_value": copy.deepcopy(old),
+                                "observation": copy.deepcopy(element["wall_material_preservation"])})
+                continue
             mode = bound.get("mode", "replace")
             absent = old.get("status") == "absent" and old.get("presence_proven") is True
             observed = old.get("status") == "observed"
@@ -463,9 +481,6 @@ def preview(plans, doc, base, settings, request):
                     continue
                 change["resource"]["delete_ownership"] = copy.deepcopy(ownership)
             elif bound["operation"] == "set_native_material":
-                if not element.get("wall_material_state"):
-                    blocked.append({"ref": element["ref"], "field": bound["field"], "reason": "native_material_preservation_unavailable"})
-                    continue
                 change["resource"]["wall_material_state"] = copy.deepcopy(element["wall_material_state"])
             elif change["native_type"] in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
                 from .component_ownership import slab_write_blocker

@@ -212,6 +212,46 @@ class ModelEditTests(unittest.TestCase):
             predicate=None, changes=[{"target": {"kind": "attribute", "name": "Material"},
                                       "value": "concrete"}]))
 
+    def test_mcp_attribute_case_variants_bind_canonical_name_and_apply_exact_id(self):
+        elements = self.fixture(("",))
+        elements[0].GetAttributes.return_value.append((20001, "old"))
+        self.attribute_catalog({935: "Fire", 20001: "MCP_QA_MARK"})
+        self.attribute_type_names[20001] = "String"
+        def lookup(doc, name):
+            if name == "mcp_qa_mark":
+                raise ValueError("project lookup is case-sensitive")
+            return 20001 if name == "MCP_QA_MARK" else -1
+        self.base.AttributeService.GetAttributeID.side_effect = lookup
+        self.setter_fakes(elements)
+
+        plan = self.preview(predicate=None, changes=[{
+            "target": {"kind": "attribute", "name": "mcp_qa_mark"}, "value": "new"}])
+
+        self.assertEqual(plan["changes"][0]["resource"]["name"], "MCP_QA_MARK")
+        self.assertEqual(plan["changes"][0]["resource"]["attribute_id"], 20001)
+        self.assertIn("MCP_QA_MARK", [call.args[1] for call in
+                                      self.base.AttributeService.GetAttributeID.call_args_list])
+        self.highlight(plan)
+        self.assertEqual(self.apply(plan)["state"], "completed")
+        self.assertEqual(dict(elements[0].GetAttributes.return_value)[20001], "new")
+        self.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+
+    def test_conflicting_case_variants_fail_before_target_scan_or_setter(self):
+        self.fixture(("",))
+        def lookup(doc, name):
+            return {"mcp_qa_mark": 20001, "MCP_QA_MARK": 20002}.get(name, -1)
+        self.base.AttributeService.GetAttributeID.side_effect = lookup
+        self.base.AttributeService.GetAttributeName.side_effect = lambda doc, ident: {
+            20001: "mcp_qa_mark", 20002: "MCP_QA_MARK"}[ident]
+
+        self.assert_code("attribute_name_unresolved", lambda: self.preview(predicate=None, changes=[{
+            "target": {"kind": "attribute", "name": "mcp_qa_mark"}, "value": "new"}]))
+
+        self.base.ElementsSelectService.SelectAllElements.assert_not_called()
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+        self.base.ElementsLayerService.ChangeLayer.assert_not_called()
+        self.base.AttributeService.GetAttributeType.assert_not_called()
+
     def test_name_lookup_runtime_failure_is_not_retried_with_other_spellings(self):
         self.fixture(("",))
         self.base.AttributeService.GetAttributeID.side_effect = RuntimeError("native failure")

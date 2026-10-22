@@ -1,4 +1,4 @@
-# M4 single-drawing coverage — current status through candidate 0.26.0
+# M4 single-drawing coverage — current status through candidate 0.27.0
 
 Updated 2026-10-22. This is implementation and verification coverage, not full
 native acceptance. Earlier scoped owner observations remain in
@@ -9,12 +9,14 @@ Candidate source `48e64b1a06bef005c26a143860d9257038cccde3` passed CI run
 job). The exact delivered fallback ZIP passed package verification; the CI ZIP
 could not be transferred through the proxy. See the
 [0.26.0 record](../evaluation-packages/0.26.0/README.md) for provenance and
-verification artifacts. Native 0.26.0 acceptance was not run.
+verification artifacts. No owner observation existed at package delivery.
+The later bounded owner observation is recorded below; full native acceptance
+remains incomplete.
 
 | Requested family / adapter | Current guarded route and owner boundary | Remaining native evidence |
 | --- | --- | --- |
-| Columns / Column | Typed attributes and exact existing organizational layer; model/view binding, exclusions, fresh readback, replay and no-op. | Only remaining W1 readback/no-op/Undo gap; preserve accepted attributes. |
-| Walls / Wall | Typed root attributes; organizational layer binds all direct WallTier owners with its own adapter. Single-tier native thickness/material read exists. Current layer IDs 0–65535 are valid; 0.26.0 fixes reading ID 0 and covers reviewed W1 plan/Apply from prior ID 0 in focused tests. This does not prove ID 0 caused the earlier `repair_conflict`; its raw trace is unavailable. | Native layer owner/readback/Undo for unaccepted case; native material change remains unaccepted. Candidate 0.26.0 improves diagnosis of the blocked property; it does not repair or enable the setter. |
+| Columns / Column | Typed attributes and exact existing organizational layer; model/view binding, exclusions, fresh readback, replay and no-op. | Only remaining W1 no-op/Undo gap; preserve accepted attributes. |
+| Walls / Wall | Typed root attributes; organizational layer binds all direct WallTier owners with its own adapter. Single-tier native thickness/material read exists. Current layer IDs 0–65535 are valid; 0.26.0 fixes reading ID 0 and covers reviewed W1 plan/Apply from prior ID 0 in focused tests. 0.27.0 tightens material preservation to exactly one stable, direct WallTier lineage with no children; opening and all other child types fail closed with separate reasons. | Native layer owner/readback/Undo for unaccepted case; native material change remains unaccepted. The 0.27.0 preservation and diagnostic changes do not enable writes or substitute observed material for preservation evidence. |
 | Beams / Beam, SkeletonBeam | Typed attributes and organizational layer, exact target resolution; unrelated broken hierarchies do not redirect the owner. | Family/build-specific UI/readback/Undo; fakes and API availability are separate. |
 | Slabs / Slab | Read-only direct identity probe; only standalone Slab permits typed attributes/layer with bound ancestry. | Resolve the owner's two Slab/MultiSlab results read-only. No new attribute trial on previously accepted targets. |
 | Aggregate slab / MultiSlab | Direct parent/child evidence; all aggregate writes blocked pending an explicit property owner. Slab children are blocked independently of the type filter. | Explicit owner contract before enabling any aggregate/tier write. |
@@ -64,6 +66,42 @@ properties, not opaque SDK objects. The candidate's `Axis`, `PlaneReferences`,
 and `SurfaceElementProperties` values provide bounded `repr` drift evidence
 only, not exhaustive preservation codecs. A material attribute, surface or
 organizational layer never substitutes for native material.
+
+## 0.27.0 candidate scope (CI pending; no new native acceptance)
+
+The attribute resolver checks a bounded set of spelling variants: supplied
+name, trimmed NFC, first-character uppercase, all uppercase and all lowercase.
+It verifies the actual project name/ID round trip for every successful
+variant, compares names by NFC casefold and rejects results that map to
+multiple IDs. The `attribute_name` probe retains exact lookup first and uses
+the shared fallback only on `ValueError`/`TypeError` lookup miss; `model_edit`
+bindings use the shared resolver. No fuzzy search or project catalog scan is
+added. This is intended to address the lowercase `mcp_qa_mark` lookup while
+preserving the canonical project ID; native verification is pending.
+
+For native Wall material, preview now reports a readable old string separately
+from operation eligibility. `criteria.required_field_failures` lists only
+unreadable required destination fields; predicate/criterion failures remain in
+`report.criterion_failures`. It may be empty when the operation remains
+blocked. `criteria.operation_eligibility_failures` currently carries Wall
+native-material preservation blockers and their observation. A Wall is
+eligible for preservation only with exactly one
+`WallTier_TypeUUID` child, lineage `[tier, Wall root]`, no tier children, and
+stable bounded enumeration. `WindowDoor_TypeUUID` uses
+`wall_material_openings_unsupported`; every other child type uses
+`wall_material_child_type_unsupported`. Stable bounded component read errors
+do not expose exception text. Post-write observation still requires the full
+preservation snapshot. No new material write or native Undo is accepted.
+
+The supplied 0.26.0 conversation log is recorded in the
+[scoped observation](test-results/m4-owner-observation-0.26.0-2026-10-22.md):
+26/26 identities enumerated with 7 `observed` and 19 `not_checked`; two
+confirmed layer changes/readbacks on one Column; and one Wall highlight
+submission without a logged view result or native selected-element count.
+The assistant's stated opening blocker conflicts with the later empty `blocked`
+arrays and has no raw diagnostic, so the cause is unverified. No material
+change, delete, no-op or Undo was recorded. See the [0.27.0 trial](m4-single-drawing-0.27.0.pl.md)
+for the strictly limited next native evidence.
 
 ## Priority status
 

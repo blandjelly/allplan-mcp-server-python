@@ -19,7 +19,9 @@ def resolve_attribute_name(doc, base, name, read):
     """
     import unicodedata
     normalized = unicodedata.normalize("NFC", name.strip())
-    variants = dict.fromkeys((name, normalized, normalized[:1].upper() + normalized[1:]))
+    variants = dict.fromkeys((name, normalized, normalized[:1].upper() + normalized[1:],
+                              normalized.upper(), normalized.lower()))
+    resolved = {}
     for spelling in variants:
         try:
             ident = positive_id(read("AttributeService.GetAttributeID",
@@ -35,7 +37,11 @@ def resolve_attribute_name(doc, base, name, read):
         if positive_id(read("AttributeService.GetAttributeID",
                             lambda: base.AttributeService.GetAttributeID(doc, actual))) != ident:
             raise ValueError("Attribute ID/name round trip differs")
-        return ident, actual
+        resolved[ident] = actual
+    if len(resolved) > 1:
+        raise ValueError("Case variants resolve to different project attribute IDs")
+    if resolved:
+        return next(iter(resolved.items()))
     raise ValueError("Attribute name was not found; inspect element_attributes")
 
 

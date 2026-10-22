@@ -93,9 +93,97 @@ a limited PASS that must not be repeated. Priority 1's bounded journal-cleanup
 PASS remains accepted; priority 2's identity inventory does not establish field
 ownership; priority 3 lacks native Undo; priority 4 selection remains
 unsupported and material remains blocked; priority 5 adds no date/vector codec.
-Native 0.26.0 acceptance is `not_run`. Priorities 1–5 and the single-drawing
-native acceptance gate remain open. See
+At package delivery, no native 0.26.0 trial had been recorded. The later
+[bounded owner observation](test-results/m4-owner-observation-0.26.0-2026-10-22.md)
+adds partial native evidence; full native acceptance remains incomplete.
+Priorities 1–5 and the single-drawing native acceptance gate remain open. See
 the [coverage matrix](m4-single-drawing-coverage-0.24.0.md).
+
+The [scoped 0.26.0 owner observation](test-results/m4-owner-observation-0.26.0-2026-10-22.md)
+preserves the supplied [conversation log](test-results/evidence/log_rozmowy-0.26.0-2026-10-22.md).
+It reports 26/26 enumerated drawing identities, with 7 `observed` and 19
+`not_checked`; two readbacks on one Column after confirmed layer changes
+3700 → W1 (65535) → 0; and one 200 mm Wall highlight submission. The log lacks
+raw MCP responses, installed manifest, exact ZIP and Allplan build ID. The
+highlight response requested visual observation; the log does not record its
+result or a native selected-element count. Material was not changed. A prior
+assistant reply attributed the blocked preview to a `Door_TypeUUID` child, but
+the later response records empty `blocked` arrays and no diagnostic fields, so
+that child is not established as the actual cause. No W1 no-op/Undo or delete
+was performed. This does not close priorities 1–5 or full native 0.26.0
+acceptance.
+
+## Current work: 0.27.0 candidate — CI pending, no new native observation
+
+The current source changes target three guarded behaviors. `model_edit` uses
+the shared bounded attribute-name resolver for every bind. The read-only
+`attribute_name` probe keeps exact lookup first and calls the fallback only on
+`ValueError`/`TypeError` lookup miss. It checks supplied, trimmed NFC,
+first-character uppercase, all-uppercase and all-lowercase forms; it collects
+successful IDs, verifies the actual name/ID roundtrip and accepts case-fold
+equivalence only when all successful variants identify one project ID.
+Ambiguous IDs fail closed. There is no fuzzy search or catalog enumeration;
+this is intended to resolve lowercase `mcp_qa_mark` to the canonical project
+name and ID.
+
+Native Wall material preservation now fails closed unless the root has exactly
+one `WallTier_TypeUUID` child with lineage `[tier, Wall root]`, no children,
+and no other children. A `WindowDoor_TypeUUID` child reports
+`wall_material_openings_unsupported`; every other child, including unknown
+Door/Window/Macro adapters, reports `wall_material_child_type_unsupported`.
+Bounded native read errors retain stable stage/error-type diagnostics. Preview
+separates an observed old material string from preservation eligibility:
+blocked plans can report the old value as `observed` alongside
+`native_material_preservation_unavailable` and its observation diagnostic.
+`criteria.operation_eligibility_failures` currently reports Wall
+native-material preservation blockers. `criteria.required_field_failures`
+contains only unreadable required destination fields; predicate failures stay
+in `report.criterion_failures`, and the destination-field list may be empty
+for a blocked material operation. A post-write observation still
+requires preservation evidence; reading the material alone cannot authorize
+or validate a write. These changes do not add a material setter case, weaken
+guards, or provide native acceptance.
+
+CI and final package verification are pending. There is no new native
+observation for 0.27.0. The [short trial](m4-single-drawing-0.27.0.pl.md)
+covers only the name-variant resolution, material diagnostics and remaining
+unobserved native scope; it must not repeat accepted writes or deletion.
+
+### Priority checklist (1–5)
+
+1. **Journal cleanup — bounded 0.23.0 PASS accepted.** The archival preview and
+   confirmations remain accepted and must not be repeated. Snapshot/replay
+   after native restart is still not visible in owner evidence. Next evidence:
+   only a previously unobserved restart/replay scope if specifically planned;
+   preserve unresolved/corrupt/oversized records.
+2. **Slab/MultiSlab identity — inventory exists, field ownership unresolved.**
+   0.26.0 pages drawing identity and preserves model/view UUIDs and lineage;
+   it does not reconcile the original Slab view probe with the MultiSlab child
+   or establish property ownership. 0.27.0 changes do not address this. Next
+   evidence: read-only identity probes of the exact unresolved adapters in one
+   native build, recording model/view UUID, parent/child and represented type.
+3. **Single drawing layer — layer 0 fixed in runtime, native Undo missing.**
+   0.26.0 log records a Column readback at ID 0 after a confirmed write, but no
+   no-op or Undo; this does not substitute for the separate missing W1
+   no-op/Undo trial. Next evidence: use only the explicitly designated,
+   separate test targets from the trial, recording zero setters for no-op and
+   one UI Undo plus fresh readback. Do not repeat prior writes/readbacks.
+4. **Selection, delete and native material — separate statuses.** Selection
+   remains unsupported. One 0.25.0 subtree deletion PASS is accepted and must
+   not be repeated; broader typed-delete/Undo evidence remains absent. 0.27.0
+   tightens native-material eligibility and diagnostics, but does not enable
+   writes. Next evidence: one read-only preview per exact new observation,
+   capturing complete raw response fields for operation eligibility; any
+   future material write requires a narrow native trial and fresh
+   preservation-bound readback under the existing plan acknowledgement. Do not
+   repeat the 0.26.0 material observation or accepted deletion.
+5. **Families and value codecs — native coverage partial.** Scalar/Enum routes
+   remain bounded to their existing adapters; date/vector/object values remain
+   blocked. 0.27.0 name variants address lookup only and create no codecs.
+   Next evidence: a per-family native matrix for the exact adapter, field
+   owner, value roundtrip and Undo, plus a separate exact setter/readback
+   design before any date/vector implementation. Do not infer support from
+   SDK symbols or repeat previously accepted attribute writes.
 
 ## Retained 0.24.0 evidence
 

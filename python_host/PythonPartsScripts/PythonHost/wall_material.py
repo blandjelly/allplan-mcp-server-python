@@ -38,7 +38,7 @@ def _representation(value):
     return result
 
 
-def snapshot(base, adapter, check=lambda: None):
+def snapshot(base, adapter, check=lambda: None, *, material_observation=None):
     import NemAll_Python_ArchElements as arch
     import NemAll_Python_Geometry as geometry
     import NemAll_Python_IFW_ElementAdapter as adapters
@@ -57,20 +57,49 @@ def snapshot(base, adapter, check=lambda: None):
     if text(read(lambda: adapter.GetElementAdapterType().GetTypeName())) != "Wall_TypeUUID":
         raise ValueError("Native material requires a Wall root")
     hierarchy = read(lambda: observe(adapter, check), "material_hierarchy")
-    if hierarchy["lineage"] != [hierarchy["target"]]:
-        raise ValueError("Native material requires a standalone Wall root")
     native = read(lambda: base.GetElement(adapter), "material_native_representation")
     if not isinstance(native, arch.WallElement):
         raise ValueError("Native representation is not WallElement")
     props = read(lambda: native.Properties, "material_properties")
     if integer(read(lambda: props.TierCount)) != 1:
-        raise ValueError("Native material requires exactly one tier")
+        raise ComponentReadError("material_tier_count", "wall_material_single_tier_required")
     tier = read(lambda: props.GetWallTierProperties(1))
-    if not callable(getattr(tier, "SetMaterial", None)) or not callable(getattr(native, "SetProperties", None)):
-        raise ValueError("Native Wall material setters are unavailable")
     material = read(lambda: tier.Material, "material_value")
     if type(material) is not str or len(material) > 255:
-        raise ValueError("Native material string is unavailable")
+        raise ComponentReadError("material_value", "wall_material_string_unavailable")
+    if material_observation is not None:
+        material_observation.update(status="observed", value=material)
+    if hierarchy["lineage"] != [hierarchy["target"]]:
+        raise ComponentReadError("material_hierarchy", "wall_material_standalone_root_required")
+    if not callable(getattr(tier, "SetMaterial", None)) or not callable(getattr(native, "SetProperties", None)):
+        raise ComponentReadError("material_setters", "wall_material_setters_unavailable")
+    children = read(lambda: adapters.BaseElementAdapterChildElementsService.GetChildModelElements(adapter, True),
+                    "material_children")
+    tiers = []
+    child_refs = []
+    for index, child in enumerate(children):
+        check()
+        if index >= 256:
+            raise ComponentReadError("material_children", "wall_material_child_limit")
+        kind = text(read(lambda: child.GetElementAdapterType().GetTypeName(), "material_child_type"))
+        if kind == "WindowDoor_TypeUUID":
+            raise ComponentReadError("material_children", "wall_material_openings_unsupported")
+        if kind != "WallTier_TypeUUID":
+            raise ComponentReadError("material_children", "wall_material_child_type_unsupported")
+        child_hierarchy = read(lambda: observe(child, check), "material_tier_hierarchy")
+        if (child_hierarchy["lineage"] != [child_hierarchy["target"], hierarchy["target"]]
+                or child_hierarchy["children"]):
+            raise ComponentReadError("material_tier_hierarchy", "wall_material_tier_hierarchy_unsupported")
+        child_refs.append(child_hierarchy["target"])
+        solid = read(child.GetModelGeometry, "material_tier_geometry")
+        if not isinstance(solid, geometry.Polyhedron3D) or not boolean(read(solid.IsValid)):
+            raise ComponentReadError("material_tier_geometry", "wall_material_valid_tier_geometry_required")
+        code, stream = read(solid.WriteToStream, "material_geometry_stream")
+        if code != geometry.eGeometryErrorCode.eOK or type(stream) is not str or not stream or len(stream) > 524288:
+            raise ComponentReadError("material_geometry_stream", "wall_material_geometry_stream_unavailable")
+        tiers.append(hashlib.sha256(stream.encode("utf-8")).hexdigest())
+    if len(tiers) != 1 or child_refs != hierarchy["children"]:
+        raise ComponentReadError("material_children", "wall_material_one_exact_tier_required")
     state = {"hierarchy": hierarchy, "tier_count": 1,
              "axis": read(lambda: _representation(props.Axis), "material_axis"),
              "path_axis_type": integer(read(lambda: props.PathElementAxisType)),
@@ -80,27 +109,6 @@ def snapshot(base, adapter, check=lambda: None):
                                     for name in ("PlaneReferences", "SurfaceElementProperties")}}
     if type(state["tier"]["Thickness"]) not in (float, int) or state["tier"]["Thickness"] <= 0:
         raise ValueError("Wall thickness unavailable")
-    children = read(lambda: adapters.BaseElementAdapterChildElementsService.GetChildModelElements(adapter, True))
-    tiers = []
-    for index, child in enumerate(children):
-        check()
-        if index >= 256:
-            raise ValueError("Wall children exceed budget")
-        kind = text(read(lambda: child.GetElementAdapterType().GetTypeName()))
-        # Openings and inserted objects require a separate preservation adapter.
-        if kind == "WindowDoor_TypeUUID":
-            raise ValueError("Wall with openings requires a dedicated material adapter")
-        if kind != "WallTier_TypeUUID":
-            continue
-        solid = read(child.GetModelGeometry, "material_tier_geometry")
-        if not isinstance(solid, geometry.Polyhedron3D) or not boolean(read(solid.IsValid)):
-            raise ValueError("Wall material requires valid Polyhedron3D tier geometry")
-        code, stream = read(solid.WriteToStream, "material_geometry_stream")
-        if code != geometry.eGeometryErrorCode.eOK or type(stream) is not str or not stream or len(stream) > 524288:
-            raise ValueError("Wall tier geometry serialization unavailable or over budget")
-        tiers.append(hashlib.sha256(stream.encode("utf-8")).hexdigest())
-    if len(tiers) != 1:
-        raise ValueError("Wall material requires one exact native tier geometry")
     state["geometry_stream_sha256"] = tiers[0]
     state["invariant_coverage"] = "serialized_tier_solid_explicit_scalars_bounded_complex_representations"
     check()
@@ -108,13 +116,25 @@ def snapshot(base, adapter, check=lambda: None):
 
 
 def observation(base, element, check=lambda: None):
+    value, state, preservation = preview_observation(base, element, check)
+    return (value, state) if state is not None else (preservation, None)
+
+
+def preview_observation(base, element, check=lambda: None):
+    """Separate a readable material string from eligibility to preserve the Wall.
+
+    A material read alone never qualifies a setter or post-write readback.
+    Native exception messages and representations are never returned on failure.
+    """
+    value = {}
     try:
-        material, state, _, _ = snapshot(base, element, check)
-        return {"status": "observed", "value": material}, state
+        material, state, _, _ = snapshot(base, element, check, material_observation=value)
+        return {"status": "observed", "value": material}, state, {"status": "observed", "value": True}
     except BridgeError:
         raise
     except Exception as exc:
-        return failure(exc, "wall_material_validation"), None
+        blocked = failure(exc, "wall_material_validation")
+        return value or blocked, None, blocked
 
 
 def valid_change(change):
