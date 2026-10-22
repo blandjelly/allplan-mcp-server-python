@@ -6,6 +6,43 @@ and target pull requests to `develop/m4`. Main remains separate. Read
 implementation. The policy is the source of truth for automated checks and
 package builds.
 
+## Current candidate: 0.28.0 — CI and exact ZIP verification passed
+
+Source `b59ef15d9bfd4dfb42476b240e31b5b300268d2d` is on
+`fix/m4-owner-views-0.28.0`; [PR #26](https://github.com/blandjelly/allplan-mcp-server-python/pull/26)
+targets `develop/m4`. Full CI run
+[39871551499](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39871551499)
+passed 601 tests on both Windows and Ubuntu Python 3.12 jobs and the package
+job. Focused verification passed 170 unique affected/dependent checks.
+
+CI artifact 12466447229 (digest
+`52f5a8533673c7347de2a9fe6d3e12f49a24ecc460585cf4acd8687f25922649`) was not
+available to the executor: the connector supplied a file-service reference and
+the one normal-proxy transfer failed with `URLError` before an HTTP status.
+Per policy, one fallback build was made from a clean worktree at the exact
+source (`source_modified=false`). The 186-payload-file ZIP passed exact
+verification on its first attempt. SHA-256:
+`74099ec341cdf8b2bc87def42487fafbbbcdb963ec6f4b8859a412f7b6d064ed`.
+Checksum/payload, registration, frozen sync/import, `drawing_identity` schema,
+source safety limits, upgrade from and restore to 0.27.0, 42 bridge hashes,
+and active/archive journal, trace and log markers passed. See the
+[0.28.0 evaluation record](../evaluation-packages/0.28.0/README.md),
+[verification result](../evaluation-packages/0.28.0/package-verification.json),
+[build provenance](../evaluation-packages/0.28.0/build.log),
+[artifact hashes](../evaluation-packages/0.28.0/artifact-hashes.json), and
+[API evidence](m4-editing-api-0.28.0.md).
+
+The candidate matches component parent edges by drawing, model UUID and type
+across alternate view wrappers, retains actual parent view UUIDs in bound
+`child_parent_edges` / `descendant_parent_edges`, and keeps the selected
+target's exact view UUID bound. It raises journal capacity to 512 active
+records, retains the 1 MiB per-record cap, sets active trace to 8 MiB and trace
+inspection to 32 MiB, and bounds archive inventory at 1 GiB / 1024 files.
+Slab/MultiSlab write guards remain unchanged. Native Allplan 0.28.0 has not been
+run. Priorities 1–5 remain partially open; see the
+[0.28.0 short trial](m4-single-drawing-0.28.0.pl.md) and
+[coverage matrix](m4-single-drawing-coverage-0.24.0.md).
+
 ## Retained candidate: 0.25.0
 
 Candidate 0.25.0 extends `model_edit` with exact component deletion and an
@@ -113,7 +150,7 @@ that child is not established as the actual cause. No W1 no-op/Undo or delete
 was performed. This does not close priorities 1–5 or full native 0.26.0
 acceptance.
 
-## Current delivery: 0.27.0 — CI and exact ZIP verification passed
+## Retained delivery: 0.27.0 — CI and exact ZIP verification passed
 
 Status updated 23 October 2026 (Europe/Warsaw). Final source
 `e62a50c9c6c6b51978b6f1a55f9d9978eee5b1c3` on PR #25 targeting `develop/m4`,
@@ -190,11 +227,11 @@ Beam W1 writes.
 ### Priority checklist (1–5)
 
 1. **Implemented and accepted:** bounded journal preview and confirmed archival
-   scope from 0.23.0. Candidate 0.28.0 increases capacity to 512 active
-   records, 1 MiB per record, 8 MiB active trace, 32 MiB trace-inspection
-   limit, and archive inventory of 1 GiB / 1024 files. Focused checks passed;
-   full CI and package verification remain pending. Native restart/replay is
-   unobserved. Protect unresolved, corrupt and unverifiable records.
+   scope from 0.23.0. Candidate 0.28.0 expands capacity to 512 active records,
+   1 MiB per record, 8 MiB active trace, 32 MiB trace-inspection limit, and
+   archive inventory of 1 GiB / 1024 files. Focused checks, full CI, and exact
+   ZIP verification passed. Native restart/replay remains unobserved. Protect
+   unresolved, corrupt and unverifiable records.
 2. **Implemented:** identity inventory and fail-closed Slab write guards.
    **Unresolved:** the 0.27.0 read-only report retains a Slab/MultiSlab
    parent-lineage conflict; identity does not establish field ownership. Keep
@@ -206,8 +243,8 @@ Beam W1 writes.
 4. **Implemented in the 0.28.0 candidate:** typed subtree delete binds parent
    edges by drawing/model/type identity and retains actual parent view UUIDs in
    bound `child_parent_edges` and `descendant_parent_edges`; the selected
-   target's exact view UUID remains bound. Focused checks passed; full CI,
-   package verification and native Column trial remain pending. The supplied
+   target's exact view UUID remains bound. Focused checks, full CI, and exact
+   ZIP verification passed; native Column trial remains pending. The supplied
    0.27.0 log reports a separate Wall 240 mm deletion with five descendants
    absent on a fresh complete scan and two Beam W1 readbacks. Three W1 Columns
    were blocked at preview by `component_child_owner_mismatch`. Next evidence
@@ -307,7 +344,8 @@ native fakes and MCP HTTP. The delivery commit adds docs/artifacts only.
    defined and safe.
 3. Candidate 0.28.0 implements parent-edge matching for typed deletion while
    retaining the selected target's exact view UUID and actual parent view UUIDs
-   in preview/revalidation evidence. Focused checks passed. The next native
+   in preview/revalidation evidence. Focused checks, full CI and exact ZIP
+   verification passed. The next native
    trial is only the exact W1 Columns blocked in the 0.27.0 log, if their exact
    identities can be established: preview, confirmed delete, complete subtree
    absence scan, and one native Undo per deleted element with fresh identity

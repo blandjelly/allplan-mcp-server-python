@@ -151,6 +151,41 @@ builda Allplana. Punkty 1–5 pozostają częściowo otwarte zgodnie z
 [handoffem](next-model-handoff.md); kolejny zakres opisuje
 [krótka próba 0.28.0](m4-single-drawing-0.28.0.pl.md).
 
+## Aktualny kandydat 0.28.0 — CI i dokładny ZIP zweryfikowane
+
+Źródło `b59ef15d9bfd4dfb42476b240e31b5b300268d2d` na gałęzi
+`fix/m4-owner-views-0.28.0` ma [PR #26 do `develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/pull/26);
+CI 39871551499 zakończyło się powodzeniem: 601 testów na
+Windows i 601 na Ubuntu, Python 3.12, oraz job pakietu. Przeszło też 170
+unikalnych focused checks.
+
+Oryginalny artifact CI 12466447229 (digest
+`52f5a8533673c7347de2a9fe6d3e12f49a24ecc460585cf4acd8687f25922649`) nie został
+dostarczony: transfer referencji pliku przez zwykły proxy zakończył się
+`URLError` przed odpowiedzią HTTP. Zgodnie z polityką utworzono jeden fallback
+build z czystego checkoutu dokładnego źródła (`source_modified=false`). ZIP z
+186 plikami payload przeszedł dokładną weryfikację za pierwszym razem; SHA-256
+`74099ec341cdf8b2bc87def42487fafbbbcdb963ec6f4b8859a412f7b6d064ed`.
+Przeszły checksum/payload, rejestracja, frozen sync/import, schemat
+`drawing_identity`, limity źródła, upgrade z i restore do 0.27.0, 42 hashe
+mostka oraz markery aktywnego/archiwalnego dziennika, śladu i logu. Szczegóły:
+[rekord pakietu](../evaluation-packages/0.28.0/README.md),
+[weryfikacja](../evaluation-packages/0.28.0/package-verification.json),
+[build](../evaluation-packages/0.28.0/build.log) i
+[hashe artefaktów](../evaluation-packages/0.28.0/artifact-hashes.json).
+
+Kandydat wiąże krawędzie własności rodzic–potomek usuwania po rysunku, model
+UUID i typie pomiędzy wrapperami widoku; zachowuje rzeczywisty view UUID
+rodzica w krawędziach podglądu/ponownej walidacji, a dokładny view UUID
+wybranego targetu nadal jest związany z planem. Limity dziennika wynoszą teraz
+512 aktywnych rekordów, 1 MiB na rekord, 8 MiB śladu, 32 MiB inspekcji śladu
+oraz 1 GiB / 1024 pliki inwentarza archiwizacji. Blokady zapisu Slab/MultiSlab
+pozostają. Próby natywnej 0.28.0 nie wykonano; priorytety 1–5 pozostają
+częściowo otwarte. Kolejna ograniczona próba dotyczy tylko wskazanych Column
+na W1, potomków i Undo: [plan próby](m4-single-drawing-0.28.0.pl.md).
+[Macierz pokrycia](m4-single-drawing-coverage-0.24.0.md) nie zastępuje odbioru
+natywnego.
+
 Nie powtarzać zaakceptowanych odczytów, zapytań, podświetleń ani zapisów
 atrybutów słupów i stropów. Identyczne granice przestrzenne wyników
 `Slab_TypeUUID` i `MultiSlab_TypeUUID` nie dowodzą, że reprezentują ten sam
@@ -177,12 +212,12 @@ wykończenia. Właściciel właściwości oraz dokładny cel muszą być jawne.
 ## Priorytety dalszej pracy
 
 1. **Implementacja:** zaakceptowany zakres 0.23.0 obejmuje podgląd i
-   potwierdzoną archiwizację. Kandydat 0.28.0 rozszerza limity do 512
-   aktywnych rekordów, 1 MiB na rekord, 8 MiB aktywnego śladu, 32 MiB limitu
-   inspekcji śladu i inwentarza archiwizacji 1 GiB / 1024 plików. Focused
-   checks dla kandydata przeszły; pełne CI i weryfikacja pakietu pozostają do
-   wykonania. Natywny restart/replay nie ma dowodu. Nie archiwizować rekordów
-   running/unknown, uszkodzonych ani niezweryfikowanych.
+   potwierdzoną archiwizację. Kandydat 0.28.0 zwiększa limity do 512 aktywnych
+   rekordów, 1 MiB na rekord, 8 MiB aktywnego śladu, 32 MiB inspekcji śladu i
+   inwentarza archiwizacji 1 GiB / 1024 plików. Focused checks, pełne CI i
+   dokładna weryfikacja ZIP-a przeszły. Natywny restart/replay nie ma dowodu.
+   Nie archiwizować rekordów running/unknown, uszkodzonych ani
+   niezweryfikowanych.
 2. **Implementacja:** bounded identity inventory oraz fail-closed blokady
    zapisu istnieją. **Pozostaje:** lineage `Slab_TypeUUID` pod
    `MultiSlab_TypeUUID` zgłoszone w logu 0.27.0 jest nierozstrzygnięte;
@@ -198,9 +233,10 @@ wykończenia. Właściciel właściwości oraz dokładny cel muszą być jawne.
    **Dowody native:** oddzielny Wall 240 mm subtree delete z pięcioma dziećmi
    i dwa Beam W1 readbacki zgłoszono jako wykonane; nie są to akceptacje Column.
    Preview trzech Column W1 zablokował `component_child_owner_mismatch` i nie
-   usunął celów. Kandydat dopasowuje krawędzie po rysunku, model UUID i typie,
-   zachowując rzeczywiste view UUID rodziców oraz dokładny view UUID wybranego
-   targetu, związane z preview i ponowną walidacją. **Pozostaje:** natywna
+   usunął celów. Kandydat 0.28.0 (focused checks, CI i dokładna weryfikacja ZIP-a przeszły)
+   dopasowuje krawędzie po rysunku, model UUID i typie, zachowując rzeczywiste
+   view UUID rodziców oraz dokładny view UUID wybranego targetu, związane z
+   preview i ponowną walidacją. **Pozostaje:** natywna
    próba dokładnych Column W1, pełnego poddrzewa i Undo. Selekcja pozostaje
    nieobsługiwana, a diagnostyka materiału nie akceptuje ani nie włącza zapisu
    natywnego materiału.

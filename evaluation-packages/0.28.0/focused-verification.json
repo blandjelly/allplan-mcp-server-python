@@ -22,9 +22,21 @@
     "log": "journal-http-rerun.log",
     "initial_failures": "Installed editable-package metadata remained 0.27.0 after the source version bump. All six passed after frozen sync to 0.28.0; no health gate was weakened."
   },
-  "version_and_lock": {"tests": 1, "result": "pass"},
+  "version_and_lock": {
+    "tests": 1,
+    "result": "pass"
+  },
   "environment_setup": "Global Python lacked FastMCP; the repository virtual environment was used. HTTP loopback needed the tool's network permission. UV_CACHE_DIR=/tmp/allplan-uv-cache was used for frozen sync.",
   "full_local_suite": "not_run_per_testing_policy",
-  "full_ci": "pending",
+  "full_ci": {
+    "result": "pass",
+    "run_id": 39871551499,
+    "tests_per_platform": 601,
+    "platforms": [
+      "Ubuntu Python 3.12",
+      "Windows Python 3.12"
+    ],
+    "package_job": "pass"
+  },
   "native_Allplan_0_28_0": "not_run"
 }
