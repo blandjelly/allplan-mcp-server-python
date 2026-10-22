@@ -149,6 +149,7 @@ is required, with only its declared parameters:
 
 | Phase | Parameter / native work |
 | --- | --- |
+| drawing_identity | drawing_file, optional offset/limit: bounded paged inventory for one exact foreground drawing; reports each API-enumerated adapter's model/view UUID, bounded lineage, and represented native type. Every page is a new scan; compare its membership/type/state fingerprint. Fingerprint agreement does not guarantee an atomic hierarchy snapshot. No attributes, property-owner inference, UI calls or setters. The page limit is at most 32. |
 | column_sample | drawing_file: one explicit foreground file; existing M1 Column scan, then raw GetAttributes(ReadAll) on one unambiguous root adapter. |
 | attribute_name | attribute_name: one exact project name; GetAttributeID and, if observed, GetAttributeName round trip. |
 | attribute_definition | attribute_id: one ID observed from project metadata/sample; name/type/unit/control readers, stopping at first unavailable value. |
@@ -173,6 +174,12 @@ The native type, ancestry and children do not prove physical equivalence or
 the owner of an attribute/material/layer. The optional query field
 `component_ownership` returns observed/not_checked structural evidence; it
 cannot be used as a predicate. Default query reads are unchanged.
+
+Candidate 0.26.0 adds `drawing_identity` for a bounded inventory of one
+foreground drawing. This inventories model/view identity, lineage, and native
+representation across pages; it does not turn a structural inventory into
+field ownership, nor merge Slab/MultiSlab targets. See the
+[0.26.0 short trial](m4-single-drawing-0.26.0.pl.md).
 
 From 0.24.0, typed model-edit plans include slab ownership evidence. Slab
 children and all MultiSlab aggregate writes are blocked pending an explicit
@@ -361,6 +368,13 @@ leaves an unknown result; recover the same execution ID without repeating
 deletion. The shared journal, exact target binding, confirmation, and setter-free
 replay/recovery safeguards apply.
 
+Candidate 0.26.0 exposes delete diagnostics in
+`blocked[].observation.reason` and `blocked[].observation.diagnostic` (`stage`,
+`error_type`). One fresh read-only preview may inspect the exact existing
+blocked target. This reporting does not relax exact lineage, subtree
+completeness, exclusion, confirmation, fresh absence/parent checks, or
+unknown-result recovery.
+
 ### `native_material` — experimental single-tier Wall only
 
 The only accepted form is an exact nonempty string of at most 255 characters
@@ -378,8 +392,16 @@ match the requested material and the bound preservation evidence. Drift or an
 incomplete observation blocks Apply or leaves recovery to the same execution
 ID; setters are never retried. This adapter is experimental and has no native
 Allplan acceptance yet. The narrow trial is in
-[the 0.25.0 owner instructions](m4-single-drawing-0.25.0.pl.md); SDK evidence
+[the archived 0.25.0 instructions](m4-single-drawing-0.25.0.pl.md); SDK evidence
 and its limits are in [the API note](m4-editing-api-0.25.0.md).
+
+For candidate 0.26.0, a fresh read-only preview of the exact existing blocked
+Wall exposes `blocked[].observation.reason` and
+`blocked[].observation.diagnostic` (`stage`, `error_type`); when
+`old_value_unknown`, retain `criteria.required_field_failures` as well. No Apply
+is needed to inspect this diagnostic. It explains why a guarded path stopped
+and does not authorize bypassing ownership, identity, revalidation, journal, or
+readback guards.
 
 The default native type list is Column, Beam, SkeletonBeam, Wall, Slab,
 MultiSlab, and the documented `WindowDoor_TypeUUID` opening adapter. Without
@@ -580,6 +602,12 @@ WallTier identities/layers. Every tier is checked before journal/setters; one
 ChangeLayer targets tiers only, followed by fresh owner/aggregate layer readback.
 Mixed tier layers and missing/conflicting ownership block the plan. Historical
 set_layer journal records retain their legacy root-adapter readback.
+Current layer IDs are valid throughout the inclusive range 0–65535; ID 0 is a
+real value and must not be treated as absent or false. W1 is resolved by its
+native name/ID round trip and is a positive ID. The 0.26.0 implementation change
+is covered by automated tests; native verification is limited to a fresh
+read-only current-layer observation if the exact Wall reports ID 0. See the
+[0.26.0 short trial](m4-single-drawing-0.26.0.pl.md).
 
 `model_query` adds optional layer_resolution=adapter (default) or component.
 Component resolution requires semantic_component and reads Wall layer_id from

@@ -231,6 +231,67 @@ class WallMaterialEditTests(unittest.TestCase):
             self.native.base, self.root, plan["changes"][0], check=expired))
         self.native.base.ModifyElements.assert_not_called()
 
+    def test_missing_common_pen_has_bounded_diagnostic_and_blocks_without_setters(self):
+        del self.properties.GetWallTierProperties(1).CommonProperties.Pen
+        module = importlib.import_module(self.native.module.__package__ + ".wall_material")
+        with patch.object(TierProperties, "SetMaterial", autospec=True) as set_material, \
+             patch.object(FakeWallElement, "SetProperties", autospec=True) as set_properties:
+            plan = self.preview()
+
+        expected = {"status": "not_checked", "value": None,
+                    "reason": "wall_material_read_unavailable",
+                    "diagnostic": {"stage": "material_common_Pen", "error_type": "AttributeError"}}
+        observed, state = module.observation(self.native.base, self.root)
+        self.assertEqual(observed, expected)
+        self.assertIsNone(state)
+        self.assertFalse(plan["apply_available"], plan)
+        blocker = next(item for item in plan["blocked"]
+                       if item["field"] == "wall.native_material" and item["reason"] == "old_value_unknown")
+        self.assertEqual(blocker["observation"], expected)
+        self.assertNotIn("CommonProperties", repr(plan))
+        self.assertEqual(set_material.call_count, 0)
+        self.assertEqual(set_properties.call_count, 0)
+        self.native.base.ModifyElements.assert_not_called()
+
+    def test_unstable_axis_repr_has_bounded_diagnostic_without_exception_message(self):
+        secret = "axis repr must not escape"
+
+        class UnstableAxis:
+            def __repr__(self):
+                raise ValueError(secret)
+
+        self.properties.Axis = UnstableAxis()
+        module = importlib.import_module(self.native.module.__package__ + ".wall_material")
+        observed, state = module.observation(self.native.base, self.root)
+        self.assertEqual(observed, {"status": "not_checked", "value": None,
+            "reason": "wall_material_read_unavailable",
+            "diagnostic": {"stage": "material_axis", "error_type": "ValueError"}})
+        self.assertIsNone(state)
+        self.assertNotIn(secret, repr(observed))
+        plan = self.preview()
+        self.assertFalse(plan["apply_available"], plan)
+        blocker = next(item for item in plan["blocked"]
+                       if item["field"] == "wall.native_material" and item["reason"] == "old_value_unknown")
+        self.assertEqual(blocker["observation"], observed)
+        self.assertNotIn(secret, repr(plan))
+        self.native.base.ModifyElements.assert_not_called()
+
+    def test_material_observation_propagates_budget_and_trace_bridge_errors(self):
+        module = importlib.import_module(self.native.module.__package__ + ".wall_material")
+        bridge_error = importlib.import_module(self.native.module.__package__ + ".transport").BridgeError
+        for code in ("scan_limit_exceeded", "trace_write_failed"):
+            with self.subTest(code=code):
+                error = bridge_error(code, "private bridge detail", 409)
+
+                def stop(error=error):
+                    raise error
+
+                with self.assertRaises(bridge_error) as raised:
+                    module.observation(self.native.base, self.root, stop)
+                self.assertIs(raised.exception, error)
+                self.assertEqual(raised.exception.code, code)
+        self.native.base.ModifyElements.assert_not_called()
+
     def test_material_contract_requires_literal_tier_one_and_exact_nonempty_text(self):
         host_contracts = importlib.import_module(self.native.module.__package__ + ".model_edit_contracts")
         TypeAdapter(ModelEditRequest).validate_python(self.request())

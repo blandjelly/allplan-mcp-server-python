@@ -67,6 +67,27 @@ mostka oraz znaczniki aktywnych dzienników, śladów i archiwów.
 [Podstawa i granice API](m4-editing-api-0.25.0.md) nie odbiera selekcji,
 materiału, rodzin ani kodeków. Kandydat nie zamyka priorytetów 1–5.
 
+Właściciel potwierdza, że [log z 22 października](test-results/evidence/log_rozmowy-2026-10-22.md)
+odpowiada rzeczywistemu zachowaniu Allplana. [Ograniczona obserwacja 0.25.0](test-results/m4-owner-observation-0.25.0-2026-10-22.md)
+zapisuje PASS odczytu `component_identity` dla jednego wskazanego Wall i
+jednego wyniku MultiSlab oraz usunięcia jednej pozostałej ściany z dziećmi po
+potwierdzeniu i świeżym kompletnym skanie. Zapisuje też readback W1 dla ściany
+200 mm (ID 3702 → 65535). Log nie zawiera dokładnego manifestu instalacji,
+surowych odpowiedzi MCP ani builda Allplana, więc wyniki nie są przypisane do
+konkretnego ZIP-a i nie stanowią pełnego odbioru typowanego usuwania. Usunięcie
+otworu i jego ściany nadrzędnej, zmiana natywnego materiału/kreskowania 129 oraz
+zbiorcza zmiana warstw na W1 zostały zablokowane. No-op/Undo W1 nie wykonano.
+Punkty 1–5 i bramka odbioru pojedynczego rysunku pozostają otwarte.
+
+Kandydat **0.26.0** jest w toku. Próba właściciela jest ograniczona do
+[nowej krótkiej próby](m4-single-drawing-0.26.0.pl.md): stronicowanego,
+read-only inwentarza tożsamości rysunku 101, warunkowego odczytu bieżącej
+warstwy 0, brakującego W1 no-op/Undo oraz diagnostyk, które zmieniły się od
+wcześniejszych blokad. Próba nie powtarza usunięcia, odczytów tożsamości ani
+readbacku W1 ściany 200 mm z 0.25.0. Statusy 1–5 i powody otwartych luk
+zestawia [macierz pokrycia](m4-single-drawing-coverage-0.24.0.md). Wyników CI
+ani pakietu 0.26.0 jeszcze tu nie deklarować.
+
 Nie powtarzać zaakceptowanych odczytów, zapytań, podświetleń ani zapisów
 atrybutów słupów i stropów. Identyczne granice przestrzenne wyników
 `Slab_TypeUUID` i `MultiSlab_TypeUUID` nie dowodzą, że reprezentują ten sam
@@ -100,8 +121,8 @@ wykończenia. Właściciel właściwości oraz dokładny cel muszą być jawne.
    lub zbyt dużego rekordu. Incydent właściciela nie zawiera dokładnego błędu,
    więc osobno rozróżnić limit 1 MiB śladu, 128 aktywnych rekordów i limit 1 MiB
    na rekord; nie przypisywać przyczyny bez dowodu.
-2. **Tożsamość celów stropów — odczyt i blokady wdrożone, wynik natywny
-   nierozstrzygnięty.** Odczyt `model_identity` ograniczono do `file_state` i
+2. **Tożsamość celów stropów — odczyt i blokady wdrożone, wynik częściowy.**
+   Odczyt `model_identity` ograniczono do `file_state` i
    wymaganej tożsamości type; różne `layer_id` lub nazwy w wrapperach nie
    blokują już strukturalnego wyniku. Regresja obejmuje taką rozbieżność, ale
    nie ustala przyczyny ani nie rozstrzyga natywnego błędu właściciela z 0.24.0.
@@ -110,12 +131,16 @@ wykończenia. Właściciel właściwości oraz dokładny cel muszą być jawne.
    `probe_scope_unavailable`, a view UUID płyty potomnej w drugim różnił się
    od view UUID pierwszego wyniku. Zachować typ adaptera, model/view UUID,
    rodzica/dziecko i reprezentację natywną. Nie scalać wyników na podstawie
-   bounds ani nie zapisywać do nich przed wyjaśnieniem relacji celu.
-3. **Pojedynczy rysunek — rozszerzone testy automatyczne, brak natywnego W1
-   no-op/Undo.** Log 0.24.0 potwierdza readback warstwy W1 (ID 65535) dla
-   słupa `(12000, 6000 mm)`, ale nie no-op ani Undo. Użyć krótkiej próby 0.25.0
-   wyłącznie dla niezaobserwowanych no-op/Undo na jawnych, odrębnych celach.
-   Nie powtarzać poprzedniego readbacku ani zaakceptowanych zapisów atrybutów.
+   bounds ani nie zapisywać do nich przed wyjaśnieniem relacji celu. Log
+   22 października dodaje ograniczony PASS `component_identity` dla wskazanego
+   Wall i wyniku `MultiSlab_TypeUUID`; nie rozstrzyga pierwotnego wyniku Slab,
+   rozbieżności view UUID potomka ani właściciela właściwości.
+3. **Pojedynczy rysunek — ograniczone odczyty natywne, brak W1 no-op/Undo.**
+   Logi 0.24.0 i 0.25.0 potwierdzają readback W1 (ID 65535) dla wskazanego
+   słupa i oddzielnie dla ściany 200 mm (ID 3702 → 65535); nie potwierdzają
+   no-op ani Undo. Wykonać wyłącznie brakujące no-op/Undo na jawnych,
+   odrębnych celach określonych próbą. Nie powtarzać readbacków ani
+   zaakceptowanych zapisów atrybutów.
 4. **Selekcja, usuwanie i materiał — oddzielne stany implementacji i odbioru.**
    Log 0.24.0 stwierdza, że selekcja programowa jest nieobsługiwana;
    podświetlenie ma tylko stan `submitted`, bez potwierdzenia widoczności.
@@ -125,7 +150,14 @@ wykończenia. Właściciel właściwości oraz dokładny cel muszą być jawne.
    kaskady nie jest zakładana. Dodaje też eksperymentalny setter natywnego
    materiału dla jednowarstwowej ściany, oparty na udokumentowanych metodach
    SDK i jawnych dowodach niezmienników. Obie ścieżki wymagają ograniczonej
-   próby właściciela. Selekcja nadal jest nieobsługiwana.
+   próby właściciela. Log 0.25.0 informuje o usunięciu jednej pozostałej
+   ściany i potomków po potwierdzeniu oraz świeżym kompletnym skanie, ale nie
+   dostarcza manifestu, surowej odpowiedzi MCP ani Undo; usunięcie otworu i
+   jego ściany nadrzędnej zostało zablokowane. Plan natywnego materiału i
+   kreskowania został zablokowany, podobnie jak zbiorcze przeniesienie ścian
+   na W1 z powodu `repair_conflict` dla ściany 240 mm. Nie przypisywać usunięcia
+   do dokładnego ZIP-a ani nie rozszerzać go do pełnej akceptacji typowanego
+   delete. Selekcja nadal jest nieobsługiwana.
 5. **Macierz rodzin i typów — uzupełniona, odbiór natywny nadal częściowy.**
    [Macierz 0.24.0](m4-single-drawing-coverage-0.24.0.md) rozdziela adaptery,
    właścicieli, testy i nieobsługiwane kodeki. Obecne celowane zapisy obejmują

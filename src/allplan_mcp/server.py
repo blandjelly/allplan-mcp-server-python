@@ -410,6 +410,11 @@ def model_property_probe(request: PropertyProbeRequest) -> dict[str, Any]:
     direct children and represented native Python type. Use it to distinguish
     Slab tiers, MultiSlab owners and opening/inserted adapters. It never merges
     identities by bounds or establishes which adapter owns a writable property.
+    drawing_identity explicitly inventories direct model/view identities in one
+    foreground drawing, including children and unsupported families. It returns
+    at most 32 views per page (offset/limit), with per-view hierarchy/native-type
+    observations and explicit unreadable/conflicting results. Each page is a
+    fresh scan; compare source_fingerprint before combining pages.
     The <240 mm comparison is informational pending native units/value observation;
     it neither finds all thin walls nor binds C35 or authorizes material writes.
     Other phases resolve one exact attribute/layer name or read one observed
@@ -417,7 +422,7 @@ def model_property_probe(request: PropertyProbeRequest) -> dict[str, Any]:
     Local/.allplan-mcp/logs/m4-native-probe.jsonl entry. Unwritable/full tracing blocks
     calls. M1 scan is logged as one existing service phase, not an individual API
     trace. Review one phase's evidence before requesting another; no automatic
-    batch, retries, GetEnumValues, highlighting, writes or resource creation.
+    implicit batch, retries, GetEnumValues, highlighting, writes or resource creation.
     element_attributes requires one exact foreground drawing/model UUID/view UUID;
     it pages ReadAll values and targeted name/ID roundtrip and SDK type metadata
     for that root adapter across supported semantic families. Name search is

@@ -86,6 +86,13 @@ class ComponentIdentityProbeInput(ContractModel):
         return self
 
 
+class DrawingIdentityProbeInput(ContractModel):
+    phase: Literal["drawing_identity"]
+    drawing_file: int = Field(ge=1, le=2147483647)
+    offset: int = Field(default=0, ge=0, le=9999)
+    limit: int = Field(default=16, ge=1, le=32)
+
+
 class LayerNameProbeInput(ContractModel):
     phase: Literal["layer_name"]
     layer_short_name: str | None = Field(default=None, min_length=1, max_length=16)
@@ -112,4 +119,4 @@ class LayerCatalogProbeInput(ContractModel):
         return self
 
 
-PropertyProbeRequest = Annotated[ColumnProbeInput | WallProbeInput | AttributeNameProbeInput | AttributeDefinitionProbeInput | ElementAttributesProbeInput | ComponentIdentityProbeInput | LayerNameProbeInput | LayerCatalogProbeInput, Field(discriminator="phase")]
+PropertyProbeRequest = Annotated[ColumnProbeInput | WallProbeInput | AttributeNameProbeInput | AttributeDefinitionProbeInput | ElementAttributesProbeInput | ComponentIdentityProbeInput | DrawingIdentityProbeInput | LayerNameProbeInput | LayerCatalogProbeInput, Field(discriminator="phase")]

@@ -425,7 +425,8 @@ def preview(plans, doc, base, settings, request):
                 if not undefined_numeric_or_boolean:
                     reason = "old_value_type_differs"
             if reason:
-                blocked.append({"ref": element["ref"], "field": bound["field"], "reason": reason})
+                blocked.append({"ref": element["ref"], "field": bound["field"], "reason": reason,
+                                "observation": copy.deepcopy(old)})
                 continue
             change = {**copy.deepcopy(bound), "ref": copy.deepcopy(element["ref"]),
                       "adapter_version": SCHEMA, "native_type": element["fields"]["type_name"]["value"],
@@ -453,7 +454,8 @@ def preview(plans, doc, base, settings, request):
                 ownership = element.get("delete_ownership")
                 reason = delete_blocker(ownership)
                 if reason:
-                    blocked.append({"ref": element["ref"], "field": bound["field"], "reason": reason})
+                    blocked.append({"ref": element["ref"], "field": bound["field"], "reason": reason,
+                                    "observation": copy.deepcopy(ownership)})
                     continue
                 descendant_ids = {item["model_uuid"] for item in ownership["value"]["descendants"]}
                 if descendant_ids & set(request.get("exclude_model_uuids", [])):

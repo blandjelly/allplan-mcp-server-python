@@ -6,6 +6,7 @@ root is used only to bind and revalidate hierarchy ownership.
 from __future__ import annotations
 
 from .model_context import boolean, guid, integer
+from .layer_names import bounded_layer_id
 from .transport import BridgeError
 
 SCHEMA = "m4-wall-layer-ownership-1"
@@ -41,10 +42,7 @@ def _identity(adapter):
 def _layer(adapter):
     try:
         common = adapter.GetCommonProperties()
-        value = integer(common.Layer)
-        if value <= 0:
-            _conflict("Wall layer value is not a positive native layer ID.")
-        return value
+        return bounded_layer_id(common.Layer)
     except BridgeError:
         raise
     except Exception as exc:
@@ -138,7 +136,7 @@ def layer_value(evidence):
             or evidence.get("complete") is not True or not isinstance(tiers, list) or not tiers):
         return {"status": "not_checked", "value": None, "reason": "wall_tier_ownership_unavailable"}
     values = [tier.get("layer") for tier in tiers]
-    if any(type(value) is not int or value <= 0 for value in values):
+    if any(type(value) is not int or not 0 <= value <= 65535 for value in values):
         return {"status": "not_checked", "value": None, "reason": "wall_tier_layer_unavailable"}
     if len(set(values)) != 1:
         return {"status": "not_checked", "value": None, "reason": "mixed_wall_tier_layers"}
@@ -196,10 +194,10 @@ def _validate_reviewed(change):
             or not isinstance(ref.get("model_uuid"), str)
             or not isinstance(ref.get("type_uuid"), str)
             or not isinstance(short_name, str) or not 1 <= len(short_name) <= 16
-            or type(target_layer) is not int or target_layer <= 0
+            or type(target_layer) is not int or not 1 <= target_layer <= 65535
             or type(change.get("new_value")) is not int or change["new_value"] != target_layer
             or old_value.get("status") != "observed"
-            or type(old_value.get("value")) is not int or old_value["value"] <= 0
+            or type(old_value.get("value")) is not int or not 0 <= old_value["value"] <= 65535
             or not isinstance(reviewed, dict) or reviewed.get("schema_version") != SCHEMA
             or reviewed.get("complete") is not True):
         raise BridgeError("target_not_writable", "Wall tier layer ownership was not explicitly reviewed.", 409)
@@ -221,7 +219,7 @@ def _validate_reviewed(change):
                     or guid(record["model_uuid"]) != record["model_uuid"]
                     or guid(record["view_uuid"]) != record["view_uuid"]
                     or guid(record["type_uuid"]) != record["type_uuid"]
-                    or type(record.get("layer")) is not int or record["layer"] <= 0):
+                    or type(record.get("layer")) is not int or not 0 <= record["layer"] <= 65535):
                 raise BridgeError("target_not_writable", "Reviewed wall tier manifest contains an invalid identity or layer.", 409)
     except BridgeError:
         raise
