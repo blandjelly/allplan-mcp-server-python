@@ -1,0 +1,43 @@
+test_mcp_attribute_case_variants_bind_canonical_name_and_apply_exact_id (test_model_edit.ModelEditTests.test_mcp_attribute_case_variants_bind_canonical_name_and_apply_exact_id) ... ok
+test_conflicting_case_variants_fail_before_target_scan_or_setter (test_model_edit.ModelEditTests.test_conflicting_case_variants_fail_before_target_scan_or_setter) ... ok
+test_multiple_tiers_and_openings_are_blocked_before_modify (test_wall_material_edit.WallMaterialEditTests.test_multiple_tiers_and_openings_are_blocked_before_modify) ... ok
+test_already_desired_material_does_not_hide_unknown_child_eligibility_block (test_wall_material_edit.WallMaterialEditTests.test_already_desired_material_does_not_hide_unknown_child_eligibility_block) ... ok
+test_material_read_failure_reports_unknown_field_and_eligibility_diagnostics (test_wall_material_edit.WallMaterialEditTests.test_material_read_failure_reports_unknown_field_and_eligibility_diagnostics) ... ERROR
+test_material_edit_preview_highlight_apply_and_replay_over_http (test_wall_material_http.WallMaterialHTTPTests.test_material_edit_preview_highlight_apply_and_replay_over_http) ... ok
+test_missing_tier_index_fails_at_public_contract_before_bridge (test_wall_material_http.WallMaterialHTTPTests.test_missing_tier_index_fails_at_public_contract_before_bridge) ... ok
+test_preservation_failure_keeps_material_read_and_reports_http_diagnostic (test_wall_material_http.WallMaterialHTTPTests.test_preservation_failure_keeps_material_read_and_reports_http_diagnostic) ... ok
+test_model_delete_preview_highlight_apply_replay_over_http (test_model_delete_http.ModelDeleteHTTPTests.test_model_delete_preview_highlight_apply_replay_over_http) ... ok
+test_full_polish_layer_name_catalog_then_confirmed_short_name_apply (test_model_edit_recovery_http.BeamRecoveryHTTPTests.test_full_polish_layer_name_catalog_then_confirmed_short_name_apply) ... ok
+test_recover_exact_beam_targets_then_finish_attributes_and_layer (test_model_edit_recovery_http.BeamRecoveryHTTPTests.test_recover_exact_beam_targets_then_finish_attributes_and_layer) ... Executing <Task pending name='Task-839' coro=<Client._session_runner() running at /workspace/allplan-mcp-server-python/.venv/lib/python3.12/site-packages/fastmcp/client/client.py:690> created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/tasks.py:420> took 0.137 seconds
+ok
+
+======================================================================
+ERROR: test_material_read_failure_reports_unknown_field_and_eligibility_diagnostics (test_wall_material_edit.WallMaterialEditTests.test_material_read_failure_reports_unknown_field_and_eligibility_diagnostics)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/allplan-mcp-server-python/tests/test_wall_material_edit.py", line 294, in test_material_read_failure_reports_unknown_field_and_eligibility_diagnostics
+    with patch.object(TierProperties, "Material", new_callable=PropertyMock,
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/mock.py", line 1467, in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/mock.py", line 1437, in get_original
+    raise AttributeError(
+AttributeError: <class 'test_wall_material_edit.TierProperties'> does not have the attribute 'Material'
+
+----------------------------------------------------------------------
+Ran 11 tests in 14.325s
+
+FAILED (errors=1)
+test_material_read_failure_reports_unknown_field_and_eligibility_diagnostics (test_wall_material_edit.WallMaterialEditTests.test_material_read_failure_reports_unknown_field_and_eligibility_diagnostics) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.067s
+
+OK
+test_material_read_failure_reports_unknown_field_and_eligibility_diagnostics (test_wall_material_edit.WallMaterialEditTests.test_material_read_failure_reports_unknown_field_and_eligibility_diagnostics) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.080s
+
+OK

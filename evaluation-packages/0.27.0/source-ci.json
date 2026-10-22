@@ -1,0 +1,56 @@
+{
+  "source_commit": "e62a50c9c6c6b51978b6f1a55f9d9978eee5b1c3",
+  "pull_request": "https://github.com/blandjelly/allplan-mcp-server-python/pull/25",
+  "run_id": 39841530841,
+  "run_url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39841530841",
+  "workflow": "Final candidate checks",
+  "run_number": 192,
+  "status": "completed",
+  "jobs": {
+    "configuration": "success",
+    "portable (windows-latest, 3.12)": "success",
+    "portable (ubuntu-latest, 3.12)": "success",
+    "package": "success"
+  },
+  "matrix": [
+    "windows-latest / Python 3.12",
+    "ubuntu-latest / Python 3.12"
+  ],
+  "test_command": "uv run --frozen python -m unittest discover -s tests -v",
+  "artifacts": [
+    {
+      "id": 12453911418,
+      "name": "candidate-e62a50c9c6c6b51978b6f1a55f9d9978eee5b1c3",
+      "size_in_bytes": 1030489,
+      "digest": "sha256:b034d9ddd2f89ae5c0315230a1f92a81ab3abcee1521493a83c4502b55f39445",
+      "expires_at": "2026-11-05T19:45:22Z"
+    }
+  ],
+  "test_count": {
+    "windows-latest / Python 3.12": 593,
+    "ubuntu-latest / Python 3.12": 593
+  },
+  "previous_cancelled_run_id": 39841514203,
+  "conclusion": "success",
+  "package_artifact": {
+    "artifact_id": 12453911418,
+    "name": "candidate-e62a50c9c6c6b51978b6f1a55f9d9978eee5b1c3",
+    "size_in_bytes": 1030489,
+    "digest": "sha256:b034d9ddd2f89ae5c0315230a1f92a81ab3abcee1521493a83c4502b55f39445",
+    "expires_at": "2026-11-05T19:45:22Z",
+    "download_status": "Connector returned a reusable file reference; one normal-proxy urllib transfer attempt failed before an HTTP status with OSError for sdmntprindiasocentral.oaiusercontent.com. No local artifact bytes were received; /tmp/m4-027-ci-artifact.zip is an existing 0-byte placeholder.",
+    "file_id": "file_00000000e8a48211b304b58f6ed816a1",
+    "file_name": "candidate-e62a50c9c6c6b51978b6f1a55f9d9978eee5b1c3.zip",
+    "mime_type": "application/zip"
+  },
+  "delivered_package": {
+    "kind": "local_fallback",
+    "source_commit": "e62a50c9c6c6b51978b6f1a55f9d9978eee5b1c3",
+    "source_modified": false,
+    "original_ci_artifact_delivered": false,
+    "zip_filename": "allplan-mcp-0.27.0-windows-evaluation.zip",
+    "zip_sha256": "eab80cd2c907e7fd90ba733f4f8d1335f097986b938c74ccdda6bf3382cdaa30",
+    "verification_record": "package-verification.json",
+    "verification_result": "PASS"
+  }
+}

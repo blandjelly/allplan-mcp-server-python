@@ -1,0 +1,15 @@
+test_version_and_lock_agree (test_package.PackageTests.test_version_and_lock_agree) ... ok
+test_material_edit_preview_highlight_apply_and_replay_over_http (test_wall_material_http.WallMaterialHTTPTests.test_material_edit_preview_highlight_apply_and_replay_over_http) ... Executing <Task pending name='anyio._core._sockets.connect_tcp.<locals>.try_connect' coro=<connect_tcp.<locals>.try_connect() running at /workspace/allplan-mcp-server-python/.venv/lib/python3.12/site-packages/anyio/_core/_sockets.py:182> wait_for=<Future pending cb=[BaseSelectorEventLoop._sock_write_done(8, handle=<Handle BaseS...events.py:317>)(), Task.task_wakeup()] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:448> cb=[TaskGroup._spawn.<locals>.task_done() at /workspace/allplan-mcp-server-python/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:821] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/tasks.py:420> took 0.186 seconds
+ok
+test_missing_tier_index_fails_at_public_contract_before_bridge (test_wall_material_http.WallMaterialHTTPTests.test_missing_tier_index_fails_at_public_contract_before_bridge) ... Executing <Task pending name='mcp.client.streamable_http.StreamableHTTPTransport.post_writer.<locals>.handle_request_async' coro=<StreamableHTTPTransport.post_writer.<locals>.handle_request_async() running at /workspace/allplan-mcp-server-python/.venv/lib/python3.12/site-packages/mcp/client/streamable_http.py:565> wait_for=<Future pending cb=[Task.task_wakeup()] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:448> cb=[TaskGroup._spawn.<locals>.task_done() at /workspace/allplan-mcp-server-python/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:821] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/tasks.py:420> took 0.100 seconds
+ok
+test_preservation_failure_keeps_material_read_and_reports_http_diagnostic (test_wall_material_http.WallMaterialHTTPTests.test_preservation_failure_keeps_material_read_and_reports_http_diagnostic) ... ok
+test_model_delete_preview_highlight_apply_replay_over_http (test_model_delete_http.ModelDeleteHTTPTests.test_model_delete_preview_highlight_apply_replay_over_http) ... Executing <Task pending name='Task-550' coro=<Client._session_runner() running at /workspace/allplan-mcp-server-python/.venv/lib/python3.12/site-packages/fastmcp/client/client.py:690> created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/tasks.py:420> took 0.251 seconds
+ok
+test_full_polish_layer_name_catalog_then_confirmed_short_name_apply (test_model_edit_recovery_http.BeamRecoveryHTTPTests.test_full_polish_layer_name_catalog_then_confirmed_short_name_apply) ... ok
+test_recover_exact_beam_targets_then_finish_attributes_and_layer (test_model_edit_recovery_http.BeamRecoveryHTTPTests.test_recover_exact_beam_targets_then_finish_attributes_and_layer) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 20.047s
+
+OK

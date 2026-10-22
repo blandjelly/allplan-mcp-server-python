@@ -1,0 +1,27 @@
+{
+  "source_commit": "bab1c02eb73cf4a0139116b2c6ab422a3ec23af3",
+  "pull_request": "https://github.com/blandjelly/allplan-mcp-server-python/pull/25",
+  "run_id": 39840589327,
+  "run_url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39840589327",
+  "workflow": "Final candidate checks",
+  "run_number": 189,
+  "status": "failure",
+  "jobs": {
+    "configuration": "success",
+    "portable (ubuntu-latest, 3.12)": "failure",
+    "portable (windows-latest, 3.12)": "cancelled after Ubuntu failure",
+    "package": "skipped"
+  },
+  "artifacts": [],
+  "test_count": 593,
+  "draft_run_id": 39840282100,
+  "draft_run_note": "Configuration passed; portable and package were skipped as expected while PR was draft.",
+  "matrix": [
+    "windows-latest / Python 3.12",
+    "ubuntu-latest / Python 3.12"
+  ],
+  "test_command": "uv run --frozen python -m unittest discover -s tests -v",
+  "conclusion": "failure",
+  "failures": 51,
+  "test_failure_summary": "Ubuntu full suite failed: test_package.test_version_and_lock_agree compares __version__ 0.26.0 with project 0.27.0; MCP/HTTP tests then reject the stale host/package identity."
+}

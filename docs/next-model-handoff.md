@@ -58,7 +58,7 @@ hatch 129 were blocked; moving all Walls to W1 was blocked by the 240 mm Wall's
 `repair_conflict`. W1 no-op/Undo remains unobserved. These outcomes do not close
 priorities 1–5 or the single-drawing acceptance gate.
 
-## Current delivery: 0.26.0 — CI and exact ZIP verification passed
+## Retained candidate: 0.26.0 — CI and exact ZIP verification passed
 
 Source `48e64b1a06bef005c26a143860d9257038cccde3` on PR #24 targeting
 `develop/m4`, merged as `40f71b737616b9dde4b3f6804b774c0e5f76ac40`, passed
@@ -113,7 +113,35 @@ that child is not established as the actual cause. No W1 no-op/Undo or delete
 was performed. This does not close priorities 1–5 or full native 0.26.0
 acceptance.
 
-## Current work: 0.27.0 candidate — CI pending, no new native observation
+## Current delivery: 0.27.0 — CI and exact ZIP verification passed
+
+Status updated 23 October 2026 (Europe/Warsaw). Final source
+`e62a50c9c6c6b51978b6f1a55f9d9978eee5b1c3` on PR #25 targeting `develop/m4`,
+merged as `23b8b2591d7be0721fe7a5651379408e7a2f5e76`,
+passed [full CI run 39841530841](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39841530841):
+593 tests on each Windows and Ubuntu Python 3.12 job, plus the package job.
+The historical run remains dated 22 October. Exact ZIP verification passed
+on its first run for the single fallback ZIP built from clean detached source
+(`source_modified=false`). The original CI artifact was not delivered: its
+reusable file reference could not be transferred to the executor. The verified
+ZIP has SHA-256
+`eab80cd2c907e7fd90ba733f4f8d1335f097986b938c74ccdda6bf3382cdaa30` and 183
+payload files. Checksum/payload, registration, frozen sync/import,
+`drawing_identity` schema, upgrade from 0.26.0, restore, 42 bridge hashes and
+journal/trace/log plus archive markers passed. See [package verification](../evaluation-packages/0.27.0/package-verification.json),
+[verification log](../evaluation-packages/0.27.0/package-verification.log),
+[build provenance](../evaluation-packages/0.27.0/build.log) and the
+[evaluation package record](../evaluation-packages/0.27.0/README.md).
+
+This source follows the superseded initial CI attempt for
+`bab1c02eb73cf4a0139116b2c6ab422a3ec23af3`, retained in
+[initial-ci.json](../evaluation-packages/0.27.0/initial-ci.json): run
+39840589327 failed because the package version constant was still 0.26.0. The
+corrected final source passed the full matrix. The [focused checks](../evaluation-packages/0.27.0/focused-verification.json)
+cover 143 unique affected/dependent tests across iterations; they are separate
+from the full CI result. No native Allplan 0.27.0 trial has been run.
+
+## 0.27.0 candidate scope
 
 The current source changes target three guarded behaviors. `model_edit` uses
 the shared bounded attribute-name resolver for every bind. The read-only
@@ -144,8 +172,8 @@ requires preservation evidence; reading the material alone cannot authorize
 or validate a write. These changes do not add a material setter case, weaken
 guards, or provide native acceptance.
 
-CI and final package verification are pending. There is no new native
-observation for 0.27.0. The [short trial](m4-single-drawing-0.27.0.pl.md)
+Full CI and exact ZIP verification passed. There is no new native observation
+for 0.27.0. The [short trial](m4-single-drawing-0.27.0.pl.md)
 covers only the name-variant resolution, material diagnostics and remaining
 unobserved native scope; it must not repeat accepted writes or deletion.
 

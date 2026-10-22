@@ -121,8 +121,20 @@ materiału z powodu otworu, lecz późniejsza odpowiedź zawiera puste `blocked`
 i brak diagnostyki, więc rzeczywista przyczyna nie jest potwierdzona. Materiału
 nie zmieniono; nie wykonano delete ani W1 no-op/Undo.
 
-Kandydat **0.27.0** jest w trakcie implementacji; CI i pakiet oczekują na
-walidację, a nowej próby natywnej nie wykonano. Obejmuje bounded resolver nazw
+Status zaktualizowano 23 października 2026 (Europe/Warsaw). Kandydat **0.27.0**
+ze źródła `e62a50c9c6c6b51978b6f1a55f9d9978eee5b1c3` na PR #25 do `develop/m4`
+scalono jako `23b8b2591d7be0721fe7a5651379408e7a2f5e76`. Przeszedł pełne CI
+39841530841: 593 testy na Windows i 593 na Ubuntu (Python 3.12) oraz job
+pakietu. Pojedynczy fallback ZIP z czystego źródła (`source_modified=false`)
+przeszedł dokładną weryfikację za pierwszym razem: 183 pliki payload, checksum
+i payload, rejestrację, frozen sync/import, schemat `drawing_identity`, upgrade
+i restore 0.26.0, 42 hashe mostka oraz markery dziennika/śladu/logu i archiwum.
+SHA-256 ZIP-a: `eab80cd2c907e7fd90ba733f4f8d1335f097986b938c74ccdda6bf3382cdaa30`.
+Oryginalny artifact CI nie został dostarczony; zweryfikowany pakiet to fallback.
+Nie wykonano nowej próby natywnej. Historyczny log CI zachowuje datę
+22 października. Szczegóły: [rekord pakietu](../evaluation-packages/0.27.0/README.md)
+i [weryfikacja ZIP](../evaluation-packages/0.27.0/package-verification.json).
+Kandydat obejmuje bounded resolver nazw
 atrybutów bez fuzzy/catalog, fail-closed inwentaryzację potomków Wall dla
 preservation materiału oraz rozdzielenie starej wartości materiału od
 kwalifikacji operacji. Diagnostyka nie dodaje nowych zapisów i nie umożliwia

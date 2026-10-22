@@ -1,8 +1,23 @@
 # M4 single-drawing coverage — current status through candidate 0.27.0
 
-Updated 2026-10-22. This is implementation and verification coverage, not full
+Updated 2026-10-23. This is implementation and verification coverage, not full
 native acceptance. Earlier scoped owner observations remain in
 [validation status](validation-status.md).
+
+Final 0.27.0 source `e62a50c9c6c6b51978b6f1a55f9d9978eee5b1c3`, merged as
+`23b8b2591d7be0721fe7a5651379408e7a2f5e76`, passed full CI
+run [39841530841](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39841530841):
+593 tests on each Windows and Ubuntu Python 3.12 job, plus package job. The
+single exact fallback ZIP verification passed from clean source
+(`source_modified=false`): 183 payload files; SHA-256
+`eab80cd2c907e7fd90ba733f4f8d1335f097986b938c74ccdda6bf3382cdaa30`; 42
+bridge hashes; registration, frozen sync/import, upgrade from and restore to
+0.26.0; and journal/trace/log/archive marker preservation. The original CI ZIP
+was not delivered. See the [0.27.0 package record](../evaluation-packages/0.27.0/README.md).
+The separate focused record reports 143 unique
+affected/dependent tests across iterations. No 0.27.0 native acceptance has
+been run; priorities 1–5 remain partially open as described below. Historical
+CI logs remain dated 22 October.
 
 Candidate source `48e64b1a06bef005c26a143860d9257038cccde3` passed CI run
 39822585188 (580 tests on Windows and 580 on Ubuntu, Python 3.12, plus package
@@ -67,7 +82,7 @@ and `SurfaceElementProperties` values provide bounded `repr` drift evidence
 only, not exhaustive preservation codecs. A material attribute, surface or
 organizational layer never substitutes for native material.
 
-## 0.27.0 candidate scope (CI pending; no new native acceptance)
+## 0.27.0 candidate scope (CI and package verification passed; no new native acceptance)
 
 The attribute resolver checks a bounded set of spelling variants: supplied
 name, trimmed NFC, first-character uppercase, all uppercase and all lowercase.

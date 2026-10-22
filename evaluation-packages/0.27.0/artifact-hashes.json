@@ -1,0 +1,25 @@
+{
+  "source_commit": "e62a50c9c6c6b51978b6f1a55f9d9978eee5b1c3",
+  "source_modified": false,
+  "artifacts": {
+    "allplan_mcp_server-0.27.0.tar.gz": {
+      "sha256": "a4a6c44558b2458061fdeece08e5d7758a7ef7a52fe493a408ca32d5d1895200",
+      "bytes": 484568
+    },
+    "allplan_mcp_server-0.27.0-py3-none-any.whl": {
+      "sha256": "46cd6f68173213770993c293d765e591eb74ea4bf640d87091d27f4e1bae454e",
+      "bytes": 100247
+    },
+    "allplan-mcp-0.27.0-windows-evaluation.zip": {
+      "sha256": "eab80cd2c907e7fd90ba733f4f8d1335f097986b938c74ccdda6bf3382cdaa30",
+      "bytes": 475718
+    }
+  },
+  "ci_artifact": {
+    "id": 12453911418,
+    "sha256": "b034d9ddd2f89ae5c0315230a1f92a81ab3abcee1521493a83c4502b55f39445",
+    "delivered": false,
+    "reason": "Connector returned a reusable file reference; one normal-proxy transfer attempt failed with OSError before an HTTP status. No artifact bytes were received."
+  },
+  "verified_fallback_zip": "allplan-mcp-0.27.0-windows-evaluation.zip"
+}

@@ -1,0 +1,26 @@
+build_started_utc=2026-10-22T22:29:08Z
+source_commit=e62a50c9c6c6b51978b6f1a55f9d9978eee5b1c3
+source_status=clean
+Python 3.12.14
+uv 0.12.19 (x86_64-unknown-linux-gnu)
+command: UV_CACHE_DIR=/tmp/uv-cache uv build --out-dir /workspace/allplan-mcp-server-python/evaluation-packages/0.27.0
+Building source distribution...
+error: Failed to build `/tmp/m4-027-build`
+  cause: Failed to resolve requirements from `build-system.requires`
+  cause: No solution found when resolving: `hatchling==1.28.0`
+  cause: Request failed after 3 retries in 8.8s
+  cause: Failed to fetch: `https://pypi.org/simple/hatchling/`
+  cause: error sending request for url (https://pypi.org/simple/hatchling/)
+  cause: client error (Connect)
+  cause: tunnel error: failed to create underlying connection
+  cause: tcp open error
+  cause: Operation not permitted (os error 1)
+command: python utils/build_windows_package.py --output /workspace/allplan-mcp-server-python/evaluation-packages/0.27.0
+/workspace/allplan-mcp-server-python/evaluation-packages/0.27.0/allplan-mcp-0.27.0-windows-evaluation.zip
+build_finished_utc=2026-10-22T22:29:18Z
+
+wheel_sdist_completion
+command: UV_CACHE_DIR=/tmp/uv-cache uv build --out-dir /workspace/allplan-mcp-server-python/evaluation-packages/0.27.0 (require_escalated for configured package proxy)
+Successfully built /workspace/allplan-mcp-server-python/evaluation-packages/0.27.0/allplan_mcp_server-0.27.0.tar.gz
+Successfully built /workspace/allplan-mcp-server-python/evaluation-packages/0.27.0/allplan_mcp_server-0.27.0-py3-none-any.whl
+Windows ZIP was already built and subsequently verified; it was not rebuilt.

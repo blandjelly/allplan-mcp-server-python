@@ -1,0 +1,54 @@
+{
+  "source_commit": "e62a50c9c6c6b51978b6f1a55f9d9978eee5b1c3",
+  "initial_source_commit": "bab1c02eb73cf4a0139116b2c6ab422a3ec23af3",
+  "pull_request": 25,
+  "target_branch": "develop/m4",
+  "result": "PASS for 143 unique affected/dependent tests across focused iterations",
+  "unique_tests": 143,
+  "full_local_suite_run": false,
+  "full_ci": "PASS: run 39841530841, 593 tests on each Windows and Ubuntu Python 3.12 job plus package job",
+  "final_source_ci": "PASS",
+  "final_source_ci_run_id": 39841530841,
+  "final_source_ci_url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39841530841",
+  "initial_ci_record": "initial-ci.json",
+  "package_build": "Windows ZIP built once from clean detached source; initial uv build failed before artifact production; later uv build completed wheel and sdist",
+  "package_verification": "PASS on the single exact ZIP verification run",
+  "package_verification_record": "package-verification.json",
+  "delivered_zip_sha256": "eab80cd2c907e7fd90ba733f4f8d1335f097986b938c74ccdda6bf3382cdaa30",
+  "delivered_zip_payload_files": 183,
+  "native_Allplan": "not_run",
+  "logs": [
+    "focused-run.log",
+    "focused-rerun.log",
+    "version-focused.log"
+  ],
+  "run_method": "PYTHONPATH=tests .venv/bin/python -m unittest -v <affected/dependent modules and named cases>",
+  "additional_final_source_run": {
+    "tests": 7,
+    "result": "PASS",
+    "new_unique_tests": 1,
+    "repeated_http_tests": 6,
+    "reason_for_http_rerun": "Recheck HTTP paths against the corrected package version constant.",
+    "log": "version-focused.log"
+  },
+  "scope": [
+    "bounded attribute-name variants, roundtrip and ambiguity rejection",
+    "Wall material preservation eligibility, child hierarchy and bounded diagnostics",
+    "preview distinction between observed old material and preservation eligibility",
+    "destination-field failures versus operation-eligibility failures",
+    "affected model-edit, native model-edit and HTTP boundaries"
+  ],
+  "initial_run": {
+    "tests": 140,
+    "fixture_expectation_mismatches": 3,
+    "http_socket_restriction_errors": 6,
+    "notes": [
+      "The initial 140-test run had two assertion failures and one fixture error (three fixture/expectation mismatches total); the affected cases were corrected and passed on rerun.",
+      "Six HTTP test setup errors were caused by sandbox socket restrictions; all six were rerun with network-enabled socket access and passed.",
+      "A newly added raw-read getter case was outside the initial 140 tests; its fixture initially errored, was corrected, and passed on rerun."
+    ]
+  },
+  "count_basis": "142 distinct affected/dependent test identities passed across the first source's focused run and corrective reruns, including the additional raw-read getter case. On final source e62a50c9c6c6b51978b6f1a55f9d9978eee5b1c3, the version/lock test and six HTTP rechecks passed; only the version/lock test adds a new unique identity, for 143 total across iterations. The retained logs include initial fixture/expectation and socket-restricted HTTP errors as well as passing rerun evidence; this is not a full-suite run.",
+  "prior_native_observations": "The bounded 0.26.0 owner observation and earlier accepted M4 observations remain separate; they are not counted as 0.27.0 native acceptance.",
+  "original_ci_artifact_delivered": false
+}
