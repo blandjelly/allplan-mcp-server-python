@@ -4,10 +4,17 @@ Updated 2026-10-22. This is implementation and verification coverage, not full
 native acceptance. Earlier scoped owner observations remain in
 [validation status](validation-status.md).
 
+Candidate source `48e64b1a06bef005c26a143860d9257038cccde3` passed CI run
+39822585188 (580 tests on Windows and 580 on Ubuntu, Python 3.12, plus package
+job). The exact delivered fallback ZIP passed package verification; the CI ZIP
+could not be transferred through the proxy. See the
+[0.26.0 record](../evaluation-packages/0.26.0/README.md) for provenance and
+verification artifacts. Native 0.26.0 acceptance was not run.
+
 | Requested family / adapter | Current guarded route and owner boundary | Remaining native evidence |
 | --- | --- | --- |
 | Columns / Column | Typed attributes and exact existing organizational layer; model/view binding, exclusions, fresh readback, replay and no-op. | Only remaining W1 readback/no-op/Undo gap; preserve accepted attributes. |
-| Walls / Wall | Typed root attributes; organizational layer binds all direct WallTier owners with its own adapter. Single-tier native thickness/material read exists. Current layer IDs 0–65535 are valid; the 0.26.0 layer-0 reader fix is automated. This does not prove ID 0 caused the earlier `repair_conflict`; its raw trace is unavailable. | Native layer owner/readback/Undo for unaccepted case; native material change remains unaccepted. Candidate 0.26.0 improves diagnosis of the blocked property; it does not repair or enable the setter. |
+| Walls / Wall | Typed root attributes; organizational layer binds all direct WallTier owners with its own adapter. Single-tier native thickness/material read exists. Current layer IDs 0–65535 are valid; 0.26.0 fixes reading ID 0 and covers reviewed W1 plan/Apply from prior ID 0 in focused tests. This does not prove ID 0 caused the earlier `repair_conflict`; its raw trace is unavailable. | Native layer owner/readback/Undo for unaccepted case; native material change remains unaccepted. Candidate 0.26.0 improves diagnosis of the blocked property; it does not repair or enable the setter. |
 | Beams / Beam, SkeletonBeam | Typed attributes and organizational layer, exact target resolution; unrelated broken hierarchies do not redirect the owner. | Family/build-specific UI/readback/Undo; fakes and API availability are separate. |
 | Slabs / Slab | Read-only direct identity probe; only standalone Slab permits typed attributes/layer with bound ancestry. | Resolve the owner's two Slab/MultiSlab results read-only. No new attribute trial on previously accepted targets. |
 | Aggregate slab / MultiSlab | Direct parent/child evidence; all aggregate writes blocked pending an explicit property owner. Slab children are blocked independently of the type filter. | Explicit owner contract before enabling any aggregate/tier write. |
@@ -60,22 +67,23 @@ organizational layer never substitutes for native material.
 
 ## Priority status
 
-1. **Limited accepted PASS.** Preserve the scoped native observations already
-   recorded. They do not establish a full office-editing acceptance gate.
+1. **Limited journal-cleanup PASS remains accepted.** The 0.23.0 preview and
+   confirmed archival are retained in the owner record; do not repeat that
+   trial. It does not close broader single-drawing acceptance.
 2. **Identity inventory is not field ownership.** Candidate 0.26.0 adds a
    bounded `drawing_identity` inventory across pages. Model/view UUID, lineage
-   and native type do not prove attribute/material/layer ownership or merge
-   Slab/MultiSlab identities.
-3. **Layer 0 is an automated reader fix.** Legal IDs include 0 through 65535;
-   W1 remains resolved by positive native ID/name evidence. No native layer-0
-   write is authorized by this fix. Only the missing W1 no-op/Undo remains in
-   the short owner trial.
+   and native type do not prove attribute/material/layer ownership or resolve
+   the owner's Slab/MultiSlab relationship.
+3. **Layer 0 is handled in read and reviewed W1 plan/Apply.** Legal IDs include
+   0 through 65535; focused tests cover a reviewed W1 change from old ID 0.
+   This does not establish that ID 0 caused the earlier `repair_conflict`;
+   its raw trace is unavailable. Native W1 no-op/Undo remains missing.
 4. **Selection unsupported; deletion limited; material unaccepted.** Official
    Allplan 2026 APIs show interactive user selection only. The owner confirms
    the 0.25.0 run and its scoped single-subtree deletion PASS; do not repeat
    that successful deletion. Broader family/Undo evidence remains missing.
    Candidate 0.26.0 diagnoses blocked delete/material properties; it does not
-   enable the material setter or relax any guard.
+   repair the native blockers, enable the material setter or relax any guard.
 5. **Date/vector writes unsupported on the existing adapter.** `AttributeDate`
    exists as a typed SDK payload for `SetAttributes`, but an accepted payload
    for `ElementsAttributeService.ChangeAttribute` and exact fresh readback are

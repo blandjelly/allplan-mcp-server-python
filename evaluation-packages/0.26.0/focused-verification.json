@@ -1,0 +1,32 @@
+{
+  "source_commit": "48e64b1a06bef005c26a143860d9257038cccde3",
+  "result": "PASS for focused affected/dependent test runs",
+  "unique_tests": 166,
+  "full_local_suite_run": false,
+  "native_Allplan": "not_run",
+  "run_method": "uv run --frozen python -m unittest -v <module names>",
+  "http_tests_used_network_enabled_sandbox": true,
+  "modules": [
+    "test_component_identity",
+    "test_component_identity_http",
+    "test_drawing_identity",
+    "test_drawing_identity_http",
+    "test_model_delete",
+    "test_model_delete_http",
+    "test_wall_material_edit",
+    "test_wall_material_http",
+    "test_wall_layer",
+    "test_wall_layer_edit",
+    "test_edit_ownership",
+    "test_model_edit",
+    "test_model_edit_contracts",
+    "test_model_edit_recovery_http",
+    "test_attribute_codecs",
+    "test_journal_cleanup",
+    "test_journal_cleanup_http",
+    "test_journal_inspection",
+    "test_native_model_edit"
+  ],
+  "count_basis": "154 tests passed in the combined focused run; 2 additional test_model_delete preview diagnostic tests and 10 drawing_identity inventory tests (8 unit, 2 HTTP) passed afterward.",
+  "prior_native_observations": "Retained 0.25.0 observations remain recorded separately and are not counted as 0.26.0 native acceptance."
+}

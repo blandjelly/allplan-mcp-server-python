@@ -34,6 +34,7 @@ accept the full M4 workflow.
 | [2026-10-19 observation](test-results/m4-agent-observation-0.21.1-2026-10-19.md) · [follow-up](test-results/m4-agent-followup-2026-10-19.md) | Layer lookup and the multiview recovery blocker; preserve original execution state. |
 | [2026-10-20 observation](test-results/m4-agent-observation-2026-10-20.md) | Owner confirms Slab and Column attribute outcomes; exact installed manifest is absent. |
 | [0.23.0 journal PASS](test-results/m4-journal-cleanup-0.23.0-owner-pass-2026-10-21.md) | Owner-reported preview and confirmed archival of both journals; no exact manifest, native replay/restart or snapshot-conflict evidence supplied. |
+| [0.25.0 owner observation](test-results/m4-owner-observation-0.25.0-2026-10-22.md) | Owner confirms the log matches Allplan 2026.1 during the 0.25.0 run. Limited PASS: Wall and MultiSlab identity reads, one confirmed Wall subtree deletion with fresh complete absence scan, and one 200 mm Wall W1 readback. The exact manifest, raw MCP responses and Allplan build ID are absent; opening/owning-Wall deletion, material/hatch, bulk W1 and no-op/Undo remain blocked or unobserved. Do not repeat successful deletion, identity reads or the 200 mm Wall readback. |
 
 Raw owner logs are retained unmodified under
 [test-results/evidence](test-results/evidence/). Source CI and package checks
@@ -49,7 +50,8 @@ are recorded separately in each [evaluation package](../evaluation-packages/).
   diagnostic trace have separate 1 MiB limits. Candidate 0.23.0 provides
   explicit preview and confirmed archival; its bounded owner-reported trial
   passed. Preserve the limitations in the linked observation.
-- Native selection, native material writes, the complete six-family matrix,
+- Native selection, native material writes, full typed-delete coverage/Undo,
+  the complete six-family matrix,
   multi-file writes, whole-project access, long-term/concurrent stability,
   broader Undo and cross-copy identity remain unaccepted.
 

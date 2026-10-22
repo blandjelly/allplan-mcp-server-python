@@ -1,0 +1,54 @@
+{
+  "run_id": 39822585188,
+  "run_url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39822585188",
+  "workflow": "Final candidate checks",
+  "event": "pull_request",
+  "conclusion": "success",
+  "source_commit": "48e64b1a06bef005c26a143860d9257038cccde3",
+  "base_branch": "develop/m4",
+  "jobs": {
+    "configuration": {
+      "job_id": 119977458935,
+      "conclusion": "success"
+    },
+    "portable_windows_python_3_12": {
+      "job_id": 119977581734,
+      "conclusion": "success",
+      "tests": 580,
+      "result": "OK",
+      "log_tail": "Ran 580 tests in 409.842s; OK"
+    },
+    "portable_ubuntu_python_3_12": {
+      "job_id": 119977581915,
+      "conclusion": "success",
+      "tests": 580,
+      "result": "OK",
+      "log_tail": "Ran 580 tests in 168.133s; OK"
+    },
+    "package": {
+      "job_id": 119981482174,
+      "conclusion": "success",
+      "uv_build": "success",
+      "windows_package_build": "success",
+      "artifact_upload": "success",
+      "artifact_downloaded": false
+    }
+  },
+  "failed_tests_or_steps": [],
+  "native_Allplan": "not_run",
+  "delivery_provenance": "local_fallback_after_proxy_transfer_denial",
+  "ci_package_job": "pass; transfer of the original CI artifact was blocked by the execution proxy; one clean local fallback build provided the delivered files",
+  "ci_artifact_id": 12445232990,
+  "ci_artifact_digest": "4e2617cf34cf2269663942ac193a526eac3e0fcb2743e0da78712333ec4bfbfd",
+  "ci_zip_verified_as_delivered": false,
+  "delivered_package": {
+    "provenance": "single_local_fallback_build_after_ci_artifact_proxy_transfer_denial",
+    "source_commit": "48e64b1a06bef005c26a143860d9257038cccde3",
+    "source_modified": false,
+    "zip_sha256": "4c0dd3ed9c9c038320fe08032a26ef61d8be7a57ed4169d5cdd3bc5952b292a9",
+    "verification": "pass",
+    "verification_file": "package-verification.json",
+    "full_output_file": "package-verification.log"
+  },
+  "ci_artifact_transfer": "blocked_by_proxy_CONNECT_403_for_file_service_download_host"
+}

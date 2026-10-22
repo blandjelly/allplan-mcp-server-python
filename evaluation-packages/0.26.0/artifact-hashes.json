@@ -1,0 +1,18 @@
+{
+  "allplan-mcp-0.26.0-windows-evaluation.zip": {
+    "bytes": 459282,
+    "sha256": "4c0dd3ed9c9c038320fe08032a26ef61d8be7a57ed4169d5cdd3bc5952b292a9"
+  },
+  "allplan-mcp-0.26.0-windows-evaluation.zip.sha256": {
+    "bytes": 108,
+    "sha256": "1ec5f092f0ed55b8914b04f9db1d1af7ca7322291c1bc18f824615e4effbee02"
+  },
+  "allplan_mcp_server-0.26.0-py3-none-any.whl": {
+    "bytes": 99931,
+    "sha256": "53fde3e9dccf4abf62abbe9798f4c05cb42e35a8b27b5e21d0d1736f1cb609d3"
+  },
+  "allplan_mcp_server-0.26.0.tar.gz": {
+    "bytes": 469156,
+    "sha256": "ac87cdbdc66eac9733b757dbb28bba2f90ff6f33cafd03b587f27f739b41ce69"
+  }
+}

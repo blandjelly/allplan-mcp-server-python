@@ -58,17 +58,44 @@ hatch 129 were blocked; moving all Walls to W1 was blocked by the 240 mm Wall's
 `repair_conflict`. W1 no-op/Undo remains unobserved. These outcomes do not close
 priorities 1–5 or the single-drawing acceptance gate.
 
-## Current candidate: 0.26.0 — in progress
+## Current delivery: 0.26.0 — CI and exact ZIP verification passed
 
-Candidate 0.26.0 documentation and implementation work is in progress on
-`develop/m4`; do not report CI or package acceptance until the candidate's
-final CI artifact and checks are recorded. The owner trial for it is limited to
-the [0.26.0 short trial](m4-single-drawing-0.26.0.pl.md): paged read-only
-`drawing_identity` for drawing 101, a read-only current-layer-0 check if
-available, missing W1 no-op/Undo, and changed deletion/material diagnostics
-only when they provide new evidence. Do not repeat the scoped 0.25.0 deletion,
-identity reads, or 200 mm Wall W1 readback. The concise per-priority boundaries
-are in the [coverage matrix](m4-single-drawing-coverage-0.24.0.md).
+Source `48e64b1a06bef005c26a143860d9257038cccde3` on PR #24 targeting
+`develop/m4`, merged as `40f71b737616b9dde4b3f6804b774c0e5f76ac40`, passed
+[CI run 39822585188](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39822585188):
+580 tests on each Windows/Ubuntu Python 3.12 job and the package job. The
+original CI artifact (ID 12445232990, digest
+`4e2617cf34cf2269663942ac193a526eac3e0fcb2743e0da78712333ec4bfbfd`) could not
+be transferred because the execution proxy returned CONNECT 403. Per testing
+policy, one local fallback build was produced from a clean detached worktree at
+the exact source commit with `source_modified=false`. The delivered ZIP SHA-256
+is `4c0dd3ed9c9c038320fe08032a26ef61d8be7a57ed4169d5cdd3bc5952b292a9`. The
+exact ZIP passed checksum/payload, exact registration, frozen sync/import,
+`drawing_identity` schema, upgrade from 0.25.0 and restore, 42 bridge hashes,
+and preservation of active/archive journal, trace and log markers. The CI
+artifact itself was not delivered; the locally built fallback is the verified
+package. See [CI record](../evaluation-packages/0.26.0/source-ci.json),
+[focused checks](../evaluation-packages/0.26.0/focused-verification.json),
+[build provenance](../evaluation-packages/0.26.0/build.log) and
+[artifact hashes](../evaluation-packages/0.26.0/artifact-hashes.json),
+[exact ZIP verification](../evaluation-packages/0.26.0/package-verification.json)
+and [verification log](../evaluation-packages/0.26.0/package-verification.log).
+
+The [0.26.0 short trial](m4-single-drawing-0.26.0.pl.md) remains limited to
+paged read-only `drawing_identity` for drawing 101, read-only layer-0
+observation, missing W1 no-op/Undo, and one fresh read-only diagnostic preview
+for an exact blocked target. Focused tests cover layer ID 0 in Wall layer
+reading and reviewed W1 plan/Apply from the old value 0; this does not supply
+native Undo or prove the historical `repair_conflict` cause. Material/delete
+changes improve diagnostics only: native material remains blocked, and prior
+0.25.0 deletion is
+a limited PASS that must not be repeated. Priority 1's bounded journal-cleanup
+PASS remains accepted; priority 2's identity inventory does not establish field
+ownership; priority 3 lacks native Undo; priority 4 selection remains
+unsupported and material remains blocked; priority 5 adds no date/vector codec.
+Native 0.26.0 acceptance is `not_run`. Priorities 1–5 and the single-drawing
+native acceptance gate remain open. See
+the [coverage matrix](m4-single-drawing-coverage-0.24.0.md).
 
 ## Retained 0.24.0 evidence
 

@@ -5,12 +5,20 @@ audits and reviewed model edits. Current M4 development uses
 [`develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/tree/develop/m4);
 main remains separate.
 
-The current candidate is **0.24.0**. It adds read-only component identity and
-parent/child evidence, blocks ambiguous Slab/MultiSlab writes, and expands
-single-drawing ownership/W1 contract checks. The owner reports PASS for 0.23.0
-journal preview and confirmed archival; preserve its bounded evidence.
-[Package and evidence](evaluation-packages/0.24.0/README.md) ·
-[short native trial](docs/m4-single-drawing-0.24.0.pl.md) ·
+Delivery **0.26.0** from merged PR #24 (merge
+`40f71b737616b9dde4b3f6804b774c0e5f76ac40`), source
+`48e64b1a06bef005c26a143860d9257038cccde3`, passed CI run 39822585188:
+580 tests on each Windows and Ubuntu Python 3.12 job plus the package job. The
+166 focused affected/dependent checks passed. The original CI artifact could
+not be transferred through the execution proxy, so a single local fallback
+build from the same clean source produced the candidate ZIP; its exact-package
+verification passed. The candidate adds paged read-only drawing identity,
+layer ID 0 support through Wall layer planning/apply, and clearer blocked edit
+diagnostics. Native 0.26.0 was not run. It does not establish property
+ownership, enable blocked native material writes, or close M4 acceptance. The owner's limited 0.25.0 observations
+are retained in [validation status](docs/validation-status.md).
+[0.26.0 candidate record](evaluation-packages/0.26.0/README.md) ·
+[short native trial](docs/m4-single-drawing-0.26.0.pl.md) ·
 [current handoff](docs/next-model-handoff.md).
 
 M4 remains partially accepted. Native selection, native material updates,
@@ -35,7 +43,7 @@ remaining development gates.
 
 ## Local Windows setup
 
-Use the [complete 0.24.0 evaluation package](evaluation-packages/0.24.0/README.md)
+Use the [complete 0.26.0 evaluation package](evaluation-packages/0.26.0/README.md)
 on the Windows machine running Allplan and Codex. External Python **3.11+**
 and internet access for locked dependencies are required. Allplan, Python and
 Codex are not bundled.

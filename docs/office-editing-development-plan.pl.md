@@ -79,14 +79,35 @@ otworu i jego ściany nadrzędnej, zmiana natywnego materiału/kreskowania 129 o
 zbiorcza zmiana warstw na W1 zostały zablokowane. No-op/Undo W1 nie wykonano.
 Punkty 1–5 i bramka odbioru pojedynczego rysunku pozostają otwarte.
 
-Kandydat **0.26.0** jest w toku. Próba właściciela jest ograniczona do
-[nowej krótkiej próby](m4-single-drawing-0.26.0.pl.md): stronicowanego,
-read-only inwentarza tożsamości rysunku 101, warunkowego odczytu bieżącej
-warstwy 0, brakującego W1 no-op/Undo oraz diagnostyk, które zmieniły się od
-wcześniejszych blokad. Próba nie powtarza usunięcia, odczytów tożsamości ani
-readbacku W1 ściany 200 mm z 0.25.0. Statusy 1–5 i powody otwartych luk
-zestawia [macierz pokrycia](m4-single-drawing-coverage-0.24.0.md). Wyników CI
-ani pakietu 0.26.0 jeszcze tu nie deklarować.
+Kandydat **0.26.0** ze źródła `48e64b1a06bef005c26a143860d9257038cccde3`
+(PR #24 do `develop/m4`, merge `40f71b737616b9dde4b3f6804b774c0e5f76ac40`)
+przeszedł [CI 39822585188](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39822585188):
+580 testów na Windows i 580 na Ubuntu (Python 3.12) oraz job pakietu. Transfer
+oryginalnego artefaktu CI (ID 12445232990) zablokował proxy CONNECT 403; zgodnie
+z polityką wykonano jeden fallback build z czystego detached worktree tego
+samego źródła (`source_modified=false`). Dostarczany ZIP ma SHA-256
+`4c0dd3ed9c9c038320fe08032a26ef61d8be7a57ed4169d5cdd3bc5952b292a9`. Dokładny
+ZIP przeszedł weryfikację: checksum/payload, rejestrację, frozen sync/import,
+schemat `drawing_identity`, upgrade z 0.25.0 i restore, 42 hashe mostka oraz
+zachowanie markerów dziennika/śladu/logu i archiwów. Oryginalny artifact CI nie
+został dostarczony; zweryfikowany pakiet jest pojedynczym local fallback
+buildem. Szczegóły są w [rekordzie 0.26.0](../evaluation-packages/0.26.0/README.md),
+[source CI](../evaluation-packages/0.26.0/source-ci.json),
+[focused checks](../evaluation-packages/0.26.0/focused-verification.json),
+[build logu](../evaluation-packages/0.26.0/build.log) i
+[weryfikacji ZIP](../evaluation-packages/0.26.0/package-verification.json).
+
+Nowa [krótka próba właściciela](m4-single-drawing-0.26.0.pl.md) obejmuje
+stronicowany read-only inwentarz tożsamości rysunku 101, odczyt warstwy 0,
+brakujące W1 no-op/Undo oraz jedną diagnostykę read-only dokładnego celu.
+Focused testy pokrywają odczyt ID 0 oraz reviewed W1 plan/apply od starej
+wartości 0, ale nie natywne Undo ani przyczynę historycznego `repair_conflict`.
+Diagnostyka delete/materialu nie naprawia blokad ani nie włącza setterów.
+Native acceptance dla 0.26.0 nie została wykonana (`not_run`). Nie powtarzać
+ograniczonego PASS usunięcia, odczytów identity ani readbacku W1 ściany 200 mm
+z 0.25.0. Statusy priorytetów są w
+[macierzy pokrycia](m4-single-drawing-coverage-0.24.0.md); pełne priorytety
+1–5 pozostają otwarte.
 
 Nie powtarzać zaakceptowanych odczytów, zapytań, podświetleń ani zapisów
 atrybutów słupów i stropów. Identyczne granice przestrzenne wyników
@@ -121,7 +142,7 @@ wykończenia. Właściciel właściwości oraz dokładny cel muszą być jawne.
    lub zbyt dużego rekordu. Incydent właściciela nie zawiera dokładnego błędu,
    więc osobno rozróżnić limit 1 MiB śladu, 128 aktywnych rekordów i limit 1 MiB
    na rekord; nie przypisywać przyczyny bez dowodu.
-2. **Tożsamość celów stropów — odczyt i blokady wdrożone, wynik częściowy.**
+2. **Tożsamość celów stropów — inwentarz i blokady, właściciel nierozstrzygnięty.**
    Odczyt `model_identity` ograniczono do `file_state` i
    wymaganej tożsamości type; różne `layer_id` lub nazwy w wrapperach nie
    blokują już strukturalnego wyniku. Regresja obejmuje taką rozbieżność, ale
@@ -134,13 +155,16 @@ wykończenia. Właściciel właściwości oraz dokładny cel muszą być jawne.
    bounds ani nie zapisywać do nich przed wyjaśnieniem relacji celu. Log
    22 października dodaje ograniczony PASS `component_identity` dla wskazanego
    Wall i wyniku `MultiSlab_TypeUUID`; nie rozstrzyga pierwotnego wyniku Slab,
-   rozbieżności view UUID potomka ani właściciela właściwości.
-3. **Pojedynczy rysunek — ograniczone odczyty natywne, brak W1 no-op/Undo.**
+   rozbieżności view UUID potomka ani właściciela właściwości. 0.26.0 dodaje
+   pełnostronicowy inwentarz `drawing_identity` z parą model/view UUID, ale
+   odczyt struktury nadal nie ustanawia właściciela pola.
+3. **Pojedynczy rysunek — layer 0 obsłużony w planie/apply, brak natywnego Undo.**
    Logi 0.24.0 i 0.25.0 potwierdzają readback W1 (ID 65535) dla wskazanego
    słupa i oddzielnie dla ściany 200 mm (ID 3702 → 65535); nie potwierdzają
-   no-op ani Undo. Wykonać wyłącznie brakujące no-op/Undo na jawnych,
-   odrębnych celach określonych próbą. Nie powtarzać readbacków ani
-   zaakceptowanych zapisów atrybutów.
+   no-op ani Undo. 0.26.0 poprawia obsługę legalnego layer ID 0 również w
+   reviewed W1 plan/apply, co pokrywają focused tests. Nie dowodzi to, że 0
+   spowodowało historyczny `repair_conflict` bez raw trace. Wykonać wyłącznie
+   brakujące no-op/Undo na jawnych, odrębnych celach; nie powtarzać readbacków.
 4. **Selekcja, usuwanie i materiał — oddzielne stany implementacji i odbioru.**
    Log 0.24.0 stwierdza, że selekcja programowa jest nieobsługiwana;
    podświetlenie ma tylko stan `submitted`, bez potwierdzenia widoczności.
@@ -157,7 +181,10 @@ wykończenia. Właściciel właściwości oraz dokładny cel muszą być jawne.
    kreskowania został zablokowany, podobnie jak zbiorcze przeniesienie ścian
    na W1 z powodu `repair_conflict` dla ściany 240 mm. Nie przypisywać usunięcia
    do dokładnego ZIP-a ani nie rozszerzać go do pełnej akceptacji typowanego
-   delete. Selekcja nadal jest nieobsługiwana.
+   delete. 0.26.0 poprawia diagnostykę blocked observations; nie naprawia
+   blokad native material/delete ani nie osłabia guardów. Selekcja nadal jest
+   nieobsługiwana. Nie powtarzać zaakceptowanego usunięcia z 0.25.0; kolejne
+   dowody mają dotyczyć brakującej rodziny/cascade/Undo.
 5. **Macierz rodzin i typów — uzupełniona, odbiór natywny nadal częściowy.**
    [Macierz 0.24.0](m4-single-drawing-coverage-0.24.0.md) rozdziela adaptery,
    właścicieli, testy i nieobsługiwane kodeki. Obecne celowane zapisy obejmują
@@ -168,7 +195,8 @@ wykończenia. Właściciel właściwości oraz dokładny cel muszą być jawne.
    `Polyhedron3D.WriteToStream` tego nie ustanawia.
    Sprawdzić osobno ściany, belki, stropy, słupy, drzwi i okna, w tym właściciela
    pola, warianty natywne, otwory i elementy wstawione. API ani atrapowe testy
-   nie zastępują krótkiej próby w konkretnym buildzie Allplana. Log 0.24.0
+   nie zastępują krótkiej próby w konkretnym buildzie Allplana. Macierz 0.26.0
+   precyzuje zakres, ale nie dodaje kodeków dat/wektorów. Log 0.24.0
    dodaje ograniczone obserwacje atrybutu ściany REI120 i usuwania słupa przez
    UI; nie odbiera to pełnej macierzy rodzin ani natywnego materiału.
 6. **Dopiero potem zaprojektować pracę wieloplikową.** Potrzebne są manifest,
