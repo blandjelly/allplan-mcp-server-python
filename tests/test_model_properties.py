@@ -89,6 +89,49 @@ class PropertyTests(unittest.TestCase):
         self.assertEqual(result["attribute_name_resolution"][0]["resolution"]["status"], "not_checked")
         self.assertEqual(result["layer_name_resolution"][0]["resolution"]["status"], "not_checked")
 
+    def test_attribute_spelling_variants_bind_casefolded_actual_name_without_definition_scan(self):
+        self.fixture()
+        from test_allplan_host.model_properties import resolve_attribute_name
+
+        variants = {"MCP_QA_MARK": 20001, "mcp_qa_mark": 20001,
+                    "Mcp_qa_mark": 20001, "mCP_QA_MARK": 20001}
+        self.base.AttributeService.GetAttributeID.side_effect = lambda doc, name: variants.get(name, -1)
+        self.base.AttributeService.GetAttributeName.side_effect = lambda doc, ident: "MCP_QA_MARK"
+
+        for requested in ("mcp_qa_mark", "MCP_QA_MARK"):
+            with self.subTest(requested=requested):
+                self.base.AttributeService.GetAttributeID.reset_mock()
+                self.base.AttributeService.GetAttributeName.reset_mock()
+                ident, actual = resolve_attribute_name(
+                    self.coord.GetInputViewDocument(), self.base, requested,
+                    lambda _api, callback: callback())
+                self.assertEqual((ident, actual), (20001, "MCP_QA_MARK"))
+                self.assertIn("MCP_QA_MARK", [call.args[1] for call in self.base.AttributeService.GetAttributeID.call_args_list])
+                self.base.AttributeService.GetAttributeType.assert_not_called()
+                self.base.AttributeService.GetEnumValues.assert_not_called()
+
+    def test_attribute_case_variant_conflict_is_ambiguous_and_runtime_failure_stops_lookup(self):
+        self.fixture()
+        from test_allplan_host.model_properties import resolve_attribute_name
+
+        self.base.AttributeService.GetAttributeID.side_effect = lambda doc, name: {
+            "mcp_qa_mark": 20001, "MCP_QA_MARK": 20002}.get(name, -1)
+        self.base.AttributeService.GetAttributeName.side_effect = lambda doc, ident: {
+            20001: "mcp_qa_mark", 20002: "MCP_QA_MARK"}[ident]
+        with self.assertRaises(ValueError):
+            resolve_attribute_name(self.coord.GetInputViewDocument(), self.base, "mcp_qa_mark",
+                                   lambda _api, callback: callback())
+        self.assertEqual(self.base.AttributeService.GetAttributeID.call_count, 5)
+        self.base.AttributeService.GetAttributeType.assert_not_called()
+        self.base.AttributeService.GetEnumValues.assert_not_called()
+
+        self.base.AttributeService.GetAttributeID.reset_mock()
+        self.base.AttributeService.GetAttributeID.side_effect = RuntimeError("unexpected native failure")
+        with self.assertRaises(RuntimeError):
+            resolve_attribute_name(self.coord.GetInputViewDocument(), self.base, "mcp_qa_mark",
+                                   lambda _api, callback: callback())
+        self.assertEqual(self.base.AttributeService.GetAttributeID.call_count, 1)
+
     def test_full_layer_name_without_sdk_lookup_reports_catalog_followup(self):
         self.fixture()
         result = self.discover(layer_names=["Ogólne03"])

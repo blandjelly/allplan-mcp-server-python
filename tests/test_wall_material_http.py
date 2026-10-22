@@ -67,3 +67,38 @@ class WallMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
                     result = await client.call_tool("model_edit", {"request": request}, raise_on_error=False)
                     self.assertTrue(result.is_error)
             self.assertFalse(any(path == "/model-edit" for path, _ in self.bridge_handler.calls))
+
+    async def test_preservation_failure_keeps_material_read_and_reports_http_diagnostic(self):
+        native = fixture_module.WallMaterialEditTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        del native.properties.GetWallTierProperties(1).CommonProperties.Pen
+        original = self.bridge_handler.handle
+
+        def handle(path, payload):
+            if path == "/model-edit":
+                self.bridge_handler.calls.append((path, payload))
+                try:
+                    return native.native.handler.handle(path, payload)
+                except native.native.module.BridgeError as exc:
+                    raise smoke.transport.BridgeError(exc.code, str(exc), exc.status) from exc
+            return original(path, payload)
+
+        self.bridge_handler.handle = handle
+        async with Client(self.url, timeout=10) as client:
+            result = (await client.call_tool("model_edit", {
+                "request": native.request()})).data
+
+        self.assertFalse(result["apply_available"], result)
+        self.assertFalse(result["changes"], result)
+        self.assertEqual(result["criteria"]["required_field_failures"], [])
+        self.assertEqual(result["criteria"]["operation_eligibility_failures"][0]["field"],
+                         "wall.native_material")
+        self.assertEqual(result["criteria"]["checks"][0]["decision"], "matched")
+        blocker = next(item for item in result["blocked"]
+                       if item["field"] == "wall.native_material")
+        self.assertEqual(blocker["reason"], "native_material_preservation_unavailable")
+        self.assertEqual(blocker["observation"]["reason"], "wall_material_read_unavailable")
+        self.assertEqual(blocker["observation"]["diagnostic"], {
+            "stage": "material_common_Pen", "error_type": "AttributeError"})
+        self.assertEqual(native.native.base.ModifyElements.call_count, 0)

@@ -97,17 +97,40 @@ buildem. Szczegóły są w [rekordzie 0.26.0](../evaluation-packages/0.26.0/READ
 [build logu](../evaluation-packages/0.26.0/build.log) i
 [weryfikacji ZIP](../evaluation-packages/0.26.0/package-verification.json).
 
-Nowa [krótka próba właściciela](m4-single-drawing-0.26.0.pl.md) obejmuje
+Ówczesna [krótka próba właściciela](m4-single-drawing-0.26.0.pl.md) obejmowała
 stronicowany read-only inwentarz tożsamości rysunku 101, odczyt warstwy 0,
 brakujące W1 no-op/Undo oraz jedną diagnostykę read-only dokładnego celu.
 Focused testy pokrywają odczyt ID 0 oraz reviewed W1 plan/apply od starej
 wartości 0, ale nie natywne Undo ani przyczynę historycznego `repair_conflict`.
 Diagnostyka delete/materialu nie naprawia blokad ani nie włącza setterów.
-Native acceptance dla 0.26.0 nie została wykonana (`not_run`). Nie powtarzać
-ograniczonego PASS usunięcia, odczytów identity ani readbacku W1 ściany 200 mm
-z 0.25.0. Statusy priorytetów są w
+W chwili dostawy nie było natywnej próby 0.26.0; późniejsza obserwacja
+potwierdza tylko jej ograniczony zakres, a pełny odbiór natywny pozostaje
+nieukończony. Nie powtarzać ograniczonego PASS usunięcia, odczytów identity ani
+readbacku W1 ściany 200 mm z 0.25.0. Statusy priorytetów są w
 [macierzy pokrycia](m4-single-drawing-coverage-0.24.0.md); pełne priorytety
 1–5 pozostają otwarte.
+
+Ograniczona [obserwacja 0.26.0](test-results/m4-owner-observation-0.26.0-2026-10-22.md)
+zachowuje log właściciela bez surowych odpowiedzi MCP, manifestu, dokładnego
+ZIP-a ani builda Allplana. Skan `drawing_identity` zgłosił kompletne 26/26
+członków zakresu przy 7 `observed` i 19 `not_checked`. Na tym samym słupie
+potwierdzono readbacki po zmianie warstwy 3700 → W1 → 0. Podświetlenie jednej
+ściany 200 mm zostało wysłane; status wymagał obserwacji widoku, a log nie
+podaje jej wyniku ani natywnej liczby selekcji. Asystent zgłosił blokadę
+materiału z powodu otworu, lecz późniejsza odpowiedź zawiera puste `blocked`
+i brak diagnostyki, więc rzeczywista przyczyna nie jest potwierdzona. Materiału
+nie zmieniono; nie wykonano delete ani W1 no-op/Undo.
+
+Kandydat **0.27.0** jest w trakcie implementacji; CI i pakiet oczekują na
+walidację, a nowej próby natywnej nie wykonano. Obejmuje bounded resolver nazw
+atrybutów bez fuzzy/catalog, fail-closed inwentaryzację potomków Wall dla
+preservation materiału oraz rozdzielenie starej wartości materiału od
+kwalifikacji operacji. Diagnostyka nie dodaje nowych zapisów i nie umożliwia
+materiału bez pełnego snapshotu preservation, również przy świeżym odczycie po
+zapisie. [Nowa krótka próba](m4-single-drawing-0.27.0.pl.md) dotyczy tylko
+lowercase `mcp_qa_mark`, nowych diagnostyk i nieodebranych dowodów; nie powtarza
+zaakceptowanych zapisów ani usunięcia. Punkty 1–5 pozostają otwarte zgodnie z
+[handoffem](next-model-handoff.md).
 
 Nie powtarzać zaakceptowanych odczytów, zapytań, podświetleń ani zapisów
 atrybutów słupów i stropów. Identyczne granice przestrzenne wyników
@@ -156,13 +179,16 @@ wykończenia. Właściciel właściwości oraz dokładny cel muszą być jawne.
    22 października dodaje ograniczony PASS `component_identity` dla wskazanego
    Wall i wyniku `MultiSlab_TypeUUID`; nie rozstrzyga pierwotnego wyniku Slab,
    rozbieżności view UUID potomka ani właściciela właściwości. 0.26.0 dodaje
-   pełnostronicowy inwentarz `drawing_identity` z parą model/view UUID, ale
-   odczyt struktury nadal nie ustanawia właściciela pola.
+   pełnostronicowy inwentarz `drawing_identity` z parą model/view UUID; log
+   zgłasza 26/26 enumerowanych tożsamości, ale tylko 7 `observed` i 19
+   `not_checked`. Odczyt struktury nadal nie ustanawia właściciela pola.
 3. **Pojedynczy rysunek — layer 0 obsłużony w planie/apply, brak natywnego Undo.**
    Logi 0.24.0 i 0.25.0 potwierdzają readback W1 (ID 65535) dla wskazanego
    słupa i oddzielnie dla ściany 200 mm (ID 3702 → 65535); nie potwierdzają
    no-op ani Undo. 0.26.0 poprawia obsługę legalnego layer ID 0 również w
-   reviewed W1 plan/apply, co pokrywają focused tests. Nie dowodzi to, że 0
+   reviewed W1 plan/apply, co pokrywają focused tests. Log 0.26.0 dodaje
+   readback ID 0 dla wskazanego słupa po zapisie, ale nie no-op ani Undo. Nie
+   dowodzi to, że 0
    spowodowało historyczny `repair_conflict` bez raw trace. Wykonać wyłącznie
    brakujące no-op/Undo na jawnych, odrębnych celach; nie powtarzać readbacków.
 4. **Selekcja, usuwanie i materiał — oddzielne stany implementacji i odbioru.**
@@ -184,7 +210,10 @@ wykończenia. Właściciel właściwości oraz dokładny cel muszą być jawne.
    delete. 0.26.0 poprawia diagnostykę blocked observations; nie naprawia
    blokad native material/delete ani nie osłabia guardów. Selekcja nadal jest
    nieobsługiwana. Nie powtarzać zaakceptowanego usunięcia z 0.25.0; kolejne
-   dowody mają dotyczyć brakującej rodziny/cascade/Undo.
+   dowody mają dotyczyć brakującej rodziny/cascade/Undo. Kandydat 0.27.0
+   jedynie zaostrza diagnostykę i eligibility preservation materiału; nie
+   włącza nowych zapisów. Otwór zgłoszony jako przyczyna w logu 0.26.0 nie
+   został potwierdzony surową diagnostyką. Nie powtarzać tej obserwacji.
 5. **Macierz rodzin i typów — uzupełniona, odbiór natywny nadal częściowy.**
    [Macierz 0.24.0](m4-single-drawing-coverage-0.24.0.md) rozdziela adaptery,
    właścicieli, testy i nieobsługiwane kodeki. Obecne celowane zapisy obejmują

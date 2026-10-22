@@ -124,6 +124,49 @@ class PropertyProbeTests(unittest.TestCase):
         self.assertFalse(result["semantic_alias_verified"])
         self.base.ElementsSelectService.SelectAllElements.assert_not_called()
 
+    def test_uppercase_project_attribute_resolves_from_lowercase_request_after_minus_one(self):
+        self.fixture()
+        self.base.AttributeService.GetAttributeID.side_effect = lambda doc, name: (
+            20001 if name == "MCP_QA_MARK" else -1)
+        self.base.AttributeService.GetAttributeName.side_effect = lambda doc, ident: "MCP_QA_MARK"
+
+        result = self.probe(phase="attribute_name", attribute_name="mcp_qa_mark")
+
+        self.assertEqual(result["attribute_id"], {"status": "observed", "value": 20001})
+        self.assertEqual(result["name"], {"status": "observed", "value": "MCP_QA_MARK"})
+        self.assertTrue(result["case_insensitive_name_round_trip"])
+        self.assertFalse(result["semantic_alias_verified"])
+        self.base.ElementsSelectService.SelectAllElements.assert_not_called()
+        self.base.AttributeService.GetAttributeType.assert_not_called()
+        self.base.AttributeService.GetEnumValues.assert_not_called()
+
+    def test_conflicting_case_variants_are_not_checked_and_runtime_error_stops_search(self):
+        self.fixture()
+        calls = [0]
+        def conflicting_lookup(doc, name):
+            calls[0] += 1
+            if calls[0] == 1:  # Initial exact lookup misses; fallback checks every spelling.
+                return -1
+            return {"mcp_qa_mark": 20001, "MCP_QA_MARK": 20002}.get(name, -1)
+        self.base.AttributeService.GetAttributeID.side_effect = conflicting_lookup
+        self.base.AttributeService.GetAttributeName.side_effect = lambda doc, ident: {
+            20001: "mcp_qa_mark", 20002: "MCP_QA_MARK"}[ident]
+        ambiguous = self.probe(phase="attribute_name", attribute_name="mcp_qa_mark")
+        self.assertEqual(ambiguous["attribute_id"]["status"], "not_checked")
+        self.base.AttributeService.GetAttributeType.assert_not_called()
+        self.base.AttributeService.GetEnumValues.assert_not_called()
+        self.base.ElementsSelectService.SelectAllElements.assert_not_called()
+
+        self.base.AttributeService.GetAttributeID.reset_mock()
+        self.base.AttributeService.GetAttributeID.side_effect = RuntimeError("unexpected native failure")
+        self.base.AttributeService.GetAttributeName.reset_mock()
+        failed = self.probe(phase="attribute_name", attribute_name="mcp_qa_mark")
+        self.assertEqual(failed["attribute_id"], {"status": "not_checked", "value": None,
+                                                    "reason": "RuntimeError"})
+        self.assertEqual(self.base.AttributeService.GetAttributeID.call_count, 1)
+        self.base.AttributeService.GetAttributeName.assert_not_called()
+        self.base.AttributeService.GetAttributeType.assert_not_called()
+
     def test_invalid_phase_fields_and_passive_scope_reject_without_attribute_reads(self):
         self.fixture()
         for request in ({"phase": "attribute_definition", "attribute_id": True},
