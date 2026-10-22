@@ -45,6 +45,13 @@ class NativeTraceCleanupTests(unittest.TestCase):
         self.assertEqual((record["phase"], record["api"], record["state"]),
                          ("cleanup_test", "test.api", "returned"))
 
+    def test_trace_accepts_more_than_the_previous_one_mib_capacity(self):
+        self.path.write_bytes(b"x" * (1024 * 1024 + 1))
+        self.trace(self.path, "capacity_test").record("test.api", "returned")
+        result = self.trace.inspect_storage(self.path)
+        self.assertGreater(result["bytes"], 1024 * 1024)
+        self.assertLessEqual(result["bytes"], self.trace.MAX_BYTES)
+
     def test_stale_snapshot_does_not_move_or_change_trace(self):
         self.path.write_bytes(b"reviewed\n")
         reviewed = self.trace.inspect_storage(self.path)

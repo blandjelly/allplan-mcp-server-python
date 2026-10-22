@@ -47,9 +47,9 @@ Original walkthroughs/reports remain in [historical records](validation-status.m
 **M3 Journal.cmd** or fix_model_issues action=inspect_journal reports verified
 historical summaries, slots and invalid/unresolved blockers without native model
 access or reconciliation. It is not a backup or proof of current values.
-The active execution history holds at most **128 records**, and an individual
-record has a separate **1 MiB** limit. The active diagnostic trace also has a
-**1 MiB** limit. At any capacity error, preserve the journal and trace. Never
+The active execution history holds at most **512 records**, and an individual
+record has a separate **1 MiB** limit. The active diagnostic trace has an
+**8 MiB** limit. At any capacity error, preserve the journal and trace. Never
 delete execution IDs to gain slots. Candidate 0.23.0 provides reviewed,
 confirmed archival through `fix_model_issues`; follow the
 [current owner trial](m4-journal-cleanup-0.23.0.pl.md) before using it. Before

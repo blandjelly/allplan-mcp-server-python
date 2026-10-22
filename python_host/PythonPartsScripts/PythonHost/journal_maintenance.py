@@ -8,7 +8,7 @@ from .query_contracts import fingerprint
 from .transport import BridgeError
 
 MAX_FILES = 1024
-MAX_BYTES = 64 * 1024 * 1024
+MAX_BYTES = 1024 * 1024 * 1024
 
 
 def archive_path(executor):
@@ -33,7 +33,7 @@ def inventory(executor):
             size = path.stat().st_size
             total += size
             if total > MAX_BYTES:
-                raise BridgeError("journal_cleanup_limit", "Cleanup inventory exceeds 64 MiB; no records changed.", 409)
+                raise BridgeError("journal_cleanup_limit", "Cleanup inventory exceeds 1 GiB; no records changed.", 409)
             digest = hashlib.sha256()
             with path.open("rb") as stream:
                 for chunk in iter(lambda: stream.read(65536), b""):

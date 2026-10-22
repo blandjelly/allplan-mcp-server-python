@@ -204,6 +204,56 @@ class ComponentIdentityTests(unittest.TestCase):
         self.assertEqual(result["reason"], "component_parent_cycle")
         self.assertEqual(result["diagnostic"], {"stage": "parent_identity", "error_type": "ValueError"})
 
+    def test_child_parent_view_difference_is_recorded_but_logical_owner_must_match(self):
+        from test_allplan_host.component_ownership import observation
+
+        target = self.element(48)
+        child = self.element(49, name="AttributeContainer_TypeUUID")
+        parent_view = self.element(50)
+        parent_view.GetModelElementUUID.return_value = target.GetModelElementUUID.return_value
+        parent_view.GetElementAdapterType.return_value.GetTypeName.return_value = (
+            target.GetElementAdapterType.return_value.GetTypeName.return_value)
+        parent_view.GetElementAdapterType.return_value.GetGuid.return_value = (
+            target.GetElementAdapterType.return_value.GetGuid.return_value)
+        self.fixture([target])
+        self.children[id(target)] = [child]
+        self.parents[id(child)] = parent_view
+
+        result = observation(target)
+        self.assertEqual(result["status"], "observed")
+        edge = result["value"]["child_parent_edges"][0]
+        self.assertEqual(edge["child"]["model_uuid"], child.GetModelElementUUID.return_value)
+        self.assertEqual(edge["parent"]["model_uuid"], target.GetModelElementUUID.return_value)
+        self.assertNotEqual(edge["parent"]["view_uuid"], target.GetElementUUID.return_value)
+
+        parent_view.GetModelElementUUID.return_value = self.element(51).GetModelElementUUID.return_value
+        rejected = observation(target)
+        self.assertEqual(rejected["status"], "not_checked")
+        self.assertEqual(rejected["reason"], "component_child_owner_mismatch")
+
+    def test_alternate_view_logical_self_child_and_ancestry_cycle_are_rejected(self):
+        from test_allplan_host.component_ownership import observation
+
+        target = self.element(52)
+        alternate = self.element(53)
+        alternate.GetModelElementUUID.return_value = target.GetModelElementUUID.return_value
+        alternate.GetElementAdapterType.return_value.GetTypeName.return_value = (
+            target.GetElementAdapterType.return_value.GetTypeName.return_value)
+        alternate.GetElementAdapterType.return_value.GetGuid.return_value = (
+            target.GetElementAdapterType.return_value.GetGuid.return_value)
+        self.fixture([target])
+        self.parents[id(target)] = alternate
+        cycle = observation(target, include_children=False)
+        self.assertEqual(cycle["status"], "not_checked")
+        self.assertEqual(cycle["reason"], "component_parent_cycle")
+
+        self.parents[id(target)] = self.null_adapter()
+        self.children[id(target)] = [alternate]
+        self.parents[id(alternate)] = target
+        self_child = observation(target)
+        self.assertEqual(self_child["status"], "not_checked")
+        self.assertEqual(self_child["reason"], "component_child_owner_mismatch")
+
     def test_child_budget_overflow_is_not_reported_as_complete(self):
         from test_allplan_host.component_ownership import observation
 

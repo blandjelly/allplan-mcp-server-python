@@ -5,21 +5,30 @@ audits and reviewed model edits. Current M4 development uses
 [`develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/tree/develop/m4);
 main remains separate.
 
-Delivery **0.26.0** from merged PR #24 (merge
-`40f71b737616b9dde4b3f6804b774c0e5f76ac40`), source
-`48e64b1a06bef005c26a143860d9257038cccde3`, passed CI run 39822585188:
-580 tests on each Windows and Ubuntu Python 3.12 job plus the package job. The
-166 focused affected/dependent checks passed. The original CI artifact could
-not be transferred through the execution proxy, so a single local fallback
-build from the same clean source produced the candidate ZIP; its exact-package
-verification passed. The candidate adds paged read-only drawing identity,
-layer ID 0 support through Wall layer planning/apply, and clearer blocked edit
-diagnostics. Native 0.26.0 was not run. It does not establish property
-ownership, enable blocked native material writes, or close M4 acceptance. The owner's limited 0.25.0 observations
-are retained in [validation status](docs/validation-status.md).
-[0.26.0 candidate record](evaluation-packages/0.26.0/README.md) ·
-[short native trial](docs/m4-single-drawing-0.26.0.pl.md) ·
-[current handoff](docs/next-model-handoff.md).
+Candidate **0.28.0** is source commit
+`b59ef15d9bfd4dfb42476b240e31b5b300268d2d` on `fix/m4-owner-views-0.28.0`,
+with [PR #26 targeting `develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/pull/26).
+Focused verification passed 170 unique affected/dependent checks. Full CI run
+[39871551499](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39871551499)
+passed 601 tests on each Windows and Ubuntu Python 3.12 job plus the package
+job. PR #26 targets `develop/m4`. The original CI ZIP was unavailable to the
+executor, so one fallback ZIP was built from the exact clean source and passed
+verification on its first attempt: 186 payload files, 42 bridge hashes, SHA-256
+`74099ec341cdf8b2bc87def42487fafbbbcdb963ec6f4b8859a412f7b6d064ed`.
+
+The candidate matches component parent edges by drawing, model UUID and type
+across view wrappers, while retaining actual parent view UUIDs in the deletion
+evidence and binding the selected target's exact view UUID. It also raises the
+journal capacity limits while preserving the per-record bound and protection
+for unresolved or unverifiable history. See the
+[0.28.0 evaluation record](evaluation-packages/0.28.0/README.md),
+[0.28.0 API evidence](docs/m4-editing-api-0.28.0.md),
+[short native trial](docs/m4-single-drawing-0.28.0.pl.md), and
+[current handoff](docs/next-model-handoff.md). Native 0.28.0 has not been run;
+M4 priorities 1–5 remain incomplete. Exact ZIP checks include checksum/payload,
+registration, frozen sync/import, `drawing_identity` schema, source safety
+limits, upgrade/restore, and history markers. The scoped 0.27.0 native observations are
+indexed in [validation status](docs/validation-status.md).
 
 M4 remains partially accepted. Native selection, native material updates,
 complete support for all six families, multi-file writes and whole-project
@@ -43,10 +52,11 @@ remaining development gates.
 
 ## Local Windows setup
 
-Use the [complete 0.26.0 evaluation package](evaluation-packages/0.26.0/README.md)
-on the Windows machine running Allplan and Codex. External Python **3.11+**
-and internet access for locked dependencies are required. Allplan, Python and
-Codex are not bundled.
+For the next native trial, use the exact verified 0.28.0 ZIP linked from the
+[0.28.0 evaluation record](evaluation-packages/0.28.0/README.md) on the Windows
+machine running Allplan and Codex. External
+Python **3.11+** and internet access for locked dependencies are required.
+Allplan, Python and Codex are not bundled.
 
 1. Extract the full ZIP into a writable versioned folder. Close Allplan and run
    `Setup.cmd`, selecting the actual user Local folder.

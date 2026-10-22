@@ -131,7 +131,7 @@ i payload, rejestrację, frozen sync/import, schemat `drawing_identity`, upgrade
 i restore 0.26.0, 42 hashe mostka oraz markery dziennika/śladu/logu i archiwum.
 SHA-256 ZIP-a: `eab80cd2c907e7fd90ba733f4f8d1335f097986b938c74ccdda6bf3382cdaa30`.
 Oryginalny artifact CI nie został dostarczony; zweryfikowany pakiet to fallback.
-Nie wykonano nowej próby natywnej. Historyczny log CI zachowuje datę
+W chwili dostawy nie było próby natywnej. Historyczny log CI zachowuje datę
 22 października. Szczegóły: [rekord pakietu](../evaluation-packages/0.27.0/README.md)
 i [weryfikacja ZIP](../evaluation-packages/0.27.0/package-verification.json).
 Kandydat obejmuje bounded resolver nazw
@@ -139,10 +139,52 @@ atrybutów bez fuzzy/catalog, fail-closed inwentaryzację potomków Wall dla
 preservation materiału oraz rozdzielenie starej wartości materiału od
 kwalifikacji operacji. Diagnostyka nie dodaje nowych zapisów i nie umożliwia
 materiału bez pełnego snapshotu preservation, również przy świeżym odczycie po
-zapisie. [Nowa krótka próba](m4-single-drawing-0.27.0.pl.md) dotyczy tylko
-lowercase `mcp_qa_mark`, nowych diagnostyk i nieodebranych dowodów; nie powtarza
-zaakceptowanych zapisów ani usunięcia. Punkty 1–5 pozostają otwarte zgodnie z
-[handoffem](next-model-handoff.md).
+zapisie. Właściciel zgłosił ograniczony PASS próby lowercase resolvera i
+diagnostyki materiału oraz W1 read/write z jednym elementem na krok Undo.
+Szczegóły i granice są w [obserwacji 0.27.0](test-results/m4-owner-observation-0.27.0-2026-10-23.md)
+i jej [oryginalnym logu](test-results/evidence/allplan-chat-log-0.27.0-2026-10-23.md).
+Nie zgłoszono jawnego no-op ani zera setterów. Log potwierdza osobny Wall
+subtree delete i dwie zmiany Beam na W1, ale trzy Columns na W1 pozostały
+zablokowane przez `component_child_owner_mismatch`; relacja Slab/MultiSlab
+nadal jest nierozstrzygnięta. Nie przypisano wyników do dokładnego ZIP-a ani
+builda Allplana. Punkty 1–5 pozostają częściowo otwarte zgodnie z
+[handoffem](next-model-handoff.md); kolejny zakres opisuje
+[krótka próba 0.28.0](m4-single-drawing-0.28.0.pl.md).
+
+## Aktualny kandydat 0.28.0 — CI i dokładny ZIP zweryfikowane
+
+Źródło `b59ef15d9bfd4dfb42476b240e31b5b300268d2d` na gałęzi
+`fix/m4-owner-views-0.28.0` ma [PR #26 do `develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/pull/26);
+CI 39871551499 zakończyło się powodzeniem: 601 testów na
+Windows i 601 na Ubuntu, Python 3.12, oraz job pakietu. Przeszło też 170
+unikalnych focused checks.
+
+Oryginalny artifact CI 12466447229 (digest
+`52f5a8533673c7347de2a9fe6d3e12f49a24ecc460585cf4acd8687f25922649`) nie został
+dostarczony: transfer referencji pliku przez zwykły proxy zakończył się
+`URLError` przed odpowiedzią HTTP. Zgodnie z polityką utworzono jeden fallback
+build z czystego checkoutu dokładnego źródła (`source_modified=false`). ZIP z
+186 plikami payload przeszedł dokładną weryfikację za pierwszym razem; SHA-256
+`74099ec341cdf8b2bc87def42487fafbbbcdb963ec6f4b8859a412f7b6d064ed`.
+Przeszły checksum/payload, rejestracja, frozen sync/import, schemat
+`drawing_identity`, limity źródła, upgrade z i restore do 0.27.0, 42 hashe
+mostka oraz markery aktywnego/archiwalnego dziennika, śladu i logu. Szczegóły:
+[rekord pakietu](../evaluation-packages/0.28.0/README.md),
+[weryfikacja](../evaluation-packages/0.28.0/package-verification.json),
+[build](../evaluation-packages/0.28.0/build.log) i
+[hashe artefaktów](../evaluation-packages/0.28.0/artifact-hashes.json).
+
+Kandydat wiąże krawędzie własności rodzic–potomek usuwania po rysunku, model
+UUID i typie pomiędzy wrapperami widoku; zachowuje rzeczywisty view UUID
+rodzica w krawędziach podglądu/ponownej walidacji, a dokładny view UUID
+wybranego targetu nadal jest związany z planem. Limity dziennika wynoszą teraz
+512 aktywnych rekordów, 1 MiB na rekord, 8 MiB śladu, 32 MiB inspekcji śladu
+oraz 1 GiB / 1024 pliki inwentarza archiwizacji. Blokady zapisu Slab/MultiSlab
+pozostają. Próby natywnej 0.28.0 nie wykonano; priorytety 1–5 pozostają
+częściowo otwarte. Kolejna ograniczona próba dotyczy tylko wskazanych Column
+na W1, potomków i Undo: [plan próby](m4-single-drawing-0.28.0.pl.md).
+[Macierz pokrycia](m4-single-drawing-coverage-0.24.0.md) nie zastępuje odbioru
+natywnego.
 
 Nie powtarzać zaakceptowanych odczytów, zapytań, podświetleń ani zapisów
 atrybutów słupów i stropów. Identyczne granice przestrzenne wyników
@@ -169,77 +211,41 @@ wykończenia. Właściciel właściwości oraz dokładny cel muszą być jawne.
 
 ## Priorytety dalszej pracy
 
-1. **Czyszczenie dziennika 0.23.0 — ograniczony PASS właściciela.** Zapisano
-   podgląd i potwierdzoną archiwizację obu zakresów; nie powtarzać tej próby.
-   Zmiana migawki i replay po restarcie mają testy automatyczne, ale nie są
-   widoczne w dostarczonym wyniku natywnym.
-   Nie usuwać, nie archiwizować ani nie zmieniać nierozliczonego, uszkodzonego
-   lub zbyt dużego rekordu. Incydent właściciela nie zawiera dokładnego błędu,
-   więc osobno rozróżnić limit 1 MiB śladu, 128 aktywnych rekordów i limit 1 MiB
-   na rekord; nie przypisywać przyczyny bez dowodu.
-2. **Tożsamość celów stropów — inwentarz i blokady, właściciel nierozstrzygnięty.**
-   Odczyt `model_identity` ograniczono do `file_state` i
-   wymaganej tożsamości type; różne `layer_id` lub nazwy w wrapperach nie
-   blokują już strukturalnego wyniku. Regresja obejmuje taką rozbieżność, ale
-   nie ustala przyczyny ani nie rozstrzyga natywnego błędu właściciela z 0.24.0.
-   Log 0.24.0 opisuje dwa wyniki `Slab_TypeUUID` i
-   `MultiSlab_TypeUUID`; dokładny probe pierwszego zwrócił
-   `probe_scope_unavailable`, a view UUID płyty potomnej w drugim różnił się
-   od view UUID pierwszego wyniku. Zachować typ adaptera, model/view UUID,
-   rodzica/dziecko i reprezentację natywną. Nie scalać wyników na podstawie
-   bounds ani nie zapisywać do nich przed wyjaśnieniem relacji celu. Log
-   22 października dodaje ograniczony PASS `component_identity` dla wskazanego
-   Wall i wyniku `MultiSlab_TypeUUID`; nie rozstrzyga pierwotnego wyniku Slab,
-   rozbieżności view UUID potomka ani właściciela właściwości. 0.26.0 dodaje
-   pełnostronicowy inwentarz `drawing_identity` z parą model/view UUID; log
-   zgłasza 26/26 enumerowanych tożsamości, ale tylko 7 `observed` i 19
-   `not_checked`. Odczyt struktury nadal nie ustanawia właściciela pola.
-3. **Pojedynczy rysunek — layer 0 obsłużony w planie/apply, brak natywnego Undo.**
-   Logi 0.24.0 i 0.25.0 potwierdzają readback W1 (ID 65535) dla wskazanego
-   słupa i oddzielnie dla ściany 200 mm (ID 3702 → 65535); nie potwierdzają
-   no-op ani Undo. 0.26.0 poprawia obsługę legalnego layer ID 0 również w
-   reviewed W1 plan/apply, co pokrywają focused tests. Log 0.26.0 dodaje
-   readback ID 0 dla wskazanego słupa po zapisie, ale nie no-op ani Undo. Nie
-   dowodzi to, że 0
-   spowodowało historyczny `repair_conflict` bez raw trace. Wykonać wyłącznie
-   brakujące no-op/Undo na jawnych, odrębnych celach; nie powtarzać readbacków.
-4. **Selekcja, usuwanie i materiał — oddzielne stany implementacji i odbioru.**
-   Log 0.24.0 stwierdza, że selekcja programowa jest nieobsługiwana;
-   podświetlenie ma tylko stan `submitted`, bez potwierdzenia widoczności.
-   Usunięcie słupa `MCP_QA_MARK=6` w UI i późniejszy odczyt zera wyników
-   potwierdzają przepływ UI, nie API MCP. Kandydat 0.25.0 dodaje typowane
-   usunięcie dokładnego root z weryfikacją całego poddrzewa; jego obsługa
-   kaskady nie jest zakładana. Dodaje też eksperymentalny setter natywnego
-   materiału dla jednowarstwowej ściany, oparty na udokumentowanych metodach
-   SDK i jawnych dowodach niezmienników. Obie ścieżki wymagają ograniczonej
-   próby właściciela. Log 0.25.0 informuje o usunięciu jednej pozostałej
-   ściany i potomków po potwierdzeniu oraz świeżym kompletnym skanie, ale nie
-   dostarcza manifestu, surowej odpowiedzi MCP ani Undo; usunięcie otworu i
-   jego ściany nadrzędnej zostało zablokowane. Plan natywnego materiału i
-   kreskowania został zablokowany, podobnie jak zbiorcze przeniesienie ścian
-   na W1 z powodu `repair_conflict` dla ściany 240 mm. Nie przypisywać usunięcia
-   do dokładnego ZIP-a ani nie rozszerzać go do pełnej akceptacji typowanego
-   delete. 0.26.0 poprawia diagnostykę blocked observations; nie naprawia
-   blokad native material/delete ani nie osłabia guardów. Selekcja nadal jest
-   nieobsługiwana. Nie powtarzać zaakceptowanego usunięcia z 0.25.0; kolejne
-   dowody mają dotyczyć brakującej rodziny/cascade/Undo. Kandydat 0.27.0
-   jedynie zaostrza diagnostykę i eligibility preservation materiału; nie
-   włącza nowych zapisów. Otwór zgłoszony jako przyczyna w logu 0.26.0 nie
-   został potwierdzony surową diagnostyką. Nie powtarzać tej obserwacji.
-5. **Macierz rodzin i typów — uzupełniona, odbiór natywny nadal częściowy.**
-   [Macierz 0.24.0](m4-single-drawing-coverage-0.24.0.md) rozdziela adaptery,
-   właścicieli, testy i nieobsługiwane kodeki. Obecne celowane zapisy obejmują
-   tekst, Integer, Double, Boolean, SDK Integer/CheckBox i etykiety Enum.
-   Daty, wektory i inne obiekty SDK pozostają zablokowane: brak zaakceptowanego
-   payloadu/settera istniejącego adaptera i dokładnego readbacku w tym
-   kontrakcie. Samo `AttributeDate`, `AttributeDoubleVec` lub
-   `Polyhedron3D.WriteToStream` tego nie ustanawia.
-   Sprawdzić osobno ściany, belki, stropy, słupy, drzwi i okna, w tym właściciela
-   pola, warianty natywne, otwory i elementy wstawione. API ani atrapowe testy
-   nie zastępują krótkiej próby w konkretnym buildzie Allplana. Macierz 0.26.0
-   precyzuje zakres, ale nie dodaje kodeków dat/wektorów. Log 0.24.0
-   dodaje ograniczone obserwacje atrybutu ściany REI120 i usuwania słupa przez
-   UI; nie odbiera to pełnej macierzy rodzin ani natywnego materiału.
+1. **Implementacja:** zaakceptowany zakres 0.23.0 obejmuje podgląd i
+   potwierdzoną archiwizację. Kandydat 0.28.0 zwiększa limity do 512 aktywnych
+   rekordów, 1 MiB na rekord, 8 MiB aktywnego śladu, 32 MiB inspekcji śladu i
+   inwentarza archiwizacji 1 GiB / 1024 plików. Focused checks, pełne CI i
+   dokładna weryfikacja ZIP-a przeszły. Natywny restart/replay nie ma dowodu.
+   Nie archiwizować rekordów running/unknown, uszkodzonych ani
+   niezweryfikowanych.
+2. **Implementacja:** bounded identity inventory oraz fail-closed blokady
+   zapisu istnieją. **Pozostaje:** lineage `Slab_TypeUUID` pod
+   `MultiSlab_TypeUUID` zgłoszone w logu 0.27.0 jest nierozstrzygnięte;
+   strukturalna tożsamość nie ustanawia właściciela pola. Nie scalać wyników
+   ani nie zapisywać do nich przed wyjaśnieniem relacji i właściciela.
+3. **Implementacja:** obsługa layer 0 i reviewed W1 plan/apply. **Ograniczony
+   dowód native:** właściciel zgłosił W1 read/write i jeden element na krok UI
+   Undo. **Pozostaje:** jawny no-op z potwierdzeniem zera setterów nie został
+   zgłoszony. Nie powtarzać przyjętego Undo/readback i nie wnioskować o Undo
+   całej grupy.
+4. **Implementacja:** guarded typed delete, zachowane krawędzie tożsamości
+   rodzic–potomek w kandydacie 0.28.0 oraz diagnostyka eligibility materiału.
+   **Dowody native:** oddzielny Wall 240 mm subtree delete z pięcioma dziećmi
+   i dwa Beam W1 readbacki zgłoszono jako wykonane; nie są to akceptacje Column.
+   Preview trzech Column W1 zablokował `component_child_owner_mismatch` i nie
+   usunął celów. Kandydat 0.28.0 (focused checks, CI i dokładna weryfikacja ZIP-a przeszły)
+   dopasowuje krawędzie po rysunku, model UUID i typie, zachowując rzeczywiste
+   view UUID rodziców oraz dokładny view UUID wybranego targetu, związane z
+   preview i ponowną walidacją. **Pozostaje:** natywna
+   próba dokładnych Column W1, pełnego poddrzewa i Undo. Selekcja pozostaje
+   nieobsługiwana, a diagnostyka materiału nie akceptuje ani nie włącza zapisu
+   natywnego materiału.
+5. **Implementacja:** kontrakty scalar/Enum, inwentarz rodzin/wartości oraz
+   bounded resolver nazw. W próbie 0.27.0 zgłoszono PASS lowercase lookup i
+   diagnostyki materiału. **Pozostaje:** pełna native macierz rodzin, właściciel
+   pola i roundtrip dla konkretnego adaptera; daty, wektory i inne wartości
+   nieskalarne pozostają zablokowane do czasu dokładnego setter/readback
+   kontraktu oraz osobnej próby z Undo.
 6. **Dopiero potem zaprojektować pracę wieloplikową.** Potrzebne są manifest,
    deterministyczne partie, jawne wyniki częściowe, obsługa timeout/restart i
    pomiary dla ponad 32 zmian oraz ponad 200 wyników. Nie deklarować atomowości

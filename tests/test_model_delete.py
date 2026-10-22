@@ -78,6 +78,33 @@ class ModelDeleteTests(unittest.TestCase):
             element for element in self.elements if not element.IsDeleted()
         ]
 
+    def alternate_view(self, source, index):
+        alias = self.element(index)
+        alias.GetDrawingfileNumber.return_value = source.GetDrawingfileNumber.return_value
+        alias.GetModelElementUUID.return_value = source.GetModelElementUUID.return_value
+        alias.GetElementAdapterType.return_value.GetTypeName.return_value = (
+            source.GetElementAdapterType.return_value.GetTypeName.return_value)
+        alias.GetElementAdapterType.return_value.GetGuid.return_value = (
+            source.GetElementAdapterType.return_value.GetGuid.return_value)
+        return alias
+
+    def column_with_attribute_container(self):
+        target = self.fixture(("",))[0]
+        container = self.element(2, name="AttributeContainer_TypeUUID")
+        parent_view = self.alternate_view(target, 3)
+        self.parents[id(target)] = self.null_parent()
+        self.parents[id(container)] = parent_view
+        self.children[id(target)] = [container]
+        self.elements = [target, container]
+        self.live_elements()
+        return target, container, parent_view
+
+    @staticmethod
+    def null_parent():
+        parent = MagicMock()
+        parent.IsNull.return_value = True
+        return parent
+
     def test_delete_request_is_exclusive_with_field_edits(self):
         self.fixture(("",))
         self.assert_code("invalid_payload", lambda: self.preview(changes=[
@@ -156,6 +183,76 @@ class ModelDeleteTests(unittest.TestCase):
         self.assertEqual(peer.GetAttributes.return_value, [(935, "peer")])
         self.assertTrue(self.apply(plan, execution_id)["replayed"])
         self.base.DeleteElements.assert_called_once()
+
+    def test_column_delete_accepts_child_parent_alias_view_and_replays_once(self):
+        target, container, parent_view = self.column_with_attribute_container()
+
+        def delete_elements(doc, adapters):
+            self.assertEqual([id(item) for item in adapters], [id(target)])
+            target.IsDeleted.return_value = True
+            container.IsDeleted.return_value = True
+
+        self.base.DeleteElements.side_effect = delete_elements
+        plan = self.preview(predicate=None, native_types=["Column_TypeUUID"],
+                            changes=[{"target": {"kind": "delete"}}])
+        self.assertTrue(plan["apply_available"], plan)
+        value = plan["changes"][0]["resource"]["delete_ownership"]["value"]
+        direct_edge = value["child_parent_edges"][0]
+        descendant_edge = value["descendant_parent_edges"][0]
+        self.assertEqual(direct_edge["child"]["model_uuid"], container.GetModelElementUUID())
+        self.assertEqual(direct_edge["parent"]["view_uuid"], parent_view.GetElementUUID())
+        self.assertEqual(descendant_edge["child"]["model_uuid"], container.GetModelElementUUID())
+        self.assertEqual(descendant_edge["parent"]["view_uuid"], parent_view.GetElementUUID())
+        self.assertNotEqual(direct_edge["parent"]["view_uuid"], target.GetElementUUID())
+        self.highlight(plan)
+
+        execution_id = uuid4().hex
+        result = self.apply(plan, execution_id)
+        self.assertEqual(result["state"], "completed", result)
+        self.assertTrue(self.apply(plan, execution_id)["replayed"])
+        self.base.DeleteElements.assert_called_once()
+
+    def test_column_delete_conflicts_when_child_parent_view_changes_after_preview(self):
+        target, _container, _parent_view = self.column_with_attribute_container()
+        plan = self.preview(predicate=None, native_types=["Column_TypeUUID"],
+                            changes=[{"target": {"kind": "delete"}}])
+        self.assertTrue(plan["apply_available"], plan)
+        self.highlight(plan)
+        self.parents[id(self.children[id(target)][0])] = self.alternate_view(target, 4)
+        self.assert_code("repair_conflict", lambda: self.apply(plan))
+        self.base.DeleteElements.assert_not_called()
+
+    def test_column_delete_conflicts_when_child_enumeration_changes_after_preview(self):
+        target, _container, _parent_view = self.column_with_attribute_container()
+        plan = self.preview(predicate=None, native_types=["Column_TypeUUID"],
+                            changes=[{"target": {"kind": "delete"}}])
+        self.assertTrue(plan["apply_available"], plan)
+        self.highlight(plan)
+        added = self.element(5, name="AttributeContainer_TypeUUID")
+        self.parents[id(added)] = self.alternate_view(target, 6)
+        self.children[id(target)].append(added)
+        self.elements.append(added)
+
+        self.assert_code("repair_conflict", lambda: self.apply(plan))
+        self.base.DeleteElements.assert_not_called()
+
+    def test_column_delete_rejects_child_parent_model_type_and_file_mismatch(self):
+        for mismatch in ("model", "type", "file"):
+            with self.subTest(mismatch=mismatch):
+                target, container, parent_view = self.column_with_attribute_container()
+                if mismatch == "model":
+                    parent_view.GetModelElementUUID.return_value = self.element(4).GetModelElementUUID.return_value
+                elif mismatch == "type":
+                    parent_view.GetElementAdapterType.return_value.GetTypeName.return_value = "Wall_TypeUUID"
+                else:
+                    parent_view.GetDrawingfileNumber.return_value = 102
+                plan = self.preview(predicate=None, native_types=["Column_TypeUUID"],
+                                    changes=[{"target": {"kind": "delete"}}])
+                self.assertFalse(plan["apply_available"])
+                self.assertEqual(plan["blocked"][0]["reason"], "delete_ownership_unavailable")
+                self.assertEqual(plan["blocked"][0]["observation"]["reason"],
+                                 "component_child_owner_mismatch")
+                self.base.DeleteElements.assert_not_called()
 
     def test_late_parent_appearance_conflicts_before_delete(self):
         target = self.fixture(("",))[0]
@@ -285,7 +382,10 @@ class ModelDeleteTests(unittest.TestCase):
 
         def get_children(*_args):
             calls[0] += 1
-            if calls[0] == 1:
+            # Root ownership reads direct children once for its manifest and
+            # again during the exact descendant consistency check. Fail only
+            # on the latter descendant enumeration.
+            if calls[0] <= 2:
                 return []
             raise RuntimeError("private descendant read detail")
 

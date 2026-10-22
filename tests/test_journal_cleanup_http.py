@@ -1,5 +1,6 @@
 """User-confirmed maintenance through MCP/HTTP, then normal guarded model edits."""
 import tempfile
+import importlib
 import unittest
 from pathlib import Path
 from uuid import uuid4
@@ -44,7 +45,8 @@ class JournalCleanupHTTPTests(unittest.IsolatedAsyncioTestCase):
     async def test_full_trace_prompts_then_confirmed_rotation_restores_preview(self):
         native = self.native_fixture()
         path = native.handler.repair_plans.trace_path
-        original = b"x" * (1024 * 1024)
+        trace_limit = importlib.import_module("test_allplan_host.property_probe").NativeProbeTrace.MAX_BYTES
+        original = b"x" * trace_limit
         path.write_bytes(original)
         request = native.request(changes=[{"target": {"kind": "attribute", "attribute_id": 935},
                                           "value": "F90"}])

@@ -1,0 +1,116 @@
+test_full_execution_journal_archives_and_replays_without_setters (test_journal_cleanup_http.JournalCleanupHTTPTests.test_full_execution_journal_archives_and_replays_without_setters) ... ok
+test_full_trace_prompts_then_confirmed_rotation_restores_preview (test_journal_cleanup_http.JournalCleanupHTTPTests.test_full_trace_prompts_then_confirmed_rotation_restores_preview) ... ok
+test_cancel_changed_excluded_peer_and_invalid_journal_never_write (test_selected_mark_http.SelectedMarkHTTPTests.test_cancel_changed_excluded_peer_and_invalid_journal_never_write) ... FAIL
+test_collateral_change_stops_inspection_and_keeps_original_identity (test_selected_mark_http.SelectedMarkHTTPTests.test_collateral_change_stops_inspection_and_keeps_original_identity) ... FAIL
+test_lost_write_reply_keeps_id_and_recover_never_replays_apply (test_selected_mark_http.SelectedMarkHTTPTests.test_lost_write_reply_keeps_id_and_recover_never_replays_apply) ... FAIL
+test_pre_setter_rejection_retains_identity_and_persistence_failure_sends_no_apply (test_selected_mark_http.SelectedMarkHTTPTests.test_pre_setter_rejection_retains_identity_and_persistence_failure_sends_no_apply) ... FAIL
+test_selected_write_keeps_excluded_peer_journal_and_undo_snapshot (test_selected_mark_http.SelectedMarkHTTPTests.test_selected_write_keeps_excluded_peer_journal_and_undo_snapshot) ... FAIL
+test_successful_final_slot_reports_full_journal_without_invalidating_gate (test_selected_mark_http.SelectedMarkHTTPTests.test_successful_final_slot_reports_full_journal_without_invalidating_gate) ... Executing <Task pending name='Task-938' coro=<SelectedMarkHTTPTests.test_successful_final_slot_reports_full_journal_without_invalidating_gate() running at /workspace/allplan-mcp-server-python/tests/test_selected_mark_http.py:128> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.335 seconds
+FAIL
+
+======================================================================
+FAIL: test_cancel_changed_excluded_peer_and_invalid_journal_never_write (test_selected_mark_http.SelectedMarkHTTPTests.test_cancel_changed_excluded_peer_and_invalid_journal_never_write)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/workspace/allplan-mcp-server-python/tests/test_selected_mark_http.py", line 67, in test_cancel_changed_excluded_peer_and_invalid_journal_never_write
+    self.assertEqual(cancelled['state'], 'cancelled')
+AssertionError: 'blocked' != 'cancelled'
+- blocked
++ cancelled
+
+
+======================================================================
+FAIL: test_collateral_change_stops_inspection_and_keeps_original_identity (test_selected_mark_http.SelectedMarkHTTPTests.test_collateral_change_stops_inspection_and_keeps_original_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/workspace/allplan-mcp-server-python/tests/test_selected_mark_http.py", line 85, in test_collateral_change_stops_inspection_and_keeps_original_identity
+    self.assertEqual(report['state'], 'ready_for_ui_observation', report.get('message'))
+AssertionError: 'blocked' != 'ready_for_ui_observation'
+- blocked
++ ready_for_ui_observation
+ : health_preflight differs from the declared recovery gate. No Apply sent. Preserve logs and Local journal; resolve the preflight failure before rerunning.
+
+======================================================================
+FAIL: test_lost_write_reply_keeps_id_and_recover_never_replays_apply (test_selected_mark_http.SelectedMarkHTTPTests.test_lost_write_reply_keeps_id_and_recover_never_replays_apply)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/workspace/allplan-mcp-server-python/tests/test_selected_mark_http.py", line 51, in test_lost_write_reply_keeps_id_and_recover_never_replays_apply
+    self.assertEqual(report['state'], 'unknown', report.get('message'))
+AssertionError: 'blocked' != 'unknown'
+- blocked
++ unknown
+ : health_preflight differs from the declared recovery gate. No Apply sent. Preserve logs and Local journal; resolve the preflight failure before rerunning.
+
+======================================================================
+FAIL: test_pre_setter_rejection_retains_identity_and_persistence_failure_sends_no_apply (test_selected_mark_http.SelectedMarkHTTPTests.test_pre_setter_rejection_retains_identity_and_persistence_failure_sends_no_apply)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/workspace/allplan-mcp-server-python/tests/test_selected_mark_http.py", line 106, in test_pre_setter_rejection_retains_identity_and_persistence_failure_sends_no_apply
+    self.assertEqual(rejected['state'], 'rejected', rejected.get('message'))
+AssertionError: 'blocked' != 'rejected'
+- blocked
++ rejected
+ : health_preflight differs from the declared recovery gate. No Apply sent. Preserve logs and Local journal; resolve the preflight failure before rerunning.
+
+======================================================================
+FAIL: test_selected_write_keeps_excluded_peer_journal_and_undo_snapshot (test_selected_mark_http.SelectedMarkHTTPTests.test_selected_write_keeps_excluded_peer_journal_and_undo_snapshot)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/workspace/allplan-mcp-server-python/tests/test_selected_mark_http.py", line 25, in test_selected_write_keeps_excluded_peer_journal_and_undo_snapshot
+    self.assertEqual(report['state'], 'ready_for_ui_observation', report.get('message'))
+AssertionError: 'blocked' != 'ready_for_ui_observation'
+- blocked
++ ready_for_ui_observation
+ : health_preflight differs from the declared recovery gate. No Apply sent. Preserve logs and Local journal; resolve the preflight failure before rerunning.
+
+======================================================================
+FAIL: test_successful_final_slot_reports_full_journal_without_invalidating_gate (test_selected_mark_http.SelectedMarkHTTPTests.test_successful_final_slot_reports_full_journal_without_invalidating_gate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/workspace/allplan-mcp-server-python/tests/test_selected_mark_http.py", line 129, in test_successful_final_slot_reports_full_journal_without_invalidating_gate
+    self.assertEqual(report['state'], 'ready_for_ui_observation', report.get('message'))
+AssertionError: 'blocked' != 'ready_for_ui_observation'
+- blocked
++ ready_for_ui_observation
+ : health_preflight differs from the declared recovery gate. No Apply sent. Preserve logs and Local journal; resolve the preflight failure before rerunning.
+
+----------------------------------------------------------------------
+Ran 8 tests in 10.298s
+
+FAILED (failures=6)

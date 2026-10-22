@@ -1,8 +1,21 @@
-# M4 single-drawing coverage — current status through candidate 0.27.0
+# M4 single-drawing coverage — current status through candidate 0.28.0
 
 Updated 2026-10-23. This is implementation and verification coverage, not full
-native acceptance. Earlier scoped owner observations remain in
-[validation status](validation-status.md).
+native acceptance. Scoped 0.27.0 owner-reported observations are retained in
+[this observation](test-results/m4-owner-observation-0.27.0-2026-10-23.md)
+and [validation status](validation-status.md). Candidate 0.28.0 source and its
+exact fallback ZIP are verified; its native trial has not been run.
+
+Final 0.28.0 source `b59ef15d9bfd4dfb42476b240e31b5b300268d2d` is on PR #26
+targeting `develop/m4`. CI run
+[39871551499](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39871551499)
+passed 601 Windows and 601 Ubuntu Python 3.12 tests and the package job; 170
+unique focused checks passed. The original CI artifact was not delivered after
+a normal-proxy transfer failed with `URLError` before an HTTP status. One
+fallback build from clean exact source (`source_modified=false`) passed exact
+ZIP verification on the first attempt: 186 payload files, 42 bridge hashes,
+SHA-256 `74099ec341cdf8b2bc87def42487fafbbbcdb963ec6f4b8859a412f7b6d064ed`.
+See the [0.28.0 evaluation record](../evaluation-packages/0.28.0/README.md).
 
 Final 0.27.0 source `e62a50c9c6c6b51978b6f1a55f9d9978eee5b1c3`, merged as
 `23b8b2591d7be0721fe7a5651379408e7a2f5e76`, passed full CI
@@ -15,9 +28,9 @@ bridge hashes; registration, frozen sync/import, upgrade from and restore to
 0.26.0; and journal/trace/log/archive marker preservation. The original CI ZIP
 was not delivered. See the [0.27.0 package record](../evaluation-packages/0.27.0/README.md).
 The separate focused record reports 143 unique
-affected/dependent tests across iterations. No 0.27.0 native acceptance has
-been run; priorities 1–5 remain partially open as described below. Historical
-CI logs remain dated 22 October.
+affected/dependent tests across iterations. The later owner-reported 0.27.0
+trial is limited and is not tied to this exact package; priorities 1–5 remain
+partially open as described below. Historical CI logs remain dated 22 October.
 
 Candidate source `48e64b1a06bef005c26a143860d9257038cccde3` passed CI run
 39822585188 (580 tests on Windows and 580 on Ubuntu, Python 3.12, plus package
@@ -30,7 +43,7 @@ remains incomplete.
 
 | Requested family / adapter | Current guarded route and owner boundary | Remaining native evidence |
 | --- | --- | --- |
-| Columns / Column | Typed attributes and exact existing organizational layer; model/view binding, exclusions, fresh readback, replay and no-op. | Only remaining W1 no-op/Undo gap; preserve accepted attributes. |
+| Columns / Column | Typed attributes and exact existing organizational layer; model/view binding, exclusions, fresh readback, replay and no-op. Candidate 0.28.0 delete matching uses drawing/model/type identity while preserving actual parent view UUID edges and the exact selected target view UUID. | The 0.27.0 log reports three W1 Columns blocked at delete preview by `component_child_owner_mismatch`; no deletion occurred. Requires a new exact-target Column delete/cascade/Undo trial. No explicit W1 no-op/zero-setter evidence. |
 | Walls / Wall | Typed root attributes; organizational layer binds all direct WallTier owners with its own adapter. Single-tier native thickness/material read exists. Current layer IDs 0–65535 are valid; 0.26.0 fixes reading ID 0 and covers reviewed W1 plan/Apply from prior ID 0 in focused tests. 0.27.0 tightens material preservation to exactly one stable, direct WallTier lineage with no children; opening and all other child types fail closed with separate reasons. | Native layer owner/readback/Undo for unaccepted case; native material change remains unaccepted. The 0.27.0 preservation and diagnostic changes do not enable writes or substitute observed material for preservation evidence. |
 | Beams / Beam, SkeletonBeam | Typed attributes and organizational layer, exact target resolution; unrelated broken hierarchies do not redirect the owner. | Family/build-specific UI/readback/Undo; fakes and API availability are separate. |
 | Slabs / Slab | Read-only direct identity probe; only standalone Slab permits typed attributes/layer with bound ancestry. | Resolve the owner's two Slab/MultiSlab results read-only. No new attribute trial on previously accepted targets. |
@@ -82,9 +95,9 @@ and `SurfaceElementProperties` values provide bounded `repr` drift evidence
 only, not exhaustive preservation codecs. A material attribute, surface or
 organizational layer never substitutes for native material.
 
-## 0.27.0 candidate scope (CI and package verification passed; no new native acceptance)
+## 0.27.0 candidate scope (CI and package verification passed; later limited owner report)
 
-The attribute resolver checks a bounded set of spelling variants: supplied
+The 0.27.0 attribute resolver checks a bounded set of spelling variants: supplied
 name, trimmed NFC, first-character uppercase, all uppercase and all lowercase.
 It verifies the actual project name/ID round trip for every successful
 variant, compares names by NFC casefold and rejects results that map to
@@ -92,7 +105,8 @@ multiple IDs. The `attribute_name` probe retains exact lookup first and uses
 the shared fallback only on `ValueError`/`TypeError` lookup miss; `model_edit`
 bindings use the shared resolver. No fuzzy search or project catalog scan is
 added. This is intended to address the lowercase `mcp_qa_mark` lookup while
-preserving the canonical project ID; native verification is pending.
+preserving the canonical project ID. The later limited 0.27.0 owner report records
+a PASS for the lowercase lookup; it is not bound to this exact package.
 
 For native Wall material, preview now reports a readable old string separately
 from operation eligibility. `criteria.required_field_failures` lists only
@@ -106,43 +120,57 @@ stable bounded enumeration. `WindowDoor_TypeUUID` uses
 `wall_material_openings_unsupported`; every other child type uses
 `wall_material_child_type_unsupported`. Stable bounded component read errors
 do not expose exception text. Post-write observation still requires the full
-preservation snapshot. No new material write or native Undo is accepted.
+preservation snapshot. No native material write is accepted.
 
-The supplied 0.26.0 conversation log is recorded in the
-[scoped observation](test-results/m4-owner-observation-0.26.0-2026-10-22.md):
+The 0.27.0 owner report and attached chat log are recorded in the
+[scoped observation](test-results/m4-owner-observation-0.27.0-2026-10-23.md):
+reported PASS for lowercase attribute lookup and material diagnostics; reported
+W1 read/write with one element per UI Undo; one Wall 240 mm subtree deletion
+with five descendants absent on a fresh complete scan; and two Beam readbacks
+on W1. The log also reports three W1 Columns blocked at preview by
+`component_child_owner_mismatch` and a Slab/MultiSlab parent-lineage conflict.
+There is no explicit no-op/zero-setter result, no raw MCP payload, exact
+installed manifest or Allplan build ID. The results are not tied to the exact
+0.27.0 ZIP. Do not repeat accepted targets or actions. The earlier supplied
+0.26.0 conversation log is recorded in the
+[0.26.0 scoped observation](test-results/m4-owner-observation-0.26.0-2026-10-22.md):
 26/26 identities enumerated with 7 `observed` and 19 `not_checked`; two
 confirmed layer changes/readbacks on one Column; and one Wall highlight
 submission without a logged view result or native selected-element count.
 The assistant's stated opening blocker conflicts with the later empty `blocked`
 arrays and has no raw diagnostic, so the cause is unverified. No material
-change, delete, no-op or Undo was recorded. See the [0.27.0 trial](m4-single-drawing-0.27.0.pl.md)
-for the strictly limited next native evidence.
+change, delete, no-op or Undo was recorded in that 0.26.0 log. See the
+[0.28.0 trial](m4-single-drawing-0.28.0.pl.md) for the strictly limited next
+native evidence.
 
 ## Priority status
 
-1. **Limited journal-cleanup PASS remains accepted.** The 0.23.0 preview and
-   confirmed archival are retained in the owner record; do not repeat that
-   trial. It does not close broader single-drawing acceptance.
-2. **Identity inventory is not field ownership.** Candidate 0.26.0 adds a
-   bounded `drawing_identity` inventory across pages. Model/view UUID, lineage
-   and native type do not prove attribute/material/layer ownership or resolve
-   the owner's Slab/MultiSlab relationship.
-3. **Layer 0 is handled in read and reviewed W1 plan/Apply.** Legal IDs include
-   0 through 65535; focused tests cover a reviewed W1 change from old ID 0.
-   This does not establish that ID 0 caused the earlier `repair_conflict`;
-   its raw trace is unavailable. Native W1 no-op/Undo remains missing.
-4. **Selection unsupported; deletion limited; material unaccepted.** Official
-   Allplan 2026 APIs show interactive user selection only. The owner confirms
-   the 0.25.0 run and its scoped single-subtree deletion PASS; do not repeat
-   that successful deletion. Broader family/Undo evidence remains missing.
-   Candidate 0.26.0 diagnoses blocked delete/material properties; it does not
-   repair the native blockers, enable the material setter or relax any guard.
-5. **Date/vector writes unsupported on the existing adapter.** `AttributeDate`
-   exists as a typed SDK payload for `SetAttributes`, but an accepted payload
-   for `ElementsAttributeService.ChangeAttribute` and exact fresh readback are
-   missing. Vector and other non-scalar routes likewise require an exact
-   adapter contract; SDK representations alone do not provide one.
-
-All five priorities remain open where their acceptance conditions are unmet.
-See the [0.26.0 bounded trial](m4-single-drawing-0.26.0.pl.md) and
-[development plan](office-editing-development-plan.pl.md).
+1. **Implemented and accepted:** bounded journal cleanup and the 0.23.0
+   archival scope. Candidate 0.28.0 raises limits to 512 active records, 1 MiB
+   per record, 8 MiB active trace, 32 MiB trace-inspection limit and an archive
+   inventory bounded at 1 GiB / 1024 files. Focused checks, full CI, and exact
+   ZIP verification passed. Native restart/replay is unobserved. Unresolved
+   and unverifiable records remain protected.
+2. **Implemented:** structural identity inventory and fail-closed ownership
+   guards. **Unresolved:** the 0.27.0 log retains model/view identities and a
+   parent-lineage conflict for the Slab child, but does not establish field
+   ownership. Keep writes blocked until exact hierarchy and property owner are
+   resolved.
+3. **Implemented:** layer 0 read and reviewed W1 plan/Apply. **Limited
+   owner-reported native PASS:** W1 read/write works, with one changed element
+   reverted per UI Undo step. No explicit no-op or zero-setter evidence; no
+   multi-element Undo claim.
+4. **Implemented in candidate 0.28.0:** typed subtree delete matches owner edges
+   by drawing/model/type identity while preserving actual parent view UUIDs on
+   bound child/descendant edges and the selected target's exact view UUID.
+   Focused checks, full CI, and exact ZIP verification passed; native Column
+   trial remains pending. The log reports a separate Wall 240 mm subtree PASS
+   and two
+   Beam moves to W1. Three W1 Columns did not delete because preview returned
+   `component_child_owner_mismatch`. A narrow native Column deletion/cascade/
+   Undo trial remains. Native material writes are not accepted, and selection
+   remains unsupported.
+5. **Implemented:** scalar/Enum contracts and family/value inventory. The
+   0.27.0 lowercase lookup and material diagnostics have reported PASS, but
+   date/vector/object codecs and per-family owner, value roundtrip and Undo
+   evidence remain open.
