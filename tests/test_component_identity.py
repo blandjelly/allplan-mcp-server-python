@@ -216,13 +216,25 @@ class ComponentIdentityTests(unittest.TestCase):
         self.parents[id(child)] = self.element(47)
         result = observation(target)
         self.assertEqual(result["reason"], "component_child_owner_mismatch")
-        self.assertEqual(result["diagnostic"], {"stage": "child_parent_identity", "error_type": "ValueError"})
+        self.assertEqual(result["diagnostic"]["stage"], "child_parent_identity")
+        self.assertEqual(result["diagnostic"]["error_type"], "ValueError")
+        evidence = result["diagnostic"]["evidence"]
+        self.assertEqual(evidence["target"]["model_uuid"], target.GetModelElementUUID.return_value)
+        self.assertEqual(evidence["child"]["model_uuid"], child.GetModelElementUUID.return_value)
+        self.assertEqual(evidence["observed_parent"]["model_uuid"],
+                         self.parents[id(child)].GetModelElementUUID.return_value)
+
+        self.parents[id(child)] = self.null_adapter()
+        missing_parent = observation(target)
+        self.assertEqual(missing_parent["reason"], "component_child_owner_mismatch")
+        self.assertIsNone(missing_parent["diagnostic"]["evidence"]["observed_parent"])
 
         self.parents[id(target)] = target
         self.children[id(target)] = []
         result = observation(target)
         self.assertEqual(result["reason"], "component_parent_cycle")
         self.assertEqual(result["diagnostic"], {"stage": "parent_identity", "error_type": "ValueError"})
+        self.assertNotIn("evidence", result["diagnostic"])
 
     def test_child_parent_view_difference_is_recorded_but_logical_owner_must_match(self):
         from test_allplan_host.component_ownership import observation

@@ -49,6 +49,9 @@ class ModelDeleteTests(unittest.TestCase):
             unrelated = self.element(3, name="Wall_TypeUUID")
             self.children[id(opening)] = [tier]
             self.parents[id(tier)] = unrelated
+            self.broken_opening = opening
+            self.broken_tier = tier
+            self.broken_unrelated_parent = unrelated
         plan = self.preview(predicate=None, native_types=["WindowDoor_TypeUUID"],
                             changes=[{"target": {"kind": "delete"}}])
         self.assertFalse(plan["apply_available"])
@@ -62,8 +65,15 @@ class ModelDeleteTests(unittest.TestCase):
         blocked = self._broken_opening_preview()
         self.assertEqual(blocked["reason"], "delete_ownership_unavailable")
         self.assertEqual(blocked["observation"]["reason"], "component_child_owner_mismatch")
-        self.assertEqual(blocked["observation"]["diagnostic"],
+        diagnostic = blocked["observation"]["diagnostic"]
+        self.assertEqual({key: diagnostic[key] for key in ("stage", "error_type")},
                          {"stage": "child_parent_identity", "error_type": "ValueError"})
+        identity = importlib.import_module(self.module.__package__ + ".component_ownership").identity
+        self.assertEqual(diagnostic["evidence"], {
+            "target": identity(self.broken_opening),
+            "child": identity(self.broken_tier),
+            "observed_parent": identity(self.broken_unrelated_parent),
+        })
 
     def test_preview_exposes_bounded_native_read_diagnostic_without_write(self):
         blocked = self._broken_opening_preview(sdk_failure=True)

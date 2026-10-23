@@ -1,0 +1,116 @@
+{
+  "undo_read": {
+    "request": {
+      "phase": "element_attributes",
+      "drawing_file": 101,
+      "model_uuid": "06d71e4d-193b-483e-8a32-344ade3d612c",
+      "view_uuid": "2d33e5a6-b4e8-444b-94e8-d4d0ae75d622",
+      "name_contains": "Rodzaj rozliczenia",
+      "limit": 16,
+      "offset": 0
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"schema_version\":\"m4-property-probe-1\",\"phase\":\"element_attributes\",\"probe_id\":\"188a14d84e574f03b0c3cfa5d4c19ab9\",\"read_only\":true,\"model_data_changed\":false,\"usable_for_write\":false,\"runtime_verified\":false,\"status\":\"ready_for_isolated_owner_probe\",\"trace_file\":\"Local/.allplan-mcp/logs/m4-native-probe.jsonl\",\"native_calls_not_automatically_retried\":true,\"native_selection\":\"not_requested\",\"scope\":{\"requested\":{\"drawing_files\":[101],\"include_passive\":false,\"visibility\":\"api_select_all\"},\"included_files\":[{\"drawing_file\":101,\"state\":\"active_foreground\",\"write_eligibility\":\"not_checked\"}]},\"counts\":{\"raw_adapters_visited\":26,\"in_scope_adapters\":26,\"matched_model_identities\":12,\"nonmatching_model_identities\":0,\"predicate_not_checked\":0,\"identity_not_checked\":0,\"conflicting_model_identities\":0,\"duplicate_representations\":12,\"file_identity_not_checked\":0,\"file_state_conflicts\":0,\"hierarchy_not_checked\":0,\"stale_adapters_skipped\":0,\"non_component_adapters\":2},\"ref\":{\"query_session_id\":\"e40d8c50c3824e0d8589c1e2e88b9ff0\",\"project_key\":\"7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f\",\"document_id\":0,\"drawing_file\":101,\"model_uuid\":\"06d71e4d-193b-483e-8a32-344ade3d612c\",\"type_uuid\":\"ec7f50b0-1a27-49d6-b6a2-007b854513c7\",\"durable_identity_verified\":false,\"component_kind\":\"semantic_component\"},\"attributes\":[{\"attribute_id\":120,\"name\":{\"status\":\"observed\",\"value\":\"Rodzaj rozliczenia\"},\"name_id_round_trip\":{\"status\":\"observed\",\"value\":120},\"value\":\"m3\",\"type\":{\"status\":\"observed\",\"value\":69},\"supported_scalar_value_types\":[]}],\"total_matches\":1,\"offset\":0,\"adapter_attribute_consistency\":\"consistent\",\"adapter_attribute_representation_count\":4,\"total_matches_status\":\"observed\",\"next_offset\":null,\"listing_complete\":true,\"metadata_complete\":true,\"metadata_not_checked_count\":0,\"filter_unknown_name_count\":0,\"presence_semantics\":\"values_present_in_ReadAll_only; omissions_unknown\",\"writable\":\"not_established\",\"enum_values\":\"not_read\",\"filter\":{\"name_contains\":\"Rodzaj rozliczenia\",\"case_sensitive\":false},\"probe_fingerprint\":\"96700ea5992c37f2b9495aebb6479f43f7a48b1b412b43360777cfac18b3ed18\",\"request_id\":\"b77efaf8-d52c-4e1b-a741-ab5778c7f9ad\",\"host_session_id\":\"06bdff76-5c71-45fd-87ae-2ae6b7dc6ca1\"}"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": "m4-property-probe-1",
+        "phase": "element_attributes",
+        "probe_id": "188a14d84e574f03b0c3cfa5d4c19ab9",
+        "read_only": true,
+        "model_data_changed": false,
+        "usable_for_write": false,
+        "runtime_verified": false,
+        "status": "ready_for_isolated_owner_probe",
+        "trace_file": "Local/.allplan-mcp/logs/m4-native-probe.jsonl",
+        "native_calls_not_automatically_retried": true,
+        "native_selection": "not_requested",
+        "scope": {
+          "requested": {
+            "drawing_files": [
+              101
+            ],
+            "include_passive": false,
+            "visibility": "api_select_all"
+          },
+          "included_files": [
+            {
+              "drawing_file": 101,
+              "state": "active_foreground",
+              "write_eligibility": "not_checked"
+            }
+          ]
+        },
+        "counts": {
+          "raw_adapters_visited": 26,
+          "in_scope_adapters": 26,
+          "matched_model_identities": 12,
+          "nonmatching_model_identities": 0,
+          "predicate_not_checked": 0,
+          "identity_not_checked": 0,
+          "conflicting_model_identities": 0,
+          "duplicate_representations": 12,
+          "file_identity_not_checked": 0,
+          "file_state_conflicts": 0,
+          "hierarchy_not_checked": 0,
+          "stale_adapters_skipped": 0,
+          "non_component_adapters": 2
+        },
+        "ref": {
+          "query_session_id": "e40d8c50c3824e0d8589c1e2e88b9ff0",
+          "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+          "document_id": 0,
+          "drawing_file": 101,
+          "model_uuid": "06d71e4d-193b-483e-8a32-344ade3d612c",
+          "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+          "durable_identity_verified": false,
+          "component_kind": "semantic_component"
+        },
+        "attributes": [
+          {
+            "attribute_id": 120,
+            "name": {
+              "status": "observed",
+              "value": "Rodzaj rozliczenia"
+            },
+            "name_id_round_trip": {
+              "status": "observed",
+              "value": 120
+            },
+            "value": "m3",
+            "type": {
+              "status": "observed",
+              "value": 69
+            },
+            "supported_scalar_value_types": []
+          }
+        ],
+        "total_matches": 1,
+        "offset": 0,
+        "adapter_attribute_consistency": "consistent",
+        "adapter_attribute_representation_count": 4,
+        "total_matches_status": "observed",
+        "next_offset": null,
+        "listing_complete": true,
+        "metadata_complete": true,
+        "metadata_not_checked_count": 0,
+        "filter_unknown_name_count": 0,
+        "presence_semantics": "values_present_in_ReadAll_only; omissions_unknown",
+        "writable": "not_established",
+        "enum_values": "not_read",
+        "filter": {
+          "name_contains": "Rodzaj rozliczenia",
+          "case_sensitive": false
+        },
+        "probe_fingerprint": "96700ea5992c37f2b9495aebb6479f43f7a48b1b412b43360777cfac18b3ed18",
+        "request_id": "b77efaf8-d52c-4e1b-a741-ab5778c7f9ad",
+        "host_session_id": "06bdff76-5c71-45fd-87ae-2ae6b7dc6ca1"
+      },
+      "isError": false
+    }
+  },
+  "prior_execution_id": "d59f59b8c1ad4dff9fd684fbfaef14bd"
+}

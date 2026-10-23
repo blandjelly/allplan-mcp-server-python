@@ -6,7 +6,37 @@ and target pull requests to `develop/m4`. Main remains separate. Read
 implementation. The policy is the source of truth for automated checks and
 package builds.
 
-## Latest completed candidate: 0.30.0 — full CI and exact ZIP verification passed
+## Candidate under evaluation: 0.32.0 — bounded tier attribute preservation
+
+Candidate 0.32.0 extends the guarded native material snapshot for a single-tier
+Wall. It allows direct `AttributeContainer_TypeUUID` leaves under the tier
+only when each container has a fully checked container → tier → Wall lineage.
+It captures all stored `ReadAll` attribute values using bounded JSON codecs and
+rechecks container identity and values through the existing preservation,
+revalidation and readback flow. The snapshot does not authorize attribute
+writes or prove field ownership. Unsupported child types, nested children,
+unknown/oversized values, openings and other Wall children remain blocked.
+
+Focused fake-adapter checks reproduce the former blanket rejection of all tier
+children and exercise the bounded container path. They do not prove that this
+was the cause of the 0.31.0 native `wall_material_tier_hierarchy_unsupported`
+diagnostic. The 200 mm opening `component_child_owner_mismatch` remains
+unresolved and outside this change. Exact source [`75cd26e31ae1e3ee0d6ef86411b55490cd457302`](https://github.com/blandjelly/allplan-mcp-server-python/commit/75cd26e31ae1e3ee0d6ef86411b55490cd457302) is associated with [PR #30](https://github.com/blandjelly/allplan-mcp-server-python/pull/30), targeting `develop/m4`. **161 unique focused checks passed** ([record](../evaluation-packages/0.32.0/focused-verification.json)). Final full CI [run 40033163989](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40033163989) passed 635 tests on Ubuntu Python 3.12.15 and 635 on Windows Python 3.12.10, plus the package job ([record](../evaluation-packages/0.32.0/source-ci.json)). One fallback package was built from a clean exact-source checkout; the exact ZIP passed verification once with 210 payload files and 43 bridge hashes, SHA-256 `99fe6909340d4d4e3174601cf23a4854dfece683a1b75b95e5fdebfcc0aaf8b5` ([delivery record](../evaluation-packages/0.32.0/README.md), [verification](../evaluation-packages/0.32.0/package-verification.json)). Native Allplan acceptance remains pending; no 0.32.0 trial has run. The 200 mm opening mismatch remains unresolved.
+The only planned native trial is the original 240 mm Wall material path. If
+blocked, preserve the first reason/stage and obtain fresh
+`component_identity` for the Wall and exact tier; if ready, perform one
+Apply/readback/UI Undo cycle. Do not repeat previously accepted Enum, journal,
+scalar, or grouped Column delete/Undo trials. Boolean/CheckBox has only a
+documented post-Undo read without raw Apply evidence; do not repeat that read
+as an accepted trial. A blocked owner diagnostic may carry bounded
+`diagnostic.evidence`; retain it for read-only identity follow-up, without
+repeating the 200 mm material preview or any write. See
+the [0.32.0 API note](m4-editing-api-0.32.0.md),
+[single-path trial](m4-single-drawing-0.32.0.pl.md), and the
+[scoped 0.31.0 observation](test-results/m4-owner-observation-0.31.0-2026-10-24.md).
+Priorities 1–5 remain open beyond their already accepted scopes.
+
+## Retained candidate: 0.30.0 — full CI and exact ZIP verification passed
 
 Source commit
 [`9966c31fc1b79b0ed7c2061d671dafa3f1f2e8d6`](https://github.com/blandjelly/allplan-mcp-server-python/commit/9966c31fc1b79b0ed7c2061d671dafa3f1f2e8d6)
@@ -72,7 +102,7 @@ intended scope across all five priorities; the new material FAIL and the
 limited scalar PASS do not close priorities 1–5. See the
 [0.30.0 API evidence note](m4-editing-api-0.30.0.md).
 
-## Candidate under evaluation: 0.31.0 — Wall material parent identity
+## Retained prior candidate: 0.31.0 — Wall material parent identity
 
 Source commit
 [`0f99863b7c11143d9f14ca12a1027aad5b009195`](https://github.com/blandjelly/allplan-mcp-server-python/commit/0f99863b7c11143d9f14ca12a1027aad5b009195)
@@ -104,9 +134,32 @@ files, 43 bridge hashes, SHA-256
 [checksum](../evaluation-packages/0.31.0/allplan-mcp-0.31.0-windows-evaluation.zip.sha256),
 [build log](../evaluation-packages/0.31.0/build.log) and
 [CI provenance](../evaluation-packages/0.31.0/source-ci.json).
-Native trial remains pending. See the [0.31.0 API note](m4-editing-api-0.31.0.md)
-and the [one-path native trial plan](m4-single-drawing-0.31.0.pl.md). Do not repeat the accepted
-0.30.0 trials 1–3/5 or the 0.29.0 grouped Column delete/Undo.
+
+The owner later supplied a 0.31.0 session log from Allplan 2026.1, active
+drawing 101 on a project copy. A 240 mm Wall preview to `Silikat` was blocked
+by `wall_material_tier_hierarchy_unsupported`; a 200 mm Wall preview to
+`Silikat` was blocked by `component_child_owner_mismatch`. Both were before
+Apply with no changes and zero setters. The material trial therefore failed to
+reach Apply. The conversation lacks raw MCP responses and the installed
+package manifest/checksum, so these are scoped observations, not exact-ZIP
+acceptance. See the [0.31.0 owner observation](test-results/m4-owner-observation-0.31.0-2026-10-24.md)
+and [verbatim evidence copies](test-results/evidence/0.31.0-2026-10-24/).
+
+The same session has a recorded Apply/readback and owner-confirmed UI Undo for
+Wall Enum attribute 120 (`m3` → `m2` → `m3`), with four consistent
+representations. This is a scoped native observation for that Enum pair only;
+execution metadata still says `allplan_acceptance=not_run` and
+`runtime_verified=false`. Boolean/CheckBox attribute 1371 has a raw post-Undo
+readback of its original value 0 and SDK type 73, but no raw Apply record. The
+read-only Slab/MultiSlab probe reports `evidence_complete=false` for Slab and
+`true` for MultiSlab; property ownership remains `not_established` for both,
+and no write was performed. Beam, Door, Enum Status, and date/vector cases
+remain blocked or fixture-missing as recorded in the observation.
+
+The 0.31.0 native material fix remains unverified and blocked by these observed
+diagnostics; do not claim priorities 1–5 are closed. See the [0.31.0 API note](m4-editing-api-0.31.0.md)
+and the [one-path native trial plan](m4-single-drawing-0.31.0.pl.md). Do not
+repeat the accepted 0.30.0 trials 1–3/5 or the 0.29.0 grouped Column delete/Undo.
 
 ## Retained candidate: 0.29.0 — CI and exact fallback ZIP verification passed
 
@@ -423,20 +476,33 @@ Beam W1 writes.
    parent-wrapper regressions passed as part of the 86 affected/dependent
    focused checks: alternate same-model parent acceptance with bound edge and
    readback, parent-view drift conflict, and blocking different parent model,
-   type or drawing. The version check, full CI and exact fallback ZIP
-   verification passed for 0.31.0; its native material trial remains pending.
-   Slab/MultiSlab write blockers stay in force.
+   type or drawing. The later 0.31.0 native preview was blocked before Apply:
+   the 240 mm Wall returned `wall_material_tier_hierarchy_unsupported`; the
+   separate 200 mm Wall with opening returned
+   `component_child_owner_mismatch`. See the
+   [scoped 0.31.0 observation](test-results/m4-owner-observation-0.31.0-2026-10-24.md).
+   Candidate 0.32.0 adds bounded preservation of direct tier attribute
+   containers. It has 161 unique focused checks passed; final CI passed with
+   635 tests on each platform and the package job. The exact-source fallback ZIP
+   was verified once; see the [delivery record](../evaluation-packages/0.32.0/README.md).
+   Native acceptance remains pending. Any trial stays limited to the original
+   240 mm Wall path; do not repeat the 200 mm material preview or write. Slab/MultiSlab write blockers stay in force.
    Native selection set/clear/readback remains unsupported.
 5. **Implemented:** bounded scalar/Enum contracts, family/value inventory,
    attribute-name resolver and the 0.30.0 requested-ID evidence phase.
    **Limited native PASS:** trial 5's detailed log confirms Column text,
    integer and real writes and one Wall text write, each with fresh typed
-   readback and one owner-confirmed UI Undo/restoration read. Enum was not
-   written because its observed value was undefined; Boolean and standalone
-   Slab fixtures were missing; Beam and opening reads were blocked. **Remaining:**
-   full family/type coverage, owner-specific roundtrips, and date/vector/object
-   codecs. Do not infer support from SDK symbols or repeat accepted attribute
-   writes.
+   readback and one owner-confirmed UI Undo/restoration read. In the 0.30.0
+   trial specifically, Column Enum `Status` ID 49 was not written because its
+   observed value was undefined; Boolean and standalone Slab fixtures were
+   missing; Beam and opening reads were blocked. **Remaining:**
+   a later 0.31.0 session has a scoped Apply/readback/UI Undo PASS for Wall Enum
+   `Rodzaj rozliczenia` ID 120 (`m3` → `m2` → `m3`); this does not generalize to
+   Column Enum `Status` ID 49, which remained undefined/BLOCKED. Boolean/CheckBox
+   ID 1371 has only a raw post-Undo readback of `0`, with no raw Apply evidence;
+   do not treat it as a complete accepted trial. Full family/type coverage,
+   owner-specific roundtrips, and date/vector/object codecs remain open. Do not
+   infer support from SDK symbols or repeat accepted attribute writes.
 
 ### Acceptance coverage after the 0.30.0 session
 

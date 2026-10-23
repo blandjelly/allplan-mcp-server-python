@@ -1,0 +1,192 @@
+{
+  "plan": {
+    "plan_id": "dc16173532424fb9a35fa77473eb11c9",
+    "plan_hash": "5c5a86a0941084886e8be1ccf69b76a348f5b91526d4a39ed73c3d5a8e5c2c1b"
+  },
+  "execution_id": "d59f59b8c1ad4dff9fd684fbfaef14bd",
+  "apply_request": {
+    "schema_version": "m4-model-edit-1",
+    "action": "apply",
+    "plan_id": "dc16173532424fb9a35fa77473eb11c9",
+    "plan_hash": "5c5a86a0941084886e8be1ccf69b76a348f5b91526d4a39ed73c3d5a8e5c2c1b",
+    "acknowledgement": "disposable_copy_reviewed_plan",
+    "execution_id": "d59f59b8c1ad4dff9fd684fbfaef14bd"
+  },
+  "stages": {
+    "highlight": {
+      "request": {
+        "schema_version": "m4-model-edit-1",
+        "action": "highlight",
+        "plan_id": "dc16173532424fb9a35fa77473eb11c9",
+        "plan_hash": "5c5a86a0941084886e8be1ccf69b76a348f5b91526d4a39ed73c3d5a8e5c2c1b"
+      },
+      "response": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"schema_version\":\"m4-selection-1\",\"action\":\"highlight\",\"model_data_changed\":false,\"usable_for_write\":true,\"runtime_verified\":false,\"native_selection\":{\"status\":\"unsupported\",\"reason\":\"no_verified_programmatic_UI_selection_in_current_interactor\"},\"ui_visibility\":\"requires_owner_observation\",\"status\":\"ready_for_owner_test\",\"clear_scope\":\"all_highlights_in_current_document_including_other_sources\",\"selection_id\":\"ee832d1a5982479d901f7aad4ff28225\",\"source_fingerprint\":\"ad4999879732a3bab9f50193e26311c49624f446de1793ce3a10618d4ee9b6c9\",\"scope\":{\"requested\":{\"drawing_files\":[101],\"include_passive\":true,\"visibility\":\"api_select_all\"},\"included_files\":[{\"drawing_file\":101,\"state\":\"active_foreground\",\"write_eligibility\":\"not_checked\"}]},\"coverage\":{\"scan_complete\":true,\"requested_scope_complete\":true,\"layer_resolution\":\"adapter\",\"attribute_read_mode\":\"stored\",\"returned_fields_complete\":true,\"returned_fields_not_checked\":0,\"whole_project\":false,\"unloaded_files\":\"not_enumerated\",\"visibility\":\"api_select_all_screen_and_occlusion_not_checked\",\"count_kind\":\"supported_native_semantic_components\",\"native_component_counts\":\"implemented_runtime_pending\",\"supported_component_types\":[\"Beam_TypeUUID\",\"Column_TypeUUID\",\"MultiSlab_TypeUUID\",\"SkeletonBeam_TypeUUID\",\"Slab_TypeUUID\",\"Wall_TypeUUID\",\"WindowDoor_TypeUUID\"],\"geometry_units_offset\":\"not_checked\"},\"omissions\":[],\"exclude_model_uuids\":[\"545bb0a2-a054-4c91-ac6c-ec552d5b0c18\"],\"counts\":{\"matched\":2,\"excluded\":1,\"requested_model_identities\":1,\"requested_adapters\":1,\"submitted_model_identities\":1,\"submitted_adapters\":1,\"selected\":null,\"highlighted\":null,\"not_visible\":null,\"unreadable\":0,\"not_editable\":0,\"other_editability\":\"not_checked\"},\"state\":\"submitted\",\"ui_calls_started\":true,\"plan_id\":\"dc16173532424fb9a35fa77473eb11c9\",\"plan_hash\":\"5c5a86a0941084886e8be1ccf69b76a348f5b91526d4a39ed73c3d5a8e5c2c1b\",\"apply_available\":true,\"evaluation_apply_available\":true,\"production_apply_available\":false,\"write_mode\":\"disposable_copy_evaluation\",\"write_blockers\":[],\"native_acceptance_blocks_evaluation\":false,\"required_steps\":[\"review_exact_plan_in_disposable_copy\",\"highlight_exact_plan\",\"persist_apply_request_with_new_execution_id\",\"apply_with_acknowledgement\"],\"next_action\":{\"tool\":\"model_edit\",\"request\":{\"schema_version\":\"m4-model-edit-1\",\"action\":\"apply\",\"plan_id\":\"dc16173532424fb9a35fa77473eb11c9\",\"plan_hash\":\"5c5a86a0941084886e8be1ccf69b76a348f5b91526d4a39ed73c3d5a8e5c2c1b\",\"acknowledgement\":\"disposable_copy_reviewed_plan\"},\"required_request_fields\":{\"execution_id\":\"persist_new_uuid4_hex_before_sending\"}},\"request_id\":\"386f752b-79bf-4f35-b1d6-ff91855b8e80\",\"host_session_id\":\"5617b71e-4283-4da4-b3b4-7e97a02a9a50\"}"
+          }
+        ],
+        "structuredContent": {
+          "schema_version": "m4-selection-1",
+          "action": "highlight",
+          "model_data_changed": false,
+          "usable_for_write": true,
+          "runtime_verified": false,
+          "native_selection": {
+            "status": "unsupported",
+            "reason": "no_verified_programmatic_UI_selection_in_current_interactor"
+          },
+          "ui_visibility": "requires_owner_observation",
+          "status": "ready_for_owner_test",
+          "clear_scope": "all_highlights_in_current_document_including_other_sources",
+          "selection_id": "ee832d1a5982479d901f7aad4ff28225",
+          "source_fingerprint": "ad4999879732a3bab9f50193e26311c49624f446de1793ce3a10618d4ee9b6c9",
+          "scope": {
+            "requested": {
+              "drawing_files": [
+                101
+              ],
+              "include_passive": true,
+              "visibility": "api_select_all"
+            },
+            "included_files": [
+              {
+                "drawing_file": 101,
+                "state": "active_foreground",
+                "write_eligibility": "not_checked"
+              }
+            ]
+          },
+          "coverage": {
+            "scan_complete": true,
+            "requested_scope_complete": true,
+            "layer_resolution": "adapter",
+            "attribute_read_mode": "stored",
+            "returned_fields_complete": true,
+            "returned_fields_not_checked": 0,
+            "whole_project": false,
+            "unloaded_files": "not_enumerated",
+            "visibility": "api_select_all_screen_and_occlusion_not_checked",
+            "count_kind": "supported_native_semantic_components",
+            "native_component_counts": "implemented_runtime_pending",
+            "supported_component_types": [
+              "Beam_TypeUUID",
+              "Column_TypeUUID",
+              "MultiSlab_TypeUUID",
+              "SkeletonBeam_TypeUUID",
+              "Slab_TypeUUID",
+              "Wall_TypeUUID",
+              "WindowDoor_TypeUUID"
+            ],
+            "geometry_units_offset": "not_checked"
+          },
+          "omissions": [],
+          "exclude_model_uuids": [
+            "545bb0a2-a054-4c91-ac6c-ec552d5b0c18"
+          ],
+          "counts": {
+            "matched": 2,
+            "excluded": 1,
+            "requested_model_identities": 1,
+            "requested_adapters": 1,
+            "submitted_model_identities": 1,
+            "submitted_adapters": 1,
+            "selected": null,
+            "highlighted": null,
+            "not_visible": null,
+            "unreadable": 0,
+            "not_editable": 0,
+            "other_editability": "not_checked"
+          },
+          "state": "submitted",
+          "ui_calls_started": true,
+          "plan_id": "dc16173532424fb9a35fa77473eb11c9",
+          "plan_hash": "5c5a86a0941084886e8be1ccf69b76a348f5b91526d4a39ed73c3d5a8e5c2c1b",
+          "apply_available": true,
+          "evaluation_apply_available": true,
+          "production_apply_available": false,
+          "write_mode": "disposable_copy_evaluation",
+          "write_blockers": [],
+          "native_acceptance_blocks_evaluation": false,
+          "required_steps": [
+            "review_exact_plan_in_disposable_copy",
+            "highlight_exact_plan",
+            "persist_apply_request_with_new_execution_id",
+            "apply_with_acknowledgement"
+          ],
+          "next_action": {
+            "tool": "model_edit",
+            "request": {
+              "schema_version": "m4-model-edit-1",
+              "action": "apply",
+              "plan_id": "dc16173532424fb9a35fa77473eb11c9",
+              "plan_hash": "5c5a86a0941084886e8be1ccf69b76a348f5b91526d4a39ed73c3d5a8e5c2c1b",
+              "acknowledgement": "disposable_copy_reviewed_plan"
+            },
+            "required_request_fields": {
+              "execution_id": "persist_new_uuid4_hex_before_sending"
+            }
+          },
+          "request_id": "386f752b-79bf-4f35-b1d6-ff91855b8e80",
+          "host_session_id": "5617b71e-4283-4da4-b3b4-7e97a02a9a50"
+        },
+        "isError": false
+      }
+    },
+    "revalidate": {
+      "request": {
+        "schema_version": "m4-model-edit-1",
+        "action": "revalidate",
+        "plan_id": "dc16173532424fb9a35fa77473eb11c9",
+        "plan_hash": "5c5a86a0941084886e8be1ccf69b76a348f5b91526d4a39ed73c3d5a8e5c2c1b"
+      },
+      "response": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"schema_version\":\"m4-model-edit-1\",\"action\":\"revalidate\",\"read_only\":true,\"state\":\"unchanged\",\"plan_id\":\"dc16173532424fb9a35fa77473eb11c9\",\"plan_hash\":\"5c5a86a0941084886e8be1ccf69b76a348f5b91526d4a39ed73c3d5a8e5c2c1b\",\"setter_calls_started\":0,\"apply_available\":true,\"evaluation_apply_available\":true,\"production_apply_available\":false,\"usable_for_write\":true,\"write_mode\":\"disposable_copy_evaluation\",\"write_blockers\":[],\"native_acceptance_blocks_evaluation\":false,\"required_steps\":[\"review_exact_plan_in_disposable_copy\",\"highlight_exact_plan\",\"persist_apply_request_with_new_execution_id\",\"apply_with_acknowledgement\"],\"next_action\":{\"tool\":\"model_edit\",\"request\":{\"schema_version\":\"m4-model-edit-1\",\"action\":\"apply\",\"plan_id\":\"dc16173532424fb9a35fa77473eb11c9\",\"plan_hash\":\"5c5a86a0941084886e8be1ccf69b76a348f5b91526d4a39ed73c3d5a8e5c2c1b\",\"acknowledgement\":\"disposable_copy_reviewed_plan\"},\"required_request_fields\":{\"execution_id\":\"persist_new_uuid4_hex_before_sending\"}},\"request_id\":\"fcd57700-7e01-47b5-aadb-0c7067a5b85f\",\"host_session_id\":\"5617b71e-4283-4da4-b3b4-7e97a02a9a50\"}"
+          }
+        ],
+        "structuredContent": {
+          "schema_version": "m4-model-edit-1",
+          "action": "revalidate",
+          "read_only": true,
+          "state": "unchanged",
+          "plan_id": "dc16173532424fb9a35fa77473eb11c9",
+          "plan_hash": "5c5a86a0941084886e8be1ccf69b76a348f5b91526d4a39ed73c3d5a8e5c2c1b",
+          "setter_calls_started": 0,
+          "apply_available": true,
+          "evaluation_apply_available": true,
+          "production_apply_available": false,
+          "usable_for_write": true,
+          "write_mode": "disposable_copy_evaluation",
+          "write_blockers": [],
+          "native_acceptance_blocks_evaluation": false,
+          "required_steps": [
+            "review_exact_plan_in_disposable_copy",
+            "highlight_exact_plan",
+            "persist_apply_request_with_new_execution_id",
+            "apply_with_acknowledgement"
+          ],
+          "next_action": {
+            "tool": "model_edit",
+            "request": {
+              "schema_version": "m4-model-edit-1",
+              "action": "apply",
+              "plan_id": "dc16173532424fb9a35fa77473eb11c9",
+              "plan_hash": "5c5a86a0941084886e8be1ccf69b76a348f5b91526d4a39ed73c3d5a8e5c2c1b",
+              "acknowledgement": "disposable_copy_reviewed_plan"
+            },
+            "required_request_fields": {
+              "execution_id": "persist_new_uuid4_hex_before_sending"
+            }
+          },
+          "request_id": "fcd57700-7e01-47b5-aadb-0c7067a5b85f",
+          "host_session_id": "5617b71e-4283-4da4-b3b4-7e97a02a9a50"
+        },
+        "isError": false
+      }
+    }
+  }
+}

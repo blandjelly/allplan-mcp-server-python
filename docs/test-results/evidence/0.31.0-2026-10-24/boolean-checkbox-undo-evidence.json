@@ -1,0 +1,88 @@
+{
+  "operation": "Boolean/CheckBox Allplan edit undo verification",
+  "user_confirmation": "undo wykonane",
+  "read_request": {
+    "tool": "mcp__allplan_m0__model_property_probe",
+    "request": {
+      "phase": "element_attributes",
+      "drawing_file": 101,
+      "model_uuid": "06d71e4d-193b-483e-8a32-344ade3d612c",
+      "view_uuid": "2d33e5a6-b4e8-444b-94e8-d4d0ae75d622",
+      "name_contains": "Materiał łatwopalny",
+      "offset": 0,
+      "limit": 16
+    }
+  },
+  "read_response": {
+    "schema_version": "m4-property-probe-1",
+    "phase": "element_attributes",
+    "probe_id": "c3fa8634507c470fa520800ba288444c",
+    "read_only": true,
+    "model_data_changed": false,
+    "usable_for_write": false,
+    "runtime_verified": false,
+    "status": "ready_for_isolated_owner_probe",
+    "trace_file": "Local/.allplan-mcp/logs/m4-native-probe.jsonl",
+    "native_calls_not_automatically_retried": true,
+    "scope": {
+      "requested": {"drawing_files": [101], "include_passive": false, "visibility": "api_select_all"},
+      "included_files": [{"drawing_file": 101, "state": "active_foreground", "write_eligibility": "not_checked"}]
+    },
+    "counts": {
+      "raw_adapters_visited": 26,
+      "in_scope_adapters": 26,
+      "matched_model_identities": 12,
+      "nonmatching_model_identities": 0,
+      "predicate_not_checked": 0,
+      "identity_not_checked": 0,
+      "conflicting_model_identities": 0,
+      "duplicate_representations": 12,
+      "file_identity_not_checked": 0,
+      "file_state_conflicts": 0,
+      "hierarchy_not_checked": 0,
+      "stale_adapters_skipped": 0,
+      "non_component_adapters": 2
+    },
+    "ref": {
+      "query_session_id": "e40d8c50c3824e0d8589c1e2e88b9ff0",
+      "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+      "document_id": 0,
+      "drawing_file": 101,
+      "model_uuid": "06d71e4d-193b-483e-8a32-344ade3d612c",
+      "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+      "durable_identity_verified": false,
+      "component_kind": "semantic_component"
+    },
+    "attributes": [{
+      "attribute_id": 1371,
+      "name": {"status": "observed", "value": "Materiał łatwopalny"},
+      "name_id_round_trip": {"status": "observed", "value": 1371},
+      "value": 0,
+      "type": {"status": "observed", "value": 73},
+      "supported_scalar_value_types": ["integer"]
+    }],
+    "total_matches": 1,
+    "offset": 0,
+    "adapter_attribute_consistency": "consistent",
+    "adapter_attribute_representation_count": 4,
+    "total_matches_status": "observed",
+    "next_offset": null,
+    "listing_complete": true,
+    "metadata_complete": true,
+    "metadata_not_checked_count": 0,
+    "filter_unknown_name_count": 0,
+    "presence_semantics": "values_present_in_ReadAll_only; omissions_unknown",
+    "writable": "not_established",
+    "enum_values": "not_read",
+    "filter": {"name_contains": "Materiał łatwopalny", "case_sensitive": false},
+    "probe_fingerprint": "b89f25de94cef803295f2317efb84bf7df7c683a9e3f1b86a281a02f6c947b0e",
+    "request_id": "9cbfe580-bd3c-42c5-a4ec-680f105f15b2",
+    "host_session_id": "06bdff76-5c71-45fd-87ae-2ae6b7dc6ca1"
+  },
+  "interpretation": {
+    "observed_value_after_undo": 0,
+    "type_code_after_undo": 73,
+    "restored_to_previous_observed_value": true,
+    "write_performed_during_this_turn": false
+  }
+}

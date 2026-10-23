@@ -411,7 +411,10 @@ and explicit `tier_index=1`. The target must resolve to a standalone
 `Wall_TypeUUID` represented by `WallElement`, have exactly one tier, and pass
 the bounded preservation snapshot. Starting with candidate 0.27.0, this
 requires exactly one direct `WallTier_TypeUUID` child with lineage
-`[tier, Wall root]`, no children of that tier, and no other Wall children.
+`[tier, Wall root]` and no other Wall children. Candidate 0.32.0 permits the
+tier to have direct `AttributeContainer_TypeUUID` leaf children when each
+container has a fully checked container → tier → Wall lineage. Other tier
+children, nested containers, openings and other Wall children remain blocked.
 No material catalog lookup, existence claim, alias resolution, surface edit,
 or attribute substitution occurs.
 
@@ -450,14 +453,42 @@ preservation observation. A blocked material entry uses
 material value as permission to write or as sufficient post-write validation.
 
 The preservation adapter accepts exactly one `WallTier_TypeUUID` child with
-lineage `[tier, Wall root]` and no children, and requires stable bounded
-enumeration. A `WindowDoor_TypeUUID` child is reported as
-`wall_material_openings_unsupported`. Any other child, including unknown
-Door/Window/Macro adapter types, is reported as
-`wall_material_child_type_unsupported`; unknown types do not become supported.
+lineage `[tier, Wall root]` and stable bounded enumeration. Since candidate
+0.32.0, it may also accept direct `AttributeContainer_TypeUUID` leaf children
+under that tier. It re-enumerates the immediate children and compares their
+drawing/model/type identities while retaining the observed view wrappers; each
+container lineage must resolve through the tier to the Wall, and the
+container itself must have no children. It snapshots every stored `ReadAll`
+attribute value only when the value has a bounded JSON representation: a
+scalar or one-level sequence of at most 64 scalar members. Limits are 64
+containers, 4096 records per container and 256 KiB per container and aggregate
+snapshot. Unknown types, nested values, invalid or duplicate attribute IDs,
+unsupported values and exceeded limits block preservation. These values are
+drift evidence only; they do not establish attribute ownership or a writable
+attribute codec. A `WindowDoor_TypeUUID` child is reported as
+`wall_material_openings_unsupported`. An unsupported Wall child, including
+unknown Door/Window/Macro adapter types, is reported as
+`wall_material_child_type_unsupported`; an unsupported tier child is reported
+as `wall_material_tier_child_unsupported`. Unknown types do not become
+supported.
 Bounded `ComponentReadError` failures expose stable stage and error type, not
-native exception text or object representations. These diagnostics do not
-relax preservation requirements or authorize a material setter.
+native exception text or object representations. When captured, the material
+diagnostic may also include a bounded `diagnostic.evidence` object. A
+`component_child_owner_mismatch` can include exact `target`, `child`, and
+`observed_parent` identities (`null` when no parent was observed). An
+unsupported tier lineage can include `selected_wall`, `tier_lineage`,
+`tier_child_count`, and `tier_children_sample` of at most eight identities.
+Evidence is optional and included only when read; it contains no exception
+strings or object representations. These diagnostics do not relax preservation
+requirements or authorize a material setter. They can guide a separate
+read-only `component_identity` follow-up for an unresolved owner mismatch, but
+do not make that material target eligible.
+
+Focused fake-adapter tests exercise the new direct-container path and blocked
+unsupported/drift cases. They do not establish that the container rule fixes a
+specific native Allplan diagnostic. Candidate 0.32.0 native acceptance remains
+separate; see the [API evidence note](m4-editing-api-0.32.0.md) and
+[single-path trial](m4-single-drawing-0.32.0.pl.md).
 
 Candidate 0.27.0 uses the shared bounded attribute-name resolver for every
 `model_edit` bind. The read-only `attribute_name` probe preserves its fast exact
