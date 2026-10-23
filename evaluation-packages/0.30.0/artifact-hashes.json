@@ -1,0 +1,10 @@
+{
+  "source_commit": "9966c31fc1b79b0ed7c2061d671dafa3f1f2e8d6",
+  "source_modified": false,
+  "hash_algorithm": "SHA-256",
+  "artifacts": {
+    "allplan-mcp-0.30.0-windows-evaluation.zip": "78b7b24c98749ebbd28814f84d70a2fc9cbeab80b477b9fd1585e5c10e63af8e",
+    "allplan_mcp_server-0.30.0-py3-none-any.whl": "6bb6aa0fbfb62b6f149e460d4215a97aca32d9301a8221c0732521fdb6a522fb",
+    "allplan_mcp_server-0.30.0.tar.gz": "d958be8231bf90771c59d385c39bafecf287f949073fb1271ec265ebb9583802"
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "candidate": "0.30.0",
+  "source_commit": "9966c31fc1b79b0ed7c2061d671dafa3f1f2e8d6",
+  "pull_request": 28,
+  "base_branch": "develop/m4",
+  "workflow": {
+    "name": "Final candidate checks",
+    "run_number": 200,
+    "run_id": 39993048110,
+    "url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39993048110",
+    "result": "success",
+    "trigger": "ready_for_review"
+  },
+  "jobs": {
+    "configuration": {
+      "job_id": 120549428146,
+      "result": "success"
+    },
+    "portable_windows_python_3_12": {
+      "job_id": 120549507669,
+      "runner": "windows-latest",
+      "python": "3.12",
+      "test_command": "uv run --frozen python -m unittest discover -s tests -v",
+      "tests": 622,
+      "result": "success",
+      "log_summary": "Ran 622 tests in 500.065s; OK"
+    },
+    "portable_ubuntu_python_3_12": {
+      "job_id": 120549507705,
+      "runner": "ubuntu-latest",
+      "python": "3.12",
+      "test_command": "uv run --frozen python -m unittest discover -s tests -v",
+      "tests": 622,
+      "result": "success",
+      "log_summary": "Ran 622 tests in 232.696s; OK"
+    },
+    "package": {
+      "job_id": 120553695686,
+      "result": "success",
+      "build": "wheel, sdist, and Windows ZIP"
+    }
+  },
+  "artifact": {
+    "id": 12518373563,
+    "name": "candidate-9966c31fc1b79b0ed7c2061d671dafa3f1f2e8d6",
+    "size_bytes": 1111159,
+    "digest": "sha256:fcd63041063bd723c4a98a9dade34973c8ddb0531b7ce7d7f63c95f7b7b1bb01",
+    "download_url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39993048110/artifacts/12518373563",
+    "expired": false,
+    "expires_at": "2026-11-06T17:21:01Z"
+  },
+  "artifact_delivery": {
+    "ci_artifact_delivered": false,
+    "reason": "The file-service-ref transfer attempt failed with URLError before receiving an HTTP response.",
+    "fallback": "one_clean_source_fallback_build",
+    "fallback_source_commit": "9966c31fc1b79b0ed7c2061d671dafa3f1f2e8d6",
+    "source_modified": false,
+    "source_verified": "code unchanged; clean detached worktree at the exact source commit"
+  },
+  "package_verification": {
+    "command": "UV_CACHE_DIR=/tmp/allplan-m4-uv-cache python evaluation-packages/0.30.0/verify_package.py --source-commit 9966c31fc1b79b0ed7c2061d671dafa3f1f2e8d6",
+    "result": "pass",
+    "record": "package-verification.json",
+    "log": "package-verification.log"
+  },
+  "superseded_run": {
+    "run_id": 39993030354,
+    "run_number": 199,
+    "result": "cancelled",
+    "reason": "GitHub concurrency cancelled the earlier draft configuration run; final ready-for-review run 39993048110 passed."
+  }
+}

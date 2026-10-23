@@ -410,6 +410,11 @@ def model_property_probe(request: PropertyProbeRequest) -> dict[str, Any]:
     direct children and represented native Python type. Use it to distinguish
     Slab tiers, MultiSlab owners and opening/inserted adapters. It never merges
     identities by bounds or establishes which adapter owns a writable property.
+    attribute_evidence reads 1–16 explicitly requested attribute IDs on an exact
+    model/view identity, optionally its immediate parent. Stored/computable values,
+    JSON representations and runtime types stay separate; unknown objects are never
+    coerced. Ancestry and child-read failures are independent observations. This
+    diagnoses Slab/MultiSlab and date/vector blockers without enabling setters.
     drawing_identity explicitly inventories direct model/view identities in one
     foreground drawing, including children and unsupported families. It returns
     at most 32 views per page (offset/limit), with per-view hierarchy/native-type

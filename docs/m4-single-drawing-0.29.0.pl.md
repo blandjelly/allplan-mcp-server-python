@@ -15,12 +15,12 @@ W tym środowisku nie ma natywnego Allplana; próbę wykonuje właściciel na ko
 projektu, używając dokładnego kandydata 0.29.0 po przejściu jego CI i
 weryfikacji ZIP-a. Zachować manifest instalacji, build Allplana,
 `allplan_health`, surowe odpowiedzi MCP, log wykonania i świeże odczyty.
-Właściciel zgłosił dla 0.28.0 PASS podświetlenia, preview, usunięcia/odczytu i
-read-only probe, ale FAIL oczekiwania Undo całej grupy: jeden Undo przywrócił
-tylko jeden Column, a dalsze Undo nie było dostępne. Wykonaj wyłącznie
-preview, Apply i readback potrzebne dla nowego grupowego usunięcia; nie
-powtarzaj niezależnych, wcześniej zaakceptowanych lookupów, zmian warstw,
-zapisów atrybutów, Wall deletion ani diagnostyki materiału.
+Właściciel zgłosił dla próby 0.29.0 PASS wszystkich kroków, w tym grupowego
+usunięcia i jednego Undo przywracającego wszystkie trzy Column. Historyczny
+FAIL z 0.28.0 — jedno Undo przywróciło tylko jeden Column — pozostaje zapisany
+w obserwacji tej wersji. Wynik 0.29.0 i jego ograniczenia opisuje
+[obserwacja właściciela](test-results/m4-owner-observation-0.29.0-2026-10-23.md)
+wraz z [logiem](test-results/evidence/allplan-test-log-0.29.0-2026-10-23.md).
 
 ## Zakres
 
@@ -51,9 +51,26 @@ zapisów atrybutów, Wall deletion ani diagnostyki materiału.
    niezależne elementy nadal pozostały. Jeśli choć jeden element nie wróci,
    wynik jest FAIL; nie wykonuj dalszego Undo w ramach tej próby.
 
-## Wynik i granice
+## Wynik 0.29.0 i granice
 
-Oznacz każdy etap PASS, BLOCKED, FAIL albo NOT RUN i zachowaj exact target set,
+Właściciel zgłosił PASS etapów 1–5: aktywny rysunek 101 zawierał trzy
+`Column_TypeUUID` na W1; potwierdzono plan; usunięcie zakończyło się
+`completed`, a świeży skan wykazał brak trzech słupów i kontenerów atrybutów;
+jedno UI Undo przywróciło wszystkie trzy słupy. To spełnia cel naprawy
+grupowego Undo w 0.29.0.
+
+Log nie zawiera surowych odpowiedzi MCP, UUID celów ani manifestu ZIP-a.
+Przywrócenie zaobserwował właściciel; narzędzie zgłosiło `undo: not_checked` i
+nie wykonało automatycznego readbacku po Undo. `runtime_verified` i
+`allplan_acceptance` pozostały niepotwierdzone. Nie przypisujemy wyniku do
+dokładnego artefaktu ani nie rozszerzamy go na inne typy operacji.
+
+Kolejna praca obejmie priorytety 1–5 wspólnie; ten zapis nie wyznacza jeszcze
+zakresu nowego kandydata.
+
+## Pierwotne kryteria próby
+
+Pierwotny plan wymagał oznaczyć każdy etap PASS, BLOCKED, FAIL albo NOT RUN i zachować exact target set,
 manifest, build, odpowiedzi, execution ID oraz świeże skany. Próba nie obejmuje
 zapisu atrybutów ani warstw, no-op, zapisu materiału, selekcji natywnej,
 Slab/MultiSlab setterów, date/vector codec ani innych rodzin. Jej powodzenie
