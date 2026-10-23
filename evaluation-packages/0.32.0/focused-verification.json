@@ -2,9 +2,9 @@
   "candidate": "0.32.0",
   "source_branch": "fix/m4-material-metadata-0.32.0",
   "base_commit": "1a4da74ee1e250e0ca95b549c59f6c3ee789f02e",
-  "tested_source_commit": null,
-  "source_commit_note": "No candidate commit existed when these checks ran. Results apply to the uncommitted 0.32.0 working tree based on base_commit.",
-  "source_worktree": "contains candidate source, tests, and documentation changes",
+  "tested_source_commit": "c7783cc05f00b032ead10f49e54092b9504a35c6",
+  "source_commit_note": "Runtime checks apply to source commit c7783cc. Final test evidence includes the uncommitted test-only correction in tests/test_model_delete.py, which asserts the bounded owner evidence added by that runtime commit.",
+  "source_worktree": "candidate runtime at tested_source_commit plus test-only deletion-diagnostic assertion correction",
   "scope": "focused Wall native-material preservation and ownership regressions, HTTP contracts, attribute evidence, dependent edit and ownership checks, and package version-lock agreement",
   "environment": {
     "python": "3.12.14",
@@ -12,10 +12,10 @@
     "http_loopback": "permission enabled for focused HTTP checks"
   },
   "result": "passed",
-  "unique_tests_passed": 132,
-  "unique_test_id_count": 132,
+  "unique_tests_passed": 161,
+  "unique_test_id_count": 161,
   "duplicate_test_ids": 0,
-  "counting_method": "Union of test IDs from the final focused module runs below. The seven HTTP checks comprise three Wall material tests and four component identity/attribute evidence tests. Repeated executions during iteration are not counted again.",
+  "counting_method": "Union of test IDs from the focused module runs below. The seven HTTP checks comprise three Wall material tests and four component identity/attribute evidence tests. Repeated executions during iteration are not counted again.",
   "groups": [
     {
       "name": "Wall material edit and preservation",
@@ -65,6 +65,19 @@
       "tests": 1,
       "result": "passed",
       "command": "PYTHONPATH=tests .venv/bin/python -m unittest test_package.PackageTests.test_version_and_lock_agree -v"
+    },
+    {
+      "name": "Deletion ownership and diagnostics",
+      "tests": 28,
+      "result": "passed",
+      "command": ".venv/bin/python -m unittest discover -s tests -p 'test_model_delete.py' -v"
+    },
+    {
+      "name": "Deletion HTTP contract",
+      "tests": 1,
+      "result": "passed",
+      "command": ".venv/bin/python -m unittest discover -s tests -p 'test_model_delete_http.py' -v",
+      "http_loopback_permission": true
     }
   ],
   "coverage_note": "Material regressions verify direct AttributeContainer leaves with bounded stored-value snapshots, iteration-only native child collections, logical identity across repeated alternate tier wrappers, drift conflicts, post-write unknown outcomes without replayed setters, and bounded failure evidence for tier lineage and child-owner mismatches. Component identity tests confirm evidence is omitted from unrelated failures. These are fake SDK and HTTP contract results, not Allplan acceptance.",
@@ -96,7 +109,31 @@
     }
   ],
   "full_local_suite": "not_run",
-  "full_ci": "not_run",
+  "full_ci": {
+    "result": "failed; no passing full CI yet",
+    "run_id": 40032392662,
+    "run_url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40032392662",
+    "source_sha": "c7783cc05f00b032ead10f49e54092b9504a35c6",
+    "configuration": "passed",
+    "ubuntu": {
+      "python": "3.12.15",
+      "tests": 635,
+      "result": "failed: 1 test assertion"
+    },
+    "windows": {
+      "python": "3.12.10",
+      "tests": null,
+      "result": "cancelled by matrix fail-fast; no final test count"
+    },
+    "package_job": "skipped because the Ubuntu portable job failed",
+    "failure": "test_model_delete.ModelDeleteTests.test_preview_exposes_bounded_child_owner_diagnostic_without_write expected the old two-key diagnostic; the observed diagnostic now includes bounded evidence"
+  },
+  "draft_configuration_run": {
+    "run_id": 40032373590,
+    "run_url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40032373590",
+    "source_sha": "c7783cc05f00b032ead10f49e54092b9504a35c6",
+    "result": "passed"
+  },
   "package_build": "not_run",
   "native_allplan": "not_run"
 }

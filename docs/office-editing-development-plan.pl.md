@@ -37,22 +37,36 @@ natywnego replay/restartu ogranicza zakres tego potwierdzenia.
 
 ### Bieżący kandydat 0.32.0 — ograniczone preservation atrybutów tieru
 
-Kandydat 0.32.0 zmienia wyłącznie zachowawczy snapshot ścieżki native
-material Wall. Dopuszcza bezpośrednie liście `AttributeContainer_TypeUUID`
-pod tierem po sprawdzeniu pełnej linii container → tier → Wall, zachowując
-zaobserwowane view UUID i strukturalnie porównując ponowne enumeracje dzieci.
+Kandydat 0.32.0 rozszerza zachowawczy snapshot ścieżki native material Wall i
+dodaje opcjonalne, ograniczone identity evidence do odpowiednich shared owner
+diagnostics. Snapshot dopuszcza bezpośrednie liście
+`AttributeContainer_TypeUUID` pod tierem po sprawdzeniu pełnej linii
+container → tier → Wall, zachowując zaobserwowane view UUID i strukturalnie
+porównując ponowne enumeracje dzieci.
 Snapshot obejmuje wszystkie zapisane wartości z `ReadAll` przez ograniczone
 kodowanie JSON: maksymalnie 64 kontenery, 4096 rekordów na kontener i 256 KiB
 zachowanych danych. Nieznany typ dziecka, nested child, nieobsługiwana wartość,
 opening albo inny child Wall nadal blokuje zapis. Snapshot służy zachowaniu
 stanu; nie ustala ownera pola ani nie dodaje zapisu atrybutów.
 
+Źródło
+[`c7783cc05f00b032ead10f49e54092b9504a35c6`](https://github.com/blandjelly/allplan-mcp-server-python/commit/c7783cc05f00b032ead10f49e54092b9504a35c6)
+jest na `fix/m4-material-metadata-0.32.0`; [PR #30](https://github.com/blandjelly/allplan-mcp-server-python/pull/30)
+celuje w `develop/m4`. **161 unique focused checks przeszły** ([rekord](../evaluation-packages/0.32.0/focused-verification.json)).
+Pierwszy full CI [run 40032392662](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40032392662)
+zakończył się jednym niepowodzeniem `test_model_delete`: assertion oczekiwał
+wcześniejszego exact diagnostic shape po dodaniu `diagnostic.evidence`.
+Ubuntu wykonał 635 testów, Windows został anulowany przez fail-fast, a package
+job został pominięty. Aktualizacja assertion i focused delete checks oraz
+rerun CI dla poprawionego source są w toku. Build pakietu, ZIP verification i
+native acceptance pozostają pending.
+
 Focused fake-adapter checks odtwarzają wcześniejsze blanket odrzucenie dzieci
 tieru i sprawdzają nowy bounded flow, lecz nie dowodzą, że była to dokładna
 przyczyna native diagnostyki 0.31.0. `component_child_owner_mismatch` dla Wall
-200 mm z opening pozostaje nierozstrzygnięty i poza tą poprawką. CI, package
-provenance i native acceptance 0.32.0 są w toku; brak tu claimu o ich
-ukończeniu. Próba właściciela ogranicza się do pierwotnej ścieżki materiału
+200 mm z opening pozostaje nierozstrzygnięty i poza tą poprawką. Corrected-source
+CI, build/verification pakietu i native acceptance pozostają pending.
+Próba właściciela ogranicza się do pierwotnej ścieżki materiału
 Wall 240 mm: przy blokadzie zachować pierwszy reason/stage oraz świeże
 `component_identity` Wall i dokładnego tieru; przy kwalifikacji jeden
 Apply/readback/UI Undo. [Notatka API 0.32.0](m4-editing-api-0.32.0.md) ·

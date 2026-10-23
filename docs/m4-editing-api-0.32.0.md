@@ -8,10 +8,19 @@ lineage resolves as container → tier → Wall. This snapshot is preservation
 evidence; it does not establish that a container attribute belongs to a
 particular field or that the container can be edited through a setter.
 
-Automated checks, CI, package verification and native Allplan acceptance for
-this candidate are pending. Focused fake-adapter tests reproduce the prior
-blanket-child rejection and exercise the new bounded path. They do not prove
-that this was the cause of the owner's native 0.31.0 diagnostic. The 200 mm
+**161 unique focused checks passed** ([record](../evaluation-packages/0.32.0/focused-verification.json)).
+Source
+[`c7783cc05f00b032ead10f49e54092b9504a35c6`](https://github.com/blandjelly/allplan-mcp-server-python/commit/c7783cc05f00b032ead10f49e54092b9504a35c6)
+is on `fix/m4-material-metadata-0.32.0`; [PR #30](https://github.com/blandjelly/allplan-mcp-server-python/pull/30)
+targets `develop/m4`. Initial full CI [run 40032392662](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40032392662)
+failed one Ubuntu `test_model_delete` exact-shape assertion after
+`diagnostic.evidence` was added. The Ubuntu job ran 635 tests; Windows was
+canceled by fail-fast and the package job was skipped. The assertion and
+focused delete checks are being updated; corrected-source CI is pending. The
+package build/ZIP verification and native Allplan acceptance are also pending.
+Focused fake-adapter tests reproduce the prior blanket-child
+rejection and exercise the new bounded path. They do not prove that this was
+the cause of the owner's native 0.31.0 diagnostic. The 200 mm
 Wall-with-opening `component_child_owner_mismatch` remains unresolved and is
 outside this change. See the [0.31.0 owner observation](test-results/m4-owner-observation-0.31.0-2026-10-24.md)
 for the supplied native evidence.
