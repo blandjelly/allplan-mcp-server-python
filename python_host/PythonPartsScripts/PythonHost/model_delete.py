@@ -172,11 +172,41 @@ def final_write_guard(base, element, change, doc, check):
 
 
 def write(base, element, change, doc=None, check=lambda: None):
-    preflight(element, change, check)
-    import NemAll_Python_IFW_ElementAdapter as adapters
-    targets = adapters.BaseElementAdapterList()
-    targets.append(element)
     if doc is None:
         doc = element.GetDocument()
-    final_write_guard(base, element, change, doc, check)
+    return write_batch(base, [element], [change], doc, check)
+
+
+def write_batch(base, elements, changes, doc, check=lambda: None):
+    """Submit all reviewed roots in one native operation, never one call per root.
+
+    A native call can still fail partially. The caller must durably mark every
+    target unknown before entering here, and verify each complete subtree after
+    the call. This is no claim of native atomicity or automatic rollback.
+    """
+    if not elements or len(elements) != len(changes) or len(changes) > 32:
+        raise BridgeError("target_not_writable", "Deletion batch is empty or exceeds its reviewed bound.", 409)
+    import NemAll_Python_IFW_ElementAdapter as adapters
+    targets = adapters.BaseElementAdapterList()
+    owned = set()
+    scope = None
+    for element, change in zip(elements, changes):
+        if change.get("adapter_version") != "m4-model-edit-1":
+            raise BridgeError("target_not_writable", "Native model edit adapter version is not enabled.", 409)
+        preflight(element, change, check)
+        ref = change["ref"]
+        current_scope = tuple(ref[key] for key in ("project_key", "document_id", "drawing_file"))
+        if scope is not None and current_scope != scope:
+            raise BridgeError("target_not_writable", "Deletion batch crosses its reviewed scope.", 409)
+        scope = current_scope
+        evidence = change["resource"]["delete_ownership"]["value"]
+        identities = {model_identity_key(item) for item in [evidence["target"], *evidence["descendants"]]}
+        if owned & identities:
+            raise BridgeError("repair_conflict", "Deletion batch contains overlapping owned subtrees.", 409)
+        owned.update(identities)
+        targets.append(element)
+    # Recheck every target immediately before the single native submission.
+    # No target may be deleted while another target still awaits preflight.
+    for element, change in zip(elements, changes):
+        final_write_guard(base, element, change, doc, check)
     return base.DeleteElements(doc, targets)

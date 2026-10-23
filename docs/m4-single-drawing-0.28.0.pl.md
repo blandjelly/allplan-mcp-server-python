@@ -15,6 +15,24 @@ surowe odpowiedzi MCP i logi. Pracuj na kopii projektu. Nie ponawiaj wcześniej
 zaakceptowanego usunięcia Wall 240 mm, zmian warstwy, zapisów atrybutów,
 lookupu nazwy ani diagnostyki materiału.
 
+## Zgłoszony wynik właściciela — 23 października 2026
+
+Właściciel zgłosił PASS dla punktów 1, 2, 3 i 5 oraz FAIL dla punktu 4.
+Trzy Column na W1 zostały podświetlone, preview objął trzy cele (każdy z
+podrzędnym kontenerem atrybutów, bez innych wykrytych zależności), a po
+potwierdzonym usunięciu świeży odczyt zgłosił brak wszystkich trzech. Jedno UI
+Undo przywróciło tylko jeden Column; dalsze Undo nie było dostępne. Oczekiwanie
+jednego Undo przywracającego całą grupę nie zostało spełnione. Opcjonalny
+read-only probe zgłoszono jako PASS, lecz log nie zawiera jego wyniku.
+
+Oryginalny [log rozmowy](test-results/evidence/allplan-chat-log-0.28.0-2026-10-23.md)
+i [ograniczona obserwacja właściciela](test-results/m4-owner-observation-0.28.0-2026-10-23.md)
+nie zachowują manifestu instalacji, dokładnego ZIP-a, builda Allplana, surowych
+odpowiedzi MCP ani UUID celów. Dlatego punkty 1–3 i 5 są ograniczonymi
+obserwacjami owner-reported, a punkt 4 pozostaje FAIL; nie wnioskować o
+atomowości ani przyczynie braku dalszego Undo. Próba nie daje pełnej akceptacji
+natywnej usuwania Column.
+
 ## Zakres
 
 1. **Ustal dokładne cele Column na W1.** Odczytaj identyfikatory rysunku,

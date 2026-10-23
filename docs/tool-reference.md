@@ -359,14 +359,24 @@ child is suppressed as covered by the root; an exclusion that crosses that
 subtree blocks deletion of the root. Incomplete hierarchy, cycles, cross-file
 ownership, or an over-budget tree block the plan.
 
-Apply calls `DeleteElements(doc, [target_adapter])` once. Cascade behavior is
-not assumed. Completion requires a fresh complete identity scan of the planned
-target and every bound descendant and confirmation that all are absent. For an
-opening target, its parent Wall must still be present; disappearance of the
-parent makes the result unknown. A partial subtree, unreadable scan, or timeout
-leaves an unknown result; recover the same execution ID without repeating
-deletion. The shared journal, exact target binding, confirmation, and setter-free
-replay/recovery safeguards apply.
+The plan still represents one delete change template, expanded over its
+reviewed, exact target set. For a delete-only plan, Apply preflights and binds
+the complete reviewed set, persists an unknown-capable execution record before
+the native call, then invokes `DeleteElements(doc, full_reviewed_adapter_list)`
+once. It does not invoke one native delete call per target. Cascade behavior is
+not assumed. Completion requires fresh complete identity scans for every
+planned target and every bound descendant and confirmation that all are absent.
+For an opening target, its parent Wall must still be present; disappearance of
+the parent makes the result unknown. A partial result, unreadable scan, or
+timeout leaves the entire execution result unknown for recovery under the same
+execution ID; never retry the native setter. Per-target readback reports which
+targets and descendants are absent, present, or unresolved. A single native
+call does not itself establish Allplan UI Undo grouping; that requires a narrow
+owner trial. An official example passes multiple adapters to one
+`DeleteElements` call; see the [0.29.0 API evidence](m4-editing-api-0.29.0.md).
+The evidence documents the call shape, not UI Undo behavior. The shared journal,
+exact target binding, confirmation, and setter-free replay/recovery safeguards
+apply.
 
 Candidate 0.26.0 exposes delete diagnostics in
 `blocked[].observation.reason` and `blocked[].observation.diagnostic` (`stage`,

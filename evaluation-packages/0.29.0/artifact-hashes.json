@@ -1,0 +1,14 @@
+{
+  "allplan-mcp-0.29.0-windows-evaluation.zip": {
+    "sha256": "0e4211b7a28f69a0b0400c13e2a90efeca9c230d34e42599adc6e8a2932d5aa5",
+    "size_bytes": 501736
+  },
+  "allplan_mcp_server-0.29.0-py3-none-any.whl": {
+    "sha256": "cfc2c6331526e6e75bd31344171abe2ee809856133a16752a53503a28a2b0ca0",
+    "size_bytes": 100507
+  },
+  "allplan_mcp_server-0.29.0.tar.gz": {
+    "sha256": "c746fdaa6191f148cc087659bee6ee30f73c9b3cf9d3f75c9102c5aaabd4d45b",
+    "size_bytes": 505263
+  }
+}

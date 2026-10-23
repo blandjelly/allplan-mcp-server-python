@@ -1,8 +1,9 @@
 """Guarded model-object deletion through the shared edit journal."""
+import copy
 import unittest
 import importlib
 from uuid import uuid4
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from pydantic import TypeAdapter, ValidationError
 from allplan_mcp.model_edit_models import ModelEditRequest
@@ -182,6 +183,178 @@ class ModelDeleteTests(unittest.TestCase):
         self.assertFalse(peer.IsDeleted.return_value)
         self.assertEqual(peer.GetAttributes.return_value, [(935, "peer")])
         self.assertTrue(self.apply(plan, execution_id)["replayed"])
+        self.base.DeleteElements.assert_called_once()
+
+    def test_three_column_delete_uses_one_native_submission_after_all_write_ahead_markers(self):
+        fixture = self.fixture(("", "", "", "peer"))
+        targets, peer = fixture[:3], fixture[3]
+        containers = [self.element(20 + index, name="AttributeContainer_TypeUUID")
+                      for index in range(len(targets))]
+        for container in containers:
+            for method, value in (("IsDeleted", False), ("IsValid", True),
+                                  ("IsInActiveDocument", True), ("IsInActiveLayer", True),
+                                  ("IsLabelElement", False)):
+                getattr(container, method).return_value = value
+        for target, container in zip(targets, containers):
+            self.parents[id(target)] = self.null_parent()
+            self.parents[id(container)] = target
+            self.children[id(target)] = [container]
+        self.elements = [*targets, *containers, peer]
+        self.live_elements()
+        plan = self.preview(predicate=None, native_types=["Column_TypeUUID"],
+                            exclude_model_uuids=[peer.GetModelElementUUID()],
+                            changes=[{"target": {"kind": "delete"}}])
+        self.assertTrue(plan["apply_available"], plan)
+        self.assertEqual(plan["counts"]["changes"], 3)
+        self.highlight(plan)
+        execution_id = uuid4().hex
+        journal_path = self.plans.executor.path / (execution_id + ".json")
+        submitted = []
+
+        def delete_elements(doc, adapters):
+            from pathlib import Path
+            import json
+            saved = json.loads(Path(journal_path).read_text(encoding="utf-8"))
+            self.assertEqual(saved["native_delete_batch"], {
+                "method": "DeleteElements", "target_count": 3,
+                "submission": "may_have_run", "native_undo": "not_checked"})
+            self.assertEqual([item["state"] for item in saved["outcomes"]], ["unknown"] * 3)
+            submitted.extend(adapters)
+            for item in [*adapters, *containers]:
+                item.IsDeleted.return_value = True
+
+        self.base.DeleteElements.side_effect = delete_elements
+        result = self.apply(plan, execution_id)
+        self.assertEqual(result["state"], "completed", result)
+        self.assertEqual([item["state"] for item in result["outcomes"]], ["applied"] * 3)
+        self.assertEqual(result["native_delete_batch"]["submission"], "returned")
+        self.assertEqual(result["native_delete_batch"]["target_count"], 3)
+        self.assertEqual([id(item) for item in submitted], [id(item) for item in targets])
+        self.assertFalse(peer.IsDeleted.return_value)
+        self.base.DeleteElements.assert_called_once()
+        self.assertTrue(self.apply(plan, execution_id)["replayed"])
+        self.base.DeleteElements.assert_called_once()
+
+    def test_three_column_delete_partial_native_failure_marks_every_target_unknown_and_recovers_read_only(self):
+        targets = self.fixture(("", "", ""))
+        self.elements = targets
+        self.live_elements()
+        plan = self.preview(predicate=None, native_types=["Column_TypeUUID"],
+                            changes=[{"target": {"kind": "delete"}}])
+        self.assertTrue(plan["apply_available"], plan)
+        self.highlight(plan)
+        execution_id = uuid4().hex
+        attempts = []
+
+        def partial_delete(doc, adapters):
+            attempts.append([item.GetModelElementUUID() for item in adapters])
+            self.assertEqual(len(adapters), 3)
+            adapters[0].IsDeleted.return_value = True
+            raise RuntimeError("native batch reply failed after partial deletion")
+
+        self.base.DeleteElements.side_effect = partial_delete
+        result = self.apply(plan, execution_id)
+        self.assertEqual(result["state"], "stopped")
+        self.assertEqual([item["state"] for item in result["outcomes"]], ["unknown"] * 3)
+        self.assertTrue(all(item["stage"] == "setter" for item in result["outcomes"]))
+        self.assertEqual(result["native_delete_batch"]["submission"], "may_have_run")
+        self.assertTrue(self.apply(plan, execution_id)["replayed"])
+        recovered = self.recover(execution_id)
+        self.assertTrue(recovered["read_only"])
+        self.assertEqual([item["state"] for item in recovered["recovery"]["observations"]],
+                         ["new_value_observed", "old_value_observed", "old_value_observed"])
+        self.assertEqual(len(attempts), 1)
+        self.base.DeleteElements.assert_called_once()
+
+    def test_three_column_late_write_guard_failure_submits_no_partial_delete(self):
+        targets = self.fixture(("", "", ""))
+        self.elements = targets
+        self.live_elements()
+        plan = self.preview(predicate=None, native_types=["Column_TypeUUID"],
+                            changes=[{"target": {"kind": "delete"}}])
+        self.highlight(plan)
+        model_delete = importlib.import_module(self.module.__package__ + ".model_delete")
+        original_guard = model_delete.final_write_guard
+        checked = []
+
+        def drift_on_last(base, element, change, doc, check):
+            checked.append(element)
+            if element is targets[-1]:
+                element.IsDeleted.return_value = True
+            return original_guard(base, element, change, doc, check)
+
+        with patch.object(model_delete, "final_write_guard", side_effect=drift_on_last):
+            result = self.apply(plan, uuid4().hex)
+        self.assertEqual([id(item) for item in checked], [id(item) for item in targets])
+        self.assertEqual(result["state"], "stopped")
+        self.assertEqual([item["state"] for item in result["outcomes"]], ["unknown"] * 3)
+        self.base.DeleteElements.assert_not_called()
+
+    def test_three_column_partial_subtree_readback_still_observes_remaining_batch_targets(self):
+        fixture = self.fixture(("", "", "", "peer"))
+        targets, peer = fixture[:3], fixture[3]
+        containers = [self.element(40 + index, name="AttributeContainer_TypeUUID")
+                      for index in range(len(targets))]
+        for container in containers:
+            for method, value in (("IsDeleted", False), ("IsValid", True),
+                                  ("IsInActiveDocument", True), ("IsInActiveLayer", True),
+                                  ("IsLabelElement", False)):
+                getattr(container, method).return_value = value
+        for target, container in zip(targets, containers):
+            self.parents[id(target)] = self.null_parent()
+            self.parents[id(container)] = target
+            self.children[id(target)] = [container]
+        self.elements = [*targets, *containers, peer]
+        self.live_elements()
+
+        def partially_delete(doc, adapters):
+            self.assertEqual(len(adapters), 3)
+            for target in adapters:
+                target.IsDeleted.return_value = True
+            for container in containers[1:]:
+                container.IsDeleted.return_value = True
+
+        self.base.DeleteElements.side_effect = partially_delete
+        plan = self.preview(predicate=None, native_types=["Column_TypeUUID"],
+                            exclude_model_uuids=[peer.GetModelElementUUID()],
+                            changes=[{"target": {"kind": "delete"}}])
+        self.assertTrue(plan["apply_available"], plan)
+        self.assertEqual(plan["counts"]["changes"], 3)
+        self.assertEqual([item["model_uuid"] for item in plan["changes"][0]["resource"]["delete_ownership"]["value"]["descendants"]],
+                         [containers[0].GetModelElementUUID()])
+        self.highlight(plan)
+        result = self.apply(plan, uuid4().hex)
+        self.assertEqual([item["state"] for item in result["outcomes"]],
+                         ["unknown", "applied", "applied"], result["outcomes"])
+        self.assertEqual(self.base.DeleteElements.call_count, 1)
+
+    def test_three_column_native_crash_keeps_batch_unknown_across_restart(self):
+        targets = self.fixture(("", "", ""))
+        self.elements = targets
+        self.live_elements()
+        plan = self.preview(predicate=None, native_types=["Column_TypeUUID"],
+                            changes=[{"target": {"kind": "delete"}}])
+        self.highlight(plan)
+        execution_id = uuid4().hex
+
+        def crash_after_first_delete(doc, adapters):
+            adapters[0].IsDeleted.return_value = True
+            raise SystemExit("simulated process interruption during native batch")
+
+        self.base.DeleteElements.side_effect = crash_after_first_delete
+        with self.assertRaises(SystemExit):
+            self.apply(plan, execution_id)
+        record = self.plans.executor.load(execution_id)
+        self.assertEqual([item["state"] for item in record["outcomes"]], ["unknown"] * 3)
+        service = importlib.import_module(self.module.__package__ + ".model_repair").RepairPlanService
+        self.handler.repair_plans = service(self.handler.model_queries, self.plans.executor.path)
+        self.handler.repair_plans.trace_path = self.plans.trace_path
+        replay = self.apply(plan, execution_id)
+        self.assertTrue(replay["replayed"])
+        recovered = self.recover(execution_id)
+        self.assertTrue(recovered["read_only"])
+        self.assertEqual([item["state"] for item in recovered["recovery"]["observations"]],
+                         ["new_value_observed", "old_value_observed", "old_value_observed"])
         self.base.DeleteElements.assert_called_once()
 
     def test_column_delete_accepts_child_parent_alias_view_and_replays_once(self):
@@ -447,6 +620,16 @@ class ModelDeleteTests(unittest.TestCase):
         forged["resource"]["delete_ownership"]["value"]["lineage"] = []
         native = importlib.import_module(self.module.__package__ + ".native_model_edit")
         self.assert_code("target_not_writable", lambda: native.write(self.base, target, forged))
+        self.base.DeleteElements.assert_not_called()
+
+    def test_batch_final_boundary_rejects_legacy_adapter_version_before_native_call(self):
+        target = self.fixture(("",))[0]
+        plan = self.preview(predicate=None, changes=[{"target": {"kind": "delete"}}])
+        change = copy.deepcopy(plan["changes"][0])
+        change["adapter_version"] = "m3-model-edit-1"
+        model_delete = importlib.import_module(self.module.__package__ + ".model_delete")
+        self.assert_code("target_not_writable", lambda: model_delete.write_batch(
+            self.base, [target], [change], self.coord.GetInputViewDocument()))
         self.base.DeleteElements.assert_not_called()
 
     def test_final_delete_write_guard_stops_when_budget_expires(self):
