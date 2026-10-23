@@ -1,0 +1,485 @@
+{
+  "apply": {
+    "request": {
+      "schema_version": "m4-model-edit-1",
+      "action": "apply",
+      "plan_id": "dc16173532424fb9a35fa77473eb11c9",
+      "plan_hash": "5c5a86a0941084886e8be1ccf69b76a348f5b91526d4a39ed73c3d5a8e5c2c1b",
+      "acknowledgement": "disposable_copy_reviewed_plan",
+      "execution_id": "d59f59b8c1ad4dff9fd684fbfaef14bd"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"schema_version\":\"m3-execution-1\",\"execution_id\":\"d59f59b8c1ad4dff9fd684fbfaef14bd\",\"request_hash\":\"519cc9ba7e5b7ede5be81cf57e44a5ecb1d97e9071080cd0cf395c874d625bc0\",\"plan_id\":\"dc16173532424fb9a35fa77473eb11c9\",\"plan_hash\":\"5c5a86a0941084886e8be1ccf69b76a348f5b91526d4a39ed73c3d5a8e5c2c1b\",\"state\":\"completed\",\"changes\":[{\"field\":\"attribute:120\",\"operation\":\"set_attribute\",\"property_role\":\"attribute\",\"resource\":{\"attribute_id\":120,\"name\":\"Rodzaj rozliczenia\",\"data_type\":\"enum\",\"native_type_member\":\"Enum\",\"read_mode\":\"stored\",\"enum_binding\":{\"enum_id\":1,\"value\":\"m2\"}},\"new_value\":\"m2\",\"mode\":\"replace\",\"ref\":{\"query_session_id\":\"a28291f98e354d06b62220c95d01056c\",\"project_key\":\"7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f\",\"document_id\":0,\"drawing_file\":101,\"model_uuid\":\"06d71e4d-193b-483e-8a32-344ade3d612c\",\"type_uuid\":\"ec7f50b0-1a27-49d6-b6a2-007b854513c7\",\"durable_identity_verified\":false,\"component_kind\":\"semantic_component\"},\"adapter_version\":\"m4-model-edit-1\",\"native_type\":\"Wall_TypeUUID\",\"old_value\":{\"status\":\"observed\",\"value\":\"m3\"},\"source_fingerprint\":\"7f2f3afc14cce7d78d66719bb4badfbd67f84681ba8d9f5c08c6d3b0ae8b043b\",\"locator\":{\"drawing_file\":101,\"model_uuid\":\"06d71e4d-193b-483e-8a32-344ade3d612c\"},\"target_view_uuid\":\"2d33e5a6-b4e8-444b-94e8-d4d0ae75d622\"}],\"target_preflight\":[{\"ref\":{\"query_session_id\":\"a28291f98e354d06b62220c95d01056c\",\"project_key\":\"7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f\",\"document_id\":0,\"drawing_file\":101,\"model_uuid\":\"06d71e4d-193b-483e-8a32-344ade3d612c\",\"type_uuid\":\"ec7f50b0-1a27-49d6-b6a2-007b854513c7\",\"durable_identity_verified\":false,\"component_kind\":\"semantic_component\"},\"representation_consensus\":{\"method\":\"all_exact_live_root_representations\",\"representations\":[{\"view_uuid\":\"2d33e5a6-b4e8-444b-94e8-d4d0ae75d622\",\"lifecycle\":{\"IsNull\":false,\"IsDeleted\":false,\"IsValid\":true},\"readback_status\":\"observed\",\"readback_sha256\":\"70e7ddce4097fb2b5f216c83a9fb5e42d2bf8cc717058e0a936c2614dc3255de\"},{\"view_uuid\":\"2d33e5a6-b4e8-444b-94e8-d4d0ae75d622\",\"lifecycle\":{\"IsNull\":false,\"IsDeleted\":false,\"IsValid\":true},\"readback_status\":\"observed\",\"readback_sha256\":\"70e7ddce4097fb2b5f216c83a9fb5e42d2bf8cc717058e0a936c2614dc3255de\"},{\"view_uuid\":\"2d33e5a6-b4e8-444b-94e8-d4d0ae75d622\",\"lifecycle\":{\"IsNull\":false,\"IsDeleted\":false,\"IsValid\":true},\"readback_status\":\"observed\",\"readback_sha256\":\"70e7ddce4097fb2b5f216c83a9fb5e42d2bf8cc717058e0a936c2614dc3255de\"},{\"view_uuid\":\"2d33e5a6-b4e8-444b-94e8-d4d0ae75d622\",\"lifecycle\":{\"IsNull\":false,\"IsDeleted\":false,\"IsValid\":true},\"readback_status\":\"observed\",\"readback_sha256\":\"70e7ddce4097fb2b5f216c83a9fb5e42d2bf8cc717058e0a936c2614dc3255de\"}],\"complete\":true,\"agreed\":true},\"resolved_root\":{\"drawing_file\":101,\"model_uuid\":\"06d71e4d-193b-483e-8a32-344ade3d612c\",\"view_uuid\":\"2d33e5a6-b4e8-444b-94e8-d4d0ae75d622\",\"type_name\":\"Wall_TypeUUID\"},\"native_flags\":{\"IsInMacro\":{\"status\":\"observed\",\"value\":false},\"active_drawing_file\":{\"status\":\"observed\",\"value\":101},\"IsNull\":{\"status\":\"observed\",\"value\":false},\"IsDeleted\":{\"status\":\"observed\",\"value\":false},\"IsValid\":{\"status\":\"observed\",\"value\":true},\"IsInActiveDocument\":{\"status\":\"observed\",\"value\":true},\"IsInActiveLayer\":{\"status\":\"observed\",\"value\":true},\"IsLabelElement\":{\"status\":\"observed\",\"value\":false}},\"hierarchy_check\":\"terminal_component_root_matches_reviewed_model_and_type\"}],\"outcomes\":[{\"state\":\"applied\",\"reason\":\"readback_matches\",\"representation_consensus\":{\"method\":\"all_exact_live_root_representations\",\"representations\":[{\"view_uuid\":\"2d33e5a6-b4e8-444b-94e8-d4d0ae75d622\",\"lifecycle\":{\"IsNull\":false,\"IsDeleted\":false,\"IsValid\":true},\"readback_status\":\"observed\",\"readback_sha256\":\"e3cae90ccf7d562b431962f823fa9240fe3c3d004277def3feac3a91368c4376\"},{\"view_uuid\":\"2d33e5a6-b4e8-444b-94e8-d4d0ae75d622\",\"lifecycle\":{\"IsNull\":false,\"IsDeleted\":false,\"IsValid\":true},\"readback_status\":\"observed\",\"readback_sha256\":\"e3cae90ccf7d562b431962f823fa9240fe3c3d004277def3feac3a91368c4376\"},{\"view_uuid\":\"2d33e5a6-b4e8-444b-94e8-d4d0ae75d622\",\"lifecycle\":{\"IsNull\":false,\"IsDeleted\":false,\"IsValid\":true},\"readback_status\":\"observed\",\"readback_sha256\":\"e3cae90ccf7d562b431962f823fa9240fe3c3d004277def3feac3a91368c4376\"},{\"view_uuid\":\"2d33e5a6-b4e8-444b-94e8-d4d0ae75d622\",\"lifecycle\":{\"IsNull\":false,\"IsDeleted\":false,\"IsValid\":true},\"readback_status\":\"observed\",\"readback_sha256\":\"e3cae90ccf7d562b431962f823fa9240fe3c3d004277def3feac3a91368c4376\"}],\"complete\":true,\"agreed\":true},\"readback\":{\"status\":\"observed\",\"value\":\"m2\"}}],\"criterion_request\":{\"schema_version\":\"m4-model-edit-1\",\"action\":\"preview\",\"scope\":\"open_drawings\",\"native_types\":[\"Wall_TypeUUID\"],\"predicate\":{\"field\":\"attribute:1319\",\"op\":\"eq\",\"value\":\"2d33e5a6-b4e8-444b-94e8-d4d0ae75d622\"},\"changes\":[{\"target\":{\"kind\":\"attribute\",\"attribute_id\":120},\"value_type\":\"enum\",\"value\":\"m2\",\"mode\":\"replace\"}]},\"criteria_after\":{\"schema_version\":\"m4-model-edit-1\",\"read_only\":true,\"checks\":[{\"ref\":{\"query_session_id\":\"a28291f98e354d06b62220c95d01056c\",\"project_key\":\"7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f\",\"document_id\":0,\"drawing_file\":101,\"model_uuid\":\"06d71e4d-193b-483e-8a32-344ade3d612c\",\"type_uuid\":\"ec7f50b0-1a27-49d6-b6a2-007b854513c7\",\"durable_identity_verified\":false,\"component_kind\":\"semantic_component\"},\"decision\":\"matched\"},{\"ref\":{\"query_session_id\":\"a28291f98e354d06b62220c95d01056c\",\"project_key\":\"7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f\",\"document_id\":0,\"drawing_file\":101,\"model_uuid\":\"545bb0a2-a054-4c91-ac6c-ec552d5b0c18\",\"type_uuid\":\"ec7f50b0-1a27-49d6-b6a2-007b854513c7\",\"durable_identity_verified\":false,\"component_kind\":\"semantic_component\"},\"decision\":\"nonmatching\"}],\"binding\":[{\"field\":\"attribute:120\",\"operation\":\"set_attribute\",\"property_role\":\"attribute\",\"resource\":{\"attribute_id\":120,\"name\":\"Rodzaj rozliczenia\",\"data_type\":\"enum\",\"native_type_member\":\"Enum\",\"read_mode\":\"stored\",\"enum_binding\":{\"enum_id\":1,\"value\":\"m2\"}},\"new_value\":\"m2\",\"mode\":\"replace\"}],\"source_fingerprint\":\"9e38bd1d9b6569943c29c3ddc3e279645301088cf98ab3f101290f0f3d6b6187\",\"scope\":{\"requested\":{\"drawing_files\":[101],\"include_passive\":true,\"visibility\":\"api_select_all\"},\"included_files\":[{\"drawing_file\":101,\"state\":\"active_foreground\",\"write_eligibility\":\"not_checked\"}]},\"coverage\":{\"scan_complete\":true,\"requested_scope_complete\":true,\"layer_resolution\":\"adapter\",\"attribute_read_mode\":\"stored\",\"returned_fields_complete\":true,\"returned_fields_not_checked\":0,\"whole_project\":false,\"unloaded_files\":\"not_enumerated\",\"visibility\":\"api_select_all_screen_and_occlusion_not_checked\",\"count_kind\":\"supported_native_semantic_components\",\"native_component_counts\":\"implemented_runtime_pending\",\"supported_component_types\":[\"Beam_TypeUUID\",\"Column_TypeUUID\",\"MultiSlab_TypeUUID\",\"SkeletonBeam_TypeUUID\",\"Slab_TypeUUID\",\"Wall_TypeUUID\",\"WindowDoor_TypeUUID\"],\"geometry_units_offset\":\"not_checked\",\"required_destination_fields_complete\":true,\"criteria_complete\":true},\"counts\":{\"matched\":1,\"nonmatching\":1},\"omissions\":[],\"attribute_read_mode\":\"stored\",\"required_field_failures\":[],\"operation_eligibility_failures\":[],\"component_ownership\":[],\"criterion_failures\":[],\"native_acceptance\":\"not_run\",\"runtime_verified\":false,\"report_fingerprint\":\"1f212fcf6838ca4fe6449605133cc11df67e3bc2df975c46ed1e5cf442474c5e\"},\"audited_fields_match_plan\":true,\"action\":\"apply\",\"read_only\":false,\"replayed\":false,\"automatic_retry\":false,\"undo\":\"not_checked; observe native UI Undo on disposable copy; no automatic rollback\",\"allplan_acceptance\":\"not_run\",\"runtime_verified\":false,\"report_text\":\"Repair execution completed: applied. No automatic rollback or retry.\",\"request_id\":\"d81b3354-1e05-454e-973f-0bd41bae3de5\",\"host_session_id\":\"5617b71e-4283-4da4-b3b4-7e97a02a9a50\"}"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": "m3-execution-1",
+        "execution_id": "d59f59b8c1ad4dff9fd684fbfaef14bd",
+        "request_hash": "519cc9ba7e5b7ede5be81cf57e44a5ecb1d97e9071080cd0cf395c874d625bc0",
+        "plan_id": "dc16173532424fb9a35fa77473eb11c9",
+        "plan_hash": "5c5a86a0941084886e8be1ccf69b76a348f5b91526d4a39ed73c3d5a8e5c2c1b",
+        "state": "completed",
+        "changes": [
+          {
+            "field": "attribute:120",
+            "operation": "set_attribute",
+            "property_role": "attribute",
+            "resource": {
+              "attribute_id": 120,
+              "name": "Rodzaj rozliczenia",
+              "data_type": "enum",
+              "native_type_member": "Enum",
+              "read_mode": "stored",
+              "enum_binding": {
+                "enum_id": 1,
+                "value": "m2"
+              }
+            },
+            "new_value": "m2",
+            "mode": "replace",
+            "ref": {
+              "query_session_id": "a28291f98e354d06b62220c95d01056c",
+              "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+              "document_id": 0,
+              "drawing_file": 101,
+              "model_uuid": "06d71e4d-193b-483e-8a32-344ade3d612c",
+              "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+              "durable_identity_verified": false,
+              "component_kind": "semantic_component"
+            },
+            "adapter_version": "m4-model-edit-1",
+            "native_type": "Wall_TypeUUID",
+            "old_value": {
+              "status": "observed",
+              "value": "m3"
+            },
+            "source_fingerprint": "7f2f3afc14cce7d78d66719bb4badfbd67f84681ba8d9f5c08c6d3b0ae8b043b",
+            "locator": {
+              "drawing_file": 101,
+              "model_uuid": "06d71e4d-193b-483e-8a32-344ade3d612c"
+            },
+            "target_view_uuid": "2d33e5a6-b4e8-444b-94e8-d4d0ae75d622"
+          }
+        ],
+        "target_preflight": [
+          {
+            "ref": {
+              "query_session_id": "a28291f98e354d06b62220c95d01056c",
+              "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+              "document_id": 0,
+              "drawing_file": 101,
+              "model_uuid": "06d71e4d-193b-483e-8a32-344ade3d612c",
+              "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+              "durable_identity_verified": false,
+              "component_kind": "semantic_component"
+            },
+            "representation_consensus": {
+              "method": "all_exact_live_root_representations",
+              "representations": [
+                {
+                  "view_uuid": "2d33e5a6-b4e8-444b-94e8-d4d0ae75d622",
+                  "lifecycle": {
+                    "IsNull": false,
+                    "IsDeleted": false,
+                    "IsValid": true
+                  },
+                  "readback_status": "observed",
+                  "readback_sha256": "70e7ddce4097fb2b5f216c83a9fb5e42d2bf8cc717058e0a936c2614dc3255de"
+                },
+                {
+                  "view_uuid": "2d33e5a6-b4e8-444b-94e8-d4d0ae75d622",
+                  "lifecycle": {
+                    "IsNull": false,
+                    "IsDeleted": false,
+                    "IsValid": true
+                  },
+                  "readback_status": "observed",
+                  "readback_sha256": "70e7ddce4097fb2b5f216c83a9fb5e42d2bf8cc717058e0a936c2614dc3255de"
+                },
+                {
+                  "view_uuid": "2d33e5a6-b4e8-444b-94e8-d4d0ae75d622",
+                  "lifecycle": {
+                    "IsNull": false,
+                    "IsDeleted": false,
+                    "IsValid": true
+                  },
+                  "readback_status": "observed",
+                  "readback_sha256": "70e7ddce4097fb2b5f216c83a9fb5e42d2bf8cc717058e0a936c2614dc3255de"
+                },
+                {
+                  "view_uuid": "2d33e5a6-b4e8-444b-94e8-d4d0ae75d622",
+                  "lifecycle": {
+                    "IsNull": false,
+                    "IsDeleted": false,
+                    "IsValid": true
+                  },
+                  "readback_status": "observed",
+                  "readback_sha256": "70e7ddce4097fb2b5f216c83a9fb5e42d2bf8cc717058e0a936c2614dc3255de"
+                }
+              ],
+              "complete": true,
+              "agreed": true
+            },
+            "resolved_root": {
+              "drawing_file": 101,
+              "model_uuid": "06d71e4d-193b-483e-8a32-344ade3d612c",
+              "view_uuid": "2d33e5a6-b4e8-444b-94e8-d4d0ae75d622",
+              "type_name": "Wall_TypeUUID"
+            },
+            "native_flags": {
+              "IsInMacro": {
+                "status": "observed",
+                "value": false
+              },
+              "active_drawing_file": {
+                "status": "observed",
+                "value": 101
+              },
+              "IsNull": {
+                "status": "observed",
+                "value": false
+              },
+              "IsDeleted": {
+                "status": "observed",
+                "value": false
+              },
+              "IsValid": {
+                "status": "observed",
+                "value": true
+              },
+              "IsInActiveDocument": {
+                "status": "observed",
+                "value": true
+              },
+              "IsInActiveLayer": {
+                "status": "observed",
+                "value": true
+              },
+              "IsLabelElement": {
+                "status": "observed",
+                "value": false
+              }
+            },
+            "hierarchy_check": "terminal_component_root_matches_reviewed_model_and_type"
+          }
+        ],
+        "outcomes": [
+          {
+            "state": "applied",
+            "reason": "readback_matches",
+            "representation_consensus": {
+              "method": "all_exact_live_root_representations",
+              "representations": [
+                {
+                  "view_uuid": "2d33e5a6-b4e8-444b-94e8-d4d0ae75d622",
+                  "lifecycle": {
+                    "IsNull": false,
+                    "IsDeleted": false,
+                    "IsValid": true
+                  },
+                  "readback_status": "observed",
+                  "readback_sha256": "e3cae90ccf7d562b431962f823fa9240fe3c3d004277def3feac3a91368c4376"
+                },
+                {
+                  "view_uuid": "2d33e5a6-b4e8-444b-94e8-d4d0ae75d622",
+                  "lifecycle": {
+                    "IsNull": false,
+                    "IsDeleted": false,
+                    "IsValid": true
+                  },
+                  "readback_status": "observed",
+                  "readback_sha256": "e3cae90ccf7d562b431962f823fa9240fe3c3d004277def3feac3a91368c4376"
+                },
+                {
+                  "view_uuid": "2d33e5a6-b4e8-444b-94e8-d4d0ae75d622",
+                  "lifecycle": {
+                    "IsNull": false,
+                    "IsDeleted": false,
+                    "IsValid": true
+                  },
+                  "readback_status": "observed",
+                  "readback_sha256": "e3cae90ccf7d562b431962f823fa9240fe3c3d004277def3feac3a91368c4376"
+                },
+                {
+                  "view_uuid": "2d33e5a6-b4e8-444b-94e8-d4d0ae75d622",
+                  "lifecycle": {
+                    "IsNull": false,
+                    "IsDeleted": false,
+                    "IsValid": true
+                  },
+                  "readback_status": "observed",
+                  "readback_sha256": "e3cae90ccf7d562b431962f823fa9240fe3c3d004277def3feac3a91368c4376"
+                }
+              ],
+              "complete": true,
+              "agreed": true
+            },
+            "readback": {
+              "status": "observed",
+              "value": "m2"
+            }
+          }
+        ],
+        "criterion_request": {
+          "schema_version": "m4-model-edit-1",
+          "action": "preview",
+          "scope": "open_drawings",
+          "native_types": [
+            "Wall_TypeUUID"
+          ],
+          "predicate": {
+            "field": "attribute:1319",
+            "op": "eq",
+            "value": "2d33e5a6-b4e8-444b-94e8-d4d0ae75d622"
+          },
+          "changes": [
+            {
+              "target": {
+                "kind": "attribute",
+                "attribute_id": 120
+              },
+              "value_type": "enum",
+              "value": "m2",
+              "mode": "replace"
+            }
+          ]
+        },
+        "criteria_after": {
+          "schema_version": "m4-model-edit-1",
+          "read_only": true,
+          "checks": [
+            {
+              "ref": {
+                "query_session_id": "a28291f98e354d06b62220c95d01056c",
+                "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+                "document_id": 0,
+                "drawing_file": 101,
+                "model_uuid": "06d71e4d-193b-483e-8a32-344ade3d612c",
+                "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+                "durable_identity_verified": false,
+                "component_kind": "semantic_component"
+              },
+              "decision": "matched"
+            },
+            {
+              "ref": {
+                "query_session_id": "a28291f98e354d06b62220c95d01056c",
+                "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+                "document_id": 0,
+                "drawing_file": 101,
+                "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+                "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+                "durable_identity_verified": false,
+                "component_kind": "semantic_component"
+              },
+              "decision": "nonmatching"
+            }
+          ],
+          "binding": [
+            {
+              "field": "attribute:120",
+              "operation": "set_attribute",
+              "property_role": "attribute",
+              "resource": {
+                "attribute_id": 120,
+                "name": "Rodzaj rozliczenia",
+                "data_type": "enum",
+                "native_type_member": "Enum",
+                "read_mode": "stored",
+                "enum_binding": {
+                  "enum_id": 1,
+                  "value": "m2"
+                }
+              },
+              "new_value": "m2",
+              "mode": "replace"
+            }
+          ],
+          "source_fingerprint": "9e38bd1d9b6569943c29c3ddc3e279645301088cf98ab3f101290f0f3d6b6187",
+          "scope": {
+            "requested": {
+              "drawing_files": [
+                101
+              ],
+              "include_passive": true,
+              "visibility": "api_select_all"
+            },
+            "included_files": [
+              {
+                "drawing_file": 101,
+                "state": "active_foreground",
+                "write_eligibility": "not_checked"
+              }
+            ]
+          },
+          "coverage": {
+            "scan_complete": true,
+            "requested_scope_complete": true,
+            "layer_resolution": "adapter",
+            "attribute_read_mode": "stored",
+            "returned_fields_complete": true,
+            "returned_fields_not_checked": 0,
+            "whole_project": false,
+            "unloaded_files": "not_enumerated",
+            "visibility": "api_select_all_screen_and_occlusion_not_checked",
+            "count_kind": "supported_native_semantic_components",
+            "native_component_counts": "implemented_runtime_pending",
+            "supported_component_types": [
+              "Beam_TypeUUID",
+              "Column_TypeUUID",
+              "MultiSlab_TypeUUID",
+              "SkeletonBeam_TypeUUID",
+              "Slab_TypeUUID",
+              "Wall_TypeUUID",
+              "WindowDoor_TypeUUID"
+            ],
+            "geometry_units_offset": "not_checked",
+            "required_destination_fields_complete": true,
+            "criteria_complete": true
+          },
+          "counts": {
+            "matched": 1,
+            "nonmatching": 1
+          },
+          "omissions": [],
+          "attribute_read_mode": "stored",
+          "required_field_failures": [],
+          "operation_eligibility_failures": [],
+          "component_ownership": [],
+          "criterion_failures": [],
+          "native_acceptance": "not_run",
+          "runtime_verified": false,
+          "report_fingerprint": "1f212fcf6838ca4fe6449605133cc11df67e3bc2df975c46ed1e5cf442474c5e"
+        },
+        "audited_fields_match_plan": true,
+        "action": "apply",
+        "read_only": false,
+        "replayed": false,
+        "automatic_retry": false,
+        "undo": "not_checked; observe native UI Undo on disposable copy; no automatic rollback",
+        "allplan_acceptance": "not_run",
+        "runtime_verified": false,
+        "report_text": "Repair execution completed: applied. No automatic rollback or retry.",
+        "request_id": "d81b3354-1e05-454e-973f-0bd41bae3de5",
+        "host_session_id": "5617b71e-4283-4da4-b3b4-7e97a02a9a50"
+      },
+      "isError": false
+    }
+  },
+  "post_apply_read": {
+    "request": {
+      "phase": "element_attributes",
+      "drawing_file": 101,
+      "model_uuid": "06d71e4d-193b-483e-8a32-344ade3d612c",
+      "view_uuid": "2d33e5a6-b4e8-444b-94e8-d4d0ae75d622",
+      "name_contains": "Rodzaj rozliczenia",
+      "limit": 16,
+      "offset": 0
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"schema_version\":\"m4-property-probe-1\",\"phase\":\"element_attributes\",\"probe_id\":\"64a029ef092e4d3f8c5a4444b78243fa\",\"read_only\":true,\"model_data_changed\":false,\"usable_for_write\":false,\"runtime_verified\":false,\"status\":\"ready_for_isolated_owner_probe\",\"trace_file\":\"Local/.allplan-mcp/logs/m4-native-probe.jsonl\",\"native_calls_not_automatically_retried\":true,\"native_selection\":\"not_requested\",\"scope\":{\"requested\":{\"drawing_files\":[101],\"include_passive\":false,\"visibility\":\"api_select_all\"},\"included_files\":[{\"drawing_file\":101,\"state\":\"active_foreground\",\"write_eligibility\":\"not_checked\"}]},\"counts\":{\"raw_adapters_visited\":26,\"in_scope_adapters\":26,\"matched_model_identities\":12,\"nonmatching_model_identities\":0,\"predicate_not_checked\":0,\"identity_not_checked\":0,\"conflicting_model_identities\":0,\"duplicate_representations\":12,\"file_identity_not_checked\":0,\"file_state_conflicts\":0,\"hierarchy_not_checked\":0,\"stale_adapters_skipped\":0,\"non_component_adapters\":2},\"ref\":{\"query_session_id\":\"a28291f98e354d06b62220c95d01056c\",\"project_key\":\"7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f\",\"document_id\":0,\"drawing_file\":101,\"model_uuid\":\"06d71e4d-193b-483e-8a32-344ade3d612c\",\"type_uuid\":\"ec7f50b0-1a27-49d6-b6a2-007b854513c7\",\"durable_identity_verified\":false,\"component_kind\":\"semantic_component\"},\"attributes\":[{\"attribute_id\":120,\"name\":{\"status\":\"observed\",\"value\":\"Rodzaj rozliczenia\"},\"name_id_round_trip\":{\"status\":\"observed\",\"value\":120},\"value\":\"m2\",\"type\":{\"status\":\"observed\",\"value\":69},\"supported_scalar_value_types\":[]}],\"total_matches\":1,\"offset\":0,\"adapter_attribute_consistency\":\"consistent\",\"adapter_attribute_representation_count\":4,\"total_matches_status\":\"observed\",\"next_offset\":null,\"listing_complete\":true,\"metadata_complete\":true,\"metadata_not_checked_count\":0,\"filter_unknown_name_count\":0,\"presence_semantics\":\"values_present_in_ReadAll_only; omissions_unknown\",\"writable\":\"not_established\",\"enum_values\":\"not_read\",\"filter\":{\"name_contains\":\"Rodzaj rozliczenia\",\"case_sensitive\":false},\"probe_fingerprint\":\"25a1135a2f043ab363e474167d618f8f7a1bf5e1a91f064669f61d7b4b1f35f9\",\"request_id\":\"36dd5137-ccef-45d8-a39a-08dfec58ad42\",\"host_session_id\":\"5617b71e-4283-4da4-b3b4-7e97a02a9a50\"}"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": "m4-property-probe-1",
+        "phase": "element_attributes",
+        "probe_id": "64a029ef092e4d3f8c5a4444b78243fa",
+        "read_only": true,
+        "model_data_changed": false,
+        "usable_for_write": false,
+        "runtime_verified": false,
+        "status": "ready_for_isolated_owner_probe",
+        "trace_file": "Local/.allplan-mcp/logs/m4-native-probe.jsonl",
+        "native_calls_not_automatically_retried": true,
+        "native_selection": "not_requested",
+        "scope": {
+          "requested": {
+            "drawing_files": [
+              101
+            ],
+            "include_passive": false,
+            "visibility": "api_select_all"
+          },
+          "included_files": [
+            {
+              "drawing_file": 101,
+              "state": "active_foreground",
+              "write_eligibility": "not_checked"
+            }
+          ]
+        },
+        "counts": {
+          "raw_adapters_visited": 26,
+          "in_scope_adapters": 26,
+          "matched_model_identities": 12,
+          "nonmatching_model_identities": 0,
+          "predicate_not_checked": 0,
+          "identity_not_checked": 0,
+          "conflicting_model_identities": 0,
+          "duplicate_representations": 12,
+          "file_identity_not_checked": 0,
+          "file_state_conflicts": 0,
+          "hierarchy_not_checked": 0,
+          "stale_adapters_skipped": 0,
+          "non_component_adapters": 2
+        },
+        "ref": {
+          "query_session_id": "a28291f98e354d06b62220c95d01056c",
+          "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+          "document_id": 0,
+          "drawing_file": 101,
+          "model_uuid": "06d71e4d-193b-483e-8a32-344ade3d612c",
+          "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+          "durable_identity_verified": false,
+          "component_kind": "semantic_component"
+        },
+        "attributes": [
+          {
+            "attribute_id": 120,
+            "name": {
+              "status": "observed",
+              "value": "Rodzaj rozliczenia"
+            },
+            "name_id_round_trip": {
+              "status": "observed",
+              "value": 120
+            },
+            "value": "m2",
+            "type": {
+              "status": "observed",
+              "value": 69
+            },
+            "supported_scalar_value_types": []
+          }
+        ],
+        "total_matches": 1,
+        "offset": 0,
+        "adapter_attribute_consistency": "consistent",
+        "adapter_attribute_representation_count": 4,
+        "total_matches_status": "observed",
+        "next_offset": null,
+        "listing_complete": true,
+        "metadata_complete": true,
+        "metadata_not_checked_count": 0,
+        "filter_unknown_name_count": 0,
+        "presence_semantics": "values_present_in_ReadAll_only; omissions_unknown",
+        "writable": "not_established",
+        "enum_values": "not_read",
+        "filter": {
+          "name_contains": "Rodzaj rozliczenia",
+          "case_sensitive": false
+        },
+        "probe_fingerprint": "25a1135a2f043ab363e474167d618f8f7a1bf5e1a91f064669f61d7b4b1f35f9",
+        "request_id": "36dd5137-ccef-45d8-a39a-08dfec58ad42",
+        "host_session_id": "5617b71e-4283-4da4-b3b4-7e97a02a9a50"
+      },
+      "isError": false
+    }
+  }
+}

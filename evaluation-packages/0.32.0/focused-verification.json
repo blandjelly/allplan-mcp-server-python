@@ -1,0 +1,102 @@
+{
+  "candidate": "0.32.0",
+  "source_branch": "fix/m4-material-metadata-0.32.0",
+  "base_commit": "1a4da74ee1e250e0ca95b549c59f6c3ee789f02e",
+  "tested_source_commit": null,
+  "source_commit_note": "No candidate commit existed when these checks ran. Results apply to the uncommitted 0.32.0 working tree based on base_commit.",
+  "source_worktree": "contains candidate source, tests, and documentation changes",
+  "scope": "focused Wall native-material preservation and ownership regressions, HTTP contracts, attribute evidence, dependent edit and ownership checks, and package version-lock agreement",
+  "environment": {
+    "python": "3.12.14",
+    "environment": "repository .venv",
+    "http_loopback": "permission enabled for focused HTTP checks"
+  },
+  "result": "passed",
+  "unique_tests_passed": 132,
+  "unique_test_id_count": 132,
+  "duplicate_test_ids": 0,
+  "counting_method": "Union of test IDs from the final focused module runs below. The seven HTTP checks comprise three Wall material tests and four component identity/attribute evidence tests. Repeated executions during iteration are not counted again.",
+  "groups": [
+    {
+      "name": "Wall material edit and preservation",
+      "tests": 32,
+      "result": "passed",
+      "command": ".venv/bin/python -m unittest discover -s tests -p 'test_wall_material_edit.py' -v"
+    },
+    {
+      "name": "Wall material and component identity HTTP contracts",
+      "tests": 7,
+      "result": "passed",
+      "command": "PYTHONPATH=tests .venv/bin/python -m unittest test_wall_material_http test_component_identity_http -v",
+      "http_loopback_permission": true
+    },
+    {
+      "name": "Component ownership and attribute evidence",
+      "tests": 26,
+      "result": "passed",
+      "command": ".venv/bin/python -m unittest discover -s tests -p 'test_component_identity.py' -v"
+    },
+    {
+      "name": "Model edit dependencies",
+      "tests": 37,
+      "result": "passed",
+      "command": ".venv/bin/python -m unittest discover -s tests -p 'test_model_edit.py' -v"
+    },
+    {
+      "name": "Native model edit dependencies",
+      "tests": 13,
+      "result": "passed",
+      "command": ".venv/bin/python -m unittest discover -s tests -p 'test_native_model_edit.py' -v"
+    },
+    {
+      "name": "Edit ownership dependencies",
+      "tests": 11,
+      "result": "passed",
+      "command": ".venv/bin/python -m unittest discover -s tests -p 'test_edit_ownership.py' -v"
+    },
+    {
+      "name": "Attribute codec dependencies",
+      "tests": 5,
+      "result": "passed",
+      "command": ".venv/bin/python -m unittest discover -s tests -p 'test_attribute_codecs.py' -v"
+    },
+    {
+      "name": "Package version and lock agreement",
+      "tests": 1,
+      "result": "passed",
+      "command": "PYTHONPATH=tests .venv/bin/python -m unittest test_package.PackageTests.test_version_and_lock_agree -v"
+    }
+  ],
+  "coverage_note": "Material regressions verify direct AttributeContainer leaves with bounded stored-value snapshots, iteration-only native child collections, logical identity across repeated alternate tier wrappers, drift conflicts, post-write unknown outcomes without replayed setters, and bounded failure evidence for tier lineage and child-owner mismatches. Component identity tests confirm evidence is omitted from unrelated failures. These are fake SDK and HTTP contract results, not Allplan acceptance.",
+  "non_counted_attempts": [
+    {
+      "command": "UV_CACHE_DIR=/tmp/uv-cache uv run --frozen python -m unittest discover -s tests -p 'test_wall_material_edit.py' -v",
+      "result": "could not start",
+      "reason": "uv attempted to fetch hatchling==1.28.0 from PyPI, but network access was unavailable; the existing repository .venv was used for test runs."
+    },
+    {
+      "command": ".venv/bin/python -m unittest discover -s tests -p 'test_wall_material_http.py' -v",
+      "result": "setup errors",
+      "reason": "The sandbox denied local loopback socket binding. The focused HTTP suites passed when rerun with loopback permission enabled."
+    },
+    {
+      "command": ".venv/bin/python -m unittest discover -s tests -p 'test_package.py' -v",
+      "result": "3 passed, 1 failed",
+      "reason": "The version agreement check caught the source package version still at 0.31.0 while pyproject.toml was being bumped to 0.32.0. The targeted version-and-lock check passed after the source version update."
+    },
+    {
+      "command": ".venv/bin/python -m unittest discover -s tests -p 'test_wall_material_edit.py' -v",
+      "result": "intermediate regression-test failures",
+      "reason": "Early drafts asserted fixed native enumeration call counts and changed wrappers on every scan, which caused expected plan drift in the fake setup. The tests were corrected to model repeated alternate wrappers consistently; the final material module passed 32 tests."
+    },
+    {
+      "command": ".venv/bin/python -m unittest discover -s tests -p 'test_component_identity.py' -v",
+      "result": "one intermediate assertion failure",
+      "reason": "The existing exact diagnostic comparison did not allow the newly added bounded owner evidence. The assertion now checks stable diagnostic fields and evidence separately; the final module passed 26 tests."
+    }
+  ],
+  "full_local_suite": "not_run",
+  "full_ci": "not_run",
+  "package_build": "not_run",
+  "native_allplan": "not_run"
+}

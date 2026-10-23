@@ -386,7 +386,7 @@ class WallMaterialEditTests(unittest.TestCase):
         self.assertEqual(set_properties.call_count, 0)
         self.native.base.ModifyElements.assert_not_called()
 
-    def test_tier_with_child_is_blocked_as_unpreserved_hierarchy(self):
+    def test_tier_with_unknown_child_is_blocked_as_unpreserved_hierarchy(self):
         tier_child = self.native.element(21, name="WallTierFace_TypeUUID")
         self.native.children[id(self.tier)] = [tier_child]
         self.native.parents[id(tier_child)] = self.tier
@@ -401,8 +401,286 @@ class WallMaterialEditTests(unittest.TestCase):
                        if item["field"] == "wall.native_material")
         self.assertEqual(blocker["reason"], "native_material_preservation_unavailable")
         self.assertEqual(blocker["observation"]["reason"],
-                         "wall_material_tier_hierarchy_unsupported")
-        self.assertEqual(blocker["observation"]["diagnostic"]["stage"], "material_tier_hierarchy")
+                         "wall_material_tier_child_unsupported")
+        self.assertEqual(blocker["observation"]["diagnostic"]["stage"], "material_tier_children")
+        self.native.base.ModifyElements.assert_not_called()
+
+    def test_tier_lineage_blocker_includes_bounded_identity_and_child_evidence(self):
+        bad_tier = self.native.element(27, name="WallTier_TypeUUID", solid=Polyhedron())
+        foreign_wall = self.alternate_wall_view(28)
+        foreign_wall.GetModelElementUUID.return_value = (
+            self.native.element(29).GetModelElementUUID.return_value)
+        self.native.parents[id(bad_tier)] = foreign_wall
+        self.native.parents[id(foreign_wall)] = self.native.adapter_module.BaseElementAdapterParentElementService.GetParentElement(
+            self.root)
+        descendants = [self.native.element(40 + index, name="Unknown_TypeUUID") for index in range(9)]
+        self.native.children[id(bad_tier)] = descendants
+        for child in descendants:
+            self.native.parents[id(child)] = bad_tier
+
+        child_service = self.native.adapter_module.BaseElementAdapterChildElementsService
+        original = child_service.GetChildModelElements
+        self.addCleanup(setattr, child_service, "GetChildModelElements", original)
+        root_reads = [0]
+
+        def enumerate_children(adapter, include_hidden):
+            if adapter is self.root:
+                root_reads[0] += 1
+                return [self.tier] if root_reads[0] == 1 else [bad_tier]
+            return original(adapter, include_hidden)
+
+        child_service.GetChildModelElements = enumerate_children
+        module = importlib.import_module(self.native.module.__package__ + ".wall_material")
+        _, preservation_state, preservation = module.preview_observation(self.native.base, self.root)
+
+        self.assertIsNone(preservation_state)
+        self.assertEqual(preservation["reason"], "wall_material_tier_hierarchy_unsupported")
+        evidence = preservation["diagnostic"]["evidence"]
+        self.assertEqual(evidence["selected_wall"]["model_uuid"],
+                         self.root.GetModelElementUUID.return_value)
+        self.assertEqual(evidence["tier_lineage"][1]["model_uuid"],
+                         foreign_wall.GetModelElementUUID.return_value)
+        self.assertEqual(evidence["tier_child_count"], 9)
+        self.assertEqual(len(evidence["tier_children_sample"]), 8)
+        self.native.base.ModifyElements.assert_not_called()
+
+    def test_tier_attribute_container_leaf_is_bound_with_raw_stored_values(self):
+        self.native.base.eAttibuteReadState.ReadAll = "ReadAll"
+        container = self.native.element(21, name="AttributeContainer_TypeUUID")
+        container.GetAttributes.return_value = [(120, "m3"), (1371, 0), (1500, [1, 2.5])]
+        self.native.children[id(self.tier)] = [container]
+        self.native.parents[id(container)] = self.tier
+        self.native.base.ElementsSelectService.SelectAllElements.return_value = [
+            self.root, self.tier, container]
+
+        plan = self.preview()
+
+        self.assertTrue(plan["apply_available"], plan)
+        state = plan["changes"][0]["resource"]["wall_material_state"]
+        self.assertEqual(len(state["tier_attribute_containers"]), 1)
+        evidence = state["tier_attribute_containers"][0]
+        self.assertEqual(evidence["ownership"]["target"]["type_name"], "AttributeContainer_TypeUUID")
+        self.assertEqual(evidence["ownership"]["lineage"][1]["model_uuid"],
+                         self.tier.GetModelElementUUID.return_value)
+        self.assertEqual([row["attribute_id"] for row in evidence["stored_attributes"]], [120, 1371, 1500])
+        self.assertEqual(evidence["stored_attributes"][0]["value"], "m3")
+        self.assertEqual(evidence["stored_attributes"][2]["value"], [1, 2.5])
+
+        self.native.base.ElementsSelectService.SelectAllElements.assert_called()
+        self.native.highlight(plan)
+        result = self.native.apply(plan)
+        self.assertEqual(result["state"], "completed", result)
+        self.native.base.ModifyElements.assert_called_once()
+
+    def test_attribute_container_collection_only_needs_iteration(self):
+        self.native.base.eAttibuteReadState.ReadAll = "ReadAll"
+        container = self.native.element(21, name="AttributeContainer_TypeUUID")
+        container.GetAttributes.return_value = [(120, "m3")]
+        self.native.children[id(self.tier)] = [container]
+        self.native.parents[id(container)] = self.tier
+        self.native.base.ElementsSelectService.SelectAllElements.return_value = [
+            self.root, self.tier, container]
+        child_service = self.native.adapter_module.BaseElementAdapterChildElementsService
+        original = child_service.GetChildModelElements
+        self.addCleanup(setattr, child_service, "GetChildModelElements", original)
+        tier_reads = [0]
+
+        class IterationOnlyCollection:
+            def __iter__(self):
+                return iter([container])
+
+        def enumerate_children(adapter, include_hidden):
+            if adapter is self.tier:
+                tier_reads[0] += 1
+                if tier_reads[0] == 2:
+                    return IterationOnlyCollection()
+            return original(adapter, include_hidden)
+
+        child_service.GetChildModelElements = enumerate_children
+        plan = self.preview()
+
+        self.assertTrue(plan["apply_available"], plan)
+        self.assertGreaterEqual(tier_reads[0], 2)
+        self.assertEqual(len(plan["changes"][0]["resource"]["wall_material_state"][
+            "tier_attribute_containers"]), 1)
+        self.native.base.ModifyElements.assert_not_called()
+
+    def test_repeated_tier_enumeration_accepts_same_model_alternate_wrapper(self):
+        alternate = self.native.element(21, name="WallTier_TypeUUID", solid=Polyhedron())
+        alternate.GetDrawingfileNumber.return_value = self.tier.GetDrawingfileNumber.return_value
+        alternate.GetModelElementUUID.return_value = self.tier.GetModelElementUUID.return_value
+        alternate.GetElementAdapterType.return_value.GetGuid.return_value = (
+            self.tier.GetElementAdapterType.return_value.GetGuid.return_value)
+        alternate.GetModelGeometry.return_value = self.tier.GetModelGeometry.return_value
+        self.native.parents[id(alternate)] = self.root
+        self.native.base.ElementsSelectService.SelectAllElements.return_value = [self.root]
+        child_service = self.native.adapter_module.BaseElementAdapterChildElementsService
+        original = child_service.GetChildModelElements
+        self.addCleanup(setattr, child_service, "GetChildModelElements", original)
+        root_reads = [0]
+
+        def enumerate_children(adapter, include_hidden):
+            if adapter is self.root:
+                root_reads[0] += 1
+                return [self.tier] if root_reads[0] % 2 == 1 else [alternate]
+            return original(adapter, include_hidden)
+
+        child_service.GetChildModelElements = enumerate_children
+        plan = self.preview()
+
+        self.assertTrue(plan["apply_available"], plan)
+        bound_child = plan["changes"][0]["resource"]["wall_material_state"][
+            "hierarchy"]["children"][0]
+        self.assertEqual(bound_child["view_uuid"], self.tier.GetElementUUID.return_value)
+        self.assertNotEqual(bound_child["view_uuid"], alternate.GetElementUUID.return_value)
+        self.native.highlight(plan)
+        result = self.native.apply(plan, uuid4().hex)
+        self.assertEqual(result["state"], "completed", result)
+        self.assertEqual(self.material, "C35/45")
+        self.native.base.ModifyElements.assert_called_once()
+
+    def test_tier_attribute_container_unknown_value_remains_blocked(self):
+        self.native.base.eAttibuteReadState.ReadAll = "ReadAll"
+        container = self.native.element(21, name="AttributeContainer_TypeUUID")
+        container.GetAttributes.return_value = [(120, object())]
+        self.native.children[id(self.tier)] = [container]
+        self.native.parents[id(container)] = self.tier
+        self.native.base.ElementsSelectService.SelectAllElements.return_value = [
+            self.root, self.tier, container]
+
+        plan = self.preview()
+
+        self.assertFalse(plan["apply_available"], plan)
+        self.assertFalse(plan["changes"], plan)
+        self.assertEqual(plan["blocked"][0]["reason"], "native_material_preservation_unavailable")
+        self.assertEqual(plan["blocked"][0]["observation"]["diagnostic"]["stage"],
+                         "material_attribute_container_values")
+        self.native.base.ModifyElements.assert_not_called()
+
+    def test_tier_metadata_container_identity_or_value_drift_conflicts_before_modify(self):
+        self.native.base.eAttibuteReadState.ReadAll = "ReadAll"
+        container = self.native.element(21, name="AttributeContainer_TypeUUID")
+        container.GetAttributes.return_value = [(120, "m3")]
+        self.native.children[id(self.tier)] = [container]
+        self.native.parents[id(container)] = self.tier
+        self.native.base.ElementsSelectService.SelectAllElements.return_value = [self.root, self.tier, container]
+
+        for drift in ("identity", "value"):
+            with self.subTest(drift=drift):
+                plan = self.preview()
+                self.assertTrue(plan["apply_available"], plan)
+                self.native.highlight(plan)
+                if drift == "identity":
+                    replacement = self.native.element(22, name="AttributeContainer_TypeUUID")
+                    replacement.GetAttributes.return_value = [(120, "m3")]
+                    self.native.parents[id(replacement)] = self.tier
+                    self.native.children[id(self.tier)] = [replacement]
+                else:
+                    container.GetAttributes.return_value = [(120, "m4")]
+                self.native.assert_code("repair_conflict", lambda: self.native.apply(plan))
+                self.native.base.ModifyElements.assert_not_called()
+                self.native.children[id(self.tier)] = [container]
+                container.GetAttributes.return_value = [(120, "m3")]
+
+    def test_tier_metadata_lineage_accepts_same_model_parent_view(self):
+        self.native.base.eAttibuteReadState.ReadAll = "ReadAll"
+        container = self.native.element(21, name="AttributeContainer_TypeUUID")
+        container.GetAttributes.return_value = [(120, "m3")]
+        tier_view = self.native.element(22, name="WallTier_TypeUUID")
+        tier_view.GetDrawingfileNumber.return_value = self.tier.GetDrawingfileNumber.return_value
+        tier_view.GetModelElementUUID.return_value = self.tier.GetModelElementUUID.return_value
+        tier_view.GetElementAdapterType.return_value.GetTypeName.return_value = "WallTier_TypeUUID"
+        tier_view.GetElementAdapterType.return_value.GetGuid.return_value = (
+            self.tier.GetElementAdapterType.return_value.GetGuid.return_value)
+        self.native.parents[id(tier_view)] = self.root
+        self.native.children[id(self.tier)] = [container]
+        self.native.parents[id(container)] = tier_view
+        self.native.base.ElementsSelectService.SelectAllElements.return_value = [self.root, self.tier, container]
+
+        plan = self.preview()
+
+        self.assertTrue(plan["apply_available"], plan)
+        lineage = plan["changes"][0]["resource"]["wall_material_state"][
+            "tier_attribute_containers"][0]["ownership"]["lineage"]
+        self.assertEqual(len(lineage), 3)
+        self.assertEqual(lineage[1]["model_uuid"], self.tier.GetModelElementUUID.return_value)
+        self.assertNotEqual(lineage[1]["view_uuid"], self.tier.GetElementUUID.return_value)
+
+    def test_material_metadata_drift_after_modify_is_unknown_and_replay_never_repeats_modify(self):
+        self.native.base.eAttibuteReadState.ReadAll = "ReadAll"
+        container = self.native.element(21, name="AttributeContainer_TypeUUID")
+        container.GetAttributes.return_value = [(120, "m3")]
+        self.native.children[id(self.tier)] = [container]
+        self.native.parents[id(container)] = self.tier
+        self.native.base.ElementsSelectService.SelectAllElements.return_value = [self.root, self.tier, container]
+
+        def modify_and_change_metadata(doc, elements):
+            self.properties = copy.deepcopy(elements[0].Properties)
+            self.material = self.properties.GetWallTierProperties(1).Material
+            container.GetAttributes.return_value = [(120, "m4")]
+
+        self.native.base.ModifyElements.side_effect = modify_and_change_metadata
+        plan = self.preview()
+        self.assertTrue(plan["apply_available"], plan)
+        self.native.highlight(plan)
+        execution_id = uuid4().hex
+
+        result = self.native.apply(plan, execution_id)
+
+        self.assertEqual(result["outcomes"][0]["state"], "unknown")
+        self.assertEqual(self.material, "C35/45")
+        self.assertTrue(self.native.apply(plan, execution_id)["replayed"])
+        self.assertEqual(self.native.base.ModifyElements.call_count, 1)
+
+    def test_nested_metadata_children_block_and_invalid_attribute_snapshots_fail_closed(self):
+        self.native.base.eAttibuteReadState.ReadAll = "ReadAll"
+        container = self.native.element(21, name="AttributeContainer_TypeUUID")
+        container.GetAttributes.return_value = [(120, "m3")]
+        self.native.children[id(self.tier)] = [container]
+        self.native.parents[id(container)] = self.tier
+        nested = self.native.element(22, name="WindowDoor_TypeUUID")
+        self.native.children[id(container)] = [nested]
+        self.native.parents[id(nested)] = container
+        self.native.base.ElementsSelectService.SelectAllElements.return_value = [
+            self.root, self.tier, container, nested]
+
+        plan = self.preview()
+
+        self.assertFalse(plan["apply_available"], plan)
+        blocker = next(item for item in plan["blocked"] if item["field"] == "wall.native_material")
+        self.assertEqual(blocker["observation"]["reason"],
+                         "wall_material_attribute_container_hierarchy_unsupported")
+        self.native.base.ModifyElements.assert_not_called()
+
+        self.native.children[id(container)] = []
+        for values in (((120, "first"), (120, "duplicate")), ((True, "boolean id"),),
+                       ((120, object()),)):
+            with self.subTest(values=values):
+                container.GetAttributes.return_value = list(values)
+                invalid = self.preview()
+                self.assertFalse(invalid["apply_available"], invalid)
+                blocker = next(item for item in invalid["blocked"]
+                               if item["field"] == "wall.native_material")
+                self.assertEqual(blocker["observation"]["diagnostic"]["stage"],
+                                 "material_attribute_container_values")
+                self.native.base.ModifyElements.assert_not_called()
+
+    def test_attribute_container_snapshot_budget_fails_before_modify(self):
+        self.native.base.eAttibuteReadState.ReadAll = "ReadAll"
+        container = self.native.element(21, name="AttributeContainer_TypeUUID")
+        container.GetAttributes.return_value = [(ident, "x" * 8192) for ident in range(1, 40)]
+        self.native.children[id(self.tier)] = [container]
+        self.native.parents[id(container)] = self.tier
+        self.native.base.ElementsSelectService.SelectAllElements.return_value = [
+            self.root, self.tier, container]
+
+        plan = self.preview()
+
+        self.assertFalse(plan["apply_available"], plan)
+        blocker = next(item for item in plan["blocked"] if item["field"] == "wall.native_material")
+        self.assertEqual(blocker["observation"]["reason"], "wall_material_attribute_snapshot_limit")
+        self.assertEqual(blocker["observation"]["diagnostic"]["stage"],
+                         "material_attribute_container_values")
         self.native.base.ModifyElements.assert_not_called()
 
     def test_changed_wall_child_enumeration_between_reads_blocks_before_modify(self):

@@ -6,6 +6,37 @@ and target pull requests to `develop/m4`. Main remains separate. Read
 implementation. The policy is the source of truth for automated checks and
 package builds.
 
+## Candidate under evaluation: 0.32.0 — bounded tier attribute preservation
+
+Candidate 0.32.0 extends the guarded native material snapshot for a single-tier
+Wall. It allows direct `AttributeContainer_TypeUUID` leaves under the tier
+only when each container has a fully checked container → tier → Wall lineage.
+It captures all stored `ReadAll` attribute values using bounded JSON codecs and
+rechecks container identity and values through the existing preservation,
+revalidation and readback flow. The snapshot does not authorize attribute
+writes or prove field ownership. Unsupported child types, nested children,
+unknown/oversized values, openings and other Wall children remain blocked.
+
+Focused fake-adapter checks reproduce the former blanket rejection of all tier
+children and exercise the bounded container path. They do not prove that this
+was the cause of the 0.31.0 native `wall_material_tier_hierarchy_unsupported`
+diagnostic. The 200 mm opening `component_child_owner_mismatch` remains
+unresolved and outside this change. Automated verification, candidate
+provenance and native acceptance are pending; no CI or package result is
+claimed here. The only planned native trial is the original 240 mm Wall
+material path. If blocked, preserve the first reason/stage and obtain fresh
+`component_identity` for the Wall and exact tier; if ready, perform one
+Apply/readback/UI Undo cycle. Do not repeat previously accepted Enum, journal,
+scalar, or grouped Column delete/Undo trials. Boolean/CheckBox has only a
+documented post-Undo read without raw Apply evidence; do not repeat that read
+as an accepted trial. A blocked owner diagnostic may carry bounded
+`diagnostic.evidence`; retain it for read-only identity follow-up, without
+repeating the 200 mm material preview or any write. See
+the [0.32.0 API note](m4-editing-api-0.32.0.md),
+[single-path trial](m4-single-drawing-0.32.0.pl.md), and the
+[scoped 0.31.0 observation](test-results/m4-owner-observation-0.31.0-2026-10-24.md).
+Priorities 1–5 remain open beyond their already accepted scopes.
+
 ## Latest completed candidate: 0.30.0 — full CI and exact ZIP verification passed
 
 Source commit
@@ -104,9 +135,32 @@ files, 43 bridge hashes, SHA-256
 [checksum](../evaluation-packages/0.31.0/allplan-mcp-0.31.0-windows-evaluation.zip.sha256),
 [build log](../evaluation-packages/0.31.0/build.log) and
 [CI provenance](../evaluation-packages/0.31.0/source-ci.json).
-Native trial remains pending. See the [0.31.0 API note](m4-editing-api-0.31.0.md)
-and the [one-path native trial plan](m4-single-drawing-0.31.0.pl.md). Do not repeat the accepted
-0.30.0 trials 1–3/5 or the 0.29.0 grouped Column delete/Undo.
+
+The owner later supplied a 0.31.0 session log from Allplan 2026.1, active
+drawing 101 on a project copy. A 240 mm Wall preview to `Silikat` was blocked
+by `wall_material_tier_hierarchy_unsupported`; a 200 mm Wall preview to
+`Silikat` was blocked by `component_child_owner_mismatch`. Both were before
+Apply with no changes and zero setters. The material trial therefore failed to
+reach Apply. The conversation lacks raw MCP responses and the installed
+package manifest/checksum, so these are scoped observations, not exact-ZIP
+acceptance. See the [0.31.0 owner observation](test-results/m4-owner-observation-0.31.0-2026-10-24.md)
+and [verbatim evidence copies](test-results/evidence/0.31.0-2026-10-24/).
+
+The same session has a recorded Apply/readback and owner-confirmed UI Undo for
+Wall Enum attribute 120 (`m3` → `m2` → `m3`), with four consistent
+representations. This is a scoped native observation for that Enum pair only;
+execution metadata still says `allplan_acceptance=not_run` and
+`runtime_verified=false`. Boolean/CheckBox attribute 1371 has a raw post-Undo
+readback of its original value 0 and SDK type 73, but no raw Apply record. The
+read-only Slab/MultiSlab probe reports `evidence_complete=false` for Slab and
+`true` for MultiSlab; property ownership remains `not_established` for both,
+and no write was performed. Beam, Door, Enum Status, and date/vector cases
+remain blocked or fixture-missing as recorded in the observation.
+
+The 0.31.0 native material fix remains unverified and blocked by these observed
+diagnostics; do not claim priorities 1–5 are closed. See the [0.31.0 API note](m4-editing-api-0.31.0.md)
+and the [one-path native trial plan](m4-single-drawing-0.31.0.pl.md). Do not
+repeat the accepted 0.30.0 trials 1–3/5 or the 0.29.0 grouped Column delete/Undo.
 
 ## Retained candidate: 0.29.0 — CI and exact fallback ZIP verification passed
 

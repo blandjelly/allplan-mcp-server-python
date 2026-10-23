@@ -33,16 +33,20 @@ def model_identity_key(ref):
 
 class ComponentReadError(ValueError):
     """Bounded failure labels; native exception messages never enter reports."""
-    def __init__(self, stage, reason, error_type="ValueError"):
+    def __init__(self, stage, reason, error_type="ValueError", *, evidence=None):
         super().__init__(reason)
         self.stage, self.reason, self.error_type = stage, reason, error_type
+        self.evidence = evidence
 
 
 def failure(exc, stage="component_ownership"):
-    return {"status": "not_checked", "value": None,
+    result = {"status": "not_checked", "value": None,
             "reason": exc.reason if isinstance(exc, ComponentReadError) else type(exc).__name__,
             "diagnostic": {"stage": exc.stage if isinstance(exc, ComponentReadError) else stage,
                            "error_type": exc.error_type if isinstance(exc, ComponentReadError) else type(exc).__name__}}
+    if isinstance(exc, ComponentReadError) and exc.evidence is not None:
+        result["diagnostic"]["evidence"] = exc.evidence
+    return result
 
 
 def observe(adapter, check=lambda: None, *, include_children=True):
@@ -92,10 +96,12 @@ def observe(adapter, check=lambda: None, *, include_children=True):
             parent = read("child_parent", lambda: adapters.BaseElementAdapterParentElementService.GetParentElement(child))
             retained.append(parent)
             if read("child_parent", lambda: boolean(parent.IsNull())):
-                raise ComponentReadError("child_parent_identity", "component_child_owner_mismatch")
+                raise ComponentReadError("child_parent_identity", "component_child_owner_mismatch",
+                                         evidence={"target": target, "child": child_ref, "observed_parent": None})
             parent_ref = read("child_parent_identity", lambda: identity(parent))
             if not same_model_identity(parent_ref, target) or model_identity_key(child_ref) in seen:
-                raise ComponentReadError("child_parent_identity", "component_child_owner_mismatch")
+                raise ComponentReadError("child_parent_identity", "component_child_owner_mismatch",
+                                         evidence={"target": target, "child": child_ref, "observed_parent": parent_ref})
             child_key = model_identity_key(child_ref)
             if child_key in child_models:
                 raise ComponentReadError("child_identity", "component_child_identity_ambiguous")

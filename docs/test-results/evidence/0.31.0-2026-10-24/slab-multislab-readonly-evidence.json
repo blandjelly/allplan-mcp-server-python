@@ -1,0 +1,2146 @@
+{
+  "schema": "slab-multislab-readonly-evidence-1",
+  "active_scope": {
+    "drawing_file": 101,
+    "state": "active_foreground"
+  },
+  "evidence_calls": {
+    "slab_attribute_evidence": {
+      "request": {
+        "phase": "attribute_evidence",
+        "drawing_file": 101,
+        "model_uuid": "8a693925-ae20-4dda-91d1-3951af3c0a52",
+        "view_uuid": "d947addb-95fd-410b-a320-5c9ee0af72eb",
+        "attribute_ids": [
+          10,
+          12,
+          45,
+          49,
+          110,
+          111,
+          112,
+          113,
+          114,
+          115,
+          118,
+          120,
+          133,
+          169,
+          171,
+          209
+        ],
+        "include_parent": true
+      },
+      "response": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"schema_version\":\"m4-property-probe-1\",\"phase\":\"attribute_evidence\",\"probe_id\":\"b76823373c6640649f204c6bcbaa76c0\",\"read_only\":true,\"model_data_changed\":false,\"usable_for_write\":false,\"runtime_verified\":false,\"status\":\"ready_for_isolated_owner_probe\",\"trace_file\":\"Local/.allplan-mcp/logs/m4-native-probe.jsonl\",\"native_calls_not_automatically_retried\":true,\"native_selection\":\"not_requested\",\"state\":\"not_checked\",\"evidence_complete\":false,\"scope\":{\"requested\":{\"drawing_files\":[101],\"include_passive\":false,\"visibility\":\"api_select_all\"},\"included_files\":[{\"drawing_file\":101,\"state\":\"active_foreground\",\"write_eligibility\":\"not_checked\"}]},\"ref\":{\"query_session_id\":\"a28291f98e354d06b62220c95d01056c\",\"project_key\":\"7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f\",\"document_id\":0,\"drawing_file\":101,\"model_uuid\":\"8a693925-ae20-4dda-91d1-3951af3c0a52\",\"type_uuid\":\"48722469-d049-4617-b171-4286eb0037c5\",\"durable_identity_verified\":false,\"component_kind\":\"model_identity\"},\"view_uuid\":\"d947addb-95fd-410b-a320-5c9ee0af72eb\",\"attribute_ids\":[10,12,45,49,110,111,112,113,114,115,118,120,133,169,171,209],\"metadata\":[{\"attribute_id\":10,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"String\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":12,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Integer\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":45,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Integer\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":49,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Enum\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":110,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Integer\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":111,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Integer\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":112,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Double\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":113,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Double\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":114,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Integer\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":115,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Integer\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":118,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Integer\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":120,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Enum\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":133,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Integer\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":169,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Double\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":171,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Integer\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":209,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Enum\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}}],\"representations\":[{\"target\":{\"status\":\"observed\",\"value\":{\"ref\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8a693925-ae20-4dda-91d1-3951af3c0a52\",\"view_uuid\":\"d947addb-95fd-410b-a320-5c9ee0af72eb\",\"type_name\":\"Slab_TypeUUID\",\"type_uuid\":\"48722469-d049-4617-b171-4286eb0037c5\"},\"ancestry\":{\"status\":\"observed\",\"value\":{\"schema_version\":\"m4-component-ownership-1\",\"target\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8a693925-ae20-4dda-91d1-3951af3c0a52\",\"view_uuid\":\"d947addb-95fd-410b-a320-5c9ee0af72eb\",\"type_name\":\"Slab_TypeUUID\",\"type_uuid\":\"48722469-d049-4617-b171-4286eb0037c5\"},\"lineage\":[{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8a693925-ae20-4dda-91d1-3951af3c0a52\",\"view_uuid\":\"d947addb-95fd-410b-a320-5c9ee0af72eb\",\"type_name\":\"Slab_TypeUUID\",\"type_uuid\":\"48722469-d049-4617-b171-4286eb0037c5\"},{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"}],\"terminal_root\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"},\"parent_chain_complete\":true,\"children_complete\":false,\"children\":[],\"child_parent_edges\":[],\"property_owner\":\"not_established\",\"physical_target_equivalence\":\"not_established\"}},\"children\":{\"status\":\"observed\",\"value\":{\"schema_version\":\"m4-component-ownership-1\",\"target\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8a693925-ae20-4dda-91d1-3951af3c0a52\",\"view_uuid\":\"d947addb-95fd-410b-a320-5c9ee0af72eb\",\"type_name\":\"Slab_TypeUUID\",\"type_uuid\":\"48722469-d049-4617-b171-4286eb0037c5\"},\"lineage\":[{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8a693925-ae20-4dda-91d1-3951af3c0a52\",\"view_uuid\":\"d947addb-95fd-410b-a320-5c9ee0af72eb\",\"type_name\":\"Slab_TypeUUID\",\"type_uuid\":\"48722469-d049-4617-b171-4286eb0037c5\"},{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"}],\"terminal_root\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"},\"parent_chain_complete\":true,\"children_complete\":true,\"children\":[{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"e96d6e4a-6f89-45ad-b0a7-7e06ea20840a\",\"view_uuid\":\"e96d6e4a-6f89-45ad-b0a7-7e06ea20840a\",\"type_name\":\"AttributeContainer_TypeUUID\",\"type_uuid\":\"572686a1-0ae5-4d22-88d1-35eeaea3f234\"}],\"child_parent_edges\":[{\"child\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"e96d6e4a-6f89-45ad-b0a7-7e06ea20840a\",\"view_uuid\":\"e96d6e4a-6f89-45ad-b0a7-7e06ea20840a\",\"type_name\":\"AttributeContainer_TypeUUID\",\"type_uuid\":\"572686a1-0ae5-4d22-88d1-35eeaea3f234\"},\"parent\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8a693925-ae20-4dda-91d1-3951af3c0a52\",\"view_uuid\":\"a0fcd7b3-85c8-4f83-99b7-59e8a3463c94\",\"type_name\":\"Slab_TypeUUID\",\"type_uuid\":\"48722469-d049-4617-b171-4286eb0037c5\"}}],\"property_owner\":\"not_established\",\"physical_target_equivalence\":\"not_established\"}},\"native_representation\":{\"status\":\"observed\",\"value\":{\"module\":\"NemAll_Python_ArchElements\",\"name\":\"SlabElement\"}},\"read_modes\":{\"ReadAll\":{\"status\":\"observed\",\"value\":[{\"attribute_id\":10,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"0101Str0000000024\",\"encoding\":\"json_scalar\"},{\"attribute_id\":12,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":24,\"encoding\":\"json_scalar\"},{\"attribute_id\":45,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":1,\"encoding\":\"json_scalar\"},{\"attribute_id\":49,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"Nowo projektowane\",\"encoding\":\"json_scalar\"},{\"attribute_id\":110,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":200,\"encoding\":\"json_scalar\"},{\"attribute_id\":111,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":403,\"encoding\":\"json_scalar\"},{\"attribute_id\":112,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"float\"},\"status\":\"observed\",\"value\":2300.0000000000005,\"encoding\":\"json_scalar\"},{\"attribute_id\":113,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"float\"},\"status\":\"observed\",\"value\":0.0,\"encoding\":\"json_scalar\"},{\"attribute_id\":114,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":21,\"encoding\":\"json_scalar\"},{\"attribute_id\":115,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":0,\"encoding\":\"json_scalar\"},{\"attribute_id\":118,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":1,\"encoding\":\"json_scalar\"},{\"attribute_id\":120,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"m2\",\"encoding\":\"json_scalar\"},{\"attribute_id\":133,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":0,\"encoding\":\"json_scalar\"},{\"attribute_id\":169,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"float\"},\"status\":\"observed\",\"value\":0.0,\"encoding\":\"json_scalar\"},{\"attribute_id\":171,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":0,\"encoding\":\"json_scalar\"},{\"attribute_id\":209,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"\",\"encoding\":\"json_scalar\"}]},\"ReadAllAndComputable\":{\"status\":\"observed\",\"value\":[{\"attribute_id\":10,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"0101Str0000000024\",\"encoding\":\"json_scalar\"},{\"attribute_id\":12,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":24,\"encoding\":\"json_scalar\"},{\"attribute_id\":45,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":1,\"encoding\":\"json_scalar\"},{\"attribute_id\":49,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"Nowo projektowane\",\"encoding\":\"json_scalar\"},{\"attribute_id\":110,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":200,\"encoding\":\"json_scalar\"},{\"attribute_id\":111,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":403,\"encoding\":\"json_scalar\"},{\"attribute_id\":112,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"float\"},\"status\":\"observed\",\"value\":2300.0000000000005,\"encoding\":\"json_scalar\"},{\"attribute_id\":113,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"float\"},\"status\":\"observed\",\"value\":0.0,\"encoding\":\"json_scalar\"},{\"attribute_id\":114,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":21,\"encoding\":\"json_scalar\"},{\"attribute_id\":115,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":0,\"encoding\":\"json_scalar\"},{\"attribute_id\":118,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":1,\"encoding\":\"json_scalar\"},{\"attribute_id\":120,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"m2\",\"encoding\":\"json_scalar\"},{\"attribute_id\":133,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":0,\"encoding\":\"json_scalar\"},{\"attribute_id\":169,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"float\"},\"status\":\"observed\",\"value\":0.0,\"encoding\":\"json_scalar\"},{\"attribute_id\":171,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":0,\"encoding\":\"json_scalar\"},{\"attribute_id\":209,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"\",\"encoding\":\"json_scalar\"}]}},\"property_owner\":\"not_established\",\"setter_payload\":\"not_established\"}},\"parent\":{\"status\":\"observed\",\"value\":{\"parent_present\":true,\"evidence\":{\"ref\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"},\"ancestry\":{\"status\":\"observed\",\"value\":{\"schema_version\":\"m4-component-ownership-1\",\"target\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"},\"lineage\":[{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"}],\"terminal_root\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"},\"parent_chain_complete\":true,\"children_complete\":false,\"children\":[],\"child_parent_edges\":[],\"property_owner\":\"not_established\",\"physical_target_equivalence\":\"not_established\"}},\"children\":{\"status\":\"observed\",\"value\":{\"schema_version\":\"m4-component-ownership-1\",\"target\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"},\"lineage\":[{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"}],\"terminal_root\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"},\"parent_chain_complete\":true,\"children_complete\":true,\"children\":[{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8a693925-ae20-4dda-91d1-3951af3c0a52\",\"view_uuid\":\"a0fcd7b3-85c8-4f83-99b7-59e8a3463c94\",\"type_name\":\"Slab_TypeUUID\",\"type_uuid\":\"48722469-d049-4617-b171-4286eb0037c5\"},{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"ec4a96fc-3087-48af-b9d4-7ec9fdae0603\",\"view_uuid\":\"ec4a96fc-3087-48af-b9d4-7ec9fdae0603\",\"type_name\":\"AttributeContainer_TypeUUID\",\"type_uuid\":\"572686a1-0ae5-4d22-88d1-35eeaea3f234\"}],\"child_parent_edges\":[{\"child\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"ec4a96fc-3087-48af-b9d4-7ec9fdae0603\",\"view_uuid\":\"ec4a96fc-3087-48af-b9d4-7ec9fdae0603\",\"type_name\":\"AttributeContainer_TypeUUID\",\"type_uuid\":\"572686a1-0ae5-4d22-88d1-35eeaea3f234\"},\"parent\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"}},{\"child\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8a693925-ae20-4dda-91d1-3951af3c0a52\",\"view_uuid\":\"a0fcd7b3-85c8-4f83-99b7-59e8a3463c94\",\"type_name\":\"Slab_TypeUUID\",\"type_uuid\":\"48722469-d049-4617-b171-4286eb0037c5\"},\"parent\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"}}],\"property_owner\":\"not_established\",\"physical_target_equivalence\":\"not_established\"}},\"native_representation\":{\"status\":\"observed\",\"value\":{\"module\":\"NemAll_Python_ArchElements\",\"name\":\"SlabElement\"}},\"read_modes\":{\"ReadAll\":{\"status\":\"observed\",\"value\":[{\"attribute_id\":10,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"0101TSl0000000023\",\"encoding\":\"json_scalar\"},{\"attribute_id\":12,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":23,\"encoding\":\"json_scalar\"},{\"attribute_id\":45,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":49,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"<niezdefiniowany>\",\"encoding\":\"json_scalar\"},{\"attribute_id\":110,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":200,\"encoding\":\"json_scalar\"},{\"attribute_id\":111,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":112,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":113,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":114,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":115,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":118,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":120,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"m3\",\"encoding\":\"json_scalar\"},{\"attribute_id\":133,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":169,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":171,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":209,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false}]},\"ReadAllAndComputable\":{\"status\":\"observed\",\"value\":[{\"attribute_id\":10,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"0101TSl0000000023\",\"encoding\":\"json_scalar\"},{\"attribute_id\":12,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":23,\"encoding\":\"json_scalar\"},{\"attribute_id\":45,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":49,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"<niezdefiniowany>\",\"encoding\":\"json_scalar\"},{\"attribute_id\":110,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":200,\"encoding\":\"json_scalar\"},{\"attribute_id\":111,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":112,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":113,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":114,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":115,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":118,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":120,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"m3\",\"encoding\":\"json_scalar\"},{\"attribute_id\":133,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":169,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":171,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false},{\"attribute_id\":209,\"status\":\"not_returned\",\"value\":null,\"absence_proven\":false}]}},\"property_owner\":\"not_established\",\"setter_payload\":\"not_established\"}}}}],\"representation_count\":1,\"representation_consensus\":true,\"source_fingerprint\":\"e31c0043c15482580039611e94c8f96410187aa57201a38140d92de3e6146b50\",\"presence_semantics\":\"read_modes_separate; ReadAll_omission_does_not_prove_absence\",\"property_write_available\":false,\"property_owner\":\"not_established\",\"date_vector_setter_available\":false,\"setter_calls_started\":0,\"bounds_used_for_identity\":false,\"physical_target_equivalence\":\"not_established\",\"probe_fingerprint\":\"b2576cfef7d7a79c221f8da2287d6621e09deaef98b1c18d7adb66c84d687f98\",\"request_id\":\"e6d65530-8b44-4702-8f1a-b1c2d7f04c39\",\"host_session_id\":\"5617b71e-4283-4da4-b3b4-7e97a02a9a50\"}"
+          }
+        ],
+        "structuredContent": {
+          "schema_version": "m4-property-probe-1",
+          "phase": "attribute_evidence",
+          "probe_id": "b76823373c6640649f204c6bcbaa76c0",
+          "read_only": true,
+          "model_data_changed": false,
+          "usable_for_write": false,
+          "runtime_verified": false,
+          "status": "ready_for_isolated_owner_probe",
+          "trace_file": "Local/.allplan-mcp/logs/m4-native-probe.jsonl",
+          "native_calls_not_automatically_retried": true,
+          "native_selection": "not_requested",
+          "state": "not_checked",
+          "evidence_complete": false,
+          "scope": {
+            "requested": {
+              "drawing_files": [
+                101
+              ],
+              "include_passive": false,
+              "visibility": "api_select_all"
+            },
+            "included_files": [
+              {
+                "drawing_file": 101,
+                "state": "active_foreground",
+                "write_eligibility": "not_checked"
+              }
+            ]
+          },
+          "ref": {
+            "query_session_id": "a28291f98e354d06b62220c95d01056c",
+            "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+            "document_id": 0,
+            "drawing_file": 101,
+            "model_uuid": "8a693925-ae20-4dda-91d1-3951af3c0a52",
+            "type_uuid": "48722469-d049-4617-b171-4286eb0037c5",
+            "durable_identity_verified": false,
+            "component_kind": "model_identity"
+          },
+          "view_uuid": "d947addb-95fd-410b-a320-5c9ee0af72eb",
+          "attribute_ids": [
+            10,
+            12,
+            45,
+            49,
+            110,
+            111,
+            112,
+            113,
+            114,
+            115,
+            118,
+            120,
+            133,
+            169,
+            171,
+            209
+          ],
+          "metadata": [
+            {
+              "attribute_id": 10,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "String"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 12,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Integer"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 45,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Integer"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 49,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Enum"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 110,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Integer"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 111,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Integer"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 112,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Double"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 113,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Double"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 114,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Integer"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 115,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Integer"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 118,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Integer"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 120,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Enum"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 133,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Integer"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 169,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Double"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 171,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Integer"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 209,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Enum"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            }
+          ],
+          "representations": [
+            {
+              "target": {
+                "status": "observed",
+                "value": {
+                  "ref": {
+                    "drawing_file": 101,
+                    "signed_drawing_file": 101,
+                    "model_uuid": "8a693925-ae20-4dda-91d1-3951af3c0a52",
+                    "view_uuid": "d947addb-95fd-410b-a320-5c9ee0af72eb",
+                    "type_name": "Slab_TypeUUID",
+                    "type_uuid": "48722469-d049-4617-b171-4286eb0037c5"
+                  },
+                  "ancestry": {
+                    "status": "observed",
+                    "value": {
+                      "schema_version": "m4-component-ownership-1",
+                      "target": {
+                        "drawing_file": 101,
+                        "signed_drawing_file": 101,
+                        "model_uuid": "8a693925-ae20-4dda-91d1-3951af3c0a52",
+                        "view_uuid": "d947addb-95fd-410b-a320-5c9ee0af72eb",
+                        "type_name": "Slab_TypeUUID",
+                        "type_uuid": "48722469-d049-4617-b171-4286eb0037c5"
+                      },
+                      "lineage": [
+                        {
+                          "drawing_file": 101,
+                          "signed_drawing_file": 101,
+                          "model_uuid": "8a693925-ae20-4dda-91d1-3951af3c0a52",
+                          "view_uuid": "d947addb-95fd-410b-a320-5c9ee0af72eb",
+                          "type_name": "Slab_TypeUUID",
+                          "type_uuid": "48722469-d049-4617-b171-4286eb0037c5"
+                        },
+                        {
+                          "drawing_file": 101,
+                          "signed_drawing_file": 101,
+                          "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                          "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                          "type_name": "MultiSlab_TypeUUID",
+                          "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                        }
+                      ],
+                      "terminal_root": {
+                        "drawing_file": 101,
+                        "signed_drawing_file": 101,
+                        "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                        "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                        "type_name": "MultiSlab_TypeUUID",
+                        "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                      },
+                      "parent_chain_complete": true,
+                      "children_complete": false,
+                      "children": [],
+                      "child_parent_edges": [],
+                      "property_owner": "not_established",
+                      "physical_target_equivalence": "not_established"
+                    }
+                  },
+                  "children": {
+                    "status": "observed",
+                    "value": {
+                      "schema_version": "m4-component-ownership-1",
+                      "target": {
+                        "drawing_file": 101,
+                        "signed_drawing_file": 101,
+                        "model_uuid": "8a693925-ae20-4dda-91d1-3951af3c0a52",
+                        "view_uuid": "d947addb-95fd-410b-a320-5c9ee0af72eb",
+                        "type_name": "Slab_TypeUUID",
+                        "type_uuid": "48722469-d049-4617-b171-4286eb0037c5"
+                      },
+                      "lineage": [
+                        {
+                          "drawing_file": 101,
+                          "signed_drawing_file": 101,
+                          "model_uuid": "8a693925-ae20-4dda-91d1-3951af3c0a52",
+                          "view_uuid": "d947addb-95fd-410b-a320-5c9ee0af72eb",
+                          "type_name": "Slab_TypeUUID",
+                          "type_uuid": "48722469-d049-4617-b171-4286eb0037c5"
+                        },
+                        {
+                          "drawing_file": 101,
+                          "signed_drawing_file": 101,
+                          "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                          "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                          "type_name": "MultiSlab_TypeUUID",
+                          "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                        }
+                      ],
+                      "terminal_root": {
+                        "drawing_file": 101,
+                        "signed_drawing_file": 101,
+                        "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                        "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                        "type_name": "MultiSlab_TypeUUID",
+                        "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                      },
+                      "parent_chain_complete": true,
+                      "children_complete": true,
+                      "children": [
+                        {
+                          "drawing_file": 101,
+                          "signed_drawing_file": 101,
+                          "model_uuid": "e96d6e4a-6f89-45ad-b0a7-7e06ea20840a",
+                          "view_uuid": "e96d6e4a-6f89-45ad-b0a7-7e06ea20840a",
+                          "type_name": "AttributeContainer_TypeUUID",
+                          "type_uuid": "572686a1-0ae5-4d22-88d1-35eeaea3f234"
+                        }
+                      ],
+                      "child_parent_edges": [
+                        {
+                          "child": {
+                            "drawing_file": 101,
+                            "signed_drawing_file": 101,
+                            "model_uuid": "e96d6e4a-6f89-45ad-b0a7-7e06ea20840a",
+                            "view_uuid": "e96d6e4a-6f89-45ad-b0a7-7e06ea20840a",
+                            "type_name": "AttributeContainer_TypeUUID",
+                            "type_uuid": "572686a1-0ae5-4d22-88d1-35eeaea3f234"
+                          },
+                          "parent": {
+                            "drawing_file": 101,
+                            "signed_drawing_file": 101,
+                            "model_uuid": "8a693925-ae20-4dda-91d1-3951af3c0a52",
+                            "view_uuid": "a0fcd7b3-85c8-4f83-99b7-59e8a3463c94",
+                            "type_name": "Slab_TypeUUID",
+                            "type_uuid": "48722469-d049-4617-b171-4286eb0037c5"
+                          }
+                        }
+                      ],
+                      "property_owner": "not_established",
+                      "physical_target_equivalence": "not_established"
+                    }
+                  },
+                  "native_representation": {
+                    "status": "observed",
+                    "value": {
+                      "module": "NemAll_Python_ArchElements",
+                      "name": "SlabElement"
+                    }
+                  },
+                  "read_modes": {
+                    "ReadAll": {
+                      "status": "observed",
+                      "value": [
+                        {
+                          "attribute_id": 10,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "0101Str0000000024",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 12,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 24,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 45,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 1,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 49,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "Nowo projektowane",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 110,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 200,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 111,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 403,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 112,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "float"
+                          },
+                          "status": "observed",
+                          "value": 2300.0000000000005,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 113,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "float"
+                          },
+                          "status": "observed",
+                          "value": 0,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 114,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 21,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 115,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 0,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 118,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 1,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 120,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "m2",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 133,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 0,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 169,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "float"
+                          },
+                          "status": "observed",
+                          "value": 0,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 171,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 0,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 209,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "",
+                          "encoding": "json_scalar"
+                        }
+                      ]
+                    },
+                    "ReadAllAndComputable": {
+                      "status": "observed",
+                      "value": [
+                        {
+                          "attribute_id": 10,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "0101Str0000000024",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 12,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 24,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 45,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 1,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 49,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "Nowo projektowane",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 110,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 200,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 111,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 403,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 112,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "float"
+                          },
+                          "status": "observed",
+                          "value": 2300.0000000000005,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 113,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "float"
+                          },
+                          "status": "observed",
+                          "value": 0,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 114,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 21,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 115,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 0,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 118,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 1,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 120,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "m2",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 133,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 0,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 169,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "float"
+                          },
+                          "status": "observed",
+                          "value": 0,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 171,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 0,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 209,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "",
+                          "encoding": "json_scalar"
+                        }
+                      ]
+                    }
+                  },
+                  "property_owner": "not_established",
+                  "setter_payload": "not_established"
+                }
+              },
+              "parent": {
+                "status": "observed",
+                "value": {
+                  "parent_present": true,
+                  "evidence": {
+                    "ref": {
+                      "drawing_file": 101,
+                      "signed_drawing_file": 101,
+                      "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                      "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                      "type_name": "MultiSlab_TypeUUID",
+                      "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                    },
+                    "ancestry": {
+                      "status": "observed",
+                      "value": {
+                        "schema_version": "m4-component-ownership-1",
+                        "target": {
+                          "drawing_file": 101,
+                          "signed_drawing_file": 101,
+                          "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                          "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                          "type_name": "MultiSlab_TypeUUID",
+                          "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                        },
+                        "lineage": [
+                          {
+                            "drawing_file": 101,
+                            "signed_drawing_file": 101,
+                            "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                            "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                            "type_name": "MultiSlab_TypeUUID",
+                            "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                          }
+                        ],
+                        "terminal_root": {
+                          "drawing_file": 101,
+                          "signed_drawing_file": 101,
+                          "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                          "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                          "type_name": "MultiSlab_TypeUUID",
+                          "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                        },
+                        "parent_chain_complete": true,
+                        "children_complete": false,
+                        "children": [],
+                        "child_parent_edges": [],
+                        "property_owner": "not_established",
+                        "physical_target_equivalence": "not_established"
+                      }
+                    },
+                    "children": {
+                      "status": "observed",
+                      "value": {
+                        "schema_version": "m4-component-ownership-1",
+                        "target": {
+                          "drawing_file": 101,
+                          "signed_drawing_file": 101,
+                          "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                          "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                          "type_name": "MultiSlab_TypeUUID",
+                          "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                        },
+                        "lineage": [
+                          {
+                            "drawing_file": 101,
+                            "signed_drawing_file": 101,
+                            "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                            "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                            "type_name": "MultiSlab_TypeUUID",
+                            "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                          }
+                        ],
+                        "terminal_root": {
+                          "drawing_file": 101,
+                          "signed_drawing_file": 101,
+                          "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                          "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                          "type_name": "MultiSlab_TypeUUID",
+                          "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                        },
+                        "parent_chain_complete": true,
+                        "children_complete": true,
+                        "children": [
+                          {
+                            "drawing_file": 101,
+                            "signed_drawing_file": 101,
+                            "model_uuid": "8a693925-ae20-4dda-91d1-3951af3c0a52",
+                            "view_uuid": "a0fcd7b3-85c8-4f83-99b7-59e8a3463c94",
+                            "type_name": "Slab_TypeUUID",
+                            "type_uuid": "48722469-d049-4617-b171-4286eb0037c5"
+                          },
+                          {
+                            "drawing_file": 101,
+                            "signed_drawing_file": 101,
+                            "model_uuid": "ec4a96fc-3087-48af-b9d4-7ec9fdae0603",
+                            "view_uuid": "ec4a96fc-3087-48af-b9d4-7ec9fdae0603",
+                            "type_name": "AttributeContainer_TypeUUID",
+                            "type_uuid": "572686a1-0ae5-4d22-88d1-35eeaea3f234"
+                          }
+                        ],
+                        "child_parent_edges": [
+                          {
+                            "child": {
+                              "drawing_file": 101,
+                              "signed_drawing_file": 101,
+                              "model_uuid": "ec4a96fc-3087-48af-b9d4-7ec9fdae0603",
+                              "view_uuid": "ec4a96fc-3087-48af-b9d4-7ec9fdae0603",
+                              "type_name": "AttributeContainer_TypeUUID",
+                              "type_uuid": "572686a1-0ae5-4d22-88d1-35eeaea3f234"
+                            },
+                            "parent": {
+                              "drawing_file": 101,
+                              "signed_drawing_file": 101,
+                              "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                              "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                              "type_name": "MultiSlab_TypeUUID",
+                              "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                            }
+                          },
+                          {
+                            "child": {
+                              "drawing_file": 101,
+                              "signed_drawing_file": 101,
+                              "model_uuid": "8a693925-ae20-4dda-91d1-3951af3c0a52",
+                              "view_uuid": "a0fcd7b3-85c8-4f83-99b7-59e8a3463c94",
+                              "type_name": "Slab_TypeUUID",
+                              "type_uuid": "48722469-d049-4617-b171-4286eb0037c5"
+                            },
+                            "parent": {
+                              "drawing_file": 101,
+                              "signed_drawing_file": 101,
+                              "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                              "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                              "type_name": "MultiSlab_TypeUUID",
+                              "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                            }
+                          }
+                        ],
+                        "property_owner": "not_established",
+                        "physical_target_equivalence": "not_established"
+                      }
+                    },
+                    "native_representation": {
+                      "status": "observed",
+                      "value": {
+                        "module": "NemAll_Python_ArchElements",
+                        "name": "SlabElement"
+                      }
+                    },
+                    "read_modes": {
+                      "ReadAll": {
+                        "status": "observed",
+                        "value": [
+                          {
+                            "attribute_id": 10,
+                            "runtime_type": {
+                              "module": "builtins",
+                              "name": "str"
+                            },
+                            "status": "observed",
+                            "value": "0101TSl0000000023",
+                            "encoding": "json_scalar"
+                          },
+                          {
+                            "attribute_id": 12,
+                            "runtime_type": {
+                              "module": "builtins",
+                              "name": "int"
+                            },
+                            "status": "observed",
+                            "value": 23,
+                            "encoding": "json_scalar"
+                          },
+                          {
+                            "attribute_id": 45,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 49,
+                            "runtime_type": {
+                              "module": "builtins",
+                              "name": "str"
+                            },
+                            "status": "observed",
+                            "value": "<niezdefiniowany>",
+                            "encoding": "json_scalar"
+                          },
+                          {
+                            "attribute_id": 110,
+                            "runtime_type": {
+                              "module": "builtins",
+                              "name": "int"
+                            },
+                            "status": "observed",
+                            "value": 200,
+                            "encoding": "json_scalar"
+                          },
+                          {
+                            "attribute_id": 111,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 112,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 113,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 114,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 115,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 118,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 120,
+                            "runtime_type": {
+                              "module": "builtins",
+                              "name": "str"
+                            },
+                            "status": "observed",
+                            "value": "m3",
+                            "encoding": "json_scalar"
+                          },
+                          {
+                            "attribute_id": 133,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 169,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 171,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 209,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          }
+                        ]
+                      },
+                      "ReadAllAndComputable": {
+                        "status": "observed",
+                        "value": [
+                          {
+                            "attribute_id": 10,
+                            "runtime_type": {
+                              "module": "builtins",
+                              "name": "str"
+                            },
+                            "status": "observed",
+                            "value": "0101TSl0000000023",
+                            "encoding": "json_scalar"
+                          },
+                          {
+                            "attribute_id": 12,
+                            "runtime_type": {
+                              "module": "builtins",
+                              "name": "int"
+                            },
+                            "status": "observed",
+                            "value": 23,
+                            "encoding": "json_scalar"
+                          },
+                          {
+                            "attribute_id": 45,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 49,
+                            "runtime_type": {
+                              "module": "builtins",
+                              "name": "str"
+                            },
+                            "status": "observed",
+                            "value": "<niezdefiniowany>",
+                            "encoding": "json_scalar"
+                          },
+                          {
+                            "attribute_id": 110,
+                            "runtime_type": {
+                              "module": "builtins",
+                              "name": "int"
+                            },
+                            "status": "observed",
+                            "value": 200,
+                            "encoding": "json_scalar"
+                          },
+                          {
+                            "attribute_id": 111,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 112,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 113,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 114,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 115,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 118,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 120,
+                            "runtime_type": {
+                              "module": "builtins",
+                              "name": "str"
+                            },
+                            "status": "observed",
+                            "value": "m3",
+                            "encoding": "json_scalar"
+                          },
+                          {
+                            "attribute_id": 133,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 169,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 171,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          },
+                          {
+                            "attribute_id": 209,
+                            "status": "not_returned",
+                            "value": null,
+                            "absence_proven": false
+                          }
+                        ]
+                      }
+                    },
+                    "property_owner": "not_established",
+                    "setter_payload": "not_established"
+                  }
+                }
+              }
+            }
+          ],
+          "representation_count": 1,
+          "representation_consensus": true,
+          "source_fingerprint": "e31c0043c15482580039611e94c8f96410187aa57201a38140d92de3e6146b50",
+          "presence_semantics": "read_modes_separate; ReadAll_omission_does_not_prove_absence",
+          "property_write_available": false,
+          "property_owner": "not_established",
+          "date_vector_setter_available": false,
+          "setter_calls_started": 0,
+          "bounds_used_for_identity": false,
+          "physical_target_equivalence": "not_established",
+          "probe_fingerprint": "b2576cfef7d7a79c221f8da2287d6621e09deaef98b1c18d7adb66c84d687f98",
+          "request_id": "e6d65530-8b44-4702-8f1a-b1c2d7f04c39",
+          "host_session_id": "5617b71e-4283-4da4-b3b4-7e97a02a9a50"
+        },
+        "isError": false
+      }
+    },
+    "multislab_attribute_evidence": {
+      "request": {
+        "phase": "attribute_evidence",
+        "drawing_file": 101,
+        "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+        "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+        "attribute_ids": [
+          10,
+          12,
+          49,
+          110,
+          120,
+          222,
+          223,
+          230,
+          498,
+          507,
+          508,
+          573,
+          618,
+          683,
+          684,
+          935
+        ],
+        "include_parent": true
+      },
+      "response": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"schema_version\":\"m4-property-probe-1\",\"phase\":\"attribute_evidence\",\"probe_id\":\"0ec9a3f4d1a442f195f6486709a5d5e5\",\"read_only\":true,\"model_data_changed\":false,\"usable_for_write\":false,\"runtime_verified\":false,\"status\":\"ready_for_isolated_owner_probe\",\"trace_file\":\"Local/.allplan-mcp/logs/m4-native-probe.jsonl\",\"native_calls_not_automatically_retried\":true,\"native_selection\":\"not_requested\",\"state\":\"observed\",\"evidence_complete\":true,\"scope\":{\"requested\":{\"drawing_files\":[101],\"include_passive\":false,\"visibility\":\"api_select_all\"},\"included_files\":[{\"drawing_file\":101,\"state\":\"active_foreground\",\"write_eligibility\":\"not_checked\"}]},\"ref\":{\"query_session_id\":\"a28291f98e354d06b62220c95d01056c\",\"project_key\":\"7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f\",\"document_id\":0,\"drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\",\"durable_identity_verified\":false,\"component_kind\":\"model_identity\"},\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"attribute_ids\":[10,12,49,110,120,222,223,230,498,507,508,573,618,683,684,935],\"metadata\":[{\"attribute_id\":10,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"String\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":12,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Integer\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":49,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Enum\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":110,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Integer\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":120,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Enum\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":222,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Double\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":223,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Double\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":230,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Double\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":498,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"String\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":507,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"String\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":508,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"String\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":573,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Integer\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":618,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"Enum\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":683,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"String\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":684,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"String\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}},{\"attribute_id\":935,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"String\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}}}],\"representations\":[{\"target\":{\"status\":\"observed\",\"value\":{\"ref\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"},\"ancestry\":{\"status\":\"observed\",\"value\":{\"schema_version\":\"m4-component-ownership-1\",\"target\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"},\"lineage\":[{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"}],\"terminal_root\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"},\"parent_chain_complete\":true,\"children_complete\":false,\"children\":[],\"child_parent_edges\":[],\"property_owner\":\"not_established\",\"physical_target_equivalence\":\"not_established\"}},\"children\":{\"status\":\"observed\",\"value\":{\"schema_version\":\"m4-component-ownership-1\",\"target\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"},\"lineage\":[{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"}],\"terminal_root\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"},\"parent_chain_complete\":true,\"children_complete\":true,\"children\":[{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8a693925-ae20-4dda-91d1-3951af3c0a52\",\"view_uuid\":\"a0fcd7b3-85c8-4f83-99b7-59e8a3463c94\",\"type_name\":\"Slab_TypeUUID\",\"type_uuid\":\"48722469-d049-4617-b171-4286eb0037c5\"},{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"ec4a96fc-3087-48af-b9d4-7ec9fdae0603\",\"view_uuid\":\"ec4a96fc-3087-48af-b9d4-7ec9fdae0603\",\"type_name\":\"AttributeContainer_TypeUUID\",\"type_uuid\":\"572686a1-0ae5-4d22-88d1-35eeaea3f234\"}],\"child_parent_edges\":[{\"child\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"ec4a96fc-3087-48af-b9d4-7ec9fdae0603\",\"view_uuid\":\"ec4a96fc-3087-48af-b9d4-7ec9fdae0603\",\"type_name\":\"AttributeContainer_TypeUUID\",\"type_uuid\":\"572686a1-0ae5-4d22-88d1-35eeaea3f234\"},\"parent\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"}},{\"child\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8a693925-ae20-4dda-91d1-3951af3c0a52\",\"view_uuid\":\"a0fcd7b3-85c8-4f83-99b7-59e8a3463c94\",\"type_name\":\"Slab_TypeUUID\",\"type_uuid\":\"48722469-d049-4617-b171-4286eb0037c5\"},\"parent\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"bf097d95-8275-4229-ac74-27bbea26c211\",\"view_uuid\":\"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9\",\"type_name\":\"MultiSlab_TypeUUID\",\"type_uuid\":\"40910db6-25b8-43e3-8704-8bbf285143aa\"}}],\"property_owner\":\"not_established\",\"physical_target_equivalence\":\"not_established\"}},\"native_representation\":{\"status\":\"observed\",\"value\":{\"module\":\"NemAll_Python_ArchElements\",\"name\":\"SlabElement\"}},\"read_modes\":{\"ReadAll\":{\"status\":\"observed\",\"value\":[{\"attribute_id\":10,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"0101TSl0000000023\",\"encoding\":\"json_scalar\"},{\"attribute_id\":12,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":23,\"encoding\":\"json_scalar\"},{\"attribute_id\":49,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"<niezdefiniowany>\",\"encoding\":\"json_scalar\"},{\"attribute_id\":110,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":200,\"encoding\":\"json_scalar\"},{\"attribute_id\":120,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"m3\",\"encoding\":\"json_scalar\"},{\"attribute_id\":222,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"float\"},\"status\":\"observed\",\"value\":0.2,\"encoding\":\"json_scalar\"},{\"attribute_id\":223,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"float\"},\"status\":\"observed\",\"value\":0.0,\"encoding\":\"json_scalar\"},{\"attribute_id\":230,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"float\"},\"status\":\"observed\",\"value\":1.0,\"encoding\":\"json_scalar\"},{\"attribute_id\":498,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"Cała płyta\",\"encoding\":\"json_scalar\"},{\"attribute_id\":507,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"\",\"encoding\":\"json_scalar\"},{\"attribute_id\":508,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"beton zbrojony\",\"encoding\":\"json_scalar\"},{\"attribute_id\":573,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":1,\"encoding\":\"json_scalar\"},{\"attribute_id\":618,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"<niezdefiniowany>\",\"encoding\":\"json_scalar\"},{\"attribute_id\":683,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"2qfPjRmAvC7frPtrTXEGwv\",\"encoding\":\"json_scalar\"},{\"attribute_id\":684,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"IfcSlab\",\"encoding\":\"json_scalar\"},{\"attribute_id\":935,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"<niezdefiniowany>\",\"encoding\":\"json_scalar\"}]},\"ReadAllAndComputable\":{\"status\":\"observed\",\"value\":[{\"attribute_id\":10,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"0101TSl0000000023\",\"encoding\":\"json_scalar\"},{\"attribute_id\":12,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":23,\"encoding\":\"json_scalar\"},{\"attribute_id\":49,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"<niezdefiniowany>\",\"encoding\":\"json_scalar\"},{\"attribute_id\":110,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":200,\"encoding\":\"json_scalar\"},{\"attribute_id\":120,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"m3\",\"encoding\":\"json_scalar\"},{\"attribute_id\":222,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"float\"},\"status\":\"observed\",\"value\":0.2,\"encoding\":\"json_scalar\"},{\"attribute_id\":223,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"float\"},\"status\":\"observed\",\"value\":0.0,\"encoding\":\"json_scalar\"},{\"attribute_id\":230,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"float\"},\"status\":\"observed\",\"value\":1.0,\"encoding\":\"json_scalar\"},{\"attribute_id\":498,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"Cała płyta\",\"encoding\":\"json_scalar\"},{\"attribute_id\":507,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"\",\"encoding\":\"json_scalar\"},{\"attribute_id\":508,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"beton zbrojony\",\"encoding\":\"json_scalar\"},{\"attribute_id\":573,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"int\"},\"status\":\"observed\",\"value\":1,\"encoding\":\"json_scalar\"},{\"attribute_id\":618,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"<niezdefiniowany>\",\"encoding\":\"json_scalar\"},{\"attribute_id\":683,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"2qfPjRmAvC7frPtrTXEGwv\",\"encoding\":\"json_scalar\"},{\"attribute_id\":684,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"IfcSlab\",\"encoding\":\"json_scalar\"},{\"attribute_id\":935,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"<niezdefiniowany>\",\"encoding\":\"json_scalar\"}]}},\"property_owner\":\"not_established\",\"setter_payload\":\"not_established\"}},\"parent\":{\"status\":\"observed\",\"value\":{\"parent_present\":false}}}],\"representation_count\":1,\"representation_consensus\":true,\"source_fingerprint\":\"e31c0043c15482580039611e94c8f96410187aa57201a38140d92de3e6146b50\",\"presence_semantics\":\"read_modes_separate; ReadAll_omission_does_not_prove_absence\",\"property_write_available\":false,\"property_owner\":\"not_established\",\"date_vector_setter_available\":false,\"setter_calls_started\":0,\"bounds_used_for_identity\":false,\"physical_target_equivalence\":\"not_established\",\"probe_fingerprint\":\"a98caf750f37bdaa9d541fc68513cdd790338ab6f2c01a08d50814fff8771f39\",\"request_id\":\"2ebdd289-ed47-4291-a89a-b56ff762e669\",\"host_session_id\":\"5617b71e-4283-4da4-b3b4-7e97a02a9a50\"}"
+          }
+        ],
+        "structuredContent": {
+          "schema_version": "m4-property-probe-1",
+          "phase": "attribute_evidence",
+          "probe_id": "0ec9a3f4d1a442f195f6486709a5d5e5",
+          "read_only": true,
+          "model_data_changed": false,
+          "usable_for_write": false,
+          "runtime_verified": false,
+          "status": "ready_for_isolated_owner_probe",
+          "trace_file": "Local/.allplan-mcp/logs/m4-native-probe.jsonl",
+          "native_calls_not_automatically_retried": true,
+          "native_selection": "not_requested",
+          "state": "observed",
+          "evidence_complete": true,
+          "scope": {
+            "requested": {
+              "drawing_files": [
+                101
+              ],
+              "include_passive": false,
+              "visibility": "api_select_all"
+            },
+            "included_files": [
+              {
+                "drawing_file": 101,
+                "state": "active_foreground",
+                "write_eligibility": "not_checked"
+              }
+            ]
+          },
+          "ref": {
+            "query_session_id": "a28291f98e354d06b62220c95d01056c",
+            "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+            "document_id": 0,
+            "drawing_file": 101,
+            "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+            "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa",
+            "durable_identity_verified": false,
+            "component_kind": "model_identity"
+          },
+          "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+          "attribute_ids": [
+            10,
+            12,
+            49,
+            110,
+            120,
+            222,
+            223,
+            230,
+            498,
+            507,
+            508,
+            573,
+            618,
+            683,
+            684,
+            935
+          ],
+          "metadata": [
+            {
+              "attribute_id": 10,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "String"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 12,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Integer"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 49,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Enum"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 110,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Integer"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 120,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Enum"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 222,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Double"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 223,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Double"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 230,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Double"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 498,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "String"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 507,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "String"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 508,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "String"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 573,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Integer"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 618,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "Enum"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 683,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "String"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 684,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "String"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            },
+            {
+              "attribute_id": 935,
+              "type_binding": {
+                "status": "observed",
+                "value": {
+                  "matching_sdk_members": [
+                    "String"
+                  ],
+                  "binding_status": "matched",
+                  "runtime_type": {
+                    "module": "NemAll_Python_BaseElements",
+                    "name": "AttributeType"
+                  },
+                  "writable_codec": "not_established"
+                }
+              }
+            }
+          ],
+          "representations": [
+            {
+              "target": {
+                "status": "observed",
+                "value": {
+                  "ref": {
+                    "drawing_file": 101,
+                    "signed_drawing_file": 101,
+                    "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                    "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                    "type_name": "MultiSlab_TypeUUID",
+                    "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                  },
+                  "ancestry": {
+                    "status": "observed",
+                    "value": {
+                      "schema_version": "m4-component-ownership-1",
+                      "target": {
+                        "drawing_file": 101,
+                        "signed_drawing_file": 101,
+                        "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                        "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                        "type_name": "MultiSlab_TypeUUID",
+                        "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                      },
+                      "lineage": [
+                        {
+                          "drawing_file": 101,
+                          "signed_drawing_file": 101,
+                          "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                          "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                          "type_name": "MultiSlab_TypeUUID",
+                          "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                        }
+                      ],
+                      "terminal_root": {
+                        "drawing_file": 101,
+                        "signed_drawing_file": 101,
+                        "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                        "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                        "type_name": "MultiSlab_TypeUUID",
+                        "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                      },
+                      "parent_chain_complete": true,
+                      "children_complete": false,
+                      "children": [],
+                      "child_parent_edges": [],
+                      "property_owner": "not_established",
+                      "physical_target_equivalence": "not_established"
+                    }
+                  },
+                  "children": {
+                    "status": "observed",
+                    "value": {
+                      "schema_version": "m4-component-ownership-1",
+                      "target": {
+                        "drawing_file": 101,
+                        "signed_drawing_file": 101,
+                        "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                        "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                        "type_name": "MultiSlab_TypeUUID",
+                        "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                      },
+                      "lineage": [
+                        {
+                          "drawing_file": 101,
+                          "signed_drawing_file": 101,
+                          "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                          "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                          "type_name": "MultiSlab_TypeUUID",
+                          "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                        }
+                      ],
+                      "terminal_root": {
+                        "drawing_file": 101,
+                        "signed_drawing_file": 101,
+                        "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                        "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                        "type_name": "MultiSlab_TypeUUID",
+                        "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                      },
+                      "parent_chain_complete": true,
+                      "children_complete": true,
+                      "children": [
+                        {
+                          "drawing_file": 101,
+                          "signed_drawing_file": 101,
+                          "model_uuid": "8a693925-ae20-4dda-91d1-3951af3c0a52",
+                          "view_uuid": "a0fcd7b3-85c8-4f83-99b7-59e8a3463c94",
+                          "type_name": "Slab_TypeUUID",
+                          "type_uuid": "48722469-d049-4617-b171-4286eb0037c5"
+                        },
+                        {
+                          "drawing_file": 101,
+                          "signed_drawing_file": 101,
+                          "model_uuid": "ec4a96fc-3087-48af-b9d4-7ec9fdae0603",
+                          "view_uuid": "ec4a96fc-3087-48af-b9d4-7ec9fdae0603",
+                          "type_name": "AttributeContainer_TypeUUID",
+                          "type_uuid": "572686a1-0ae5-4d22-88d1-35eeaea3f234"
+                        }
+                      ],
+                      "child_parent_edges": [
+                        {
+                          "child": {
+                            "drawing_file": 101,
+                            "signed_drawing_file": 101,
+                            "model_uuid": "ec4a96fc-3087-48af-b9d4-7ec9fdae0603",
+                            "view_uuid": "ec4a96fc-3087-48af-b9d4-7ec9fdae0603",
+                            "type_name": "AttributeContainer_TypeUUID",
+                            "type_uuid": "572686a1-0ae5-4d22-88d1-35eeaea3f234"
+                          },
+                          "parent": {
+                            "drawing_file": 101,
+                            "signed_drawing_file": 101,
+                            "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                            "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                            "type_name": "MultiSlab_TypeUUID",
+                            "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                          }
+                        },
+                        {
+                          "child": {
+                            "drawing_file": 101,
+                            "signed_drawing_file": 101,
+                            "model_uuid": "8a693925-ae20-4dda-91d1-3951af3c0a52",
+                            "view_uuid": "a0fcd7b3-85c8-4f83-99b7-59e8a3463c94",
+                            "type_name": "Slab_TypeUUID",
+                            "type_uuid": "48722469-d049-4617-b171-4286eb0037c5"
+                          },
+                          "parent": {
+                            "drawing_file": 101,
+                            "signed_drawing_file": 101,
+                            "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+                            "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9",
+                            "type_name": "MultiSlab_TypeUUID",
+                            "type_uuid": "40910db6-25b8-43e3-8704-8bbf285143aa"
+                          }
+                        }
+                      ],
+                      "property_owner": "not_established",
+                      "physical_target_equivalence": "not_established"
+                    }
+                  },
+                  "native_representation": {
+                    "status": "observed",
+                    "value": {
+                      "module": "NemAll_Python_ArchElements",
+                      "name": "SlabElement"
+                    }
+                  },
+                  "read_modes": {
+                    "ReadAll": {
+                      "status": "observed",
+                      "value": [
+                        {
+                          "attribute_id": 10,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "0101TSl0000000023",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 12,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 23,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 49,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "<niezdefiniowany>",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 110,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 200,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 120,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "m3",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 222,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "float"
+                          },
+                          "status": "observed",
+                          "value": 0.2,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 223,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "float"
+                          },
+                          "status": "observed",
+                          "value": 0,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 230,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "float"
+                          },
+                          "status": "observed",
+                          "value": 1,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 498,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "Cała płyta",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 507,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 508,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "beton zbrojony",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 573,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 1,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 618,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "<niezdefiniowany>",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 683,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "2qfPjRmAvC7frPtrTXEGwv",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 684,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "IfcSlab",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 935,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "<niezdefiniowany>",
+                          "encoding": "json_scalar"
+                        }
+                      ]
+                    },
+                    "ReadAllAndComputable": {
+                      "status": "observed",
+                      "value": [
+                        {
+                          "attribute_id": 10,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "0101TSl0000000023",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 12,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 23,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 49,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "<niezdefiniowany>",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 110,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 200,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 120,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "m3",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 222,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "float"
+                          },
+                          "status": "observed",
+                          "value": 0.2,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 223,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "float"
+                          },
+                          "status": "observed",
+                          "value": 0,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 230,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "float"
+                          },
+                          "status": "observed",
+                          "value": 1,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 498,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "Cała płyta",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 507,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 508,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "beton zbrojony",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 573,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "int"
+                          },
+                          "status": "observed",
+                          "value": 1,
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 618,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "<niezdefiniowany>",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 683,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "2qfPjRmAvC7frPtrTXEGwv",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 684,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "IfcSlab",
+                          "encoding": "json_scalar"
+                        },
+                        {
+                          "attribute_id": 935,
+                          "runtime_type": {
+                            "module": "builtins",
+                            "name": "str"
+                          },
+                          "status": "observed",
+                          "value": "<niezdefiniowany>",
+                          "encoding": "json_scalar"
+                        }
+                      ]
+                    }
+                  },
+                  "property_owner": "not_established",
+                  "setter_payload": "not_established"
+                }
+              },
+              "parent": {
+                "status": "observed",
+                "value": {
+                  "parent_present": false
+                }
+              }
+            }
+          ],
+          "representation_count": 1,
+          "representation_consensus": true,
+          "source_fingerprint": "e31c0043c15482580039611e94c8f96410187aa57201a38140d92de3e6146b50",
+          "presence_semantics": "read_modes_separate; ReadAll_omission_does_not_prove_absence",
+          "property_write_available": false,
+          "property_owner": "not_established",
+          "date_vector_setter_available": false,
+          "setter_calls_started": 0,
+          "bounds_used_for_identity": false,
+          "physical_target_equivalence": "not_established",
+          "probe_fingerprint": "a98caf750f37bdaa9d541fc68513cdd790338ab6f2c01a08d50814fff8771f39",
+          "request_id": "2ebdd289-ed47-4291-a89a-b56ff762e669",
+          "host_session_id": "5617b71e-4283-4da4-b3b4-7e97a02a9a50"
+        },
+        "isError": false
+      }
+    }
+  }
+}
