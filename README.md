@@ -5,7 +5,22 @@ audits and reviewed model edits. Current M4 development uses
 [`develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/tree/develop/m4);
 main remains separate.
 
-Latest completed candidate **0.30.0** is source commit
+Latest package-verified candidate **0.31.0** is source commit
+[`0f99863b7c11143d9f14ca12a1027aad5b009195`](https://github.com/blandjelly/allplan-mcp-server-python/commit/0f99863b7c11143d9f14ca12a1027aad5b009195)
+on `fix/m4-material-owner-0.31.0`, with [PR #29 to `develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/pull/29).
+It passed 87 unique focused checks and full
+[CI 40012042481](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40012042481):
+625 tests on Ubuntu Python 3.12.15 and 625 on Windows Python 3.12.10, plus the
+package job. The original CI artifact was unavailable, so one fallback ZIP
+built from clean exact source (`source_modified=false`) passed verification:
+201 payload files, 43 bridge hashes, SHA-256
+`4047e7bb58eff28c8f87fdc488d0e787ad1a048cf05aae7b7d537646826fbbcb`. Native
+Allplan material trial remains pending. See the [0.31.0 evaluation record](evaluation-packages/0.31.0/README.md),
+[verified ZIP](evaluation-packages/0.31.0/allplan-mcp-0.31.0-windows-evaluation.zip),
+[ZIP verification](evaluation-packages/0.31.0/package-verification.json) and
+[source CI provenance](evaluation-packages/0.31.0/source-ci.json).
+
+Retained completed candidate **0.30.0** is source commit
 `9966c31fc1b79b0ed7c2061d671dafa3f1f2e8d6` on
 `feat/m4-combined-evidence-0.30.0`, with [PR #28 targeting `develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/pull/28).
 It passed 142 unique focused checks and full
@@ -30,14 +45,10 @@ manifest, so outcomes are not attributed to that exact ZIP. See the
 [trial 5 log](docs/test-results/evidence/0.30.0-2026-10-23/allplan-attribute-trials-log.md),
 [development plan](docs/office-editing-development-plan.pl.md), and
 [current handoff](docs/next-model-handoff.md). Priorities 1–5 remain partial.
-Current candidate work is on `fix/m4-material-owner-0.31.0`. It compares the
-Wall tier parent by same-model identity while preserving the actual observed
-parent wrapper in the material snapshot; exact target view binding and strict
-single-tier/no-opening guards remain. **87 unique focused checks passed**: 86
-affected/dependent checks and one package version/lock check. Full CI, package
-build and native Allplan trial are pending. See the
-[focused verification record](evaluation-packages/0.31.0/focused-verification.json). The opening case's
-`component_child_owner_mismatch` cause remains unresolved. See the
+The 0.31.0 material fix preserves the selected Wall's exact target binding and
+strict single-tier/no-opening guards. Its focused parent-wrapper regression
+passes, while the 0.30.0 opening case's `component_child_owner_mismatch`
+remains unresolved. Native Allplan material acceptance is pending. See the
 [0.31.0 API note](docs/m4-editing-api-0.31.0.md) and
 [bounded native trial plan](docs/m4-single-drawing-0.31.0.pl.md). Earlier scoped
 observations are indexed in [validation status](docs/validation-status.md).
@@ -65,8 +76,9 @@ remaining development gates.
 ## Local Windows setup
 
 To reproduce the recorded 0.30.0 evaluation, use its verified ZIP linked from
-the [0.30.0 evaluation record](evaluation-packages/0.30.0/README.md). The 0.31.0
-candidate does not yet have a package for native evaluation. Use the Windows
+the [0.30.0 evaluation record](evaluation-packages/0.30.0/README.md). For the
+new 0.31.0 material trial, use the [verified fallback ZIP](evaluation-packages/0.31.0/allplan-mcp-0.31.0-windows-evaluation.zip)
+and follow the [one-path trial plan](docs/m4-single-drawing-0.31.0.pl.md). Use the Windows
 machine running Allplan and Codex for the recorded trial. External Python
 **3.11+** and internet access for locked dependencies are required.
 Allplan, Python and Codex are not bundled.

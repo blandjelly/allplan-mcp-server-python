@@ -6,7 +6,19 @@ zapisów/Undo z próby 5 ani zaakceptowanego grouped delete/Undo Column z
 0.29.0. Przeszło 87 unique focused checks: 86 affected/dependent checks,
 w tym trzy regresje parent-wrapper, oraz jeden package version/lock check.
 Zobacz [rekord focused verification](../evaluation-packages/0.31.0/focused-verification.json).
-Full CI, package build i native acceptance są pending.
+Oba full CI unittest jobs przeszły na Windows i Ubuntu Python 3.12 w
+[run 40012042481](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40012042481).
+CI 40012042481 przeszedł: 625 testów Ubuntu Python 3.12.15, 625 testów
+Windows Python 3.12.10 i package job. Oryginalny CI artifact 12527730616 był
+niedostępny. Jeden fallback ZIP z czystego detached exact source
+(`source_modified=false`) przeszedł weryfikację: 201 payload files, 43 bridge
+hashes, SHA-256
+`4047e7bb58eff28c8f87fdc488d0e787ad1a048cf05aae7b7d537646826fbbcb`.
+Próba native 0.31.0 pozostaje do wykonania.
+
+Użyj zweryfikowanego [fallback ZIP](../evaluation-packages/0.31.0/allplan-mcp-0.31.0-windows-evaluation.zip)
+z dokładnego źródła 0.31.0 i zachowaj [rekord ZIP](../evaluation-packages/0.31.0/package-verification.json)
+oraz [checksum](../evaluation-packages/0.31.0/allplan-mcp-0.31.0-windows-evaluation.zip.sha256).
 
 Wykonaj próbę na kopii projektu z dokładnym kandydatem i zapisz manifest
 instalacji, build Allplana, `allplan_health`, dokładne drawing/model/view UUID

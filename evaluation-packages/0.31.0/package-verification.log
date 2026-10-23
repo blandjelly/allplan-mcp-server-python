@@ -1,0 +1,15 @@
+Exact delivered ZIP verification
+
+Command (run once against the CI-source fallback build):
+  UV_CACHE_DIR=/tmp/allplan-m4-uv-cache python evaluation-packages/0.31.0/verify_package.py --source-commit 0f99863b7c11143d9f14ca12a1027aad5b009195
+
+Result: PASS
+Source commit: 0f99863b7c11143d9f14ca12a1027aad5b009195
+source_modified: false
+ZIP SHA-256: 4047e7bb58eff28c8f87fdc488d0e787ad1a048cf05aae7b7d537646826fbbcb
+Payload files: 201
+Bridge hashes verified: 43
+
+Passed: ZIP checksum and payload integrity; exact ZIP registration; frozen sync/import; drawing_identity and attribute_evidence schema validation; native source safety limits including the Wall material same-model parent-view guard and retained tier_hierarchy evidence; upgrade from 0.30.0 and restore to 0.30.0; preservation of active/archive journal, trace, and bridge-log markers.
+
+Native Allplan: not run. This is package verification evidence only.

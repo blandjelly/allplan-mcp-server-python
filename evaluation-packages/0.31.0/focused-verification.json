@@ -2,7 +2,8 @@
   "candidate": "0.31.0",
   "source_branch": "fix/m4-material-owner-0.31.0",
   "baseline_commit": "013ff67a81091e4df95ed97bc02a46b552a74093",
-  "source_commit_note": "Final candidate commit and CI source SHA are recorded in source-ci.json after PR merge.",
+  "source_commit": "0f99863b7c11143d9f14ca12a1027aad5b009195",
+  "source_commit_note": "This is the tested and packaged source SHA; any later docs-only delivery commit is distinct.",
   "source_worktree": "contains candidate changes",
   "scope": "focused affected and dependent unit, HTTP, ownership, and package version checks for Wall native-material ownership across alternate parent view wrappers",
   "environment": {

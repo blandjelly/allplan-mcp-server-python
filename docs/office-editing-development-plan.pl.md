@@ -192,9 +192,21 @@ Praca odbywa się na gałęzi `fix/m4-material-owner-0.31.0`, opartej na
 i `edit_ownership`, w tym trzy regresje parent-wrapper. Przeszedł też jeden
 package version/lock check; 25 nakładających się checks nie liczono drugi raz.
 Łącznie 87 unique focused checks. [Rekord focused verification](../evaluation-packages/0.31.0/focused-verification.json).
-Full CI, build pakietu i native acceptance pozostają pending. Zmiana porównuje parent edge tieru przez `same_model_identity` (drawing, model
-UUID i type), zachowując rzeczywiście zaobserwowany wrapper w
-`tier_hierarchy`. Target Wall nadal ma związany dokładny view UUID.
+Oba full CI unittest jobs przeszły na Windows i Ubuntu Python 3.12 w
+[run 40012042481](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40012042481).
+Run 40012042481 przeszedł: 625 testów Ubuntu Python 3.12.15, 625 testów
+Windows Python 3.12.10 i package job. Oryginalny CI artifact 12527730616 był
+niedostępny, więc jeden fallback ZIP z czystego detached exact source
+(`source_modified=false`) przeszedł weryfikację: 201 payload files, 43 bridge
+hashes, SHA-256
+`4047e7bb58eff28c8f87fdc488d0e787ad1a048cf05aae7b7d537646826fbbcb`.
+Zobacz [rekord package](../evaluation-packages/0.31.0/README.md),
+[weryfikację ZIP](../evaluation-packages/0.31.0/package-verification.json) i
+[zweryfikowany ZIP](../evaluation-packages/0.31.0/allplan-mcp-0.31.0-windows-evaluation.zip).
+Pozostaje native acceptance. Zmiana porównuje
+parent edge tieru przez `same_model_identity` (drawing, model UUID i type),
+zachowując rzeczywiście zaobserwowany wrapper w `tier_hierarchy`. Target Wall
+nadal ma związany dokładny view UUID.
 
 Focused regression potwierdził, że stary exact view UUID comparison blokował
 alternatywny parent wrapper tego samego modelu. Pierwszy native diagnostic z

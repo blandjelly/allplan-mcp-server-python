@@ -1,13 +1,24 @@
 # M4 material-path correction for candidate 0.31.0
 
-Candidate `0.31.0` is in progress on `fix/m4-material-owner-0.31.0`. This
-note describes the working-tree correction. **87 unique focused checks passed**: 86 affected/dependent checks in
+Candidate `0.31.0` is under evaluation on `fix/m4-material-owner-0.31.0`.
+This note describes the source correction. **87 unique focused checks passed**: 86 affected/dependent checks in
 `wall_material_edit`, `wall_material_http`, `model_edit`, `native_model_edit`
 and `edit_ownership`, plus one package version/lock check. The 25 overlapping
 checks were not double-counted. See the [focused verification record](../evaluation-packages/0.31.0/focused-verification.json).
-Full CI, package build and native Allplan acceptance are pending. It addresses one cause found
-in the 0.30.0 Wall material preview and does not close priority 4 or priorities
-1–5.
+Both full CI unittest jobs passed on Windows and Ubuntu Python 3.12 in
+[run 40012042481](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40012042481).
+The Windows package job passed with 625 tests in each platform job. The
+original artifact was unavailable, but one fallback ZIP from clean exact
+source (`source_modified=false`) passed verification: 201 payload files, 43
+bridge hashes, SHA-256
+`4047e7bb58eff28c8f87fdc488d0e787ad1a048cf05aae7b7d537646826fbbcb`.
+The [package-verification record](../evaluation-packages/0.31.0/package-verification.json)
+and [verified fallback ZIP](../evaluation-packages/0.31.0/allplan-mcp-0.31.0-windows-evaluation.zip)
+are available for the one planned native material trial. Native Allplan
+acceptance is pending. It corrects a
+same-model parent-wrapper defect reproduced by focused tests and associated with
+the diagnostic reported in the 0.30.0 Wall material preview; the native cause
+is unproven. It does not close priority 4 or priorities 1–5.
 
 ## Wall tier parent identity
 

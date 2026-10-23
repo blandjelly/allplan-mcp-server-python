@@ -72,10 +72,12 @@ intended scope across all five priorities; the new material FAIL and the
 limited scalar PASS do not close priorities 1–5. See the
 [0.30.0 API evidence note](m4-editing-api-0.30.0.md).
 
-## Candidate in progress: 0.31.0 — Wall material parent identity
+## Candidate under evaluation: 0.31.0 — Wall material parent identity
 
-The active topic branch is `fix/m4-material-owner-0.31.0`, based on
-`develop/m4`. This candidate changes the guarded Wall material preservation
+Source commit
+[`0f99863b7c11143d9f14ca12a1027aad5b009195`](https://github.com/blandjelly/allplan-mcp-server-python/commit/0f99863b7c11143d9f14ca12a1027aad5b009195)
+is on `fix/m4-material-owner-0.31.0`; [PR #29](https://github.com/blandjelly/allplan-mcp-server-python/pull/29)
+targets `develop/m4`. This candidate changes the guarded Wall material preservation
 snapshot: it compares the tier's parent edge using `same_model_identity`
 (drawing, model UUID and type) and records the actual tier wrapper in
 `tier_hierarchy`. The selected target remains bound to its exact view UUID.
@@ -90,7 +92,19 @@ and not covered by this fix. **87 unique focused checks passed**: 86 affected/de
 checks across `wall_material_edit`, `wall_material_http`, `model_edit`,
 `native_model_edit` and `edit_ownership`, plus one package version/lock check.
 The 25 overlapping checks were not counted twice. See the [focused record](../evaluation-packages/0.31.0/focused-verification.json).
-Full CI, package build and native trial remain pending. See the [0.31.0 API note](m4-editing-api-0.31.0.md)
+Run 40012042481 passed 625 Ubuntu Python 3.12.15 tests, 625 Windows Python
+3.12.10 tests, and the package job. The original CI artifact 12527730616 could
+not be retrieved, so one fallback ZIP was built from the clean detached exact
+source (`source_modified=false`). It passed exact verification: 201 payload
+files, 43 bridge hashes, SHA-256
+`4047e7bb58eff28c8f87fdc488d0e787ad1a048cf05aae7b7d537646826fbbcb`. See the
+[verification record](../evaluation-packages/0.31.0/package-verification.json),
+[log](../evaluation-packages/0.31.0/package-verification.log) and
+[verified ZIP](../evaluation-packages/0.31.0/allplan-mcp-0.31.0-windows-evaluation.zip),
+[checksum](../evaluation-packages/0.31.0/allplan-mcp-0.31.0-windows-evaluation.zip.sha256),
+[build log](../evaluation-packages/0.31.0/build.log) and
+[CI provenance](../evaluation-packages/0.31.0/source-ci.json).
+Native trial remains pending. See the [0.31.0 API note](m4-editing-api-0.31.0.md)
 and the [one-path native trial plan](m4-single-drawing-0.31.0.pl.md). Do not repeat the accepted
 0.30.0 trials 1–3/5 or the 0.29.0 grouped Column delete/Undo.
 
@@ -409,8 +423,9 @@ Beam W1 writes.
    parent-wrapper regressions passed as part of the 86 affected/dependent
    focused checks: alternate same-model parent acceptance with bound edge and
    readback, parent-view drift conflict, and blocking different parent model,
-   type or drawing. The separate version check, CI, package build and native
-   material trial remain pending. Slab/MultiSlab write blockers stay in force.
+   type or drawing. The version check, full CI and exact fallback ZIP
+   verification passed for 0.31.0; its native material trial remains pending.
+   Slab/MultiSlab write blockers stay in force.
    Native selection set/clear/readback remains unsupported.
 5. **Implemented:** bounded scalar/Enum contracts, family/value inventory,
    attribute-name resolver and the 0.30.0 requested-ID evidence phase.

@@ -1,0 +1,8 @@
+{
+  "source_commit": "0f99863b7c11143d9f14ca12a1027aad5b009195",
+  "artifacts": {
+    "allplan-mcp-0.31.0-windows-evaluation.zip": "4047e7bb58eff28c8f87fdc488d0e787ad1a048cf05aae7b7d537646826fbbcb",
+    "allplan_mcp_server-0.31.0-py3-none-any.whl": "86e4dca22c39b127354703b0ebb7244c4b8b18205d386c3f78998d8bfb3c8321",
+    "allplan_mcp_server-0.31.0.tar.gz": "087161b3bb80f3a8f5e56b3dcb92610ac840677ea097739623671c948f2c3a9e"
+  }
+}

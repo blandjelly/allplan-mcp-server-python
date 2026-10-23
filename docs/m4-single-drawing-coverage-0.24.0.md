@@ -1,36 +1,58 @@
-# M4 single-drawing coverage — current status through candidate 0.30.0
+# M4 single-drawing coverage — current status for candidate 0.31.0
 
 Updated 2026-10-23. This is implementation and verification coverage, not full
-native acceptance. Candidate 0.30.0 source commit
+native acceptance. The latest completed candidate 0.30.0 source commit
 `9966c31fc1b79b0ed7c2061d671dafa3f1f2e8d6` passed full
 [CI run 39993048110](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39993048110):
-622 tests on Windows and 622 on Ubuntu Python 3.12, plus the package job. The
-original CI artifact was not delivered after one normal-proxy transfer failed
-before HTTP; one fallback build from clean exact source (`source_modified=false`)
-passed exact ZIP verification on its first attempt: 196 payload files and 43
-bridge hashes, SHA-256
-`78b7b24c98749ebbd28814f84d70a2fc9cbeab80b477b9fd1585e5c10e63af8e`. Native
-trial has not been run. See the [0.30.0 candidate record](../evaluation-packages/0.30.0/README.md),
-[verified ZIP](../evaluation-packages/0.30.0/allplan-mcp-0.30.0-windows-evaluation.zip),
-[verification result](../evaluation-packages/0.30.0/package-verification.json)
-and [verification log](../evaluation-packages/0.30.0/package-verification.log).
-Its partial
-`attribute_evidence` probe and no-op evidence contract do not add date/vector
-setters, native selection, or Slab/MultiSlab field ownership. The combined
-[0.30.0 trial plan](m4-single-drawing-0.30.0.pl.md) covers priorities 1–5 in
-one session; blocked work and missing fixtures remain explicit. Full completion
-remains the goal and is blocked until those owner, payload and selection
-contracts are established. The owner
-reports PASS for all steps of the 0.29.0 Column group-delete/Undo trial; its
-scope and evidence limits are recorded in the
-[0.29.0 observation](test-results/m4-owner-observation-0.29.0-2026-10-23.md).
-Scoped 0.27.0 owner-reported observations are retained in
-[this observation](test-results/m4-owner-observation-0.27.0-2026-10-23.md)
-and [validation status](validation-status.md). Candidate 0.28.0 source and its
-exact fallback ZIP are verified. Its limited owner trial reported PASS for
-preview/delete/absence readback, but one Undo restored only one of three
-Columns. That historical grouped-Undo failure is superseded for the tested
-scope by the owner-reported 0.29.0 PASS.
+622 tests on Windows and 622 on Ubuntu Python 3.12, plus the package job. Its
+fallback ZIP from clean exact source passed verification: 196 payload files,
+43 bridge hashes, SHA-256
+`78b7b24c98749ebbd28814f84d70a2fc9cbeab80b477b9fd1585e5c10e63af8e`.
+
+The owner later reported 0.30.0 trials 1, 2, 3 and 5 as PASS and trial 4's
+Wall native-material preview as FAIL before Apply. The supplied raw log covers
+trial 5 only: four scalar writes (Column text/integer/real and Wall text) each
+had typed readback and one UI Undo/restoration read. Trial 4 had two blocked
+previews with zero changes and setters; its owner-reported symptoms and limits
+are in the [scoped observation](test-results/m4-owner-observation-0.30.0-2026-10-23.md).
+These outcomes are not bound to the exact ZIP because its installed manifest
+was not supplied. See the [0.30.0 delivery record](../evaluation-packages/0.30.0/README.md),
+[trial 5 log](test-results/evidence/0.30.0-2026-10-23/allplan-attribute-trials-log.md)
+and [persisted Apply requests](test-results/evidence/0.30.0-2026-10-23/allplan-attribute-trial-apply-requests.jsonl).
+
+Candidate 0.31.0 is on `fix/m4-material-owner-0.31.0`, source commit
+`0f99863b7c11143d9f14ca12a1027aad5b009195`, with
+[PR #29 to `develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/pull/29).
+**87 unique focused checks passed**: 86 affected/dependent checks and one
+package version/lock check. Both full CI unittest jobs passed on Windows and
+Ubuntu Python 3.12 in
+[run 40012042481](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40012042481).
+Run 40012042481 passed 625 Ubuntu Python 3.12.15 tests, 625 Windows Python
+3.12.10 tests, and the package job. Original artifact 12527730616 could not be
+retrieved: the connector returned only a File Service ID and normal-proxy
+download was forbidden. One fallback ZIP from clean exact source
+(`source_modified=false`) passed verification: 201 payload files, 43 bridge
+hashes, SHA-256
+`4047e7bb58eff28c8f87fdc488d0e787ad1a048cf05aae7b7d537646826fbbcb`. See the
+[verification record](../evaluation-packages/0.31.0/package-verification.json),
+[log](../evaluation-packages/0.31.0/package-verification.log) and
+[verified ZIP](../evaluation-packages/0.31.0/allplan-mcp-0.31.0-windows-evaluation.zip).
+Only the native material trial remains for this candidate.
+Focused tests reproduce and fix a same-model alternate-parent
+wrapper defect in the Wall preservation snapshot. The exact native branch for
+the first 0.30.0 diagnostic is unproven without raw lineage/children data. The
+second Wall-with-opening diagnostic `component_child_owner_mismatch` remains
+unresolved. See the [0.31.0 evaluation record](../evaluation-packages/0.31.0/README.md),
+[API note](m4-editing-api-0.31.0.md) and
+[narrow native trial plan](m4-single-drawing-0.31.0.pl.md).
+
+The 0.30.0 `attribute_evidence` probe and no-op evidence contract do not add
+date/vector setters, native selection, or Slab/MultiSlab field ownership.
+Neither candidate closes priorities 1–5. Runtime/native owner, payload and
+selection contracts remain prerequisites to full completion. Earlier accepted
+scope and historical evidence below remain in force. The owner reports PASS for
+all steps of the 0.29.0 Column grouped-delete/Undo trial; its scope and evidence
+limits are recorded in the [0.29.0 observation](test-results/m4-owner-observation-0.29.0-2026-10-23.md).
 
 Final 0.28.0 source `b59ef15d9bfd4dfb42476b240e31b5b300268d2d` is on PR #26
 targeting `develop/m4`. CI run
@@ -69,12 +91,12 @@ remains incomplete.
 
 | Requested family / adapter | Current guarded route and owner boundary | Remaining native evidence |
 | --- | --- | --- |
-| Columns / Column | Typed attributes and exact existing organizational layer; model/view binding, exclusions, fresh readback, replay and no-op. Candidate 0.28.0 delete matching uses drawing/model/type identity while preserving actual parent view UUID edges and the exact selected target view UUID. Candidate 0.29.0 expands one reviewed plan to a plural native delete call. | Owner reports PASS for all steps of the 0.29.0 trial: three W1 Columns in drawing 101 were deleted, a fresh scan reported all three Columns and their attribute containers absent, and one UI Undo restored all three Columns. This meets the grouped-Undo repair goal for the tested operation. The log lacks raw MCP responses, target UUIDs and installed ZIP manifest; Undo was owner-observed, with tool result `undo: not_checked` and no automatic post-Undo readback. The 0.28.0 one-of-three Undo remains historical. No explicit W1 no-op/zero-setter evidence. |
-| Walls / Wall | Typed root attributes; organizational layer binds all direct WallTier owners with its own adapter. Single-tier native thickness/material read exists. Current layer IDs 0–65535 are valid; 0.26.0 fixes reading ID 0 and covers reviewed W1 plan/Apply from prior ID 0 in focused tests. 0.27.0 tightens material preservation to exactly one stable, direct WallTier lineage with no children; opening and all other child types fail closed with separate reasons. | Native layer owner/readback/Undo for unaccepted case; native material change remains unaccepted. The 0.27.0 preservation and diagnostic changes do not enable writes or substitute observed material for preservation evidence. |
-| Beams / Beam, SkeletonBeam | Typed attributes and organizational layer, exact target resolution; unrelated broken hierarchies do not redirect the owner. | Family/build-specific UI/readback/Undo; fakes and API availability are separate. |
-| Slabs / Slab | Read-only direct identity probe; only standalone Slab permits typed attributes/layer with bound ancestry. | Resolve the owner's two Slab/MultiSlab results read-only. No new attribute trial on previously accepted targets. |
-| Aggregate slab / MultiSlab | Direct parent/child evidence; all aggregate writes blocked pending an explicit property owner. Slab children are blocked independently of the type filter. | Explicit owner contract before enabling any aggregate/tier write. |
-| Doors and windows / WindowDoor | Structural identity probe keeps parents visible. Semantic family is `opening`; optional `opening_kind` resolves `door`/`window` only through the loaded DoorOpeningElement/WindowOpeningElement classes. Unknown classes stay not_checked. | Separate native door/window, opening/inserted-object ownership and variant evidence. Owner confirms the 0.25.0 run and one scoped subtree deletion PASS; broader typed-delete coverage and Undo remain unobserved. Do not repeat that deletion. |
+| Columns / Column | Typed attributes and exact existing organizational layer; model/view binding, exclusions, fresh readback, replay and no-op. Candidate 0.28.0 delete matching uses drawing/model/type identity while preserving actual parent view UUID edges and the exact selected target view UUID. Candidate 0.29.0 expands one reviewed plan to a plural native delete call. Trial 5 of 0.30.0 confirms Column text, integer and real attribute writes with fresh typed readback and UI Undo/restoration read. | Owner reports PASS for all steps of the 0.29.0 trial: three W1 Columns in drawing 101 were deleted, a fresh scan reported all three Columns and their attribute containers absent, and one UI Undo restored all three Columns. This meets the grouped-Undo repair goal for the tested operation. The log lacks raw MCP responses, target UUIDs and installed ZIP manifest; Undo was owner-observed, with tool result `undo: not_checked` and no automatic post-Undo readback. The 0.28.0 one-of-three Undo remains historical. Trial 3 in 0.30.0 is owner-reported PASS for W1 no-op; its detailed raw response was not supplied. |
+| Walls / Wall | Typed root attributes; organizational layer binds all direct WallTier owners with its own adapter. Single-tier native thickness/material read exists. Current layer IDs 0–65535 are valid; 0.26.0 fixes reading ID 0 and covers reviewed W1 plan/Apply from prior ID 0 in focused tests. The 0.27.0 material guard requires one direct WallTier and blocks openings/other children. Candidate 0.31.0 compares a tier parent by drawing/model/type identity across view wrappers and binds the actual observed parent edge; its selected Wall target remains exact-view bound. | Trial 4 of 0.30.0 failed closed before Apply: the `Żelbet` preview reported `native_material_preservation_unavailable` / `wall_material_tier_hierarchy_unsupported`; a Wall with opening reported `component_child_owner_mismatch`. Both had zero changes/setters and no Apply. The first native branch is unproven without raw lineage/children data; the opening cause is unresolved. Candidate 0.31.0 has 87 focused checks passed, full Windows/Ubuntu CI passed, and its exact fallback ZIP passed verification. The native material trial remains pending; native material remains unaccepted. |
+| Beams / Beam, SkeletonBeam | Typed attributes and organizational layer, exact target resolution; unrelated broken hierarchies do not redirect the owner. | Trial 5's Beam attribute read was blocked by `probe_scope_unavailable`; no Beam write was attempted. Family/build-specific UI/readback/Undo remains unaccepted. |
+| Slabs / Slab | Read-only direct identity probe; only standalone Slab permits typed attributes/layer with bound ancestry. Trial 2 in 0.30.0 is owner-reported PASS for identity/evidence collection. | Resolve the conflicting Slab/MultiSlab ownership read-only. Trial 5 had no standalone Slab fixture. The SDK `ModifySlab.py` example does not establish M4 project-attribute ownership. Keep related writes blocked. |
+| Aggregate slab / MultiSlab | Direct parent/child evidence; 0.30.0 adds separate requested-ID value/representation evidence. All aggregate writes remain blocked. | Trial 2 reported identity/evidence PASS but does not establish field owner. Explicit owner contract and native validation are required before aggregate/tier writes. |
+| Doors and windows / WindowDoor | Structural identity probe keeps parents visible. Semantic family is `opening`; optional `opening_kind` resolves `door`/`window` only through the loaded DoorOpeningElement/WindowOpeningElement classes. Unknown classes stay not_checked. | Trial 5 opening attribute-list read was blocked; no opening write was attempted. The separate 0.30.0 Wall-with-opening material preview returned `component_child_owner_mismatch`; its cause remains unresolved. Native door/window ownership and variant evidence remain open. Owner confirms the 0.25.0 run and one scoped subtree deletion PASS; do not repeat that deletion. |
 
 `test_edit_ownership.py` adds parent/child blocking, standalone-slab exact
 targets despite equal geometry, late reparenting, unreadable ancestry,
@@ -85,10 +107,10 @@ fakes. They establish neither native family acceptance nor Undo behavior.
 
 | Value family | Current binding | Remaining work |
 | --- | --- | --- |
-| Text, Integer, Double, Boolean | Exact loaded SDK member, compatible scalar/readback; no display-text coercion. | Target-specific native evidence, preserving previously accepted outcomes. |
+| Text, Integer, Double, Boolean | Exact loaded SDK member, compatible scalar/readback; no display-text coercion. Trial 5 confirms text/integer/real writes on Column and text on Wall, each with typed readback and Undo/restoration read. | No Boolean fixture was observed; Integer 0/1 fields were not treated as Boolean. Other family/type pairs need their own evidence. |
 | Integer + CheckBox | Targeted SDK CheckBox metadata, exact false/true → 0/1 binding. | Family/definition-specific native UI/readback/Undo. |
-| Enum | Exact requested label → key → label → key round trip, label setter and exact readback. | Native codec evidence for that exact definition; no broad catalog enumeration. |
-| Date, vector, byte, other non-scalar values | Explicitly unsupported and blocked before target enumeration; no scalar substitution. `AttributeDate` is a documented SDK payload for `SetAttributes`, but an accepted payload for the existing `ElementsAttributeService.ChangeAttribute` route and its exact readback are missing. | Implement/document the exact existing-adapter setter payload and fresh readback codec before a narrow native trial. |
+| Enum | Exact requested label → key → label → key round trip, label setter and exact readback. | Trial 5's Column `Status` (ID 49) was undefined; no label was guessed or written. Native codec evidence for an exact definition remains open. |
+| Date, vector, byte, other non-scalar values | Explicitly unsupported and blocked before target enumeration; no scalar substitution. `AttributeDate` is a documented SDK payload for `SetAttributes`, but an accepted payload for the existing `ElementsAttributeService.ChangeAttributes` route and its exact readback are missing. | Implement/document the exact existing-adapter setter payload and fresh readback codec before a narrow native trial. |
 
 ## Native selection and material are separate gaps
 
@@ -120,6 +142,18 @@ properties, not opaque SDK objects. The candidate's `Axis`, `PlaneReferences`,
 and `SurfaceElementProperties` values provide bounded `repr` drift evidence
 only, not exhaustive preservation codecs. A material attribute, surface or
 organizational layer never substitutes for native material.
+
+The 0.30.0 owner trial later reported two material previews blocked before Apply
+with zero changes/setters: the first reported
+`native_material_preservation_unavailable` / `wall_material_tier_hierarchy_unsupported`,
+and the opening Wall reported `component_child_owner_mismatch`. Raw hierarchy
+responses were not supplied, so the exact cause of the first result is not
+established; the opening cause remains unresolved. Candidate 0.31.0 fixes the
+same-model alternate-wrapper defect reproduced by focused tests (87 unique
+focused checks passed), while preserving exact selected-target identity and
+all shape guards. Full Windows/Ubuntu CI and exact fallback ZIP verification
+passed; the original CI artifact was unavailable. The native retest remains
+pending.
 
 ## 0.27.0 candidate scope (CI and package verification passed; later limited owner report)
 
@@ -169,46 +203,40 @@ change, delete, no-op or Undo was recorded in that 0.26.0 log. The later
 0.28.0 Column trial and its outcome are recorded in the
 [0.28.0 trial record](m4-single-drawing-0.28.0.pl.md); its grouped-Undo failure
 was superseded by the limited 0.29.0 owner-reported PASS above. The next
-combined session is [0.30.0](m4-single-drawing-0.30.0.pl.md).
+material-path trial is [0.31.0](m4-single-drawing-0.31.0.pl.md).
 
 ## Priority status
 
-1. **Implemented and accepted:** bounded journal cleanup and the 0.23.0
-   archival scope. Candidate 0.28.0 raises limits to 512 active records, 1 MiB
-   per record, 8 MiB active trace, 32 MiB trace-inspection limit and an archive
-   inventory bounded at 1 GiB / 1024 files. Focused checks, full CI, and exact
-   ZIP verification passed. Native restart/replay is unobserved. Unresolved
-   and unverifiable records remain protected.
-2. **Implemented:** structural identity inventory and fail-closed ownership
-   guards. **Unresolved:** the 0.27.0 log retains model/view identities and a
-   parent-lineage conflict for the Slab child, but does not establish field
-   ownership. Candidate 0.30.0 adds exact requested-ID `attribute_evidence`
-   with separate ancestry/children/value reads; even complete evidence does not
-   establish a field owner. Keep unresolved writes blocked.
-3. **Implemented:** layer 0 read and reviewed W1 plan/Apply. **Limited
-   owner-reported native PASS:** W1 read/write works, with one changed element
-   reverted per UI Undo step. Earlier reports lack explicit no-op/zero-setter
-   evidence. Candidate 0.30.0 implements bounded fresh `no_op_evidence` and
-   revalidation with zero setters, but this candidate behavior has no recorded
-   native trial result yet. No-op has no Apply path.
-4. **Implemented in candidate 0.28.0/0.29.0:** typed subtree delete matches
-   owner edges by drawing/model/type identity while preserving actual parent
-   view UUIDs on bound child/descendant edges and the selected target's exact
-   view UUID; 0.29.0 sends the reviewed group in one plural native call.
-   Focused checks, full CI, and exact ZIP verification passed. The owner reports
-   PASS for all steps of the 0.29.0 trial, including one UI Undo restoring all
-   three Columns after the fresh absence scan. This meets the grouped-Undo
-   repair goal for that tested operation. The log lacks raw MCP responses,
-   target UUIDs and installed ZIP manifest; Undo was owner-observed, and the
-   tool reported `undo: not_checked` without automatic post-Undo readback.
-   See the [0.29.0 observation](test-results/m4-owner-observation-0.29.0-2026-10-23.md).
-   The 0.28.0 one-of-three Undo remains historical. Native material has no
-   owner acceptance; its existing guarded experimental evaluation setter may
-   be exercised in the 0.30.0 session when an exact target passes every Apply
-   guard. Native selection remains unsupported.
-5. **Implemented:** scalar/Enum contracts and family/value inventory. The
-   0.27.0 lowercase lookup and material diagnostics have reported PASS, but
-   date/vector/object codecs and per-family owner, value roundtrip and Undo
-   evidence remain open. Candidate 0.30.0 can inspect exact observed IDs and
-   SDK type bindings through `attribute_evidence`; it adds no date/vector
-   setter or codec, and unknown native objects remain type-only `not_checked`.
+1. **Earlier accepted scope:** 0.23.0 bounded journal preview/archive and
+   0.28.0 capacity limits are verified. Trial 1 in 0.30.0 is owner-reported
+   PASS for the planned journal stage, but its raw substep evidence was not
+   supplied; do not infer separate restart/replay acceptance from the summary.
+   Unknown, corrupt and unverifiable records remain protected.
+2. **Implemented, ownership unresolved:** structural identity and fail-closed
+   write guards remain. Trial 2 in 0.30.0 is owner-reported PASS for
+   identity/evidence collection. The evidence does not establish the conflicting
+   Slab/MultiSlab field owner; keep these writes blocked.
+3. **Scoped owner-reported PASS:** trial 3 in 0.30.0 reports the W1 no-op stage
+   passed. Its detailed raw response was not supplied. Do not expand this to
+   other W1 writes or grouped Undo; no-op has no Apply route.
+4. **Typed delete accepted only for the tested scope; material/selection open:**
+   the 0.29.0 grouped Column delete/Undo PASS remains accepted for that exact
+   operation; the 0.28.0 one-of-three Undo is historical. Trial 4 in 0.30.0
+   failed before Apply on two material previews, both with zero changes and
+   setters. Candidate 0.31.0 changes parent-wrapper matching and has 87 unique
+   focused checks passed, including three regressions, and full Windows/Ubuntu
+   CI and exact fallback ZIP verification passed. The native retest is pending.
+   The exact first native diagnostic branch is unproven,
+   and the second opening case is unresolved. Native selection remains
+   unsupported.
+5. **Limited native scalar PASS:** trial 5 in 0.30.0 confirms Column text,
+   integer and real, and Wall text writes with typed readback and Undo/restoration
+   read. Enum was undefined; Boolean and standalone Slab fixtures were missing;
+   Beam and opening reads were blocked. Full family/type coverage and
+   date/vector/object payload and readback contracts remain open.
+
+These scoped outcomes do not close priorities 1–5. See the
+[development plan](office-editing-development-plan.pl.md),
+[0.30.0 owner observation](test-results/m4-owner-observation-0.30.0-2026-10-23.md),
+[0.31.0 API note](m4-editing-api-0.31.0.md) and
+[0.31.0 trial plan](m4-single-drawing-0.31.0.pl.md).
