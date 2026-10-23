@@ -1,0 +1,11 @@
+Building source distribution...
+Building wheel from source distribution...
+Successfully built /workspace/allplan-mcp-server-python/evaluation-packages/0.30.0/allplan_mcp_server-0.30.0.tar.gz
+Successfully built /workspace/allplan-mcp-server-python/evaluation-packages/0.30.0/allplan_mcp_server-0.30.0-py3-none-any.whl
+/workspace/allplan-mcp-server-python/evaluation-packages/0.30.0/allplan-mcp-0.30.0-windows-evaluation.zip
+
+Fallback provenance:
+- Built once from a clean detached worktree at source commit 9966c31fc1b79b0ed7c2061d671dafa3f1f2e8d6.
+- Source modifications: none (source_modified=false).
+- CI artifact 12518373563 could not be delivered: file-service-ref transfer returned URLError before any HTTP response.
+- This fallback build was performed after the CI artifact transfer failure; artifacts were verified by verify_package.py.

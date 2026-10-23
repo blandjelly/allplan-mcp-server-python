@@ -6,12 +6,33 @@ and target pull requests to `develop/m4`. Main remains separate. Read
 implementation. The policy is the source of truth for automated checks and
 package builds.
 
-## Current candidate scope: 0.30.0 — implementation in progress
+## Current candidate: 0.30.0 — full CI and exact ZIP verification passed
 
-Branch `feat/m4-combined-evidence-0.30.0` is developing one combined session
-for priorities 1–5. This is a deliberately partial candidate; **full CI,
-package verification and native trial have not been run**. Do not mark any of
-those gates PASS or treat this documentation scope as completed acceptance.
+Source commit
+[`9966c31fc1b79b0ed7c2061d671dafa3f1f2e8d6`](https://github.com/blandjelly/allplan-mcp-server-python/commit/9966c31fc1b79b0ed7c2061d671dafa3f1f2e8d6)
+is on `feat/m4-combined-evidence-0.30.0`; [PR #28](https://github.com/blandjelly/allplan-mcp-server-python/pull/28)
+targets `develop/m4`. **142 unique focused checks passed** ([record](../evaluation-packages/0.30.0/focused-verification.json)). Full
+[CI run 39993048110](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39993048110)
+passed 622 tests on Windows and 622 on Ubuntu, Python 3.12, plus the package
+job. The original CI artifact was not delivered: the single normal-proxy
+transfer failed with `URLError` before an HTTP response. One fallback build was
+produced from a clean detached worktree at the exact source
+(`source_modified=false`). Its exact ZIP passed verification on the first
+attempt: 196 payload files and 43 bridge hashes; checksum/payload, registration,
+frozen sync/import, both property-probe schemas, safety limits, upgrade/restore
+to 0.29.0 and journal/trace/log marker preservation passed. SHA-256:
+`78b7b24c98749ebbd28814f84d70a2fc9cbeab80b477b9fd1585e5c10e63af8e`. Native
+Allplan has not been run. See the [0.30.0 candidate record](../evaluation-packages/0.30.0/README.md),
+[verified ZIP](../evaluation-packages/0.30.0/allplan-mcp-0.30.0-windows-evaluation.zip),
+[ZIP checksum](../evaluation-packages/0.30.0/allplan-mcp-0.30.0-windows-evaluation.zip.sha256),
+[verification result](../evaluation-packages/0.30.0/package-verification.json),
+[verification log](../evaluation-packages/0.30.0/package-verification.log),
+[artifact hashes](../evaluation-packages/0.30.0/artifact-hashes.json),
+[CI provenance](../evaluation-packages/0.30.0/source-ci.json) and
+[fallback build log](../evaluation-packages/0.30.0/build.log).
+
+This is a deliberately partial candidate for one combined session across
+priorities 1–5. The session plan is not evidence of completed acceptance.
 
 The current implementation adds read-only
 `model_property_probe phase=attribute_evidence` for one exact foreground

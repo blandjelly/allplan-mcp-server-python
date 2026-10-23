@@ -186,9 +186,28 @@ opisywanym poniżej dla 0.30.0. Granice SDK opisuje
 
 ## Zakres kandydata 0.30.0 — jedna sesja priorytetów 1–5
 
-Gałąź `feat/m4-combined-evidence-0.30.0` przygotowuje zakres częściowego kandydata do
-jednej wspólnej sesji priorytetów 1–5. Nie oznaczać jeszcze full CI, package
-verification ani native trial jako PASS. Nowy
+Źródło `9966c31fc1b79b0ed7c2061d671dafa3f1f2e8d6` na gałęzi
+`feat/m4-combined-evidence-0.30.0` ma [PR #28 do `develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/pull/28).
+Przeszło full [CI 39993048110](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39993048110):
+622 testy na Windows i 622 na Ubuntu (Python 3.12) oraz job pakietu; przeszło
+też 142 unique focused checks. Oryginalny artifact CI 12518373563 nie został
+dostarczony przez connector: jedyny transfer zwykłym proxy zakończył się
+`URLError` przed odpowiedzią HTTP. Wykonano jeden fallback build z czystego
+detached worktree dokładnego źródła (`source_modified=false`). Exact ZIP
+verification przeszło za pierwszym razem: 196 plików payload, 43 hashe mostka,
+checksum/payload, rejestrację, frozen sync/import, schematy `drawing_identity`
+i `attribute_evidence`, limity bezpieczeństwa, upgrade i restore 0.29.0 oraz
+markery journal/trace/log. SHA-256 ZIP-a:
+`78b7b24c98749ebbd28814f84d70a2fc9cbeab80b477b9fd1585e5c10e63af8e`.
+Próby natywnej 0.30.0 jeszcze nie było. Szczegóły są w
+[rekordzie dostawy](../evaluation-packages/0.30.0/README.md),
+[source-ci.json](../evaluation-packages/0.30.0/source-ci.json),
+[weryfikacji ZIP](../evaluation-packages/0.30.0/package-verification.json),
+[logu weryfikacji](../evaluation-packages/0.30.0/package-verification.log),
+[hashach artefaktów](../evaluation-packages/0.30.0/artifact-hashes.json),
+[build.log](../evaluation-packages/0.30.0/build.log) i
+[zweryfikowanym ZIP](../evaluation-packages/0.30.0/allplan-mcp-0.30.0-windows-evaluation.zip).
+Nowy
 [`attribute_evidence`](tool-reference.md#model_property_probe--isolated-read-phases)
 czyta exact foreground model/view oraz 1–16 rzeczywistych ID; oddziela
 ancestry, children, stored/computable wartości i runtime type. `evidence_complete`

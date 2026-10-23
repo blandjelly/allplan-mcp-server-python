@@ -1,8 +1,20 @@
 # M4 single-drawing coverage — current status through candidate 0.30.0
 
 Updated 2026-10-23. This is implementation and verification coverage, not full
-native acceptance. Candidate 0.30.0 is in progress; no full CI, package
-verification or native trial result is recorded here. Its partial
+native acceptance. Candidate 0.30.0 source commit
+`9966c31fc1b79b0ed7c2061d671dafa3f1f2e8d6` passed full
+[CI run 39993048110](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39993048110):
+622 tests on Windows and 622 on Ubuntu Python 3.12, plus the package job. The
+original CI artifact was not delivered after one normal-proxy transfer failed
+before HTTP; one fallback build from clean exact source (`source_modified=false`)
+passed exact ZIP verification on its first attempt: 196 payload files and 43
+bridge hashes, SHA-256
+`78b7b24c98749ebbd28814f84d70a2fc9cbeab80b477b9fd1585e5c10e63af8e`. Native
+trial has not been run. See the [0.30.0 candidate record](../evaluation-packages/0.30.0/README.md),
+[verified ZIP](../evaluation-packages/0.30.0/allplan-mcp-0.30.0-windows-evaluation.zip),
+[verification result](../evaluation-packages/0.30.0/package-verification.json)
+and [verification log](../evaluation-packages/0.30.0/package-verification.log).
+Its partial
 `attribute_evidence` probe and no-op evidence contract do not add date/vector
 setters, native selection, or Slab/MultiSlab field ownership. The combined
 [0.30.0 trial plan](m4-single-drawing-0.30.0.pl.md) covers priorities 1–5 in
