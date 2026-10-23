@@ -5,30 +5,42 @@ audits and reviewed model edits. Current M4 development uses
 [`develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/tree/develop/m4);
 main remains separate.
 
-Candidate **0.28.0** is source commit
-`b59ef15d9bfd4dfb42476b240e31b5b300268d2d` on `fix/m4-owner-views-0.28.0`,
-with [PR #26 targeting `develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/pull/26).
-Focused verification passed 170 unique affected/dependent checks. Full CI run
-[39871551499](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39871551499)
-passed 601 tests on each Windows and Ubuntu Python 3.12 job plus the package
-job. PR #26 targets `develop/m4`. The original CI ZIP was unavailable to the
-executor, so one fallback ZIP was built from the exact clean source and passed
-verification on its first attempt: 186 payload files, 42 bridge hashes, SHA-256
-`74099ec341cdf8b2bc87def42487fafbbbcdb963ec6f4b8859a412f7b6d064ed`.
+Latest completed candidate **0.30.0** is source commit
+`9966c31fc1b79b0ed7c2061d671dafa3f1f2e8d6` on
+`feat/m4-combined-evidence-0.30.0`, with [PR #28 targeting `develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/pull/28).
+It passed 142 unique focused checks and full
+[CI 39993048110](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39993048110):
+622 tests on each Windows and Ubuntu Python 3.12 job plus the package job. The
+original CI artifact was unavailable, so one fallback ZIP from the exact clean
+source passed verification on its first attempt: 196 payload files, 43 bridge
+hashes, SHA-256 `78b7b24c98749ebbd28814f84d70a2fc9cbeab80b477b9fd1585e5c10e63af8e`.
 
-The candidate matches component parent edges by drawing, model UUID and type
-across view wrappers, while retaining actual parent view UUIDs in the deletion
-evidence and binding the selected target's exact view UUID. It also raises the
-journal capacity limits while preserving the per-record bound and protection
-for unresolved or unverifiable history. See the
-[0.28.0 evaluation record](evaluation-packages/0.28.0/README.md),
-[0.28.0 API evidence](docs/m4-editing-api-0.28.0.md),
-[short native trial](docs/m4-single-drawing-0.28.0.pl.md), and
-[current handoff](docs/next-model-handoff.md). Native 0.28.0 has not been run;
-M4 priorities 1–5 remain incomplete. Exact ZIP checks include checksum/payload,
-registration, frozen sync/import, `drawing_identity` schema, source safety
-limits, upgrade/restore, and history markers. The scoped 0.27.0 native observations are
-indexed in [validation status](docs/validation-status.md).
+The candidate adds read-only `attribute_evidence` and fresh no-op evidence with
+zero-setter accounting. In the owner's reported Allplan session, trials 1–3
+and 5 passed, while trial 4's native material stage failed closed before Apply:
+two Wall previews reported unsupported hierarchy/child ownership, with zero
+changes, zero setters and no Apply. Trial 5 has detailed evidence for four
+scalar writes with fresh readback and UI Undo/restoration (Column text/integer/
+real and Wall text). Other families, Slab/MultiSlab ownership, native selection,
+and date/vector writes remain incomplete. The owner log identifies bridge
+0.30.0 and verified bridge integrity, but does not include the installed ZIP
+manifest, so outcomes are not attributed to that exact ZIP. See the
+[0.30.0 evaluation record](evaluation-packages/0.30.0/README.md),
+[scoped Allplan observation](docs/test-results/m4-owner-observation-0.30.0-2026-10-23.md),
+[trial 5 log](docs/test-results/evidence/0.30.0-2026-10-23/allplan-attribute-trials-log.md),
+[development plan](docs/office-editing-development-plan.pl.md), and
+[current handoff](docs/next-model-handoff.md). Priorities 1–5 remain partial.
+Current candidate work is on `fix/m4-material-owner-0.31.0`. It compares the
+Wall tier parent by same-model identity while preserving the actual observed
+parent wrapper in the material snapshot; exact target view binding and strict
+single-tier/no-opening guards remain. **87 unique focused checks passed**: 86
+affected/dependent checks and one package version/lock check. Full CI, package
+build and native Allplan trial are pending. See the
+[focused verification record](evaluation-packages/0.31.0/focused-verification.json). The opening case's
+`component_child_owner_mismatch` cause remains unresolved. See the
+[0.31.0 API note](docs/m4-editing-api-0.31.0.md) and
+[bounded native trial plan](docs/m4-single-drawing-0.31.0.pl.md). Earlier scoped
+observations are indexed in [validation status](docs/validation-status.md).
 
 M4 remains partially accepted. Native selection, native material updates,
 complete support for all six families, multi-file writes and whole-project
@@ -52,10 +64,11 @@ remaining development gates.
 
 ## Local Windows setup
 
-For the next native trial, use the exact verified 0.28.0 ZIP linked from the
-[0.28.0 evaluation record](evaluation-packages/0.28.0/README.md) on the Windows
-machine running Allplan and Codex. External
-Python **3.11+** and internet access for locked dependencies are required.
+To reproduce the recorded 0.30.0 evaluation, use its verified ZIP linked from
+the [0.30.0 evaluation record](evaluation-packages/0.30.0/README.md). The 0.31.0
+candidate does not yet have a package for native evaluation. Use the Windows
+machine running Allplan and Codex for the recorded trial. External Python
+**3.11+** and internet access for locked dependencies are required.
 Allplan, Python and Codex are not bundled.
 
 1. Extract the full ZIP into a writable versioned folder. Close Allplan and run

@@ -184,7 +184,31 @@ tym odebranym zakresem; następna praca ma objąć je wspólnie w zakresie
 opisywanym poniżej dla 0.30.0. Granice SDK opisuje
 [notatka API 0.29.0](m4-editing-api-0.29.0.md).
 
-## Zakres kandydata 0.30.0 — jedna sesja priorytetów 1–5
+## Bieżący kandydat 0.31.0 — poprawka owner identity materiału Wall
+
+Praca odbywa się na gałęzi `fix/m4-material-owner-0.31.0`, opartej na
+`develop/m4`. Przeszło 86 affected/dependent focused checks w zestawach
+`wall_material_edit`, `wall_material_http`, `model_edit`, `native_model_edit`
+i `edit_ownership`, w tym trzy regresje parent-wrapper. Przeszedł też jeden
+package version/lock check; 25 nakładających się checks nie liczono drugi raz.
+Łącznie 87 unique focused checks. [Rekord focused verification](../evaluation-packages/0.31.0/focused-verification.json).
+Full CI, build pakietu i native acceptance pozostają pending. Zmiana porównuje parent edge tieru przez `same_model_identity` (drawing, model
+UUID i type), zachowując rzeczywiście zaobserwowany wrapper w
+`tier_hierarchy`. Target Wall nadal ma związany dokładny view UUID.
+
+Focused regression potwierdził, że stary exact view UUID comparison blokował
+alternatywny parent wrapper tego samego modelu. Pierwszy native diagnostic z
+0.30.0 jest z tym defektem zgodny, ale bez raw lineage/children response nie
+ustalono dokładnej przyczyny wyniku Allplana. Guardy pozostają: standalone Wall root, dokładnie jeden
+bezpośredni `WallTier_TypeUUID`, brak tier children, opening i innych Wall
+children, poprawna geometria i pełny istniejący preservation snapshot.
+Drugi 0.30.0 wynik `component_child_owner_mismatch` dla Wall z opening jest
+nierozstrzygnięty i nie jest objęty poprawką. Obie obserwacje opisuje
+[notatka API 0.31.0](m4-editing-api-0.31.0.md); wąska próba native jest w
+[planie 0.31.0](m4-single-drawing-0.31.0.pl.md). Próba nie powtarza
+zaakceptowanych etapów 0.30.0 1–3 i 5 ani grouped delete/Undo Column 0.29.0.
+
+## Zachowany kandydat 0.30.0 — jedna sesja priorytetów 1–5
 
 Źródło `9966c31fc1b79b0ed7c2061d671dafa3f1f2e8d6` na gałęzi
 `feat/m4-combined-evidence-0.30.0` ma [PR #28 do `develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/pull/28).
@@ -199,7 +223,8 @@ checksum/payload, rejestrację, frozen sync/import, schematy `drawing_identity`
 i `attribute_evidence`, limity bezpieczeństwa, upgrade i restore 0.29.0 oraz
 markery journal/trace/log. SHA-256 ZIP-a:
 `78b7b24c98749ebbd28814f84d70a2fc9cbeab80b477b9fd1585e5c10e63af8e`.
-Próby natywnej 0.30.0 jeszcze nie było. Szczegóły są w
+Właściciel wykonał później zaplanowane próby natywne; ograniczone wyniki są
+opisane poniżej. Szczegóły dostawy są w
 [rekordzie dostawy](../evaluation-packages/0.30.0/README.md),
 [source-ci.json](../evaluation-packages/0.30.0/source-ci.json),
 [weryfikacji ZIP](../evaluation-packages/0.30.0/package-verification.json),
@@ -216,19 +241,34 @@ niekompletna zachowuje dane ze stanem `not_checked`. Probe nie ustala ownera ani
 setter payload. `model_edit.preview`/`revalidate` dodają świeży no-op evidence i
 zero-setter accounting; no-op nie ma Apply.
 
+Właściciel zgłosił PASS prób 1, 2, 3 i 5 oraz FAIL próby 4 ścieżki
+natywnego materiału. Szczegółowy zachowany log obejmuje wyłącznie próbę
+5; raw response prób 1–3 nie udostępniono, a próba 4 ma tylko objawy opisane
+w obserwacji. Próba 5 potwierdza cztery
+konkretne scalar zapisy z readbackiem i UI Undo: tekst i integer na Column,
+real na Column oraz tekst na Wall. Enum, Boolean, Beam, samodzielny Slab i
+opening nie zostały zapisane z powodów opisanych w obserwacji.
+[Ograniczona obserwacja 0.30.0](test-results/m4-owner-observation-0.30.0-2026-10-23.md)
+i [szczegółowy log próby 5](test-results/evidence/0.30.0-2026-10-23/allplan-attribute-trials-log.md).
+
 Plan [próby 0.30.0](m4-single-drawing-0.30.0.pl.md) łączy journal
 inspect/archive/restart/replay bez powtórnego settera, Slab/MultiSlab identity
 i attribute evidence, W1 no-op, osobny wynik selection versus highlight,
 material eligibility oraz dostępne scalar/Enum writes na bezpiecznych nowych
-fixture'ach. Data/vector i nierozstrzygnięte field-owner/selection kontrakty
-pozostają BLOCKED; brak fixture to `fixture_missing`. Nie powtarzać zaakceptowanego
-Column delete/Undo 0.29.0. Szczegóły API i granic:
+fixture'ach. Próba 4 native material zakończyła się FAIL przed Apply:
+preview `Żelbet` zgłosił `native_material_preservation_unavailable` i
+`wall_material_tier_hierarchy_unsupported`, a drugi Wall z opening został
+zablokowany przez `component_child_owner_mismatch`. Oba przypadki miały zero
+zmian, setterów i Apply; materiał pozostał bez zmian.
+[Ograniczona obserwacja](test-results/m4-owner-observation-0.30.0-2026-10-23.md).
+Natywna selekcja pozostaje unsupported. Data/vector i nierozstrzygnięte field-owner/selection
+kontrakty pozostają BLOCKED; brak fixture to `fixture_missing`. Nie powtarzać
+zaakceptowanego Column delete/Undo 0.29.0. Szczegóły API i granic:
 [evidence 0.30.0](m4-editing-api-0.30.0.md). Cel pełnego domknięcia
 priorytetów 1–5 pozostaje aktualny, ale jest zablokowany przez nierozstrzygnięty
 field owner Slab/MultiSlab, brak setter/readback payloadów date/vector i brak
-kontraktu native selection set/clear/readback. Kandydat zbiera dane do ustalenia
-tych kontraktów; dokumentacja i probe nie zastępują ich implementacji ani
-native evidence.
+kontraktu native selection set/clear/readback. Kandydat zbierał dane do ustalenia
+tych kontraktów; dokumentacja i probe ich nie zastępują.
 
 ## Zachowany kandydat 0.28.0 — CI i dokładny ZIP zweryfikowane
 
@@ -298,14 +338,20 @@ wykończenia. Właściciel właściwości oraz dokładny cel muszą być jawne.
 
 Priorytet 1 ma zaakceptowany zakres 0.23.0 dla podglądu i potwierdzonej
 archiwizacji; limity 0.28.0 przeszły focused checks, CI i dokładną weryfikację
-ZIP-a. Pozostałe priorytety są częściowe: w 2 własność atrybutów Slab i
-MultiSlab jest nierozstrzygnięta; kandydat 0.30.0 dodaje tylko odczyt dowodów,
-bez ustanowienia ownera; w 3 wcześniejsze native raporty nie zawierają jawnego
-no-op/zero-setter, a 0.30.0 implementuje go do próby; w 4 właściciel zgłosił PASS grupowego delete/Undo dla
-trzech Column w próbie 0.29.0 (historyczny FAIL 0.28.0 pozostaje opisany
-niżej), lecz natywna selekcja nie ma ustalonego setter/readback; w 5 brakuje
-date/vector adapter payload i typed readback. Szczegółowe ograniczenia oraz
-wymagane dowody API dla priorytetów 2, 4 i 5 są w
+ZIP-a. Właściciel zgłasza PASS prób 1–3 oraz 5 i FAIL próby 4 (zmiana natywnego
+materiału); szczegółowy log próby 5 potwierdza cztery zapisane scalar pary z
+readbackiem i Undo, ale nie pełną macierz. Pozostałe priorytety są częściowe:
+w 2 własność atrybutów Slab i MultiSlab jest nierozstrzygnięta; kandydat 0.30.0
+dodaje tylko odczyt dowodów, bez ustanowienia ownera; w 3 wcześniejsze native
+raporty nie zawierają jawnego no-op/zero-setter, a próbę 3 w 0.30.0 właściciel
+zgłosił jako PASS bez dostępnego szczegółowego logu; w 4 grupowy delete/Undo
+trzech Column z 0.29.0 pozostaje zaakceptowany tylko dla tego zakresu
+(historyczny FAIL 0.28.0 pozostaje opisany niżej), natomiast próba zmiany
+native material w 0.30.0 zakończyła się FAIL, a natywna selekcja nie ma
+ustalonego setter/readback; w 5 cztery scalar zapisy z konkretnej próby 0.30.0
+przeszły readback i Undo, lecz Enum/Boolean i inne rodziny nie zostały
+zaakceptowane, a date/vector adapter payload nadal pozostaje zablokowany.
+Szczegółowe ograniczenia oraz wymagane dowody API dla priorytetów 2, 4 i 5 są w
 [notatce API 0.30.0](m4-editing-api-0.30.0.md); ona nie zastępuje prób
 natywnych.
 
@@ -313,19 +359,24 @@ natywnych.
    potwierdzoną archiwizację. Kandydat 0.28.0 zwiększa limity do 512 aktywnych
    rekordów, 1 MiB na rekord, 8 MiB aktywnego śladu, 32 MiB inspekcji śladu i
    inwentarza archiwizacji 1 GiB / 1024 plików. Focused checks, pełne CI i
-   dokładna weryfikacja ZIP-a przeszły. Natywny restart/replay nie ma dowodu.
-   Nie archiwizować rekordów running/unknown, uszkodzonych ani
-   niezweryfikowanych.
+   dokładna weryfikacja ZIP-a przeszły. Właściciel zgłosił PASS próby 1 z
+   planu 0.30.0, którego zakres obejmował podgląd, archiwizację i restart/replay
+   bez nowego settera; szczegółowy log tej próby nie jest dostępny, więc nie
+   przypisuję PASS do poszczególnych podkroków. Nie archiwizować rekordów
+   running/unknown, uszkodzonych ani niezweryfikowanych.
 2. **Implementacja:** bounded identity inventory oraz fail-closed blokady
    zapisu istnieją. **Pozostaje:** lineage `Slab_TypeUUID` pod
    `MultiSlab_TypeUUID` zgłoszone w logu 0.27.0 jest nierozstrzygnięte;
-   strukturalna tożsamość nie ustanawia właściciela pola. Nie scalać wyników
-   ani nie zapisywać do nich przed wyjaśnieniem relacji i właściciela.
+   strukturalna tożsamość nie ustanawia właściciela pola. Właściciel zgłosił
+   PASS próby 2 (odczyty identity/evidence), lecz brak szczegółowego logu nie
+   rozstrzyga konfliktu lineage ani field owner. Nie scalać wyników ani nie
+   zapisywać do nich przed wyjaśnieniem relacji i właściciela.
 3. **Implementacja:** obsługa layer 0 i reviewed W1 plan/apply. **Ograniczony
    dowód native:** właściciel zgłosił W1 read/write i jeden element na krok UI
-   Undo. **Pozostaje:** jawny no-op z potwierdzeniem zera setterów nie został
-   zgłoszony. Nie powtarzać przyjętego Undo/readback i nie wnioskować o Undo
-   całej grupy.
+   Undo. Właściciel zgłosił PASS próby 3 no-op w 0.30.0, ale jej surowy log
+   nie jest dostępny; zero setterów traktuję jako zgłoszenie na poziomie próby,
+   bez niezależnego potwierdzenia odpowiedzi. Nie powtarzać przyjętego
+   Undo/readback i nie wnioskować o Undo całej grupy.
 4. **Implementacja:** guarded typed delete, zachowane krawędzie tożsamości
    rodzic–potomek oraz diagnostyka eligibility materiału. Kandydat 0.29.0
    rozwija jeden plan na trzy cele i wykonuje jeden plural `DeleteElements`.
@@ -338,20 +389,29 @@ natywnych.
    FAIL próby 0.28.0, w której Undo przywróciło jeden z trzech, pozostaje
    historyczny. Osobny Wall 240 mm subtree delete i dwa Beam W1 readbacki nie
    są akceptacjami Column. Selekcja pozostaje nieobsługiwana. Diagnostyka
-   materiału z 0.27.0 sama nie dodała setteru; istniejący eksperymentalny
-   setter Wall pozostaje guarded i nie ma natywnego odbioru. Próba 0.30.0 może
-   przejść jego standardowy evaluation Apply, jeśli konkretny target przejdzie
-   preservation oraz wszystkie Apply guardy.
+   materiału z 0.27.0 sama nie dodała setteru. Próba 4 w 0.30.0 zakończyła
+   się FAIL przed Apply. Preview dokładnego Wall z `Żelbet` zgłosił
+   `native_material_preservation_unavailable` →
+   `wall_material_tier_hierarchy_unsupported`; drugi Wall z opening zgłosił
+   `component_child_owner_mismatch`. Oba miały zero zmian, setterów i Apply,
+   a materiał pozostał bez zmian. Implementacyjna analiza wskazała ścisłe
+   porównanie parent view UUID w snapshotcie preservation jako źródło
+   niezgodności z porównaniem model identity pomiędzy wrapperami. Zachować
+   FAIL i naprawić tę ścieżkę przed nową próbą. Native selection
+   set/clear/readback nadal unsupported.
 5. **Implementacja:** kontrakty scalar/Enum, inwentarz rodzin/wartości oraz
    bounded resolver nazw. W próbie 0.27.0 zgłoszono PASS lowercase lookup i
    diagnostyki materiału. Kandydat 0.30.0 dodaje dokładny read-only probe
    `attribute_evidence` z raw wartościami i runtime type; jego kompletność
    wymaga `evidence_complete`, consensus i wszystkich żądanych obserwacji.
-   **Pozostaje:** pełna native macierz rodzin, owner pola i roundtrip dla
-   konkretnego adaptera; daty, wektory i inne wartości nieskalarne pozostają
-   zablokowane do czasu dokładnego setter/readback kontraktu oraz osobnej próby
-   z Undo. Scalar/Enum zapisów nie uznaje się za zaakceptowane dla nowej pary
-   rodzina/typ bez jej własnych readback i Undo.
+   Właściciel zgłosił PASS próby 5. Zachowany log potwierdza cztery konkretne
+   scalar pary (tekst, integer i real na Column; tekst na Wall), każdą z
+   `readback_matches` oraz jednym Undo i odczytem odtworzenia.
+   **Pozostaje:** pełna native macierz rodzin i owner pola. Enum `Status` miał
+   wartość niezdefiniowaną, brakowało Boolean i standalone Slab fixtures, a
+   Beam/opening odczyty zostały zablokowane. Daty, wektory i inne wartości
+   nieskalarne pozostają zablokowane do dokładnego setter/readback kontraktu
+   oraz osobnej próby z Undo. Nie uogólniać PASS na inne pary rodzina/typ.
 6. **Dopiero potem zaprojektować pracę wieloplikową.** Potrzebne są manifest,
    deterministyczne partie, jawne wyniki częściowe, obsługa timeout/restart i
    pomiary dla ponad 32 zmian oraz ponad 200 wyników. Nie deklarować atomowości
