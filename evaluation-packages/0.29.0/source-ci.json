@@ -1,0 +1,44 @@
+{
+  "source_commit": "df050afc71b9e0c2303594d6acbd3da463df3e89",
+  "pull_request": 27,
+  "base": "develop/m4",
+  "run_id": 39971389774,
+  "url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39971389774",
+  "conclusion": "success",
+  "matrix": "Windows/Ubuntu Python 3.12",
+  "tests_per_job": 607,
+  "jobs": [
+    {
+      "id": 120474694358,
+      "name": "configuration",
+      "conclusion": "success"
+    },
+    {
+      "id": 120474777242,
+      "name": "portable (windows-latest, 3.12)",
+      "conclusion": "success"
+    },
+    {
+      "id": 120474777333,
+      "name": "portable (ubuntu-latest, 3.12)",
+      "conclusion": "success"
+    },
+    {
+      "id": 120480104149,
+      "name": "package",
+      "conclusion": "success"
+    }
+  ],
+  "artifact": {
+    "id": 12510270932,
+    "digest": "sha256:3d509667620fb3a23fc7a1daf0c9303f68e2ede98cccac1c4ee08d7b00e615da",
+    "name": "candidate-df050afc71b9e0c2303594d6acbd3da463df3e89",
+    "size_in_bytes": 1076438
+  },
+  "artifact_transfer": "Connector returned a file-service download URL; one normal-proxy transfer failed with URLError before an HTTP status. Original CI artifact unavailable to the executor.",
+  "delivery": "One local fallback build from clean detached source at the exact CI commit (source_modified=false). Exact ZIP verification passed on first attempt. Original CI artifact was not delivered.",
+  "draft_configuration_only_run": 39971367200,
+  "native_Allplan_0_29_0": "not_run",
+  "verified_fallback_zip_sha256": "0e4211b7a28f69a0b0400c13e2a90efeca9c230d34e42599adc6e8a2932d5aa5",
+  "package_verification": "package-verification.json"
+}

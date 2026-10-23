@@ -153,14 +153,30 @@ builda Allplana. Punkty 1–5 pozostają częściowo otwarte zgodnie z
 
 ## Bieżąca praca 0.29.0 — plural delete i grupowe Undo
 
-Kandydat obejmuje jeden plan usunięcia rozwinięty na trzy dokładne cele
-Column, jedno wywołanie `DeleteElements` z pełną listą związanych adapterów,
-świeży odczyt braku każdego celu i potomka oraz jedno UI Undo przywracające
-całą grupę. Wymagania próby właściciela są w
-[planie próby 0.29.0](m4-single-drawing-0.29.0.pl.md), a granice SDK i API
-w [notatce API 0.29.0](m4-editing-api-0.29.0.md). Wyniki implementacji, CI i
-pakietu 0.29.0 nie są tu jeszcze zapisane; dopisać exact source oraz wyniki po
-zakończeniu tych etapów. Dostawa i obserwacja 0.28.0 poniżej są historią.
+Źródło `df050afc71b9e0c2303594d6acbd3da463df3e89` na gałęzi
+`fix/m4-batch-undo-0.29.0` ma [PR #27 do `develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/pull/27).
+Przeszedł full CI 39971389774: 607 testów na Windows i 607 na Ubuntu (Python
+3.12) oraz job pakietu; przeszło też 99 unique focused checks. Artefakt CI
+12510270932 (digest
+`3d509667620fb3a23fc7a1daf0c9303f68e2ede98cccac1c4ee08d7b00e615da`) nie został
+przesłany przez connector: pojedynczy transfer zwykłym proxy zakończył się
+`URLError` przed odpowiedzią HTTP. Zgodnie z polityką wykonano jeden fallback
+build z czystego detached checkoutu dokładnego źródła (`source_modified=false`).
+ZIP z 191 plikami payload przeszedł dokładną weryfikację raz; SHA-256
+`0e4211b7a28f69a0b0400c13e2a90efeca9c230d34e42599adc6e8a2932d5aa5`.
+Szczegóły zawiera [rekord pakietu 0.29.0](../evaluation-packages/0.29.0/README.md).
+
+Kandydat obejmuje jeden plan usunięcia rozwinięty na dokładny zestaw Column,
+jedno wywołanie `DeleteElements` z pełną listą adapterów, dziennik nieznanych
+wyników dla całego zestawu przed wywołaniem i świeży odczyt każdego celu oraz
+potomka. Częściowe/nieznane wyniki odzyskuje się pod tym samym execution ID bez
+powtarzania settera. Natywna próba 0.29.0 **nie została wykonana**. Pozostaje
+wąska próba grupowego usunięcia trzech Column i jednego Undo:
+[plan próby 0.29.0](m4-single-drawing-0.29.0.pl.md). Raport 0.28.0 pozostaje
+historyczny: jedno Undo przywróciło tylko jeden z trzech Column. Priorytet 1
+zachowuje zaakceptowany zakres bounded journal cleanup; priorytety 2–5 pozostają
+częściowe zgodnie z opisem poniżej. Granice SDK opisuje
+[notatka API 0.29.0](m4-editing-api-0.29.0.md).
 
 ## Zachowany kandydat 0.28.0 — CI i dokładny ZIP zweryfikowane
 

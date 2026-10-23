@@ -1,0 +1,18 @@
+{
+  "source_commit": "df050afc71b9e0c2303594d6acbd3da463df3e89",
+  "source_modified": false,
+  "zip_sha256": "0e4211b7a28f69a0b0400c13e2a90efeca9c230d34e42599adc6e8a2932d5aa5",
+  "payload_files": 191,
+  "bridge_hashes_verified": 42,
+  "zip_checksum": "pass",
+  "payload_integrity": "pass",
+  "exact_zip_registration": "pass",
+  "exact_zip_frozen_sync_and_import": "pass",
+  "drawing_identity_schema_validation": "pass",
+  "native_source_safety_limits": "pass",
+  "upgrade_from_0.28.0": "pass",
+  "restore_to_0.28.0": "pass",
+  "journal_trace_and_bridge_log_preserved": "pass",
+  "archived_execution_and_trace_markers_preserved": "pass",
+  "native_Allplan": "not_run"
+}

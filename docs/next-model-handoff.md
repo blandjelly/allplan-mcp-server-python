@@ -6,18 +6,45 @@ and target pull requests to `develop/m4`. Main remains separate. Read
 implementation. The policy is the source of truth for automated checks and
 package builds.
 
-## Current work: 0.29.0 — plural Column delete and group Undo
+## Current candidate: 0.29.0 — CI and exact fallback ZIP verification passed
 
-The active work targets one delete-only plan expanded over three exact Column
-targets, one `DeleteElements` call with the complete reviewed adapter list,
-per-target fresh absence readback, and one UI Undo that restores every target
-and bound descendant. The [scoped 0.29.0 trial](m4-single-drawing-0.29.0.pl.md)
-defines the owner gate; [API evidence](m4-editing-api-0.29.0.md) documents the
-official plural-list call examples and the separate uncertainty about UI Undo.
-0.29.0 implementation, CI and package verification are not recorded here yet;
-add exact source and results after those stages complete. Keep the
-[0.28.0 delivery and owner report](#retained-candidate-0280--ci-and-exact-zip-verification-passed)
-as historical evidence.
+Source `df050afc71b9e0c2303594d6acbd3da463df3e89` is on
+`fix/m4-batch-undo-0.29.0`; [PR #27](https://github.com/blandjelly/allplan-mcp-server-python/pull/27)
+targets `develop/m4`. Full CI run
+[39971389774](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/39971389774)
+passed 607 tests on each Windows and Ubuntu Python 3.12 job plus the package
+job. The configuration-only run 39971367200 also passed. The candidate passed
+99 unique affected/dependent focused checks.
+
+CI artifact 12510270932 (digest
+`3d509667620fb3a23fc7a1daf0c9303f68e2ede98cccac1c4ee08d7b00e615da`) could not
+be transferred: the connector supplied a file-service reference and the one
+normal-proxy transfer failed with `URLError` before an HTTP response. Per policy,
+one fallback build was made from a clean detached checkout at the exact source
+(`source_modified=false`). The 191-payload-file ZIP passed exact verification
+once; SHA-256:
+`0e4211b7a28f69a0b0400c13e2a90efeca9c230d34e42599adc6e8a2932d5aa5`.
+Checksum/payload, registration, frozen sync/import, `drawing_identity` schema,
+source safety limits, upgrade from and restore to 0.28.0, 42 bridge hashes, and
+active/archive journal, trace and log markers passed. See the
+[0.29.0 evaluation record](../evaluation-packages/0.29.0/README.md),
+[CI record](../evaluation-packages/0.29.0/source-ci.json),
+[package verification](../evaluation-packages/0.29.0/package-verification.json),
+[build provenance](../evaluation-packages/0.29.0/build.log), and
+[API evidence](m4-editing-api-0.29.0.md).
+
+The candidate expands one reviewed delete template over the complete exact
+target set, journals unknown outcomes for all targets before the native call,
+and makes one `DeleteElements` call with the complete bound adapter list. Fresh
+readback records per-target and descendant results; unknown/partial outcomes
+recover under the same execution ID without repeating deletion.
+
+Native Allplan 0.29.0 is **not run**. The pending owner trial for this candidate
+is the narrow three-Column grouped deletion and one-Undo check in the
+[0.29.0 trial plan](m4-single-drawing-0.29.0.pl.md). The 0.28.0 owner report
+remains historical: one Undo restored only one of three Columns, with no
+further Undo available. Priorities 1–5 remain partially open beyond the
+accepted scope; see the [coverage matrix](m4-single-drawing-coverage-0.24.0.md).
 
 ## Retained candidate: 0.28.0 — CI and exact ZIP verification passed
 
