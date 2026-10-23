@@ -151,7 +151,18 @@ builda Allplana. Punkty 1–5 pozostają częściowo otwarte zgodnie z
 [handoffem](next-model-handoff.md); kolejny zakres opisuje
 [krótka próba 0.28.0](m4-single-drawing-0.28.0.pl.md).
 
-## Aktualny kandydat 0.28.0 — CI i dokładny ZIP zweryfikowane
+## Bieżąca praca 0.29.0 — plural delete i grupowe Undo
+
+Kandydat obejmuje jeden plan usunięcia rozwinięty na trzy dokładne cele
+Column, jedno wywołanie `DeleteElements` z pełną listą związanych adapterów,
+świeży odczyt braku każdego celu i potomka oraz jedno UI Undo przywracające
+całą grupę. Wymagania próby właściciela są w
+[planie próby 0.29.0](m4-single-drawing-0.29.0.pl.md), a granice SDK i API
+w [notatce API 0.29.0](m4-editing-api-0.29.0.md). Wyniki implementacji, CI i
+pakietu 0.29.0 nie są tu jeszcze zapisane; dopisać exact source oraz wyniki po
+zakończeniu tych etapów. Dostawa i obserwacja 0.28.0 poniżej są historią.
+
+## Zachowany kandydat 0.28.0 — CI i dokładny ZIP zweryfikowane
 
 Źródło `b59ef15d9bfd4dfb42476b240e31b5b300268d2d` na gałęzi
 `fix/m4-owner-views-0.28.0` ma [PR #26 do `develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/pull/26);
@@ -180,9 +191,15 @@ rodzica w krawędziach podglądu/ponownej walidacji, a dokładny view UUID
 wybranego targetu nadal jest związany z planem. Limity dziennika wynoszą teraz
 512 aktywnych rekordów, 1 MiB na rekord, 8 MiB śladu, 32 MiB inspekcji śladu
 oraz 1 GiB / 1024 pliki inwentarza archiwizacji. Blokady zapisu Slab/MultiSlab
-pozostają. Próby natywnej 0.28.0 nie wykonano; priorytety 1–5 pozostają
-częściowo otwarte. Kolejna ograniczona próba dotyczy tylko wskazanych Column
-na W1, potomków i Undo: [plan próby](m4-single-drawing-0.28.0.pl.md).
+pozostają. Właściciel zgłosił później ograniczony PASS punktów 1, 2, 3 i 5
+próby Column oraz FAIL punktu 4: jedno UI Undo przywróciło tylko jeden z trzech
+usuniętych Column, a dalsze Undo nie było dostępne. Brak UUID, surowych
+odpowiedzi, manifestu i builda Allplana ogranicza przypisanie wyniku. Zobacz
+[obserwację 0.28.0](test-results/m4-owner-observation-0.28.0-2026-10-23.md)
+i [oryginalny log](test-results/evidence/allplan-chat-log-0.28.0-2026-10-23.md).
+Priorytety 1–3 i 5 pozostają częściowo otwarte; priorytet 4 nie spełnia
+oczekiwania grupowego Undo ani pełnej akceptacji natywnej. [Plan próby 0.28.0](m4-single-drawing-0.28.0.pl.md)
+zachowuje jej zakres i wynik.
 [Macierz pokrycia](m4-single-drawing-coverage-0.24.0.md) nie zastępuje odbioru
 natywnego.
 
@@ -211,6 +228,17 @@ wykończenia. Właściciel właściwości oraz dokładny cel muszą być jawne.
 
 ## Priorytety dalszej pracy
 
+Priorytet 1 ma zaakceptowany zakres 0.23.0 dla podglądu i potwierdzonej
+archiwizacji; limity 0.28.0 przeszły focused checks, CI i dokładną weryfikację
+ZIP-a. Pozostałe priorytety są częściowe: w 2 własność atrybutów Slab i
+MultiSlab jest nierozstrzygnięta; w 3 brakuje jawnego no-op/zero-setter i jego
+świeżego potwierdzenia; w 4 próba 0.28.0 FAIL dla jednego Undo przywracającego
+trzy Column, a natywna selekcja nie ma ustalonego setter/readback; w 5 brakuje
+date/vector adapter payload i typed readback. Szczegółowe ograniczenia oraz
+wymagane dowody API dla priorytetów 2, 4 i 5 są w
+[notatce API 0.29.0](m4-editing-api-0.29.0.md); ona nie zastępuje prób
+natywnych.
+
 1. **Implementacja:** zaakceptowany zakres 0.23.0 obejmuje podgląd i
    potwierdzoną archiwizację. Kandydat 0.28.0 zwiększa limity do 512 aktywnych
    rekordów, 1 MiB na rekord, 8 MiB aktywnego śladu, 32 MiB inspekcji śladu i
@@ -232,12 +260,15 @@ wykończenia. Właściciel właściwości oraz dokładny cel muszą być jawne.
    rodzic–potomek w kandydacie 0.28.0 oraz diagnostyka eligibility materiału.
    **Dowody native:** oddzielny Wall 240 mm subtree delete z pięcioma dziećmi
    i dwa Beam W1 readbacki zgłoszono jako wykonane; nie są to akceptacje Column.
-   Preview trzech Column W1 zablokował `component_child_owner_mismatch` i nie
-   usunął celów. Kandydat 0.28.0 (focused checks, CI i dokładna weryfikacja ZIP-a przeszły)
+   Kandydat 0.28.0 (focused checks, CI i dokładna weryfikacja ZIP-a przeszły)
    dopasowuje krawędzie po rysunku, model UUID i typie, zachowując rzeczywiste
    view UUID rodziców oraz dokładny view UUID wybranego targetu, związane z
-   preview i ponowną walidacją. **Pozostaje:** natywna
-   próba dokładnych Column W1, pełnego poddrzewa i Undo. Selekcja pozostaje
+   preview i ponowną walidacją. Właściciel zgłosił ograniczony PASS
+   podświetlenia, preview, usunięcia z odczytem braku trzech Column oraz
+   read-only probe. **FAIL:** jedno UI Undo przywróciło jeden z trzech
+   elementów; dalsze Undo nie było dostępne. Wynik nie potwierdza atomowego
+   Undo ani pełnej akceptacji Column; brak dokładnych identyfikatorów i artefaktu
+   ogranicza dowód. Selekcja pozostaje
    nieobsługiwana, a diagnostyka materiału nie akceptuje ani nie włącza zapisu
    natywnego materiału.
 5. **Implementacja:** kontrakty scalar/Enum, inwentarz rodzin/wartości oraz

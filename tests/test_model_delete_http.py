@@ -16,14 +16,14 @@ class ModelDeleteHTTPTests(unittest.IsolatedAsyncioTestCase):
         native = fixtures.ModelEditTests()
         native.setUp()
         self.addCleanup(native.doCleanups)
-        targets = native.fixture(("",))
-        target = targets[0]
+        targets = native.fixture(("", "", ""))
         native.base.DrawingFileService.GetActiveFileNumber.return_value = 101
 
         def delete_elements(doc, adapters):
             self.assertEqual([item.GetModelElementUUID() for item in adapters],
-                             [target.GetModelElementUUID()])
-            target.IsDeleted.return_value = True
+                             [target.GetModelElementUUID() for target in targets])
+            for target in adapters:
+                target.IsDeleted.return_value = True
             native.base.ElementsSelectService.SelectAllElements.side_effect = lambda current_doc: [
                 item for item in targets if not item.IsDeleted()
             ]
@@ -45,7 +45,7 @@ class ModelDeleteHTTPTests(unittest.IsolatedAsyncioTestCase):
                                  changes=[{"target": {"kind": "delete"}}])
         async with Client(self.url, timeout=10) as client:
             preview = (await client.call_tool("model_edit", {"request": request})).data
-            self.assertEqual(preview["counts"]["changes"], 1)
+            self.assertEqual(preview["counts"]["changes"], 3)
             highlighted = (await client.call_tool("model_edit", {
                 "request": preview["next_action"]["request"]})).data
             execution_id = uuid4().hex
@@ -54,7 +54,7 @@ class ModelDeleteHTTPTests(unittest.IsolatedAsyncioTestCase):
                 **apply_request}})).data
             self.assertEqual(applied["state"], "completed", applied)
             self.assertTrue(applied["audited_fields_match_plan"])
-            self.assertEqual(target.IsDeleted.return_value, True)
+            self.assertEqual([target.IsDeleted.return_value for target in targets], [True, True, True])
             replay = (await client.call_tool("model_edit", {"request": apply_request})).data
             self.assertTrue(replay["replayed"])
             self.assertEqual(native.base.DeleteElements.call_count, 1)

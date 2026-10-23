@@ -6,7 +6,20 @@ and target pull requests to `develop/m4`. Main remains separate. Read
 implementation. The policy is the source of truth for automated checks and
 package builds.
 
-## Current candidate: 0.28.0 — CI and exact ZIP verification passed
+## Current work: 0.29.0 — plural Column delete and group Undo
+
+The active work targets one delete-only plan expanded over three exact Column
+targets, one `DeleteElements` call with the complete reviewed adapter list,
+per-target fresh absence readback, and one UI Undo that restores every target
+and bound descendant. The [scoped 0.29.0 trial](m4-single-drawing-0.29.0.pl.md)
+defines the owner gate; [API evidence](m4-editing-api-0.29.0.md) documents the
+official plural-list call examples and the separate uncertainty about UI Undo.
+0.29.0 implementation, CI and package verification are not recorded here yet;
+add exact source and results after those stages complete. Keep the
+[0.28.0 delivery and owner report](#retained-candidate-0280--ci-and-exact-zip-verification-passed)
+as historical evidence.
+
+## Retained candidate: 0.28.0 — CI and exact ZIP verification passed
 
 Source `b59ef15d9bfd4dfb42476b240e31b5b300268d2d` is on
 `fix/m4-owner-views-0.28.0`; [PR #26](https://github.com/blandjelly/allplan-mcp-server-python/pull/26)
@@ -38,9 +51,19 @@ across alternate view wrappers, retains actual parent view UUIDs in bound
 target's exact view UUID bound. It raises journal capacity to 512 active
 records, retains the 1 MiB per-record cap, sets active trace to 8 MiB and trace
 inspection to 32 MiB, and bounds archive inventory at 1 GiB / 1024 files.
-Slab/MultiSlab write guards remain unchanged. Native Allplan 0.28.0 has not been
-run. Priorities 1–5 remain partially open; see the
-[0.28.0 short trial](m4-single-drawing-0.28.0.pl.md) and
+Slab/MultiSlab write guards remain unchanged. The owner later reported PASS for
+0.28.0 trial points 1, 2, 3 and 5, and FAIL for point 4: one UI Undo restored
+only one of the three deleted Columns, with no further Undo available. The
+conversation log lacks target UUIDs, raw MCP responses, exact package manifest
+and Allplan build ID, so these are scoped owner observations, not exact-artifact
+acceptance. The [observation](test-results/m4-owner-observation-0.28.0-2026-10-23.md)
+and [verbatim log](test-results/evidence/allplan-chat-log-0.28.0-2026-10-23.md)
+record the limits. Priorities 1–3 and 5 remain partially open; priority 4's
+group-Undo expectation failed and native Column acceptance remains incomplete.
+The next candidate trial is scoped to one plural native delete call and one UI
+Undo for the exact three-Column group:
+[0.29.0 short trial](m4-single-drawing-0.29.0.pl.md). See also the
+[0.28.0 trial record](m4-single-drawing-0.28.0.pl.md) and
 [coverage matrix](m4-single-drawing-coverage-0.24.0.md).
 
 ## Retained candidate: 0.25.0
@@ -244,17 +267,23 @@ Beam W1 writes.
    edges by drawing/model/type identity and retains actual parent view UUIDs in
    bound `child_parent_edges` and `descendant_parent_edges`; the selected
    target's exact view UUID remains bound. Focused checks, full CI, and exact
-   ZIP verification passed; native Column trial remains pending. The supplied
-   0.27.0 log reports a separate Wall 240 mm deletion with five descendants
-   absent on a fresh complete scan and two Beam W1 readbacks. Three W1 Columns
-   were blocked at preview by `component_child_owner_mismatch`. Next evidence
-   is limited to those exact Column W1 targets, complete subtree, and native
-   Undo. Slab/MultiSlab write blockers stay in force. Selection remains
+   ZIP verification passed. The owner reports scoped PASS for points 1–3 and 5
+   of the 0.28.0 Column trial: three W1 Columns were highlighted and previewed,
+   deletion and absence readback were reported, and an optional read-only probe
+   was reported PASS. Point 4 **FAIL**: one UI Undo restored only one of the
+   three; further Undo was unavailable. No UUIDs, raw MCP responses, exact
+   manifest or Allplan build ID were retained, so the report is not exact
+   artifact acceptance. Do not claim group Undo or full Column acceptance.
+   Next, follow the [0.29.0 short trial](m4-single-drawing-0.29.0.pl.md): one
+   plural `DeleteElements` call for the complete reviewed group, per-target
+   fresh absence readback, then one UI Undo restoring all three and their
+   descendants. Slab/MultiSlab write blockers stay in force. Selection remains
    unsupported; material diagnostics passed, but no native material setter is
    accepted.
 5. **Implemented:** bounded scalar/Enum contracts, family/value inventory and
    attribute-name resolver. The 0.27.0 lowercase lookup and material-diagnostic
-   trial points have owner-reported PASS. **Remaining:** date/vector/object
+   points and 0.28.0 optional read-only probe have owner-reported PASS in their
+   limited scope. **Remaining:** date/vector/object
    codecs and per-family owner, value roundtrip, UI readback and Undo evidence.
    Do not infer support from SDK symbols or repeat accepted attribute writes.
 

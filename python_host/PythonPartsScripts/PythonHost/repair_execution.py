@@ -540,61 +540,64 @@ class RepairExecutor:
         self.save(record)
         self.plans.invalidate_for_execution()
         self.plans.queries.selections.clear()
-        for index, change in enumerate(record["changes"]):
-            outcome = record["outcomes"][index]
-            if self.plans.queries.clock() - started >= 20:
-                outcome["reason"] = "execution_time_budget"
-                break
-            stage = "pre_set_resolve"
-            try:
-                native_owners = []
-                element = native_repairs.resolve(doc, base, self.plans.queries, change, writable=True, adapter_owners=native_owners)
-                stage = "pre_set_read"
-                old = native_repairs.read(base, self.plans.queries, element, change)
-                if not same_observation(change, old, change["old_value"]):
-                    outcome.update(state="conflict", reason="old_value_changed", readback=old)
-                    break
+        if all(change.get("operation") == "delete_element" for change in record["changes"]):
+            self._apply_delete_batch(doc, base, record, started)
+        else:
+            for index, change in enumerate(record["changes"]):
+                outcome = record["outcomes"][index]
                 if self.plans.queries.clock() - started >= 20:
                     outcome["reason"] = "execution_time_budget"
                     break
-            except Exception as exc:
-                outcome.update(state="conflict", **_error_details(exc), stage=stage)
-                break
-            outcome.update(state="unknown", reason="setter_may_have_run")
-            self.save(record)  # Write-ahead marker: a crash cannot authorize replay.
-            stage = "setter"
-            try:
-                if change.get("operation") in {"delete_element", "set_native_material"}:
-                    def write_budget():
-                        if self.plans.queries.clock() - started >= 20:
-                            raise BridgeError("scan_limit_exceeded", "Native mutation preflight exceeded execution budget.", 409)
-                    native_repairs.write(base, element, change, doc=doc, check=write_budget)
-                else:
-                    native_repairs.write(base, element, change)
-                if index == 0 and request.get("evaluation_stop"):
-                    # Leave the actual durable write-ahead marker unchanged. No
-                    # readback, final save, second setter or fabricated failure.
-                    # Exact-ID replay and Recover use the normal journal route.
-                    return self.result(record)
-                # Never trust returned/stale adapters or setter return values as success.
-                stage = "fresh_resolve"
-                resolution = {}
-                observed = native_repairs.observe(doc, base, self.plans.queries, change, resolution)
-                stage = "readback"
-                if resolution:
-                    outcome["representation_consensus"] = resolution
-                outcome["readback"] = observed
-                if new_value_observed(change, observed):
-                    outcome.update(state="applied", reason="readback_matches")
-                elif same_observation(change, observed, change["old_value"]):
-                    outcome.update(state="failed", reason="readback_unchanged")
-                else:
-                    outcome.update(state="unknown", reason="readback_differs_or_unavailable")
-            except Exception as exc:
-                outcome.update(state="unknown", **_error_details(exc), stage=stage)
-            self.save(record)
-            if outcome["state"] != "applied":
-                break
+                stage = "pre_set_resolve"
+                try:
+                    native_owners = []
+                    element = native_repairs.resolve(doc, base, self.plans.queries, change, writable=True, adapter_owners=native_owners)
+                    stage = "pre_set_read"
+                    old = native_repairs.read(base, self.plans.queries, element, change)
+                    if not same_observation(change, old, change["old_value"]):
+                        outcome.update(state="conflict", reason="old_value_changed", readback=old)
+                        break
+                    if self.plans.queries.clock() - started >= 20:
+                        outcome["reason"] = "execution_time_budget"
+                        break
+                except Exception as exc:
+                    outcome.update(state="conflict", **_error_details(exc), stage=stage)
+                    break
+                outcome.update(state="unknown", reason="setter_may_have_run")
+                self.save(record)  # Write-ahead marker: a crash cannot authorize replay.
+                stage = "setter"
+                try:
+                    if change.get("operation") in {"delete_element", "set_native_material"}:
+                        def write_budget():
+                            if self.plans.queries.clock() - started >= 20:
+                                raise BridgeError("scan_limit_exceeded", "Native mutation preflight exceeded execution budget.", 409)
+                        native_repairs.write(base, element, change, doc=doc, check=write_budget)
+                    else:
+                        native_repairs.write(base, element, change)
+                    if index == 0 and request.get("evaluation_stop"):
+                        # Leave the actual durable write-ahead marker unchanged. No
+                        # readback, final save, second setter or fabricated failure.
+                        # Exact-ID replay and Recover use the normal journal route.
+                        return self.result(record)
+                    # Never trust returned/stale adapters or setter return values as success.
+                    stage = "fresh_resolve"
+                    resolution = {}
+                    observed = native_repairs.observe(doc, base, self.plans.queries, change, resolution)
+                    stage = "readback"
+                    if resolution:
+                        outcome["representation_consensus"] = resolution
+                    outcome["readback"] = observed
+                    if new_value_observed(change, observed):
+                        outcome.update(state="applied", reason="readback_matches")
+                    elif same_observation(change, observed, change["old_value"]):
+                        outcome.update(state="failed", reason="readback_unchanged")
+                    else:
+                        outcome.update(state="unknown", reason="readback_differs_or_unavailable")
+                except Exception as exc:
+                    outcome.update(state="unknown", **_error_details(exc), stage=stage)
+                self.save(record)
+                if outcome["state"] != "applied":
+                    break
         record["state"] = "completed" if all(o["state"] == "applied" for o in record["outcomes"]) else "stopped"
         try:
             report_key = "criteria_after" if "criterion_request" in record else "audit_after"
@@ -615,6 +618,71 @@ class RepairExecutor:
                 record["state"] = "verification_failed"
         self.save(record)
         return self.result(record)
+
+    def _apply_delete_batch(self, doc, base, record, started):
+        """One delete command is one native submission for all reviewed roots."""
+        from .model_delete import write_batch
+
+        def write_budget():
+            if self.plans.queries.clock() - started >= 20:
+                raise BridgeError("scan_limit_exceeded", "Native deletion batch exceeded execution budget.", 409)
+
+        elements, native_owners = [], []
+        stage = "pre_set_resolve"
+        try:
+            # Keep all enumerations alive until the one native call completes.
+            for index, change in enumerate(record["changes"]):
+                write_budget()
+                stage = "pre_set_resolve"
+                element = native_repairs.resolve(doc, base, self.plans.queries, change,
+                    writable=True, adapter_owners=native_owners)
+                stage = "pre_set_read"
+                old = native_repairs.read(base, self.plans.queries, element, change)
+                if not same_observation(change, old, change["old_value"]):
+                    record["outcomes"][index].update(state="conflict", reason="old_value_changed", readback=old)
+                    self.save(record)
+                    return
+                elements.append(element)
+            write_budget()
+        except Exception as exc:
+            record["outcomes"][index].update(state="conflict", **_error_details(exc), stage=stage)
+            self.save(record)
+            return
+        record["native_delete_batch"] = {"method": "DeleteElements", "target_count": len(elements),
+            "submission": "may_have_run", "native_undo": "not_checked"}
+        for outcome in record["outcomes"]:
+            outcome.update(state="unknown", reason="setter_may_have_run")
+        # Every root can be affected by the next call. Persist all write-ahead
+        # markers together; a crash or partial exception must never permit retry.
+        self.save(record)
+        try:
+            write_batch(base, elements, record["changes"], doc, write_budget)
+        except Exception as exc:
+            for outcome in record["outcomes"]:
+                outcome.update(state="unknown", **_error_details(exc), stage="setter")
+            self.save(record)
+            return
+        record["native_delete_batch"]["submission"] = "returned"
+        # The whole list was submitted, so observe every root even if another
+        # root has failed readback. No result implies native batch atomicity.
+        for change, outcome in zip(record["changes"], record["outcomes"]):
+            stage = "fresh_resolve"
+            try:
+                resolution = {}
+                observed = native_repairs.observe(doc, base, self.plans.queries, change, resolution)
+                stage = "readback"
+                if resolution:
+                    outcome["representation_consensus"] = resolution
+                outcome["readback"] = observed
+                if new_value_observed(change, observed):
+                    outcome.update(state="applied", reason="readback_matches")
+                elif same_observation(change, observed, change["old_value"]):
+                    outcome.update(state="failed", reason="readback_unchanged")
+                else:
+                    outcome.update(state="unknown", reason="readback_differs_or_unavailable")
+            except Exception as exc:
+                outcome.update(state="unknown", **_error_details(exc), stage=stage)
+            self.save(record)
 
     def recover(self, doc, base, settings, record):
         # Recovery is observation only; session-local refs are never resumed.

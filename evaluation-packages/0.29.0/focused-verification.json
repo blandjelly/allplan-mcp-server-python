@@ -1,0 +1,61 @@
+{
+  "candidate": "0.29.0",
+  "scope": "focused affected and dependent unit and HTTP checks for grouped typed model-edit deletion",
+  "source_scope": [
+    "python_host/PythonPartsScripts/PythonHost/model_delete.py",
+    "python_host/PythonPartsScripts/PythonHost/repair_execution.py",
+    "tests/test_model_delete.py",
+    "tests/test_model_delete_http.py"
+  ],
+  "native_allplan": "not_run",
+  "result": "passed",
+  "unique_tests_passed": 99,
+  "commands": [
+    {
+      "command": "UV_CACHE_DIR=/tmp/uv-cache uv run --frozen --no-sync python -m unittest discover -s tests -p 'test_model_delete.py' -v",
+      "tests": 28,
+      "result": "passed"
+    },
+    {
+      "command": "UV_CACHE_DIR=/tmp/uv-cache uv run --frozen --no-sync python -m unittest discover -s tests -p 'test_model_edit.py' -v",
+      "tests": 35,
+      "result": "passed"
+    },
+    {
+      "command": "UV_CACHE_DIR=/tmp/uv-cache uv run --frozen --no-sync python -m unittest discover -s tests -p 'test_repair_execution.py' -v",
+      "tests": 15,
+      "result": "passed"
+    },
+    {
+      "command": "UV_CACHE_DIR=/tmp/uv-cache uv run --frozen --no-sync python -m unittest discover -s tests -p 'test_recovery_control.py' -v",
+      "tests": 5,
+      "result": "passed"
+    },
+    {
+      "command": "UV_CACHE_DIR=/tmp/uv-cache uv run --frozen --no-sync python -m unittest discover -s tests -p 'test_native_model_edit.py' -v",
+      "tests": 13,
+      "result": "passed"
+    },
+    {
+      "command": "UV_CACHE_DIR=/tmp/uv-cache uv run --frozen --no-sync python -m unittest discover -s tests -p 'test_model_delete_http.py' -v",
+      "tests": 1,
+      "result": "passed",
+      "sandbox": "local socket permission required"
+    },
+    {
+      "command": "UV_CACHE_DIR=/tmp/uv-cache uv run --frozen --no-sync python -m unittest discover -s tests -p 'test_model_edit_recovery_http.py' -v",
+      "tests": 2,
+      "result": "passed",
+      "sandbox": "local socket permission required"
+    }
+  ],
+  "coverage_notes": [
+    "Three Column roots are submitted in exactly one DeleteElements call after all three unknown outcomes are journaled.",
+    "The grouped success fixture includes one owned AttributeContainer child per Column and an excluded peer outside the batch.",
+    "A last-target final-guard drift submits no native deletion.",
+    "The final batch boundary rejects a legacy adapter version without calling DeleteElements.",
+    "Partial native failure and simulated process interruption retain unknown outcomes for all roots; replay and restart recovery never call DeleteElements again.",
+    "A partially present owned subtree is reported unknown while readback continues for the remaining submitted roots.",
+    "The batch metadata explicitly leaves native UI Undo as not checked; no fake Undo result is treated as native acceptance."
+  ]
+}
