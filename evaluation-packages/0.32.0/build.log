@@ -1,0 +1,25 @@
+One fallback build after successful full CI run 40033163989.
+Source: 75cd26e31ae1e3ee0d6ef86411b55490cd457302
+Worktree: /tmp/allplan-m4-0.32.0; clean, source_modified=false.
+CI artifact 12536910043 returned only a FileService reference.
+One normal-proxy gh run download attempt failed: GitHub API Forbidden.
+Commands: UV_CACHE_DIR=/tmp/allplan-m4-032-uv-cache uv build; uv run --frozen python utils/build_windows_package.py.
+
+Building source distribution...
+Building wheel from source distribution...
+Successfully built dist/allplan_mcp_server-0.32.0.tar.gz
+Successfully built dist/allplan_mcp_server-0.32.0-py3-none-any.whl
+Using CPython 3.12.14 interpreter at: /opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3
+Creating virtual environment at: .venv
+   Building allplan-mcp-server @ file:///tmp/allplan-m4-0.32.0
+Downloading cryptography (4.5MiB)
+Downloading pydantic-core (2.0MiB)
+ Downloaded pydantic-core
+Downloading pygments (1.2MiB)
+Downloading beartype (1.3MiB)
+ Downloaded pygments
+ Downloaded beartype
+ Downloaded cryptography
+      Built allplan-mcp-server @ file:///tmp/allplan-m4-0.32.0
+Installed 71 packages in 18ms
+/tmp/allplan-m4-0.32.0/dist/allplan-mcp-0.32.0-windows-evaluation.zip

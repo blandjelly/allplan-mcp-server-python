@@ -1,0 +1,96 @@
+{
+  "candidate": "0.32.0",
+  "source_branch": "fix/m4-material-metadata-0.32.0",
+  "source_commit": "75cd26e31ae1e3ee0d6ef86411b55490cd457302",
+  "full_ci": {
+    "run_id": 40033163989,
+    "run_number": 208,
+    "run_url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40033163989",
+    "result": "passed",
+    "configuration": "passed",
+    "portable_tests": {
+      "ubuntu-latest": {
+        "python": "3.12.15",
+        "tests": 635,
+        "result": "passed",
+        "duration_seconds": 163.107
+      },
+      "windows-latest": {
+        "python": "3.12.10",
+        "tests": 635,
+        "result": "passed",
+        "duration_seconds": 452.775
+      }
+    },
+    "package_job": {
+      "result": "passed",
+      "python": "3.12.15",
+      "build_command": "uv build",
+      "built_files": [
+        "allplan_mcp_server-0.32.0.tar.gz",
+        "allplan_mcp_server-0.32.0-py3-none-any.whl"
+      ]
+    },
+    "artifact": {
+      "id": 12536910043,
+      "name": "candidate-75cd26e31ae1e3ee0d6ef86411b55490cd457302",
+      "size_bytes": 1215403,
+      "sha256": "d26a5902df49911ee22a3d140efbdd446b05d5eca7e510303b96206d4dda5de1",
+      "created_at": "2026-10-23T22:30:55Z",
+      "expires_at": "2026-11-06T22:30:53Z",
+      "expired": false
+    }
+  },
+  "prior_failed_full_ci": {
+    "run_id": 40032392662,
+    "run_number": 205,
+    "run_url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40032392662",
+    "source_sha": "c7783cc05f00b032ead10f49e54092b9504a35c6",
+    "result": "failed",
+    "ubuntu": {
+      "python": "3.12.15",
+      "tests": 635,
+      "result": "failed: one test assertion"
+    },
+    "windows": {
+      "python": "3.12.10",
+      "tests": null,
+      "result": "cancelled by matrix fail-fast"
+    },
+    "package_job": "skipped because the Ubuntu portable job failed",
+    "failure": "test_model_delete.ModelDeleteTests.test_preview_exposes_bounded_child_owner_diagnostic_without_write expected the previous diagnostic shape; bounded evidence was added by the runtime change and the assertion was corrected in source commit 75cd26e31ae1e3ee0d6ef86411b55490cd457302"
+  },
+  "draft_configuration_run": {
+    "run_id": 40033159384,
+    "run_number": 207,
+    "run_url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40033159384",
+    "source_sha": "75cd26e31ae1e3ee0d6ef86411b55490cd457302",
+    "result": "cancelled after the candidate was marked ready; not a passing full CI run"
+  },
+  "scope_notes": [
+    "Run 208 is the passing full CI for the exact source commit recorded above.",
+    "The artifact was listed and its metadata verified; this record does not claim the artifact was downloaded or locally inspected.",
+    "The prior failed run and cancelled draft-configuration run are recorded separately from passing evidence."
+  ],
+  "artifact_transfer": {
+    "connector": "FileService reference only; not accessible as local Sediment file",
+    "normal_proxy_attempt": "gh run download 40033163989 --repo blandjelly/allplan-mcp-server-python --name candidate-75cd26e31ae1e3ee0d6ef86411b55490cd457302 --dir /tmp/m4-ci-artifact-0.32.0",
+    "result": "GitHub API Forbidden"
+  },
+  "fallback_build": {
+    "source_commit": "75cd26e31ae1e3ee0d6ef86411b55490cd457302",
+    "source_modified": false,
+    "worktree": "/tmp/allplan-m4-0.32.0",
+    "builds": 1,
+    "log": "build.log",
+    "reason": "Exact CI artifact unavailable after one normal-proxy attempt."
+  },
+  "exact_zip_verification": {
+    "source_commit": "75cd26e31ae1e3ee0d6ef86411b55490cd457302",
+    "result": "passed",
+    "attempts": 1,
+    "report": "package-verification.json",
+    "log": "package-verification.log",
+    "native_Allplan": "not_run"
+  }
+}

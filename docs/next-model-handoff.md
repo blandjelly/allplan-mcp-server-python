@@ -21,17 +21,7 @@ Focused fake-adapter checks reproduce the former blanket rejection of all tier
 children and exercise the bounded container path. They do not prove that this
 was the cause of the 0.31.0 native `wall_material_tier_hierarchy_unsupported`
 diagnostic. The 200 mm opening `component_child_owner_mismatch` remains
-unresolved and outside this change. Source
-[`c7783cc05f00b032ead10f49e54092b9504a35c6`](https://github.com/blandjelly/allplan-mcp-server-python/commit/c7783cc05f00b032ead10f49e54092b9504a35c6)
-is on `fix/m4-material-metadata-0.32.0`; [PR #30](https://github.com/blandjelly/allplan-mcp-server-python/pull/30)
-targets `develop/m4`. **161 unique focused checks passed** ([record](../evaluation-packages/0.32.0/focused-verification.json)).
-Initial full CI [run 40032392662](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40032392662)
-failed one Ubuntu `test_model_delete` assertion that expected the previous
-exact diagnostic shape. The new bounded `diagnostic.evidence` field changed
-that expected shape; Ubuntu ran 635 tests, while the Windows job was canceled
-by fail-fast and the package job was skipped. The test assertion and focused
-delete checks are being updated; corrected-source CI is pending. Package
-build/ZIP verification and native acceptance remain pending.
+unresolved and outside this change. Exact source [`75cd26e31ae1e3ee0d6ef86411b55490cd457302`](https://github.com/blandjelly/allplan-mcp-server-python/commit/75cd26e31ae1e3ee0d6ef86411b55490cd457302) is associated with [PR #30](https://github.com/blandjelly/allplan-mcp-server-python/pull/30), targeting `develop/m4`. **161 unique focused checks passed** ([record](../evaluation-packages/0.32.0/focused-verification.json)). Final full CI [run 40033163989](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40033163989) passed 635 tests on Ubuntu Python 3.12.15 and 635 on Windows Python 3.12.10, plus the package job ([record](../evaluation-packages/0.32.0/source-ci.json)). One fallback package was built from a clean exact-source checkout; the exact ZIP passed verification once with 210 payload files and 43 bridge hashes, SHA-256 `99fe6909340d4d4e3174601cf23a4854dfece683a1b75b95e5fdebfcc0aaf8b5` ([delivery record](../evaluation-packages/0.32.0/README.md), [verification](../evaluation-packages/0.32.0/package-verification.json)). Native Allplan acceptance remains pending; no 0.32.0 trial has run. The 200 mm opening mismatch remains unresolved.
 The only planned native trial is the original 240 mm Wall material path. If
 blocked, preserve the first reason/stage and obtain fresh
 `component_identity` for the Wall and exact tier; if ready, perform one
@@ -492,12 +482,11 @@ Beam W1 writes.
    `component_child_owner_mismatch`. See the
    [scoped 0.31.0 observation](test-results/m4-owner-observation-0.31.0-2026-10-24.md).
    Candidate 0.32.0 adds bounded preservation of direct tier attribute
-   containers. It has 161 unique focused checks passed. Initial full CI failed
-   one `test_model_delete` exact-shape assertion after bounded diagnostic
-   evidence was added; the corrected-source rerun and package verification are
-   pending. The planned 0.32.0 native trial remains
-   limited to the original 240 mm Wall path; do not repeat the 200 mm material
-   preview or write. Slab/MultiSlab write blockers stay in force.
+   containers. It has 161 unique focused checks passed; final CI passed with
+   635 tests on each platform and the package job. The exact-source fallback ZIP
+   was verified once; see the [delivery record](../evaluation-packages/0.32.0/README.md).
+   Native acceptance remains pending. Any trial stays limited to the original
+   240 mm Wall path; do not repeat the 200 mm material preview or write. Slab/MultiSlab write blockers stay in force.
    Native selection set/clear/readback remains unsupported.
 5. **Implemented:** bounded scalar/Enum contracts, family/value inventory,
    attribute-name resolver and the 0.30.0 requested-ID evidence phase.

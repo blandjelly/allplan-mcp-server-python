@@ -135,5 +135,7 @@
     "result": "passed"
   },
   "package_build": "not_run",
-  "native_allplan": "not_run"
+  "native_allplan": "not_run",
+  "final_candidate_commit": "75cd26e31ae1e3ee0d6ef86411b55490cd457302",
+  "final_candidate_note": "Commits the tested runtime and the focused deletion-diagnostic assertion correction. Full CI and package results are recorded separately in source-ci.json and package-verification.json."
 }

@@ -15,7 +15,7 @@ nie potwierdza zmiany natywnego materiału konstrukcyjnego.
 | 1 — dziennik | Ograniczony preview/archive 0.23.0; trial 1 z 0.30.0 zgłoszony jako PASS, bez pełnego raw logu. | Pełny replay/restart i obsługa unknown/corrupt/unverifiable wymagają odrębnego dowodu. Nie powtarzać zaakceptowanych kroków. |
 | 2 — właściciel pola | Brak rozstrzygnięcia dla project attributes Slab/MultiSlab. | Ustalić właściciela i zweryfikowany zapis/readback; do tego czasu zapisy pozostają zablokowane. |
 | 3 — warstwa/no-op | W1/no-op z 0.30.0 zgłoszony jako PASS w ograniczonym zakresie. | Nie rozszerza to akceptacji zapisu/Undo W1 ani szerszych przypadków. |
-| 4 — delete/material/selection | Grouped delete/Undo trzech Column zaakceptowany dla zakresu 0.29.0. Native material jest w kandydacie 0.32.0; native UI selection set/clear/readback pozostaje unsupported. | Wykonać tylko jedną próbę Wall 240 mm 0.32.0. Wall 200 mm/opening owner mismatch pozostaje nierozwiązany. |
+| 4 — delete/material/selection | Grouped delete/Undo trzech Column zaakceptowany dla zakresu 0.29.0. Pakiet kandydata 0.32.0 przeszedł CI i verification; native material acceptance pozostaje pending. Native UI selection set/clear/readback pozostaje unsupported. | Wykonać tylko jedną próbę Wall 240 mm 0.32.0. Wall 200 mm/opening owner mismatch pozostaje nierozwiązany. |
 | 5 — typy atrybutów | Cztery scalar pary z 0.30.0 oraz Wall Enum ID 120 z Apply/readback/Undo są potwierdzone w ograniczonym zakresie. Boolean/CheckBox ma tylko readback po zgłoszonym Undo, bez raw Apply. | Pełne pokrycie rodzin/typów; date/vector payload i typed readback pozostają BLOCKED. |
 
 Nie ma podstaw do bezpiecznego zamknięcia wszystkich priorytetów 1–5: pozostają
@@ -35,7 +35,7 @@ natywnego replay/restartu ogranicza zakres tego potwierdzenia.
 [pakiet 0.23.0](../evaluation-packages/0.23.0/README.md) ·
 [obserwacja właściciela](test-results/m4-agent-observation-2026-10-20.md).
 
-### Bieżący kandydat 0.32.0 — ograniczone preservation atrybutów tieru
+### Kandydat 0.32.0 — ograniczone preservation atrybutów tieru
 
 Kandydat 0.32.0 rozszerza zachowawczy snapshot ścieżki native material Wall i
 dodaje opcjonalne, ograniczone identity evidence do odpowiednich shared owner
@@ -49,23 +49,12 @@ zachowanych danych. Nieznany typ dziecka, nested child, nieobsługiwana wartoś�
 opening albo inny child Wall nadal blokuje zapis. Snapshot służy zachowaniu
 stanu; nie ustala ownera pola ani nie dodaje zapisu atrybutów.
 
-Źródło
-[`c7783cc05f00b032ead10f49e54092b9504a35c6`](https://github.com/blandjelly/allplan-mcp-server-python/commit/c7783cc05f00b032ead10f49e54092b9504a35c6)
-jest na `fix/m4-material-metadata-0.32.0`; [PR #30](https://github.com/blandjelly/allplan-mcp-server-python/pull/30)
-celuje w `develop/m4`. **161 unique focused checks przeszły** ([rekord](../evaluation-packages/0.32.0/focused-verification.json)).
-Pierwszy full CI [run 40032392662](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40032392662)
-zakończył się jednym niepowodzeniem `test_model_delete`: assertion oczekiwał
-wcześniejszego exact diagnostic shape po dodaniu `diagnostic.evidence`.
-Ubuntu wykonał 635 testów, Windows został anulowany przez fail-fast, a package
-job został pominięty. Aktualizacja assertion i focused delete checks oraz
-rerun CI dla poprawionego source są w toku. Build pakietu, ZIP verification i
-native acceptance pozostają pending.
-
+Źródło [`75cd26e31ae1e3ee0d6ef86411b55490cd457302`](https://github.com/blandjelly/allplan-mcp-server-python/commit/75cd26e31ae1e3ee0d6ef86411b55490cd457302) jest związane z [PR #30](https://github.com/blandjelly/allplan-mcp-server-python/pull/30) do `develop/m4`. **161 unique focused checks przeszło** ([rekord](../evaluation-packages/0.32.0/focused-verification.json)). Final full CI [run 40033163989](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40033163989) przeszedł: 635 testów Ubuntu Python 3.12.15, 635 Windows Python 3.12.10 oraz package job ([rekord](../evaluation-packages/0.32.0/source-ci.json)). Jeden fallback package zbudowany z czystego checkoutu dokładnego source przeszedł jednokrotną weryfikację ZIP: 210 plików payloadu, 43 hashe bridge, SHA-256 `99fe6909340d4d4e3174601cf23a4854dfece683a1b75b95e5fdebfcc0aaf8b5` ([delivery record](../evaluation-packages/0.32.0/README.md), [wynik weryfikacji](../evaluation-packages/0.32.0/package-verification.json)).
 Focused fake-adapter checks odtwarzają wcześniejsze blanket odrzucenie dzieci
 tieru i sprawdzają nowy bounded flow, lecz nie dowodzą, że była to dokładna
 przyczyna native diagnostyki 0.31.0. `component_child_owner_mismatch` dla Wall
-200 mm z opening pozostaje nierozstrzygnięty i poza tą poprawką. Corrected-source
-CI, build/verification pakietu i native acceptance pozostają pending.
+200 mm z opening pozostaje nierozstrzygnięty i poza tą poprawką. Native acceptance
+pozostaje pending; nie wykonano trialu 0.32.0.
 Próba właściciela ogranicza się do pierwotnej ścieżki materiału
 Wall 240 mm: przy blokadzie zachować pierwszy reason/stage oraz świeże
 `component_identity` Wall i dokładnego tieru; przy kwalifikacji jeden

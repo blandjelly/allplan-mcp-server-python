@@ -8,16 +8,7 @@ lineage resolves as container → tier → Wall. This snapshot is preservation
 evidence; it does not establish that a container attribute belongs to a
 particular field or that the container can be edited through a setter.
 
-**161 unique focused checks passed** ([record](../evaluation-packages/0.32.0/focused-verification.json)).
-Source
-[`c7783cc05f00b032ead10f49e54092b9504a35c6`](https://github.com/blandjelly/allplan-mcp-server-python/commit/c7783cc05f00b032ead10f49e54092b9504a35c6)
-is on `fix/m4-material-metadata-0.32.0`; [PR #30](https://github.com/blandjelly/allplan-mcp-server-python/pull/30)
-targets `develop/m4`. Initial full CI [run 40032392662](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40032392662)
-failed one Ubuntu `test_model_delete` exact-shape assertion after
-`diagnostic.evidence` was added. The Ubuntu job ran 635 tests; Windows was
-canceled by fail-fast and the package job was skipped. The assertion and
-focused delete checks are being updated; corrected-source CI is pending. The
-package build/ZIP verification and native Allplan acceptance are also pending.
+**161 unique focused checks passed** ([record](../evaluation-packages/0.32.0/focused-verification.json)). Exact source [`75cd26e31ae1e3ee0d6ef86411b55490cd457302`](https://github.com/blandjelly/allplan-mcp-server-python/commit/75cd26e31ae1e3ee0d6ef86411b55490cd457302) is associated with [PR #30](https://github.com/blandjelly/allplan-mcp-server-python/pull/30), targeting `develop/m4`. Final full CI [run 40033163989](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40033163989) passed 635 tests on Ubuntu Python 3.12.15 and 635 on Windows Python 3.12.10, plus the package job ([record](../evaluation-packages/0.32.0/source-ci.json)). One fallback package was built from a clean exact-source checkout and the exact ZIP passed verification once: 210 payload files, 43 bridge hashes, SHA-256 `99fe6909340d4d4e3174601cf23a4854dfece683a1b75b95e5fdebfcc0aaf8b5` ([package record](../evaluation-packages/0.32.0/README.md), [verification](../evaluation-packages/0.32.0/package-verification.json)). Native Allplan acceptance is pending; no 0.32.0 native trial has run. The 200 mm opening mismatch remains unresolved. This candidate does not close M4 priorities 1–5. The [single-path trial plan](m4-single-drawing-0.32.0.pl.md) limits any owner trial to the original 240 mm Wall material path.
 Focused fake-adapter tests reproduce the prior blanket-child
 rejection and exercise the new bounded path. They do not prove that this was
 the cause of the owner's native 0.31.0 diagnostic. The 200 mm
