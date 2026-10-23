@@ -18,6 +18,20 @@ from .transport import BridgeError
 KIND = "typed_model_edit"
 
 
+def no_op_evidence(report, snapshot):
+    """Publish bounded fresh destination reads without entering the executor."""
+    matched = {fingerprint(check["ref"]) for check in report["checks"] if check["decision"] == "matched"}
+    elements = [element for element in snapshot["elements"] if fingerprint(element["ref"]) in matched]
+    fields = {bound["field"] for bound in report["binding"]}
+    return {"status": "observed", "reason": "already_at_requested_values" if elements else "no_matching_targets",
+            "matched_targets": len(elements), "setter_calls_started": 0,
+            "source_fingerprint": report["source_fingerprint"],
+            "observations": [{"ref": element["ref"], "fields": {
+                field: copy.deepcopy(element["fields"][field]) for field in sorted(fields)}}
+                for element in elements[:32]],
+            "observations_complete": len(elements) <= 32, "observation_limit": 32}
+
+
 def write_availability(plan, highlighted=False, valid=True):
     """Describe the executable route separately from its native acceptance."""
     available = valid and plan["evaluation_apply_available"]
@@ -516,6 +530,9 @@ def preview(plans, doc, base, settings, request):
         "allowed_metadata_types": ["integer", "real", "boolean"],
         "raw_old_value_preserved": True,
     }
+    plan["setter_calls_started"] = 0
+    if plan["state"] == "no_op":
+        plan["no_op_evidence"] = no_op_evidence(report, snapshot)
     plan["evaluation_apply_available"] = plans.executor.evaluation_scope(plan)
     plan["evaluation_highlight_available"] = ready
     # Symbol inspection is not a production gate and must not contradict the
@@ -550,7 +567,7 @@ def revalidate(plans, doc, base, settings, request):
     plan = entry["plan"]
     if request["plan_hash"] != plan["plan_hash"]:
         raise BridgeError("plan_hash_mismatch", "Use the exact reviewed model edit plan hash.", 409)
-    report, _, _ = observe(plans, doc, base, settings, entry["request"])
+    report, snapshot, _ = observe(plans, doc, base, settings, entry["request"])
     if plans.queries.clock() - entry["created"] >= plans.TTL_SECONDS:
         del cache[ident]
         raise BridgeError("plan_expired", "Model edit plan expired during revalidation.", 409)
@@ -559,6 +576,8 @@ def revalidate(plans, doc, base, settings, request):
         del cache[ident]
     return {"schema_version": SCHEMA, "action": "revalidate", "read_only": True,
             "state": "unchanged" if valid else "conflict", "plan_id": ident, "plan_hash": plan["plan_hash"],
+            "setter_calls_started": 0,
+            **({"no_op_evidence": no_op_evidence(report, snapshot)} if valid and plan["state"] == "no_op" else {}),
             **write_availability(plan, highlighted=entry.get("presentation", {}).get("state") == "submitted", valid=valid)}
 
 

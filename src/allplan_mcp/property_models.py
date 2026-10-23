@@ -93,6 +93,18 @@ class DrawingIdentityProbeInput(ContractModel):
     limit: int = Field(default=16, ge=1, le=32)
 
 
+class AttributeEvidenceProbeInput(ComponentIdentityProbeInput):
+    phase: Literal["attribute_evidence"]
+    attribute_ids: list[Annotated[int, Field(ge=1, le=2147483647)]] = Field(min_length=1, max_length=16)
+    include_parent: bool = False
+
+    @model_validator(mode="after")
+    def distinct_attributes(self):
+        if len(set(self.attribute_ids)) != len(self.attribute_ids):
+            raise ValueError("attribute_ids must be distinct.")
+        return self
+
+
 class LayerNameProbeInput(ContractModel):
     phase: Literal["layer_name"]
     layer_short_name: str | None = Field(default=None, min_length=1, max_length=16)
@@ -119,4 +131,4 @@ class LayerCatalogProbeInput(ContractModel):
         return self
 
 
-PropertyProbeRequest = Annotated[ColumnProbeInput | WallProbeInput | AttributeNameProbeInput | AttributeDefinitionProbeInput | ElementAttributesProbeInput | ComponentIdentityProbeInput | DrawingIdentityProbeInput | LayerNameProbeInput | LayerCatalogProbeInput, Field(discriminator="phase")]
+PropertyProbeRequest = Annotated[ColumnProbeInput | WallProbeInput | AttributeNameProbeInput | AttributeDefinitionProbeInput | ElementAttributesProbeInput | ComponentIdentityProbeInput | DrawingIdentityProbeInput | AttributeEvidenceProbeInput | LayerNameProbeInput | LayerCatalogProbeInput, Field(discriminator="phase")]

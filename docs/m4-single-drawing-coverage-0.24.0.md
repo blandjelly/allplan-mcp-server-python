@@ -1,10 +1,24 @@
-# M4 single-drawing coverage — current status through candidate 0.28.0
+# M4 single-drawing coverage — current status through candidate 0.30.0
 
 Updated 2026-10-23. This is implementation and verification coverage, not full
-native acceptance. Scoped 0.27.0 owner-reported observations are retained in
+native acceptance. Candidate 0.30.0 is in progress; no full CI, package
+verification or native trial result is recorded here. Its partial
+`attribute_evidence` probe and no-op evidence contract do not add date/vector
+setters, native selection, or Slab/MultiSlab field ownership. The combined
+[0.30.0 trial plan](m4-single-drawing-0.30.0.pl.md) covers priorities 1–5 in
+one session; blocked work and missing fixtures remain explicit. Full completion
+remains the goal and is blocked until those owner, payload and selection
+contracts are established. The owner
+reports PASS for all steps of the 0.29.0 Column group-delete/Undo trial; its
+scope and evidence limits are recorded in the
+[0.29.0 observation](test-results/m4-owner-observation-0.29.0-2026-10-23.md).
+Scoped 0.27.0 owner-reported observations are retained in
 [this observation](test-results/m4-owner-observation-0.27.0-2026-10-23.md)
 and [validation status](validation-status.md). Candidate 0.28.0 source and its
-exact fallback ZIP are verified; its native trial has not been run.
+exact fallback ZIP are verified. Its limited owner trial reported PASS for
+preview/delete/absence readback, but one Undo restored only one of three
+Columns. That historical grouped-Undo failure is superseded for the tested
+scope by the owner-reported 0.29.0 PASS.
 
 Final 0.28.0 source `b59ef15d9bfd4dfb42476b240e31b5b300268d2d` is on PR #26
 targeting `develop/m4`. CI run
@@ -43,7 +57,7 @@ remains incomplete.
 
 | Requested family / adapter | Current guarded route and owner boundary | Remaining native evidence |
 | --- | --- | --- |
-| Columns / Column | Typed attributes and exact existing organizational layer; model/view binding, exclusions, fresh readback, replay and no-op. Candidate 0.28.0 delete matching uses drawing/model/type identity while preserving actual parent view UUID edges and the exact selected target view UUID. | Owner reports for 0.28.0: three W1 Columns were previewed, deleted, and absent on a check read; one UI Undo restored only one Column and further Undo was unavailable (**FAIL** for group Undo). The report lacks UUIDs, raw MCP responses, exact manifest and Allplan build ID. Candidate 0.29.0 needs one plural native delete call, per-target fresh absence scan, and one Undo restoring all three plus descendants. No explicit W1 no-op/zero-setter evidence. |
+| Columns / Column | Typed attributes and exact existing organizational layer; model/view binding, exclusions, fresh readback, replay and no-op. Candidate 0.28.0 delete matching uses drawing/model/type identity while preserving actual parent view UUID edges and the exact selected target view UUID. Candidate 0.29.0 expands one reviewed plan to a plural native delete call. | Owner reports PASS for all steps of the 0.29.0 trial: three W1 Columns in drawing 101 were deleted, a fresh scan reported all three Columns and their attribute containers absent, and one UI Undo restored all three Columns. This meets the grouped-Undo repair goal for the tested operation. The log lacks raw MCP responses, target UUIDs and installed ZIP manifest; Undo was owner-observed, with tool result `undo: not_checked` and no automatic post-Undo readback. The 0.28.0 one-of-three Undo remains historical. No explicit W1 no-op/zero-setter evidence. |
 | Walls / Wall | Typed root attributes; organizational layer binds all direct WallTier owners with its own adapter. Single-tier native thickness/material read exists. Current layer IDs 0–65535 are valid; 0.26.0 fixes reading ID 0 and covers reviewed W1 plan/Apply from prior ID 0 in focused tests. 0.27.0 tightens material preservation to exactly one stable, direct WallTier lineage with no children; opening and all other child types fail closed with separate reasons. | Native layer owner/readback/Undo for unaccepted case; native material change remains unaccepted. The 0.27.0 preservation and diagnostic changes do not enable writes or substitute observed material for preservation evidence. |
 | Beams / Beam, SkeletonBeam | Typed attributes and organizational layer, exact target resolution; unrelated broken hierarchies do not redirect the owner. | Family/build-specific UI/readback/Undo; fakes and API availability are separate. |
 | Slabs / Slab | Read-only direct identity probe; only standalone Slab permits typed attributes/layer with bound ancestry. | Resolve the owner's two Slab/MultiSlab results read-only. No new attribute trial on previously accepted targets. |
@@ -141,8 +155,9 @@ The assistant's stated opening blocker conflicts with the later empty `blocked`
 arrays and has no raw diagnostic, so the cause is unverified. No material
 change, delete, no-op or Undo was recorded in that 0.26.0 log. The later
 0.28.0 Column trial and its outcome are recorded in the
-[0.28.0 trial record](m4-single-drawing-0.28.0.pl.md); the next scoped trial is
-[0.29.0](m4-single-drawing-0.29.0.pl.md).
+[0.28.0 trial record](m4-single-drawing-0.28.0.pl.md); its grouped-Undo failure
+was superseded by the limited 0.29.0 owner-reported PASS above. The next
+combined session is [0.30.0](m4-single-drawing-0.30.0.pl.md).
 
 ## Priority status
 
@@ -155,24 +170,33 @@ change, delete, no-op or Undo was recorded in that 0.26.0 log. The later
 2. **Implemented:** structural identity inventory and fail-closed ownership
    guards. **Unresolved:** the 0.27.0 log retains model/view identities and a
    parent-lineage conflict for the Slab child, but does not establish field
-   ownership. Keep writes blocked until exact hierarchy and property owner are
-   resolved.
+   ownership. Candidate 0.30.0 adds exact requested-ID `attribute_evidence`
+   with separate ancestry/children/value reads; even complete evidence does not
+   establish a field owner. Keep unresolved writes blocked.
 3. **Implemented:** layer 0 read and reviewed W1 plan/Apply. **Limited
    owner-reported native PASS:** W1 read/write works, with one changed element
-   reverted per UI Undo step. No explicit no-op or zero-setter evidence; no
-   multi-element Undo claim.
-4. **Implemented in candidate 0.28.0:** typed subtree delete matches owner edges
-   by drawing/model/type identity while preserving actual parent view UUIDs on
-   bound child/descendant edges and the selected target's exact view UUID.
-   Focused checks, full CI, and exact ZIP verification passed. Owner reports
-   limited PASS for three Column W1 preview/delete/absence readback and an
-   optional read-only probe; the report lacks exact IDs, raw responses, manifest
-   and Allplan build. Group Undo is **FAIL**: one Undo restored only one of the
-   three; further Undo was unavailable. Next is the scoped
-   [0.29.0 trial](m4-single-drawing-0.29.0.pl.md): one plural native call and
-   one Undo restoring the full reviewed set and descendants. Native material
-   writes are not accepted, and selection remains unsupported.
+   reverted per UI Undo step. Earlier reports lack explicit no-op/zero-setter
+   evidence. Candidate 0.30.0 implements bounded fresh `no_op_evidence` and
+   revalidation with zero setters, but this candidate behavior has no recorded
+   native trial result yet. No-op has no Apply path.
+4. **Implemented in candidate 0.28.0/0.29.0:** typed subtree delete matches
+   owner edges by drawing/model/type identity while preserving actual parent
+   view UUIDs on bound child/descendant edges and the selected target's exact
+   view UUID; 0.29.0 sends the reviewed group in one plural native call.
+   Focused checks, full CI, and exact ZIP verification passed. The owner reports
+   PASS for all steps of the 0.29.0 trial, including one UI Undo restoring all
+   three Columns after the fresh absence scan. This meets the grouped-Undo
+   repair goal for that tested operation. The log lacks raw MCP responses,
+   target UUIDs and installed ZIP manifest; Undo was owner-observed, and the
+   tool reported `undo: not_checked` without automatic post-Undo readback.
+   See the [0.29.0 observation](test-results/m4-owner-observation-0.29.0-2026-10-23.md).
+   The 0.28.0 one-of-three Undo remains historical. Native material has no
+   owner acceptance; its existing guarded experimental evaluation setter may
+   be exercised in the 0.30.0 session when an exact target passes every Apply
+   guard. Native selection remains unsupported.
 5. **Implemented:** scalar/Enum contracts and family/value inventory. The
    0.27.0 lowercase lookup and material diagnostics have reported PASS, but
    date/vector/object codecs and per-family owner, value roundtrip and Undo
-   evidence remain open.
+   evidence remain open. Candidate 0.30.0 can inspect exact observed IDs and
+   SDK type bindings through `attribute_evidence`; it adds no date/vector
+   setter or codec, and unknown native objects remain type-only `not_checked`.

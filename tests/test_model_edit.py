@@ -191,6 +191,52 @@ class ModelEditTests(unittest.TestCase):
         self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
         self.base.ElementsLayerService.ChangeLayer.assert_not_called()
 
+    def test_w1_only_no_op_has_zero_setters_and_fresh_revalidation_evidence(self):
+        elements = self.fixture(("F60",))
+        elements[0].GetCommonProperties.return_value.Layer = 8
+        self.setter_fakes(elements)
+        plan = self.preview(predicate=None, changes=[{"target": {"kind": "layer", "short_name": "W1"}}])
+        self.assertEqual(plan["state"], "no_op")
+        self.assertEqual(plan["counts"]["changes"], 0)
+        self.assertEqual(plan["setter_calls_started"], 0)
+        evidence = plan["no_op_evidence"]
+        self.assertEqual(evidence["reason"], "already_at_requested_values")
+        self.assertEqual(evidence["matched_targets"], 1)
+        self.assertEqual(evidence["observations"][0]["fields"]["layer_id"]["value"], 8)
+        self.base.ElementsLayerService.ChangeLayer.assert_not_called()
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+        request = {"schema_version": "m4-model-edit-1", "action": "revalidate",
+                   "plan_id": plan["plan_id"], "plan_hash": plan["plan_hash"]}
+        checked = self.call(request)
+        self.assertEqual(checked["state"], "unchanged")
+        self.assertEqual(checked["setter_calls_started"], 0)
+        self.assertEqual(checked["no_op_evidence"]["observations"][0]["fields"]["layer_id"]["value"], 8)
+        self.base.ElementsLayerService.ChangeLayer.assert_not_called()
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+        elements[0].GetCommonProperties.return_value.Layer = 7
+        conflicted = self.call(request)
+        self.assertEqual(conflicted["state"], "conflict")
+        self.assertNotIn("no_op_evidence", conflicted)
+        self.assertEqual(conflicted["setter_calls_started"], 0)
+        self.base.ElementsLayerService.ChangeLayer.assert_not_called()
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+    def test_no_op_without_matching_targets_is_not_value_proof(self):
+        elements = self.fixture(("F60",))
+        self.setter_fakes(elements)
+        plan = self.preview(predicate={"field": "attribute:935", "op": "eq", "value": "no-match"},
+                            changes=[{"target": {"kind": "layer", "short_name": "W1"}}])
+        self.assertEqual(plan["state"], "no_op")
+        self.assertEqual(plan["setter_calls_started"], 0)
+        self.assertEqual(plan["no_op_evidence"]["reason"], "no_matching_targets")
+        self.assertEqual(plan["no_op_evidence"]["matched_targets"], 0)
+        self.assertEqual(plan["no_op_evidence"]["observations"], [])
+        self.assertTrue(plan["no_op_evidence"]["observations_complete"])
+        self.base.ElementsLayerService.ChangeLayer.assert_not_called()
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
     def test_declared_value_type_mismatch_fails_before_scan(self):
         self.fixture(("",))
         plan = self.request(changes=[{"target": {"kind": "attribute", "attribute_id": 935},

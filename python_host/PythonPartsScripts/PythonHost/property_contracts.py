@@ -12,7 +12,7 @@ PROBE_SCHEMA = "m4-property-probe-1"
 def validate_probe(request):
     keys(request, {"schema_version", "phase", "drawing_file", "attribute_name", "attribute_id", "layer_short_name",
                    "layer_name", "offset", "limit", "candidate_ids",
-                   "model_uuid", "view_uuid", "name_contains", "offset", "limit"},
+                   "model_uuid", "view_uuid", "name_contains", "attribute_ids", "include_parent"},
          {"schema_version", "phase"})
     if request["schema_version"] != PROBE_SCHEMA:
         invalid(f"schema_version must be {PROBE_SCHEMA}.")
@@ -31,8 +31,9 @@ def validate_probe(request):
                 or request["model_uuid"] == "00000000-0000-0000-0000-000000000000"):
             invalid("model_uuid must name one canonical nonzero model UUID.")
         return
-    if request["phase"] in ("element_attributes", "component_identity"):
-        extra = {"name_contains", "offset", "limit"} if request["phase"] == "element_attributes" else set()
+    if request["phase"] in ("element_attributes", "component_identity", "attribute_evidence"):
+        extra = ({"name_contains", "offset", "limit"} if request["phase"] == "element_attributes" else
+                 {"attribute_ids", "include_parent"} if request["phase"] == "attribute_evidence" else set())
         keys(request, {"schema_version", "phase", "drawing_file", "model_uuid", "view_uuid"} | extra,
              {"schema_version", "phase", "drawing_file", "model_uuid", "view_uuid"})
         bounded_int(request["drawing_file"], 1, 2147483647, "drawing_file")
@@ -42,6 +43,15 @@ def validate_probe(request):
                     or not re.fullmatch(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}", value)
                     or value == "00000000-0000-0000-0000-000000000000"):
                 invalid(f"{field} must be one canonical nonzero UUID.")
+        if request["phase"] == "attribute_evidence":
+            ids = request.get("attribute_ids")
+            if (not isinstance(ids, list) or not 1 <= len(ids) <= 16
+                    or any(type(ident) is not int or not 1 <= ident <= 2147483647 for ident in ids)
+                    or len(set(ids)) != len(ids)):
+                invalid("attribute_ids must contain 1 to 16 distinct positive IDs.")
+            if type(request.get("include_parent", False)) is not bool:
+                invalid("include_parent must be a boolean.")
+            return
         if request["phase"] == "component_identity":
             return
         contains = request.get("name_contains", "")

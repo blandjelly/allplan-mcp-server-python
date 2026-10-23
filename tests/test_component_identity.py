@@ -4,6 +4,8 @@ import unittest
 import weakref
 from unittest.mock import MagicMock
 
+from pydantic import ValidationError
+
 import test_property_probe as fixtures
 
 
@@ -41,6 +43,24 @@ class ComponentIdentityTests(unittest.TestCase):
         request = {"phase": "component_identity", "drawing_file": 101,
                    "model_uuid": adapter.GetModelElementUUID.return_value,
                    "view_uuid": adapter.GetElementUUID.return_value}
+        return self.probe(**request)
+
+    def attribute_evidence_probe(self, adapter=None, *, ids=(83,), include_parent=False, **overrides):
+        self.handler.model_queries.clock = lambda: 0.0
+        adapter = adapter or self.native_elements[0]
+        self.base.GetElement.return_value = type("NativeSlab", (), {})()
+        self.base.eAttibuteReadState.ReadAll = "ReadAll"
+        self.base.eAttibuteReadState.ReadAllAndComputable = "ReadAllAndComputable"
+        self.base.AttributeService.AttributeType = type(
+            "AttributeType", (), {"String": 11, "Integer": 12, "Date": 13, "Vector": 14})
+        if self.base.AttributeService.GetAttributeType.side_effect is None:
+            self.base.AttributeService.GetAttributeType.side_effect = lambda _doc, ident: {
+                83: 11, 84: 13, 85: 999}[ident]
+        request = {"phase": "attribute_evidence", "drawing_file": 101,
+                   "model_uuid": adapter.GetModelElementUUID.return_value,
+                   "view_uuid": adapter.GetElementUUID.return_value,
+                   "attribute_ids": list(ids), "include_parent": include_parent}
+        request.update(overrides)
         return self.probe(**request)
 
     def test_slab_child_identity_remains_distinct_from_multislab_parent(self):
@@ -324,6 +344,197 @@ class ComponentIdentityTests(unittest.TestCase):
         result = self.identity_probe(target)
         self.assertEqual(result["state"], "observed")
         self.assertIsNone(owners[-1]())
+
+    def test_attribute_evidence_keeps_exact_identity_metadata_and_read_modes_separate(self):
+        target = self.element(80, attrs=[(83, "stored"), (84, object())])
+        self.fixture([target])
+        target.GetAttributes.side_effect = lambda mode: (
+            [(83, "stored"), (84, [1, 2])] if mode == "ReadAll"
+            else [(83, "computed"), (84, [3, 4])])
+        self.base.AttributeService.GetAttributeType.side_effect = lambda _doc, ident: {83: 11, 84: 13}[ident]
+        result = self.attribute_evidence_probe(target, ids=(83, 84))
+        representation = result["representations"][0]["target"]["value"]
+        self.assertEqual(result["state"], "observed")
+        self.assertEqual(result["ref"]["model_uuid"], target.GetModelElementUUID.return_value)
+        self.assertEqual(result["view_uuid"], target.GetElementUUID.return_value)
+        self.assertEqual(result["attribute_ids"], [83, 84])
+        self.assertEqual(result["metadata"][0]["type_binding"]["value"]["matching_sdk_members"], ["String"])
+        self.assertEqual(result["metadata"][1]["type_binding"]["value"]["matching_sdk_members"], ["Date"])
+        self.assertEqual(representation["read_modes"]["ReadAll"]["value"][0]["value"], "stored")
+        self.assertEqual(representation["read_modes"]["ReadAllAndComputable"]["value"][0]["value"], "computed")
+        self.assertEqual([item["attribute_id"] for item in representation["read_modes"]["ReadAll"]["value"]], [83, 84])
+        self.assertEqual(representation["read_modes"]["ReadAll"]["value"][1]["value"], [1, 2])
+        self.assertEqual(representation["read_modes"]["ReadAll"]["value"][1]["encoding"], "json_sequence")
+        self.assertEqual(representation["read_modes"]["ReadAll"]["value"][1]["member_types"],
+                         [{"module": "builtins", "name": "int"}, {"module": "builtins", "name": "int"}])
+        self.assertFalse(result["property_write_available"])
+        self.assertEqual(result["setter_calls_started"], 0)
+
+    def test_wrong_exact_reference_stops_before_any_attribute_read(self):
+        target = self.element(81)
+        self.fixture([target])
+        self.base.GetElement.return_value = object()
+        request = {"phase": "attribute_evidence", "drawing_file": 101,
+                   "model_uuid": "00000000-0000-4000-8000-000000000099",
+                   "view_uuid": target.GetElementUUID.return_value, "attribute_ids": [83]}
+        self.assert_code("probe_scope_unavailable", lambda: self.probe(**request))
+        target.GetAttributes.assert_not_called()
+
+    def test_attribute_evidence_invalid_null_refs_duplicate_and_boolean_ids_precede_document(self):
+        self.fixture([self.element(82)])
+        valid = {"phase": "attribute_evidence", "drawing_file": 101,
+                 "model_uuid": self.native_elements[0].GetModelElementUUID.return_value,
+                 "view_uuid": self.native_elements[0].GetElementUUID.return_value, "attribute_ids": [83]}
+        for request in ({**valid, "model_uuid": "00000000-0000-0000-0000-000000000000"},
+                        {**valid, "view_uuid": "00000000-0000-0000-0000-000000000000"},
+                        {**valid, "attribute_ids": [83, 83]}, {**valid, "attribute_ids": [True]}):
+            with self.subTest(request=request):
+                self.assert_code("invalid_payload", lambda request=request: self.probe(**request))
+        self.coord.GetInputViewDocument.assert_not_called()
+        self.base.ElementsSelectService.SelectAllElements.assert_not_called()
+        from allplan_mcp.property_models import AttributeEvidenceProbeInput
+        public_valid = {**valid, "model_uuid": "00000000-0000-4000-8000-000000000001",
+                        "view_uuid": "10000000-0000-4000-8000-000000000001"}
+        for request in ({**public_valid, "model_uuid": "00000000-0000-0000-0000-000000000000"},
+                        {**public_valid, "view_uuid": "00000000-0000-0000-0000-000000000000"},
+                        {**public_valid, "attribute_ids": [True]},
+                        {**public_valid, "attribute_ids": [83, 83]}):
+            with self.subTest(public_request=request), self.assertRaises(ValidationError):
+                AttributeEvidenceProbeInput.model_validate(request)
+
+    def test_child_inventory_mismatch_does_not_erase_ancestry_or_values(self):
+        target, child, unrelated = self.element(83), self.element(84), self.element(85)
+        self.fixture([target])
+        target.GetAttributes.side_effect = lambda mode: [(83, mode)]
+        self.children[id(target)] = [child]
+        self.parents[id(child)] = unrelated
+        result = self.attribute_evidence_probe(target)
+        evidence = result["representations"][0]["target"]["value"]
+        self.assertEqual(evidence["ancestry"]["status"], "observed")
+        self.assertEqual(evidence["children"]["status"], "not_checked")
+        self.assertEqual(evidence["children"]["reason"], "component_child_owner_mismatch")
+        self.assertEqual(evidence["read_modes"]["ReadAll"]["value"][0]["value"], "ReadAll")
+        self.assertFalse(result["evidence_complete"])
+        self.assertEqual(result["state"], "not_checked")
+
+    def test_optional_immediate_parent_has_independent_identity_and_values(self):
+        target, parent = self.element(86), self.element(87)
+        self.fixture([target])
+        self.parents[id(target)] = parent
+        target.GetAttributes.side_effect = lambda mode: [(83, "target-" + mode)]
+        parent.GetAttributes.side_effect = lambda mode: [(83, "parent-" + mode)]
+        result = self.attribute_evidence_probe(target, include_parent=True)
+        row = result["representations"][0]
+        self.assertEqual(row["parent"]["status"], "observed")
+        parent_evidence = row["parent"]["value"]["evidence"]
+        self.assertEqual(parent_evidence["ref"]["model_uuid"], parent.GetModelElementUUID.return_value)
+        self.assertNotEqual(parent_evidence["ref"]["model_uuid"], row["target"]["value"]["ref"]["model_uuid"])
+        self.assertEqual(parent_evidence["read_modes"]["ReadAll"]["value"][0]["value"], "parent-ReadAll")
+        self.assertEqual(row["target"]["value"]["read_modes"]["ReadAll"]["value"][0]["value"], "target-ReadAll")
+
+    def test_read_mode_failure_is_isolated_and_duplicate_attribute_rows_fail_that_read(self):
+        target = self.element(88)
+        self.fixture([target])
+        target.GetAttributes.side_effect = lambda mode: (_ for _ in ()).throw(RuntimeError("private")) if mode == "ReadAll" else [(83, "ok")]
+        result = self.attribute_evidence_probe(target)
+        modes = result["representations"][0]["target"]["value"]["read_modes"]
+        self.assertEqual(modes["ReadAll"]["status"], "not_checked")
+        self.assertEqual(modes["ReadAll"]["reason"], "RuntimeError")
+        self.assertEqual(modes["ReadAllAndComputable"]["value"][0]["value"], "ok")
+        target.GetAttributes.side_effect = lambda _mode: [(83, "first"), (83, "duplicate")]
+        result = self.attribute_evidence_probe(target)
+        modes = result["representations"][0]["target"]["value"]["read_modes"]
+        self.assertEqual(modes["ReadAll"]["status"], "not_checked")
+        self.assertEqual(modes["ReadAll"]["reason"], "ValueError")
+        self.assertEqual(result["representation_consensus"], True)
+        self.assertFalse(result["evidence_complete"])
+        self.assertEqual(result["state"], "not_checked")
+
+    def test_wrapper_conflicts_remain_visible_instead_of_first_wrapper_winning(self):
+        first, second = self.element(89), self.element(89)
+        first.GetElementUUID.return_value = second.GetElementUUID.return_value
+        self.fixture([first, second])
+        first.GetAttributes.side_effect = lambda _mode: [(83, "A")]
+        second.GetAttributes.side_effect = lambda _mode: [(83, "B")]
+        result = self.attribute_evidence_probe(first)
+        self.assertEqual(result["representation_count"], 2)
+        self.assertFalse(result["representation_consensus"])
+        self.assertEqual(result["state"], "not_checked")
+        self.assertFalse(result["evidence_complete"])
+
+    def test_metadata_failure_keeps_consensus_but_does_not_claim_complete_evidence(self):
+        target = self.element(90)
+        self.fixture([target])
+        self.base.AttributeService.GetAttributeType.side_effect = RuntimeError("private metadata")
+        result = self.attribute_evidence_probe(target)
+        self.assertTrue(result["representation_consensus"])
+        self.assertFalse(result["evidence_complete"])
+        self.assertEqual(result["state"], "not_checked")
+        self.assertEqual(result["metadata"][0]["type_binding"]["status"], "not_checked")
+
+    def test_attribute_evidence_traces_both_modes_and_holds_native_enumerator_until_reads_finish(self):
+        target = self.element(91)
+        self.fixture([target])
+        self.base.AttributeService.GetAttributeType.side_effect = lambda _doc, _ident: 11
+        owners = []
+
+        class NativeOwnerList(list):
+            pass
+
+        def enumerate_adapters(_doc):
+            owner = NativeOwnerList([target])
+            owners.append(weakref.ref(owner))
+            return owner
+
+        self.base.ElementsSelectService.SelectAllElements.side_effect = enumerate_adapters
+        def read_attributes(mode):
+            self.assertIsNotNone(owners[-1](), "Native adapter owner must live through requested value reads.")
+            return [(83, mode)]
+        target.GetAttributes.side_effect = read_attributes
+        self.attribute_evidence_probe(target)
+        calls = [json.loads(line)["api"] for line in self.path.read_text(encoding="utf-8").splitlines()]
+        self.assertIn("BaseElementAdapter.GetAttributes.evidence.ReadAll", calls)
+        self.assertIn("BaseElementAdapter.GetAttributes.evidence.ReadAllAndComputable", calls)
+        self.assertIsNone(owners[-1]())
+
+    def test_attribute_evidence_result_budget_blocks_oversized_wrapper_report(self):
+        adapters = [self.element(92) for _ in range(16)]
+        for adapter in adapters:
+            adapter.GetElementUUID.return_value = adapters[0].GetElementUUID.return_value
+            adapter.GetAttributes.side_effect = lambda _mode: [(ident, "x" * 8192) for ident in range(1, 17)]
+        self.fixture(adapters)
+        self.base.AttributeService.GetAttributeType.side_effect = lambda _doc, _ident: 11
+        self.assert_code("scan_limit_exceeded", lambda: self.attribute_evidence_probe(
+            adapters[0], ids=tuple(range(1, 17))))
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+        self.base.ElementsLayerService.ChangeLayer.assert_not_called()
+
+    def test_untrusted_values_are_bounded_and_never_stringified(self):
+        from test_allplan_host.attribute_evidence import describe_value
+
+        class Hostile:
+            def __repr__(self):
+                raise AssertionError("repr must not run")
+            __str__ = __repr__
+
+        for value in (Hostile(), float("nan"), "x" * 8193, [1] * 65, [[1]], {"nested": 1}):
+            with self.subTest(kind=type(value).__name__):
+                evidence = describe_value(value)
+                json.dumps(evidence, allow_nan=False)
+                self.assertEqual(evidence["status"], "not_checked")
+                self.assertIsNone(evidence["value"])
+        hostile = describe_value(Hostile())
+        self.assertEqual(hostile["runtime_type"], {"module": __name__, "name": "Hostile"})
+        self.assertNotIn("repr", json.dumps(hostile))
+
+    def test_seventeenth_exact_wrapper_is_rejected_before_attribute_reads(self):
+        adapters = [self.element(93) for _ in range(17)]
+        for adapter in adapters:
+            adapter.GetElementUUID.return_value = adapters[0].GetElementUUID.return_value
+        self.fixture(adapters)
+        self.assert_code("probe_scope_unavailable", lambda: self.attribute_evidence_probe(adapters[0]))
+        for adapter in adapters:
+            adapter.GetAttributes.assert_not_called()
 
 
 if __name__ == "__main__":

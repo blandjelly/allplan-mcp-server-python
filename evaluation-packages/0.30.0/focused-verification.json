@@ -1,0 +1,61 @@
+{
+  "candidate": "0.30.0",
+  "source_branch": "feat/m4-combined-evidence-0.30.0",
+  "baseline_commit": "6e8caff81905055ff724d5a0f856e645104406d3",
+  "source_commit_note": "Final committed candidate source is recorded in source-ci.json.",
+  "source_worktree": "contains candidate changes",
+  "scope": "focused affected and dependent unit and HTTP checks for exact attribute evidence and W1 no-op reporting",
+  "environment": {
+    "python": "3.12.14",
+    "environment": "repository .venv",
+    "installed_editable_metadata": "0.30.0 after frozen sync",
+    "http_loopback": "network permission enabled for focused HTTP checks"
+  },
+  "result": "passed",
+  "unique_tests_passed": 142,
+  "unique_test_id_count": 142,
+  "duplicate_test_ids": 0,
+  "counting_method": "Union of unittest.defaultTestLoader TestCase.id() values across the core, HTTP, and dependent groups. The 12 post-clock-injection evidence tests and the environment retry are reruns of IDs already counted.",
+  "groups": [
+    {
+      "name": "affected unit core",
+      "tests": 77,
+      "result": "passed",
+      "command": "PYTHONPATH=tests .venv/bin/python -m unittest test_property_probe test_component_identity test_model_edit"
+    },
+    {
+      "name": "affected HTTP core",
+      "tests": 4,
+      "result": "passed",
+      "command": "PYTHONPATH=tests .venv/bin/python -m unittest test_component_identity_http"
+    },
+    {
+      "name": "dependent focused modules and MCP schema smoke",
+      "tests": 61,
+      "result": "passed after environment refresh",
+      "command": "PYTHONPATH=tests .venv/bin/python -m unittest test_edit_ownership test_model_edit_contracts test_attribute_codecs test_drawing_identity test_element_attributes_probe test_model_properties test_mcp_smoke.MCPSmokeTests.test_m4_isolated_probe_quarantine_and_validation_over_http test_model_edit_recovery_http test_drawing_identity_http",
+      "initial_environment_retry": {
+        "test": "test_mcp_smoke.MCPSmokeTests.test_m4_isolated_probe_quarantine_and_validation_over_http",
+        "first_result": "failed at the host/package version health gate because the existing editable metadata was 0.1.0 while source code was 0.30.0",
+        "resolution": "uv sync --frozen refreshed editable metadata to 0.30.0; the same focused smoke test then passed",
+        "production_or_test_code_changed_for_retry": false
+      }
+    },
+    {
+      "name": "attribute evidence tests after deterministic clock injection",
+      "tests": 12,
+      "result": "passed",
+      "counted_again": false,
+      "command": "PYTHONPATH=tests .venv/bin/python -m unittest test_component_identity.ComponentIdentityTests.test_attribute_evidence_keeps_exact_identity_metadata_and_read_modes_separate test_component_identity.ComponentIdentityTests.test_wrong_exact_reference_stops_before_any_attribute_read test_component_identity.ComponentIdentityTests.test_attribute_evidence_invalid_null_refs_duplicate_and_boolean_ids_precede_document test_component_identity.ComponentIdentityTests.test_child_inventory_mismatch_does_not_erase_ancestry_or_values test_component_identity.ComponentIdentityTests.test_optional_immediate_parent_has_independent_identity_and_values test_component_identity.ComponentIdentityTests.test_read_mode_failure_is_isolated_and_duplicate_attribute_rows_fail_that_read test_component_identity.ComponentIdentityTests.test_wrapper_conflicts_remain_visible_instead_of_first_wrapper_winning test_component_identity.ComponentIdentityTests.test_metadata_failure_keeps_consensus_but_does_not_claim_complete_evidence test_component_identity.ComponentIdentityTests.test_attribute_evidence_traces_both_modes_and_holds_native_enumerator_until_reads_finish test_component_identity.ComponentIdentityTests.test_attribute_evidence_result_budget_blocks_oversized_wrapper_report test_component_identity.ComponentIdentityTests.test_untrusted_values_are_bounded_and_never_stringified test_component_identity.ComponentIdentityTests.test_seventeenth_exact_wrapper_is_rejected_before_attribute_reads"
+    }
+  ],
+  "pre_candidate_baseline": {
+    "tests": 114,
+    "included_in_unique_test_count": false,
+    "note": "Baseline ran before the 0.30.0 candidate changes and is excluded."
+  },
+  "full_local_suite": "not_run",
+  "full_ci": "not_run",
+  "package_build": "not_run",
+  "native_allplan": "not_run"
+}

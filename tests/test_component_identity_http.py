@@ -67,6 +67,35 @@ class ComponentIdentityHTTPTests(unittest.IsolatedAsyncioTestCase):
         native.base.GetElement.assert_called_once_with(target)
         native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
 
+    async def test_attribute_evidence_phase_uses_public_http_contract_and_rejects_boolean_ids(self):
+        native = identity_fixtures.ComponentIdentityTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        target = native.fixture()[0]
+        target.GetAttributes.side_effect = lambda mode: [(83, mode)]
+        native.base.eAttibuteReadState.ReadAll = "ReadAll"
+        native.base.eAttibuteReadState.ReadAllAndComputable = "ReadAllAndComputable"
+        native.base.AttributeService.AttributeType = type("AttributeType", (), {"String": 11})
+        native.base.AttributeService.GetAttributeType.return_value = 11
+        native.base.GetElement.return_value = object()
+        self.attach(native, {"/model-property-probe"})
+        request = {"phase": "attribute_evidence", "drawing_file": 101,
+                   "model_uuid": target.GetModelElementUUID(),
+                   "view_uuid": target.GetElementUUID(), "attribute_ids": [83]}
+        async with Client(self.url, timeout=10) as client:
+            result = (await client.call_tool("model_property_probe", {"request": request})).data
+            self.assertEqual(result["state"], "observed")
+            self.assertFalse(result["property_write_available"])
+            self.assertEqual(result["representations"][0]["target"]["value"]["read_modes"]["ReadAll"]["value"][0]["value"],
+                             "ReadAll")
+            rejected = await client.call_tool("model_property_probe", {"request": {
+                **request, "attribute_ids": [True]}}, raise_on_error=False)
+            self.assertTrue(rejected.is_error)
+        self.assertEqual(len(self.bridge_handler.calls), 1)
+        self.assertEqual(target.GetAttributes.call_count, 2)
+        native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+        native.base.ElementsLayerService.ChangeLayer.assert_not_called()
+
     async def test_parent_and_child_slabs_have_visible_blockers_without_setters(self):
         native = edit_fixtures.EditOwnershipTests()
         native.setUp()

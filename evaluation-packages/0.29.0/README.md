@@ -1,7 +1,8 @@
 # 0.29.0 candidate record
 
-Status: **full CI and exact fallback ZIP verification passed; native Allplan
-trial not run.** This record covers source commit
+Status: **full CI and exact fallback ZIP verification passed; a later
+owner-reported native 0.29.0 trial passed its scoped grouped Column delete and
+one-Undo check.** This record covers source commit
 `df050afc71b9e0c2303594d6acbd3da463df3e89`.
 
 - Version: `0.29.0`
@@ -50,11 +51,17 @@ passed. See [CI record](source-ci.json), [artifact hashes](artifact-hashes.json)
 
 ## Native owner trial
 
-Native Allplan 0.29.0 is **not run**. The 0.28.0 owner report is historical and
-limited: one Undo restored only one of three deleted Columns, and further Undo
-was unavailable. The new [0.29.0 trial](../../docs/m4-single-drawing-0.29.0.pl.md)
-requires one plural delete call, fresh absence reads for each target and
-descendant, then one UI Undo restoring all three roots and descendants.
+The owner later reported PASS for all steps of the 0.29.0 trial: three Columns
+on W1 in active drawing 101 were deleted, a fresh scan reported all three
+Columns and their attribute containers absent, and one UI Undo restored all
+three Columns. This meets the grouped-Undo repair goal for that tested
+operation. The result is not bound to this exact ZIP: the log lacks raw MCP
+responses, target UUIDs and the installed ZIP manifest; the owner observed
+Undo while the tool reported `undo: not_checked` without automatic post-Undo
+readback. See the [scoped owner observation](../../docs/test-results/m4-owner-observation-0.29.0-2026-10-23.md)
+and [test log](../../docs/test-results/evidence/allplan-test-log-0.29.0-2026-10-23.md).
+The 0.28.0 one-of-three Undo remains historical. See the updated
+[0.29.0 trial record](../../docs/m4-single-drawing-0.29.0.pl.md).
 
 Priority 1's bounded journal cleanup scope remains accepted. Priorities 2–5
 remain partial, as recorded in the [current handoff](../../docs/next-model-handoff.md)

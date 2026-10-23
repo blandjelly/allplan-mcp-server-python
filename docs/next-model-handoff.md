@@ -6,7 +6,35 @@ and target pull requests to `develop/m4`. Main remains separate. Read
 implementation. The policy is the source of truth for automated checks and
 package builds.
 
-## Current candidate: 0.29.0 — CI and exact fallback ZIP verification passed
+## Current candidate scope: 0.30.0 — implementation in progress
+
+Branch `feat/m4-combined-evidence-0.30.0` is developing one combined session
+for priorities 1–5. This is a deliberately partial candidate; **full CI,
+package verification and native trial have not been run**. Do not mark any of
+those gates PASS or treat this documentation scope as completed acceptance.
+
+The current implementation adds read-only
+`model_property_probe phase=attribute_evidence` for one exact foreground
+drawing/model/view, 1–16 distinct observed attribute IDs and up to 16 exact
+view wrappers, optionally including the immediate parent. It separates
+ancestry, children, `ReadAll`, `ReadAllAndComputable`, native representation
+and runtime type evidence. `evidence_complete` requires consensus and all
+requested observations; partial evidence retains available data with
+`state=not_checked`. Actual SDK member binding is labeled matched, ambiguous,
+or unresolved. The probe does not establish field owner or setter payload.
+Complete no-op previews/revalidations report fresh `no_op_evidence` and
+`setter_calls_started=0`; no-op plans have no Apply route.
+
+Slab/MultiSlab field ownership, date/vector setter payloads and native
+selection set/clear/readback remain unresolved and blocked. The
+[single-session 0.30.0 trial plan](m4-single-drawing-0.30.0.pl.md) spans all
+five priorities, including available supported scalar/Enum writes on new
+family/type fixtures when exact safe fixtures exist. It records unavailable
+work as BLOCKED or `fixture_missing`, does not repeat accepted Column grouped
+delete/Undo, and continues after an independent blocked stage. See the
+[0.30.0 API evidence note](m4-editing-api-0.30.0.md).
+
+## Retained candidate: 0.29.0 — CI and exact fallback ZIP verification passed
 
 Source `df050afc71b9e0c2303594d6acbd3da463df3e89` is on
 `fix/m4-batch-undo-0.29.0`; [PR #27](https://github.com/blandjelly/allplan-mcp-server-python/pull/27)
@@ -39,12 +67,20 @@ and makes one `DeleteElements` call with the complete bound adapter list. Fresh
 readback records per-target and descendant results; unknown/partial outcomes
 recover under the same execution ID without repeating deletion.
 
-Native Allplan 0.29.0 is **not run**. The pending owner trial for this candidate
-is the narrow three-Column grouped deletion and one-Undo check in the
-[0.29.0 trial plan](m4-single-drawing-0.29.0.pl.md). The 0.28.0 owner report
-remains historical: one Undo restored only one of three Columns, with no
-further Undo available. Priorities 1–5 remain partially open beyond the
-accepted scope; see the [coverage matrix](m4-single-drawing-coverage-0.24.0.md).
+The owner reports **PASS for all steps** of the 0.29.0 native trial: three
+`Column_TypeUUID` elements on W1 in active drawing 101 were deleted, a fresh
+scan reported all three Columns and their attribute containers absent, and one
+UI Undo restored all three Columns. This meets the grouped-Undo repair goal for
+the tested Column operation. The 0.28.0 result remains historical: one Undo
+restored only one of three Columns. The 0.29.0 log lacks raw MCP responses,
+target UUIDs and the installed ZIP manifest; the owner observed Undo while the
+tool reported `undo: not_checked` and did not perform automatic post-Undo
+readback. See the [scoped owner observation](test-results/m4-owner-observation-0.29.0-2026-10-23.md)
+and [attached test log](test-results/evidence/allplan-test-log-0.29.0-2026-10-23.md).
+Priorities 1–5 remain partially open beyond this completed Column grouped
+delete/Undo scope. Next work should address priorities 1–5 together; the scope
+of a new candidate is not yet set. See the
+[coverage matrix](m4-single-drawing-coverage-0.24.0.md).
 
 ## Retained candidate: 0.28.0 — CI and exact ZIP verification passed
 
@@ -281,37 +317,44 @@ Beam W1 writes.
    1 MiB per record, 8 MiB active trace, 32 MiB trace-inspection limit, and
    archive inventory of 1 GiB / 1024 files. Focused checks, full CI, and exact
    ZIP verification passed. Native restart/replay remains unobserved. Protect
-   unresolved, corrupt and unverifiable records.
+   unresolved, corrupt and unverifiable records. Candidate 0.30.0's combined
+   session plan includes inspect/archive and restart/replay only through an
+   existing resolved execution ID, with no new setter invocation.
 2. **Implemented:** identity inventory and fail-closed Slab write guards.
    **Unresolved:** the 0.27.0 read-only report retains a Slab/MultiSlab
-   parent-lineage conflict; identity does not establish field ownership. Keep
-   writes blocked and use read-only evidence for the exact hierarchy.
+   parent-lineage conflict; identity does not establish field ownership. The
+   candidate 0.30.0 `attribute_evidence` read preserves exact identity,
+   ancestry, children, requested values and SDK type binding separately. Even
+   complete evidence does not establish field ownership. Keep unresolved writes
+   blocked.
 3. **Implemented:** layer 0 handling and reviewed W1 plan/Apply. **Limited
-   native report:** W1 read/write and one UI Undo per changed element. No
-   explicit no-op/zero-setter observation. Do not repeat accepted Undo or
-   readbacks; only the separate unobserved no-op scope remains.
-4. **Implemented in the 0.28.0 candidate:** typed subtree delete binds parent
-   edges by drawing/model/type identity and retains actual parent view UUIDs in
-   bound `child_parent_edges` and `descendant_parent_edges`; the selected
-   target's exact view UUID remains bound. Focused checks, full CI, and exact
-   ZIP verification passed. The owner reports scoped PASS for points 1–3 and 5
-   of the 0.28.0 Column trial: three W1 Columns were highlighted and previewed,
-   deletion and absence readback were reported, and an optional read-only probe
-   was reported PASS. Point 4 **FAIL**: one UI Undo restored only one of the
-   three; further Undo was unavailable. No UUIDs, raw MCP responses, exact
-   manifest or Allplan build ID were retained, so the report is not exact
-   artifact acceptance. Do not claim group Undo or full Column acceptance.
-   Next, follow the [0.29.0 short trial](m4-single-drawing-0.29.0.pl.md): one
-   plural `DeleteElements` call for the complete reviewed group, per-target
-   fresh absence readback, then one UI Undo restoring all three and their
-   descendants. Slab/MultiSlab write blockers stay in force. Selection remains
-   unsupported; material diagnostics passed, but no native material setter is
-   accepted.
+   native report:** W1 read/write and one UI Undo per changed element. Earlier
+   reports lack explicit no-op/zero-setter evidence. Candidate 0.30.0 adds
+   bounded fresh no-op evidence and revalidation with zero setters; its
+   behavior has not yet been tested in Allplan. No-op must not be applied.
+4. **Implemented in the 0.28.0/0.29.0 candidates:** typed subtree delete binds
+   parent edges by drawing/model/type identity; 0.29.0 sends the reviewed
+   Column group in one plural delete call. Focused checks, full CI, and exact
+   ZIP verification passed for the candidate. The owner reports PASS for all
+   steps of the 0.29.0 Column trial: one UI Undo restored all three deleted
+   Columns after the fresh absence scan. This meets the grouped-Undo repair
+   goal for that tested operation. The log lacks raw MCP responses, target
+   UUIDs and installed ZIP manifest; the owner observed Undo and the tool left
+   `undo: not_checked` without automatic post-Undo readback. See the
+   [0.29.0 observation](test-results/m4-owner-observation-0.29.0-2026-10-23.md).
+   The 0.28.0 one-of-three Undo remains historical. Slab/MultiSlab write
+   blockers stay in force. Native material has no owner acceptance; the
+   existing guarded experimental evaluation setter may be exercised in the
+   0.30.0 session when its target and all Apply guards qualify. Native selection
+   remains unsupported.
 5. **Implemented:** bounded scalar/Enum contracts, family/value inventory and
    attribute-name resolver. The 0.27.0 lowercase lookup and material-diagnostic
    points and 0.28.0 optional read-only probe have owner-reported PASS in their
    limited scope. **Remaining:** date/vector/object
    codecs and per-family owner, value roundtrip, UI readback and Undo evidence.
+   Candidate 0.30.0's requested-ID evidence phase reports observed SDK members
+   and raw JSON values; it does not add date/vector codecs. The combined trial
+   may use existing scalar/Enum writes on new safe fixtures when available.
    Do not infer support from SDK symbols or repeat accepted attribute writes.
 
 ## Retained 0.24.0 evidence
@@ -388,6 +431,11 @@ native fakes and MCP HTTP. The delivery commit adds docs/artifacts only.
 
 ## Next work
 
+The next combined session is scoped in the
+[0.30.0 trial plan](m4-single-drawing-0.30.0.pl.md) and covers priorities 1–5
+together. Record fixture gaps as `fixture_missing` and unresolved API work as
+BLOCKED; do not repeat the accepted 0.29.0 Column grouped delete/Undo.
+
 1. Preserve the unresolved Slab/MultiSlab lineage in the
    [0.27.0 owner observation](test-results/m4-owner-observation-0.27.0-2026-10-23.md).
    The log records model/view UUIDs and a parent-lineage conflict for the Slab
@@ -398,14 +446,14 @@ native fakes and MCP HTTP. The delivery commit adds docs/artifacts only.
    part of that scope is a designated W1 no-op with explicit confirmation that
    it invoked zero setters; run it only if its separate target is already
    defined and safe.
-3. Candidate 0.28.0 implements parent-edge matching for typed deletion while
-   retaining the selected target's exact view UUID and actual parent view UUIDs
-   in preview/revalidation evidence. Focused checks, full CI and exact ZIP
-   verification passed. The next native
-   trial is only the exact W1 Columns blocked in the 0.27.0 log, if their exact
-   identities can be established: preview, confirmed delete, complete subtree
-   absence scan, and one native Undo per deleted element with fresh identity
-   readback. Do not repeat the accepted Wall 240 mm deletion or Beam W1 moves.
+3. Candidate 0.28.0 implements parent-edge matching for typed deletion and
+   0.29.0 adds one plural native delete call for the reviewed Column group.
+   Focused checks, full CI and exact ZIP verification passed for those
+   candidates. The owner reports PASS for all steps of the 0.29.0 trial,
+   including one UI Undo restoring all three Columns; see the linked
+   observation above. Do not repeat this accepted Column deletion/Undo, the
+   Wall 240 mm deletion or Beam W1 moves. Next work should address priorities
+   1–5 together; the new candidate scope is not set.
 4. Continue the [development plan](office-editing-development-plan.pl.md) for
    capacity, selection, unaccepted families/types, multi-file and whole-project
    work. The 0.27.0 owner observation records limited resolver/material

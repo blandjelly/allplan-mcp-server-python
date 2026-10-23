@@ -155,6 +155,7 @@ is required, with only its declared parameters:
 | attribute_definition | attribute_id: one ID observed from project metadata/sample; name/type/unit/control readers, stopping at first unavailable value. |
 | element_attributes | drawing_file, model_uuid, view_uuid; optional name_contains, offset, limit: one exact foreground semantic component, paged ReadAll values and targeted name/ID roundtrip plus SDK scalar type metadata. |
 | component_identity | drawing_file, model_uuid, view_uuid: one exact direct foreground adapter, bounded full parent chain and direct children, and represented native Python type from GetElement; no attributes, geometry, metadata, UI or setters. |
+| attribute_evidence | drawing_file, model_uuid, view_uuid, 1–16 distinct observed attribute_ids, optional include_parent=false: complete model_identity scan, up to 16 exact-view wrappers, separate ancestry/children observations, native representation, requested ReadAll and ReadAllAndComputable values, and targeted runtime type metadata. Result is capped at 512 KiB. It never infers field owner or setter payload. |
 | layer_name | layer_name or legacy layer_short_name: exact full/short name lookup with fresh ID/name round trips; requests catalog search when the SDK lacks full-name lookup. |
 | layer_catalog | layer_name, optional offset/limit (default/max 8192 IDs): read-only Allplan 2026 name search over bounded ID pages, with a 3-second soft page budget, continuation and user-confirmation candidates. |
 | wall_sample | drawing_file (required integer) and optional model_uuid: one foreground file and one exact native Wall root; reads tier count and, only for a single-tier Wall, tier 1 thickness and raw material. |
@@ -174,6 +175,24 @@ The native type, ancestry and children do not prove physical equivalence or
 the owner of an attribute/material/layer. The optional query field
 `component_ownership` returns observed/not_checked structural evidence; it
 cannot be used as a predicate. Default query reads are unchanged.
+
+`attribute_evidence` accepts one exact active foreground drawing and canonical
+nonzero model/view UUIDs. `attribute_ids` must be a list of 1–16 unique,
+positive IDs observed for real project definitions. It inspects at most 16
+wrappers for that exact view and optionally reads its immediate parent when
+`include_parent=true`. Ancestry, full children observation, native
+representation, and requested attribute reads are distinct observations; a
+children error does not erase ancestry. Stored `ReadAll` and
+`ReadAllAndComputable` rows are kept separate. Each row preserves the raw JSON
+scalar/sequence and runtime type; unknown SDK objects are type-only
+`not_checked`, without `repr`, coercion, or guessed encoding. Type metadata
+reports actual SDK member matches and `binding_status` (`matched`, `ambiguous`,
+or `unresolved`). `evidence_complete` is true only when wrapper consensus and
+all requested raw rows, metadata, ancestry, children and native representation
+reads are complete; `state=observed` requires that complete result. Partial
+evidence returns `state=not_checked` while retaining collected data. Even a
+complete result is evidence only: it does not
+establish field ownership or a writable setter. No writes are started.
 
 Candidate 0.26.0 adds `drawing_identity` for a bounded inventory of one
 foreground drawing. This inventories model/view identity, lineage, and native
@@ -585,6 +604,13 @@ has authorized the write and all listed requirements are satisfied. For Apply,
 `next_action.required_request_fields` requires a newly generated UUID4 hex
 `execution_id`, persisted before sending. Revalidate carries eligibility
 forward only while the original plan remains eligible and unchanged.
+
+A complete eligible `preview` with no pending setter returns `state=no_op`,
+`setter_calls_started=0`, and `no_op_evidence` containing reason
+`already_at_requested_values` or `no_matching_targets`, matched target count,
+up to 32 fresh observations of requested fields, and `source_fingerprint`.
+An unchanged revalidation returns fresh no-op evidence; drift returns conflict
+and invalidates the plan. No-op has no Apply path and must not be applied.
 
 ## column_layer (0.17.2 candidate)
 
