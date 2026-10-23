@@ -1,0 +1,51 @@
+{
+  "candidate": "0.31.0",
+  "source_commit": "0f99863b7c11143d9f14ca12a1027aad5b009195",
+  "source_branch": "fix/m4-material-owner-0.31.0",
+  "pull_request": "https://github.com/blandjelly/allplan-mcp-server-python/pull/29",
+  "workflow_run": {
+    "id": 40012042481,
+    "url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40012042481",
+    "run_number": 202,
+    "conclusion": "success",
+    "matrix": [
+      {"job_id": 120614673595, "os": "ubuntu-latest", "python": "3.12.15", "tests": 625, "conclusion": "success"},
+      {"job_id": 120614673628, "os": "windows-latest", "python": "3.12.10", "tests": 625, "conclusion": "success"}
+    ],
+    "package_job": {"job_id": 120618812852, "conclusion": "success", "steps": ["uv build", "Windows ZIP packaging", "artifact upload"]}
+  },
+  "ci_artifact": {
+    "id": 12527730616,
+    "name": "candidate-0f99863b7c11143d9f14ca12a1027aad5b009195",
+    "size_bytes": 1140222,
+    "sha256": "6b32d305f0eac36ca8385d482c28ef4c0af350fff496c8aa3e9ae3e0770973d8",
+    "transfer": "connector returned FileService reference; one normal-proxy gh run download attempt failed with GitHub API Forbidden"
+  },
+  "fallback_build": {
+    "used": true,
+    "source_path": "/tmp/m4-material-0.31.0",
+    "source_commit": "0f99863b7c11143d9f14ca12a1027aad5b009195",
+    "source_modified": false,
+    "commands": ["uv build", "uv run --frozen python utils/build_windows_package.py"],
+    "reason": "The exact CI artifact could not be transferred after the single normal-proxy attempt."
+  },
+  "automated_tests": "pass",
+  "package_build": "pass",
+  "exact_zip_verification": {
+    "result": "pass",
+    "command": "UV_CACHE_DIR=/tmp/allplan-m4-uv-cache python evaluation-packages/0.31.0/verify_package.py --source-commit 0f99863b7c11143d9f14ca12a1027aad5b009195",
+    "payload_files": 201,
+    "bridge_hashes_verified": 43,
+    "zip_sha256": "4047e7bb58eff28c8f87fdc488d0e787ad1a048cf05aae7b7d537646826fbbcb",
+    "checks": [
+      "checksum and payload integrity",
+      "exact ZIP registration",
+      "frozen sync and import",
+      "drawing_identity and attribute_evidence schemas",
+      "native source safety limits including material parent-view guard",
+      "upgrade from and restore to 0.30.0",
+      "active/archive journal, trace, and bridge-log marker preservation"
+    ],
+    "native_Allplan": "not_run"
+  }
+}

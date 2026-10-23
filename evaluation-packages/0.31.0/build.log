@@ -1,0 +1,17 @@
+Candidate 0.31.0 package build provenance
+
+CI: https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40012042481
+Source: 0f99863b7c11143d9f14ca12a1027aad5b009195
+Source worktree: /tmp/m4-material-0.31.0 (detached, clean; source_modified=false)
+
+The CI artifact could not be transferred. The GitHub connector returned only a FileService reference. One normal-proxy transfer attempt (`gh run download 40012042481 --repo blandjelly/allplan-mcp-server-python --dir /tmp/m4-ci-artifact`) failed with GitHub API Forbidden. Per repository policy, one fallback build was produced from the exact clean source commit.
+
+Commands:
+  UV_CACHE_DIR=/tmp/uv-cache uv build
+  UV_CACHE_DIR=/tmp/uv-cache uv run --frozen python utils/build_windows_package.py
+
+Results:
+  Successfully built dist/allplan_mcp_server-0.31.0.tar.gz
+  Successfully built dist/allplan_mcp_server-0.31.0-py3-none-any.whl
+  /tmp/m4-material-0.31.0/dist/allplan-mcp-0.31.0-windows-evaluation.zip
+  ZIP SHA-256: 4047e7bb58eff28c8f87fdc488d0e787ad1a048cf05aae7b7d537646826fbbcb

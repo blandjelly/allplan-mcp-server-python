@@ -1,0 +1,45 @@
+{
+  "candidate": "0.31.0",
+  "source_branch": "fix/m4-material-owner-0.31.0",
+  "baseline_commit": "013ff67a81091e4df95ed97bc02a46b552a74093",
+  "source_commit": "0f99863b7c11143d9f14ca12a1027aad5b009195",
+  "source_commit_note": "This is the tested and packaged source SHA; any later docs-only delivery commit is distinct.",
+  "source_worktree": "contains candidate changes",
+  "scope": "focused affected and dependent unit, HTTP, ownership, and package version checks for Wall native-material ownership across alternate parent view wrappers",
+  "environment": {
+    "python": "3.12.14",
+    "environment": "uv run --frozen",
+    "http_loopback": "network permission enabled for focused HTTP checks"
+  },
+  "result": "passed",
+  "unique_tests_passed": 87,
+  "unique_test_id_count": 87,
+  "duplicate_test_ids": 0,
+  "counting_method": "Union of unittest test IDs across the affected/dependent module command and package version test. The 25-test Wall material + HTTP rerun after fake cleanup overlaps the broad command and is not counted again.",
+  "groups": [
+    {
+      "name": "affected material, HTTP, edit, native setter, and ownership modules",
+      "tests": 86,
+      "result": "passed",
+      "command": "UV_CACHE_DIR=/tmp/uv-cache uv run --frozen env PYTHONPATH=tests python -m unittest test_wall_material_edit test_wall_material_http test_model_edit test_native_model_edit test_edit_ownership -v"
+    },
+    {
+      "name": "Wall material and HTTP rerun after fixture cleanup",
+      "tests": 25,
+      "result": "passed",
+      "counted_again": false,
+      "command": "UV_CACHE_DIR=/tmp/uv-cache uv run --frozen env PYTHONPATH=tests python -m unittest test_wall_material_edit test_wall_material_http -v"
+    },
+    {
+      "name": "package version and lock agreement",
+      "tests": 1,
+      "result": "passed",
+      "command": "UV_CACHE_DIR=/tmp/uv-cache uv run --frozen env PYTHONPATH=tests python -m unittest test_package.PackageTests.test_version_and_lock_agree -v"
+    }
+  ],
+  "coverage_note": "Fake SDK tests require a same-model alternate parent view to be accepted with the observed view bound and fresh material readback; wrapper-view drift conflicts before ModifyElements; different model, type, or drawing parent identity remains blocked. Fake results are automated evidence only and are not Allplan acceptance.",
+  "full_local_suite": "not_run",
+  "full_ci": "not_run",
+  "package_build": "not_run",
+  "native_allplan": "not_run"
+}

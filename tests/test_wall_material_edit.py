@@ -125,6 +125,16 @@ class WallMaterialEditTests(unittest.TestCase):
     def preview(self, **updates):
         return self.native.call(self.request(**updates))
 
+    def alternate_wall_view(self, index):
+        """Return another view wrapper for the same native Wall model."""
+        alias = self.native.element(index, name="Wall_TypeUUID")
+        alias.GetDrawingfileNumber.return_value = self.root.GetDrawingfileNumber.return_value
+        alias.GetModelElementUUID.return_value = self.root.GetModelElementUUID.return_value
+        alias.GetElementAdapterType.return_value.GetTypeName.return_value = "Wall_TypeUUID"
+        alias.GetElementAdapterType.return_value.GetGuid.return_value = (
+            self.root.GetElementAdapterType.return_value.GetGuid.return_value)
+        return alias
+
     def snapshot_invariants(self):
         return {
             "scalars": {name: getattr(self.properties.GetWallTierProperties(1), name)
@@ -161,6 +171,63 @@ class WallMaterialEditTests(unittest.TestCase):
         self.assertTrue(self.native.apply(plan, execution_id)["replayed"])
         self.assertEqual(self.native.base.ModifyElements.call_count, 1)
         self.assertEqual(self.preview()["state"], "no_op")
+
+    def test_material_accepts_same_model_parent_view_and_binds_observed_edge(self):
+        parent_view = self.alternate_wall_view(20)
+        self.native.parents[id(self.tier)] = parent_view
+        # Keep the exact Wall view as the query target. The material adapter
+        # separately observes the tier's parent wrapper and must bind that edge.
+        self.native.base.ElementsSelectService.SelectAllElements.return_value = [self.root]
+
+        plan = self.preview()
+        self.assertTrue(plan["apply_available"], plan)
+        state = plan["changes"][0]["resource"]["wall_material_state"]
+        edge = state["hierarchy"]["child_parent_edges"][0]
+        self.assertEqual(edge["parent"]["view_uuid"], parent_view.GetElementUUID())
+        self.assertEqual(state["tier_hierarchy"]["lineage"][1]["view_uuid"],
+                         parent_view.GetElementUUID())
+        self.assertNotEqual(edge["parent"]["view_uuid"], self.root.GetElementUUID())
+
+        self.native.highlight(plan)
+        result = self.native.apply(plan, uuid4().hex)
+        self.assertEqual(result["state"], "completed", result)
+        self.assertEqual(self.material, "C35/45")
+        self.assertEqual(result["outcomes"][0]["readback"],
+                         {"status": "observed", "value": "C35/45"})
+        self.native.base.ModifyElements.assert_called_once()
+
+    def test_material_parent_view_drift_conflicts_before_modify(self):
+        parent_view = self.alternate_wall_view(23)
+        self.native.parents[id(self.tier)] = parent_view
+        self.native.base.ElementsSelectService.SelectAllElements.return_value = [self.root]
+        plan = self.preview()
+        self.assertTrue(plan["apply_available"], plan)
+        self.native.highlight(plan)
+
+        self.native.parents[id(self.tier)] = self.alternate_wall_view(24)
+        self.native.assert_code("repair_conflict", lambda: self.native.apply(plan))
+        self.native.base.ModifyElements.assert_not_called()
+
+    def test_material_rejects_tier_parent_from_different_wall_identity(self):
+        for mismatch in ("model", "type", "file"):
+            with self.subTest(mismatch=mismatch):
+                parent_view = self.alternate_wall_view(21)
+                if mismatch == "model":
+                    parent_view.GetModelElementUUID.return_value = (
+                        self.native.element(22).GetModelElementUUID.return_value)
+                elif mismatch == "type":
+                    parent_view.GetElementAdapterType.return_value.GetTypeName.return_value = "Door_TypeUUID"
+                else:
+                    parent_view.GetDrawingfileNumber.return_value = 102
+                self.native.parents[id(self.tier)] = parent_view
+
+                plan = self.preview()
+                self.assertFalse(plan["apply_available"], plan)
+                blocker = next(item for item in plan["blocked"]
+                               if item["field"] == "wall.native_material")
+                self.assertEqual(blocker["observation"]["reason"],
+                                 "component_child_owner_mismatch")
+                self.native.base.ModifyElements.assert_not_called()
 
     def test_geometry_stream_drift_after_preview_conflicts_before_modify(self):
         plan = self.preview()

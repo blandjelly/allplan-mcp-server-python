@@ -8,7 +8,7 @@ from __future__ import annotations
 import hashlib
 import math
 
-from .component_ownership import ComponentReadError, failure, observe
+from .component_ownership import ComponentReadError, failure, observe, same_model_identity
 from .model_context import boolean, integer, text
 from .query_contracts import fingerprint
 from .transport import BridgeError
@@ -87,7 +87,12 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None):
         if kind != "WallTier_TypeUUID":
             raise ComponentReadError("material_children", "wall_material_child_type_unsupported")
         child_hierarchy = read(lambda: observe(child, check), "material_tier_hierarchy")
-        if (child_hierarchy["lineage"] != [child_hierarchy["target"], hierarchy["target"]]
+        lineage = child_hierarchy["lineage"]
+        # A tier's parent can be another view wrapper of this same Wall.
+        # Bind the observed wrappers below, but compare structural ownership
+        # by drawing/model/type, as component_ownership.observe does.
+        if (len(lineage) != 2 or lineage[0] != child_hierarchy["target"]
+                or not same_model_identity(lineage[1], hierarchy["target"])
                 or child_hierarchy["children"]):
             raise ComponentReadError("material_tier_hierarchy", "wall_material_tier_hierarchy_unsupported")
         child_refs.append(child_hierarchy["target"])
@@ -100,7 +105,7 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None):
         tiers.append(hashlib.sha256(stream.encode("utf-8")).hexdigest())
     if len(tiers) != 1 or child_refs != hierarchy["children"]:
         raise ComponentReadError("material_children", "wall_material_one_exact_tier_required")
-    state = {"hierarchy": hierarchy, "tier_count": 1,
+    state = {"hierarchy": hierarchy, "tier_hierarchy": child_hierarchy, "tier_count": 1,
              "axis": read(lambda: _representation(props.Axis), "material_axis"),
              "path_axis_type": integer(read(lambda: props.PathElementAxisType)),
              "tier": {name: read(lambda name=name: _scalar(getattr(tier, name)), "material_tier_" + name) for name in _SCALARS},
