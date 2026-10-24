@@ -53,15 +53,21 @@ review. The current [workflow](../.github/workflows/portable.yml) handles
 `ready_for_review`; this event compares the full PR diff and selects the
 required matrix through [ci_policy.py](../utils/ci_policy.py). Codex must mark
 final product candidates Ready for review to trigger that validation before
-handoff. Documentation-only PRs are excluded by the workflow path filters;
-they require only diff and link checks. A passing run for an earlier source
+handoff. Documentation-only PRs run configuration and the lightweight
+`ci-required` gate; they require only diff and link checks, without product
+tests or builds. A passing run for an earlier source
 revision does not validate later runtime changes.
 
 The workflow runs full jobs for ready pull requests or `workflow_dispatch`.
-Draft pull requests run configuration checks only. On `synchronize`, CI checks
+Draft pull requests run configuration and the lightweight gate only;
+`ci-required` fails because a draft is not a validated merge candidate.
+On `synchronize`, CI checks
 the latest push's diff; on `opened`, `ready_for_review`, or `reopened`, it
 checks the full pull request diff. A docs-only update to a mixed pull request
-skips product jobs. A ready pull request targeting the default `main` branch runs
+skips product jobs, but the gate requires accepted validation of unchanged
+product source. Matrix requirements also consider the full PR diff, so a later
+ordinary push cannot downgrade a compatibility change to two jobs.
+A ready pull request targeting the default `main` branch runs
 the full six-job matrix before integration; code changes to a feature branch use two jobs, and
 critical changes use six. `workflow_dispatch` has `full_matrix` defaulting to
 true: use false for a standard two-platform draft-candidate run, and true
@@ -78,6 +84,37 @@ For manual runs, the owner (or Codex when explicitly instructed) must choose
 true for compatibility-sensitive changes;
 false is only for an ordinary package candidate. Do not repeatedly dispatch an
 unchanged candidate, or rerun passed checks without a relevant change or failure.
+
+## Required GitHub check
+
+For PRs to **develop/m4**, configure **ci-required** (GitHub Actions) as the
+required status check. It runs after configuration, portable and package even
+on failure or skip, and requires successful configuration, every selected
+Windows/Ubuntu matrix job and the package job for a product candidate. It
+checks concrete job results for the current run attempt; `skipped`, cancelled,
+missing or incomplete mandatory validation fails. Documentation-only PRs
+explicitly exempt product tests and package builds. Marking a draft Ready for
+review compares the full PR and starts the required validation.
+
+For a docs-only `synchronize` on a mixed PR, the gate searches at most 20
+first-parent revisions for a successful run of this workflow in the same PR
+and with the same base SHA/ref. Every file outside the policy's documentation
+paths must be unchanged, including runtime, tests, dependencies and workflow.
+It requires concrete successful matrix/package jobs and a successful prior
+gate; a successful skip is only a link to the actual test evidence. It inspects
+the latest attempt and rejects failed, missing, inaccessible or excessive
+evidence (over 100 runs per SHA or 1,000 jobs per attempt). It never starts
+replacement tests or builds. Without proof, the gate fails and the owner
+decides the next validation action. Older runs without this gate are not proof.
+
+Changing a PR's base triggers selection and validation against the new base.
+Other PR metadata edits reuse existing validation without new product jobs.
+Manual runs expose **ci-manual**, so a manually selected two-job run cannot
+replace the required PR check. Only the gate has extra `actions: read` access;
+all workflow permissions remain read-only. This check covers automated CI and
+package production; the owner's exact-ZIP and applicable native gates still
+apply. Configure conditional matrix/package jobs through this aggregate check
+instead of requiring their skipped contexts on documentation-only PRs.
 
 ## Package build and installation
 

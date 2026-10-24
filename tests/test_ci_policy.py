@@ -97,7 +97,7 @@ class SelectionTests(unittest.TestCase):
 
     def test_critical_install_and_ci_paths_require_full_matrix(self):
         for path in ("windows/setup.cmd", "utils/register_python_host.py", "utils/build_windows_package.py",
-                     "utils/ci_policy.py", ".github/workflows/portable.yml", ".python-version", "uv.toml"):
+                     "utils/ci_policy.py", "utils/ci_required.py", ".github/workflows/portable.yml", ".python-version", "uv.toml"):
             with self.subTest(path=path):
                 self.assert_matrix(self.plan([path]), ["3.11", "3.12", "3.13"])
 
@@ -166,6 +166,7 @@ class OutputTests(unittest.TestCase):
     def run_policy(self, before, after, *, draft=False, base="feature/m4"):
         payload = event(draft=draft, base=base, action="synchronize")
         payload["before"] = before
+        payload["pull_request"]["base"]["sha"] = self.base
         payload["pull_request"]["head"]["sha"] = after
         event_file, output_file = self.repo / "event.json", self.repo / "output.txt"
         event_file.write_text(json.dumps(payload), encoding="utf-8")
@@ -186,7 +187,30 @@ class OutputTests(unittest.TestCase):
         self.assertEqual(len(plan["matrix"]["include"]), 2)
 
     def test_real_git_docs_update_to_mixed_pr_emits_skip(self):
-        self.assertFalse(self.run_policy(self.version, self.docs)["run_portable"])
+        plan = self.run_policy(self.version, self.docs)
+        self.assertFalse(plan["run_portable"])
+        self.assertEqual(plan["validation_mode"], "reuse")
+
+    def test_real_git_docs_only_pr_emits_documentation_exemption(self):
+        docs = self.commit({"README.md": "only docs relative to version\n"})
+        self.base = self.version
+        plan = self.run_policy(self.docs, docs)
+        self.assertFalse(plan["run_portable"])
+        self.assertEqual(plan["validation_mode"], "documentation")
+
+    def test_later_ordinary_push_retains_full_pr_compatibility_requirement(self):
+        critical = self.commit({"uv.lock": LOCK.replace("3.2.4", "3.2.5")})
+        code = self.commit({"source.py": "changed runtime\n"})
+        plan = self.run_policy(critical, code)
+        self.assertTrue(plan["run_portable"])
+        self.assertTrue(plan["full_matrix"])
+
+    def test_docs_update_retains_six_required_jobs_for_reuse(self):
+        critical = self.commit({"uv.lock": LOCK.replace("3.2.4", "3.2.5")})
+        docs = self.commit({"README.md": "critical candidate docs\n"})
+        plan = self.run_policy(critical, docs)
+        self.assertEqual(plan["validation_mode"], "reuse")
+        self.assertTrue(plan["full_matrix"])
 
     def test_real_git_missing_history_fails_to_full_checks(self):
         plan = self.run_policy("f" * 40, self.version)

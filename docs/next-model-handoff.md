@@ -6,6 +6,13 @@ and the [documentation policy](documentation-policy.md),
 [testing policy](testing-policy.md) and [development plan](office-editing-development-plan.pl.md)
 before implementation.
 
+The workflow now provides the required PR check `ci-required`; selection,
+failure/skip handling and unchanged-source reuse have 49 focused policy/gate
+checks passing. The owner must review this workflow candidate's six-job CI
+and package, then configure `ci-required` for develop/m4; branch protection
+has not been changed. See the [testing policy](testing-policy.md#required-github-check).
+This procedural change leaves the 0.33.0 native trial below pending.
+
 ## Next task — one bounded 0.33.0 Wall material trial
 
 Candidate 0.33.0 is ready for the bounded native trial. Before preview, verify
