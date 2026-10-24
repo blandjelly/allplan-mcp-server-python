@@ -12,77 +12,64 @@ checks passing. The owner must review this workflow candidate's six-job CI
 and package, then configure `ci-required` for develop/m4; branch protection
 has not been changed. See the [testing policy](testing-policy.md#required-github-check).
 
-## Next task — bounded 0.34.0 Wall material edge-case trial
+## Next task — 0.35.0 native material trial on Wall and Column
 
-Download the existing 0.34.0 CI artifact linked below; package production has
-passed. Verify the exact ZIP and required upgrade/restore procedures, then the
-installed manifest/checksum and Allplan build. Reload PythonHost and use the original **240 mm Wall** for
-`Beton` → `Silikat`, capturing raw MCP responses and fresh Wall/tier identities.
-This fixture has no known opening edge case; separately use a disposable copied
-or independent Wall with an opening and, if available, macro/nested metadata.
-Do not retry the earlier **200 mm Wall/opening** fixture: its
-`component_child_owner_mismatch` remains unresolved.
+After the owner checks required CI for the final PR commit, verifies its exact
+0.35.0 ZIP and required upgrade/restore procedures, and reloads PythonHost,
+use the original 240 mm Wall and the Column at X=0, Y=0. Capture raw preview,
+Apply, readback and recovery responses with fresh exact root identities. Test a
+same-material no-op and controlled revalidation drift. Apply only after a
+qualifying preview; for every actual write, capture the requested native
+material readback, one UI Undo, and restoration readback. If a result is
+unknown, recover with its original execution ID without retrying setters. Stop
+any blocked case after retaining its first stage/reason/diagnostic.
 
-The public contract remains standalone single-tier Wall and `tier_index: 1`.
-The candidate removes material child type whitelisting and blanket opening
-rejection, snapshots bounded auxiliary identities, parent/children and nested
-AttributeContainer `ReadAll` values, and retains target/lineage checks, valid
-single-tier solid hashing, tier/common/axis/complex evidence, journaling,
-revalidation and readback. Auxiliary geometry uses a bounded stream digest when
-supported and reports `not_checked` otherwise; geometry alone being unchecked
-does not establish complete hidden-child preservation. Multi-tier Walls remain
-blocked.
+The owner reports that 0.34.0 blocked the Wall at tier geometry; no raw report
+is available. The Column reported `old_value_unknown` because 0.34.0 used a
+Wall-only material adapter. These are owner reports, not verified native
+evidence. Do not repeat them as accepted observations. For a separate generic
+attribute edit, run target-scoped `element_attributes` searches for `material`
+and `materiał`, then inspect the returned exact name, ID, type and name/ID
+roundtrip. Use that path only if the intended attribute is found. Do not
+hard-code ID 508, use ID 1371 (`Materiał łatwopalny`) as Material, or infer
+that a Material attribute changes native material.
 
-Include a same-material no-op and a controlled drift/conflict case. Apply only
-on a qualifying preview and a disposable fixture; for each actual write, capture
-fresh material/preservation readback, one UI Undo and restoration readback. An
-unknown result requires recovery with the original execution ID, without setter
-retry. If a preview is blocked, retain its first reason/stage/error and
-diagnostics, then stop that case without Apply. Do not repeat accepted journal,
-scalar, Enum, W1 or grouped Column delete/Undo trials.
+Candidate 0.35.0 uses request
+`target={"kind":"native_material","tier_index":1}` and the exact string;
+the report field is `native.material`, with state in
+`resource.native_material_state`. Standalone Walls require one tier; Columns
+use their native properties. Unavailable geometry, formatting, axis
+representations, metadata or auxiliary hierarchy are diagnostic
+`not_checked` evidence rather than preview blockers. Available evidence remains
+bound into fingerprints and revalidation. Exact root/type, readable material,
+setter availability, active drawing and existing journal/write guards remain
+required. Post-write drift remains unknown; recovery never retries a setter.
 
-Candidate 0.33.0's native preview on the original 240 mm Wall was BLOCKED before
-writes; [the raw log](test-results/evidence/0.33.0-2026-10-24/wall-native-material-preview-log.md)
-records `native_material_preservation_unavailable` because the tier child was
-unsupported. Do not treat automated checks or the 0.33.0 implementation as
-native acceptance. Record each 0.34.0 native outcome in
-[validation status](validation-status.md); remaining work is in the
+Do not retry the earlier 200 mm Wall/opening fixture: its
+`component_child_owner_mismatch` remains unresolved. Do not repeat accepted
+journal, scalar, Enum, W1 or grouped Column delete/Undo trials. Record native
+results in [validation status](validation-status.md); remaining work is in the
 [development backlog](office-editing-development-plan.pl.md).
 
-## Current candidate — 0.34.0
+## Current candidate — 0.35.0
 
-[PR #36](https://github.com/blandjelly/allplan-mcp-server-python/pull/36) was
-merged into `develop/m4` at `11d90a98e7f27adf7ba6595032083bc6cb0a208d`.
-The tested/package source is `77d291599dbd2037e6cd171042aa4c22ee939f76`;
-the merge contains the same product source. The material adapter removes
-shape/type-only blockers for auxiliary children and records bounded recursive
-ownership, required stored metadata and optional geometry streams. The
-public single-tier contract and execution safeguards remain. See the
+Prepared on `fix/m4-material-unblock`, based on `develop/m4` commit
+`6a6798cc865ce617d4c768964df297164e787293`, for a PR into `develop/m4`.
+153 distinct affected/dependent tests and 4 MCP HTTP tests passed on Python
+3.12. Project metadata, editable lock entry and server version agree on
+0.35.0. Full CI and package production run in GitHub Actions; the owner
+supervises them and verifies the exact ZIP. Native acceptance remains pending.
+See the
 [API details](m4-editing-api-0.32.0.md).
 
-Focused validation: 131 affected/dependent tests and 3 HTTP tests passed.
-Project metadata, editable lock entry and server version agree on 0.34.0.
-[Full CI run 40126702661](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40126702661)
-passed Windows/Ubuntu Python 3.12, `package` and `ci-required`.
-The existing [CI artifact](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40126702661/artifacts/12572659255)
-is `candidate-77d291599dbd2037e6cd171042aa4c22ee939f76` and contains
-`allplan-mcp-0.34.0-windows-evaluation.zip`, its `.sha256`, wheel and sdist.
-It expires on 2026-11-07; download and extract the outer artifact archive to
-obtain the installation ZIP. Do not rebuild an already successful artifact.
-The owner confirmed CI and merge; exact-ZIP installation/upgrade/restore
-verification and native Allplan acceptance have not been reported.
-
-The 0.33.0 native preview was FAIL/BLOCKED with zero setters: its direct tier
-child `WallAxis_TypeUUID` triggered `wall_material_tier_child_unsupported`.
-The [log](test-results/evidence/0.33.0-2026-10-24/wall-native-material-preview-log.md)
-contains owner/child identities, without an exception message. This confirms
-the rejected shape but does not prove the relaxed route will preserve the
-native object. Its installed manifest/build is not included in that log.
-The prior 0.32.0 report has a different reason spelling and an unproven host
-mismatch; retain its limits in
-[validation status](validation-status.md#evidence-for-unresolved-cases).
-The separate 200 mm opening ownership mismatch remains open. Priorities 1–5
-remain partial.
+0.34.0 remains the last packaged candidate. Its native Wall geometry block and
+Wall-only Column limitation are recorded above as owner reports without raw
+responses; the 0.33.0 raw preview remains historical evidence only. The
+separate 200 mm opening ownership mismatch remains unresolved. Optional
+evidence from the chosen exact view is fingerprinted; other views must agree
+on required material/owner rather than view-specific diagnostics. Completed
+Wall component observations survive a later optional-read failure. Prior M4 scopes
+remain partial and are summarized below.
 
 ## Prior work needed for continuation
 

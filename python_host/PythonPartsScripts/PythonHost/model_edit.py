@@ -103,7 +103,7 @@ def bind_changes(doc, base, request, check, trace):
             item = {"field": "element_exists", "operation": "delete_element", "property_role": "element",
                     "resource": {}, "new_value": False}
         elif target["kind"] == "native_material":
-            item = {"field": "wall.native_material", "operation": "set_native_material", "property_role": "native_material",
+            item = {"field": "native.material", "operation": "set_native_material", "property_role": "native_material",
                     "resource": {"tier_index": 1, "data_type": "text", "binding": "exact_native_material_string"},
                     "new_value": choice["value"]}
         elif target["kind"] == "layer":
@@ -149,7 +149,7 @@ def bind_changes(doc, base, request, check, trace):
                 except BridgeError:
                     raise
                 except Exception as exc:
-                    raise BridgeError("attribute_name_unresolved", "Exact project attribute name was not resolved. Use model_property_probe phase=element_attributes on a known target to find its actual names/IDs; then bind the chosen ID. Do not guess an attribute or substitute native material.", 409) from exc
+                    raise BridgeError("attribute_name_unresolved", "Exact project attribute name was not resolved. Use model_property_probe phase=element_attributes on the exact target to find actual names/IDs; for material try name_contains=material and name_contains=materiał. Bind the returned project name/ID. Native Wall/Column material uses target.kind=native_material without an attribute-name lookup.", 409) from exc
             name = bounded_text(read("AttributeService.GetAttributeName", lambda: base.AttributeService.GetAttributeName(doc, ident)))
             import unicodedata
             if not name or (target.get("name") is not None and
@@ -262,7 +262,7 @@ def observe(plans, doc, base, settings, request):
     layer_requested = any(b["operation"] == "set_layer" for b in binding)
     delete_requested = any(b["operation"] == "delete_element" for b in binding)
     material_requested = any(b["operation"] == "set_native_material" for b in binding)
-    query["fields"] = [field for field in query["fields"] if field not in {"element_exists", "wall.native_material"}]
+    query["fields"] = [field for field in query["fields"] if field not in {"element_exists", "native.material"}]
     if layer_requested or "layer_id" in predicate_fields(request.get("predicate")):
         query["layer_resolution"] = "component"
     live, owners = {}, []
@@ -270,19 +270,19 @@ def observe(plans, doc, base, settings, request):
         doc, base, settings, query, adapter_sink=live, adapter_owners=owners))
     check()
     if material_requested:
-        from .wall_material import preview_observation as material_observation
+        from .wall_material import preview_observation as material_observation, consensus_key
         for element in snapshot["elements"]:
             representations = live.get((element["ref"]["drawing_file"], element["ref"]["model_uuid"]), {})
-            values = [trace.call("Wall.native_material_preservation", lambda adapter=adapter:
-                      material_observation(base, adapter, check))
-                      for wrappers in representations.values() for adapter in wrappers]
-            if values and len({fingerprint(value) for value in values}) == 1 and not element["view_identity_not_checked"]:
-                (element["fields"]["wall.native_material"], element["wall_material_state"],
-                 element["wall_material_preservation"]) = values[0]
+            values = [(view, trace.call("Native.material_observation", lambda adapter=adapter:
+                       material_observation(base, adapter, check)))
+                      for view in sorted(representations) for adapter in representations[view]]
+            if values and len({consensus_key(value) for _, value in values}) == 1 and not element["view_identity_not_checked"]:
+                (element["fields"]["native.material"], element["native_material_state"],
+                 element["native_material_preservation"]) = values[0][1]
             else:
-                element["fields"]["wall.native_material"] = {"status": "not_checked", "value": None,
+                element["fields"]["native.material"] = {"status": "not_checked", "value": None,
                                                             "reason": "native_material_representation_conflict"}
-                element["wall_material_preservation"] = {
+                element["native_material_preservation"] = {
                     "status": "not_checked", "value": None, "reason": "native_material_representation_conflict",
                     "diagnostic": {"stage": "material_representation_consensus", "error_type": "RepresentationConflict"}}
     if delete_requested:
@@ -392,12 +392,12 @@ def observe(plans, doc, base, settings, request):
               "attribute_read_mode": request.get("attribute_read_mode", "stored"),
               "required_field_failures": required_failures,
               "operation_eligibility_failures": [
-                  {"ref": element["ref"], "field": "wall.native_material",
-                   "old_value": copy.deepcopy(element["fields"]["wall.native_material"]),
-                   "observation": copy.deepcopy(element["wall_material_preservation"])}
+                  {"ref": element["ref"], "field": "native.material",
+                   "old_value": copy.deepcopy(element["fields"]["native.material"]),
+                   "observation": copy.deepcopy(element["native_material_preservation"])}
                   for element in snapshot["elements"]
                   if decisions[fingerprint(element["ref"])] == "matched"
-                  and element.get("wall_material_preservation", {}).get("status") == "not_checked"],
+                  and element.get("native_material_preservation", {}).get("status") == "not_checked"],
               "component_ownership": [{"ref": element["ref"], "observation": element["component_ownership"]}
                                       for element in snapshot["elements"] if "component_ownership" in element],
               "criterion_failures": [
@@ -424,12 +424,12 @@ def preview(plans, doc, base, settings, request):
         targets.append(copy.deepcopy(element["ref"]))
         for bound in report["binding"]:
             old = element["fields"][bound["field"]]
-            if bound["operation"] == "set_native_material" and not element.get("wall_material_state"):
+            if bound["operation"] == "set_native_material" and not element.get("native_material_state"):
                 blocked.append({"ref": element["ref"], "field": bound["field"],
                                 "reason": ("native_material_preservation_unavailable"
                                            if old.get("status") == "observed" else "old_value_unknown"),
                                 "old_value": copy.deepcopy(old),
-                                "observation": copy.deepcopy(element["wall_material_preservation"])})
+                                "observation": copy.deepcopy(element["native_material_preservation"])})
                 continue
             mode = bound.get("mode", "replace")
             absent = old.get("status") == "absent" and old.get("presence_proven") is True
@@ -495,7 +495,7 @@ def preview(plans, doc, base, settings, request):
                     continue
                 change["resource"]["delete_ownership"] = copy.deepcopy(ownership)
             elif bound["operation"] == "set_native_material":
-                change["resource"]["wall_material_state"] = copy.deepcopy(element["wall_material_state"])
+                change["resource"]["native_material_state"] = copy.deepcopy(element["native_material_state"])
             elif change["native_type"] in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
                 from .component_ownership import slab_write_blocker
                 ownership = element.get("component_ownership")
@@ -523,7 +523,7 @@ def preview(plans, doc, base, settings, request):
             "runtime_verified": False, "allplan_acceptance": "not_run", "usable_for_write": False,
             "expires_after_seconds": plans.TTL_SECONDS,
             "limits": {"changes": plans.executor.MAX_CHANGES, "write_scope": "one_active_foreground_drawing",
-                       "native_material_update": "experimental_single_tier_Wall_without_openings",
+                       "native_material_update": "experimental_single_tier_Wall_and_Column_optional_preservation",
                        "deletion": "exact_component_roots_or_Wall_owned_openings_with_reviewed_subtrees"}}
     plan["undefined_policy"] = {
         "recognized_raw_values": sorted(UNDEFINED_ATTRIBUTE_VALUES),

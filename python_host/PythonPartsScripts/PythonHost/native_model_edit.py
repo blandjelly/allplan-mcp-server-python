@@ -207,7 +207,7 @@ def _writable(doc, base, queries, element, change, diagnostics, budget):
     if change.get("operation") == "set_native_material":
         from .wall_material import read as read_material
         if read_material(base, element, change, budget) != change["old_value"]:
-            _conflict("Wall material or preservation evidence changed before write.")
+            _conflict("Native material or observed evidence changed before write.")
 
 
 def read_consensus(base, queries, elements, change, diagnostics=None):
@@ -229,7 +229,16 @@ def read_consensus(base, queries, elements, change, diagnostics=None):
         valid = all(lifecycle[method].get("status") == "observed"
                     and lifecycle[method].get("value") is expected
                     for method, expected in (("IsNull", False), ("IsDeleted", False), ("IsValid", True)))
-        value = (read(base, queries, element, change) if valid else
+        # Optional preservation belongs to the exact reviewed view. Other
+        # live views must agree on the required native material/owner only.
+        if (valid and change.get("operation") == "set_native_material"
+                and guid(element.GetElementUUID()) != change.get("target_view_uuid")):
+            from .wall_material import preview_observation
+            value, material_state, eligibility = preview_observation(base, element)
+            if material_state is None:
+                value = eligibility
+        else:
+            value = (read(base, queries, element, change) if valid else
                  {"status": "not_checked", "value": None, "reason": "representation_lifecycle_unavailable"})
         # Retain raw agreed readback in the outcome, but do not duplicate up to
         # 8192 characters per view into the bounded durable journal.

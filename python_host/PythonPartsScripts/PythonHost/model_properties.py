@@ -229,7 +229,7 @@ def discover_properties(service, doc, base, settings, request):
                   "GetAttributeID", "GetAttributeName", "GetAttributeType", "GetAttributeUnit", "GetEnumValues")},
               "layer_api_symbols": {name: callable(getattr(base.LayerService, name, None)) for name in (
                   "GetIDByShortName", "GetNameByID", "GetShortNameByID", "GetAllLayerNames", "GetIDByName")},
-              "semantics": {"attribute_material": "separate_from_native.material",
+              "semantics": {"attribute_material": "separate_binding_may_reflect_native_material_requires_live_readback",
                             "organizational.layer": "separate_from_wall_tier_and_visual.surface",
                             "concrete_class": "requires_actual_project_catalog_no_C35_substitution",
                             "api_symbol_presence": "not_native_acceptance"}}
