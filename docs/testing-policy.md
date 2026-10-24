@@ -4,14 +4,36 @@ This policy is the source of truth for choosing checks and package builds.
 At the start of each chat, read this file and [the current handoff](next-model-handoff.md).
 First identify the checkout and branch, source state, and scope of the proposed
 change. Keep focused test passes, full CI passes, and native Allplan passes
-separate when reporting results. The model owns automated tests and GitHub CI;
-the owner is asked only for a brief Allplan trial when a candidate needs it.
+separate when reporting results. Codex owns implementation and focused tests;
+GitHub Actions runs full CI and builds; the owner supervises CI, verifies
+delivery and merges after all required gates pass.
 An explicit owner pause takes precedence over this procedure.
 
 M4 topic branches and PRs use **develop/m4** as their base; main integration
 is a separate task. Ref/PR consolidation with unchanged runtime follows the
 documentation-only checks, without repeating accepted product or native gates.
 See the [current handoff](next-model-handoff.md) for branch and scope.
+
+## Responsibilities and handoff
+
+Codex analyzes and implements changes, runs focused affected/dependent tests,
+checks version consistency, commits, pushes and prepares the PR. Version
+checks include agreement between project metadata, the self editable lock
+entry and the server version constant. Codex marks the final candidate
+**Ready for review**, provides the commit SHA and PR link, then ends the task.
+
+The owner monitors CI, checks that all required jobs passed for the intended
+source commit, downloads and verifies the ZIP and all applicable installation,
+upgrade and restore procedures, and merges into **develop/m4** only after all
+required conditions pass. Downloading an artifact alone does not satisfy any
+package verification gate. The owner sends failed-test logs to Codex; Codex
+can then diagnose and fix the failure and hand off a new candidate.
+
+Unless explicitly instructed by the owner to perform the specific action,
+Codex does not poll GitHub Actions status, wait for Windows/Ubuntu jobs,
+repeatedly retrieve logs, download CI artifacts, perform a fallback ZIP build
+(including after HTTP 403), rerun full CI, or merge PRs. This responsibility
+split does not waive any required validation or native Allplan gate.
 
 ## During implementation
 
@@ -23,12 +45,17 @@ builds, hash checks, and reruns.
 
 ## Candidate and CI selection
 
-For each new candidate or package, run the full GitHub CI matrix on Windows
-and Ubuntu with Python 3.12. This full CI result replaces a full local test
+For each new candidate or package, GitHub Actions must run the full CI matrix
+on Windows and Ubuntu with Python 3.12. This full CI result replaces a full local test
 run. Keep a pull request in draft while iterating and return it to draft when
 development resumes. Mark it ready once the final candidate is ready for
-review. A passing run for an earlier source revision does not validate later
-runtime changes.
+review. The current [workflow](../.github/workflows/portable.yml) handles
+`ready_for_review`; this event compares the full PR diff and selects the
+required matrix through [ci_policy.py](../utils/ci_policy.py). Codex must mark
+final product candidates Ready for review to trigger that validation before
+handoff. Documentation-only PRs are excluded by the workflow path filters;
+they require only diff and link checks. A passing run for an earlier source
+revision does not validate later runtime changes.
 
 The workflow runs full jobs for ready pull requests or `workflow_dispatch`.
 Draft pull requests run configuration checks only. On `synchronize`, CI checks
@@ -47,17 +74,22 @@ builder, or workflow changes, and for `main` integration or release. A
 package version in `uv.lock` does not by itself require six jobs. Changes to
 actual dependencies or other `pyproject.toml`/lock settings conservatively
 require six jobs. Use six jobs when the relevant change history is incomplete.
-For manual runs, the model must choose true for compatibility-sensitive changes;
+For manual runs, the owner (or Codex when explicitly instructed) must choose
+true for compatibility-sensitive changes;
 false is only for an ordinary package candidate. Do not repeatedly dispatch an
 unchanged candidate, or rerun passed checks without a relevant change or failure.
 
 ## Package build and installation
 
-After all tests finish, run one separate build job to produce wheel, sdist,
-and ZIP. Use that same source's CI artifact for installation or upgrade and,
-if applicable, restore of the exact ZIP, once. Do not rebuild or repeat these
-checks after the artifact succeeds. If the artifact is unavailable, one local
-build may replace package production.
+After all tests pass, GitHub Actions automatically runs one separate build
+job to produce wheel, sdist and ZIP. The owner uses that same source's CI
+artifact and verifies the exact delivered ZIP once, including installation
+or upgrade and, if applicable, restore. All existing integrity/hash and
+installation/upgrade/restore checks remain mandatory in their existing scope.
+Do not rebuild or repeat these checks after the artifact succeeds. If the
+artifact is unavailable, the owner may perform one local build to replace
+package production, or explicitly assign that fallback to Codex. HTTP 403
+alone does not authorize Codex to build a replacement.
 
 ## Native Allplan checks
 
