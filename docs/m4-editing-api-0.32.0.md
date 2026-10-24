@@ -1,33 +1,37 @@
-# M4 native Wall material preservation — candidate 0.32.0
+# M4 native Wall material preservation — candidate 0.33.0
 
-Candidate 0.32.0 extends the existing guarded native material path for a
-single-tier Wall. It addresses an implementation gap in which every child
-under the tier was rejected before its type and ownership were checked. The
-new path admits only direct `AttributeContainer_TypeUUID` leaves whose full
-lineage resolves as container → tier → Wall. This snapshot is preservation
-evidence; it does not establish that a container attribute belongs to a
-particular field or that the container can be edited through a setter.
+Candidate 0.33.0 extends guarded single-tier Wall material preservation to
+direct root `AttributeContainer_TypeUUID` leaves as well as tier leaves. It
+checks full parent lineage and preserves bounded `ReadAll` snapshots during
+revalidation and readback; state includes `root_attribute_containers`.
+Unsupported root/tier child diagnostics carry owner and child identities.
+Preservation evidence does not establish field ownership or authorize
+attribute writes. Automated validation and the verified 0.33.0 delivery are
+recorded in the [handoff](next-model-handoff.md). Native acceptance is pending.
 
-**161 unique focused checks passed** ([record](../evaluation-packages/0.32.0/focused-verification.json)). Exact source [`75cd26e31ae1e3ee0d6ef86411b55490cd457302`](https://github.com/blandjelly/allplan-mcp-server-python/commit/75cd26e31ae1e3ee0d6ef86411b55490cd457302) is associated with [PR #30](https://github.com/blandjelly/allplan-mcp-server-python/pull/30), targeting `develop/m4`. Final full CI [run 40033163989](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40033163989) passed 635 tests on Ubuntu Python 3.12.15 and 635 on Windows Python 3.12.10, plus the package job ([record](../evaluation-packages/0.32.0/source-ci.json)). One fallback package was built from a clean exact-source checkout and the exact ZIP passed verification once: 210 payload files, 43 bridge hashes, SHA-256 `99fe6909340d4d4e3174601cf23a4854dfece683a1b75b95e5fdebfcc0aaf8b5` ([package record](../evaluation-packages/0.32.0/README.md), [verification](../evaluation-packages/0.32.0/package-verification.json)). Native Allplan acceptance is pending; no 0.32.0 native trial has run. The 200 mm opening mismatch remains unresolved. This candidate does not close M4 priorities 1–5. The [single-path trial plan](m4-single-drawing-0.32.0.pl.md) limits any owner trial to the original 240 mm Wall material path.
-Focused fake-adapter tests reproduce the prior blanket-child
-rejection and exercise the new bounded path. They do not prove that this was
-the cause of the owner's native 0.31.0 diagnostic. The 200 mm
-Wall-with-opening `component_child_owner_mismatch` remains unresolved and is
-outside this change. See the [0.31.0 owner observation](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-owner-observation-0.31.0-2026-10-24.md)
-for the supplied native evidence.
+The delivered 0.32.0 baseline has [161 unique focused checks](../evaluation-packages/0.32.0/focused-verification.json),
+[full CI](../evaluation-packages/0.32.0/source-ci.json), and one verified exact
+ZIP ([record](../evaluation-packages/0.32.0/README.md)); those results apply to
+0.32.0 only. Its native Wall trial was BLOCKED before writes. The reported
+`wall.native_material` observation says `wall_tier_child_unsupported` at
+`material_tier_children`; that exact reason is absent from current source and
+the retained ZIP, both of which use `wall_material_tier_child_unsupported`.
+The cause and any installed/live host mismatch remain unverified. See the
+[handoff](next-model-handoff.md) and [validation status](validation-status.md).
 
 ## Accepted child shape and identity checks
 
 The Wall remains the exact bound target. Its existing guards still require a
-standalone Wall root, exactly one direct `WallTier_TypeUUID`, no opening or
-other Wall children, valid geometry, one tier and a complete preservation
-snapshot. The tier may now have direct metadata children, but every such child
-must be an `AttributeContainer_TypeUUID` leaf. A non-container child, nested
-container, missing or inconsistent lineage, duplicate identity, or changed
-child set blocks the preview or conflicts during revalidation.
+standalone Wall root, exactly one direct `WallTier_TypeUUID`, no opening,
+valid geometry, one tier and a complete preservation snapshot. The root and
+tier may have direct metadata children, but every such child must be an
+`AttributeContainer_TypeUUID` leaf. A non-container child, nested container,
+missing or inconsistent lineage, duplicate identity, or changed child set
+blocks the preview or conflicts during revalidation.
 
-For each container, the adapter lineage must include the container, its tier,
-and the Wall, with every parent edge checked by drawing, model UUID and type.
+For each root container, lineage includes the container and Wall; for each
+tier container, it includes the container, tier and Wall. Every parent edge
+is checked by drawing, model UUID and type.
 Observed view UUIDs are retained in the snapshot. The immediate tier-child
 inventory is enumerated again from live adapters and compared structurally
 with the earlier ownership observation; each repeated enumeration must resolve
@@ -76,17 +80,18 @@ implemented guard behavior in tests; it is not a native Allplan result.
 When a component child fails parent verification,
 `blocked[].observation.diagnostic` may contain an `evidence` object with the
 exact observed `target`, `child`, and `observed_parent` identities. The parent
-is `null` when the adapter reports no parent. For an unsupported material tier
-lineage, the diagnostic may include `selected_wall`, `tier_lineage`,
+is `null` when the adapter reports no parent. Unsupported material root/tier
+children include their owner and child identities. For unsupported tier
+lineage, diagnostics may also include `selected_wall`, `tier_lineage`,
 `tier_child_count`, and a `tier_children_sample` limited to eight identities.
 These bounded fields are included only when that specific evidence was read;
 they contain no exception text or object representations.
 
-The evidence can guide a read-only `component_identity` follow-up for the
-unresolved 200 mm opening mismatch. It does not establish ownership or make the
-material path eligible. Do not repeat its material preview or perform any
-write; the planned 0.32.0 material trial remains limited to the original
-240 mm Wall.
+The evidence can guide read-only identity follow-up for the unresolved 200 mm
+opening mismatch. It does not establish ownership or make the material path
+eligible. Follow the current bounded native step in the
+[handoff](next-model-handoff.md); do not repeat the 200 mm preview or perform
+any write for that case.
 
 The native trial is limited to the original 240 mm Wall material path. It must
 capture the initial reason, diagnostic stage, and any `diagnostic.evidence`,

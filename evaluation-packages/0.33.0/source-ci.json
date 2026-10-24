@@ -1,0 +1,30 @@
+{
+  "source_commit": "5de0c318f10facd17eb220d5ca7de7bc3d394130",
+  "run_url": "https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40102111179",
+  "jobs": [
+    {
+      "id": 120896223947,
+      "name": "configuration",
+      "conclusion": "success"
+    },
+    {
+      "id": 120896251163,
+      "name": "portable (windows-latest, 3.12)",
+      "conclusion": "success"
+    },
+    {
+      "id": 120896251178,
+      "name": "portable (ubuntu-latest, 3.12)",
+      "conclusion": "success"
+    },
+    {
+      "id": 120897623424,
+      "name": "package",
+      "conclusion": "success"
+    }
+  ],
+  "tests_per_platform": 642,
+  "artifact_id": 12563183345,
+  "delivery": "One fallback build from clean exact-source checkout; CI artifact download returned HTTP 403",
+  "native_Allplan": "not_run"
+}

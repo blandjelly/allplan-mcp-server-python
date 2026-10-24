@@ -73,12 +73,12 @@ def _read_container_attributes(adapter, base, check):
     return sorted(result, key=lambda item: item["attribute_id"])
 
 
-def _attribute_container_snapshot(adapter, base, tier, check, read):
+def _attribute_container_snapshot(adapter, base, owner, check, read):
     observed = read(lambda: observe(adapter, check), "material_attribute_container_hierarchy")
     lineage = observed["lineage"]
-    if (len(lineage) != len(tier["lineage"]) + 1 or lineage[0] != observed["target"]
+    if (len(lineage) != len(owner["lineage"]) + 1 or lineage[0] != observed["target"]
             or any(not same_model_identity(actual, expected)
-                   for actual, expected in zip(lineage[1:], tier["lineage"]))
+                   for actual, expected in zip(lineage[1:], owner["lineage"]))
             or observed["children"]):
         raise ComponentReadError("material_attribute_container_hierarchy",
                                  "wall_material_attribute_container_hierarchy_unsupported")
@@ -129,6 +129,7 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None):
                     "material_children")
     tiers = []
     child_refs = []
+    root_metadata = []
     for index, child in enumerate(children):
         check()
         if index >= 256:
@@ -136,8 +137,18 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None):
         kind = text(read(lambda: child.GetElementAdapterType().GetTypeName(), "material_child_type"))
         if kind == "WindowDoor_TypeUUID":
             raise ComponentReadError("material_children", "wall_material_openings_unsupported")
+        if kind == "AttributeContainer_TypeUUID":
+            if len(root_metadata) >= _MAX_ATTRIBUTE_CONTAINERS:
+                raise ComponentReadError("material_children", "wall_material_attribute_container_limit")
+            metadata = _attribute_container_snapshot(child, base, hierarchy, check, read)
+            child_refs.append(metadata["ownership"]["target"])
+            root_metadata.append(metadata)
+            if len(json.dumps(root_metadata, ensure_ascii=False, allow_nan=False).encode("utf-8")) > _MAX_ATTRIBUTE_SNAPSHOT_BYTES:
+                raise ComponentReadError("material_children", "wall_material_attribute_snapshot_limit")
+            continue
         if kind != "WallTier_TypeUUID":
-            raise ComponentReadError("material_children", "wall_material_child_type_unsupported")
+            raise ComponentReadError("material_children", "wall_material_child_type_unsupported",
+                                     evidence={"owner": hierarchy["target"], "child": identity(child)})
         child_hierarchy = read(lambda: observe(child, check), "material_tier_hierarchy")
         lineage = child_hierarchy["lineage"]
         # A tier's parent can be another view wrapper of this same Wall.
@@ -178,7 +189,8 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None):
             for metadata_adapter, metadata_ref in zip(live_metadata, live_refs):
                 check()
                 if metadata_ref["type_name"] != "AttributeContainer_TypeUUID":
-                    raise ComponentReadError("material_tier_children", "wall_material_tier_child_unsupported")
+                    raise ComponentReadError("material_tier_children", "wall_material_tier_child_unsupported",
+                                             evidence={"owner": child_hierarchy["target"], "child": metadata_ref})
                 metadata_snapshot = _attribute_container_snapshot(
                     metadata_adapter, base, child_hierarchy, check, read)
                 if not same_model_identity(metadata_snapshot["ownership"]["target"], metadata_ref):
@@ -198,7 +210,11 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None):
             or len({_identity_key(ref) for ref in child_refs}) != len(child_refs)
             or {_identity_key(ref) for ref in child_refs} != {_identity_key(ref) for ref in hierarchy["children"]}):
         raise ComponentReadError("material_children", "wall_material_one_exact_tier_required")
+    root_metadata.sort(key=fingerprint)
+    if len(json.dumps(root_metadata + metadata_children, ensure_ascii=False, allow_nan=False).encode("utf-8")) > _MAX_ATTRIBUTE_SNAPSHOT_BYTES:
+        raise ComponentReadError("material_children", "wall_material_attribute_snapshot_limit")
     state = {"hierarchy": hierarchy, "tier_hierarchy": child_hierarchy,
+             "root_attribute_containers": root_metadata,
              "tier_attribute_containers": metadata_children, "tier_count": 1,
              "axis": read(lambda: _representation(props.Axis), "material_axis"),
              "path_axis_type": integer(read(lambda: props.PathElementAxisType)),

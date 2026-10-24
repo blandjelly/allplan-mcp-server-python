@@ -1,0 +1,15 @@
+{
+  "command": "PYTHONPATH=tests .venv/bin/python -m unittest test_wall_material_edit test_component_identity test_model_edit test_wall_filter -q",
+  "tests": 118,
+  "result": "PASS",
+  "duration_seconds": 5.787,
+  "native_Allplan": "not_run",
+  "additional_checks": [
+    {
+      "command": "PYTHONPATH=tests .venv/bin/python -m unittest test_wall_filter_http.WallFilterHTTPTests.test_highlight_full_filter_persisted_request_and_same_session_health -q",
+      "tests": 1,
+      "result": "PASS",
+      "duration_seconds": 1.514
+    }
+  ]
+}
