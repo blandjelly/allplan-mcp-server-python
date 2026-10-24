@@ -6,8 +6,8 @@ checks full parent lineage and preserves bounded `ReadAll` snapshots during
 revalidation and readback; state includes `root_attribute_containers`.
 Unsupported root/tier child diagnostics carry owner and child identities.
 Preservation evidence does not establish field ownership or authorize
-attribute writes. Focused affected tests passed (118 tests); full CI and
-package verification are pending. Native Allplan acceptance is pending.
+attribute writes. Automated validation and the verified 0.33.0 delivery are
+recorded in the [handoff](next-model-handoff.md). Native acceptance is pending.
 
 The delivered 0.32.0 baseline has [161 unique focused checks](../evaluation-packages/0.32.0/focused-verification.json),
 [full CI](../evaluation-packages/0.32.0/source-ci.json), and one verified exact

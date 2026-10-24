@@ -3,8 +3,9 @@
 Current candidate and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
 [development plan](office-editing-development-plan.pl.md).
-Candidate 0.33.0 has 118 focused checks passed; full CI and package
-verification are pending. Native Allplan results remain separate; the bounded
+Candidate 0.33.0 passed 118 focused checks and one additional HTTP check,
+[full CI](../evaluation-packages/0.33.0/source-ci.json) (642 tests per platform),
+and [exact ZIP verification](../evaluation-packages/0.33.0/package-verification.json). Native Allplan results remain separate; the bounded
 0.32.0 Wall material trial was
 BLOCKED before any writes, and does not identify the preservation failure's
 cause.

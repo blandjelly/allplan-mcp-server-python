@@ -8,9 +8,8 @@ before implementation.
 
 ## Next task — one bounded 0.33.0 Wall material trial
 
-Candidate 0.33.0 is under work; 118 focused affected tests passed. Full CI and
-package verification are pending. Before any native preview, verify the
-installed manifest/checksum and Allplan build, reload PythonHost, then run one
+Candidate 0.33.0 is ready for the bounded native trial. Before preview, verify
+the installed manifest/checksum and Allplan build, reload PythonHost, then run one
 bounded preview on the original **240 mm Wall** for **`Silikat`**, capturing
 raw MCP responses and fresh Wall/tier `component_identity`. The 0.32.0 preview was
 BLOCKED before writes; do not infer that the 0.33.0 root-container support
@@ -25,7 +24,7 @@ and tier UUIDs were supplied, but their actual lineage is unknown.
 - Do not repeat the **200 mm Wall/opening** material preview or any write.
   Its `component_child_owner_mismatch` remains separate. Do not repeat already
   accepted journal, scalar, Enum, W1 or grouped Column delete/Undo trials.
-- Record native outcome and pending automated checks in
+- Record the native outcome in
   [validation status](validation-status.md); remaining work is in the
   [development backlog](office-editing-development-plan.pl.md).
 
@@ -36,8 +35,17 @@ Candidate 0.33.0 extends guarded Wall material preservation to direct root
 revalidates the complete parent lineage and `ReadAll` snapshots and records
 `root_attribute_containers`; unsupported root/tier children report owner and
 child identities. This does not establish field ownership or authorize
-attribute writes. The 118 focused checks passed; full CI and package
-verification are pending. Native Allplan acceptance is pending.
+attribute writes. 118 focused checks and one additional HTTP check passed;
+[full CI](../evaluation-packages/0.33.0/source-ci.json) passed 642 tests on each
+Windows/Ubuntu Python 3.12 job and the package job. One clean exact-source
+fallback build was used because CI artifact download returned HTTP 403;
+[exact ZIP verification](../evaluation-packages/0.33.0/package-verification.json)
+passed once, including upgrade/restore and journal preservation.
+
+Source `5de0c318f10facd17eb220d5ca7de7bc3d394130`, [PR #33](https://github.com/blandjelly/allplan-mcp-server-python/pull/33).
+[Download ZIP](../evaluation-packages/0.33.0/allplan-mcp-0.33.0-windows-evaluation.zip)
+and [checksum](../evaluation-packages/0.33.0/allplan-mcp-0.33.0-windows-evaluation.zip.sha256).
+Native Allplan acceptance remains pending.
 [API details](m4-editing-api-0.32.0.md).
 
 The 0.32.0 native trial on drawing 101, original 240 mm Wall
