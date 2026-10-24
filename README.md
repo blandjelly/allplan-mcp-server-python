@@ -15,6 +15,7 @@ work and unresolved errors. M4 remains partially accepted.
 
 | Read | Purpose |
 | --- | --- |
+| [Documentation policy](docs/documentation-policy.md) | Keep the handoff and backlog concise; avoid redundant files. |
 | [Current handoff](docs/next-model-handoff.md) | Current version, delivery and next action. |
 | [Development plan](docs/office-editing-development-plan.pl.md) | Remaining work, blockers and acceptance criteria. |
 | [Validation status](docs/validation-status.md) | Concise accepted scopes and necessary source evidence. |

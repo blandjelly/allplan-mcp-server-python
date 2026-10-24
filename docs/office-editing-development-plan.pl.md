@@ -2,22 +2,13 @@
 
 ## Aktualny stan i kolejne zadanie
 
-M4 jest częściowo odebrane. Aktualna wersja to **0.32.0**: ograniczone
-zachowanie atrybutów kontenerów tieru przy zmianie natywnego materiału Wall.
-Focused checks, pełne CI oraz weryfikacja dokładnego ZIP-a przeszły; próby
-natywnej tej wersji nie wykonano. Szczegóły wersji i dostawy podaje
-[handoff](next-model-handoff.md#current-version--0320).
+M4 jest częściowo odebrane. Aktualną wersję, dostawę i konkretne następne
+zadanie opisuje [handoff](next-model-handoff.md). Ten plan utrzymuje pozostałe
+prace i warunki ich zamknięcia, zgodnie z [polityką dokumentacji](documentation-policy.md).
 
-**Najbliższe zadanie:** tylko jedna próba materiału pierwotnej Wall 240 mm
-z żądaniem `Silikat`, według [procedury 0.32.0](m4-single-drawing-0.32.0.pl.md).
-Przy blokadzie zachować diagnostykę i świeżą tożsamość Wall/tier; przy
-kwalifikacji jeden Apply/readback/UI Undo. Wall 200 mm z opening pozostaje
-poza tą próbą. Pełny opis następnego kroku jest w
-[handoffie](next-model-handoff.md#next-task--one-0320-wall-material-trial).
-
-Wcześniejsze wyniki są zebrane wyłącznie w
-[statusie walidacji](validation-status.md). Nie powtarzać odebranych zakresów
-ani rozszerzać ich na inne rodziny, typy czy wersje bez dowodu.
+Dowody wcześniejszych prób są w [statusie walidacji](validation-status.md);
+ich istotne ograniczenia zachowują poniższe zadania i handoff. Nie powtarzać
+odebranych zakresów ani rozszerzać ich na inne rodziny, typy czy wersje bez dowodu.
 
 ## Cel i granice produktu
 
@@ -78,6 +69,7 @@ Brak fixture oznaczać `fixture_missing`, nierozstrzygnięty kontrakt — BLOCKE
 - Dziennik zachowuje nierozliczone zapisy przy limitach, archiwizacji
   i restarcie. Każdy większy zakres ma odrębny odbiór.
 
-[Testing policy](testing-policy.md) określa kontrole i budowanie.
+[Polityka dokumentacji](documentation-policy.md) określa aktualizację handoffu i zadań;
+[testing policy](testing-policy.md) — kontrole i budowanie.
 [Tool reference](tool-reference.md), [API evidence](m4-attribute-api-evidence.md)
 i [macierz typów](m4-attribute-type-coverage.md) pozostają źródłami kontraktów API.

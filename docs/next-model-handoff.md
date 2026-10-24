@@ -2,7 +2,9 @@
 
 Development branch: **`develop/m4`**. Start topic branches there and target
 PRs to it; integration with main is separate. Read [AGENTS](../AGENTS.md)
-and the [testing policy](testing-policy.md) before implementation.
+and the [documentation policy](documentation-policy.md),
+[testing policy](testing-policy.md) and [development plan](office-editing-development-plan.pl.md)
+before implementation.
 
 ## Next task — one 0.32.0 Wall material trial
 
