@@ -291,12 +291,16 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     Never translate or invent a layer short name.
     Attribute material is distinct from native material and surface.
     Native material uses changes=[{target:{kind:native_material,tier_index:1},value:EXACT_STRING}]
-    as the only edit. It requires a standalone single-tier Wall without openings,
+    as the only edit. It requires a standalone single-tier Wall,
     readable native scalar properties and serialized Polyhedron3D tier geometry.
     The exact string is a native property value, without catalog validation or
     catalog creation. Geometry and explicit non-material evidence must remain
-    unchanged at preflight and fresh readback; unsupported variants are blocked.
-    Complex property representations provide bounded drift evidence only.
+    unchanged at preflight and fresh readback. Auxiliary children (including axes,
+    openings and nested metadata) use a bounded ownership tree and stored metadata.
+    Auxiliary geometry is hashed when stream serialization is available, otherwise
+    explicitly not_checked without blocking solely on its type or missing stream.
+    Complex representations and optional streams provide bounded drift evidence;
+    they do not prove preservation of every hidden auxiliary property.
     Delete with changes=[{target:{kind:delete}}] as the only edit. This binds
     exact terminal component roots and their full bounded owned subtrees, or a
     WindowDoor opening directly owned by a Wall; it never uses the current UI

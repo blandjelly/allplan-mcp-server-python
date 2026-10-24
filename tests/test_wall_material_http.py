@@ -1,5 +1,6 @@
 """Public MCP HTTP contract for native Wall material editing."""
 import unittest
+from types import SimpleNamespace
 from uuid import uuid4
 
 from fastmcp import Client
@@ -12,10 +13,14 @@ class WallMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
     asyncSetUp = smoke.MCPSmokeTests.asyncSetUp
     stop_process = smoke.MCPSmokeTests.stop_process
 
-    async def test_material_edit_preview_highlight_apply_and_replay_over_http(self):
+    async def test_material_edit_with_axis_preview_highlight_apply_and_replay_over_http(self):
         native = fixture_module.WallMaterialEditTests()
         native.setUp()
         self.addCleanup(native.doCleanups)
+        axis = native.native.element(21, name="WallAxis_TypeUUID")
+        axis.GetModelGeometry.return_value = SimpleNamespace()
+        native.native.children[id(native.tier)] = [axis]
+        native.native.parents[id(axis)] = native.tier
         original = self.bridge_handler.handle
 
         def handle(path, payload):
@@ -33,6 +38,9 @@ class WallMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
             preview = (await client.call_tool("model_edit", {"request": request})).data
             self.assertEqual(preview["counts"]["changes"], 1)
             self.assertEqual(preview["changes"][0]["resource"]["tier_index"], 1)
+            axis_state = preview["changes"][0]["resource"]["wall_material_state"]["auxiliary_components"]["tier"][0]
+            self.assertEqual(axis_state["ownership"]["target"]["type_name"], "WallAxis_TypeUUID")
+            self.assertEqual(axis_state["geometry"]["status"], "not_checked")
             highlighted = (await client.call_tool("model_edit", {
                 "request": preview["next_action"]["request"]})).data
             execution_id = uuid4().hex

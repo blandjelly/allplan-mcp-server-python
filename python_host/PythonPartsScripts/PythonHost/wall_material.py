@@ -22,6 +22,8 @@ _COMMON = ("Color", "ColorByLayer", "ConstructionLine", "DrawOrder", "ForceColor
            "Visible", "VisibleInsideZoomwindows", "VisibleOutsideZoomwindows")
 _MAX_ATTRIBUTE_CONTAINERS = 64
 _MAX_ATTRIBUTE_SNAPSHOT_BYTES = 256 * 1024
+_MAX_AUXILIARY_COMPONENTS = 256
+_MAX_COMPONENT_SNAPSHOT_BYTES = 1024 * 1024
 
 
 def _scalar(value):
@@ -47,7 +49,7 @@ def _identity_key(ref):
 
 
 def _read_container_attributes(adapter, base, check):
-    """Snapshot all stored metadata on one exact AttributeContainer leaf.
+    """Snapshot all stored metadata on one exact AttributeContainer.
 
     Unknown SDK values are not coerced or omitted: they block preservation.
     This is preservation evidence only and does not establish field ownership.
@@ -73,21 +75,90 @@ def _read_container_attributes(adapter, base, check):
     return sorted(result, key=lambda item: item["attribute_id"])
 
 
-def _attribute_container_snapshot(adapter, base, owner, check, read):
-    observed = read(lambda: observe(adapter, check), "material_attribute_container_hierarchy")
+def _live_children(adapter, observed, check, read):
+    """Re-enumerate bounded live wrappers without requiring an indexable SDK collection."""
+    import NemAll_Python_IFW_ElementAdapter as adapters
+
+    collection = read(lambda: adapters.BaseElementAdapterChildElementsService.GetChildModelElements(adapter, True),
+                      "material_component_children")
+    live = []
+    for index, child in enumerate(collection):
+        check()
+        if index >= _MAX_AUXILIARY_COMPONENTS:
+            raise ComponentReadError("material_component_children", "wall_material_component_limit")
+        live.append(child)
+    refs = [read(lambda child=child: identity(child), "material_component_identity") for child in live]
+    if (len({_identity_key(ref) for ref in refs}) != len(refs)
+            or {_identity_key(ref) for ref in refs} != {_identity_key(ref) for ref in observed["children"]}):
+        raise ComponentReadError("material_component_children", "wall_material_component_children_changed")
+    # Some native collections own the wrapper lifetimes; callers must retain it.
+    return collection, list(zip(live, refs))
+
+
+def _auxiliary_geometry(adapter, check):
+    """Keep stream evidence when available, without requiring every child to be a solid.
+
+    Axis and other auxiliary SDK geometries need not expose WriteToStream.
+    A bounded not_checked result is explicit coverage information, not proof
+    that hidden geometry or other native properties have been preserved.
+    """
+    import NemAll_Python_Geometry as geometry_api
+
+    check()
+    try:
+        geometry = adapter.GetModelGeometry()
+        serializer = getattr(geometry, "WriteToStream", None)
+        if not callable(serializer):
+            return {"status": "not_checked", "reason": "geometry_stream_unsupported"}
+        code, stream = serializer()
+        if code != geometry_api.eGeometryErrorCode.eOK or type(stream) is not str or not stream or len(stream) > 524288:
+            return {"status": "not_checked", "reason": "geometry_stream_unavailable"}
+        return {"status": "observed", "stream_sha256": hashlib.sha256(stream.encode("utf-8")).hexdigest()}
+    except (BridgeError, ComponentReadError):
+        raise
+    except Exception as exc:
+        return {"status": "not_checked", "reason": "geometry_stream_unavailable", "error_type": type(exc).__name__}
+    finally:
+        check()
+
+
+def _auxiliary_snapshot(adapter, base, owner, check, read, budget, expected):
+    check()
+    if budget["count"] >= _MAX_AUXILIARY_COMPONENTS:
+        raise ComponentReadError("material_component_children", "wall_material_component_limit")
+    budget["count"] += 1
+    observed = read(lambda: observe(adapter, check), "material_component_hierarchy")
     lineage = observed["lineage"]
-    if (len(lineage) != len(owner["lineage"]) + 1 or lineage[0] != observed["target"]
+    if (not same_model_identity(observed["target"], expected)
+            or len(lineage) != len(owner["lineage"]) + 1 or lineage[0] != observed["target"]
             or any(not same_model_identity(actual, expected)
-                   for actual, expected in zip(lineage[1:], owner["lineage"]))
-            or observed["children"]):
-        raise ComponentReadError("material_attribute_container_hierarchy",
-                                 "wall_material_attribute_container_hierarchy_unsupported")
-    if observed["target"]["type_name"] != "AttributeContainer_TypeUUID":
-        raise ComponentReadError("material_attribute_container_type",
-                                 "wall_material_attribute_container_type_unsupported")
-    attrs = read(lambda: _read_container_attributes(adapter, base, check),
-                 "material_attribute_container_values")
-    return {"ownership": observed, "stored_attributes": attrs}
+                   for actual, expected in zip(lineage[1:], owner["lineage"]))):
+        raise ComponentReadError("material_component_hierarchy", "wall_material_component_hierarchy_changed",
+                                 evidence={"owner": owner["target"], "child": observed["target"]})
+    key = (observed["target"]["signed_drawing_file"], observed["target"]["model_uuid"])
+    if key in budget["seen"]:
+        raise ComponentReadError("material_component_hierarchy", "wall_material_component_identity_ambiguous")
+    budget["seen"].add(key)
+    result = {"ownership": observed, "children": []}
+    if observed["target"]["type_name"] == "AttributeContainer_TypeUUID":
+        attrs = read(lambda: _read_container_attributes(adapter, base, check),
+                     "material_attribute_container_values")
+        result["stored_attributes"] = attrs
+        budget["attribute_bytes"] += len(json.dumps(result, ensure_ascii=False, allow_nan=False).encode("utf-8"))
+        if budget["attribute_bytes"] > _MAX_ATTRIBUTE_SNAPSHOT_BYTES:
+            raise ComponentReadError("material_children", "wall_material_attribute_snapshot_limit")
+    result["geometry"] = _auxiliary_geometry(adapter, check)
+    # Count each node once, including empty child-list framing and a comma
+    # allowance, before its descendants are attached to the serialized tree.
+    budget["snapshot_bytes"] += len(json.dumps(result, ensure_ascii=False, allow_nan=False).encode("utf-8")) + 2
+    if budget["snapshot_bytes"] > _MAX_COMPONENT_SNAPSHOT_BYTES:
+        raise ComponentReadError("material_component_children", "wall_material_component_snapshot_limit")
+    children_owner, children = _live_children(adapter, observed, check, read)
+    if sum(ref["type_name"] == "AttributeContainer_TypeUUID" for ref in observed["children"]) > _MAX_ATTRIBUTE_CONTAINERS:
+        raise ComponentReadError("material_component_children", "wall_material_attribute_container_limit")
+    result["children"] = sorted(
+        [_auxiliary_snapshot(child, base, observed, check, read, budget, ref) for child, ref in children], key=fingerprint)
+    return result
 
 
 def snapshot(base, adapter, check=lambda: None, *, material_observation=None):
@@ -130,25 +201,22 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None):
     tiers = []
     child_refs = []
     root_metadata = []
+    root_auxiliary, tier_auxiliary = [], []
+    budget = {"count": 0, "attribute_bytes": 0, "snapshot_bytes": 0,
+              "seen": {(hierarchy["target"]["signed_drawing_file"], hierarchy["target"]["model_uuid"])}}
     for index, child in enumerate(children):
         check()
         if index >= 256:
             raise ComponentReadError("material_children", "wall_material_child_limit")
         kind = text(read(lambda: child.GetElementAdapterType().GetTypeName(), "material_child_type"))
-        if kind == "WindowDoor_TypeUUID":
-            raise ComponentReadError("material_children", "wall_material_openings_unsupported")
-        if kind == "AttributeContainer_TypeUUID":
-            if len(root_metadata) >= _MAX_ATTRIBUTE_CONTAINERS:
-                raise ComponentReadError("material_children", "wall_material_attribute_container_limit")
-            metadata = _attribute_container_snapshot(child, base, hierarchy, check, read)
-            child_refs.append(metadata["ownership"]["target"])
-            root_metadata.append(metadata)
-            if len(json.dumps(root_metadata, ensure_ascii=False, allow_nan=False).encode("utf-8")) > _MAX_ATTRIBUTE_SNAPSHOT_BYTES:
-                raise ComponentReadError("material_children", "wall_material_attribute_snapshot_limit")
-            continue
         if kind != "WallTier_TypeUUID":
-            raise ComponentReadError("material_children", "wall_material_child_type_unsupported",
-                                     evidence={"owner": hierarchy["target"], "child": identity(child)})
+            if kind == "AttributeContainer_TypeUUID" and len(root_metadata) >= _MAX_ATTRIBUTE_CONTAINERS:
+                raise ComponentReadError("material_children", "wall_material_attribute_container_limit")
+            ref = read(lambda: identity(child), "material_component_identity")
+            component = _auxiliary_snapshot(child, base, hierarchy, check, read, budget, ref)
+            child_refs.append(component["ownership"]["target"])
+            (root_metadata if kind == "AttributeContainer_TypeUUID" else root_auxiliary).append(component)
+            continue
         child_hierarchy = read(lambda: observe(child, check), "material_tier_hierarchy")
         lineage = child_hierarchy["lineage"]
         # A tier's parent can be another view wrapper of this same Wall.
@@ -161,44 +229,16 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None):
                                                "tier_child_count": len(child_hierarchy["children"]),
                                                "tier_children_sample": child_hierarchy["children"][:8]})
         child_refs.append(child_hierarchy["target"])
-        # Wall tiers can own a direct AttributeContainer metadata leaf. Keep
-        # this narrow: every other child type, nested container, incomplete
-        # owner edge, or unrepresentable stored value remains blocked.
+        # Auxiliary shape alone does not disqualify material edits. Preserve
+        # bounded ownership trees, supported geometry streams and metadata.
         metadata_children = []
-        if child_hierarchy["children"]:
-            if len(child_hierarchy["children"]) > _MAX_ATTRIBUTE_CONTAINERS:
+        tier_children_owner, live_children = _live_children(child, child_hierarchy, check, read)
+        for auxiliary, ref in live_children:
+            if ref["type_name"] == "AttributeContainer_TypeUUID" and len(metadata_children) >= _MAX_ATTRIBUTE_CONTAINERS:
                 raise ComponentReadError("material_tier_children", "wall_material_attribute_container_limit")
-            metadata_owner = read(lambda: adapters.BaseElementAdapterChildElementsService.GetChildModelElements(child, True),
-                                  "material_tier_children")
-            # Native child collections only need to support iteration. Keep
-            # their owner alive and retain a bounded list of adapter wrappers.
-            live_metadata = []
-            for metadata_index, item in enumerate(metadata_owner):
-                check()
-                if metadata_index >= _MAX_ATTRIBUTE_CONTAINERS:
-                    raise ComponentReadError("material_tier_children", "wall_material_attribute_container_limit")
-                live_metadata.append(item)
-            if len(live_metadata) != len(child_hierarchy["children"]):
-                raise ComponentReadError("material_tier_children", "wall_material_attribute_container_changed")
-            live_refs = [read(lambda item=item: identity(item), "material_attribute_container_identity")
-                         for item in live_metadata]
-            expected_refs = child_hierarchy["children"]
-            if (len({_identity_key(ref) for ref in live_refs}) != len(live_refs)
-                    or {_identity_key(ref) for ref in live_refs} != {_identity_key(ref) for ref in expected_refs}):
-                raise ComponentReadError("material_tier_children", "wall_material_attribute_container_changed")
-            for metadata_adapter, metadata_ref in zip(live_metadata, live_refs):
-                check()
-                if metadata_ref["type_name"] != "AttributeContainer_TypeUUID":
-                    raise ComponentReadError("material_tier_children", "wall_material_tier_child_unsupported",
-                                             evidence={"owner": child_hierarchy["target"], "child": metadata_ref})
-                metadata_snapshot = _attribute_container_snapshot(
-                    metadata_adapter, base, child_hierarchy, check, read)
-                if not same_model_identity(metadata_snapshot["ownership"]["target"], metadata_ref):
-                    raise ComponentReadError("material_tier_children", "wall_material_attribute_container_changed")
-                metadata_children.append(metadata_snapshot)
-                if len(json.dumps(metadata_children, ensure_ascii=False, allow_nan=False).encode("utf-8")) > _MAX_ATTRIBUTE_SNAPSHOT_BYTES:
-                    raise ComponentReadError("material_tier_children", "wall_material_attribute_snapshot_limit")
-            metadata_children.sort(key=fingerprint)
+            component = _auxiliary_snapshot(auxiliary, base, child_hierarchy, check, read, budget, ref)
+            (metadata_children if ref["type_name"] == "AttributeContainer_TypeUUID" else tier_auxiliary).append(component)
+        metadata_children.sort(key=fingerprint)
         solid = read(child.GetModelGeometry, "material_tier_geometry")
         if not isinstance(solid, geometry.Polyhedron3D) or not boolean(read(solid.IsValid)):
             raise ComponentReadError("material_tier_geometry", "wall_material_valid_tier_geometry_required")
@@ -211,11 +251,11 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None):
             or {_identity_key(ref) for ref in child_refs} != {_identity_key(ref) for ref in hierarchy["children"]}):
         raise ComponentReadError("material_children", "wall_material_one_exact_tier_required")
     root_metadata.sort(key=fingerprint)
-    if len(json.dumps(root_metadata + metadata_children, ensure_ascii=False, allow_nan=False).encode("utf-8")) > _MAX_ATTRIBUTE_SNAPSHOT_BYTES:
-        raise ComponentReadError("material_children", "wall_material_attribute_snapshot_limit")
     state = {"hierarchy": hierarchy, "tier_hierarchy": child_hierarchy,
              "root_attribute_containers": root_metadata,
              "tier_attribute_containers": metadata_children, "tier_count": 1,
+             "auxiliary_components": {"root": sorted(root_auxiliary, key=fingerprint),
+                                      "tier": sorted(tier_auxiliary, key=fingerprint)},
              "axis": read(lambda: _representation(props.Axis), "material_axis"),
              "path_axis_type": integer(read(lambda: props.PathElementAxisType)),
              "tier": {name: read(lambda name=name: _scalar(getattr(tier, name)), "material_tier_" + name) for name in _SCALARS},
@@ -225,7 +265,7 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None):
     if type(state["tier"]["Thickness"]) not in (float, int) or state["tier"]["Thickness"] <= 0:
         raise ValueError("Wall thickness unavailable")
     state["geometry_stream_sha256"] = tiers[0]
-    state["invariant_coverage"] = "serialized_tier_solid_explicit_scalars_bounded_complex_representations_and_attribute_container_values"
+    state["invariant_coverage"] = "serialized_tier_solid_explicit_properties_metadata_and_bounded_auxiliary_tree_with_optional_geometry_streams"
     check()
     return material, state, native, props
 

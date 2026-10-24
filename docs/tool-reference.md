@@ -409,12 +409,12 @@ unknown-result recovery.
 The only accepted form is an exact nonempty string of at most 255 characters
 and explicit `tier_index=1`. The target must resolve to a standalone
 `Wall_TypeUUID` represented by `WallElement`, have exactly one tier, and pass
-the bounded preservation snapshot. Starting with candidate 0.27.0, this
-requires exactly one direct `WallTier_TypeUUID` child with lineage
-`[tier, Wall root]` and no other Wall children. Candidate 0.32.0 permits the
-tier to have direct `AttributeContainer_TypeUUID` leaf children when each
-container has a fully checked container → tier → Wall lineage. Other tier
-children, nested containers, openings and other Wall children remain blocked.
+the bounded preservation snapshot. Candidate 0.34.0 still requires exactly
+one direct `WallTier_TypeUUID` with lineage `[tier, Wall root]`, but removes
+child-type whitelisting, blanket opening rejection and the leaf-only metadata
+rule. Root/tier auxiliary subtrees may include axes, openings, macros and
+nested metadata with checked ownership. This does not authorize editing those
+auxiliary objects independently.
 No material catalog lookup, existence claim, alias resolution, surface edit,
 or attribute substitution occurs.
 
@@ -426,9 +426,9 @@ and submits the existing Wall through `ModifyElements`. Fresh readback must
 match the requested material and the bound preservation evidence. Drift or an
 incomplete observation blocks Apply or leaves recovery to the same execution
 ID; setters are never retried. This adapter is experimental and has no native
-Allplan acceptance yet. The narrow trial is in
-[the archived 0.25.0 instructions](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/m4-single-drawing-0.25.0.pl.md); SDK evidence
-and its limits are in [the API note](m4-editing-api-0.25.0.md).
+Allplan acceptance yet. The current bounded edge-case trial is in the
+[handoff](next-model-handoff.md); SDK evidence and its limits are in the
+[API research](m4-editing-api-0.25.0.md).
 
 For candidate 0.26.0, a fresh read-only preview of the exact existing blocked
 Wall exposes `blocked[].observation.reason` and
@@ -452,43 +452,41 @@ preservation observation. A blocked material entry uses
 `{"status":"observed","value":"..."}`. Do not interpret an observed
 material value as permission to write or as sufficient post-write validation.
 
-The preservation adapter accepts exactly one `WallTier_TypeUUID` child with
-lineage `[tier, Wall root]` and stable bounded enumeration. Since candidate
-0.32.0, it may also accept direct `AttributeContainer_TypeUUID` leaf children
-under that tier. It re-enumerates the immediate children and compares their
-drawing/model/type identities while retaining the observed view wrappers; each
-container lineage must resolve through the tier to the Wall, and the
-container itself must have no children. It snapshots every stored `ReadAll`
-attribute value only when the value has a bounded JSON representation: a
-scalar or one-level sequence of at most 64 scalar members. Limits are 64
-containers, 4096 records per container and 256 KiB per container and aggregate
-snapshot. Unknown types, nested values, invalid or duplicate attribute IDs,
-unsupported values and exceeded limits block preservation. These values are
-drift evidence only; they do not establish attribute ownership or a writable
-attribute codec. A `WindowDoor_TypeUUID` child is reported as
-`wall_material_openings_unsupported`. An unsupported Wall child, including
-unknown Door/Window/Macro adapter types, is reported as
-`wall_material_child_type_unsupported`; an unsupported tier child is reported
-as `wall_material_tier_child_unsupported`. Unknown types do not become
-supported.
-Bounded `ComponentReadError` failures expose stable stage and error type, not
-native exception text or object representations. When captured, the material
-diagnostic may also include a bounded `diagnostic.evidence` object. A
-`component_child_owner_mismatch` can include exact `target`, `child`, and
-`observed_parent` identities (`null` when no parent was observed). An
-unsupported tier lineage can include `selected_wall`, `tier_lineage`,
-`tier_child_count`, and `tier_children_sample` of at most eight identities.
-Evidence is optional and included only when read; it contains no exception
-strings or object representations. These diagnostics do not relax preservation
-requirements or authorize a material setter. They can guide a separate
-read-only `component_identity` follow-up for an unresolved owner mismatch, but
-do not make that material target eligible.
+Every auxiliary node has a complete lineage and checked direct-child inventory,
+re-enumerated from live adapters by drawing/model/type identity. Observed view
+wrappers remain bound as evidence. Direct root/tier containers remain in
+`root_attribute_containers`/`tier_attribute_containers`; other direct children
+are in `auxiliary_components.root`/`.tier`. Each node recursively records
+`children`. Container `ReadAll` values must have the existing bounded JSON
+codec: a scalar or one-level sequence of at most 64 scalar members. Invalid or
+duplicate attribute IDs, unavailable stored values, inconsistent ownership,
+duplicates, cycles and cross-file identities still block preservation.
 
-Focused fake-adapter tests exercise the new direct-container path and blocked
-unsupported/drift cases. They do not establish that the container rule fixes a
-specific native Allplan diagnostic. Candidate 0.32.0 native acceptance remains
-separate; see the [API evidence note](m4-editing-api-0.32.0.md) and
-[single-path trial](m4-single-drawing-0.32.0.pl.md).
+Every auxiliary node has a `geometry` observation. A bounded successful SDK
+`WriteToStream` produces an observed `stream_sha256`; unavailable or unsupported
+serialization produces explicit `not_checked` without blocking solely on that
+result. The geometry status and any digest remain part of revalidation and
+readback. Consistently unchecked auxiliary geometry cannot detect hidden
+geometry changes and is reduced coverage, not full preservation proof.
+Required tier-solid hashing and explicit Wall properties remain mandatory.
+
+The shared tree limits are 256 auxiliary nodes and 1 MiB of auxiliary snapshot
+JSON; lineage and direct-child bounds come from the shared component reader.
+Existing limits remain 64 direct containers per owner, 4096 stored rows per
+container, and 256 KiB of metadata per container and across the tree. Container
+values are drift evidence only, without establishing attribute ownership or
+writable codecs. Unknown child types no longer cause a material-specific block
+solely by type. Unsupported metadata values or ownership still do.
+
+Bounded failures expose stable reason, stage and error type, without native
+exception text or object representations. Optional diagnostic evidence can
+include exact owner/child/observed-parent identities and a tier-lineage sample
+of at most eight children. A parent mismatch still blocks the material path;
+relaxed auxiliary types do not establish ownership. Focused tests cover axes,
+openings, nested metadata and pre-/post-write drift with replay/recovery.
+Native acceptance remains separate; see the
+[API note](m4-editing-api-0.32.0.md) and current
+[trial](next-model-handoff.md).
 
 Candidate 0.27.0 uses the shared bounded attribute-name resolver for every
 `model_edit` bind. The read-only `attribute_name` probe preserves its fast exact

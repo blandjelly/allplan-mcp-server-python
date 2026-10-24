@@ -11,63 +11,70 @@ failure/skip handling and unchanged-source reuse have 49 focused policy/gate
 checks passing. The owner must review this workflow candidate's six-job CI
 and package, then configure `ci-required` for develop/m4; branch protection
 has not been changed. See the [testing policy](testing-policy.md#required-github-check).
-This procedural change leaves the 0.33.0 native trial below pending.
 
-## Next task — one bounded 0.33.0 Wall material trial
+## Next task — bounded 0.34.0 Wall material edge-case trial
 
-Candidate 0.33.0 is ready for the bounded native trial. Before preview, verify
-the installed manifest/checksum and Allplan build, reload PythonHost, then run one
-bounded preview on the original **240 mm Wall** for **`Silikat`**, capturing
-raw MCP responses and fresh Wall/tier `component_identity`. The 0.32.0 preview was
-BLOCKED before writes; do not infer that the 0.33.0 root-container support
-addresses its reported native material-preservation cause. Linked container
-and tier UUIDs were supplied, but their actual lineage is unknown.
+After candidate 0.34.0 is packaged, verify the installed manifest/checksum and
+Allplan build, reload PythonHost, then use the original **240 mm Wall** for
+`Beton` → `Silikat`, capturing raw MCP responses and fresh Wall/tier identities.
+This fixture has no known opening edge case; separately use a disposable copied
+or independent Wall with an opening and, if available, macro/nested metadata.
+Do not retry the earlier **200 mm Wall/opening** fixture: its
+`component_child_owner_mismatch` remains unresolved.
 
-- If blocked, preserve the first reason/stage/error type and diagnostics,
-  record fresh identities, and stop without Apply.
-- If eligible, perform one reviewed Apply, fresh material/preservation
-  readback, one UI Undo and restoration readback. An unknown outcome requires
-  recovery with the original execution ID, without retrying setters.
-- Do not repeat the **200 mm Wall/opening** material preview or any write.
-  Its `component_child_owner_mismatch` remains separate. Do not repeat already
-  accepted journal, scalar, Enum, W1 or grouped Column delete/Undo trials.
-- Record the native outcome in
-  [validation status](validation-status.md); remaining work is in the
-  [development backlog](office-editing-development-plan.pl.md).
+The public contract remains standalone single-tier Wall and `tier_index: 1`.
+The candidate removes material child type whitelisting and blanket opening
+rejection, snapshots bounded auxiliary identities, parent/children and nested
+AttributeContainer `ReadAll` values, and retains target/lineage checks, valid
+single-tier solid hashing, tier/common/axis/complex evidence, journaling,
+revalidation and readback. Auxiliary geometry uses a bounded stream digest when
+supported and reports `not_checked` otherwise; geometry alone being unchecked
+does not establish complete hidden-child preservation. Multi-tier Walls remain
+blocked.
 
-## Current candidate — 0.33.0
+Include a same-material no-op and a controlled drift/conflict case. Apply only
+on a qualifying preview and a disposable fixture; for each actual write, capture
+fresh material/preservation readback, one UI Undo and restoration readback. An
+unknown result requires recovery with the original execution ID, without setter
+retry. If a preview is blocked, retain its first reason/stage/error and
+diagnostics, then stop that case without Apply. Do not repeat accepted journal,
+scalar, Enum, W1 or grouped Column delete/Undo trials.
 
-Candidate 0.33.0 extends guarded Wall material preservation to direct root
-`AttributeContainer_TypeUUID` leaves as well as the existing tier leaves. It
-revalidates the complete parent lineage and `ReadAll` snapshots and records
-`root_attribute_containers`; unsupported root/tier children report owner and
-child identities. This does not establish field ownership or authorize
-attribute writes. 118 focused checks and one additional HTTP check passed;
-[full CI](../evaluation-packages/0.33.0/source-ci.json) passed 642 tests on each
-Windows/Ubuntu Python 3.12 job and the package job. One clean exact-source
-fallback build was used because CI artifact download returned HTTP 403;
-[exact ZIP verification](../evaluation-packages/0.33.0/package-verification.json)
-passed once, including upgrade/restore and journal preservation.
+Candidate 0.33.0's native preview on the original 240 mm Wall was BLOCKED before
+writes; [the raw log](test-results/evidence/0.33.0-2026-10-24/wall-native-material-preview-log.md)
+records `native_material_preservation_unavailable` because the tier child was
+unsupported. Do not treat automated checks or the 0.33.0 implementation as
+native acceptance. Record each 0.34.0 native outcome in
+[validation status](validation-status.md); remaining work is in the
+[development backlog](office-editing-development-plan.pl.md).
 
-Source `5de0c318f10facd17eb220d5ca7de7bc3d394130`, [PR #33](https://github.com/blandjelly/allplan-mcp-server-python/pull/33).
-[Download ZIP](../evaluation-packages/0.33.0/allplan-mcp-0.33.0-windows-evaluation.zip)
-and [checksum](../evaluation-packages/0.33.0/allplan-mcp-0.33.0-windows-evaluation.zip.sha256).
-Native Allplan acceptance remains pending.
+## Current candidate — 0.34.0
+
+Topic branch: `fix/m4-material-relaxed-guards`, based on `develop/m4`
+`5c688f06192703a6ca05212aa0bdde8b6f4a6713`. The material adapter removes
+shape/type-only blockers for auxiliary children and records bounded recursive
+ownership, required stored metadata and optional geometry streams. The
+public single-tier contract and execution safeguards remain. See the
 [API details](m4-editing-api-0.32.0.md).
 
-The 0.32.0 native trial on drawing 101, original 240 mm Wall
-`Ściana, prosta`, material `Beton`, was BLOCKED before writes. The reported
-`wall.native_material` preservation failure cites `wall_tier_child_unsupported`
-at `material_tier_children`,
-`ValueError`, with no evidence. That exact reason is absent from both current
-source and the retained 0.32.0 ZIP, which use
-`wall_material_tier_child_unsupported`; a live/installed host mismatch is
-possible but unproven. Supplied tier UUID
-`4db19151-9090-4b1c-bd50-b6fba6873aff` and container UUID
-`abecfaf0-ad01-45e1-91df-4b32ed9960ae` have unverified lineage. See
+Focused validation: 131 affected/dependent tests and 3 HTTP tests passed.
+Project metadata, editable lock entry and server version agree on 0.34.0.
+Full Windows/Ubuntu Python 3.12 CI and package production are performed by
+GitHub Actions for the Ready PR; the owner checks those results and verifies
+the exact ZIP before the native trial. No 0.34.0 native acceptance or exact-ZIP
+verification is claimed by these focused checks.
+
+The 0.33.0 native preview was FAIL/BLOCKED with zero setters: its direct tier
+child `WallAxis_TypeUUID` triggered `wall_material_tier_child_unsupported`.
+The [log](test-results/evidence/0.33.0-2026-10-24/wall-native-material-preview-log.md)
+contains owner/child identities, without an exception message. This confirms
+the rejected shape but does not prove the relaxed route will preserve the
+native object. Its installed manifest/build is not included in that log.
+The prior 0.32.0 report has a different reason spelling and an unproven host
+mismatch; retain its limits in
 [validation status](validation-status.md#evidence-for-unresolved-cases).
-This observation does not identify the native preservation cause. Priorities
-1–5 remain partial.
+The separate 200 mm opening ownership mismatch remains open. Priorities 1–5
+remain partial.
 
 ## Prior work needed for continuation
 

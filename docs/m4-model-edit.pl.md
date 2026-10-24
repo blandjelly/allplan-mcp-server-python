@@ -70,14 +70,18 @@ pokazać starą wartość jako `observed`, a jednocześnie zablokować operację
 `criteria.operation_eligibility_failures` (obecnie wyłącznie blokady
 preservation natywnego materiału Wall), a `criteria.required_field_failures`
 wykazuje wyłącznie nieodczytane wymagane pola docelowe i może być puste.
-Błędy kryterium pozostają w `report.criterion_failures`. Zachowanie jest
-kwalifikowane tylko dla dokładnie jednego `WallTier_TypeUUID` z lineage
-`[tier, Wall root]` i bez dzieci. Otwory raportują
-`wall_material_openings_unsupported`; wszystkie inne typy dzieci raportują
-`wall_material_child_type_unsupported`. Nieznany Door/Window/Macro nie jest
-obsługiwany. Post-write readback nadal wymaga pełnego preservation snapshot;
-sam odczyt materiału nie wystarcza. Szczegóły próby 0.27.0 są w
-[krótkim trialu](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/m4-single-drawing-0.27.0.pl.md).
+Błędy kryterium pozostają w `report.criterion_failures`. Kandydat 0.34.0 nadal
+wymaga jednego `WallTier_TypeUUID` z lineage `[tier, Wall root]`, lecz nie
+odrzuca samego typu potomka: oś, otwór, makro i zagnieżdżone metadane mogą
+wejść do ograniczonego drzewa dowodów zachowania ściany. To nie uprawnia do
+osobnej edycji tych potomków. Tożsamość i relacje rodzic–dziecko muszą być
+spójne, a wartości `ReadAll` kontenerów atrybutów odczytywalne. Geometria
+pomocnicza ma hash strumienia, gdy SDK to umożliwia; w przeciwnym razie
+`not_checked` nie blokuje wyłącznie z tego powodu. Nie dowodzi to zachowania
+wszystkich ukrytych właściwości potomków. Odczyt po zapisie nadal porównuje
+cały zapisany snapshot; sam materiał nie wystarcza. Szczegóły kontraktu są w
+[opisie API](m4-editing-api-0.32.0.md), a następna próba z przypadkami brzegowymi
+w [handoffie](next-model-handoff.md).
 
 Resolver 0.27.0 dla każdego `model_edit` bind sprawdza ograniczone warianty
 nazwy: podaną postać, trim/NFC, pierwszą literę wielką, całość wielkimi i
