@@ -4,8 +4,14 @@ Current candidate and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
 [development plan](office-editing-development-plan.pl.md).
 Candidate 0.34.0 passed 131 affected/dependent checks and 3 HTTP checks.
-Full CI, package delivery/exact-ZIP verification and native Allplan results
-remain separate and pending owner review. The previous 0.33.0 240 mm Wall
+[Full CI](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40126702661)
+passed Windows/Ubuntu Python 3.12, package production and `ci-required` for
+`77d291599dbd2037e6cd171042aa4c22ee939f76`. The owner confirmed CI and merge
+of PR #36 into `develop/m4` (`11d90a98e7f27adf7ba6595032083bc6cb0a208d`).
+The existing ZIP artifact and download instructions are in the
+[handoff](next-model-handoff.md#current-candidate--0340); no replacement build
+was needed. Exact-ZIP installation/upgrade/restore verification and native
+Allplan results remain unreported. The previous 0.33.0 240 mm Wall
 material preview was FAIL/BLOCKED before writes by an unsupported WallAxis
 tier child. That log does not include the installed manifest or Allplan build.
 Automated checks do not establish native acceptance.

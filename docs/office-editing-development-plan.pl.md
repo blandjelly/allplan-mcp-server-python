@@ -5,6 +5,8 @@
 M4 jest częściowo odebrane. Aktualną wersję, dostawę i konkretne następne
 zadanie opisuje [handoff](next-model-handoff.md). Ten plan utrzymuje pozostałe
 prace i warunki ich zamknięcia, zgodnie z [polityką dokumentacji](documentation-policy.md).
+0.34.0 jest scalone do `develop/m4`, a CI zbudowało ZIP. Pozostaje weryfikacja
+dostarczonej paczki i próba natywna; nie jest potrzebny ponowny build.
 
 Dowody wcześniejszych prób są w [statusie walidacji](validation-status.md);
 ich istotne ograniczenia zachowują poniższe zadania i handoff. Nie powtarzać

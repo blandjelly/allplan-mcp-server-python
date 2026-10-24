@@ -14,8 +14,9 @@ has not been changed. See the [testing policy](testing-policy.md#required-github
 
 ## Next task — bounded 0.34.0 Wall material edge-case trial
 
-After candidate 0.34.0 is packaged, verify the installed manifest/checksum and
-Allplan build, reload PythonHost, then use the original **240 mm Wall** for
+Download the existing 0.34.0 CI artifact linked below; package production has
+passed. Verify the exact ZIP and required upgrade/restore procedures, then the
+installed manifest/checksum and Allplan build. Reload PythonHost and use the original **240 mm Wall** for
 `Beton` → `Silikat`, capturing raw MCP responses and fresh Wall/tier identities.
 This fixture has no known opening edge case; separately use a disposable copied
 or independent Wall with an opening and, if available, macro/nested metadata.
@@ -50,8 +51,10 @@ native acceptance. Record each 0.34.0 native outcome in
 
 ## Current candidate — 0.34.0
 
-Topic branch: `fix/m4-material-relaxed-guards`, based on `develop/m4`
-`5c688f06192703a6ca05212aa0bdde8b6f4a6713`. The material adapter removes
+[PR #36](https://github.com/blandjelly/allplan-mcp-server-python/pull/36) was
+merged into `develop/m4` at `11d90a98e7f27adf7ba6595032083bc6cb0a208d`.
+The tested/package source is `77d291599dbd2037e6cd171042aa4c22ee939f76`;
+the merge contains the same product source. The material adapter removes
 shape/type-only blockers for auxiliary children and records bounded recursive
 ownership, required stored metadata and optional geometry streams. The
 public single-tier contract and execution safeguards remain. See the
@@ -59,10 +62,15 @@ public single-tier contract and execution safeguards remain. See the
 
 Focused validation: 131 affected/dependent tests and 3 HTTP tests passed.
 Project metadata, editable lock entry and server version agree on 0.34.0.
-Full Windows/Ubuntu Python 3.12 CI and package production are performed by
-GitHub Actions for the Ready PR; the owner checks those results and verifies
-the exact ZIP before the native trial. No 0.34.0 native acceptance or exact-ZIP
-verification is claimed by these focused checks.
+[Full CI run 40126702661](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40126702661)
+passed Windows/Ubuntu Python 3.12, `package` and `ci-required`.
+The existing [CI artifact](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40126702661/artifacts/12572659255)
+is `candidate-77d291599dbd2037e6cd171042aa4c22ee939f76` and contains
+`allplan-mcp-0.34.0-windows-evaluation.zip`, its `.sha256`, wheel and sdist.
+It expires on 2026-11-07; download and extract the outer artifact archive to
+obtain the installation ZIP. Do not rebuild an already successful artifact.
+The owner confirmed CI and merge; exact-ZIP installation/upgrade/restore
+verification and native Allplan acceptance have not been reported.
 
 The 0.33.0 native preview was FAIL/BLOCKED with zero setters: its direct tier
 child `WallAxis_TypeUUID` triggered `wall_material_tier_child_unsupported`.
