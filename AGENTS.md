@@ -10,16 +10,23 @@ and [the development plan](docs/office-editing-development-plan.pl.md).
 Follow the documentation policy when updating project state; keep the handoff and
 plan concise and current, without adding release histories or redundant files.
 Identify the checkout, branch, source state, and change scope before choosing
-checks. Keep focused,
-full CI, and native Allplan results distinct; the model owns automated checks
-and GitHub CI, while the owner performs only the brief Allplan trial requested
-for a candidate. Follow the testing policy as the single source of truth for test and
-build decisions. An explicit owner pause takes precedence.
+checks. Keep focused, full CI, and native Allplan results distinct.
+Follow the testing policy as the single source of truth for test and build
+decisions and the responsibility split below. An explicit owner pause takes precedence.
 
-- During iteration, run affected/dependent tests only; keep the PR in draft.
-- For documentation/evidence only, check diff and links, without runtime tests or builds.
-- For a final candidate, use full CI instead of repeating the full suite locally.
-- Standard candidate: Windows/Ubuntu on Python 3.12; compatibility changes and
-  main integration/release: six configurations. A project-version bump alone is exempt.
-- Build once after CI and verify the exact delivered ZIP once. Preserve completed
-  native observations and all runtime write/journal safeguards.
+- Codex owns analysis, implementation, focused affected/dependent tests, version
+  consistency checks, commit, push and PR preparation. Keep the PR in draft
+  during iteration; mark the final candidate Ready for review, hand over the
+  commit SHA and PR link, then end the task.
+- GitHub Actions runs the required full CI matrix and automatically builds
+  artifacts after successful tests, as defined in the testing policy.
+- The owner monitors CI, checks required jobs and the tested commit, downloads
+  the ZIP, verifies the package and required installation/upgrade/restore
+  procedures, and merges into develop/m4 only after all required gates pass.
+  The owner supplies failed-test logs to Codex for diagnosis.
+- Codex performs CI supervision, artifact retrieval, fallback builds, full CI
+  reruns or PR merges only when explicitly requested by the owner; see the
+  testing policy for the exact boundaries.
+- For documentation/evidence only, check diff and links, without runtime tests
+  or builds. Preserve completed native observations and all runtime
+  write/journal/hash safeguards.
