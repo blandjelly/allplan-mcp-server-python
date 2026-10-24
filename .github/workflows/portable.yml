@@ -1,12 +1,7 @@
 name: Final candidate checks
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
-    paths-ignore:
-      - 'AGENTS.md'
-      - 'docs/**'
-      - 'README.md'
-      - 'evaluation-packages/**'
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft, edited]
   workflow_dispatch:
     inputs:
       full_matrix:
@@ -24,6 +19,8 @@ jobs:
     outputs:
       matrix: ${{ steps.policy.outputs.matrix }}
       run_portable: ${{ steps.policy.outputs.run_portable }}
+      full_matrix: ${{ steps.policy.outputs.full_matrix }}
+      validation_mode: ${{ steps.policy.outputs.validation_mode }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -36,6 +33,7 @@ jobs:
         name: Select final-candidate checks
         run: python utils/ci_policy.py
   portable:
+    name: portable (${{ matrix.os }}, ${{ matrix.python }})
     needs: configuration
     if: needs.configuration.outputs.run_portable == 'true'
     strategy:
@@ -72,3 +70,25 @@ jobs:
           path: dist/*
           if-no-files-found: error
           retention-days: 14
+  ci-required:
+    # Keep the PR context stable; manual two-job runs must not override its gate.
+    name: ${{ github.event_name == 'pull_request' && 'ci-required' || 'ci-manual' }}
+    needs: [configuration, portable, package]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Enforce required candidate validation
+        env:
+          CI_NEEDS: ${{ toJSON(needs) }}
+          GH_TOKEN: ${{ github.token }}
+        run: python utils/ci_required.py

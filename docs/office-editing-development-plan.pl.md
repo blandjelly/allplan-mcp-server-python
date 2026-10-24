@@ -71,5 +71,10 @@ Brak fixture oznaczać `fixture_missing`, nierozstrzygnięty kontrakt — BLOCKE
 
 [Polityka dokumentacji](documentation-policy.md) określa aktualizację handoffu i zadań;
 [testing policy](testing-policy.md) — kontrole i budowanie.
+
+Zbiorcza bramka CI `ci-required` jest przygotowana; 49 focused checks PASS.
+Właściciel sprawdza CI/paczkę kandydata workflow i ustawia wymagany check dla
+develop/m4 według [polityki testów](testing-policy.md#required-github-check).
+Ochrona gałęzi nie została zmieniona; bramka nie zastępuje odbioru ZIP ani Allplana.
 [Tool reference](tool-reference.md), [API evidence](m4-attribute-api-evidence.md)
 i [macierz typów](m4-attribute-type-coverage.md) pozostają źródłami kontraktów API.

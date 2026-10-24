@@ -12,7 +12,7 @@ import tomllib
 
 DOCUMENTATION = ("AGENTS.md", "README.md", "docs/*", "evaluation-packages/*")
 COMPATIBILITY = ("windows/*", "utils/register_python_host.*",
-                 "utils/build_windows_package.py", "utils/ci_policy.py",
+                 "utils/build_windows_package.py", "utils/ci_policy.py", "utils/ci_required.py",
                  ".github/workflows/*", ".python-version", "uv.toml")
 
 
@@ -73,7 +73,11 @@ def plan_ci(event_name, event, paths=(), read_blob=None, *, history_available=Tr
     else:
         raise ValueError(f"Unsupported CI event: {event_name}")
     versions = ["3.11", "3.12", "3.13"] if full else ["3.12"]
+    mode = "candidate" if run else "documentation"
+    if event_name == "pull_request" and event["pull_request"].get("draft", False):
+        mode = "draft"
     return {"run_portable": run, "full_matrix": full, "reason": reason,
+            "validation_mode": mode,
             "matrix": {"include": [{"os": system, "python": version}
                                    for system in ("ubuntu-latest", "windows-latest")
                                    for version in versions]}}
@@ -89,9 +93,7 @@ def comparison(event):
     return before, after
 
 
-def main():
-    event_name = os.environ["GITHUB_EVENT_NAME"]
-    event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text(encoding="utf-8"))
+def comparison_plan(event_name, event):
     paths, available = (), True
     read_blob = None
     if event_name == "pull_request" and not event["pull_request"].get("draft", False):
@@ -106,10 +108,39 @@ def main():
                                                text=True, encoding="utf-8", stderr=subprocess.PIPE)
         except (ValueError, OSError, subprocess.SubprocessError):
             available = False
-    plan = plan_ci(event_name, event, paths, read_blob, history_available=available)
+    return plan_ci(event_name, event, paths, read_blob, history_available=available)
+
+
+def select_ci(event_name, event):
+    latest = comparison_plan(event_name, event)
+    if (event_name == "pull_request" and event.get("action") == "edited"
+            and "base" not in event.get("changes", {}) and latest["run_portable"]):
+        return {**latest, "run_portable": False, "validation_mode": "reuse",
+                "reason": "PR metadata edit: require existing validation for this source and base"}
+    if (event_name != "pull_request" or event.get("action") != "synchronize"
+            or event["pull_request"].get("draft", False)):
+        return latest
+    whole_pr = comparison_plan(event_name, {**event, "action": "opened"})
+    if latest["validation_mode"] == "documentation":
+        if whole_pr["run_portable"]:
+            return {**whole_pr, "run_portable": False, "validation_mode": "reuse",
+                    "reason": "Documentation update: require prior CI for unchanged product source"}
+        return latest
+    # A later ordinary push must not erase a compatibility requirement in this PR.
+    if whole_pr["run_portable"] and not latest["full_matrix"]:
+        return whole_pr
+    return latest
+
+
+def main():
+    event_name = os.environ["GITHUB_EVENT_NAME"]
+    event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text(encoding="utf-8"))
+    plan = select_ci(event_name, event)
     with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:
         output.write("matrix=" + json.dumps(plan["matrix"]) + "\n")
         output.write("run_portable=" + str(plan["run_portable"]).lower() + "\n")
+        output.write("full_matrix=" + str(plan["full_matrix"]).lower() + "\n")
+        output.write("validation_mode=" + plan["validation_mode"] + "\n")
     print(json.dumps(plan, indent=2))
 
 
