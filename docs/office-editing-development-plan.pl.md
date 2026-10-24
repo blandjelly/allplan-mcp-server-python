@@ -5,8 +5,9 @@
 M4 jest częściowo odebrane. Aktualną wersję, dostawę i konkretne następne
 zadanie opisuje [handoff](next-model-handoff.md). Ten plan utrzymuje pozostałe
 prace i warunki ich zamknięcia, zgodnie z [polityką dokumentacji](documentation-policy.md).
-0.34.0 jest scalone do `develop/m4`, a CI zbudowało ZIP. Pozostaje weryfikacja
-dostarczonej paczki i próba natywna; nie jest potrzebny ponowny build.
+Kandydat 0.35.0 rozwija natywną zmianę materiału dla Wall i Column. Aktualny
+stan, zakres próby i weryfikację opisuje [handoff](next-model-handoff.md).
+Wyniki focused checks, CI/paczki oraz próby natywnej pozostają osobnymi etapami.
 
 Dowody wcześniejszych prób są w [statusie walidacji](validation-status.md);
 ich istotne ograniczenia zachowują poniższe zadania i handoff. Nie powtarzać
@@ -16,8 +17,9 @@ odebranych zakresów ani rozszerzać ich na inne rodziny, typy czy wersje bez do
 
 Użytkownik opisuje zamiar zwykłym językiem. Agent rozpoznaje zakres, elementy,
 właściciela pola i typ wartości, pokazuje plan, ponownie go waliduje, wykonuje
-obsługiwany zapis i świeży odczyt. Atrybut materiału, natywny materiał, warstwa
-organizacyjna i wykończenie są odrębnymi polami.
+obsługiwany zapis i świeży odczyt. Atrybut materiału i natywny materiał mają
+odrębne powiązania API; ich ewentualne sprzężenie wymaga odczytu w danym
+projekcie. Warstwa organizacyjna i wykończenie mają osobne cele zapisu.
 
 Odczyt może obejmować jawnie wskazane otwarte rysunki; obecny Apply jest
 ograniczony do jednego aktywnego rysunku i 1–32 rzeczywistych zmian.
@@ -30,7 +32,7 @@ Wieloplikowość i cały projekt wymagają osobnego projektu oraz odbioru.
 | 1 — dziennik i recovery | Uzupełnić brakujące dowody restart/replay oraz unknown/corrupt/unverifiable poza już odebranym zakresem. PASS próby dziennika bez pełnego raw logu nie potwierdza osobno każdego podkroku. Chronić nierozliczone rekordy. |
 | 2 — Slab/MultiSlab | Rozstrzygnąć lineage i właściciela project attributes. Różne view UUID, zbieżne bounds oraz structural identity nie ustanawiają właściciela ani równoważności fizycznych celów. Najnowszy probe ma `evidence_complete=false` dla Slab i `true` dla MultiSlab, ale `property_owner=not_established` dla obu. Do ustalenia kontraktu zapisy pozostają BLOCKED. |
 | 3 — warstwa i no-op | Uzupełnić wyłącznie nieodebrane przypadki. W1 read/write, pojedyncze Undo i zgłoszony no-op nie dowodzą grupowego Undo ani pełnego pokrycia rodzin. No-op nie ma drogi Apply. |
-| 4 — materiał Wall | Domknąć natywny odbiór po ograniczeniu blokad typów potomków w 0.34.0. 0.33.0 preview Wall 240 mm potwierdził blokadę osi `WallAxis_TypeUUID` przed zapisem ([log](test-results/evidence/0.33.0-2026-10-24/wall-native-material-preview-log.md)). Następna próba obejmuje tę ścianę oraz osobne fixture z otworem/zagnieżdżonymi metadanymi, no-op i konflikt; warunki Apply/readback/Undo podaje [handoff](next-model-handoff.md). Pozostaje kontrakt single-tier. Oryginalny Wall 200 mm/opening ma osobny nierozwiązany mismatch właściciela; nie ponawiać tej próby. |
+| 4 — natywny materiał Wall/Column | Odebrać candidate 0.35.0 na Wall 240 mm i Column X=0, Y=0: no-op, revalidation/drift, actual Apply, świeży readback, pojedyncze UI Undo i restoration readback. Owner reports dla 0.34.0 mówią o blokadzie Wall na geometrii i `old_value_unknown` dla Column przez Wall-only adapter; brak raw odpowiedzi, więc nie są natywnym dowodem. Natywne Wall/Column Material, atrybut Material i `Materiał łatwopalny` pozostają oddzielne. Warunki oraz recovery podaje [handoff](next-model-handoff.md). Oryginalny Wall 200 mm/opening ma nierozwiązany mismatch właściciela; nie ponawiać. |
 | 4 — delete i selekcja | Zachować odebrany grouped Column delete/Undo; pozostałe rodziny/poddrzewa wymagają oddzielnego dowodu. Native selection set/clear/readback nadal unsupported. Highlight nie jest selekcją. |
 | 5 — typy i rodziny | Domknąć owner-specific roundtrip oraz macierz rodzin/typów. Column Enum `Status` ID 49 pozostaje BLOCKED (`<niezdefiniowany>`, brak potwierdzonej etykiety). Wall CheckBox ID 1371 nie ma surowego Apply; fixture SDK Boolean brak. Beam i Door blokuje niejednoznaczna reprezentacja/tożsamość. Date/vector/object wymagają dokładnych kontraktów setter payload i typed readback; sam symbol lub konstruktor SDK nie wystarcza. |
 

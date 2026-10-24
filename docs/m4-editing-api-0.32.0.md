@@ -1,82 +1,84 @@
-# M4 native Wall material preservation
+# Native material editing — candidate 0.35.0
 
-## Bounded auxiliary trees — candidate 0.34.0
+## Request and native property owner
 
-The 0.33.0 owner trial on a 240 mm Wall was blocked before setters because a
-`WallAxis_TypeUUID` below its tier was rejected by the child-type whitelist.
-The [raw log](test-results/evidence/0.33.0-2026-10-24/wall-native-material-preview-log.md)
-records `wall_material_tier_child_unsupported` at `material_tier_children`;
-no exception message was supplied. This identifies a shape rejected by the
-adapter, without proving that a subsequent native material write will work.
+The public request remains
+`target={"kind":"native_material","tier_index":1}` with an exact nonempty
+material string. It is an exclusive plan change. The result field is
+`native.material`; the plan binds its native evidence as
+`resource.native_material_state`.
 
-Candidate 0.34.0 removes material-specific child-type whitelisting, blanket
-opening rejection, and the requirement that an AttributeContainer be a leaf.
-A standalone Wall still requires exactly one direct `WallTier_TypeUUID`,
-`tier_index: 1`, a valid serialized tier `Polyhedron3D`, readable material and
-explicit tier/common/axis/plane/surface evidence. The existing represented
-Wall alone goes through `SetMaterial`, `SetProperties` and `ModifyElements`;
-no auxiliary child is submitted as a new edit target. Multi-tier Walls remain
-unsupported. The SDK basis and limits of this route are in the
-[existing API research](m4-editing-api-0.25.0.md).
+The eligible root is a standalone `Wall_TypeUUID` represented by
+`WallElement`, or a standalone `Column_TypeUUID` represented by
+`ColumnElement`. A Wall must have `WallProperties.TierCount == 1` and uses
+`GetWallTierProperties(1).Material` / `SetMaterial`. A Column uses its
+`ColumnProperties.Material` / `SetMaterial`. Both routes mutate the existing
+represented native object, call `SetProperties` with its properties, then
+submit that object through `ModifyElements`. A missing enumerated tier child
+does not disqualify a single-tier Wall when its native properties report one
+tier. Multi-tier Walls and other element families are outside this candidate.
 
-## Evidence and limits
+The API basis is the 2026 [WallElement](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/WallElement/),
+[WallProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/WallProperties/),
+[WallTierProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/WallTierProperties/),
+[ColumnElement](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/ColumnElement/),
+[ColumnProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/ColumnProperties/),
+and shared [ArchBaseProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/ArchBaseProperties/)
+references. The general [element modification guide](https://pythonparts.allplan.com/2026/manual/features/model_access/element_modification/)
+documents submitting an existing native element through `ModifyElements`.
+These API contracts do not establish that a particular Allplan build accepts
+the write or preserves every hidden property.
 
-Root and tier auxiliary children may include axes, openings, macros, other
-adapter types and nested metadata. Every descendant has a fresh identity,
-complete parent lineage, direct-child inventory and parent-edge evidence.
-Each inventory is enumerated again from live adapters and compared by drawing,
-model and type. Native collection owners remain alive while their wrappers
-are read. Structural parent comparisons permit alternate views of the same
-model; observed view UUIDs remain bound in the complete snapshot. The selected
-Wall target retains its exact view binding.
+## Required checks and optional preservation evidence
 
-`root_attribute_containers` and `tier_attribute_containers` retain direct
-metadata snapshots; `auxiliary_components.root` and `.tier` contain other
-direct auxiliary nodes. Each node's `children` recursively stores its
-descendants, including nested AttributeContainers. All stored container values
-use `ReadAll` and the existing bounded value codec. Unsupported values,
-malformed or duplicate IDs, missing lineage, duplicate/cyclic/cross-file
-identities and changed enumerations still block or conflict. These values are
-preservation evidence, without establishing attribute ownership or write codecs.
+Eligibility requires an exact standalone root identity and native type,
+readable current material, the matching native setter, an active foreground
+drawing, and the existing write, journal, revalidation and recovery guards.
+Wall tier count must be exactly one. These are required even when optional
+preservation observations are unavailable.
 
-Each auxiliary node also records `geometry`. A successful bounded
-`WriteToStream` produces an observed `stream_sha256`. A missing serializer,
-unavailable geometry, failed serialization or an oversized stream records
-`not_checked` with a bounded reason/error type, without native exception text.
-This auxiliary geometry result alone does not block preview. Its status and
-any digest remain part of revalidation and readback: losing coverage or
-changing an observed digest conflicts. A consistently unavailable stream cannot
-detect hidden geometry changes; this is reduced preservation coverage, not a
-claim that every auxiliary property was preserved. Required tier-solid and
-explicit Wall-property checks remain mandatory.
+Tier geometry does not have to be a `Polyhedron3D` or report `IsValid()`. A
+bounded `WriteToStream` digest is retained when available; unavailable or
+unsupported geometry is recorded as `not_checked`. Formatting properties,
+axis representation, metadata values and auxiliary hierarchy are also
+observed independently where supported. An unavailable field becomes
+diagnostic `not_checked` evidence rather than blocking the native material
+preview. Available evidence remains in the state fingerprint and is compared
+during revalidation and fresh readback. A changed observation conflicts before
+setters; drift or incomplete required readback after a write leaves the result
+unknown. Recovery uses the original execution ID and never retries setters.
 
-The shared limits are 256 auxiliary nodes and 1 MiB of auxiliary snapshot
-JSON, including ownership and per-node framing. Existing per-owner limits of
-64 direct AttributeContainers remain. Stored metadata keeps its 4096-row limit
-per container and 256 KiB limits per container and across the tree. Serialized
-geometry streams are limited to 524288 characters. The shared component reader
-bounds lineage to 16 parent steps and direct children to 256; the existing
-cooperative scan budget remains in force.
+Completed Wall hierarchy/component observations remain in partial evidence if
+a later optional detail fails. Property reads are independent. Across live
+views, consensus covers the required native value and structural owner; the
+chosen exact view retains its own preservation fingerprint. Other views'
+different optional coverage is not a material-value conflict. A failed complete
+Column child inventory reports a diagnostic; it cannot prove preservation of
+unread children.
 
-## Execution, recovery and native trial
+The standard Material attribute ID 508 is excluded from unrelated metadata
+invariants because it may mirror the native material being changed. This does
+not write attribute 508 or bind an attribute target. Generic typed attribute
+edits remain a separate `ChangeAttributes` route. Historical 0.27.0 owner
+notes report changing `Materiał` on two Slab representations, but the stored
+chat log has no request payload or attribute ID; later read-only evidence
+shows ID 508 as a String with value `beton zbrojony` on Slabs without a live
+name/ID roundtrip. This does not establish that a Material attribute changes
+native material or that the attribute route was accepted for Wall or Column.
+`Materiał łatwopalny` is a separate attribute (ID 1371).
 
-The reviewed plan binds current material and the full bounded evidence.
-Apply rechecks it immediately before the existing native setter route. Fresh
-readback must match the requested material and all captured evidence. Drift
-before modification prevents setters; drift or an incomplete required read
-after modification follows the existing unknown-result flow. Replay and
-recovery use the original execution ID without retrying setters. Exact target,
-plan hashes, journal and final write guards remain in force.
+## Execution and acceptance boundary
 
-Focused fake-adapter checks cover the reported 240 mm Wall axis, openings and
-mixed nested trees, metadata and geometry coverage, pre-write conflicts,
-post-write unknown/replay/recovery, malformed ownership and shared budgets.
-These are automated checks, not native acceptance. The
-[handoff](next-model-handoff.md) gives the bounded 0.34.0 edge-case trial and
-[validation status](validation-status.md) preserves earlier evidence.
+The requested string is used exactly; there is no catalog lookup, existence
+claim, alias resolution, surface edit or attribute substitution. The same
+native root object is submitted with its updated properties. Exact target
+binding, plan hashes, fresh pre-write revalidation, journal safeguards,
+post-write readback and unknown-result recovery remain in force. Automated
+checks and API availability do not establish native Allplan acceptance.
 
-Use a separate disposable opening fixture; the original 200 mm Wall/opening
-`component_child_owner_mismatch` remains unresolved. Relaxed child types do
-not bypass that ownership check. Do not repeat accepted journal, scalar, Enum,
-W1 or grouped Column delete trials. Broad property discovery remains suspended;
-this change does not authorize new Slab/MultiSlab or auxiliary write paths.
+The owner reports that candidate 0.34.0 blocked the 240 mm Wall at tier
+geometry and returned `old_value_unknown` for a Column because that adapter
+was Wall-only. No raw responses were supplied, so those reports do not
+establish the exact stage or a successful native write. The next Wall and
+Column trial is recorded in the [handoff](next-model-handoff.md); prior
+material observations remain in [validation status](validation-status.md).

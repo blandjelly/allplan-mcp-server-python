@@ -289,16 +289,21 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     confirmed_targets entry in a new preview, including expected_layer_id and
     expected_name. This keeps the user's choice bound to the same ID and names.
     Never translate or invent a layer short name.
-    Attribute material is distinct from native material and surface.
+    A project material attribute and the native material use separate bindings;
+    they can reflect the same native value, but equivalence needs live readback.
+    If Material cannot be resolved by name, inspect element_attributes on the
+    exact target with name_contains=material or name_contains=materiał and use
+    the returned project name/ID. ID 1371 is flammable material, not Material.
     Native material uses changes=[{target:{kind:native_material,tier_index:1},value:EXACT_STRING}]
-    as the only edit. It requires a standalone single-tier Wall,
-    readable native scalar properties and serialized Polyhedron3D tier geometry.
+    as the only edit, with native_types=[Wall_TypeUUID] or [Column_TypeUUID].
+    It requires an exact standalone Wall with one native tier or a Column,
+    a readable Material property and native material/property setters.
     The exact string is a native property value, without catalog validation or
-    catalog creation. Geometry and explicit non-material evidence must remain
-    unchanged at preflight and fresh readback. Auxiliary children (including axes,
-    openings and nested metadata) use a bounded ownership tree and stored metadata.
-    Auxiliary geometry is hashed when stream serialization is available, otherwise
-    explicitly not_checked without blocking solely on its type or missing stream.
+    catalog creation. The report field is native.material and resource evidence
+    is native_material_state. Geometry, formatting and auxiliary metadata reads
+    are optional: unsupported reads report not_checked without blocking material.
+    Available non-material evidence is checked at preflight and fresh readback;
+    its drift is a conflict before a write or an unknown outcome after a write.
     Complex representations and optional streams provide bounded drift evidence;
     they do not prove preservation of every hidden auxiliary property.
     Delete with changes=[{target:{kind:delete}}] as the only edit. This binds

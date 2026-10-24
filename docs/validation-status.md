@@ -3,18 +3,16 @@
 Current candidate and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
 [development plan](office-editing-development-plan.pl.md).
-Candidate 0.34.0 passed 131 affected/dependent checks and 3 HTTP checks.
-[Full CI](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40126702661)
-passed Windows/Ubuntu Python 3.12, package production and `ci-required` for
-`77d291599dbd2037e6cd171042aa4c22ee939f76`. The owner confirmed CI and merge
-of PR #36 into `develop/m4` (`11d90a98e7f27adf7ba6595032083bc6cb0a208d`).
-The existing ZIP artifact and download instructions are in the
-[handoff](next-model-handoff.md#current-candidate--0340); no replacement build
-was needed. Exact-ZIP installation/upgrade/restore verification and native
-Allplan results remain unreported. The previous 0.33.0 240 mm Wall
-material preview was FAIL/BLOCKED before writes by an unsupported WallAxis
-tier child. That log does not include the installed manifest or Allplan build.
-Automated checks do not establish native acceptance.
+Candidate 0.35.0 on `fix/m4-material-unblock` passed 153 distinct
+affected/dependent tests and 4 MCP HTTP tests on Python 3.12. Version metadata
+agrees on 0.35.0. Full GitHub CI, exact-ZIP verification and native acceptance
+are separate pending gates owned as described in the testing policy.
+The owner reports that 0.34.0's 240 mm Wall preview blocked at geometry and its
+Column request returned `old_value_unknown` through the Wall-only path. No raw
+responses were supplied, so these reports do not establish exact runtime
+stages or native acceptance. The 0.34.0 package/CI references remain in the
+prior handoff and repository history; the current trial is defined in the
+[handoff](next-model-handoff.md).
 
 ## Accepted baseline and scoped M4 observations
 
@@ -33,7 +31,7 @@ exact installed manifest/build and do not establish exact-ZIP acceptance.
 | Scope to preserve | Evidence and limit |
 | --- | --- |
 | Read/query/highlight | Scoped Column observation, Wall 240 mm/`Beton` read, and Wall `<240 mm` filter/highlight/clear were observed. Highlight does not establish native selection. [Original observations](https://github.com/blandjelly/allplan-mcp-server-python/tree/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results). |
-| Earlier Slab/Column attributes | Owner confirmed two queried Slab attributes, `Priorytet` on two results and ordered `MCP_QA_MARK` on six Columns. [Source log](test-results/evidence/m4-agent-test-2026-10-20.md). These observations do not resolve current Slab/MultiSlab ownership; an attribute material write is not native material. |
+| Earlier Slab/Column attributes | Owner log reports `Materiał=beton zbrojony` and `Element nośny=1` on two Slab representations with readback, and `Priorytet` on two results plus ordered `MCP_QA_MARK` on six Columns. It contains no request payload or attribute ID. Later read-only evidence shows ID 508 as a String with value `beton zbrojony` on Slabs; the official example calls 508 `Material`, but there is no live name/ID roundtrip in that evidence. None of this establishes native material or a Wall/Column material-attribute write. [Source log](test-results/evidence/allplan-chat-log-0.27.0-2026-10-23.md), [read-only evidence](test-results/evidence/0.31.0-2026-10-24/slab-multislab-readonly-evidence.json), [API note](test-results/m4-agent-test-api-evidence.md). |
 | Journal archival | 0.23.0 owner PASS: preview and confirmed archive of 614,396 trace bytes and 32 resolved records (739,786 bytes), preserving replay protection. Native restart/replay was not demonstrated by that report. Trial 1 in 0.30.0 was reported PASS without detailed raw evidence for its individual substeps. [Original archival observation](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-journal-cleanup-0.23.0-owner-pass-2026-10-21.md). |
 | Identity, lookup and W1 | Owner reported identity reads, lowercase attribute-name resolution, W1 read/write with one UI Undo per changed element, and 0.30.0 identity/no-op trials PASS. Detailed raw logs for trials 1–3 are absent. Do not infer field ownership, all-family coverage or grouped W1 Undo. [0.27.0 source log](test-results/evidence/allplan-chat-log-0.27.0-2026-10-23.md). |
 | Typed deletion | Separate Wall subtree deletion and Beam W1 moves remain scoped observations. The repaired 0.29.0 three-Column delete trial was reported PASS: fresh scan found Columns/attribute containers absent; one UI Undo restored all three Columns. Tool metadata retained `undo: not_checked`, without automatic post-Undo readback, target UUIDs or exact ZIP manifest. This supersedes the earlier one-of-three Undo failure only for that Column operation. [0.29.0 source log](test-results/evidence/allplan-test-log-0.29.0-2026-10-23.md). |
@@ -46,6 +44,14 @@ pairs. Missing fixtures and blocked paths are separate from PASS.
 
 ## Evidence for unresolved cases
 
+- **0.34.0 native material — owner report only:** Wall 240 mm preview was
+  reportedly blocked at tier geometry; Column at X=0, Y=0 reportedly returned
+  `old_value_unknown` because that candidate's adapter was Wall-only. No raw
+  responses are available. Candidate 0.35.0 expands the native property route
+  to standalone single-tier Walls and Columns while keeping the public
+  `native_material` request. Do not treat the report or implementation as
+  native acceptance; use the bounded Wall/Column trial in the
+  [handoff](next-model-handoff.md).
 - **Wall material — 0.33.0 native trial:** on drawing 101, the query found one
   original 240 mm `Ściana, prosta` (`Wall_TypeUUID`) with material observed as
   `Beton`. Query reported `scan_complete=true` but
@@ -81,8 +87,9 @@ pairs. Missing fixtures and blocked paths are separate from PASS.
   `4db19151-9090-4b1c-bd50-b6fba6873aff` and container UUID
   `abecfaf0-ad01-45e1-91df-4b32ed9960ae` have unknown actual lineage. The
   0.33.0 trial independently observed the unsupported tier child described
-  above; neither result alone establishes the preservation cause. The next
-  candidate trial is 0.34.0: verify its manifest/hash and Allplan build, reload
+  above; neither result alone establishes the preservation cause. At the time
+  of this report, the next trial was candidate 0.34.0: verify its manifest/hash
+  and Allplan build, reload
   PythonHost, then test the original 240 mm Wall and a disposable copied or
   independent Wall with opening/macro/nested metadata where fixtures permit.
   The public contract remains single-tier (`tier_index: 1`); multi-tier stays

@@ -342,7 +342,7 @@ owner workflow saves a pending record and fsyncs it before each MCP call,
 brackets the filter call with same-session health, and never retries a lost
 reply. See the [0.19.0 owner observation](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-wall-filter-observation-0.19.0.md).
 
-## model_edit — typed edits, exact deletion and Wall material
+## model_edit — typed edits, exact deletion and native material
 
 Schema `m4-model-edit-1`, bridge `/model-edit`. This is an experimental
 preview/apply path for edits selected by a criterion, independent of audit
@@ -357,8 +357,9 @@ loaded SDK type, including Enum when an exact display label passes the targeted
 label/key round trip. JSON booleans for Integer fields are encoded as 1/0 only
 when targeted SDK metadata confirms `AttributeControlType.CheckBox`; this codec
 is hash-bound and rebound before Apply. Other integers do not accept booleans.
-It never parses a string to infer a type. Attribute values such as
-`Beton C37` remain distinct from a wall's native material and visual surface.
+It never parses a string to infer a type. A project Material attribute and
+native Material have separate API bindings; whether they reflect the same
+value must be checked on the actual element. Visual surface is a separate target.
 Date/vector/object attribute codecs and general attribute catalog discovery
 are outside this contract.
 
@@ -404,89 +405,45 @@ blocked target. This reporting does not relax exact lineage, subtree
 completeness, exclusion, confirmation, fresh absence/parent checks, or
 unknown-result recovery.
 
-### `native_material` — experimental single-tier Wall only
+### `native_material` — experimental standalone Wall and Column
 
-The only accepted form is an exact nonempty string of at most 255 characters
-and explicit `tier_index=1`. The target must resolve to a standalone
-`Wall_TypeUUID` represented by `WallElement`, have exactly one tier, and pass
-the bounded preservation snapshot. Candidate 0.34.0 still requires exactly
-one direct `WallTier_TypeUUID` with lineage `[tier, Wall root]`, but removes
-child-type whitelisting, blanket opening rejection and the leaf-only metadata
-rule. Root/tier auxiliary subtrees may include axes, openings, macros and
-nested metadata with checked ownership. This does not authorize editing those
-auxiliary objects independently.
-No material catalog lookup, existence claim, alias resolution, surface edit,
-or attribute substitution occurs.
+The public request is unchanged: an exact nonempty string up to 255 characters
+and `target={"kind":"native_material","tier_index":1}`. It must be the only
+change in its plan. A standalone `Wall_TypeUUID` represented by `WallElement`
+must have exactly one native tier; a standalone `Column_TypeUUID` represented
+by `ColumnElement` is also supported. Other element families and multi-tier
+Walls remain outside the contract. No catalog lookup, existence claim, alias
+resolution, surface edit or attribute substitution occurs.
 
-The plan binds the current material, complete bounded hierarchy, valid tier
-`Polyhedron3D` stream hash, and explicit tier/common scalar and axis/plane/
-surface preservation representations. Apply rechecks this evidence, invokes
-`SetMaterial(exact_string)` on tier 1, reattaches the same `WallProperties`,
-and submits the existing Wall through `ModifyElements`. Fresh readback must
-match the requested material and the bound preservation evidence. Drift or an
-incomplete observation blocks Apply or leaves recovery to the same execution
-ID; setters are never retried. This adapter is experimental and has no native
-Allplan acceptance yet. The current bounded edge-case trial is in the
-[handoff](next-model-handoff.md); SDK evidence and its limits are in the
-[API research](m4-editing-api-0.25.0.md).
+The report field is `native.material`; the plan binds evidence in
+`resource.native_material_state`. The Wall route calls
+`GetWallTierProperties(1).SetMaterial(exact_string)`. The Column route calls
+`ColumnProperties.SetMaterial(exact_string)`. Both reattach the same
+`Properties` through `SetProperties` and submit the existing native root with
+`ModifyElements`.
 
-For candidate 0.26.0, a fresh read-only preview of the exact existing blocked
-Wall exposes `blocked[].observation.reason` and
-`blocked[].observation.diagnostic` (`stage`, `error_type`); when
-`old_value_unknown`, retain `criteria.required_field_failures` as well. No Apply
-is needed to inspect this diagnostic. It explains why a guarded path stopped
-and does not authorize bypassing ownership, identity, revalidation, journal, or
-readback guards.
+Exact root/type, current material, setter availability, active foreground
+drawing and existing target, journal and write guards are required. Geometry
+does not need to be `Polyhedron3D` or pass `IsValid`; a bounded geometry stream
+hash is recorded when available, otherwise `not_checked`. Formatting, axis,
+metadata and auxiliary hierarchy evidence are also optional and recorded
+independently. Available evidence remains fingerprinted and is rechecked before
+Apply and in fresh readback. Pre-write drift blocks setters; post-write drift
+or incomplete required readback leaves the result unknown. Recovery uses the
+same execution ID and never retries setters.
 
-Candidate 0.27.0 separates a readable old material string from eligibility to
-preserve and safely change the Wall. `criteria.required_field_failures` lists
-only unreadable required destination fields (the read side of the proposed
-write); predicate/criterion failures remain in `report.criterion_failures`.
-A complete destination can therefore have an empty list while material remains
-blocked. The new `criteria.operation_eligibility_failures` currently reports
-Wall native-material preservation blockers, including the old value and
-preservation observation. A blocked material entry uses
-`reason=native_material_preservation_unavailable` and includes
-`observation.reason` and bounded `observation.diagnostic` (`stage`,
-`error_type`); the old material can independently remain
-`{"status":"observed","value":"..."}`. Do not interpret an observed
-material value as permission to write or as sufficient post-write validation.
+Across representations, the required native material and owner must agree.
+Optional evidence is bound to the chosen exact view; another view's different
+geometry coverage or diagnostics alone does not block the material edit.
 
-Every auxiliary node has a complete lineage and checked direct-child inventory,
-re-enumerated from live adapters by drawing/model/type identity. Observed view
-wrappers remain bound as evidence. Direct root/tier containers remain in
-`root_attribute_containers`/`tier_attribute_containers`; other direct children
-are in `auxiliary_components.root`/`.tier`. Each node recursively records
-`children`. Container `ReadAll` values must have the existing bounded JSON
-codec: a scalar or one-level sequence of at most 64 scalar members. Invalid or
-duplicate attribute IDs, unavailable stored values, inconsistent ownership,
-duplicates, cycles and cross-file identities still block preservation.
-
-Every auxiliary node has a `geometry` observation. A bounded successful SDK
-`WriteToStream` produces an observed `stream_sha256`; unavailable or unsupported
-serialization produces explicit `not_checked` without blocking solely on that
-result. The geometry status and any digest remain part of revalidation and
-readback. Consistently unchecked auxiliary geometry cannot detect hidden
-geometry changes and is reduced coverage, not full preservation proof.
-Required tier-solid hashing and explicit Wall properties remain mandatory.
-
-The shared tree limits are 256 auxiliary nodes and 1 MiB of auxiliary snapshot
-JSON; lineage and direct-child bounds come from the shared component reader.
-Existing limits remain 64 direct containers per owner, 4096 stored rows per
-container, and 256 KiB of metadata per container and across the tree. Container
-values are drift evidence only, without establishing attribute ownership or
-writable codecs. Unknown child types no longer cause a material-specific block
-solely by type. Unsupported metadata values or ownership still do.
-
-Bounded failures expose stable reason, stage and error type, without native
-exception text or object representations. Optional diagnostic evidence can
-include exact owner/child/observed-parent identities and a tier-lineage sample
-of at most eight children. A parent mismatch still blocks the material path;
-relaxed auxiliary types do not establish ownership. Focused tests cover axes,
-openings, nested metadata and pre-/post-write drift with replay/recovery.
-Native acceptance remains separate; see the
-[API note](m4-editing-api-0.32.0.md) and current
-[trial](next-model-handoff.md).
+Standard attribute ID 508 is omitted from unrelated metadata invariants because
+it may reflect the native Material being changed. This is not an attribute
+write or a hard-coded attribute binding. Generic typed attribute edits remain
+separate: “Material” as an attribute does not establish native material
+semantics. See the [0.35.0 API details](m4-editing-api-0.32.0.md), current
+[trial](next-model-handoff.md), and
+[validation status](validation-status.md). Native Allplan acceptance is not
+established by the implementation or automated checks.
 
 Candidate 0.27.0 uses the shared bounded attribute-name resolver for every
 `model_edit` bind. The read-only `attribute_name` probe preserves its fast exact

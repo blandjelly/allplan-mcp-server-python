@@ -78,7 +78,7 @@ def _preview(request):
             keys(change, {"target", "value"}, {"target", "value"})
             keys(target, {"kind", "tier_index"}, {"kind", "tier_index"})
             if type(target["tier_index"]) is not int or target["tier_index"] != 1:
-                invalid("Native material requires explicit tier_index=1 of a single-tier Wall.")
+                invalid("Native material requires explicit tier_index=1 (single-tier Wall or Column properties).")
             value = change["value"]
             if not isinstance(value, str) or not value.strip() or len(value) > 255 or any(ord(c) < 32 for c in value):
                 invalid("Native material must be an exact nonempty string of at most 255 characters.")
