@@ -4,12 +4,16 @@ The canonical M4 development branch is **develop/m4**. Start M4 topic branches
 from it and target PRs to it. Keep main separate. See the current checkout and
 handoff instructions in [the M4 handoff](docs/next-model-handoff.md).
 
-At the start of each chat, read [the testing policy](docs/testing-policy.md) and
-[the current handoff](docs/next-model-handoff.md). Identify the checkout and
-branch, source state, and change scope before choosing checks. Keep focused,
+At the start of each chat, read [the documentation policy](docs/documentation-policy.md),
+[the testing policy](docs/testing-policy.md), [the current handoff](docs/next-model-handoff.md)
+and [the development plan](docs/office-editing-development-plan.pl.md).
+Follow the documentation policy when updating project state; keep the handoff and
+plan concise and current, without adding release histories or redundant files.
+Identify the checkout, branch, source state, and change scope before choosing
+checks. Keep focused,
 full CI, and native Allplan results distinct; the model owns automated checks
 and GitHub CI, while the owner performs only the brief Allplan trial requested
-for a candidate. Follow the policy as the single source of truth for test and
+for a candidate. Follow the testing policy as the single source of truth for test and
 build decisions. An explicit owner pause takes precedence.
 
 - During iteration, run affected/dependent tests only; keep the PR in draft.
