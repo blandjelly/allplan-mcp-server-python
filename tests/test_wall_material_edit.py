@@ -270,7 +270,7 @@ class WallMaterialEditTests(unittest.TestCase):
         self.assertEqual(self.material, "C20/25")
         self.assertEqual(self.native.base.ModifyElements.call_count, 1)
 
-    def test_multiple_tiers_and_openings_are_blocked_before_modify(self):
+    def test_multiple_tiers_are_blocked_and_opening_shape_is_eligible(self):
         for tier_count in (0, 2):
             with self.subTest(tier_count=tier_count):
                 self.properties = WallProperties("C20/25", tier_count=tier_count)
@@ -291,20 +291,16 @@ class WallMaterialEditTests(unittest.TestCase):
         self.native.parents[id(opening)] = self.root
         self.native.base.ElementsSelectService.SelectAllElements.return_value = [self.root, self.tier, opening]
         with_opening = self.preview()
-        self.assertFalse(with_opening["apply_available"], with_opening)
-        self.assertFalse(with_opening["changes"])
+        self.assertTrue(with_opening["apply_available"], with_opening)
+        self.assertEqual(with_opening["counts"]["changes"], 1)
         self.assertEqual(with_opening["criteria"]["required_field_failures"], [])
-        self.assertTrue(with_opening["criteria"]["operation_eligibility_failures"])
-        opening_blocker = next(item for item in with_opening["blocked"]
-                                if item["field"] == "wall.native_material")
-        self.assertEqual(opening_blocker["reason"], "native_material_preservation_unavailable")
-        self.assertEqual(opening_blocker["observation"]["reason"],
-                         "wall_material_openings_unsupported")
-        self.assertEqual(opening_blocker["observation"]["diagnostic"]["stage"],
-                         "material_children")
-        self.native.base.ModifyElements.assert_not_called()
+        self.assertEqual(with_opening["criteria"]["operation_eligibility_failures"], [])
+        self.native.highlight(with_opening)
+        result = self.native.apply(with_opening)
+        self.assertEqual(result["state"], "completed", result)
+        self.native.base.ModifyElements.assert_called_once()
 
-    def test_unknown_wall_children_fail_closed_with_material_and_eligibility_separate(self):
+    def test_auxiliary_wall_child_types_are_eligible_with_explicit_geometry_coverage(self):
         for child_type in ("Door_TypeUUID", "Window_TypeUUID", "Macro_TypeUUID",
                            "UnclassifiedChild_TypeUUID"):
             with self.subTest(child_type=child_type):
@@ -317,21 +313,17 @@ class WallMaterialEditTests(unittest.TestCase):
 
                 plan = self.preview()
 
-                self.assertFalse(plan["apply_available"], plan)
-                self.assertFalse(plan["changes"], plan)
+                self.assertTrue(plan["apply_available"], plan)
+                self.assertEqual(plan["counts"]["changes"], 1)
                 self.assertEqual(plan["criteria"]["required_field_failures"], [])
-                self.assertTrue(plan["criteria"]["operation_eligibility_failures"])
-                blocker = next(item for item in plan["blocked"]
-                               if item["field"] == "wall.native_material")
-                self.assertEqual(blocker["reason"], "native_material_preservation_unavailable")
-                self.assertEqual(blocker["observation"]["reason"],
-                                 "wall_material_child_type_unsupported")
-                self.assertEqual(blocker["observation"]["diagnostic"]["stage"],
-                                 "material_children")
+                self.assertEqual(plan["criteria"]["operation_eligibility_failures"], [])
+                evidence = plan["changes"][0]["resource"]["wall_material_state"]["auxiliary_components"]["root"][0]
+                self.assertEqual(evidence["ownership"]["target"]["type_name"], child_type)
+                self.assertEqual(evidence["geometry"]["status"], "not_checked")
                 self.assertEqual(plan["criteria"]["checks"][0]["decision"], "matched")
                 self.native.base.ModifyElements.assert_not_called()
 
-    def test_already_desired_material_does_not_hide_unknown_child_eligibility_block(self):
+    def test_already_desired_material_with_auxiliary_child_is_no_op(self):
         child = self.native.element(22, name="Door_TypeUUID")
         self.native.children[id(self.root)] = [self.tier, child]
         self.native.parents[id(child)] = self.root
@@ -342,17 +334,11 @@ class WallMaterialEditTests(unittest.TestCase):
 
         plan = self.native.call(request)
 
-        self.assertNotEqual(plan["state"], "no_op")
+        self.assertEqual(plan["state"], "no_op")
         self.assertFalse(plan["apply_available"], plan)
         self.assertFalse(plan["changes"], plan)
         self.assertEqual(plan["criteria"]["required_field_failures"], [])
-        self.assertTrue(plan["criteria"]["operation_eligibility_failures"])
-        blocker = next(item for item in plan["blocked"]
-                       if item["field"] == "wall.native_material")
-        self.assertEqual(blocker["old_value"], {"status": "observed", "value": self.material})
-        self.assertEqual(blocker["reason"], "native_material_preservation_unavailable")
-        self.assertEqual(blocker["observation"]["reason"],
-                         "wall_material_child_type_unsupported")
+        self.assertEqual(plan["criteria"]["operation_eligibility_failures"], [])
         self.native.base.ModifyElements.assert_not_called()
 
     def test_material_read_failure_reports_unknown_field_and_eligibility_diagnostics(self):
@@ -386,28 +372,160 @@ class WallMaterialEditTests(unittest.TestCase):
         self.assertEqual(set_properties.call_count, 0)
         self.native.base.ModifyElements.assert_not_called()
 
-    def test_tier_with_unknown_child_is_blocked_as_unpreserved_hierarchy(self):
-        tier_child = self.native.element(21, name="WallTierFace_TypeUUID")
+    def test_reported_240mm_wall_axis_under_tier_allows_material_apply(self):
+        self.material = "Beton"
+        tier_child = self.native.element(21, name="WallAxis_TypeUUID")
+        tier_child.GetModelGeometry.return_value = SimpleNamespace()
         self.native.children[id(self.tier)] = [tier_child]
         self.native.parents[id(tier_child)] = self.tier
         self.native.base.ElementsSelectService.SelectAllElements.return_value = [
             self.root, self.tier, tier_child]
 
-        plan = self.preview()
+        plan = self.preview(changes=[{"target": {"kind": "native_material", "tier_index": 1}, "value": "Silikat"}])
 
-        self.assertFalse(plan["apply_available"], plan)
-        self.assertFalse(plan["changes"], plan)
-        blocker = next(item for item in plan["blocked"]
-                       if item["field"] == "wall.native_material")
-        self.assertEqual(blocker["reason"], "native_material_preservation_unavailable")
-        self.assertEqual(blocker["observation"]["reason"],
-                         "wall_material_tier_child_unsupported")
-        self.assertEqual(blocker["observation"]["diagnostic"]["stage"], "material_tier_children")
-        evidence = blocker["observation"]["diagnostic"]["evidence"]
-        self.assertEqual(evidence["owner"]["model_uuid"],
-                         self.tier.GetModelElementUUID.return_value)
-        self.assertEqual(evidence["child"]["type_name"], "WallTierFace_TypeUUID")
-        self.native.base.ModifyElements.assert_not_called()
+        self.assertTrue(plan["apply_available"], plan)
+        evidence = plan["changes"][0]["resource"]["wall_material_state"]["auxiliary_components"]["tier"][0]
+        self.assertEqual(evidence["ownership"]["lineage"][1]["model_uuid"], self.tier.GetModelElementUUID())
+        self.assertEqual(evidence["ownership"]["target"]["type_name"], "WallAxis_TypeUUID")
+        self.assertEqual(evidence["geometry"], {"status": "not_checked", "reason": "geometry_stream_unsupported"})
+        self.native.highlight(plan)
+        result = self.native.apply(plan, uuid4().hex)
+        self.assertEqual(result["state"], "completed", result)
+        self.assertEqual(self.material, "Silikat")
+        self.native.base.ModifyElements.assert_called_once()
+
+    def auxiliary_tree(self):
+        """A mixed subtree that previously failed several child-shape guards."""
+        self.native.base.eAttibuteReadState.ReadAll = "ReadAll"
+        opening = self.native.element(51, name="WindowDoor_TypeUUID", solid=Polyhedron("opening"))
+        macro = self.native.element(52, name="Macro_TypeUUID", solid=Polyhedron("macro"))
+        metadata = self.native.element(53, name="AttributeContainer_TypeUUID", solid=Polyhedron("metadata"))
+        metadata.GetAttributes.return_value = [(120, "preserved")]
+        self.native.children[id(self.root)] = [self.tier, opening]
+        self.native.children[id(opening)] = [macro]
+        self.native.children[id(macro)] = [metadata]
+        for child, parent in ((opening, self.root), (macro, opening), (metadata, macro)):
+            self.native.parents[id(child)] = parent
+        self.native.base.ElementsSelectService.SelectAllElements.return_value = [self.root]
+        return opening, macro, metadata
+
+    def test_mixed_auxiliary_subtree_preserves_geometry_and_nested_metadata_through_apply(self):
+        opening, macro, metadata = self.auxiliary_tree()
+        plan = self.preview()
+        self.assertTrue(plan["apply_available"], plan)
+        evidence = plan["changes"][0]["resource"]["wall_material_state"]["auxiliary_components"]["root"][0]
+        self.assertEqual(evidence["geometry"]["status"], "observed")
+        self.assertEqual(evidence["children"][0]["geometry"]["status"], "observed")
+        self.assertEqual(evidence["children"][0]["children"][0]["stored_attributes"][0]["value"], "preserved")
+        self.assertEqual(evidence["children"][0]["children"][0]["geometry"]["status"], "observed")
+        self.native.highlight(plan)
+        self.native.children[id(self.root)].reverse()
+        result = self.native.apply(plan)
+        self.assertEqual(result["state"], "completed", result)
+        self.assertEqual(metadata.GetAttributes.return_value, [(120, "preserved")])
+        self.assertEqual(macro.GetModelGeometry.return_value.stream, "macro")
+        self.native.base.ModifyElements.assert_called_once()
+
+    def test_auxiliary_subtree_drift_conflicts_before_modify(self):
+        for drift in ("identity", "parent", "children", "geometry", "metadata", "metadata_geometry", "geometry_coverage"):
+            with self.subTest(drift=drift):
+                opening, macro, metadata = self.auxiliary_tree()
+                plan = self.preview()
+                self.assertTrue(plan["apply_available"], plan)
+                self.native.highlight(plan)
+                if drift == "identity":
+                    macro.GetModelElementUUID.return_value = str(uuid4())
+                elif drift == "parent":
+                    self.native.parents[id(macro)] = self.root
+                elif drift == "children":
+                    self.native.children[id(macro)] = []
+                elif drift == "geometry":
+                    macro.GetModelGeometry.return_value.stream = "changed"
+                elif drift == "metadata":
+                    metadata.GetAttributes.return_value = [(120, "changed")]
+                elif drift == "metadata_geometry":
+                    metadata.GetModelGeometry.return_value.stream = "changed"
+                else:
+                    macro.GetModelGeometry.return_value = SimpleNamespace()
+                self.native.assert_code("repair_conflict", lambda: self.native.apply(plan))
+                self.native.base.ModifyElements.assert_not_called()
+
+    def test_auxiliary_geometry_drift_after_modify_is_unknown_and_recovery_never_retries(self):
+        _, macro, _ = self.auxiliary_tree()
+        original = self.native.base.ModifyElements.side_effect
+
+        def modify_then_drift(doc, elements):
+            original(doc, elements)
+            macro.GetModelGeometry.return_value.stream = "changed-after-write"
+
+        self.native.base.ModifyElements.side_effect = modify_then_drift
+        plan = self.preview()
+        self.native.highlight(plan)
+        execution_id = uuid4().hex
+        result = self.native.apply(plan, execution_id)
+        self.assertEqual(result["outcomes"][0]["state"], "unknown")
+        self.assertTrue(self.native.apply(plan, execution_id)["replayed"])
+        recovered = self.native.recover(execution_id)
+        self.assertTrue(recovered["read_only"])
+        self.assertEqual(recovered["outcomes"][0]["state"], "unknown")
+        self.native.base.ModifyElements.assert_called_once()
+
+    def test_auxiliary_geometry_failures_are_bounded_and_nonblocking(self):
+        opening, _, _ = self.auxiliary_tree()
+        secret = "private native geometry detail"
+        opening.GetModelGeometry.side_effect = RuntimeError(secret)
+        plan = self.preview()
+        self.assertTrue(plan["apply_available"], plan)
+        evidence = plan["changes"][0]["resource"]["wall_material_state"]["auxiliary_components"]["root"][0]
+        self.assertEqual(evidence["geometry"], {"status": "not_checked", "reason": "geometry_stream_unavailable",
+                                               "error_type": "RuntimeError"})
+        self.assertNotIn(secret, repr(plan))
+        self.native.highlight(plan)
+        self.assertEqual(self.native.apply(plan)["state"], "completed")
+        self.native.base.ModifyElements.assert_called_once()
+
+    def test_auxiliary_geometry_uses_sdk_success_enum(self):
+        opening, _, _ = self.auxiliary_tree()
+        success = object()
+        sys.modules["NemAll_Python_Geometry"].eGeometryErrorCode.eOK = success
+        self.tier.GetModelGeometry.return_value.WriteToStream = lambda: (success, "tier")
+        opening.GetModelGeometry.return_value.WriteToStream = lambda: (success, "opening")
+        plan = self.preview()
+        self.assertTrue(plan["apply_available"], plan)
+        evidence = plan["changes"][0]["resource"]["wall_material_state"]["auxiliary_components"]["root"][0]
+        self.assertEqual(evidence["geometry"]["status"], "observed")
+
+    def test_malformed_auxiliary_subtrees_still_block_without_setters(self):
+        for defect in ("duplicate", "cross_file", "owner", "parent_cycle"):
+            with self.subTest(defect=defect):
+                opening, macro, metadata = self.auxiliary_tree()
+                if defect == "duplicate":
+                    self.native.children[id(opening)] = [macro, macro]
+                elif defect == "cross_file":
+                    macro.GetDrawingfileNumber.return_value = 102
+                elif defect == "owner":
+                    self.native.parents[id(metadata)] = opening
+                else:
+                    self.native.parents[id(opening)] = macro
+                for desired in ("C35/45", self.material):
+                    plan = self.preview(changes=[{
+                        "target": {"kind": "native_material", "tier_index": 1}, "value": desired}])
+                    self.assertFalse(plan["apply_available"], plan)
+                    self.assertFalse(plan["changes"], plan)
+                    self.assertNotEqual(plan["state"], "no_op")
+                    self.native.base.ModifyElements.assert_not_called()
+
+    def test_auxiliary_count_and_byte_budgets_are_shared_across_subtrees(self):
+        self.auxiliary_tree()
+        module = importlib.import_module(self.native.module.__package__ + ".wall_material")
+        for constant, reason, limit in (("_MAX_AUXILIARY_COMPONENTS", "wall_material_component_limit", 2),
+                                        ("_MAX_COMPONENT_SNAPSHOT_BYTES", "wall_material_component_snapshot_limit", 5000)):
+            with self.subTest(constant=constant), patch.object(module, constant, limit):
+                plan = self.preview()
+                self.assertFalse(plan["apply_available"], plan)
+                blocker = next(item for item in plan["blocked"] if item["field"] == "wall.native_material")
+                self.assertEqual(blocker["observation"]["reason"], reason)
+                self.native.base.ModifyElements.assert_not_called()
 
     def test_tier_lineage_blocker_includes_bounded_identity_and_child_evidence(self):
         bad_tier = self.native.element(27, name="WallTier_TypeUUID", solid=Polyhedron())
@@ -713,7 +831,7 @@ class WallMaterialEditTests(unittest.TestCase):
         self.native.assert_code("repair_conflict", lambda: self.native.apply(plan))
         self.native.base.ModifyElements.assert_not_called()
 
-    def test_duplicate_or_invalid_root_attribute_container_children_are_rejected(self):
+    def test_duplicate_children_are_rejected_but_nested_metadata_and_siblings_are_eligible(self):
         container = self.root_attribute_container()
         self.native.children[id(self.root)] = [self.tier, container, container]
         duplicate = self.preview()
@@ -731,22 +849,17 @@ class WallMaterialEditTests(unittest.TestCase):
         self.native.children[id(container)] = [nested]
         self.native.parents[id(nested)] = container
         nested_plan = self.preview()
-        self.assertFalse(nested_plan["apply_available"], nested_plan)
-        nested_blocker = next(item for item in nested_plan["blocked"]
-                              if item["field"] == "wall.native_material")
-        self.assertEqual(nested_blocker["observation"]["reason"],
-                         "wall_material_attribute_container_hierarchy_unsupported")
+        self.assertTrue(nested_plan["apply_available"], nested_plan)
+        nested_state = nested_plan["changes"][0]["resource"]["wall_material_state"]
+        self.assertEqual(nested_state["root_attribute_containers"][0]["children"][0][
+            "ownership"]["target"]["type_name"], "Unknown_TypeUUID")
         self.native.children[id(container)] = []
 
         unknown = self.native.element(34, name="Door_TypeUUID")
         self.native.children[id(self.root)] = [self.tier, container, unknown]
         self.native.parents[id(unknown)] = self.root
         unknown_plan = self.preview()
-        self.assertFalse(unknown_plan["apply_available"], unknown_plan)
-        unknown_blocker = next(item for item in unknown_plan["blocked"]
-                               if item["field"] == "wall.native_material")
-        self.assertEqual(unknown_blocker["observation"]["reason"],
-                         "wall_material_child_type_unsupported")
+        self.assertTrue(unknown_plan["apply_available"], unknown_plan)
         self.native.base.ModifyElements.assert_not_called()
 
     def test_root_children_still_require_exactly_one_wall_tier(self):
@@ -816,7 +929,7 @@ class WallMaterialEditTests(unittest.TestCase):
         self.assertEqual(blocker["observation"]["diagnostic"]["stage"], "material_children")
         self.native.base.ModifyElements.assert_not_called()
 
-    def test_nested_metadata_children_block_and_invalid_attribute_snapshots_fail_closed(self):
+    def test_nested_metadata_children_are_eligible_and_invalid_attributes_fail_closed(self):
         self.native.base.eAttibuteReadState.ReadAll = "ReadAll"
         container = self.native.element(21, name="AttributeContainer_TypeUUID")
         container.GetAttributes.return_value = [(120, "m3")]
@@ -830,10 +943,10 @@ class WallMaterialEditTests(unittest.TestCase):
 
         plan = self.preview()
 
-        self.assertFalse(plan["apply_available"], plan)
-        blocker = next(item for item in plan["blocked"] if item["field"] == "wall.native_material")
-        self.assertEqual(blocker["observation"]["reason"],
-                         "wall_material_attribute_container_hierarchy_unsupported")
+        self.assertTrue(plan["apply_available"], plan)
+        state = plan["changes"][0]["resource"]["wall_material_state"]
+        self.assertEqual(state["tier_attribute_containers"][0]["children"][0][
+            "ownership"]["target"]["model_uuid"], nested.GetModelElementUUID())
         self.native.base.ModifyElements.assert_not_called()
 
         self.native.children[id(container)] = []

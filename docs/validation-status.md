@@ -3,12 +3,12 @@
 Current candidate and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
 [development plan](office-editing-development-plan.pl.md).
-Candidate 0.33.0 passed 118 focused checks and one additional HTTP check,
-[full CI](../evaluation-packages/0.33.0/source-ci.json) (642 tests per platform),
-and [exact ZIP verification](../evaluation-packages/0.33.0/package-verification.json). Native Allplan results remain separate; the bounded
-0.32.0 Wall material trial was
-BLOCKED before any writes, and does not identify the preservation failure's
-cause.
+Candidate 0.34.0 passed 131 affected/dependent checks and 3 HTTP checks.
+Full CI, package delivery/exact-ZIP verification and native Allplan results
+remain separate and pending owner review. The previous 0.33.0 240 mm Wall
+material preview was FAIL/BLOCKED before writes by an unsupported WallAxis
+tier child. That log does not include the installed manifest or Allplan build.
+Automated checks do not establish native acceptance.
 
 ## Accepted baseline and scoped M4 observations
 
@@ -40,22 +40,50 @@ pairs. Missing fixtures and blocked paths are separate from PASS.
 
 ## Evidence for unresolved cases
 
-- **Wall material:** the 0.32.0 owner trial on drawing 101, original 240 mm
-  Wall (`Ściana, prosta`), material `Beton` → `Silikat`, was
-  BLOCKED before writes. The reported `wall.native_material` failure was
-  `native_material_preservation_unavailable`, old value `Beton`, observation
-  reason `wall_tier_child_unsupported`, stage `material_tier_children`,
-  `ValueError`, with no diagnostic evidence. That exact reason is absent from
-  current source and the retained 0.32.0 ZIP; both contain
-  `wall_material_tier_child_unsupported`. An installed/live host mismatch is
-  possible, not proven. Supplied tier UUID
+- **Wall material — 0.33.0 native trial:** on drawing 101, the query found one
+  original 240 mm `Ściana, prosta` (`Wall_TypeUUID`) with material observed as
+  `Beton`. Query reported `scan_complete=true` but
+  `requested_scope_complete=false`; model UUID was
+  `06d71e4d-193b-483e-8a32-344ade3d612c`, and `usable_for_write=false`.
+  Preview matched one element and blocked one property (`changes=0`):
+  `wall.native_material` / `native_material_preservation_unavailable`, old
+  value `Beton`, observation `not_checked` because
+  `wall_material_tier_child_unsupported` at `material_tier_children`
+  (`ValueError`). The diagnostic identifies owner `WallTier_TypeUUID`
+  (`a7fae808-845c-4491-9f44-3757c493e673`, model
+  `4db19151-9090-4b1c-bd50-b6fba6873aff`) and child `WallAxis_TypeUUID`
+  (`b7b85ac6-3b03-4b81-a353-153216f8ae4d`, model
+  `6446ff90-420c-4d1d-8d3f-cccb1987c768`), both in drawing 101. No exception
+  message was supplied. `usable_for_write=false`, `setter_calls_started=0`,
+  `apply_available=false` and `production_apply_available=false`; no write or
+  native acceptance occurred. Query request ID was
+  `f5fc110f-ad9f-481a-a5fd-70326103c27a`; preview request ID
+  `c5e0d95e-f705-44d4-b903-f12b2f0732a2`, plan ID
+  `7cb19ce69f1242229b441a289e71424c`, plan hash
+  `adece99dd84670cf267ba10cc7328f0d2f22b3c77b6f6ff80d968c6f3be0a1d2`.
+  See the [raw log](test-results/evidence/0.33.0-2026-10-24/wall-native-material-preview-log.md).
+  This records the observed 0.33.0 blocker only; it does not establish its
+  native preservation cause.
+- **Wall material — prior 0.32.0 report:** on drawing 101, original 240 mm
+  Wall (`Ściana, prosta`), material `Beton` → `Silikat`, was BLOCKED before
+  writes. It reported `native_material_preservation_unavailable`, old value
+  `Beton`, reason `wall_tier_child_unsupported`, stage
+  `material_tier_children`, `ValueError`, with no diagnostic evidence. That
+  exact reason was absent from the 0.33.0 source and retained 0.32.0 ZIP; both
+  used `wall_material_tier_child_unsupported`. An installed/live host
+  mismatch is possible, not proven. Supplied tier UUID
   `4db19151-9090-4b1c-bd50-b6fba6873aff` and container UUID
-  `abecfaf0-ad01-45e1-91df-4b32ed9960ae` have unknown actual lineage. Do not
-  claim that 0.33.0 root-container support fixes this native cause. Next,
-  verify installed manifest/hash and Allplan build, reload PythonHost and run
-  one bounded preview with fresh identities on this original Wall. Apply,
-  readback and UI Undo are permitted only if preview qualifies. The separate
-  200 mm Wall/opening model `545bb0a2-a054-4c91-ac6c-ec552d5b0c18` reported
+  `abecfaf0-ad01-45e1-91df-4b32ed9960ae` have unknown actual lineage. The
+  0.33.0 trial independently observed the unsupported tier child described
+  above; neither result alone establishes the preservation cause. The next
+  candidate trial is 0.34.0: verify its manifest/hash and Allplan build, reload
+  PythonHost, then test the original 240 mm Wall and a disposable copied or
+  independent Wall with opening/macro/nested metadata where fixtures permit.
+  The public contract remains single-tier (`tier_index: 1`); multi-tier stays
+  blocked. Include no-op and controlled drift/conflict previews. A qualifying
+  preview on a disposable fixture may proceed to Apply, fresh readback, one UI
+  Undo and restoration readback. The separate 200 mm Wall/opening model
+  `545bb0a2-a054-4c91-ac6c-ec552d5b0c18` reported
   `component_child_owner_mismatch` at `child_parent_identity`; keep it
   unresolved and do not repeat its preview.
   The prior [0.31.0 conversation log](test-results/evidence/0.31.0-2026-10-24/allplan-conversation-log.md)
