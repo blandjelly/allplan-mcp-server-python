@@ -1,10 +1,13 @@
 # Validation status and necessary evidence
 
-Current version and next action: [handoff](next-model-handoff.md).
+Current candidate and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
 [development plan](office-editing-development-plan.pl.md).
-Automated checks, package verification and native Allplan observations are
-separate results; 0.32.0 has no native trial result yet.
+Candidate 0.33.0 has 118 focused checks passed; full CI and package
+verification are pending. Native Allplan results remain separate; the bounded
+0.32.0 Wall material trial was
+BLOCKED before any writes, and does not identify the preservation failure's
+cause.
 
 ## Accepted baseline and scoped M4 observations
 
@@ -36,21 +39,32 @@ pairs. Missing fixtures and blocked paths are separate from PASS.
 
 ## Evidence for unresolved cases
 
-- **Wall material:** latest [conversation log](test-results/evidence/0.31.0-2026-10-24/allplan-conversation-log.md)
-  records both previews blocked before Apply, with no changes and zero setters.
-  In drawing 101, 240 mm Wall model
-  `06d71e4d-193b-483e-8a32-344ade3d612c`, view
-  `2d33e5a6-b4e8-444b-94e8-d4d0ae75d622`; tier model
-  `4db19151-9090-4b1c-bd50-b6fba6873aff`, view
-  `1bdccbc1-6931-46fd-9f1f-f7b8657ac284`.
-  Material `Beton` → requested `Silikat` was blocked by
-  `wall_material_tier_hierarchy_unsupported`, stage `material_tier_hierarchy`,
-  `ValueError`. The separate 200 mm Wall model
-  `545bb0a2-a054-4c91-ac6c-ec552d5b0c18`, material `Cegła`, returned
-  `component_child_owner_mismatch`, stage `child_parent_identity`,
-  `ValueError`. These are conversation observations, without raw material
-  MCP responses or exact installed manifest. Identities are historical clues;
-  refresh them before the permitted next action.
+- **Wall material:** the 0.32.0 owner trial on drawing 101, original 240 mm
+  Wall (`Ściana, prosta`), material `Beton` → `Silikat`, was
+  BLOCKED before writes. The reported `wall.native_material` failure was
+  `native_material_preservation_unavailable`, old value `Beton`, observation
+  reason `wall_tier_child_unsupported`, stage `material_tier_children`,
+  `ValueError`, with no diagnostic evidence. That exact reason is absent from
+  current source and the retained 0.32.0 ZIP; both contain
+  `wall_material_tier_child_unsupported`. An installed/live host mismatch is
+  possible, not proven. Supplied tier UUID
+  `4db19151-9090-4b1c-bd50-b6fba6873aff` and container UUID
+  `abecfaf0-ad01-45e1-91df-4b32ed9960ae` have unknown actual lineage. Do not
+  claim that 0.33.0 root-container support fixes this native cause. Next,
+  verify installed manifest/hash and Allplan build, reload PythonHost and run
+  one bounded preview with fresh identities on this original Wall. Apply,
+  readback and UI Undo are permitted only if preview qualifies. The separate
+  200 mm Wall/opening model `545bb0a2-a054-4c91-ac6c-ec552d5b0c18` reported
+  `component_child_owner_mismatch` at `child_parent_identity`; keep it
+  unresolved and do not repeat its preview.
+  The prior [0.31.0 conversation log](test-results/evidence/0.31.0-2026-10-24/allplan-conversation-log.md)
+  records historical clues for the original Wall model/view
+  `06d71e4d-193b-483e-8a32-344ade3d612c` /
+  `2d33e5a6-b4e8-444b-94e8-d4d0ae75d622` and tier model/view
+  `4db19151-9090-4b1c-bd50-b6fba6873aff` /
+  `1bdccbc1-6931-46fd-9f1f-f7b8657ac284`; these are not identities freshly
+  verified by the 0.32.0 report. The supplied container UUID
+  `abecfaf0-ad01-45e1-91df-4b32ed9960ae` likewise has unverified lineage.
 - **Slab/MultiSlab:** the [0.27.0 log](test-results/evidence/allplan-chat-log-0.27.0-2026-10-23.md)
   retains the parent-lineage conflict; the
   [latest raw attribute probe](test-results/evidence/0.31.0-2026-10-24/slab-multislab-readonly-evidence.json)

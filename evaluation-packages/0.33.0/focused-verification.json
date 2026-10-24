@@ -1,0 +1,7 @@
+{
+  "command": "PYTHONPATH=tests .venv/bin/python -m unittest test_wall_material_edit test_component_identity test_model_edit test_wall_filter -q",
+  "tests": 118,
+  "result": "PASS",
+  "duration_seconds": 5.787,
+  "native_Allplan": "not_run"
+}

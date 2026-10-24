@@ -6,50 +6,53 @@ and the [documentation policy](documentation-policy.md),
 [testing policy](testing-policy.md) and [development plan](office-editing-development-plan.pl.md)
 before implementation.
 
-## Next task — one 0.32.0 Wall material trial
+## Next task — one bounded 0.33.0 Wall material trial
 
-Native acceptance of 0.32.0 is pending. On the retained project copy, follow
-the [single-path procedure](m4-single-drawing-0.32.0.pl.md) for the original
-**240 mm Wall**, requested material **`Silikat`**. Record the installed
-manifest/checksum, Allplan build, exact identities and raw MCP responses.
+Candidate 0.33.0 is under work; 118 focused affected tests passed. Full CI and
+package verification are pending. Before any native preview, verify the
+installed manifest/checksum and Allplan build, reload PythonHost, then run one
+bounded preview on the original **240 mm Wall** for **`Silikat`**, capturing
+raw MCP responses and fresh Wall/tier `component_identity`. The 0.32.0 preview was
+BLOCKED before writes; do not infer that the 0.33.0 root-container support
+addresses its reported native material-preservation cause. Linked container
+and tier UUIDs were supplied, but their actual lineage is unknown.
 
-- If preview is blocked, retain the first reason/stage/error type and all
-  diagnostic evidence, then obtain fresh `component_identity` for Wall and
-  its exact tier. Record BLOCKED or `fixture_missing`; do not Apply.
-- If eligible, perform one reviewed Apply, fresh material/preservation readback,
-  one UI Undo and restoration readback. An unknown outcome requires recovery
-  with the original execution ID, without retrying setters.
+- If blocked, preserve the first reason/stage/error type and diagnostics,
+  record fresh identities, and stop without Apply.
+- If eligible, perform one reviewed Apply, fresh material/preservation
+  readback, one UI Undo and restoration readback. An unknown outcome requires
+  recovery with the original execution ID, without retrying setters.
 - Do not repeat the **200 mm Wall/opening** material preview or any write.
-  Its `component_child_owner_mismatch` is a separate unresolved case;
-  bounded read-only identity evidence may support later diagnosis.
-- Record the outcome in [validation status](validation-status.md), update this
-  next task and the [development backlog](office-editing-development-plan.pl.md).
-  Do not repeat already accepted journal, scalar, Enum, W1 or grouped Column
-  delete/Undo trials.
+  Its `component_child_owner_mismatch` remains separate. Do not repeat already
+  accepted journal, scalar, Enum, W1 or grouped Column delete/Undo trials.
+- Record native outcome and pending automated checks in
+  [validation status](validation-status.md); remaining work is in the
+  [development backlog](office-editing-development-plan.pl.md).
 
-## Current version — 0.32.0
+## Current candidate — 0.33.0
 
-0.32.0 permits direct `AttributeContainer_TypeUUID` leaves under a single
-Wall tier only after checking container → tier → Wall lineage. Stored
-`ReadAll` values are preserved with bounded JSON codecs and rechecked during
-revalidation/readback. This does not establish field ownership or authorize
-attribute writes. Unsupported/nested children, unsupported values, openings
-and other Wall children remain blocked.
+Candidate 0.33.0 extends guarded Wall material preservation to direct root
+`AttributeContainer_TypeUUID` leaves as well as the existing tier leaves. It
+revalidates the complete parent lineage and `ReadAll` snapshots and records
+`root_attribute_containers`; unsupported root/tier children report owner and
+child identities. This does not establish field ownership or authorize
+attribute writes. The 118 focused checks passed; full CI and package
+verification are pending. Native Allplan acceptance is pending.
 [API details](m4-editing-api-0.32.0.md).
 
-Runtime source `75cd26e31ae1e3ee0d6ef86411b55490cd457302` was delivered in
-[PR #30](https://github.com/blandjelly/allplan-mcp-server-python/pull/30),
-merged into `develop/m4` at `c42adf0377438dcb729df08b0527635301af2e50`.
-161 unique focused checks passed; full CI passed 635 tests per Windows/Ubuntu
-Python 3.12 job and the package job. One clean exact-source fallback ZIP
-passed verification once. Delivery, checksum and provenance are in the
-[0.32.0 package record](../evaluation-packages/0.32.0/README.md).
-**These results do not establish native Allplan acceptance.**
-
-The fake-adapter regressions do not prove the cause of the earlier native
-`wall_material_tier_hierarchy_unsupported`. The material trial is still open;
-priorities 1–5 remain partial. Remaining work and unresolved errors have one
-backlog in the [development plan](office-editing-development-plan.pl.md).
+The 0.32.0 native trial on drawing 101, original 240 mm Wall
+`Ściana, prosta`, material `Beton`, was BLOCKED before writes. The reported
+`wall.native_material` preservation failure cites `wall_tier_child_unsupported`
+at `material_tier_children`,
+`ValueError`, with no evidence. That exact reason is absent from both current
+source and the retained 0.32.0 ZIP, which use
+`wall_material_tier_child_unsupported`; a live/installed host mismatch is
+possible but unproven. Supplied tier UUID
+`4db19151-9090-4b1c-bd50-b6fba6873aff` and container UUID
+`abecfaf0-ad01-45e1-91df-4b32ed9960ae` have unverified lineage. See
+[validation status](validation-status.md#evidence-for-unresolved-cases).
+This observation does not identify the native preservation cause. Priorities
+1–5 remain partial.
 
 ## Prior work needed for continuation
 
