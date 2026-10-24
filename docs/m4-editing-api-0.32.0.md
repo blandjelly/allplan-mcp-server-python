@@ -13,7 +13,7 @@ Focused fake-adapter tests reproduce the prior blanket-child
 rejection and exercise the new bounded path. They do not prove that this was
 the cause of the owner's native 0.31.0 diagnostic. The 200 mm
 Wall-with-opening `component_child_owner_mismatch` remains unresolved and is
-outside this change. See the [0.31.0 owner observation](test-results/m4-owner-observation-0.31.0-2026-10-24.md)
+outside this change. See the [0.31.0 owner observation](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-owner-observation-0.31.0-2026-10-24.md)
 for the supplied native evidence.
 
 ## Accepted child shape and identity checks

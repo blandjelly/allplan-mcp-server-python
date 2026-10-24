@@ -98,7 +98,7 @@ operation.
 
 ## Scope of acceptance
 
-The trial plan at [0.30.0](m4-single-drawing-0.30.0.pl.md) exercises all
+The trial plan at [0.30.0](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/m4-single-drawing-0.30.0.pl.md) exercises all
 available priority 1–5 paths in one session and records blocked work
 explicitly. Existing supported scalar/Enum writes may be tried on concrete,
 previously unaccepted family/type fixtures when those definitions and safe

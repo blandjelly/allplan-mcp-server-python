@@ -61,7 +61,7 @@ and [`model_delete.py`](../python_host/PythonPartsScripts/PythonHost/model_delet
 This comparator is consistent with M1's model-group/view-representation data
 model; it does not establish durable physical identity or explain a particular
 native mismatch. The
-[0.27.0 owner log](test-results/m4-owner-observation-0.27.0-2026-10-23.md)
+[0.27.0 owner log](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-owner-observation-0.27.0-2026-10-23.md)
 reports `component_child_owner_mismatch` for three Column previews and a separate
 Slab/MultiSlab lineage conflict, but it does not retain raw MCP responses or
 an Allplan build identifier. The exact native cause remains unconfirmed. The

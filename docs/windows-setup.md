@@ -1,12 +1,11 @@
 # Windows setup — M4 evaluation
 
-Use the [complete 0.23.0 ZIP](../evaluation-packages/0.23.0/README.md) on the
-Windows machine running Allplan and Codex. External Python **3.11+** (normal
-distribution with Tcl/Tk/launcher) and internet access for locked dependencies
-are required. Allplan/Python/Codex are not bundled. [Acceptance is fixture-bound](validation-status.md).
-The 0.23.0 journal-maintenance trial is pending; follow only its
-[short owner procedure](m4-journal-cleanup-0.23.0.pl.md). Previously accepted
-native observations do not need to be repeated.
+Use the verified ZIP linked from the [current handoff](next-model-handoff.md)
+on the Windows machine running Allplan and Codex. External Python **3.11+**
+(normal distribution with Tcl/Tk/launcher) and internet access for locked
+dependencies are required. Allplan/Python/Codex are not bundled.
+[Acceptance is fixture-bound](validation-status.md). Follow only the current
+scoped trial linked in the handoff; do not repeat accepted native observations.
 
 1. Extract the whole ZIP into a writable versioned folder; never run inside the ZIP.
 2. Close Allplan/MCP and run **Setup.cmd**. Select the actual existing user Local

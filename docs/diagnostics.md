@@ -50,9 +50,10 @@ access or reconciliation. It is not a backup or proof of current values.
 The active execution history holds at most **512 records**, and an individual
 record has a separate **1 MiB** limit. The active diagnostic trace has an
 **8 MiB** limit. At any capacity error, preserve the journal and trace. Never
-delete execution IDs to gain slots. Candidate 0.23.0 provides reviewed,
-confirmed archival through `fix_model_issues`; follow the
-[current owner trial](m4-journal-cleanup-0.23.0.pl.md) before using it. Before
+delete execution IDs to gain slots. Reviewed, confirmed archival through
+`fix_model_issues` preserves unresolved, corrupt and unverifiable records.
+See [validation status](validation-status.md) for its accepted scope and the
+[handoff](next-model-handoff.md) for current work. Before
 migration/restoration close Allplan/MCP and preserve the entire journal, original
 project and logs; bridge backups do not include journal history. Use the
 [M3 contract](m3-execution-contract.md#journal-lifecycle-and-inspection) for limits.

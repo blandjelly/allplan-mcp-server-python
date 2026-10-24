@@ -1,65 +1,78 @@
-# Validation status and retained evidence
+# Validation status and necessary evidence
 
-This page indexes accepted baselines and native observations. Current M4 status
-and next steps are in the [handoff](next-model-handoff.md) and
-[office editing plan](office-editing-development-plan.pl.md). Keep automated
-tests, GitHub CI and native Allplan results distinct.
+Current version and next action: [handoff](next-model-handoff.md).
+Remaining development and unresolved errors:
+[development plan](office-editing-development-plan.pl.md).
+Automated checks, package verification and native Allplan observations are
+separate results; 0.32.0 has no native trial result yet.
 
-## Accepted M0–M3 fixture baseline
+## Accepted baseline and scoped M4 observations
 
-M0–M3 are accepted only within the retained `MCP_QA_DEMO` test project and
-recorded scopes. M3 covers demonstrated one- and two-change scenarios in
-foreground drawing 101; it does not establish arbitrary combinations,
-multi-file writes, durable cross-copy identity or general-purpose office use.
-See the [fixture guide](fixture-guide.md), [M3 execution contract](m3-execution-contract.md),
-and preserved [0.15.0 delivery record](../evaluation-packages/0.15.0/README.md).
-The original M0–M2 acceptance reports remain in the historical baseline at
-[commit 5ec1f57](https://github.com/blandjelly/allplan-mcp-server-python/tree/5ec1f57dd0ebb08e0e2bc19ef23c7440333c7b74/docs/test-results).
+M0–M3 are accepted only for the retained `MCP_QA_DEMO` fixture and recorded
+one-/two-change scenarios in foreground drawing 101. They do not establish
+arbitrary combinations, multi-file writes, cross-copy identity or general
+office use. See the [fixture](fixture-guide.md) and
+[M3 contract](m3-execution-contract.md).
+Original baseline reports remain in
+[Git history](https://github.com/blandjelly/allplan-mcp-server-python/tree/5ec1f57dd0ebb08e0e2bc19ef23c7440333c7b74/docs/test-results).
 
-## Retained M4 native observations
+The following prior outcomes are retained to avoid repeating completed work.
+Except where explicitly supported by source evidence, owner reports lack an
+exact installed manifest/build and do not establish exact-ZIP acceptance.
 
-Each observation has a narrow scope. A pass for one sample or UI action does not
-accept the full M4 workflow.
-
-| Evidence | Recorded scope |
+| Scope to preserve | Evidence and limit |
 | --- | --- |
-| [0.16.0 crash](test-results/m4-native-crash-0.16.0.md) | Broad property discovery crashed; its cause remains unknown and the route stays suspended. |
-| [0.16.1 isolated Column read](https://github.com/blandjelly/allplan-mcp-server-python/blob/96033359842271cc7dd487adca8fcb737042fc95/docs/next-model-handoff.md) | The owner reported one raw Column read between healthy replies in one session; names, layers, UI and writes were not accepted. |
-| [0.17.1 Column observation](test-results/m4-column-layer-observation-0.17.1.md) | Original field binding, two W1 writes and incomplete highlight behavior; see the report for exact limits. |
-| [0.18.1 observations](test-results/m4-native-observation-0.18.1-2026-10-17.md) | Host response and Columns highlight were observed; the Wall sample was blocked before reading. |
-| [0.18.2 Wall observation](test-results/m4-wall-observation-0.18.2.md) | One single-tier Wall read returned 240 mm and `Beton`, matching the UI. |
-| [0.19.0 Wall filter observation](test-results/m4-wall-filter-observation-0.19.0.md) | In drawing 101, 200 mm matched `<240 mm`, 240 mm did not, and the owner confirmed highlight and clear. |
-| [2026-10-17 agent observation](test-results/m4-agent-observation-2026-10-17.md) | Owner-reported fire-classification, query and highlight outcomes plus failed/thin-wall and unsupported operations. |
-| [2026-10-18 observations](test-results/m4-agent-observation-2026-10-18.md) · [v2](test-results/m4-agent-observation-v2-2026-10-18.md) | Owner logs and their interpretation; no exact build claim. |
-| [2026-10-19 observation](test-results/m4-agent-observation-0.21.1-2026-10-19.md) · [follow-up](test-results/m4-agent-followup-2026-10-19.md) | Layer lookup and the multiview recovery blocker; preserve original execution state. |
-| [2026-10-20 observation](test-results/m4-agent-observation-2026-10-20.md) | Owner confirms Slab and Column attribute outcomes; exact installed manifest is absent. |
-| [0.23.0 journal PASS](test-results/m4-journal-cleanup-0.23.0-owner-pass-2026-10-21.md) | Owner-reported preview and confirmed archival of both journals; no exact manifest, native replay/restart or snapshot-conflict evidence supplied. |
-| [0.25.0 owner observation](test-results/m4-owner-observation-0.25.0-2026-10-22.md) | Owner confirms the log matches Allplan 2026.1 during the 0.25.0 run. Limited PASS: Wall and MultiSlab identity reads, one confirmed Wall subtree deletion with fresh complete absence scan, and one 200 mm Wall W1 readback. The exact manifest, raw MCP responses and Allplan build ID are absent; opening/owning-Wall deletion, material/hatch, bulk W1 and no-op/Undo remain blocked or unobserved. Do not repeat successful deletion, identity reads or the 200 mm Wall readback. |
-| [0.27.0 owner observation](test-results/m4-owner-observation-0.27.0-2026-10-23.md) | Owner-reported PASS for lowercase attribute lookup and native-material diagnostics; limited W1 read/write and one UI Undo per changed element. The supplied log reports one separate Wall 240 mm subtree deletion with five descendants absent on a fresh complete scan and two Beam moves/readbacks on W1. Three W1 Columns were blocked at delete preview by `component_child_owner_mismatch`; Slab/MultiSlab lineage remains unresolved. No explicit W1 no-op/zero-setter result, raw MCP responses, exact manifest or Allplan build ID. Do not repeat accepted lookup, diagnostic, deletion or Beam writes. |
+| Read/query/highlight | Scoped Column observation, Wall 240 mm/`Beton` read, and Wall `<240 mm` filter/highlight/clear were observed. Highlight does not establish native selection. [Original observations](https://github.com/blandjelly/allplan-mcp-server-python/tree/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results). |
+| Earlier Slab/Column attributes | Owner confirmed two queried Slab attributes, `Priorytet` on two results and ordered `MCP_QA_MARK` on six Columns. [Source log](test-results/evidence/m4-agent-test-2026-10-20.md). These observations do not resolve current Slab/MultiSlab ownership; an attribute material write is not native material. |
+| Journal archival | 0.23.0 owner PASS: preview and confirmed archive of 614,396 trace bytes and 32 resolved records (739,786 bytes), preserving replay protection. Native restart/replay was not demonstrated by that report. Trial 1 in 0.30.0 was reported PASS without detailed raw evidence for its individual substeps. [Original archival observation](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-journal-cleanup-0.23.0-owner-pass-2026-10-21.md). |
+| Identity, lookup and W1 | Owner reported identity reads, lowercase attribute-name resolution, W1 read/write with one UI Undo per changed element, and 0.30.0 identity/no-op trials PASS. Detailed raw logs for trials 1–3 are absent. Do not infer field ownership, all-family coverage or grouped W1 Undo. [0.27.0 source log](test-results/evidence/allplan-chat-log-0.27.0-2026-10-23.md). |
+| Typed deletion | Separate Wall subtree deletion and Beam W1 moves remain scoped observations. The repaired 0.29.0 three-Column delete trial was reported PASS: fresh scan found Columns/attribute containers absent; one UI Undo restored all three Columns. Tool metadata retained `undo: not_checked`, without automatic post-Undo readback, target UUIDs or exact ZIP manifest. This supersedes the earlier one-of-three Undo failure only for that Column operation. [0.29.0 source log](test-results/evidence/allplan-test-log-0.29.0-2026-10-23.md). |
+| Scalar attributes | Four 0.30.0 pairs: Column text/integer/real and Wall text, each with typed readback and owner-confirmed UI Undo/restoration read. [Detailed log](test-results/evidence/0.30.0-2026-10-23/allplan-attribute-trials-log.md), [persisted requests](test-results/evidence/0.30.0-2026-10-23/allplan-attribute-trial-apply-requests.jsonl). |
+| Wall Enum | ID 120 `Rodzaj rozliczenia`: `m3` → `m2` → `m3`, Apply/readback and owner-confirmed UI Undo; four consistent representations. [Apply request](test-results/evidence/0.31.0-2026-10-24/enum-apply-evidence.json), [execution/readback](test-results/evidence/0.31.0-2026-10-24/enum-apply-execution-evidence.json), [Undo readback](test-results/evidence/0.31.0-2026-10-24/enum-undo-evidence.json). Metadata still says `allplan_acceptance=not_run`, `runtime_verified=false`; no exact installed ZIP attribution. |
+| Wall CheckBox | ID 1371 has only [post-Undo readback](test-results/evidence/0.31.0-2026-10-24/boolean-checkbox-undo-evidence.json): value 0, SDK Integer 73. No raw Apply evidence; this is not an accepted complete Boolean cycle. |
 
-Raw owner logs are retained unmodified under
-[test-results/evidence](test-results/evidence/). Source CI and package checks
-are recorded separately in each [evaluation package](../evaluation-packages/).
+Do not repeat these accepted scopes or generalize them to other family/type
+pairs. Missing fixtures and blocked paths are separate from PASS.
 
-## Safeguards and limits
+## Evidence for unresolved cases
 
-- Keep exact project/document and target identity checks, preview binding,
-  revalidation, journaling, replay, fresh readback and controlled recovery.
-- A lost write response or unknown outcome remains blocked under the original
-  execution ID. Do not retry setters or discard journal state to free capacity.
-- Candidate 0.28.0 sets active execution history to 512 records, retains the
-  1 MiB per-record bound, raises the active diagnostic trace limit to 8 MiB and
-  trace-inspection limit to 32 MiB, and bounds archive inventory at 1 GiB / 1024
-  files. Full CI and exact fallback ZIP verification passed; see the
-  [0.28.0 evaluation record](../evaluation-packages/0.28.0/README.md). Confirmed
-  archive cleanup continues to preserve unresolved, corrupt and unverifiable
-  records. The 0.23.0 owner PASS covers its original bounded archival scope
-  only; native restart/replay remains unobserved.
-- Native selection, native material writes, full typed-delete coverage/Undo,
-  the complete six-family matrix,
-  multi-file writes, whole-project access, long-term/concurrent stability,
-  broader Undo and cross-copy identity remain unaccepted.
+- **Wall material:** latest [conversation log](test-results/evidence/0.31.0-2026-10-24/allplan-conversation-log.md)
+  records both previews blocked before Apply, with no changes and zero setters.
+  In drawing 101, 240 mm Wall model
+  `06d71e4d-193b-483e-8a32-344ade3d612c`, view
+  `2d33e5a6-b4e8-444b-94e8-d4d0ae75d622`; tier model
+  `4db19151-9090-4b1c-bd50-b6fba6873aff`, view
+  `1bdccbc1-6931-46fd-9f1f-f7b8657ac284`.
+  Material `Beton` → requested `Silikat` was blocked by
+  `wall_material_tier_hierarchy_unsupported`, stage `material_tier_hierarchy`,
+  `ValueError`. The separate 200 mm Wall model
+  `545bb0a2-a054-4c91-ac6c-ec552d5b0c18`, material `Cegła`, returned
+  `component_child_owner_mismatch`, stage `child_parent_identity`,
+  `ValueError`. These are conversation observations, without raw material
+  MCP responses or exact installed manifest. Identities are historical clues;
+  refresh them before the permitted next action.
+- **Slab/MultiSlab:** the [0.27.0 log](test-results/evidence/allplan-chat-log-0.27.0-2026-10-23.md)
+  retains the parent-lineage conflict; the
+  [latest raw attribute probe](test-results/evidence/0.31.0-2026-10-24/slab-multislab-readonly-evidence.json)
+  retains view differences, incomplete Slab evidence and unestablished field
+  ownership. No new Slab/MultiSlab write was performed.
+- **Multiview recovery:** the [owner follow-up](test-results/evidence/m4-agent-followup-blocker-2026-10-19.md)
+  records unresolved execution `4388b04e39a14fac811db4f58723d01f`.
+  Native resolution has not been recorded.
+- **Broad property crash:** [original analysis and source evidence](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-native-crash-0.16.0.md).
+  Allplan 2026-1-7 failed during `/model-properties`; no native stack
+  established the reader/cause. Broad discovery remains suspended.
 
-The exact delivered packages and their verification records are immutable
-historical evidence. Documentation cleanup does not authorize rebuilding,
-reinstalling, or repeating their native trials.
+The [backlog](office-editing-development-plan.pl.md) specifies the remaining
+contracts, fixture gaps and acceptance criteria. Preserve all target,
+revalidation, journal, replay and unknown-result guards.
+
+## Historical records
+
+Superseded release narratives, interpreted observations and trial plans were
+removed from the working documentation. Their original contents remain at the
+[pinned pre-cleanup revision](https://github.com/blandjelly/allplan-mcp-server-python/tree/c42adf0377438dcb729df08b0527635301af2e50).
+Raw evidence linked above remains unchanged. Evaluation ZIPs, machine-readable
+CI/package records and build/verification logs remain preserved; no old package
+was rebuilt or reverified. Versioned API research retains its original scope
+and is not a source for current candidate or acceptance status.
