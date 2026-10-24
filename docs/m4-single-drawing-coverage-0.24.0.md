@@ -14,9 +14,9 @@ Wall native-material preview as FAIL before Apply. The supplied raw log covers
 trial 5 only: four scalar writes (Column text/integer/real and Wall text) each
 had typed readback and one UI Undo/restoration read. Trial 4 had two blocked
 previews with zero changes and setters; its owner-reported symptoms and limits
-are in the [scoped observation](test-results/m4-owner-observation-0.30.0-2026-10-23.md).
+are in the [scoped observation](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-owner-observation-0.30.0-2026-10-23.md).
 These outcomes are not bound to the exact ZIP because its installed manifest
-was not supplied. See the [0.30.0 delivery record](../evaluation-packages/0.30.0/README.md),
+was not supplied. See the [0.30.0 delivery record](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/evaluation-packages/0.30.0/README.md),
 [trial 5 log](test-results/evidence/0.30.0-2026-10-23/allplan-attribute-trials-log.md)
 and [persisted Apply requests](test-results/evidence/0.30.0-2026-10-23/allplan-attribute-trial-apply-requests.jsonl).
 
@@ -42,9 +42,9 @@ Focused tests reproduce and fix a same-model alternate-parent
 wrapper defect in the Wall preservation snapshot. The exact native branch for
 the first 0.30.0 diagnostic is unproven without raw lineage/children data. The
 second Wall-with-opening diagnostic `component_child_owner_mismatch` remains
-unresolved. See the [0.31.0 evaluation record](../evaluation-packages/0.31.0/README.md),
+unresolved. See the [0.31.0 evaluation record](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/evaluation-packages/0.31.0/README.md),
 [API note](m4-editing-api-0.31.0.md) and
-[narrow native trial plan](m4-single-drawing-0.31.0.pl.md).
+[narrow native trial plan](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/m4-single-drawing-0.31.0.pl.md).
 
 The 0.30.0 `attribute_evidence` probe and no-op evidence contract do not add
 date/vector setters, native selection, or Slab/MultiSlab field ownership.
@@ -52,7 +52,7 @@ Neither candidate closes priorities 1–5. Runtime/native owner, payload and
 selection contracts remain prerequisites to full completion. Earlier accepted
 scope and historical evidence below remain in force. The owner reports PASS for
 all steps of the 0.29.0 Column grouped-delete/Undo trial; its scope and evidence
-limits are recorded in the [0.29.0 observation](test-results/m4-owner-observation-0.29.0-2026-10-23.md).
+limits are recorded in the [0.29.0 observation](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-owner-observation-0.29.0-2026-10-23.md).
 
 Final 0.28.0 source `b59ef15d9bfd4dfb42476b240e31b5b300268d2d` is on PR #26
 targeting `develop/m4`. CI run
@@ -63,7 +63,7 @@ a normal-proxy transfer failed with `URLError` before an HTTP status. One
 fallback build from clean exact source (`source_modified=false`) passed exact
 ZIP verification on the first attempt: 186 payload files, 42 bridge hashes,
 SHA-256 `74099ec341cdf8b2bc87def42487fafbbbcdb963ec6f4b8859a412f7b6d064ed`.
-See the [0.28.0 evaluation record](../evaluation-packages/0.28.0/README.md).
+See the [0.28.0 evaluation record](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/evaluation-packages/0.28.0/README.md).
 
 Final 0.27.0 source `e62a50c9c6c6b51978b6f1a55f9d9978eee5b1c3`, merged as
 `23b8b2591d7be0721fe7a5651379408e7a2f5e76`, passed full CI
@@ -74,7 +74,7 @@ single exact fallback ZIP verification passed from clean source
 `eab80cd2c907e7fd90ba733f4f8d1335f097986b938c74ccdda6bf3382cdaa30`; 42
 bridge hashes; registration, frozen sync/import, upgrade from and restore to
 0.26.0; and journal/trace/log/archive marker preservation. The original CI ZIP
-was not delivered. See the [0.27.0 package record](../evaluation-packages/0.27.0/README.md).
+was not delivered. See the [0.27.0 package record](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/evaluation-packages/0.27.0/README.md).
 The separate focused record reports 143 unique
 affected/dependent tests across iterations. The later owner-reported 0.27.0
 trial is limited and is not tied to this exact package; priorities 1–5 remain
@@ -84,7 +84,7 @@ Candidate source `48e64b1a06bef005c26a143860d9257038cccde3` passed CI run
 39822585188 (580 tests on Windows and 580 on Ubuntu, Python 3.12, plus package
 job). The exact delivered fallback ZIP passed package verification; the CI ZIP
 could not be transferred through the proxy. See the
-[0.26.0 record](../evaluation-packages/0.26.0/README.md) for provenance and
+[0.26.0 record](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/evaluation-packages/0.26.0/README.md) for provenance and
 verification artifacts. No owner observation existed at package delivery.
 The later bounded owner observation is recorded below; full native acceptance
 remains incomplete.
@@ -183,7 +183,7 @@ do not expose exception text. Post-write observation still requires the full
 preservation snapshot. No native material write is accepted.
 
 The 0.27.0 owner report and attached chat log are recorded in the
-[scoped observation](test-results/m4-owner-observation-0.27.0-2026-10-23.md):
+[scoped observation](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-owner-observation-0.27.0-2026-10-23.md):
 reported PASS for lowercase attribute lookup and material diagnostics; reported
 W1 read/write with one element per UI Undo; one Wall 240 mm subtree deletion
 with five descendants absent on a fresh complete scan; and two Beam readbacks
@@ -193,7 +193,7 @@ There is no explicit no-op/zero-setter result, no raw MCP payload, exact
 installed manifest or Allplan build ID. The results are not tied to the exact
 0.27.0 ZIP. Do not repeat accepted targets or actions. The earlier supplied
 0.26.0 conversation log is recorded in the
-[0.26.0 scoped observation](test-results/m4-owner-observation-0.26.0-2026-10-22.md):
+[0.26.0 scoped observation](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-owner-observation-0.26.0-2026-10-22.md):
 26/26 identities enumerated with 7 `observed` and 19 `not_checked`; two
 confirmed layer changes/readbacks on one Column; and one Wall highlight
 submission without a logged view result or native selected-element count.
@@ -201,9 +201,9 @@ The assistant's stated opening blocker conflicts with the later empty `blocked`
 arrays and has no raw diagnostic, so the cause is unverified. No material
 change, delete, no-op or Undo was recorded in that 0.26.0 log. The later
 0.28.0 Column trial and its outcome are recorded in the
-[0.28.0 trial record](m4-single-drawing-0.28.0.pl.md); its grouped-Undo failure
+[0.28.0 trial record](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/m4-single-drawing-0.28.0.pl.md); its grouped-Undo failure
 was superseded by the limited 0.29.0 owner-reported PASS above. The next
-material-path trial is [0.31.0](m4-single-drawing-0.31.0.pl.md).
+material-path trial is [0.31.0](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/m4-single-drawing-0.31.0.pl.md).
 
 ## Priority status
 
@@ -237,6 +237,6 @@ material-path trial is [0.31.0](m4-single-drawing-0.31.0.pl.md).
 
 These scoped outcomes do not close priorities 1–5. See the
 [development plan](office-editing-development-plan.pl.md),
-[0.30.0 owner observation](test-results/m4-owner-observation-0.30.0-2026-10-23.md),
+[0.30.0 owner observation](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-owner-observation-0.30.0-2026-10-23.md),
 [0.31.0 API note](m4-editing-api-0.31.0.md) and
-[0.31.0 trial plan](m4-single-drawing-0.31.0.pl.md).
+[0.31.0 trial plan](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/m4-single-drawing-0.31.0.pl.md).

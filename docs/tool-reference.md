@@ -136,7 +136,7 @@ Bridge `/model-properties`, schema `m4-properties-1`. The 0.16.0 native gate
 failed with an Allplan crash on its first request. Valid requests now return
 native_probe_blocked **before build/document/API reads**. Do not repeat the broad
 experiment. No runtime/writable support may be inferred from its portable tests.
-[Incident and limits](test-results/m4-native-crash-0.16.0.md).
+[Incident and limits](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-native-crash-0.16.0.md).
 
 The dormant implementation has also stopped unconditional GetEnumValues calls.
 That code issue is not a proven explanation of the crash. The former automatic
@@ -198,7 +198,7 @@ Candidate 0.26.0 adds `drawing_identity` for a bounded inventory of one
 foreground drawing. This inventories model/view identity, lineage, and native
 representation across pages; it does not turn a structural inventory into
 field ownership, nor merge Slab/MultiSlab targets. See the
-[0.26.0 short trial](m4-single-drawing-0.26.0.pl.md).
+[0.26.0 short trial](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/m4-single-drawing-0.26.0.pl.md).
 
 From 0.24.0, typed model-edit plans include slab ownership evidence. Slab
 children and all MultiSlab aggregate writes are blocked pending an explicit
@@ -299,7 +299,7 @@ API basis checked against Allplan 2026:
 ## model_wall_filter — M4 wall thickness filter
 
 Schema `m4-wall-filter-1`, bridge `/model-wall-filter`; 0.19.0 source, CI and exact
-package checks passed; [scoped native filter/highlight/clear PASS](test-results/m4-wall-filter-observation-0.19.0.md). The request
+package checks passed; [scoped native filter/highlight/clear PASS](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-wall-filter-observation-0.19.0.md). The request
 contains `action=query|highlight`, one explicit `drawing_file`, optional
 `threshold={value,unit}` (`mm`, `cm`, `m`; default 24 cm), optional up to 100
 distinct canonical nonzero `exclude_model_uuids`, and `max_walls` (default 20,
@@ -340,7 +340,7 @@ they require owner observation. `native_selection=unsupported`,
 does not read material, attributes, or metadata and invokes no setters. The
 owner workflow saves a pending record and fsyncs it before each MCP call,
 brackets the filter call with same-session health, and never retries a lost
-reply. See the [0.19.0 owner observation](test-results/m4-wall-filter-observation-0.19.0.md).
+reply. See the [0.19.0 owner observation](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-wall-filter-observation-0.19.0.md).
 
 ## model_edit — typed edits, exact deletion and Wall material
 
@@ -427,7 +427,7 @@ match the requested material and the bound preservation evidence. Drift or an
 incomplete observation blocks Apply or leaves recovery to the same execution
 ID; setters are never retried. This adapter is experimental and has no native
 Allplan acceptance yet. The narrow trial is in
-[the archived 0.25.0 instructions](m4-single-drawing-0.25.0.pl.md); SDK evidence
+[the archived 0.25.0 instructions](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/m4-single-drawing-0.25.0.pl.md); SDK evidence
 and its limits are in [the API note](m4-editing-api-0.25.0.md).
 
 For candidate 0.26.0, a fresh read-only preview of the exact existing blocked
@@ -675,7 +675,7 @@ checked again. Shared M3 journal/preflight/readback/recovery limits apply (up to
 never invokes setters. This is highlighting, not native selection, as agreed
 for this workflow.
 The historical 0.17.1 native observation is retained in
-[the observation record](test-results/m4-column-layer-observation-0.17.1.md).
+[the observation record](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-column-layer-observation-0.17.1.md).
 
 The 0.17.1 native observation confirmed the field binding and two writes but
 submitted only two highlight targets, omitting a matching no-op. The owner later
@@ -712,7 +712,7 @@ real value and must not be treated as absent or false. W1 is resolved by its
 native name/ID round trip and is a positive ID. The 0.26.0 implementation change
 is covered by automated tests; native verification is limited to a fresh
 read-only current-layer observation if the exact Wall reports ID 0. See the
-[0.26.0 short trial](m4-single-drawing-0.26.0.pl.md).
+[0.26.0 short trial](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/m4-single-drawing-0.26.0.pl.md).
 
 `model_query` adds optional layer_resolution=adapter (default) or component.
 Component resolution requires semantic_component and reads Wall layer_id from
@@ -768,5 +768,5 @@ accepts up to 32 MiB of legacy oversized data. Beyond these bounds or on I/O
 failure, maintenance fails safely and keeps the data. Oversized/unverifiable
 execution records are not deleted to unblock writes.
 
-[Owner trial](m4-journal-cleanup-0.23.0.pl.md) ·
+[Owner trial](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/m4-journal-cleanup-0.23.0.pl.md) ·
 [Current development plan](office-editing-development-plan.pl.md).

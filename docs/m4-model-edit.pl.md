@@ -77,7 +77,7 @@ kwalifikowane tylko dla dokładnie jednego `WallTier_TypeUUID` z lineage
 `wall_material_child_type_unsupported`. Nieznany Door/Window/Macro nie jest
 obsługiwany. Post-write readback nadal wymaga pełnego preservation snapshot;
 sam odczyt materiału nie wystarcza. Szczegóły próby 0.27.0 są w
-[krótkim trialu](m4-single-drawing-0.27.0.pl.md).
+[krótkim trialu](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/m4-single-drawing-0.27.0.pl.md).
 
 Resolver 0.27.0 dla każdego `model_edit` bind sprawdza ograniczone warianty
 nazwy: podaną postać, trim/NFC, pierwszą literę wielką, całość wielkimi i

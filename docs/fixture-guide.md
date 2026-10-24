@@ -50,7 +50,7 @@ read only the first Wall in model UUID order: **240 mm**, raw material
 read. The ten-component baseline above remains historical evidence, not a
 fresh count of this later fixture state. Keep both Walls; do not alter the
 fixture to force selection of the 200 mm Wall.
-[Observation and original reports](test-results/m4-wall-observation-0.18.2.md).
+[Observation and original reports](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-wall-observation-0.18.2.md).
 
 ## Accepted observations and current state
 
