@@ -1,5 +1,6 @@
 """Public MCP HTTP contract for native Wall material editing."""
 import unittest
+import json
 from types import SimpleNamespace
 from uuid import uuid4
 
@@ -39,6 +40,11 @@ class WallMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
         async with Client(self.url, timeout=10) as client:
             preview = (await client.call_tool("model_edit", {"request": request})).data
             self.assertEqual(preview["counts"]["changes"], 1)
+            records = [json.loads(line) for line in native.native.plans.trace_path.read_text(encoding="utf-8").splitlines()]
+            material_reads = [row for row in records if row["api"] == "WallTierProperties.Material"]
+            self.assertTrue(material_reads)
+            self.assertEqual({row["model_uuid"] for row in material_reads},
+                             {preview["changes"][0]["ref"]["model_uuid"]})
             self.assertEqual(preview["changes"][0]["resource"]["tier_index"], 1)
             axis_state = preview["changes"][0]["resource"]["native_material_state"]["auxiliary_components"]["tier"][0]
             self.assertEqual(axis_state["ownership"]["target"]["type_name"], "WallAxis_TypeUUID")

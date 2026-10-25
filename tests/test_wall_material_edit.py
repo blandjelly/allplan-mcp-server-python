@@ -1,9 +1,11 @@
 """Single-tier native Wall material edits with detached SDK object fakes."""
 import copy
 import importlib
+import json
 import sys
 import types
 import unittest
+import weakref
 from types import SimpleNamespace
 from uuid import uuid4
 from unittest.mock import PropertyMock, patch
@@ -171,6 +173,100 @@ class WallMaterialEditTests(unittest.TestCase):
         self.assertTrue(self.native.apply(plan, execution_id)["replayed"])
         self.assertEqual(self.native.base.ModifyElements.call_count, 1)
         self.assertEqual(self.preview()["state"], "no_op")
+
+    def test_detailed_tier_keeps_its_native_owners_through_optional_reads(self):
+        module = importlib.import_module(self.native.module.__package__ + ".wall_material")
+        owners = []
+
+        class BorrowedTier(TierProperties):
+            def __getattribute__(self, name):
+                if name in module._SCALARS or name in {"CommonProperties", "PlaneReferences", "SurfaceElementProperties"}:
+                    refs = object.__getattribute__(self, "owner_refs")
+                    if any(ref() is None for ref in refs):
+                        raise RuntimeError("Native property owner was released")
+                return super().__getattribute__(name)
+
+        def get_wall(_adapter):
+            props = WallProperties(self.material)
+            native = FakeWallElement(props)
+            tier = BorrowedTier(self.material)
+            tier.owner_refs = weakref.ref(native), weakref.ref(props)
+            props._tiers = [tier]
+            owners.append(tier.owner_refs)
+            return native
+
+        self.native.base.GetElement.side_effect = get_wall
+        _, state, native, props = module.snapshot(self.native.base, self.root)
+        self.assertEqual(len(owners), 2)  # Keep the independent material comparison.
+        self.assertEqual(state["optional_properties"]["tier"]["Thickness"], 240.0)
+        self.assertEqual(state["optional_properties"]["common"]["Pen"], 5)
+        self.assertIs(owners[1][0](), native)
+        self.assertIs(owners[1][1](), props)
+        self.assertTrue(all(ref() is None for ref in owners[0]))
+        self.native.base.ModifyElements.assert_not_called()
+
+    def test_second_material_read_still_rejects_drift(self):
+        module = importlib.import_module(self.native.module.__package__ + ".wall_material")
+        count = [0]
+
+        def get_wall(_adapter):
+            count[0] += 1
+            return FakeWallElement(WallProperties(self.material if count[0] == 1 else "changed"))
+
+        self.native.base.GetElement.side_effect = get_wall
+        self.native.assert_code("repair_conflict", lambda: module.snapshot(self.native.base, self.root))
+        self.native.base.ModifyElements.assert_not_called()
+
+    def test_material_trace_is_durable_before_getter_and_has_exact_root_view(self):
+        path = self.native.plans.trace_path
+        accesses = []
+
+        def material(*args):
+            if args:  # The fake's constructor sets its detached property.
+                return
+            records = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+            last = records[-1]
+            self.assertEqual((last["api"], last["state"]), ("WallTierProperties.Material", "started"))
+            self.assertEqual(last["drawing_file"], 101)
+            self.assertEqual(last["model_uuid"], self.root.GetModelElementUUID())
+            self.assertEqual(last["view_uuid"], self.root.GetElementUUID())
+            accesses.append(last)
+            return "C20/25"
+
+        with patch.object(TierProperties, "Material", new_callable=PropertyMock, create=True) as value:
+            value.side_effect = material
+            plan = self.preview()
+        self.assertTrue(plan["apply_available"], plan)
+        self.assertTrue(accesses)
+        trace_text = path.read_text(encoding="utf-8")
+        self.assertNotIn("C20/25", trace_text)
+        self.assertNotIn("C35/45", trace_text)
+        self.native.base.ModifyElements.assert_not_called()
+
+    def test_trace_failure_prevents_material_getter_and_remains_a_bridge_error(self):
+        module = importlib.import_module(self.native.module.__package__ + ".wall_material")
+        trace_module = importlib.import_module(self.native.module.__package__ + ".property_probe")
+        trace = trace_module.NativeProbeTrace(self.native.plans.trace_path, "material_test")
+        record = trace.record
+        accesses = []
+
+        def record_or_stop(api, state, **details):
+            if api == "WallTierProperties.Material" and state == "started":
+                raise self.native.module.BridgeError("probe_trace_unavailable", "Injected storage failure", 409)
+            return record(api, state, **details)
+
+        def material(*args):
+            if not args:
+                accesses.append(True)
+            return "C20/25"
+
+        trace.record = record_or_stop
+        with patch.object(TierProperties, "Material", new_callable=PropertyMock, create=True) as value:
+            value.side_effect = material
+            self.native.assert_code("probe_trace_unavailable", lambda: module.preview_observation(
+                self.native.base, self.root, trace=trace))
+        self.assertEqual(accesses, [])
+        self.native.base.ModifyElements.assert_not_called()
 
     def test_material_accepts_same_model_parent_view_and_binds_observed_edge(self):
         parent_view = self.alternate_wall_view(20)

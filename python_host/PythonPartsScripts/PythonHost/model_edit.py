@@ -273,8 +273,11 @@ def observe(plans, doc, base, settings, request):
         from .wall_material import preview_observation as material_observation, consensus_key
         for element in snapshot["elements"]:
             representations = live.get((element["ref"]["drawing_file"], element["ref"]["model_uuid"]), {})
-            values = [(view, trace.call("Native.material_observation", lambda adapter=adapter:
-                       material_observation(base, adapter, check)))
+            values = [(view, trace.call("Native.material_observation", lambda adapter=adapter, view=view:
+                       material_observation(base, adapter, check, trace=trace,
+                                            trace_ref={**element["ref"], "view_uuid": view}),
+                       drawing_file=element["ref"]["drawing_file"], model_uuid=element["ref"]["model_uuid"],
+                       view_uuid=view))
                       for view in sorted(representations) for adapter in representations[view]]
             if values and len({consensus_key(value) for _, value in values}) == 1 and not element["view_identity_not_checked"]:
                 (element["fields"]["native.material"], element["native_material_state"],
