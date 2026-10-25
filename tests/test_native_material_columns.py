@@ -171,7 +171,7 @@ class ColumnMaterialTests(unittest.TestCase):
 
 class MaterialAttributeRegressionTests(unittest.TestCase):
     def test_exact_project_material_attribute_still_edits_wall_and_column(self):
-        for kind in ("Wall_TypeUUID", "Column_TypeUUID"):
+        for kind in ("Wall_TypeUUID", "Column_TypeUUID", "Beam_TypeUUID", "SkeletonBeam_TypeUUID"):
             with self.subTest(kind=kind):
                 native = test_model_edit.ModelEditTests()
                 native.setUp()

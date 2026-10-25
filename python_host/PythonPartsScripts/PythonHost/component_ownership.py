@@ -133,7 +133,7 @@ def observation(adapter, check=lambda: None, *, include_children=True):
         return failure(exc)
 
 
-def slab_write_blocker(evidence):
+def slab_write_blocker(evidence, change=None):
     """No automatic redirection from slab tiers or aggregates to a field owner."""
     if not isinstance(evidence, dict) or evidence.get("status") != "observed":
         return "slab_ownership_unavailable"
@@ -142,11 +142,49 @@ def slab_write_blocker(evidence):
         return "slab_ownership_unavailable"
     lineage, target = value.get("lineage"), value.get("target")
     if (value.get("parent_chain_complete") is not True or not isinstance(lineage, list) or not lineage
+            or any(not isinstance(ref, dict) for ref in lineage)
             or not isinstance(target, dict) or target.get("type_name") not in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}
             or lineage[0] != target or value.get("terminal_root") != lineage[-1]):
         return "slab_ownership_unavailable"
+    resource = (change or {}).get("resource") or {}
+    if resource.get("property_owner") == "selected_element":
+        # This is an explicit adapter target for ChangeAttributes, not an
+        # inference that the aggregate and its tiers are interchangeable.
+        ref = change.get("ref") or {}
+        if (change.get("operation") not in {"set_attribute", "add_attribute"}
+                or change.get("native_type") != target["type_name"]
+                or any(target.get(key) != ref.get(key) for key in ("drawing_file", "model_uuid", "type_uuid"))
+                or target.get("view_uuid") != change.get("target_view_uuid")
+                or value.get("children_complete") is not True
+                or (len(lineage) != 1 and not (len(lineage) == 2
+                    and target["type_name"] == "Slab_TypeUUID"
+                    and lineage[1].get("type_name") == "MultiSlab_TypeUUID"))):
+            return "slab_explicit_property_owner_invalid"
+        return None
+    if "property_owner" in resource:
+        return "slab_explicit_property_owner_invalid"
     if len(lineage) != 1:
         return "slab_has_parent_requires_explicit_property_owner"
     if target["type_name"] == "MultiSlab_TypeUUID":
         return "aggregate_slab_requires_explicit_property_owner"
     return None
+
+
+def overlapping_slab_owners(changes):
+    """Reject separate edits of an aggregate and its selected tier in one plan."""
+    selected = {(c["ref"]["drawing_file"], c["ref"]["model_uuid"]) for c in changes}
+    for change in changes:
+        resource = change.get("resource") or {}
+        material = resource.get("native_material_state") or {}
+        ownership = resource.get("component_ownership") or {}
+        hierarchy = material.get("hierarchy") if isinstance(material, dict) else None
+        if not isinstance(hierarchy, dict):
+            hierarchy = ownership.get("value") if isinstance(ownership, dict) else None
+        if not isinstance(hierarchy, dict):
+            continue  # The field-specific validator rejects malformed evidence.
+        lineage = hierarchy.get("lineage", [])
+        if not isinstance(lineage, list) or any(not isinstance(ref, dict) for ref in lineage):
+            continue
+        if any((ref["drawing_file"], ref["model_uuid"]) in selected for ref in lineage[1:]):
+            return True
+    return False

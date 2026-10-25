@@ -53,35 +53,42 @@ Kryterium musi osobno ustalić, czy taka wartość ma znaczyć brak.
 
 ## Cele i rozdzielenie pól
 
-`model_edit` zapisuje tylko jawnie związany atrybut przez
-`ElementsAttributeService.ChangeAttributes` albo nazwę warstwy organizacyjnej
-przez `ElementsLayerService.ChangeLayer`. Nazwa atrybutu jest rozwiązywana w
-bieżącym dokumencie i sprawdzana w obie strony; warstwa `W1` również wymaga
-roundtrip nazwa–ID. Narzędzie nie tworzy definicji atrybutów ani warstw;
-może dodać już istniejącą definicję atrybutu do elementu.
+`model_edit` zapisuje jawnie związany atrybut przez
+`ElementsAttributeService.ChangeAttributes`, warstwę organizacyjną przez
+`ElementsLayerService.ChangeLayer` albo natywny materiał przez właściwości
+istniejącego obiektu SDK i `ModifyElements`. Nazwa atrybutu i warstwa wymagają
+roundtrip nazwa–ID. Narzędzie nie tworzy definicji atrybutów ani warstw; może
+dodać istniejącą definicję atrybutu do elementu.
 
-Przykład `Beton C37` w tym narzędziu oznacza dokładnie wskazany atrybut tekstowy.
-To oddzielne od natywnego `WallTierProperties.Material`, powierzchni
-wizualnej i warstwy organizacyjnej. Ścieżka `native_material` pozostaje
-eksperymentalna i fail-closed. Odczytana wartość starego materiału jest osobna
-od dowodu, że ścianę można bezpiecznie zachować podczas zmiany. Preview może
-pokazać starą wartość jako `observed`, a jednocześnie zablokować operację jako
-`native_material_preservation_unavailable`; szczegóły są w
-`criteria.operation_eligibility_failures` (obecnie wyłącznie blokady
-preservation natywnego materiału Wall), a `criteria.required_field_failures`
-wykazuje wyłącznie nieodczytane wymagane pola docelowe i może być puste.
-Błędy kryterium pozostają w `report.criterion_failures`. Kandydat 0.34.0 nadal
-wymaga jednego `WallTier_TypeUUID` z lineage `[tier, Wall root]`, lecz nie
-odrzuca samego typu potomka: oś, otwór, makro i zagnieżdżone metadane mogą
-wejść do ograniczonego drzewa dowodów zachowania ściany. To nie uprawnia do
-osobnej edycji tych potomków. Tożsamość i relacje rodzic–dziecko muszą być
-spójne, a wartości `ReadAll` kontenerów atrybutów odczytywalne. Geometria
-pomocnicza ma hash strumienia, gdy SDK to umożliwia; w przeciwnym razie
-`not_checked` nie blokuje wyłącznie z tego powodu. Nie dowodzi to zachowania
-wszystkich ukrytych właściwości potomków. Odczyt po zapisie nadal porównuje
-cały zapisany snapshot; sam materiał nie wystarcza. Szczegóły kontraktu są w
-[opisie API](m4-editing-api-0.32.0.md), a następna próba z przypadkami brzegowymi
-w [handoffie](next-model-handoff.md).
+Atrybut „Materiał”, materiał natywny, powierzchnia wizualna i warstwa
+organizacyjna mają osobne powiązania. Natywny materiał używa
+`target={"kind":"native_material","tier_index":1}` oraz dokładnego tekstu.
+Obsługiwane są Wall z jednym natywnym tierem, Column, Beam/SkeletonBeam i
+Slab/MultiSlab. Reprezentacja SDK jest sprawdzana w czasie odczytu. Dla ściany
+właścicielem jest `WallTierProperties(1)`, dla pozostałych rodzin właściwości
+wybranego obiektu: `ColumnProperties`, `BeamProperties`,
+`StructuralBeamProperties` lub `SlabProperties`. Dla stropu nie następuje
+przekierowanie do rodzica, potomka ani `SlabTierProperties`.
+
+Atrybut stropu może jawnie wskazać `target.property_owner="selected_element"`.
+Należy zawęzić `native_types` do zamierzonego Slab albo MultiSlab i sprawdzić
+jego dokładny ref, view, lineage i dzieci w planie. Nie wolno objąć jednym
+planem zarówno agregatu, jak i jego warstwy. Brak właściciela nadal blokuje
+atrybuty agregatu i podrzędnej płyty; warstwy organizacyjne zachowują osobne
+ograniczenia własności.
+
+Odczyt materiału i dostępność bezpiecznego zapisu są osobnymi wynikami.
+`criteria.operation_eligibility_failures` pokazuje blokadę właściciela/settera,
+a `criteria.required_field_failures` nieodczytane wymagane pola docelowe.
+Geometria, formatowanie i pomocnicze metadane są obserwowane niezależnie, gdy
+SDK je udostępnia. Niedostępność dowodu opcjonalnego jest jawnie oznaczona
+`not_checked`; każdy uzyskany dowód pozostaje porównywany przed zapisem i przy
+świeżym readback. Nie dowodzi to zachowania wszystkich ukrytych właściwości.
+
+Niezgodność przed zapisem blokuje setter. Nieznany wynik po zapisie wymaga
+recovery z tym samym `execution_id`, bez ponawiania settera. Szczegóły są w
+[opisie API](m4-editing-api-0.32.0.md), a stan odbioru i następny krok w
+[handoffie](next-model-handoff.md).
 
 Resolver 0.27.0 dla każdego `model_edit` bind sprawdza ograniczone warianty
 nazwy: podaną postać, trim/NFC, pierwszą literę wielką, całość wielkimi i

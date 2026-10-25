@@ -1,4 +1,4 @@
-"""Native Wall/Column material edits with optional preservation evidence.
+"""Native architectural material edits with optional preservation evidence.
 
 No definition enumeration, catalog creation, attribute or surface substitution.
 Only the existing represented object is submitted to ModifyElements.
@@ -25,7 +25,30 @@ _MAX_ATTRIBUTE_CONTAINERS = 64
 _MAX_ATTRIBUTE_SNAPSHOT_BYTES = 256 * 1024
 _MAX_AUXILIARY_COMPONENTS = 256
 _MAX_COMPONENT_SNAPSHOT_BYTES = 1024 * 1024
-_STATE_SCHEMA = "m4-native-material-state-2"
+_STATE_SCHEMA = "m4-native-material-state-3"
+_NATIVE_CLASSES = {
+    "Wall_TypeUUID": ("WallElement",),
+    "Column_TypeUUID": ("ColumnElement",),
+    "Beam_TypeUUID": ("BeamElement", "StructuralBeamElement"),
+    "SkeletonBeam_TypeUUID": ("BeamElement", "StructuralBeamElement"),
+    "Slab_TypeUUID": ("SlabElement",),
+    "MultiSlab_TypeUUID": ("SlabElement",),
+}
+_MATERIAL_OWNERS = {"WallElement": "wall_tier_1", "ColumnElement": "column_properties",
+                    "BeamElement": "beam_properties", "StructuralBeamElement": "structural_beam_properties",
+                    "SlabElement": "slab_properties"}
+
+
+def _supported_lineage(hierarchy):
+    if not isinstance(hierarchy, dict):
+        return False
+    lineage = hierarchy.get("lineage", [])
+    target = hierarchy.get("target")
+    return (isinstance(target, dict) and isinstance(lineage, list)
+            and all(isinstance(ref, dict) for ref in lineage) and (lineage == [target]
+            or (len(lineage) == 2 and lineage[0] == hierarchy["target"]
+                and lineage[0]["type_name"] == "Slab_TypeUUID"
+                and lineage[1].get("type_name") == "MultiSlab_TypeUUID")))
 
 
 def _reader(check, trace=None, trace_ref=None, *, reason="wall_material_read_unavailable"):
@@ -193,6 +216,14 @@ def _auxiliary_snapshot(adapter, base, owner, check, read, budget, expected):
     return result
 
 
+def _child_preservation(adapter, base, hierarchy, check, read):
+    budget = {"count": 0, "attribute_bytes": 0, "snapshot_bytes": 0,
+              "seen": {(hierarchy["target"]["signed_drawing_file"], hierarchy["target"]["model_uuid"])}}
+    retained_children, children = _live_children(adapter, hierarchy, check, read)
+    return sorted([_auxiliary_snapshot(child, base, hierarchy, check, read, budget, ref)
+                   for child, ref in children], key=fingerprint)
+
+
 def _detailed_snapshot(base, adapter, check=lambda: None, *, material_observation=None, captured=None,
                        trace=None, trace_ref=None):
     read = _reader(check, trace, trace_ref)
@@ -325,21 +356,26 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None, tr
 
     hierarchy = read(lambda: observe(adapter, check, include_children=False, trace=read.native), "material_hierarchy")
     kind = hierarchy["target"]["type_name"]
-    class_name = {"Wall_TypeUUID": "WallElement", "Column_TypeUUID": "ColumnElement"}.get(kind)
-    if class_name is None:
+    class_names = _NATIVE_CLASSES.get(kind)
+    if class_names is None:
         raise ComponentReadError("material_native_type", "native_material_type_unsupported")
-    if hierarchy["lineage"] != [hierarchy["target"]]:
+    if not _supported_lineage(hierarchy):
         raise ComponentReadError("material_hierarchy", "native_material_standalone_root_required")
     native = read(lambda: base.GetElement(adapter), "material_native_representation", api="BaseElements.GetElement")
-    if not isinstance(native, getattr(arch, class_name)):
+    # Adapter names alone do not prove the represented SDK class (notably
+    # SkeletonBeam). Dispatch only after checking the live native instance.
+    matching_classes = [name for name in class_names if isinstance(getattr(arch, name, None), type)
+                        and isinstance(native, getattr(arch, name))]
+    if len(matching_classes) != 1:
         raise ComponentReadError("material_native_representation", "native_material_representation_unsupported")
+    class_name = matching_classes[0]
     props = read(lambda: native.Properties, "material_properties", api=class_name + ".Properties")
     is_wall = kind == "Wall_TypeUUID"
     if is_wall and integer(read(lambda: props.TierCount, "material_tier_count", api="WallProperties.TierCount")) != 1:
         raise ComponentReadError("material_tier_count", "wall_material_single_tier_required")
     tier = read(lambda: props.GetWallTierProperties(1), "material_tier_properties",
                 api="WallProperties.GetWallTierProperties(1)") if is_wall else props
-    owner_name = "WallTierProperties" if is_wall else "ColumnProperties"
+    owner_name = "WallTierProperties" if is_wall else class_name.replace("Element", "Properties")
     material = read(lambda: tier.Material, "material_value", api=owner_name + ".Material")
     if type(material) is not str or len(material) > 255:
         raise ComponentReadError("material_value", "native_material_string_unavailable")
@@ -349,6 +385,7 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None, tr
         raise ComponentReadError("material_setters", "native_material_setters_unavailable")
 
     state = {"hierarchy": hierarchy, "tier_count": 1 if is_wall else None}
+    detailed = None
     if is_wall:
         # Boost.Python may expose borrowed children. Retain the first owner
         # graph through all reads, including replacement by the detailed read.
@@ -368,24 +405,36 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None, tr
     else:
         state["component_tree"] = _optional(lambda: observe(adapter, check, trace=read.native), check, "material_component_tree")
         state["geometry"] = _auxiliary_geometry(adapter, check, read)
+        if class_name == "SlabElement" and state["component_tree"].get("children_complete") is True:
+            # Aggregate Slab geometry may live on its child tiers. Bind those
+            # exact children and available geometry/metadata without treating
+            # any child's adapter as the selected native property owner.
+            state["child_components"] = _optional(lambda: _child_preservation(
+                adapter, base, state["component_tree"], check, read), check, "material_child_preservation")
 
     # Read each unrelated property independently: one unsupported field must
     # not discard all the other available drift evidence.
-    state["optional_properties"] = {
-        "tier": {name: _optional(lambda name=name: read.native(owner_name + "." + name,
-                                  lambda: _scalar(getattr(tier, name))), check,
-                                  "material_tier_" + name) for name in _SCALARS},
-        "common": {name: _optional(lambda name=name: read.native(owner_name + ".CommonProperties." + name,
-                                    lambda: _scalar(getattr(tier.CommonProperties, name))), check,
-                                    "material_common_" + name) for name in _COMMON},
-        "complex": {name: _optional(lambda name=name: read.native(owner_name + "." + name + ".repr",
-                                     lambda: _representation(getattr(tier, name))), check,
-                                     "material_" + name) for name in ("PlaneReferences", "SurfaceElementProperties")}}
-    if is_wall:
+    if isinstance(detailed, tuple):
+        # These values already belong to the final retained property owners.
+        # Reuse them instead of repeating every SDK getter and durable trace.
+        state["optional_properties"] = {"tier": dict(state["tier"]), "common": dict(state["common"]),
+                                        "complex": dict(state["complex_properties"]), "axis": state["axis"]}
+    else:
+        state["optional_properties"] = {
+            "tier": {name: _optional(lambda name=name: read.native(owner_name + "." + name,
+                                      lambda: _scalar(getattr(tier, name))), check,
+                                      "material_tier_" + name) for name in _SCALARS},
+            "common": {name: _optional(lambda name=name: read.native(owner_name + ".CommonProperties." + name,
+                                        lambda: _scalar(getattr(tier.CommonProperties, name))), check,
+                                        "material_common_" + name) for name in _COMMON},
+            "complex": {name: _optional(lambda name=name: read.native(owner_name + "." + name + ".repr",
+                                         lambda: _representation(getattr(tier, name))), check,
+                                         "material_" + name) for name in ("PlaneReferences", "SurfaceElementProperties")}}
+    if is_wall and not isinstance(detailed, tuple):
         state["optional_properties"]["axis"] = _optional(lambda: read.native("WallProperties.Axis.repr",
                                                           lambda: _representation(props.Axis)), check, "material_axis")
     state.update(schema_version=_STATE_SCHEMA,
-                 material_owner="wall_tier_1" if is_wall else "column_properties")
+                 native_class=class_name, material_owner=_MATERIAL_OWNERS[class_name])
     check()
     return material, state, native, props
 
@@ -428,10 +477,13 @@ def preview_observation(base, element, check=lambda: None, *, trace=None, trace_
 def valid_change(change):
     resource = change.get("resource") or {}
     evidence = resource.get("native_material_state")
-    target = (evidence or {}).get("hierarchy", {}).get("target", {})
+    if not isinstance(evidence, dict) or not _supported_lineage(evidence.get("hierarchy")):
+        return False
+    target = evidence["hierarchy"]["target"]
     ref = change.get("ref") or {}
     kind = change.get("native_type")
-    return (change.get("operation") == "set_native_material" and kind in {"Wall_TypeUUID", "Column_TypeUUID"}
+    class_name = (evidence or {}).get("native_class")
+    return (change.get("operation") == "set_native_material" and kind in _NATIVE_CLASSES
             and change.get("field") == "native.material" and change.get("property_role") == "native_material"
             and resource.get("tier_index") == 1 and resource.get("data_type") == "text"
             and type(resource.get("tier_index")) is int
@@ -440,7 +492,9 @@ def valid_change(change):
             and change.get("old_value", {}).get("status") == "observed"
             and type(change["old_value"].get("value")) is str
             and isinstance(evidence, dict) and evidence.get("schema_version") == _STATE_SCHEMA
-            and evidence.get("material_owner") == ("wall_tier_1" if kind == "Wall_TypeUUID" else "column_properties")
+            and class_name in _NATIVE_CLASSES[kind]
+            and evidence.get("material_owner") == _MATERIAL_OWNERS[class_name]
+            and _supported_lineage(evidence["hierarchy"])
             and (kind != "Wall_TypeUUID" or evidence.get("tier_count") == 1)
             and all(target.get(key) == ref.get(key) for key in ("drawing_file", "model_uuid", "type_uuid"))
             and target.get("type_name") == kind
@@ -449,7 +503,7 @@ def valid_change(change):
 
 def read(base, element, change, check=lambda: None):
     if not valid_change(change):
-        raise BridgeError("target_not_writable", "Native material requires an exact reviewed Wall or Column.", 409)
+        raise BridgeError("target_not_writable", "Native material requires an exact reviewed architectural property owner.", 409)
     value, state = observation(base, element, check)
     if fingerprint(state) != fingerprint(change["resource"]["native_material_state"]):
         return {"status": "not_checked", "value": None, "reason": "wall_material_invariants_changed"}

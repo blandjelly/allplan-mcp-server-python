@@ -342,6 +342,9 @@ class RepairExecutor:
                 or plan["coverage"].get("required_destination_fields_complete",
                                         plan["coverage"].get("returned_fields_complete")) is not True):
             return False
+        from .component_ownership import overlapping_slab_owners
+        if overlapping_slab_owners(changes):
+            return False
         seen = set()
         for change in changes:
             ref, resource, old = change["ref"], change["resource"], change["old_value"]
@@ -369,7 +372,7 @@ class RepairExecutor:
                 continue
             if change.get("native_type") in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
                 from .component_ownership import slab_write_blocker
-                if slab_write_blocker(resource.get("component_ownership")):
+                if slab_write_blocker(resource.get("component_ownership"), change):
                     return False
             symbol = ("ElementsLayerService.ChangeLayer" if change["operation"] in {"set_layer", "set_wall_layer"}
                       else "ElementsAttributeService.ChangeAttributes")

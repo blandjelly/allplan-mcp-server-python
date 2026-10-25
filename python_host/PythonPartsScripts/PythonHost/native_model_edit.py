@@ -195,7 +195,8 @@ def _writable(doc, base, queries, element, change, diagnostics, budget):
             raise BridgeError("target_not_writable", f"Target fails {method}; no write requested.", 409)
     if integer(element.GetDrawingfileNumber()) != ref["drawing_file"]:
         raise BridgeError("target_not_writable", "Passive target cannot be changed.", 409)
-    if change.get("native_type") in {"Slab_TypeUUID", "MultiSlab_TypeUUID"} and change.get("operation") != "delete_element":
+    if (change.get("native_type") in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}
+            and change.get("operation") not in {"delete_element", "set_native_material"}):
         _slab_ownership(element, change, budget)
     if change.get("operation") == "set_wall_layer":
         import NemAll_Python_IFW_ElementAdapter as native_adapters
@@ -441,10 +442,10 @@ def replaceable_attribute_value(change):
 def _slab_ownership(element, change, check=lambda: None):
     from .component_ownership import observation, slab_write_blocker
     reviewed = (change.get("resource") or {}).get("component_ownership")
-    if slab_write_blocker(reviewed):
+    if slab_write_blocker(reviewed, change):
         raise BridgeError("target_not_writable", "Slab needs a reviewed, standalone field owner; use component_identity read-only.", 409)
     current = observation(element, check)
-    if slab_write_blocker(current) or current != reviewed:
+    if slab_write_blocker(current, change) or current != reviewed:
         _conflict("Slab ownership changed or became unavailable since preview.")
 
 

@@ -55,6 +55,18 @@ class ModelEditContractTests(unittest.TestCase):
         TypeAdapter(ModelEditRequest).validate_python(request)
         self.contracts.validate_request(request)
 
+    def test_explicit_selected_attribute_owner_has_public_host_parity(self):
+        request = self.request(native_types=["MultiSlab_TypeUUID"], predicate=None, changes=[{
+            "target": {"kind": "attribute", "attribute_id": 508, "property_owner": "selected_element"},
+            "value": "Beton1", "mode": "upsert"}])
+        parsed = TypeAdapter(ModelEditRequest).validate_python(request)
+        self.assertEqual(parsed.changes[0].target.property_owner, "selected_element")
+        self.contracts.validate_request(request)
+        for owner in ("parent", "MultiSlab", 1, {}, []):
+            with self.subTest(owner=owner):
+                request["changes"][0]["target"]["property_owner"] = owner
+                self.assert_both_reject(request)
+
     def test_layer_exact_name_and_legacy_short_name_validate_exclusively(self):
         for target in ({"kind": "layer", "short_name": "W1"},
                        {"kind": "layer", "name": "Structural level one"}):

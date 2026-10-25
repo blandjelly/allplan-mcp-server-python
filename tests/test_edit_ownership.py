@@ -60,6 +60,92 @@ class EditOwnershipTests(unittest.TestCase):
         self.assertFalse(plan["apply_available"])
         self.assertEqual(plan["blocked"][0]["reason"], "slab_has_parent_requires_explicit_property_owner")
 
+    def explicit_material_plan(self, kind, **updates):
+        return self.preview(native_types=[kind], predicate=None, changes=[{
+            "target": {"kind": "attribute", "attribute_id": 508, "property_owner": "selected_element"},
+            "value": "Beton1", "mode": "upsert"}], **updates)
+
+    def material_slabs(self):
+        slab, aggregate = self.slab_fixture()
+        for element in (slab, aggregate):
+            element.GetAttributes.return_value = [(508, "old")]
+        self.attribute_catalog({508: "Materiał"})
+        return slab, aggregate
+
+    def test_explicit_slab_material_owner_apply_readback_replay_no_op_without_redirect(self):
+        slab, aggregate = self.material_slabs()
+        for kind, target, other in (("MultiSlab_TypeUUID", aggregate, slab), ("Slab_TypeUUID", slab, aggregate)):
+            with self.subTest(kind=kind):
+                target.GetAttributes.return_value = [(508, "old")]
+                self.base.ElementsAttributeService.ChangeAttributes.reset_mock()
+                before = copy.deepcopy(other.GetAttributes.return_value)
+                plan = self.explicit_material_plan(kind)
+                self.assertTrue(plan["apply_available"], plan)
+                self.assertEqual(plan["changes"][0]["ref"]["model_uuid"], target.GetModelElementUUID())
+                self.highlight(plan)
+                execution = uuid4().hex
+                result = self.apply(plan, execution)
+                self.assertEqual(result["state"], "completed", result)
+                self.assertEqual(result["outcomes"][0]["readback"]["value"], "Beton1")
+                self.assertEqual(other.GetAttributes.return_value, before)
+                self.assertTrue(self.apply(plan, execution)["replayed"])
+                self.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+                self.assertEqual(self.explicit_material_plan(kind)["state"], "no_op")
+                self.base.GetElement.assert_not_called()
+
+    def test_explicit_material_owner_can_upsert_after_complete_absence_read(self):
+        _, aggregate = self.material_slabs()
+        aggregate.GetAttributes.return_value = []
+        plan = self.explicit_material_plan("MultiSlab_TypeUUID", attribute_read_mode="all_and_computable")
+        self.assertTrue(plan["apply_available"], plan)
+        self.assertEqual(plan["changes"][0]["operation"], "add_attribute")
+        self.highlight(plan)
+        self.assertEqual(self.apply(plan)["state"], "completed")
+        self.assertEqual(dict(aggregate.GetAttributes.return_value)[508], "Beton1")
+
+    def test_explicit_parent_child_material_overlap_blocks_before_setters(self):
+        self.material_slabs()
+        request = self.request(predicate=None, native_types=["Slab_TypeUUID", "MultiSlab_TypeUUID"], changes=[{
+            "target": {"kind": "attribute", "attribute_id": 508, "property_owner": "selected_element"},
+            "value": "Beton1"}])
+        plan = self.call(request)
+        self.assertFalse(plan["apply_available"])
+        self.assertIn("overlapping_slab_property_owners", {row["reason"] for row in plan["blocked"]})
+        execution = importlib.import_module(self.module.__package__ + ".repair_execution")
+        forged = copy.deepcopy(plan)
+        forged["state"], forged["blocked"] = "preview_ready", []
+        self.assertFalse(execution.RepairExecutor.model_edit_scope(forged))
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+    def test_explicit_owner_forgery_and_fresh_lineage_drift_block_final_setter(self):
+        slab, aggregate = self.material_slabs()
+        plan = self.explicit_material_plan("MultiSlab_TypeUUID")
+        native = importlib.import_module(self.module.__package__ + ".native_model_edit")
+        damaged = copy.deepcopy(plan["changes"][0])
+        damaged["resource"]["component_ownership"]["value"]["target"]["model_uuid"] = slab.GetModelElementUUID()
+        self.assert_code("target_not_writable", lambda: native.write(self.base, aggregate, damaged))
+        self.highlight(plan)
+        self.children[id(aggregate)] = []
+        self.assert_code("repair_conflict", lambda: self.apply(plan))
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+    def test_explicit_owner_readback_drift_remains_unknown_and_is_never_retried(self):
+        _, aggregate = self.material_slabs()
+        setter = self.base.ElementsAttributeService.ChangeAttributes.side_effect
+
+        def mutate_then_reparent(*args):
+            setter(*args)
+            self.parents[id(aggregate)] = self.element(99, name="Macro_TypeUUID")
+
+        self.base.ElementsAttributeService.ChangeAttributes.side_effect = mutate_then_reparent
+        plan = self.explicit_material_plan("MultiSlab_TypeUUID")
+        self.highlight(plan)
+        execution = uuid4().hex
+        result = self.apply(plan, execution)
+        self.assertEqual(result["outcomes"][0]["state"], "unknown")
+        self.assertTrue(self.apply(plan, execution)["replayed"])
+        self.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+
     def test_unavailable_slab_parent_blocks_preview(self):
         slab, _ = self.slab_fixture()
         def unavailable(_):

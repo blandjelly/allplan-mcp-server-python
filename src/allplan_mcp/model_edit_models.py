@@ -11,6 +11,7 @@ class AttributeEditTarget(ContractModel):
     kind: Literal["attribute"]
     attribute_id: Annotated[int, Field(ge=1, le=2147483647)] | None = None
     name: Annotated[str, Field(min_length=1, max_length=128)] | None = None
+    property_owner: Literal["selected_element"] | None = None
 
     @model_validator(mode="after")
     def has_binding(self):

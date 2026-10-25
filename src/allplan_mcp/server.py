@@ -295,9 +295,16 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     exact target with name_contains=material or name_contains=materiał and use
     the returned project name/ID. ID 1371 is flammable material, not Material.
     Native material uses changes=[{target:{kind:native_material,tier_index:1},value:EXACT_STRING}]
-    as the only edit, with native_types=[Wall_TypeUUID] or [Column_TypeUUID].
-    It requires an exact standalone Wall with one native tier or a Column,
-    a readable Material property and native material/property setters.
+    as the only edit. Supported native_types are Wall_TypeUUID, Column_TypeUUID,
+    Beam_TypeUUID, SkeletonBeam_TypeUUID, Slab_TypeUUID and MultiSlab_TypeUUID.
+    The live SDK class and its Material/property setters must match; Wall requires
+    one native tier. Slab uses the selected SlabElement.Properties.Material,
+    including MultiSlab aggregates; it never redirects to a child or parent.
+    For a slab project attribute, bind target.property_owner=selected_element
+    and narrow native_types to the intended Slab or MultiSlab owner. Inspect the
+    exact ref and complete lineage in resource.component_ownership. A plan that
+    edits both a slab aggregate and its child is blocked. Other attribute types
+    and computed-only/presence safeguards retain their existing requirements.
     The exact string is a native property value, without catalog validation or
     catalog creation. The report field is native.material and resource evidence
     is native_material_state. Geometry, formatting and auxiliary metadata reads
