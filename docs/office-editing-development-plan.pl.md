@@ -5,10 +5,13 @@
 M4 jest częściowo odebrane. Aktualną wersję, dostawę i konkretne następne
 zadanie opisuje [handoff](next-model-handoff.md). Ten plan utrzymuje pozostałe
 prace i warunki ich zamknięcia, zgodnie z [polityką dokumentacji](documentation-policy.md).
-Kandydat 0.36.0 wymaga pełnego CI po korekcie zbyt krótkiego timeoutu testu
-HTTP na Windows; runtime i jego zabezpieczenia nie zmieniają się w tej korekcie.
-Aktualny stan i ograniczony zakres próby opisuje [handoff](next-model-handoff.md).
-Wyniki focused checks, CI/paczki oraz próby natywnej pozostają osobnymi etapami.
+Kandydat 0.36.0 na `ee831a0` przeszedł pełne CI Windows/Ubuntu, produkcję
+paczki i `ci-required` (run [40228207181](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40228207181)).
+Test-only optymalizacja doboru trace’a przeszła 103 affected tests (19.564 s,
+Python 3.12.14); jej CI nadal oczekuje i nie ma podstaw do estymacji wyniku
+Windows z benchmarku lokalnego. Runtime ani zabezpieczenia się nie zmieniają.
+Dokładna weryfikacja ZIP i ograniczony preview natywny nadal oczekują. Aktualny stan opisuje
+[handoff](next-model-handoff.md).
 
 Dowody wcześniejszych prób są w [statusie walidacji](validation-status.md);
 ich istotne ograniczenia zachowują poniższe zadania i handoff. Nie powtarzać
@@ -33,7 +36,7 @@ Wieloplikowość i cały projekt wymagają osobnego projektu oraz odbioru.
 | 1 — dziennik i recovery | Uzupełnić brakujące dowody restart/replay oraz unknown/corrupt/unverifiable poza już odebranym zakresem. PASS próby dziennika bez pełnego raw logu nie potwierdza osobno każdego podkroku. Chronić nierozliczone rekordy. |
 | 2 — Slab/MultiSlab | Rozstrzygnąć lineage i właściciela project attributes. Różne view UUID, zbieżne bounds oraz structural identity nie ustanawiają właściciela ani równoważności fizycznych celów. Najnowszy probe ma `evidence_complete=false` dla Slab i `true` dla MultiSlab, ale `property_owner=not_established` dla obu. Do ustalenia kontraktu zapisy pozostają BLOCKED. |
 | 3 — warstwa i no-op | Uzupełnić wyłącznie nieodebrane przypadki. W1 read/write, pojedyncze Undo i zgłoszony no-op nie dowodzą grupowego Undo ani pełnego pokrycia rodzin. No-op nie ma drogi Apply. |
-| 4 — natywny materiał Wall/Column | Zdiagnozować preview crash 0.35.0 na kandydacie 0.36.0: zachować oba odczyty native i ich porównanie materiału, utrzymać pierwszy zestaw właścicieli do końca odczytu, a `_detailed_snapshot` niech zwraca też `tier`, aby końcowy `wall_material.snapshot` miał spójne `native`/`props`/`tier`. Dodać trwały `model_edit.observe` dla preview/revalidation/source observations, z tą samą metadaną root reference przy każdym SDK getterze, bez osłabiania guards. Po CI i sprawdzeniu dokładnego ZIP właściciel wykonuje wyłącznie preview oryginalnej ściany 240 mm; zachowuje pierwszy nowy trace/failure i zatrzymuje próbę. Nie Apply przy wyniku unknown/blocked. Trzy requesty testowe 0.35.0 to dwie próby 240 mm i jedna 200 mm; faktyczny root odczytywany przy crashu pozostaje nieznany. Ukończony zapis Column z readback pozostaje jedynym potwierdzonym Apply; nie powtarzać go. Dostarczone dowody nie zawierają wyników no-op, drift, UI Undo ani restoration. Surowy plik `crash log 0.35.0.zip`; szczegóły: [status walidacji](validation-status.md#evidence-for-unresolved-cases). Natywne Material, atrybut Material i `Materiał łatwopalny` pozostają oddzielne. Nie ponawiać ściany 200 mm/opening z nierozstrzygniętym mismatch właściciela. Kryteria próby: [handoff](next-model-handoff.md). |
+| 4 — natywny materiał Wall/Column | Kandydat 0.36.0 zawiera utrzymanie właścicieli i spójnego zestawu `native`/`props`/`tier`, oraz trwały trace obserwacji bez zmiany guards. Po CI i sprawdzeniu dokładnego ZIP właściciel wykonuje wyłącznie preview oryginalnej ściany 240 mm, zachowuje pierwszy nowy trace/failure i zatrzymuje próbę; przy wyniku unknown/blocked nie Apply. Nie powtarzać zaakceptowanego Column Apply/readback, nie żądać brakującego dumpa ani nie ponawiać Wall 200 mm/opening z nierozstrzygniętym mismatch właściciela. Przyczyna trzech crashy 0.35.0 pozostaje nieznana. Materiał natywny, atrybut Material i `Materiał łatwopalny` są odrębnymi polami. [Handoff](next-model-handoff.md) i [status walidacji](validation-status.md#evidence-for-unresolved-cases). |
 | 4 — delete i selekcja | Zachować odebrany grouped Column delete/Undo; pozostałe rodziny/poddrzewa wymagają oddzielnego dowodu. Native selection set/clear/readback nadal unsupported. Highlight nie jest selekcją. |
 | 5 — typy i rodziny | Domknąć owner-specific roundtrip oraz macierz rodzin/typów. Column Enum `Status` ID 49 pozostaje BLOCKED (`<niezdefiniowany>`, brak potwierdzonej etykiety). Wall CheckBox ID 1371 nie ma surowego Apply; fixture SDK Boolean brak. Beam i Door blokuje niejednoznaczna reprezentacja/tożsamość. Date/vector/object wymagają dokładnych kontraktów setter payload i typed readback; sam symbol lub konstruktor SDK nie wystarcza. |
 
@@ -77,9 +80,10 @@ Brak fixture oznaczać `fixture_missing`, nierozstrzygnięty kontrakt — BLOCKE
 [Polityka dokumentacji](documentation-policy.md) określa aktualizację handoffu i zadań;
 [testing policy](testing-policy.md) — kontrole i budowanie.
 
-Zbiorcza bramka CI `ci-required` jest przygotowana; 49 focused checks PASS.
-Właściciel sprawdza CI/paczkę kandydata workflow i ustawia wymagany check dla
-develop/m4 według [polityki testów](testing-policy.md#required-github-check).
-Ochrona gałęzi nie została zmieniona; bramka nie zastępuje odbioru ZIP ani Allplana.
+Zbiorcza bramka CI `ci-required` jest przygotowana; 49 focused checks PASS,
+a run 40228207181 przeszedł wymagany check wraz z pełnym CI i paczką dla
+`ee831a0`. Właściciel nadal ustawia wymagany check dla develop/m4 według
+[polityki testów](testing-policy.md#required-github-check). Ochrona gałęzi nie
+została zmieniona; bramka nie zastępuje odbioru ZIP ani Allplana.
 [Tool reference](tool-reference.md), [API evidence](m4-attribute-api-evidence.md)
 i [macierz typów](m4-attribute-type-coverage.md) pozostają źródłami kontraktów API.

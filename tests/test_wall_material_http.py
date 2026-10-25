@@ -11,7 +11,7 @@ import test_wall_material_edit as fixture_module
 import test_native_material_columns as column_fixtures
 
 
-# The workflow fixtures freeze the native scan clock but keep real trace fsync.
+# The durable Wall workflow keeps real trace fsync; logic flows use a trace double.
 # Highlight revalidates and observes again; Windows storage can take >10 s.
 # Let the bridge's existing 30 s deadline expire before this test client does.
 MATERIAL_HTTP_TIMEOUT = 40
@@ -23,6 +23,7 @@ class WallMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_material_edit_with_axis_preview_highlight_apply_and_replay_over_http(self):
         native = fixture_module.WallMaterialEditTests()
+        native.use_durable_trace = True
         native.setUp()
         self.addCleanup(native.doCleanups)
         axis = native.native.element(21, name="WallAxis_TypeUUID")

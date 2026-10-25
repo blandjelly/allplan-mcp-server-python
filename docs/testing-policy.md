@@ -43,6 +43,35 @@ full local suite or build packages after every change. For documentation,
 logs, or AGENTS-only changes, review the diff and links; skip runtime tests,
 builds, hash checks, and reruns.
 
+### Material trace selection
+
+Choose trace storage according to what the test claims to verify:
+
+| Test scope | Trace setup | Required coverage |
+| --- | --- | --- |
+| Routine material fixture and workflow logic | Fixture-scoped in-memory `NativeProbeTrace.record` by default for `WallMaterialEditTests` and nested Column/material fixtures; material HTTP flows also use memory storage by default. Install the scoped double after importing the fake-host module. | Keep the full logical assertions; do not write trace files for tests that do not verify persistence. |
+| Trace ordering or storage-failure behavior | Explicit `@durable_trace` or `use_durable_trace = True` opt-in for tests that assert durable ordering or storage failure. | Exercise the production trace behavior on disk. |
+| Material HTTP end-to-end | Keep one Wall flow on the real trace: preview, highlight, apply, readback and replay. Other material HTTP workflows use memory storage. | Preserve the complete real-storage flow and its HTTP assertions. |
+| Persistence, security, capacity or restart/recovery | Real filesystem, fsync and production trace/journal classes, including the existing `property_probe`, `trace_cleanup` and `journal_cleanup` tests. | Retain these checks in full CI; do not replace their production storage with memory. |
+
+For new logic fixtures, import the fake-host module first, then install a
+fixture-scoped trace double from [trace_test_support.py](../tests/trace_test_support.py).
+Verify fixture selection and cleanup, JSON
+serialization rejection, no trace-file writes, and that execution journals
+remain real. Persistence tests must opt into the production trace writer.
+Never globally replace `os.fsync` with a no-op; a dedicated spy may wrap and
+forward to the real OS call. Keep persistence, security, capacity and restart
+checks in full CI. This test-only optimization does not change runtime
+budgets, journals, trace limits or package version, remove guards, or split the
+required Windows/Ubuntu full-CI matrix.
+
+When changing trace storage or fixture behavior, compare the same representative
+cases before and after and report event/record counts with elapsed time. Treat
+local measurements as local; do not estimate Windows results from Linux
+benchmarks. Profile the slow path before increasing client timeouts. Advance an
+injected clock across the limit in budget-boundary tests instead of using long sleeps. Do not claim
+faster Windows CI until the full Windows job confirms it.
+
 ## Candidate and CI selection
 
 For each new candidate or package, GitHub Actions must run the full CI matrix

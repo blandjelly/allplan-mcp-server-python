@@ -13,6 +13,7 @@ from unittest.mock import PropertyMock, patch
 from pydantic import TypeAdapter, ValidationError
 from allplan_mcp.model_edit_models import ModelEditRequest
 import test_model_edit as fixtures
+from trace_test_support import durable_trace, install_memory_trace
 
 
 class Polyhedron:
@@ -76,6 +77,10 @@ class WallMaterialEditTests(unittest.TestCase):
         self.native.setUp()
         self.addCleanup(self.native.doCleanups)
         self.root = self.native.fixture(("",))[0]
+        method = getattr(self, self._testMethodName, None)
+        if not (getattr(self, "use_durable_trace", False) or getattr(method, "uses_durable_trace", False)):
+            trace_class = importlib.import_module(self.native.module.__package__ + ".property_probe").NativeProbeTrace
+            self.trace_records = install_memory_trace(self, trace_class)
         self.root.GetElementAdapterType.return_value.GetTypeName.return_value = "Wall_TypeUUID"
         self.root.GetElementAdapterType.return_value.GetGuid.return_value = "20000000-0000-4000-8000-000000000001"
         self.root.GetCommonProperties.return_value.Layer = 17
@@ -217,6 +222,7 @@ class WallMaterialEditTests(unittest.TestCase):
         self.native.assert_code("repair_conflict", lambda: module.snapshot(self.native.base, self.root))
         self.native.base.ModifyElements.assert_not_called()
 
+    @durable_trace
     def test_material_trace_is_durable_before_getter_and_has_exact_root_view(self):
         path = self.native.plans.trace_path
         accesses = []
@@ -243,6 +249,7 @@ class WallMaterialEditTests(unittest.TestCase):
         self.assertNotIn("C35/45", trace_text)
         self.native.base.ModifyElements.assert_not_called()
 
+    @durable_trace
     def test_trace_failure_prevents_material_getter_and_remains_a_bridge_error(self):
         module = importlib.import_module(self.native.module.__package__ + ".wall_material")
         trace_module = importlib.import_module(self.native.module.__package__ + ".property_probe")

@@ -3,38 +3,34 @@
 Current candidate and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
 [development plan](office-editing-development-plan.pl.md).
-Current candidate 0.36.0 is on `fix/m4-material-lifetime-trace`, based on
-`develop/m4` commit `9553c8d10d6cd8f0987b1310d0ee89d3b519dc49`. On Python
-3.12.14, 160 distinct focused tests passed across `test_wall_material_edit`,
-`test_native_material_columns`, `test_component_identity`,
-`test_edit_ownership`, `test_model_edit`, `test_native_model_edit` and
-`test_trace_cleanup`. Ten HTTP tests passed across
-`test_wall_material_http`, `test_component_identity_http` and
-`test_model_edit_recovery_http`. The borrowed-owner regression failed against
-the actual 0.35.0 source and passed on this candidate.
+The full-CI baseline for the current test-only optimization is `ee831a0` on
+`fix/m4-material-lifetime-trace`, based on `develop/m4` commit
+`9553c8d10d6cd8f0987b1310d0ee89d3b519dc49`. Full
+[CI run 40228207181](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40228207181)
+on `ee831a0` passed all 693 tests on both Windows and Ubuntu, package
+production, and the required `ci-required` gate. Windows test time was
+2,418.236 s; Ubuntu was 225.682 s. This supersedes the earlier Windows timeout
+failure on `c15ffaa` for `ee831a0`.
 
-Full [CI run 40222560194](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40222560194)
-for `c15ffaa` passed Ubuntu. [Windows](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40222560194/job/121257175269)
-ran 693 tests with one error: the material HTTP highlight workflow exceeded
-its test client's 10-second deadline. Highlight performs revalidation and a
-second source observation; the fixture freezes the native budget clock but
-retains real trace fsync. A secondary missing test-module traceback occurred
-afterwards as fixture teardown overtook the pending request; it was not a
-second unittest error. The aggregate gate failed and
-package production was skipped.
+The optimization continuing from `ee831a0` passed 103 affected tests in
+19.564 s on Python 3.12.14: `test_trace_test_support`,
+`test_wall_material_edit`, `test_native_material_columns`,
+`test_wall_material_http`, `test_property_probe`, `test_trace_cleanup` and
+`test_journal_cleanup`. Fixture selection/cleanup, JSON rejection, real journal
+storage and the real-fsync spy passed. Required CI for these new test changes
+is still pending; run 40228207181 validates only `ee831a0`.
 
-The follow-up keeps runtime source and version unchanged and sets only the
-three material workflow clients to 40 seconds, allowing the bridge's existing
-30-second deadline to produce its own result. Invalid-request checks retain
-10 seconds. Twelve focused HTTP/client and existing budget/trace-failure guard
-checks pass locally. Full CI for this corrected commit, exact-ZIP verification
-and the bounded native preview remain pending gates as described in the
-[handoff](next-model-handoff.md) and testing policy.
-A separate controlled run on Linux added per-record delay while retaining
-real trace append/flush/fsync. The existing HTTP workflow passed with preview
-6.21 s, highlight 12.43 s, Apply 18.64 s and replay 0.001 s. This demonstrates
-completion beyond the former 10-second test deadline without bypassing
-storage; it is not a Windows CI or native Allplan result.
+A local Linux benchmark of identical cases recorded 6,200 events in both
+configurations: real trace wrote 6,200 disk records in 0.720 s; the in-memory
+trace wrote zero disk records in 0.269 s. This local measurement does not
+estimate Windows performance. Routine material fixtures and most material HTTP
+tests use a fixture-scoped in-memory trace; durable ordering/storage-failure
+tests, production journal/storage tests, and one full Wall HTTP
+preview/highlight/apply/readback/replay flow retain real trace storage and
+fsync. See the [testing policy](testing-policy.md#material-trace-selection).
+Runtime code, budgets, journals, guards and package version are unchanged.
+The exact-ZIP verification and bounded native preview remain pending as
+described in the [handoff](next-model-handoff.md).
 
 ## Accepted baseline and scoped M4 observations
 

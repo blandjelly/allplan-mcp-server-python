@@ -6,11 +6,11 @@ and the [documentation policy](documentation-policy.md),
 [testing policy](testing-policy.md) and [development plan](office-editing-development-plan.pl.md)
 before implementation.
 
-The workflow now provides the required PR check `ci-required`; selection,
+The workflow provides required PR check `ci-required`; selection,
 failure/skip handling and unchanged-source reuse have 49 focused policy/gate
-checks passing. The owner must review this workflow candidate's six-job CI
-and package, then configure `ci-required` for develop/m4; branch protection
-has not been changed. See the [testing policy](testing-policy.md#required-github-check).
+checks passing. Branch protection still needs the owner to configure
+`ci-required` for develop/m4. See the
+[testing policy](testing-policy.md#required-github-check).
 
 ## Next task — 0.36.0 native material crash candidate
 
@@ -56,25 +56,38 @@ procedure. The owner-supplied raw archive is `crash log 0.35.0.zip` in the
 local/chat attachments; its hash is recorded in the
 [validation status](validation-status.md#evidence-for-unresolved-cases).
 
-## Current candidate — 0.36.0
+## Current candidate — 0.36.0 / PR 39
 
-Prepared on `fix/m4-material-lifetime-trace`, based on `develop/m4` commit
-`9553c8d10d6cd8f0987b1310d0ee89d3b519dc49`. On Python 3.12.14, 160 distinct
-focused tests and 10 HTTP tests passed. A borrowed-owner regression failed
-against 0.35.0 source and passed on this candidate.
+The test-only optimization continues from `ee831a0` on
+`fix/m4-material-lifetime-trace`, based on `develop/m4` commit
+`9553c8d10d6cd8f0987b1310d0ee89d3b519dc49`. The full
+[CI run 40228207181](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40228207181)
+on `ee831a0` passed all 693 tests on Windows and Ubuntu, package production,
+and `ci-required`. Windows tests took 2,418.236 s; Ubuntu took 225.682 s.
+This run supersedes the earlier timeout failure on `c15ffaa` for that source
+revision.
 
-The initial full [CI run](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40222560194)
-on `c15ffaa` passed Ubuntu but failed Windows: one of 693 tests exceeded the
-HTTP fixture client's 10-second deadline during Wall highlighting. A secondary
-missing test-module traceback followed timeout/fixture cleanup. Package production
-was skipped. The follow-up changes only the material workflow tests' client
-deadline to 40 seconds, above the bridge's existing 30-second deadline;
-validation-only requests retain 10 seconds. Native read budgets, trace fsync,
-runtime code and package version remain unchanged. Twelve affected HTTP/client
-and budget/storage-guard checks pass locally. Required CI for the corrected
-commit, exact-ZIP verification and the bounded owner preview remain pending.
-A controlled slow-trace run of the same HTTP workflow also passed, including
-a 12.4-second highlight and 18.6-second Apply, with real flush/fsync retained.
+The focused Python 3.12.14 run passed 103 affected tests in 19.564 s across
+`test_trace_test_support`, `test_wall_material_edit`,
+`test_native_material_columns`, `test_wall_material_http`,
+`test_property_probe`, `test_trace_cleanup` and `test_journal_cleanup`.
+Fixture selection/cleanup, JSON rejection, real journal persistence and the
+real-fsync spy passed. In a local Linux benchmark of the same cases, 6,200
+real-trace disk records took 0.720 s; 6,200 in-memory events with zero disk
+records took 0.269 s. This is a local result and does not estimate Windows
+performance.
+
+The test-only optimization uses fixture-scoped in-memory trace recording for
+routine material workflows while retaining explicit durable trace, journal,
+storage-failure and real-storage HTTP coverage. It does not change runtime
+code, budgets, journals, guards or package version. These new test changes are
+not covered by run 40228207181; required CI for the updated candidate remains
+pending. See the [test selection policy](testing-policy.md#material-trace-selection).
+The exact-ZIP check and bounded native preview also remain pending. After the
+owner checks CI and the exact ZIP, run only the original 240 mm Wall preview
+described above. No need to repeat the accepted Column Apply/readback or
+request the missing crash dump.
+
 Earlier M4 scopes remain partial and are summarized below.
 
 ## Prior work needed for continuation
