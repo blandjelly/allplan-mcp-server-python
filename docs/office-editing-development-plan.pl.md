@@ -5,8 +5,9 @@
 M4 jest częściowo odebrane. Aktualną wersję, dostawę i konkretne następne
 zadanie opisuje [handoff](next-model-handoff.md). Ten plan utrzymuje pozostałe
 prace i warunki ich zamknięcia, zgodnie z [polityką dokumentacji](documentation-policy.md).
-Kandydat 0.35.0 rozwija natywną zmianę materiału dla Wall i Column. Aktualny
-stan, zakres próby i weryfikację opisuje [handoff](next-model-handoff.md).
+Kandydat 0.36.0 wymaga pełnego CI po korekcie zbyt krótkiego timeoutu testu
+HTTP na Windows; runtime i jego zabezpieczenia nie zmieniają się w tej korekcie.
+Aktualny stan i ograniczony zakres próby opisuje [handoff](next-model-handoff.md).
 Wyniki focused checks, CI/paczki oraz próby natywnej pozostają osobnymi etapami.
 
 Dowody wcześniejszych prób są w [statusie walidacji](validation-status.md);

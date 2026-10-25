@@ -61,10 +61,21 @@ local/chat attachments; its hash is recorded in the
 Prepared on `fix/m4-material-lifetime-trace`, based on `develop/m4` commit
 `9553c8d10d6cd8f0987b1310d0ee89d3b519dc49`. On Python 3.12.14, 160 distinct
 focused tests and 10 HTTP tests passed. A borrowed-owner regression failed
-against 0.35.0 source and passed on this candidate. Full CI, exact-ZIP
-verification and the bounded owner preview remain separate gates; these
-focused results do not establish those outcomes. Earlier M4 scopes remain
-partial and are summarized below.
+against 0.35.0 source and passed on this candidate.
+
+The initial full [CI run](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40222560194)
+on `c15ffaa` passed Ubuntu but failed Windows: one of 693 tests exceeded the
+HTTP fixture client's 10-second deadline during Wall highlighting. A secondary
+missing test-module traceback followed timeout/fixture cleanup. Package production
+was skipped. The follow-up changes only the material workflow tests' client
+deadline to 40 seconds, above the bridge's existing 30-second deadline;
+validation-only requests retain 10 seconds. Native read budgets, trace fsync,
+runtime code and package version remain unchanged. Twelve affected HTTP/client
+and budget/storage-guard checks pass locally. Required CI for the corrected
+commit, exact-ZIP verification and the bounded owner preview remain pending.
+A controlled slow-trace run of the same HTTP workflow also passed, including
+a 12.4-second highlight and 18.6-second Apply, with real flush/fsync retained.
+Earlier M4 scopes remain partial and are summarized below.
 
 ## Prior work needed for continuation
 

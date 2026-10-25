@@ -11,6 +11,12 @@ import test_wall_material_edit as fixture_module
 import test_native_material_columns as column_fixtures
 
 
+# The workflow fixtures freeze the native scan clock but keep real trace fsync.
+# Highlight revalidates and observes again; Windows storage can take >10 s.
+# Let the bridge's existing 30 s deadline expire before this test client does.
+MATERIAL_HTTP_TIMEOUT = 40
+
+
 class WallMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
     asyncSetUp = smoke.MCPSmokeTests.asyncSetUp
     stop_process = smoke.MCPSmokeTests.stop_process
@@ -37,7 +43,7 @@ class WallMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
 
         self.bridge_handler.handle = handle
         request = native.request()
-        async with Client(self.url, timeout=10) as client:
+        async with Client(self.url, timeout=MATERIAL_HTTP_TIMEOUT) as client:
             preview = (await client.call_tool("model_edit", {"request": request})).data
             self.assertEqual(preview["counts"]["changes"], 1)
             records = [json.loads(line) for line in native.native.plans.trace_path.read_text(encoding="utf-8").splitlines()]
@@ -103,7 +109,7 @@ class WallMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
             return original(path, payload)
 
         self.bridge_handler.handle = handle
-        async with Client(self.url, timeout=10) as client:
+        async with Client(self.url, timeout=MATERIAL_HTTP_TIMEOUT) as client:
             result = (await client.call_tool("model_edit", {
                 "request": native.request()})).data
 
@@ -134,7 +140,7 @@ class WallMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
             return original(path, payload)
 
         self.bridge_handler.handle = handle
-        async with Client(self.url, timeout=10) as client:
+        async with Client(self.url, timeout=MATERIAL_HTTP_TIMEOUT) as client:
             preview = (await client.call_tool("model_edit", {"request": native.fixture.request(
                 native_types=["Column_TypeUUID"])})).data
             self.assertTrue(preview["apply_available"], preview)

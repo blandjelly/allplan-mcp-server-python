@@ -11,9 +11,30 @@ Current candidate 0.36.0 is on `fix/m4-material-lifetime-trace`, based on
 `test_trace_cleanup`. Ten HTTP tests passed across
 `test_wall_material_http`, `test_component_identity_http` and
 `test_model_edit_recovery_http`. The borrowed-owner regression failed against
-the actual 0.35.0 source and passed on this candidate. Full GitHub CI,
-exact-ZIP verification and the bounded native preview are separate pending
-gates as described in the [handoff](next-model-handoff.md) and testing policy.
+the actual 0.35.0 source and passed on this candidate.
+
+Full [CI run 40222560194](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40222560194)
+for `c15ffaa` passed Ubuntu. [Windows](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40222560194/job/121257175269)
+ran 693 tests with one error: the material HTTP highlight workflow exceeded
+its test client's 10-second deadline. Highlight performs revalidation and a
+second source observation; the fixture freezes the native budget clock but
+retains real trace fsync. A secondary missing test-module traceback occurred
+afterwards as fixture teardown overtook the pending request; it was not a
+second unittest error. The aggregate gate failed and
+package production was skipped.
+
+The follow-up keeps runtime source and version unchanged and sets only the
+three material workflow clients to 40 seconds, allowing the bridge's existing
+30-second deadline to produce its own result. Invalid-request checks retain
+10 seconds. Twelve focused HTTP/client and existing budget/trace-failure guard
+checks pass locally. Full CI for this corrected commit, exact-ZIP verification
+and the bounded native preview remain pending gates as described in the
+[handoff](next-model-handoff.md) and testing policy.
+A separate controlled run on Linux added per-record delay while retaining
+real trace append/flush/fsync. The existing HTTP workflow passed with preview
+6.21 s, highlight 12.43 s, Apply 18.64 s and replay 0.001 s. This demonstrates
+completion beyond the former 10-second test deadline without bypassing
+storage; it is not a Windows CI or native Allplan result.
 
 ## Accepted baseline and scoped M4 observations
 
