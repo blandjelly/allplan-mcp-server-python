@@ -1,5 +1,6 @@
 """Public MCP HTTP contract for native Wall material editing."""
 import unittest
+import json
 from types import SimpleNamespace
 from uuid import uuid4
 
@@ -10,12 +11,19 @@ import test_wall_material_edit as fixture_module
 import test_native_material_columns as column_fixtures
 
 
+# The durable Wall workflow keeps real trace fsync; logic flows use a trace double.
+# Highlight revalidates and observes again; Windows storage can take >10 s.
+# Let the bridge's existing 30 s deadline expire before this test client does.
+MATERIAL_HTTP_TIMEOUT = 40
+
+
 class WallMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
     asyncSetUp = smoke.MCPSmokeTests.asyncSetUp
     stop_process = smoke.MCPSmokeTests.stop_process
 
     async def test_material_edit_with_axis_preview_highlight_apply_and_replay_over_http(self):
         native = fixture_module.WallMaterialEditTests()
+        native.use_durable_trace = True
         native.setUp()
         self.addCleanup(native.doCleanups)
         axis = native.native.element(21, name="WallAxis_TypeUUID")
@@ -36,9 +44,14 @@ class WallMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
 
         self.bridge_handler.handle = handle
         request = native.request()
-        async with Client(self.url, timeout=10) as client:
+        async with Client(self.url, timeout=MATERIAL_HTTP_TIMEOUT) as client:
             preview = (await client.call_tool("model_edit", {"request": request})).data
             self.assertEqual(preview["counts"]["changes"], 1)
+            records = [json.loads(line) for line in native.native.plans.trace_path.read_text(encoding="utf-8").splitlines()]
+            material_reads = [row for row in records if row["api"] == "WallTierProperties.Material"]
+            self.assertTrue(material_reads)
+            self.assertEqual({row["model_uuid"] for row in material_reads},
+                             {preview["changes"][0]["ref"]["model_uuid"]})
             self.assertEqual(preview["changes"][0]["resource"]["tier_index"], 1)
             axis_state = preview["changes"][0]["resource"]["native_material_state"]["auxiliary_components"]["tier"][0]
             self.assertEqual(axis_state["ownership"]["target"]["type_name"], "WallAxis_TypeUUID")
@@ -97,7 +110,7 @@ class WallMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
             return original(path, payload)
 
         self.bridge_handler.handle = handle
-        async with Client(self.url, timeout=10) as client:
+        async with Client(self.url, timeout=MATERIAL_HTTP_TIMEOUT) as client:
             result = (await client.call_tool("model_edit", {
                 "request": native.request()})).data
 
@@ -128,7 +141,7 @@ class WallMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
             return original(path, payload)
 
         self.bridge_handler.handle = handle
-        async with Client(self.url, timeout=10) as client:
+        async with Client(self.url, timeout=MATERIAL_HTTP_TIMEOUT) as client:
             preview = (await client.call_tool("model_edit", {"request": native.fixture.request(
                 native_types=["Column_TypeUUID"])})).data
             self.assertTrue(preview["apply_available"], preview)

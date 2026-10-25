@@ -6,15 +6,19 @@ from .query_contracts import fingerprint
 from .transport import BridgeError
 
 
-def identity(adapter):
-    signed = integer(adapter.GetDrawingfileNumber())
+def identity(adapter, *, trace=None):
+    def read(api, callback):
+        return trace(api, callback) if trace is not None else callback()
+
+    signed = integer(read("BaseElementAdapter.GetDrawingfileNumber", adapter.GetDrawingfileNumber))
     if signed == 0:
         raise ValueError("Missing drawing-file identity")
-    native_type = adapter.GetElementAdapterType()
+    native_type = read("BaseElementAdapter.GetElementAdapterType", adapter.GetElementAdapterType)
     return {"drawing_file": abs(signed), "signed_drawing_file": signed,
-            "model_uuid": guid(adapter.GetModelElementUUID()),
-            "view_uuid": guid(adapter.GetElementUUID()),
-            "type_name": text(native_type.GetTypeName()), "type_uuid": guid(native_type.GetGuid())}
+            "model_uuid": guid(read("BaseElementAdapter.GetModelElementUUID", adapter.GetModelElementUUID)),
+            "view_uuid": guid(read("BaseElementAdapter.GetElementUUID", adapter.GetElementUUID)),
+            "type_name": text(read("ElementAdapterType.GetTypeName", native_type.GetTypeName)),
+            "type_uuid": guid(read("ElementAdapterType.GetGuid", native_type.GetGuid))}
 
 
 def same_model_identity(left, right):
@@ -49,14 +53,14 @@ def failure(exc, stage="component_ownership"):
     return result
 
 
-def observe(adapter, check=lambda: None, *, include_children=True):
+def observe(adapter, check=lambda: None, *, include_children=True, trace=None):
     """Read exact ancestry/direct children; no writable property owner is inferred."""
     import NemAll_Python_IFW_ElementAdapter as adapters
 
-    def read(stage, callback):
+    def read(stage, callback, *, api=None):
         check()
         try:
-            value = callback()
+            value = trace(api or "Component." + stage, callback) if trace is not None else callback()
         except (BridgeError, ComponentReadError):
             raise
         except Exception as exc:
@@ -64,15 +68,16 @@ def observe(adapter, check=lambda: None, *, include_children=True):
         check()
         return value
 
-    target = read("target_identity", lambda: identity(adapter))
+    target = read("target_identity", lambda: identity(adapter, trace=trace))
     lineage, seen, retained = [target], {model_identity_key(target)}, [adapter]
     current = adapter
     for _ in range(16):
-        parent = read("parent", lambda: adapters.BaseElementAdapterParentElementService.GetParentElement(current))
+        parent = read("parent", lambda: adapters.BaseElementAdapterParentElementService.GetParentElement(current),
+                      api="BaseElementAdapterParentElementService.GetParentElement")
         retained.append(parent)
-        if read("parent", lambda: boolean(parent.IsNull())):
+        if read("parent", lambda: boolean(parent.IsNull()), api="BaseElementAdapter.IsNull"):
             break
-        ref = read("parent_identity", lambda: identity(parent))
+        ref = read("parent_identity", lambda: identity(parent, trace=trace))
         if ref["signed_drawing_file"] != target["signed_drawing_file"]:
             raise ComponentReadError("parent_identity", "component_cross_file")
         if model_identity_key(ref) in seen:
@@ -84,21 +89,23 @@ def observe(adapter, check=lambda: None, *, include_children=True):
         raise ComponentReadError("parent", "component_parent_limit")
     children, child_parent_edges, child_models = {}, [], set()
     if include_children:
-        owner = read("children", lambda: adapters.BaseElementAdapterChildElementsService.GetChildModelElements(adapter, True))
+        owner = read("children", lambda: adapters.BaseElementAdapterChildElementsService.GetChildModelElements(adapter, True),
+                     api="BaseElementAdapterChildElementsService.GetChildModelElements")
         retained.append(owner)
         for index, child in enumerate(owner):
             check()
             if index >= 256:
                 raise ComponentReadError("children", "component_child_limit")
-            child_ref = read("child_identity", lambda: identity(child))
+            child_ref = read("child_identity", lambda: identity(child, trace=trace))
             if child_ref["signed_drawing_file"] != target["signed_drawing_file"]:
                 raise ComponentReadError("child_identity", "component_cross_file")
-            parent = read("child_parent", lambda: adapters.BaseElementAdapterParentElementService.GetParentElement(child))
+            parent = read("child_parent", lambda: adapters.BaseElementAdapterParentElementService.GetParentElement(child),
+                          api="BaseElementAdapterParentElementService.GetParentElement")
             retained.append(parent)
-            if read("child_parent", lambda: boolean(parent.IsNull())):
+            if read("child_parent", lambda: boolean(parent.IsNull()), api="BaseElementAdapter.IsNull"):
                 raise ComponentReadError("child_parent_identity", "component_child_owner_mismatch",
                                          evidence={"target": target, "child": child_ref, "observed_parent": None})
-            parent_ref = read("child_parent_identity", lambda: identity(parent))
+            parent_ref = read("child_parent_identity", lambda: identity(parent, trace=trace))
             if not same_model_identity(parent_ref, target) or model_identity_key(child_ref) in seen:
                 raise ComponentReadError("child_parent_identity", "component_child_owner_mismatch",
                                          evidence={"target": target, "child": child_ref, "observed_parent": parent_ref})

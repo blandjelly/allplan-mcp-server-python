@@ -13,6 +13,31 @@ Read health/context and a fresh explicit-scope audit before planning a change.
 Historical execution results do not establish current values after Undo/Redo.
 Unknown data remains not_checked.
 
+## Native material preview failures
+
+Candidate 0.36.0 adds nested durable records to
+`Local/.allplan-mcp/logs/m4-native-probe.jsonl` during material observations
+in `model_edit.observe`. SDK imports, identity/ownership reads, native material,
+properties and geometry operations record `started` before execution and
+`returned` or `failed` afterwards. Entries share the enclosing `probe_id` and
+carry the drawing-file, model UUID and root view UUID from the completed M1
+scan. Those IDs identify the root being observed; they are not the identities
+of every auxiliary child read inside that observation. Property values and
+native exception messages are not logged.
+
+After a process crash, retain the first interrupted observation and its nested
+entries together with `bridge.log`, the original request and the Allplan crash
+log. The last `started` entry without completion narrows the failing operation;
+compound operations can still contain multiple SDK accesses. Material reads
+precede the full criterion filter, so the requested thickness alone does not
+identify the failing root. A missing dump does not justify repeating the crash
+on an unchanged candidate. The current bounded next trial is in the
+[handoff](next-model-handoff.md).
+
+Tracing preserves the existing 5-second read budget and 8 MiB trace limit.
+Storage or budget failures stop the operation; they do not authorize cleanup,
+fallback setters or automatic retry.
+
 ## Unknown results
 
 After a lost reply or partial/unknown result, preserve the original request and

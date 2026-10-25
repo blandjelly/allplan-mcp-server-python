@@ -3,16 +3,34 @@
 Current candidate and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
 [development plan](office-editing-development-plan.pl.md).
-Candidate 0.35.0 on `fix/m4-material-unblock` passed 153 distinct
-affected/dependent tests and 4 MCP HTTP tests on Python 3.12. Version metadata
-agrees on 0.35.0. Full GitHub CI, exact-ZIP verification and native acceptance
-are separate pending gates owned as described in the testing policy.
-The owner reports that 0.34.0's 240 mm Wall preview blocked at geometry and its
-Column request returned `old_value_unknown` through the Wall-only path. No raw
-responses were supplied, so these reports do not establish exact runtime
-stages or native acceptance. The 0.34.0 package/CI references remain in the
-prior handoff and repository history; the current trial is defined in the
-[handoff](next-model-handoff.md).
+The full-CI baseline for the current test-only optimization is `ee831a0` on
+`fix/m4-material-lifetime-trace`, based on `develop/m4` commit
+`9553c8d10d6cd8f0987b1310d0ee89d3b519dc49`. Full
+[CI run 40228207181](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40228207181)
+on `ee831a0` passed all 693 tests on both Windows and Ubuntu, package
+production, and the required `ci-required` gate. Windows test time was
+2,418.236 s; Ubuntu was 225.682 s. This supersedes the earlier Windows timeout
+failure on `c15ffaa` for `ee831a0`.
+
+The optimization continuing from `ee831a0` passed 103 affected tests in
+19.564 s on Python 3.12.14: `test_trace_test_support`,
+`test_wall_material_edit`, `test_native_material_columns`,
+`test_wall_material_http`, `test_property_probe`, `test_trace_cleanup` and
+`test_journal_cleanup`. Fixture selection/cleanup, JSON rejection, real journal
+storage and the real-fsync spy passed. Required CI for these new test changes
+is still pending; run 40228207181 validates only `ee831a0`.
+
+A local Linux benchmark of identical cases recorded 6,200 events in both
+configurations: real trace wrote 6,200 disk records in 0.720 s; the in-memory
+trace wrote zero disk records in 0.269 s. This local measurement does not
+estimate Windows performance. Routine material fixtures and most material HTTP
+tests use a fixture-scoped in-memory trace; durable ordering/storage-failure
+tests, production journal/storage tests, and one full Wall HTTP
+preview/highlight/apply/readback/replay flow retain real trace storage and
+fsync. See the [testing policy](testing-policy.md#material-trace-selection).
+Runtime code, budgets, journals, guards and package version are unchanged.
+The exact-ZIP verification and bounded native preview remain pending as
+described in the [handoff](next-model-handoff.md).
 
 ## Accepted baseline and scoped M4 observations
 
@@ -44,14 +62,50 @@ pairs. Missing fixtures and blocked paths are separate from PASS.
 
 ## Evidence for unresolved cases
 
-- **0.34.0 native material — owner report only:** Wall 240 mm preview was
-  reportedly blocked at tier geometry; Column at X=0, Y=0 reportedly returned
-  `old_value_unknown` because that candidate's adapter was Wall-only. No raw
-  responses are available. Candidate 0.35.0 expands the native property route
-  to standalone single-tier Walls and Columns while keeping the public
-  `native_material` request. Do not treat the report or implementation as
-  native acceptance; use the bounded Wall/Column trial in the
-  [handoff](next-model-handoff.md).
+- **0.35.0 native material preview crash:** Three previews on 25.10.2026
+  crashed Allplan with `C0000005` reading address `690`. At 17:34:17.597,
+  17:36:17.018 and 17:42:03.510 Europe/Warsaw, each M1 scan returned and
+  `Native.material_observation` started without a corresponding return or
+  failure. The first two requests targeted the original 240 mm Wall; the third
+  targeted a 200 mm Wall. The request IDs were
+  `aaa5eaeb-aae1-42b7-9cbe-4e2f27679653`,
+  `cad8b848-9c8b-4f64-8d44-e3a38cc050a2` and
+  `16b62bb6-3ceb-44f8-94f4-1faabfde6daf`. Preview did not reach Apply. The
+  `model_edit` reads material before filtering by thickness, so the requested
+  thicknesses do not identify which root was being read.
+  Cause remains unknown. A mixed `native`/`props`/`tier` set in
+  `wall_material.snapshot` is a candidate code issue, not a proven crash cause.
+  The owner checked WER and CrashDumps and found no dump for 25.10. The
+  available 29.09 PID 24704 and 08.10 PID 27988 dumps are historical
+  `C0000374` heap corruption events and do not diagnose these `C0000005`s.
+  Do not request another 0.35.0 crash or ask for those absent dumps. The
+  owner-supplied raw archive `crash log 0.35.0.zip` remains in local/chat
+  attachments. SHA-256:
+  `4ac1f7382f23e12f41e2398e0db6d41e4c6c264c78a57517ac22927bfdb534ac`.
+- **Completed Column Apply/readback from 0.35.0:** journal record
+  `repairs/c2fd4904f22c4d58bba15b9014bf07eb.json`, plan
+  `1a3cb68bc86c4076a84413c89f9ecca6`, model UUID
+  `eb88c850-0cac-408a-8091-f118872d74c2`, file 101, `Column_TypeUUID`, records
+  `native.material` from empty string to `Żelbet`, `completed` / `applied`,
+  `readback_matches`, and readback `Żelbet`. This confirms that Apply and
+  readback for this Column only. The supplied evidence does not include a
+  no-op, drift, UI Undo or restoration result; do not repeat this write/readback
+  trial.
+- **0.36.0 next native check:** After required CI and exact-ZIP verification,
+  owner runs only preview on the original 240 mm Wall. Preserve the first new
+  durable trace or failure and stop; no Apply for blocked or unknown preview.
+  This focused crash trial is not full native acceptance. Keep the 200 mm
+  Wall/opening `component_child_owner_mismatch` unresolved and do not repeat it.
+  Candidate work retains both existing native reads and their material
+  comparison, keeps the first owners alive through the full read, and includes
+  `tier` in `_detailed_snapshot` so the final snapshot uses coherent
+  `native`/`props`/`tier`. It adds durable `model_edit.observe` trace for
+  preview/revalidation/source observations, with the same root reference
+  metadata on traced SDK reads, preserving existing guards.
+  The uploaded `m4-native-probe.jsonl` measured 2,096,914 bytes; source
+  `NativeProbeTrace.MAX_BYTES` is 8 MiB. Preserve trace and journal history.
+  Do not add auto cleanup/delete; if storage blocks, retain its snapshot and
+  follow existing reviewed snapshot and confirmation procedure.
 - **Wall material — 0.33.0 native trial:** on drawing 101, the query found one
   original 240 mm `Ściana, prosta` (`Wall_TypeUUID`) with material observed as
   `Beton`. Query reported `scan_complete=true` but

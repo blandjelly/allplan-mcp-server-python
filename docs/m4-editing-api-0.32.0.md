@@ -1,4 +1,4 @@
-# Native material editing — candidate 0.35.0
+# Native material editing — candidate 0.36.0
 
 ## Request and native property owner
 
@@ -69,6 +69,13 @@ native material or that the attribute route was accepted for Wall or Column.
 
 ## Execution and acceptance boundary
 
+The Wall observation retains both native/property owner sets through the
+optional reads and uses the tier returned with the detailed observation's
+native object and properties. It retains the independent material comparison
+between the two reads. This corrects mixed-owner use in 0.35.0; it does not
+establish that borrowed-wrapper lifetime caused the native crash. Nested
+material trace entries are described in [diagnostics](diagnostics.md).
+
 The requested string is used exactly; there is no catalog lookup, existence
 claim, alias resolution, surface edit or attribute substitution. The same
 native root object is submitted with its updated properties. Exact target
@@ -76,9 +83,9 @@ binding, plan hashes, fresh pre-write revalidation, journal safeguards,
 post-write readback and unknown-result recovery remain in force. Automated
 checks and API availability do not establish native Allplan acceptance.
 
-The owner reports that candidate 0.34.0 blocked the 240 mm Wall at tier
-geometry and returned `old_value_unknown` for a Column because that adapter
-was Wall-only. No raw responses were supplied, so those reports do not
-establish the exact stage or a successful native write. The next Wall and
-Column trial is recorded in the [handoff](next-model-handoff.md); prior
-material observations remain in [validation status](validation-status.md).
+The 0.35.0 evidence confirms one Column Apply/readback and three interrupted
+Wall material previews followed by native access violations. Their underlying
+cause remains unproven, and neither old heap-corruption dump diagnoses those
+events. The next check is limited to a Wall preview after CI and exact-ZIP
+verification; see the [handoff](next-model-handoff.md). Prior material
+observations and their limits remain in [validation status](validation-status.md).

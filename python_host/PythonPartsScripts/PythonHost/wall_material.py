@@ -6,6 +6,7 @@ Only the existing represented object is submitted to ModifyElements.
 from __future__ import annotations
 
 import hashlib
+import importlib
 import json
 import math
 
@@ -25,6 +26,30 @@ _MAX_ATTRIBUTE_SNAPSHOT_BYTES = 256 * 1024
 _MAX_AUXILIARY_COMPONENTS = 256
 _MAX_COMPONENT_SNAPSHOT_BYTES = 1024 * 1024
 _STATE_SCHEMA = "m4-native-material-state-2"
+
+
+def _reader(check, trace=None, trace_ref=None, *, reason="wall_material_read_unavailable"):
+    # Identities come from the completed M1 scan; do not make untraced SDK
+    # identity calls to enrich the diagnostic. Values and SDK reprs stay out.
+    details = {key: trace_ref[key] for key in ("drawing_file", "model_uuid", "view_uuid")
+               if trace_ref is not None and key in trace_ref}
+
+    def native(api, callback):
+        return trace.call(api, callback, **details) if trace is not None else callback()
+
+    def read(callback, stage="wall_material", *, api=None):
+        check()
+        try:
+            return native(api or "Native.material." + stage, callback)
+        except (BridgeError, ComponentReadError):
+            raise
+        except Exception as exc:
+            raise ComponentReadError(stage, reason, type(exc).__name__) from exc
+        finally:
+            check()
+
+    read.native = native
+    return read
 
 
 def _scalar(value):
@@ -49,13 +74,14 @@ def _identity_key(ref):
     return tuple(ref[key] for key in ("drawing_file", "signed_drawing_file", "model_uuid", "type_name", "type_uuid"))
 
 
-def _read_container_attributes(adapter, base, check):
+def _read_container_attributes(adapter, base, check, read):
     """Snapshot all stored metadata on one exact AttributeContainer.
 
     Unknown SDK values are not coerced: they make this optional snapshot unavailable.
     This is preservation evidence only and does not establish field ownership.
     """
-    raw = adapter.GetAttributes(base.eAttibuteReadState.ReadAll)
+    raw = read.native("BaseElementAdapter.GetAttributes(ReadAll)",
+                      lambda: adapter.GetAttributes(base.eAttibuteReadState.ReadAll))
     result, seen, byte_count = [], set(), 0
     for index, pair in enumerate(raw):
         check()
@@ -85,14 +111,14 @@ def _live_children(adapter, observed, check, read):
     import NemAll_Python_IFW_ElementAdapter as adapters
 
     collection = read(lambda: adapters.BaseElementAdapterChildElementsService.GetChildModelElements(adapter, True),
-                      "material_component_children")
+                      "material_component_children", api="BaseElementAdapterChildElementsService.GetChildModelElements")
     live = []
     for index, child in enumerate(collection):
         check()
         if index >= _MAX_AUXILIARY_COMPONENTS:
             raise ComponentReadError("material_component_children", "wall_material_component_limit")
         live.append(child)
-    refs = [read(lambda child=child: identity(child), "material_component_identity") for child in live]
+    refs = [read(lambda child=child: identity(child, trace=read.native), "material_component_identity") for child in live]
     if (len({_identity_key(ref) for ref in refs}) != len(refs)
             or {_identity_key(ref) for ref in refs} != {_identity_key(ref) for ref in observed["children"]}):
         raise ComponentReadError("material_component_children", "wall_material_component_children_changed")
@@ -100,7 +126,7 @@ def _live_children(adapter, observed, check, read):
     return collection, list(zip(live, refs))
 
 
-def _auxiliary_geometry(adapter, check):
+def _auxiliary_geometry(adapter, check, read=None):
     """Keep stream evidence when available, without requiring every child to be a solid.
 
     Axis and other auxiliary SDK geometries need not expose WriteToStream.
@@ -111,11 +137,12 @@ def _auxiliary_geometry(adapter, check):
 
     check()
     try:
-        geometry = adapter.GetModelGeometry()
+        native_read = read.native if read is not None else lambda api, callback: callback()
+        geometry = native_read("BaseElementAdapter.GetModelGeometry", adapter.GetModelGeometry)
         serializer = getattr(geometry, "WriteToStream", None)
         if not callable(serializer):
             return {"status": "not_checked", "reason": "geometry_stream_unsupported"}
-        code, stream = serializer()
+        code, stream = native_read("Geometry.WriteToStream", serializer)
         if code != geometry_api.eGeometryErrorCode.eOK or type(stream) is not str or not stream or len(stream) > 524288:
             return {"status": "not_checked", "reason": "geometry_stream_unavailable"}
         return {"status": "observed", "stream_sha256": hashlib.sha256(stream.encode("utf-8")).hexdigest()}
@@ -132,7 +159,7 @@ def _auxiliary_snapshot(adapter, base, owner, check, read, budget, expected):
     if budget["count"] >= _MAX_AUXILIARY_COMPONENTS:
         raise ComponentReadError("material_component_children", "wall_material_component_limit")
     budget["count"] += 1
-    observed = read(lambda: observe(adapter, check), "material_component_hierarchy")
+    observed = read(lambda: observe(adapter, check, trace=read.native), "material_component_hierarchy")
     lineage = observed["lineage"]
     if (not same_model_identity(observed["target"], expected)
             or len(lineage) != len(owner["lineage"]) + 1 or lineage[0] != observed["target"]
@@ -146,13 +173,13 @@ def _auxiliary_snapshot(adapter, base, owner, check, read, budget, expected):
     budget["seen"].add(key)
     result = {"ownership": observed, "children": []}
     if observed["target"]["type_name"] == "AttributeContainer_TypeUUID":
-        attrs = read(lambda: _read_container_attributes(adapter, base, check),
+        attrs = read(lambda: _read_container_attributes(adapter, base, check, read),
                      "material_attribute_container_values")
         result["stored_attributes"] = attrs
         budget["attribute_bytes"] += len(json.dumps(result, ensure_ascii=False, allow_nan=False).encode("utf-8"))
         if budget["attribute_bytes"] > _MAX_ATTRIBUTE_SNAPSHOT_BYTES:
             raise ComponentReadError("material_children", "wall_material_attribute_snapshot_limit")
-    result["geometry"] = _auxiliary_geometry(adapter, check)
+    result["geometry"] = _auxiliary_geometry(adapter, check, read)
     # Count each node once, including empty child-list framing and a comma
     # allowance, before its descendants are attached to the serialized tree.
     budget["snapshot_bytes"] += len(json.dumps(result, ensure_ascii=False, allow_nan=False).encode("utf-8")) + 2
@@ -166,34 +193,27 @@ def _auxiliary_snapshot(adapter, base, owner, check, read, budget, expected):
     return result
 
 
-def _detailed_snapshot(base, adapter, check=lambda: None, *, material_observation=None, captured=None):
-    import NemAll_Python_ArchElements as arch
-    import NemAll_Python_IFW_ElementAdapter as adapters
-
-    def read(callback, stage="wall_material"):
-        check()
-        try:
-            result = callback()
-        except (BridgeError, ComponentReadError):
-            raise
-        except Exception as exc:
-            raise ComponentReadError(stage, "wall_material_read_unavailable", type(exc).__name__) from exc
-        check()
-        return result
+def _detailed_snapshot(base, adapter, check=lambda: None, *, material_observation=None, captured=None,
+                       trace=None, trace_ref=None):
+    read = _reader(check, trace, trace_ref)
+    arch = read(lambda: importlib.import_module("NemAll_Python_ArchElements"), "material_native_module",
+                api="Python.import.NemAll_Python_ArchElements")
+    adapters = read(lambda: importlib.import_module("NemAll_Python_IFW_ElementAdapter"), "material_adapter_module",
+                    api="Python.import.NemAll_Python_IFW_ElementAdapter")
 
     if text(read(lambda: adapter.GetElementAdapterType().GetTypeName())) != "Wall_TypeUUID":
         raise ValueError("Native material requires a Wall root")
     state = captured if captured is not None else {}
-    hierarchy = read(lambda: observe(adapter, check), "material_hierarchy")
+    hierarchy = read(lambda: observe(adapter, check, trace=read.native), "material_hierarchy")
     state["hierarchy"] = hierarchy
-    native = read(lambda: base.GetElement(adapter), "material_native_representation")
+    native = read(lambda: base.GetElement(adapter), "material_native_representation", api="BaseElements.GetElement")
     if not isinstance(native, arch.WallElement):
         raise ValueError("Native representation is not WallElement")
-    props = read(lambda: native.Properties, "material_properties")
-    if integer(read(lambda: props.TierCount)) != 1:
+    props = read(lambda: native.Properties, "material_properties", api="WallElement.Properties")
+    if integer(read(lambda: props.TierCount, api="WallProperties.TierCount")) != 1:
         raise ComponentReadError("material_tier_count", "wall_material_single_tier_required")
-    tier = read(lambda: props.GetWallTierProperties(1))
-    material = read(lambda: tier.Material, "material_value")
+    tier = read(lambda: props.GetWallTierProperties(1), api="WallProperties.GetWallTierProperties(1)")
+    material = read(lambda: tier.Material, "material_value", api="WallTierProperties.Material")
     if type(material) is not str or len(material) > 255:
         raise ComponentReadError("material_value", "wall_material_string_unavailable")
     if material_observation is not None:
@@ -203,7 +223,7 @@ def _detailed_snapshot(base, adapter, check=lambda: None, *, material_observatio
     if not callable(getattr(tier, "SetMaterial", None)) or not callable(getattr(native, "SetProperties", None)):
         raise ComponentReadError("material_setters", "wall_material_setters_unavailable")
     children = read(lambda: adapters.BaseElementAdapterChildElementsService.GetChildModelElements(adapter, True),
-                    "material_children")
+                    "material_children", api="BaseElementAdapterChildElementsService.GetChildModelElements")
     tiers = []
     child_refs = []
     root_metadata = []
@@ -220,12 +240,12 @@ def _detailed_snapshot(base, adapter, check=lambda: None, *, material_observatio
         if kind != "WallTier_TypeUUID":
             if kind == "AttributeContainer_TypeUUID" and len(root_metadata) >= _MAX_ATTRIBUTE_CONTAINERS:
                 raise ComponentReadError("material_children", "wall_material_attribute_container_limit")
-            ref = read(lambda: identity(child), "material_component_identity")
+            ref = read(lambda: identity(child, trace=read.native), "material_component_identity")
             component = _auxiliary_snapshot(child, base, hierarchy, check, read, budget, ref)
             child_refs.append(component["ownership"]["target"])
             (root_metadata if kind == "AttributeContainer_TypeUUID" else root_auxiliary).append(component)
             continue
-        child_hierarchy = read(lambda: observe(child, check), "material_tier_hierarchy")
+        child_hierarchy = read(lambda: observe(child, check, trace=read.native), "material_tier_hierarchy")
         state["tier_hierarchy"] = child_hierarchy
         lineage = child_hierarchy["lineage"]
         # A tier's parent can be another view wrapper of this same Wall.
@@ -251,7 +271,7 @@ def _detailed_snapshot(base, adapter, check=lambda: None, *, material_observatio
         metadata_children.sort(key=fingerprint)
         # Material is a property edit; a tier need not expose a valid
         # Polyhedron3D (or any serializable geometry) to accept it.
-        tiers.append(_auxiliary_geometry(child, check))
+        tiers.append(_auxiliary_geometry(child, check, read))
         state["tier_geometry"] = tiers[-1]
     if (len(tiers) != 1 or len(child_refs) != len(hierarchy["children"])
             or len({_identity_key(ref) for ref in child_refs}) != len(child_refs)
@@ -263,10 +283,12 @@ def _detailed_snapshot(base, adapter, check=lambda: None, *, material_observatio
              "tier_attribute_containers": metadata_children, "tier_count": 1,
              "auxiliary_components": {"root": sorted(root_auxiliary, key=fingerprint),
                                       "tier": sorted(tier_auxiliary, key=fingerprint)},
-             "axis": read(lambda: _representation(props.Axis), "material_axis"),
-             "path_axis_type": integer(read(lambda: props.PathElementAxisType)),
-             "tier": {name: read(lambda name=name: _scalar(getattr(tier, name)), "material_tier_" + name) for name in _SCALARS},
-             "common": {name: read(lambda name=name: _scalar(getattr(tier.CommonProperties, name)), "material_common_" + name) for name in _COMMON},
+             "axis": read(lambda: _representation(props.Axis), "material_axis", api="WallProperties.Axis.repr"),
+             "path_axis_type": integer(read(lambda: props.PathElementAxisType, api="WallProperties.PathElementAxisType")),
+             "tier": {name: read(lambda name=name: _scalar(getattr(tier, name)), "material_tier_" + name,
+                                  api="WallTierProperties." + name) for name in _SCALARS},
+             "common": {name: read(lambda name=name: _scalar(getattr(tier.CommonProperties, name)), "material_common_" + name,
+                                    api="WallTierProperties.CommonProperties." + name) for name in _COMMON},
              "complex_properties": {name: read(lambda name=name: _representation(getattr(tier, name)), "material_" + name)
                                     for name in ("PlaneReferences", "SurfaceElementProperties")}})
     if type(state["tier"]["Thickness"]) not in (float, int) or state["tier"]["Thickness"] <= 0:
@@ -275,7 +297,7 @@ def _detailed_snapshot(base, adapter, check=lambda: None, *, material_observatio
     state["geometry_stream_sha256"] = tiers[0].get("stream_sha256")
     state["invariant_coverage"] = "explicit_properties_metadata_and_bounded_auxiliary_tree_with_optional_geometry_streams"
     check()
-    return material, state, native, props
+    return material, state, native, props, tier
 
 
 def _optional(callback, check, stage):
@@ -290,42 +312,35 @@ def _optional(callback, check, stage):
         check()
 
 
-def snapshot(base, adapter, check=lambda: None, *, material_observation=None):
+def snapshot(base, adapter, check=lambda: None, *, material_observation=None, trace=None, trace_ref=None):
     """Require the field owner and material, not geometry or hidden metadata.
 
     Available invariant evidence is still bound into revalidation/readback.
     Unsupported preservation reads remain explicit and never authorize a
     different target, an automatic setter retry or a claim of full coverage.
     """
-    import NemAll_Python_ArchElements as arch
+    read = _reader(check, trace, trace_ref, reason="native_material_read_unavailable")
+    arch = read(lambda: importlib.import_module("NemAll_Python_ArchElements"), "material_native_module",
+                api="Python.import.NemAll_Python_ArchElements")
 
-    def read(callback, stage):
-        check()
-        try:
-            return callback()
-        except (BridgeError, ComponentReadError):
-            raise
-        except Exception as exc:
-            raise ComponentReadError(stage, "native_material_read_unavailable", type(exc).__name__) from exc
-        finally:
-            check()
-
-    hierarchy = read(lambda: observe(adapter, check, include_children=False), "material_hierarchy")
+    hierarchy = read(lambda: observe(adapter, check, include_children=False, trace=read.native), "material_hierarchy")
     kind = hierarchy["target"]["type_name"]
     class_name = {"Wall_TypeUUID": "WallElement", "Column_TypeUUID": "ColumnElement"}.get(kind)
     if class_name is None:
         raise ComponentReadError("material_native_type", "native_material_type_unsupported")
     if hierarchy["lineage"] != [hierarchy["target"]]:
         raise ComponentReadError("material_hierarchy", "native_material_standalone_root_required")
-    native = read(lambda: base.GetElement(adapter), "material_native_representation")
+    native = read(lambda: base.GetElement(adapter), "material_native_representation", api="BaseElements.GetElement")
     if not isinstance(native, getattr(arch, class_name)):
         raise ComponentReadError("material_native_representation", "native_material_representation_unsupported")
-    props = read(lambda: native.Properties, "material_properties")
+    props = read(lambda: native.Properties, "material_properties", api=class_name + ".Properties")
     is_wall = kind == "Wall_TypeUUID"
-    if is_wall and integer(read(lambda: props.TierCount, "material_tier_count")) != 1:
+    if is_wall and integer(read(lambda: props.TierCount, "material_tier_count", api="WallProperties.TierCount")) != 1:
         raise ComponentReadError("material_tier_count", "wall_material_single_tier_required")
-    tier = read(lambda: props.GetWallTierProperties(1), "material_tier_properties") if is_wall else props
-    material = read(lambda: tier.Material, "material_value")
+    tier = read(lambda: props.GetWallTierProperties(1), "material_tier_properties",
+                api="WallProperties.GetWallTierProperties(1)") if is_wall else props
+    owner_name = "WallTierProperties" if is_wall else "ColumnProperties"
+    material = read(lambda: tier.Material, "material_value", api=owner_name + ".Material")
     if type(material) is not str or len(material) > 255:
         raise ComponentReadError("material_value", "native_material_string_unavailable")
     if material_observation is not None:
@@ -335,10 +350,14 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None):
 
     state = {"hierarchy": hierarchy, "tier_count": 1 if is_wall else None}
     if is_wall:
+        # Boost.Python may expose borrowed children. Retain the first owner
+        # graph through all reads, including replacement by the detailed read.
+        retained_core = native, props, tier
         captured = {}
-        detailed = _optional(lambda: _detailed_snapshot(base, adapter, check, captured=captured), check, "material_preservation")
+        detailed = _optional(lambda: _detailed_snapshot(base, adapter, check, captured=captured,
+                             trace=trace, trace_ref=trace_ref), check, "material_preservation")
         if isinstance(detailed, tuple):
-            current_material, state, native, props = detailed
+            current_material, state, native, props, tier = detailed
             if current_material != material:
                 raise BridgeError("repair_conflict", "Material changed during observation.", 409)
         else:
@@ -347,20 +366,24 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None):
             state["partial_preservation"] = captured
             state["preservation_diagnostic"] = detailed
     else:
-        state["component_tree"] = _optional(lambda: observe(adapter, check), check, "material_component_tree")
-        state["geometry"] = _auxiliary_geometry(adapter, check)
+        state["component_tree"] = _optional(lambda: observe(adapter, check, trace=read.native), check, "material_component_tree")
+        state["geometry"] = _auxiliary_geometry(adapter, check, read)
 
     # Read each unrelated property independently: one unsupported field must
     # not discard all the other available drift evidence.
     state["optional_properties"] = {
-        "tier": {name: _optional(lambda name=name: _scalar(getattr(tier, name)), check,
+        "tier": {name: _optional(lambda name=name: read.native(owner_name + "." + name,
+                                  lambda: _scalar(getattr(tier, name))), check,
                                   "material_tier_" + name) for name in _SCALARS},
-        "common": {name: _optional(lambda name=name: _scalar(getattr(tier.CommonProperties, name)), check,
+        "common": {name: _optional(lambda name=name: read.native(owner_name + ".CommonProperties." + name,
+                                    lambda: _scalar(getattr(tier.CommonProperties, name))), check,
                                     "material_common_" + name) for name in _COMMON},
-        "complex": {name: _optional(lambda name=name: _representation(getattr(tier, name)), check,
+        "complex": {name: _optional(lambda name=name: read.native(owner_name + "." + name + ".repr",
+                                     lambda: _representation(getattr(tier, name))), check,
                                      "material_" + name) for name in ("PlaneReferences", "SurfaceElementProperties")}}
     if is_wall:
-        state["optional_properties"]["axis"] = _optional(lambda: _representation(props.Axis), check, "material_axis")
+        state["optional_properties"]["axis"] = _optional(lambda: read.native("WallProperties.Axis.repr",
+                                                          lambda: _representation(props.Axis)), check, "material_axis")
     state.update(schema_version=_STATE_SCHEMA,
                  material_owner="wall_tier_1" if is_wall else "column_properties")
     check()
@@ -384,7 +407,7 @@ def observation(base, element, check=lambda: None):
     return (value, state) if state is not None else (preservation, None)
 
 
-def preview_observation(base, element, check=lambda: None):
+def preview_observation(base, element, check=lambda: None, *, trace=None, trace_ref=None):
     """Separate a readable material string from eligibility to preserve the Wall.
 
     Eligibility requires the native property owner and available setters.
@@ -392,7 +415,8 @@ def preview_observation(base, element, check=lambda: None):
     """
     value = {}
     try:
-        material, state, _, _ = snapshot(base, element, check, material_observation=value)
+        material, state, _, _ = snapshot(base, element, check, material_observation=value,
+                                       trace=trace, trace_ref=trace_ref)
         return {"status": "observed", "value": material}, state, {"status": "observed", "value": True}
     except BridgeError:
         raise
