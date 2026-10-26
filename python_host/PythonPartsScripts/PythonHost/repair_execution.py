@@ -458,7 +458,7 @@ class RepairExecutor:
                     return {**self.result(record, replayed=True), "action": "recover", "archived": True,
                             "current_model_values": "not_checked", "recovery_required": False,
                             "report_text": "Archived resolved execution; history only. No current model values read or setters repeated."}
-                return self.recover(doc, base, settings, record)
+                return self.recover(doc, base, settings, record, request)
             if record is not None:
                 if record["request_hash"] != fingerprint(request):
                     raise BridgeError("execution_id_conflict", "Execution ID belongs to a different apply request.", 409)
@@ -687,7 +687,7 @@ class RepairExecutor:
                 outcome.update(state="unknown", **_error_details(exc), stage=stage)
             self.save(record)
 
-    def recover(self, doc, base, settings, record):
+    def recover(self, doc, base, settings, record, request=None):
         # Recovery is observation only; session-local refs are never resumed.
         reference = record["changes"][0]["ref"]
         criterion_request = record.get("criterion_request", {})
@@ -721,7 +721,11 @@ class RepairExecutor:
                         "method": "recovery_audit"}
         if current is None or any(current[k] != reference[k] for k in ("project_key", "document_id")):
             raise BridgeError("repair_conflict", "Open the original disposable project/document for recovery.", 409)
+        requested_hash = (request or {}).get("reconciliation_hash")
+        previous_proposal = record.get("recovery", {}).get("reconciliation", {})
+        original_outcomes = copy.deepcopy(record["outcomes"])
         observations = []
+        candidates = []
         for index, change in enumerate(record["changes"]):
             stage = "recovery_resolve"
             resolution = {}
@@ -737,12 +741,42 @@ class RepairExecutor:
                 details = {}
             observations.append({"state": state, "readback": value, "stage": stage,
                                  **({"representation_consensus": resolution} if resolution else {}), **details})
+            if (record["outcomes"][index]["state"] == "unknown"
+                    and change.get("operation") == "set_native_material"
+                    and resolution.get("reconciliation_readback", {}).get("status") == "observed"):
+                candidates.append({"index": index, "ref": change["ref"],
+                    "readback": resolution["reconciliation_readback"],
+                    "representations": resolution["representations"]})
             if record["outcomes"][index]["state"] == "unknown" and state in {"new_value_observed", "old_value_observed"}:
                 record["outcomes"][index].update(state="reconciled", reason=state, readback=value)
+        reconciliation = None
+        unresolved = [index for index, outcome in enumerate(record["outcomes"]) if outcome["state"] == "unknown"]
+        if candidates and [item["index"] for item in candidates] == unresolved:
+            digest = fingerprint({"execution_id": record["execution_id"], "changes": record["changes"],
+                                  "evidence": candidates})
+            reconciliation = {"hash": digest, "targets": candidates,
+                "meaning": "Current native material is agreed; preservation differs from the reviewed plan. "
+                           "Review changed sections and the model before acknowledging. This does not prove preservation or setter causality.",
+                "request": {"schema_version": "m4-model-edit-1", "action": "recover",
+                    "execution_id": record["execution_id"], "reconciliation_hash": digest,
+                    "acknowledgement": "reviewed_material_reconciliation"}}
+        if requested_hash is not None:
+            if (reconciliation is None or requested_hash != reconciliation["hash"]
+                    or previous_proposal.get("hash") != requested_hash):
+                raise BridgeError("repair_conflict", "Reconciliation evidence changed or was not reviewed; recover again without acknowledgement.", 409)
+            for item in candidates:
+                index = item["index"]
+                record["outcomes"][index].update(state="reconciled", reason="reviewed_material_preservation_conflict",
+                    readback=item["readback"], original_outcome=original_outcomes[index],
+                    reconciliation_hash=requested_hash, reconciliation_evidence=item,
+                    acknowledgement="reviewed_material_reconciliation", preservation_verified=False)
+            reconciliation["accepted"] = True
         record["state"] = "stopped" if record["state"] == "running" else record["state"]
         record["recovery"] = {"observations": observations, ("criteria" if "criterion_request" in record else "audit"): report,
                               "identity": identity,
                               "identity_limit": "project/document/model match; copy identity and mutation causality not proven"}
+        if reconciliation is not None:
+            record["recovery"]["reconciliation"] = reconciliation
         self.save(record)
         result = self.result(record)
         result.update(action="recover", read_only=True)
@@ -766,6 +800,9 @@ class RepairExecutor:
             blockers.append("journal_full")
         if blocking_ids:
             next_action = {"action": "recover", "execution_id": blocking_ids[0]}
+            if reconciliation is not None and not reconciliation.get("accepted"):
+                next_action = {"action": "review_reconciliation", "execution_id": record["execution_id"],
+                               "after_review_request": reconciliation["request"]}
         elif blockers:
             next_action = {"action": "inspect_journal"}
         else:

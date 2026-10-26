@@ -152,6 +152,13 @@ def validate_request(request):
         converted = {**request, "schema_version": "m3-repair-1"}
         if action == "highlight":
             converted["action"] = "revalidate"
+        if action == "recover":
+            digest = converted.pop("reconciliation_hash", None)
+            ack = converted.pop("acknowledgement", None)
+            if digest is not None or ack is not None:
+                if (not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest)
+                        or ack != "reviewed_material_reconciliation"):
+                    invalid("Reconciliation needs its reviewed hash and acknowledgement together.")
         validate_repair_request(converted)
         if "workflow_kind" in request or "evaluation_stop" in request:
             invalid("No alternate workflow or diagnostic interruption on this route.")

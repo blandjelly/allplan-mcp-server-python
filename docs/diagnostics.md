@@ -53,6 +53,31 @@ does not resume skipped targets, retry, Undo or prove write causality. Exact-ID
 replay returns historical outcomes without setters. After host restart, use
 recovery for the saved execution and a fresh preview for any new authorized work.
 
+## Reviewed native-material reconciliation
+
+For an unresolved native-material execution, install the verified candidate
+and keep the original project open in the same Allplan session. Inspect the
+current model, then recover with the original execution ID and no extra fields.
+Only when every remaining unknown is native material and all exact live views
+agree on material and original owner can the response offer
+`recovery.reconciliation`. Review its exact targets, `meaning`, per-view
+`changed_sections`, and before/current preservation hashes. Compare them with
+the current model; inspect UI or geometry when the differences require it.
+
+After review, use the returned `request` unchanged, including its exact
+`reconciliation_hash` and
+`acknowledgement="reviewed_material_reconciliation"`, in the same session.
+The bridge rereads under the journal lock and accepts only if the evidence hash
+is unchanged. A changed proposal requires a fresh unacknowledged recover and a
+new review. Missing/disagreeing/unreadable representations or any unknown
+non-material operation keep the lock and cannot be acknowledged this way.
+Accepted reconciliation is read-only: it retains the original outcome and
+records `reviewed_material_preservation_conflict` with
+`preservation_verified=false`, retaining the reconciliation evidence, exact
+hash and acknowledgement. It does not establish setter causality or
+preservation, report applied success, retry writes or delete history. After the
+blocker clears, plan any new authorized change with a fresh preview.
+
 | Launcher | Saved pointer under package logs |
 | --- | --- |
 | M3 Workflow Recover.cmd | m3-last-workflow-execution.json |

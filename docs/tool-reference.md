@@ -434,10 +434,15 @@ the plan.
 
 Native material observations skip decisively nonmatching and explicitly
 excluded peers, which stay in the M1 source fingerprint so new matches still
-invalidate Apply. Material evidence has a 10-second bound including durable
-trace I/O; M1 scanning retains its 5-second limit and the client timeout is
-unchanged. Completed Wall scalar evidence is reused on the retained property
-owners instead of reading every property twice.
+invalidate Apply. Preview captures the full optional preservation snapshot
+only on the exact reviewed setter wrapper. Other live representations receive
+core material and bound-owner reads, which must agree with that wrapper.
+Preview observation, consensus and setter preflight each have a separate
+10-second material evidence budget, including durable trace I/O; preflight does
+not reuse an expired 5-second M1 enumeration budget. M1 scanning keeps its
+5-second limit and the client timeout is unchanged. Completed Wall scalar
+evidence is reused on retained property owners instead of reading every
+property twice.
 
 Exact root/type, current material, setter availability, active foreground
 drawing and existing target, journal and write guards are required. Geometry
@@ -565,6 +570,30 @@ is chosen to hide a conflicting read. New previews bind `target_view_uuid` into
 the plan hash for one exact setter target, after agreement across representations.
 A missing reviewed view or a disagreeing/unreadable representation blocks writes.
 Legacy records need no view binding for read-only recovery.
+
+For native-material preservation drift, candidate 0.38.0 can propose a
+separate read-only reconciliation only when every remaining unknown outcome is
+native material and all exact live representations agree on current material
+and original owner. The unacknowledged `recover` response may include
+`recovery.reconciliation` (`hash`, `targets`, `meaning`, `request`). Inspect
+each exact target and its per-representation `changed_sections` and before/current
+hashes against the current model; use UI/geometry review when needed. Missing
+views/owners, unreadable evidence, material disagreement or another unknown
+operation keeps the lock and produces no proposal.
+Ordinary preview, revalidation and readback still enforce the full preservation
+fingerprint; this recovery path does not weaken setter eligibility.
+
+After reviewing the offered evidence, submit the returned `request` with its
+unchanged `reconciliation_hash` and
+`acknowledgement="reviewed_material_reconciliation"` in the same session. The
+bridge rereads under the journal lock and accepts only if the proposal hash is
+unchanged. If it changed, recover again without acknowledgement and review the
+new proposal. Accepted outcome reason is
+`reviewed_material_preservation_conflict`; `original_outcome` is retained and
+`preservation_verified=false`; `reconciliation_evidence`, the accepted hash and
+the acknowledgement are also retained. This does not prove setter causality, report
+applied success, retry a setter, or delete history. Once the recovery blocker
+clears, a new edit requires a fresh preview.
 
 Example shape for a simple Column: the `attribute:<ID_FROM_PROBE>` token below
 is a placeholder for the numeric ID actually resolved in the current

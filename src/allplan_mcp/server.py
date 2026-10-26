@@ -360,7 +360,15 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     Shared journal, fresh scope/resource checks, native writability and readback
     remain enforced. Recover M4 executions by exact journal targets in the original
     project/document, without requiring a new global criterion scan. Recovery
-    never repeats setters. Follow its journal blockers and next action; if the
+    never repeats setters. If recovery.reconciliation is offered, inspect its
+    current material, changed preservation sections and the model. To settle
+    that recorded conflict, submit its exact request (reconciliation_hash plus
+    acknowledgement=reviewed_material_reconciliation). The host re-reads all
+    evidence under the journal lock; stale or unavailable evidence stays blocked.
+    This records reconciled with preservation_verified=false, retains the original
+    outcome and never claims successful preservation or repeats a setter. The
+    agent can perform this review in-session; it is not trace/journal deletion.
+    Follow its journal blockers and next action; if the
     outcome remains unreadable, preserve the journal and do not create a new
     execution ID to bypass it. Native acceptance of this new path is pending.
     If a trace/journal fills, follow next_action to fix_model_issues

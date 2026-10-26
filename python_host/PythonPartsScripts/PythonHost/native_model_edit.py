@@ -170,12 +170,20 @@ def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapte
     selected = matches[selected_view] if selected_view is not None else next(iter(matches.values()))
     element = selected[0]
     if writable:
+        # The enumeration deadline ends with enumeration. Material evidence
+        # has its own bounded allowance, as it does in preview/readback.
+        if change.get("operation") == "set_native_material":
+            from .model_edit import MATERIAL_EVIDENCE_SECONDS
+            evidence_started = queries.clock()
+            def budget():
+                if queries.clock() - evidence_started >= max(queries.SCAN_SECONDS, MATERIAL_EVIDENCE_SECONDS):
+                    raise BridgeError("scan_limit_exceeded", "Material preflight evidence time budget exceeded.", 409)
         for wrapper in selected:
-            _writable(doc, base, queries, wrapper, change, diagnostics, budget)
+            _writable(doc, base, queries, wrapper, change, diagnostics, budget, preservation=wrapper is element)
     return element
 
 
-def _writable(doc, base, queries, element, change, diagnostics, budget):
+def _writable(doc, base, queries, element, change, diagnostics, budget, *, preservation=True):
     ref = change["ref"]
     flags = {}
     if diagnostics is not None:
@@ -207,7 +215,7 @@ def _writable(doc, base, queries, element, change, diagnostics, budget):
         preflight(element, change, budget)
     if change.get("operation") == "set_native_material":
         from .wall_material import read as read_material
-        if read_material(base, element, change, budget) != change["old_value"]:
+        if read_material(base, element, change, budget, preservation=preservation) != change["old_value"]:
             _conflict("Native material or observed evidence changed before write.")
 
 
@@ -222,22 +230,30 @@ def read_consensus(base, queries, elements, change, diagnostics=None):
     if not elements or len(elements) > 64:
         return {"status": "not_checked", "value": None, "reason": "representation_count_unavailable_or_over_limit"}
     observations = []
-    for element in elements:
-        if queries.clock() - started >= queries.SCAN_SECONDS:
+    material = change.get("operation") == "set_native_material"
+    selected = next((element for element in elements
+                     if guid(element.GetElementUUID()) == change.get("target_view_uuid")), None)
+    seconds = queries.SCAN_SECONDS
+    if material:
+        from .model_edit import MATERIAL_EVIDENCE_SECONDS
+        seconds = max(seconds, MATERIAL_EVIDENCE_SECONDS)
+    def check():
+        if queries.clock() - started >= seconds:
             raise BridgeError("scan_limit_exceeded", "Consensus read time budget exceeded.", 409)
+    for element in elements:
+        check()
         lifecycle = {method: observation(lambda method=method: boolean(getattr(element, method)()))
                      for method in ("IsNull", "IsDeleted", "IsValid")}
         valid = all(lifecycle[method].get("status") == "observed"
                     and lifecycle[method].get("value") is expected
                     for method, expected in (("IsNull", False), ("IsDeleted", False), ("IsValid", True)))
-        # Optional preservation belongs to the exact reviewed view. Other
-        # live views must agree on the required native material/owner only.
-        if (valid and change.get("operation") == "set_native_material"
-                and guid(element.GetElementUUID()) != change.get("target_view_uuid")):
-            from .wall_material import preview_observation
-            value, material_state, eligibility = preview_observation(base, element)
-            if material_state is None:
-                value = eligibility
+        # Only one wrapper's preservation was bound by preview. Every other
+        # wrapper still has to prove the same required owner and material.
+        if valid and material:
+            from .wall_material import read as read_material
+            value = read_material(base, element, change, check, preservation=element is selected)
+            if selected is None:
+                value = {"status": "not_checked", "value": None, "reason": "reviewed_view_missing"}
         else:
             value = (read(base, queries, element, change) if valid else
                  {"status": "not_checked", "value": None, "reason": "representation_lifecycle_unavailable"})
@@ -246,16 +262,24 @@ def read_consensus(base, queries, elements, change, diagnostics=None):
         evidence["representations"].append({"view_uuid": guid(element.GetElementUUID()),
             "lifecycle": {key: item["value"] if item.get("status") == "observed" else item
                           for key, item in lifecycle.items()},
-            "readback_status": value.get("status"), "readback_sha256": fingerprint(value)})
+            "readback_status": value.get("status"), "readback_sha256": fingerprint(value),
+            **({"reason": value["reason"]} if "reason" in value else {}),
+            **({"preservation": value["preservation"]} if "preservation" in value else {})})
         observations.append(value)
-        if queries.clock() - started >= queries.SCAN_SECONDS:
-            raise BridgeError("scan_limit_exceeded", "Consensus read time budget exceeded.", 409)
+        check()
     evidence["complete"] = True
     first = observations[0]
     readable = all(value.get("status") == "observed" or (
         value.get("status") == "absent" and value.get("presence_proven") is True
         and value.get("evidence") == _ADD_EVIDENCE) for value in observations)
     evidence["agreed"] = readable and all(same_observation(change, first, value) for value in observations[1:])
+    if material and not evidence["agreed"]:
+        # This is evidence for a separate reviewed journal reconciliation, not
+        # success and never authorization to run a setter.
+        current = [value.get("material_readback", value) for value in observations]
+        if (all(value.get("status") == "observed" for value in current)
+                and all(same_observation(change, current[0], value) for value in current[1:])):
+            evidence["reconciliation_readback"] = current[0]
     if diagnostics is not None:
         diagnostics.update(evidence)
     if not evidence["agreed"]:

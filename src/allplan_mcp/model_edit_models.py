@@ -181,6 +181,15 @@ class ModelEditRecover(ContractModel):
     action: Literal["recover"]
     execution_id: str = Field(pattern=r"^[0-9a-f]{32}$")
 
+    reconciliation_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    acknowledgement: Literal["reviewed_material_reconciliation"] | None = None
+
+    @model_validator(mode="after")
+    def paired_reconciliation(self):
+        if (self.reconciliation_hash is None) != (self.acknowledgement is None):
+            raise ValueError("Reconciliation requires the reviewed hash and acknowledgement together.")
+        return self
+
 
 ModelEditRequest = Annotated[ModelEditPreview | ModelEditPlan | ModelEditApply | ModelEditRecover,
                              Field(discriminator="action")]

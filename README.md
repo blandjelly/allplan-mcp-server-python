@@ -5,9 +5,12 @@ audits and reviewed edits. M4 development uses
 [`develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/tree/develop/m4);
 main integration is separate.
 
-Current package-verified candidate: **0.32.0**. Its native Allplan material
-trial is pending. Use the [current handoff](docs/next-model-handoff.md) for
-version status and the next task, and the
+Current source candidate: **0.38.0** on `fix/m4-material-recovery`; 177 unit
+checks and 11 MCP/HTTP checks passed, with version consistency at 0.38.0. Full
+CI, package verification and native Allplan validation are pending.
+The most recently package-verified candidate remains **0.32.0**. Use the
+[current handoff](docs/next-model-handoff.md) for version status and the next
+task, and the
 [development plan](docs/office-editing-development-plan.pl.md) for remaining
 work and unresolved errors. M4 remains partially accepted.
 
@@ -40,4 +43,7 @@ Allplan, Python and Codex are not bundled.
 Preserve `Local/.allplan-mcp/repairs`, diagnostic traces and archives, the
 original project, package logs and execution IDs. A lost write reply is an
 unknown result: recover with the original execution ID and do not retry Apply.
+For eligible native-material preservation conflicts, review the proposed
+reconciliation against the current model before submitting its exact hash and
+acknowledgement; this read-only action does not report an applied success.
 The cloud workspace cannot access Windows localhost.
