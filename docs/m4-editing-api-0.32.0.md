@@ -1,4 +1,85 @@
-# Native material editing — candidate 0.39.0
+# Native material editing — API contracts
+
+## Native Material, material attribute and Surface
+
+Sources reviewed **2026-10-26** for the Python API **2026**; GUI references
+below identify their 2026-0/2026-1 version explicitly. This section separates
+published SDK contracts, native observations and hypotheses. Current delivery
+and acceptance belong in the [handoff](next-model-handoff.md).
+
+| Requested field | API owner and persistence route | What success establishes |
+| --- | --- | --- |
+| Native architectural Material | `ArchBaseProperties.Material: str`, `GetMaterial()` / `SetMaterial(str)` on the actual property owner. Reattach the properties to the existing element and submit it with `ModifyElements`. | Only a fresh native read from the same owner establishes the retained native value; method availability alone does not. |
+| Element attribute named Material / Materiał | Resolve the element's exact name↔ID/type; `GetAttributes` reads ID/value pairs and `ElementsAttributeService.ChangeAttributes` writes them through the selected adapter. The official read-access example identifies standard Material as ID 508. | Typed attribute readback establishes that attribute value on that owner. The supplied 0.39.0 log omits its actual ID/payload. This is an element attribute, not the separate document/project-attributes API. |
+| Rendering Surface | `ArchBaseProperties.Surface` / `SetSurface`, separate from Material; GUI surface controls affect animation appearance. | A surface/texture result, not a structural material assignment. The current native-material operation does not target Surface. |
+
+The [ArchBaseProperties reference](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/ArchBaseProperties/)
+defines Material and Surface separately. The
+[read-access manual](https://pythonparts.allplan.com/2026/manual/features/model_access/read_access/)
+and [element-attributes manual](https://pythonparts.allplan.com/2026/manual/features/attributes/element_attributes/)
+establish the attribute path. These are distinct API entry points; the sources
+do not promise independent storage or universal bidirectional synchronization
+of native Material and attribute 508. Equal displayed values may reflect the
+same architectural information. Neither equality nor attribute-write success
+proves that the native-property setter persisted on the same owner.
+
+### Beam, StructuralBeam and Slab contracts
+
+- **Ordinary Beam:** [BeamProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/BeamProperties/)
+  derives from ArchBaseProperties, so Material is inherited even when absent
+  from the page's own-member list. [BeamElement](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/BeamElement/)
+  exposes `Properties` / `SetProperties`.
+- **Structural framing beam:** [StructuralBeamProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/StructuralBeamProperties/)
+  lists ArchBaseProperties among its bases. [StructuralBeamElement](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/StructuralBeamElement/)
+  exposes `StructuralBeamProperties` / `GetStructuralBeamProperties()` /
+  `SetStructuralBeamProperties`. This differs from the ordinary Beam accessor;
+  a SkeletonBeam adapter still needs runtime class/owner confirmation.
+- **Slab:** [SlabProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/SlabProperties/)
+  documents writable Material plus `GetMaterial` / `SetMaterial`.
+  [SlabElement](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/SlabElement/)
+  exposes `Properties` / `SetProperties`. Neither this page nor Material on a
+  property object establishes which MultiSlab/Slab adapter owns the stored
+  value or that updating its aggregate updates a tier.
+
+The [modification manual](https://pythonparts.allplan.com/2026/manual/features/model_access/element_modification/)
+requires get properties → change → reassign → `ModifyElements`; mutating a
+nested temporary property alone is insufficient. It also says ModifyElements
+can do nothing when an internal modification function is absent. Thus a setter
+on a Python object can exist without proving persistence of that particular
+change in a particular Allplan build. This is a possible explanation to test,
+not a diagnosed cause of the reported Slab failure.
+
+### Why a missing palette field does not establish non-support
+
+The [2026-1 Slab parameters help](https://help.allplan.com/Allplan/2026-1/1033/Allplan/10367.htm)
+includes Material selection and links to
+[Material/qualities](https://help.allplan.com/Allplan/2026-1/1033/Allplan/10314.htm),
+whose choices depend on catalog/qualities configuration. The
+[2026-0 Structural framing beam palette](https://help.allplan.com/Allplan/2026-0/1033/Allplan/276259.htm)
+places Material/qualities on its Attributes tab and Surface on Representation.
+The [2026-1 beam editing help](https://help.allplan.com/Allplan/2026-1/1033/Allplan/254647.htm)
+opens that specialized palette by double-click or context Properties and notes
+restrictions when editing several beams together. These controls need not be
+named "native material". The owner's missing field could involve the palette,
+selection, catalog/qualities or selected representation; the log does not
+identify which. Do not infer any one cause or promise a UI setting will fix
+the bridge's failed update.
+
+### Native result and unresolved inference
+
+The [0.39.0 owner log](test-results/evidence/0.39.0-2026-10-26/allplan-conversation-log.md),
+summarized in [validation status](validation-status.md#latest-owner-observations), reports
+zero native Beam/SkeletonBeam query matches with representation
+conflicts, then successful Material-attribute writes on two SkeletonBeams.
+This does not exercise a confirmed native Beam setter. Slab native readback
+stayed blank after attempts; later attribute readback matched the requested value on MultiSlab
+and its Slab. There is no paired native read after that attribute write, so
+the log does not show whether it affected native Material. Owner, persistence
+and discovery remain separate unresolved questions. Compare both read paths
+on the same exact element/owner first, preserve raw values including blanks,
+and retain unknown journal outcomes. Never silently substitute an attribute
+write for a requested native-material change. Current closure work is in
+[plan items 1–3](office-editing-development-plan.pl.md#dowody-potrzebne-do-zamknięcia-punktów-15).
 
 ## Request and native property owner
 
@@ -193,3 +274,4 @@ Historical native crashes and family-specific outcomes are retained with their
 evidence in [validation status](validation-status.md). This SDK note describes
 API contracts only; the current candidate and required owner trials are in the
 [handoff](next-model-handoff.md).
+
