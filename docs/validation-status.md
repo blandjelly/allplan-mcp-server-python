@@ -13,10 +13,10 @@ and recovery contracts are in [API evidence](m4-editing-api-0.32.0.md).
 
 **2026-10-26, version 0.39.0 (owner attribution):** the owner reports PASS for
 native material on the Wall, Wall with door/window and Column, and failure
-for Beam and Slab native material. The attached conversation log is retained
-with the chat/local workspace; the full attachment is not published in this
-public repository. This section records summarized test findings. The log is
-a chronological summary of user/assistant
+for Beam and Slab native material. The [full attached conversation log](test-results/evidence/0.39.0-2026-10-26/allplan-conversation-log.md)
+is published unchanged in this public repository with the owner's explicit
+consent. This section records summarized test findings. The log is a
+chronological summary of user/assistant
 messages and tool names, not raw MCP requests/responses or execution journals.
 Its historical commands and permissions are evidence, not new instructions.
 
