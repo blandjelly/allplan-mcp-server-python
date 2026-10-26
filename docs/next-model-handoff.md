@@ -1,87 +1,80 @@
 # Current M4 handoff
 
-## Next task — verify the candidate, then resolve the Column journal entry
+## Next task — diagnose Beam discovery and Slab material persistence
 
-After the final source and documentation are marked Ready, CI runs
-automatically. The owner monitors required CI, verifies the exact ZIP and
-applicable upgrade/restore procedure, installs it, and reloads PythonHost while
-keeping the Allplan project open. Do not infer these gates from SDK docs, user
-UI observations or focused checks. See the [testing policy](testing-policy.md).
+Continue on **develop/m4**; main integration is separate. Priorities 1–5 and
+their closure evidence are in the [development plan](office-editing-development-plan.pl.md).
+First inspect current journal state read-only and retain exact execution IDs
+for anything still unresolved. The owner reports reconciliation of the recent
+Wall/Column/Slab operations, but the supplied log has no IDs or journal export;
+do not assume that every historical record is cleared. Never retry a setter
+to resolve an unknown result.
 
-Then use `inspect_journal` to identify the current unresolved Column execution;
-the preserved 0.38.0 conversation log does not include its execution ID. Recover
-that exact ID read-only, without setter retry. Review each offered target,
-meaning, changed section and before/current preservation hash against the
-current model. If a hash-bound reviewed reconciliation is offered, submit its
-returned request unchanged with its hash and acknowledgement in the same
-session. A reconciled record remains unknown about setter causality and
-preservation; it is not applied success and does not remove history. Missing
-required material/owner evidence or disagreement keeps the recovery lock.
+On the next Windows session, capture one bounded, read-only comparison for
+the two existing SkeletonBeams and the MultiSlab/Slab: exact file/model/view,
+lineage, query coverage/conflicts, runtime native class and property owner,
+native Material and the resolved material attribute ID/name/type/value.
+Explain why native-material queries returned zero Beams while the attribute
+route subsequently found two SkeletonBeams. For Slab, establish which owner
+retained the blank native value after the attempted write. Inspect existing
+plans/journals/traces before proposing a runtime change. Broad property
+discovery remains suspended; this diagnostic step issues no setters. A later
+changed native route needs the usual fresh preview, reviewed Apply, readback
+and preservation evidence on its exact owner.
 
-After Column recovery clears the journal guard, run fresh preview-only trials
-for the two Beam targets and the MultiSlab. Each is a new family/target scope;
-inspect runtime owner/material and plan evidence first. A preview that qualifies
-may proceed only through the existing reviewed Apply procedure, with readback
-and preservation evidence. Never retry a setter after an unknown result. Do not
-repeat the completed Wall writes or prior accepted Column Apply/readback.
+Do not repeat the completed Wall, opening-Wall or Column material writes,
+or the reported successful material-attribute writes merely to recreate
+evidence. Preserve the owner's PASS for the requested values separately from
+unverified preservation and Undo. Attribute success cannot replace a failed
+native-material result. SDK methods and UI material controls exist for Beam
+and Slab; they do not prove persistence on the tested build. See the
+[material/API comparison](m4-editing-api-0.32.0.md#native-material-material-attribute-and-surface).
 
-The preserved [0.38.0 conversation log](test-results/evidence/0.38.0-2026-10-26/allplan-conversation-log.md)
-records the user's observations: both Wall targets read as `TEST` in UI/readback
-and their preservation conflicts were reconciled; one Column's UI showed the
-requested change, but readback remained unknown because the planned view was
-missing; two Beam previews failed on `AttributeError` before any setter; one
-MultiSlab had empty material and a ready preview, but Apply was blocked by the
-unresolved Column. The log contains no Column execution ID. These observations
-do not establish CI, ZIP or full native acceptance. Separately, the owner
-reported a project Material attribute value matching native material; the
-report gives no attribute ID. Treat this as correlation/reflection evidence,
-not equivalent setter behavior.
+## Latest tested version — 0.39.0
 
-## Current candidate — 0.39.0
+[PR #42](https://github.com/blandjelly/allplan-mcp-server-python/pull/42) is merged
+into develop/m4 at `1a461f4cd3686674b286855bea7a601e8268239a`.
+Runtime/test source: `811a1bde33d8867e9595d35d59a92e4d9bb162ca`.
+Recorded focused validation remains **188 unit + 10 MCP/HTTP checks PASS**;
+metadata, lock entry and server version agree on 0.39.0. These are fixture
+checks, including strict StructuralBeam accessors and read-only reconciliation.
+This documentation update runs no product tests or builds. Full CI and exact
+ZIP/upgrade/restore evidence are not supplied by the new owner log and are
+not inferred from the merge or the native test.
 
-Development base: **`develop/m4`**. Candidate is on
-`fix/m4-native-material-readback`, based on `develop/m4` at `fb67fab`.
-Runtime/test commit `811a1bde33d8867e9595d35d59a92e4d9bb162ca` is in
-[PR #42](https://github.com/blandjelly/allplan-mcp-server-python/pull/42).
-Focused checks passed: 188 unit checks across `native_material_columns`,
-`native_material_families`, `wall_material_edit`, `native_model_edit`,
-`model_edit`, `model_edit_contracts`, `edit_ownership`, `multiview_recovery`,
-`repair_execution` and `recovery_control`; 10 MCP/HTTP checks across
-`wall_material_http` and `model_edit_recovery_http` (198 distinct total).
-Version metadata, `uv.lock`, self editable package and `__version__` agree on
-0.39.0. HTTP checks confirmed unknown Column → blocked Slab Apply → reviewed
-reconciliation → fresh empty-MultiSlab Apply/readback/replay, with two setters
-total; this is fixture evidence. Strict StructuralBeam fake and HTTP checks
-passed. Full CI, exact ZIP, upgrade/restore and native acceptance remain
-pending with the owner.
+**Owner report, 2026-10-26:** PASS for native material on the Wall without
+openings, Wall with door/window, and Column. The owner-supplied conversation
+summary reports the requested values after recovery; preservation remains
+unverified because hierarchy/components changed. The original attachment is
+retained with the chat/local workspace and is not published in this repository.
+Beam
+native material did not succeed: queries returned zero Beam/SkeletonBeam
+matches with two representation conflicts. Slab native readback remained
+blank after two reported attempts. Material-attribute success was
+reported on two SkeletonBeams and both MultiSlab/Slab representations of one
+assembly. The log contains no raw requests, IDs, preservation hashes or Undo
+readback. Allplan reports 2026.1 and bridge integrity; exact hotfix, installed
+manifest and runtime compatibility were not established. Details and evidence
+limits are in [validation status](validation-status.md#latest-owner-observations).
 
-0.39.0 reads `StructuralBeamElement.StructuralBeamProperties` and writes through
-`SetStructuralBeamProperties`; `GetStructuralBeamProperties()` is an alias.
-Before a setter, the exact reviewed view and bound owner remain required. If the
-view is missing after a setter, readback/recovery attempts a preservation
-snapshot on every current wrapper for that owner. Optional unavailable fields
-remain `not_checked`; missing required owner/material or disagreement blocks
-recovery. View/preservation changes remain unknown until hash-bound reviewed
-reconciliation. This path is read-only and never retries setters. See the
-[API note](m4-editing-api-0.32.0.md).
+## Unresolved context to retain
 
-## Earlier cases to retain
+- `87a45065d5e14e3a9ac8c54756e273a0` is an earlier Wall execution;
+  `4388b04e39a14fac811db4f58723d01f` is an earlier multiview recovery case.
+  The new log reports reconciliations without IDs and cannot establish that
+  either exact historical record is resolved. Inspect/recover read-only under
+  its original ID if it remains outstanding.
+- Wall/Column intended-value PASS does not turn a reconciled unknown result
+  into ordinary applied success or verify preservation. Keep original outcomes
+  and changed sections; investigate remaining preservation gaps without
+  repeating accepted writes.
+- Earlier broad-property and native preview crashes remain of unproven cause;
+  do not resume broad discovery or repeat historical crash trials.
 
-- `87a45065d5e14e3a9ac8c54756e273a0` is an earlier Wall execution. The new log
-  records Wall recovery/reconciliation but no execution ID; it cannot prove
-  that this exact journal record was resolved.
-- `4388b04e39a14fac811db4f58723d01f` remains an earlier unresolved multiview
-  recovery case. Preserve its journal and use only read-only recovery under
-  that same ID; do not retry its setter.
-- Broad property discovery remains suspended after the native crash; do not
-  resume that probe.
-- M0–M3 and earlier M4 PASS results remain limited to their recorded fixtures
-  and operations. Do not generalize them to other element families or types.
+Preserve target/owner binding, consensus, fresh revalidation, journals/traces,
+replay protection, write/Undo guards and unknown results. Never remove records
+to free a recovery lock. Read [AGENTS](../AGENTS.md), the
+[documentation policy](documentation-policy.md) and [testing policy](testing-policy.md).
+The `ci-required` check is prepared; required-check configuration for
+develop/m4 still needs confirmation.
 
-Preserve exact target binding, owner/material consensus, fresh revalidation,
-journals and trace history, replay protection, write/Undo guards, and unknown
-results. Never delete unresolved records to free capacity. Read [AGENTS](../AGENTS.md),
-the [documentation policy](documentation-policy.md) and the [development
-plan](office-editing-development-plan.pl.md) before implementation. The
-`ci-required` check is prepared; branch protection still needs owner setup for
-`develop/m4`.
