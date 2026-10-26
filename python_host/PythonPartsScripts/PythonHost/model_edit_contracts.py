@@ -78,7 +78,7 @@ def _preview(request):
             keys(change, {"target", "value"}, {"target", "value"})
             keys(target, {"kind", "tier_index"}, {"kind", "tier_index"})
             if type(target["tier_index"]) is not int or target["tier_index"] != 1:
-                invalid("Native material requires explicit tier_index=1 (single-tier Wall or Column properties).")
+                invalid("Native material requires explicit tier_index=1 (single-tier Wall or exact native element properties).")
             value = change["value"]
             if not isinstance(value, str) or not value.strip() or len(value) > 255 or any(ord(c) < 32 for c in value):
                 invalid("Native material must be an exact nonempty string of at most 255 characters.")
@@ -86,7 +86,9 @@ def _preview(request):
                 invalid("Native material must be the only change in a plan.")
         elif target.get("kind") == "attribute":
             keys(change, {"target", "value_type", "value", "mode"}, {"target", "value"})
-            keys(target, {"kind", "attribute_id", "name"}, {"kind"})
+            keys(target, {"kind", "attribute_id", "name", "property_owner"}, {"kind"})
+            if "property_owner" in target and target["property_owner"] != "selected_element":
+                invalid("property_owner must be selected_element; no automatic owner redirection is supported.")
             if "attribute_id" not in target and "name" not in target:
                 invalid("Attribute target requires an attribute_id or exact name.")
             if "attribute_id" in target:

@@ -16,6 +16,9 @@ from .repair_contracts import capability_probe
 from .transport import BridgeError
 
 KIND = "typed_model_edit"
+# Native material evidence includes durable per-getter trace writes. Keep a
+# bounded allowance for that work, separate from M1's unchanged scan budget.
+MATERIAL_EVIDENCE_SECONDS = 10
 
 
 def no_op_evidence(report, snapshot):
@@ -149,7 +152,7 @@ def bind_changes(doc, base, request, check, trace):
                 except BridgeError:
                     raise
                 except Exception as exc:
-                    raise BridgeError("attribute_name_unresolved", "Exact project attribute name was not resolved. Use model_property_probe phase=element_attributes on the exact target to find actual names/IDs; for material try name_contains=material and name_contains=materiał. Bind the returned project name/ID. Native Wall/Column material uses target.kind=native_material without an attribute-name lookup.", 409) from exc
+                    raise BridgeError("attribute_name_unresolved", "Exact project attribute name was not resolved. Use model_property_probe phase=element_attributes on the exact target to find actual names/IDs; for material try name_contains=material and name_contains=materiał. Bind the returned project name/ID. Native material uses target.kind=native_material without an attribute-name lookup.", 409) from exc
             name = bounded_text(read("AttributeService.GetAttributeName", lambda: base.AttributeService.GetAttributeName(doc, ident)))
             import unicodedata
             if not name or (target.get("name") is not None and
@@ -216,6 +219,8 @@ def bind_changes(doc, base, request, check, trace):
                                  "read_mode": request.get("attribute_read_mode", "stored")},
                     "new_value": float(new_value) if value_type == "real" else new_value,
                     "mode": choice.get("mode", "replace")}
+            if "property_owner" in target:
+                item["resource"]["property_owner"] = target["property_owner"]
             if enum_binding is not None:
                 item["resource"]["enum_binding"] = enum_binding
             if boolean_binding is not None:
@@ -232,11 +237,14 @@ def bind_changes(doc, base, request, check, trace):
 def observe(plans, doc, base, settings, request):
     validate_request(request)
     started = plans.queries.clock()
+    material_requested = any(c["target"]["kind"] == "native_material" for c in request["changes"])
+    evidence_seconds = (max(plans.queries.SCAN_SECONDS, MATERIAL_EVIDENCE_SECONDS)
+                        if material_requested else plans.queries.SCAN_SECONDS)
     from .property_probe import NativeProbeTrace
     trace = NativeProbeTrace(plans.trace_path, "model_edit")
 
     def check():
-        if plans.queries.clock() - started >= plans.queries.SCAN_SECONDS:
+        if plans.queries.clock() - started >= evidence_seconds:
             raise BridgeError("scan_limit_exceeded", "Model edit evidence exceeded its read budget.", 409)
 
     try:
@@ -261,7 +269,6 @@ def observe(plans, doc, base, settings, request):
              "attribute_ids": attribute_ids, "max_adapters": request.get("max_adapters", 5000)}
     layer_requested = any(b["operation"] == "set_layer" for b in binding)
     delete_requested = any(b["operation"] == "delete_element" for b in binding)
-    material_requested = any(b["operation"] == "set_native_material" for b in binding)
     query["fields"] = [field for field in query["fields"] if field not in {"element_exists", "native.material"}]
     if layer_requested or "layer_id" in predicate_fields(request.get("predicate")):
         query["layer_resolution"] = "component"
@@ -272,6 +279,16 @@ def observe(plans, doc, base, settings, request):
     if material_requested:
         from .wall_material import preview_observation as material_observation, consensus_key
         for element in snapshot["elements"]:
+            # Keep every peer in the M1 source, but do not perform expensive
+            # native destination reads for a decisively excluded/nonmatching
+            # peer. Revalidation still detects when that peer starts matching.
+            criterion = request.get("predicate")
+            if (element["ref"]["model_uuid"] in request.get("exclude_model_uuids", [])
+                    or ("native.material" not in predicate_fields(criterion)
+                        and evaluate_criterion(criterion, element["fields"]) is False)):
+                element["fields"]["native.material"] = {
+                    "status": "not_checked", "value": None, "reason": "destination_not_requested_for_non_target"}
+                continue
             representations = live.get((element["ref"]["drawing_file"], element["ref"]["model_uuid"]), {})
             values = [(view, trace.call("Native.material_observation", lambda adapter=adapter, view=view:
                        material_observation(base, adapter, check, trace=trace,
@@ -502,12 +519,15 @@ def preview(plans, doc, base, settings, request):
             elif change["native_type"] in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
                 from .component_ownership import slab_write_blocker
                 ownership = element.get("component_ownership")
-                reason = slab_write_blocker(ownership)
+                reason = slab_write_blocker(ownership, change)
                 if reason:
                     blocked.append({"ref": element["ref"], "field": bound["field"], "reason": reason})
                     continue
                 change["resource"]["component_ownership"] = copy.deepcopy(ownership)
             changes.append(change)
+    from .component_ownership import overlapping_slab_owners
+    if overlapping_slab_owners(changes):
+        blocked.append({"field": "material_owner", "reason": "overlapping_slab_property_owners"})
     if any(change["operation"] == "delete_element" for change in changes):
         descendants = {item["model_uuid"] for change in changes
                        for item in change["resource"]["delete_ownership"]["value"]["descendants"]}
@@ -526,7 +546,10 @@ def preview(plans, doc, base, settings, request):
             "runtime_verified": False, "allplan_acceptance": "not_run", "usable_for_write": False,
             "expires_after_seconds": plans.TTL_SECONDS,
             "limits": {"changes": plans.executor.MAX_CHANGES, "write_scope": "one_active_foreground_drawing",
-                       "native_material_update": "experimental_single_tier_Wall_and_Column_optional_preservation",
+                       "native_material_update": "experimental_native_architectural_material_optional_preservation",
+                       "evidence_seconds": (max(MATERIAL_EVIDENCE_SECONDS, plans.queries.SCAN_SECONDS)
+                                            if any(b["operation"] == "set_native_material" for b in report["binding"])
+                                            else plans.queries.SCAN_SECONDS),
                        "deletion": "exact_component_roots_or_Wall_owned_openings_with_reviewed_subtrees"}}
     plan["undefined_policy"] = {
         "recognized_raw_values": sorted(UNDEFINED_ATTRIBUTE_VALUES),

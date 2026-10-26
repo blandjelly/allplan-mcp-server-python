@@ -9,6 +9,8 @@ from fastmcp import Client
 import test_mcp_smoke as smoke
 import test_wall_material_edit as fixture_module
 import test_native_material_columns as column_fixtures
+import test_native_material_families as family_fixtures
+import test_edit_ownership as ownership_fixtures
 
 
 # The durable Wall workflow keeps real trace fsync; logic flows use a trace double.
@@ -20,6 +22,66 @@ MATERIAL_HTTP_TIMEOUT = 40
 class WallMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
     asyncSetUp = smoke.MCPSmokeTests.asyncSetUp
     stop_process = smoke.MCPSmokeTests.stop_process
+
+    def route_model_edit(self, native):
+        original = self.bridge_handler.handle
+
+        def handle(path, payload):
+            if path == "/model-edit":
+                self.bridge_handler.calls.append((path, payload))
+                try:
+                    return native.handler.handle(path, payload)
+                except native.module.BridgeError as exc:
+                    raise smoke.transport.BridgeError(exc.code, str(exc), exc.status) from exc
+            return original(path, payload)
+
+        self.bridge_handler.handle = handle
+
+    async def test_beam_and_aggregate_slab_native_material_over_public_mcp(self):
+        fixtures = family_fixtures.NativeMaterialFamiliesTests()
+        self.addCleanup(fixtures.doCleanups)
+        async with Client(self.url, timeout=MATERIAL_HTTP_TIMEOUT) as client:
+            for kind, cls in (("SkeletonBeam_TypeUUID", family_fixtures.BeamElement),
+                              ("MultiSlab_TypeUUID", family_fixtures.SlabElement)):
+                with self.subTest(kind=kind):
+                    native = fixtures.fixture(kind, cls)
+                    self.route_model_edit(native.native)
+                    preview = (await client.call_tool("model_edit", {"request": native.fixture.request(
+                        native_types=[kind])})).data
+                    self.assertTrue(preview["apply_available"], preview)
+                    highlighted = (await client.call_tool("model_edit", {
+                        "request": preview["next_action"]["request"]})).data
+                    request = {**highlighted["next_action"]["request"], "execution_id": uuid4().hex}
+                    result = (await client.call_tool("model_edit", {"request": request})).data
+                    self.assertEqual(result["state"], "completed", result)
+                    self.assertEqual(result["outcomes"][0]["readback"]["value"], "C35/45")
+                    self.assertTrue((await client.call_tool("model_edit", {"request": request})).data["replayed"])
+                    native.native.base.ModifyElements.assert_called_once()
+
+    async def test_explicit_aggregate_material_attribute_owner_over_public_mcp(self):
+        native = ownership_fixtures.EditOwnershipTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        _, aggregate = native.material_slabs()
+        self.route_model_edit(native)
+        request = native.request(native_types=["MultiSlab_TypeUUID"], predicate=None, changes=[{
+            "target": {"kind": "attribute", "attribute_id": 508, "property_owner": "selected_element"},
+            "value": "Beton1"}])
+        async with Client(self.url, timeout=MATERIAL_HTTP_TIMEOUT) as client:
+            invalid = {**request, "changes": [{"target": {
+                "kind": "attribute", "attribute_id": 508, "property_owner": "parent"}, "value": "Beton1"}]}
+            self.assertTrue((await client.call_tool("model_edit", {"request": invalid}, raise_on_error=False)).is_error)
+            self.assertFalse(any(path == "/model-edit" for path, _ in self.bridge_handler.calls))
+            preview = (await client.call_tool("model_edit", {"request": request})).data
+            self.assertTrue(preview["apply_available"], preview)
+            self.assertEqual(preview["changes"][0]["resource"]["property_owner"], "selected_element")
+            highlighted = (await client.call_tool("model_edit", {"request": preview["next_action"]["request"]})).data
+            apply = {**highlighted["next_action"]["request"], "execution_id": uuid4().hex}
+            result = (await client.call_tool("model_edit", {"request": apply})).data
+            self.assertEqual(result["state"], "completed", result)
+            self.assertEqual(dict(aggregate.GetAttributes.return_value)[508], "Beton1")
+            self.assertTrue((await client.call_tool("model_edit", {"request": apply})).data["replayed"])
+            native.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
 
     async def test_material_edit_with_axis_preview_highlight_apply_and_replay_over_http(self):
         native = fixture_module.WallMaterialEditTests()

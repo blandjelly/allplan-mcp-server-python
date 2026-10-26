@@ -1,110 +1,82 @@
 # Current M4 handoff
 
-Development branch: **`develop/m4`**. Start topic branches there and target
-PRs to it; integration with main is separate. Read [AGENTS](../AGENTS.md)
-and the [documentation policy](documentation-policy.md),
-[testing policy](testing-policy.md) and [development plan](office-editing-development-plan.pl.md)
-before implementation.
+Development branch: **`develop/m4`**. Start M4 topic branches there and target
+PRs to it; integration with main is separate. This candidate is on
+`fix/m4-material-assignment`, based on `develop/m4` commit
+`c666b3288c6fd22aa0b635498fdfb0d30eb21553`. Read [AGENTS](../AGENTS.md), the
+[documentation policy](documentation-policy.md), [testing policy](testing-policy.md)
+and [development plan](office-editing-development-plan.pl.md) before implementation.
+The required `ci-required` check is prepared; branch protection still needs the
+owner to configure it for `develop/m4`.
 
-The workflow provides required PR check `ci-required`; selection,
-failure/skip handling and unchanged-source reuse have 49 focused policy/gate
-checks passing. Branch protection still needs the owner to configure
-`ci-required` for develop/m4. See the
-[testing policy](testing-policy.md#required-github-check).
+## Next task — 0.37.0 native material and selected attribute owner
 
-## Next task — 0.36.0 native material crash candidate
+The owner checks the final candidate's required CI and exact ZIP, then performs
+the bounded native trial described below.
+The candidate extends native material observation/write to Beam and
+SkeletonBeam when the live SDK object is a `BeamElement` or
+`StructuralBeamElement`, and Slab/MultiSlab represented by `SlabElement` using
+the exact `SlabProperties.Material` / `SetMaterial` owner. It does not redirect
+between Slab and MultiSlab or substitute `SlabTierProperties` for that root
+field. A Slab child is eligible only with its directly observed MultiSlab
+parent; parent and child may not both be edited in one plan. Wall remains
+single-tier; Column remains supported.
 
-Three 0.35.0 Wall material preview requests ended in Allplan `C0000005` read
-access violations at address `690`: two requests targeted the original 240 mm
-Wall and one targeted a 200 mm Wall. In each trace, M1 scan returned and
-`Native.material_observation` started without a return or failure. The actual
-root read during each crash is unknown because material observation precedes
-the thickness filter. Stale tier ownership in `wall_material.snapshot` is a
-candidate, not an established cause. No dump was found for these events: the owner
-checked WER and CrashDumps; dumps dated 29.09 and 08.10 are earlier
-`C0000374` events and do not diagnose this incident. Do not request another
-0.35.0 crash or ask for a missing dump.
+Project attribute edits can now state
+`target.property_owner="selected_element"` to bind the exact selected element.
+Planning requires complete lineage and child evidence; old requests without an
+explicit owner remain blocked for Slab children and MultiSlab aggregates. The
+owner change never selects a parent automatically. The source and safety changes
+also reduce repeated Wall scalar reads (594 to 454 trace events for the simple
+Wall case), skip native destination reads for excluded/nonmatching peers while
+retaining the M1 source fingerprint and drift detection, and provide a bounded
+10-second material evidence allowance. The M1 scan remains 5 seconds and the
+client timeout remains 30 seconds. Existing write guards, journals, replay
+protection and trace retention remain in force.
 
-After the owner checks required CI for the final 0.36.0 commit, verifies the
-exact ZIP and required upgrade/restore procedures, and reloads PythonHost, run
-only a preview of the original 240 mm Wall. The first new trace or failure is
-the stopping point: preserve its raw response and exact references, then stop.
-Do not Apply when the preview is blocked or unknown. Do not repeat the
-completed Column Apply/readback, and do not retry the 200 mm Wall/opening
-fixture with its unresolved `component_child_owner_mismatch`. This is a
-focused crash trial, not full native acceptance.
+The 0.36.0 trial reported no PythonHost interruption or Allplan crash. The user
+reported successful project `Materiał` attribute edits on Wall, Column and Beam,
+but not Slab. Native Beam success is disputed: the user reported that it worked,
+while the supplied 0.36.0 conversation log records a completed Column
+Apply/readback, `native_material_type_unsupported` for SkeletonBeam and
+MultiSlab, and a Wall preview timeout at 5 seconds. Treat this discrepancy as
+unresolved; do not claim native Beam PASS. Do not repeat the completed Column
+native Apply/readback. The unchanged [0.36.0 conversation log](test-results/evidence/conversation-log-0.36.0-2026-10-26.md)
+is the source for the tool outcomes.
 
-The candidate change retains both existing native reads and their material
-comparison. It keeps the first owners alive through the full read, and
-`_detailed_snapshot` also returns its `tier`, so `wall_material.snapshot` uses
-one coherent final `native`/`props`/`tier` set. It adds durable
-`model_edit.observe` tracing for preview, revalidation and source observations,
-with the same root reference metadata on the traced SDK reads, while retaining all
-existing guards. The public
-request remains `target={"kind":"native_material","tier_index":1}` and the
-exact string; field `native.material` is bound in
-`resource.native_material_state`. See [API details](m4-editing-api-0.32.0.md)
-and [validation status](validation-status.md).
+After the owner verifies required CI for the final 0.37.0 commit, the exact ZIP,
+and the required upgrade/restore procedures, run a short native flow only for
+the changed routes. Preserve the first blocked/unknown result and exact refs;
+never retry a setter after an unknown result. Any write requires fresh readback
+and the appropriate UI Undo/restoration check. Do not repeat the accepted
+Column scope, request missing dumps, or change unresolved journal history.
+Native 0.37.0 acceptance remains pending.
 
-The successful Column record is one completed Apply/readback only. The
-supplied evidence does not include a no-op, drift, UI Undo or restoration
-result. The trace upload measured
-2,096,914 bytes against source `MAX_BYTES = 8 MiB`; preserve it and all journal
-history. Do not add automatic trace deletion or cleanup. If a storage block
-occurs, retain the snapshot and use the existing reviewed snapshot/confirmation
-procedure. The owner-supplied raw archive is `crash log 0.35.0.zip` in the
-local/chat attachments; its hash is recorded in the
-[validation status](validation-status.md#evidence-for-unresolved-cases).
+## Current candidate — 0.37.0
 
-## Current candidate — 0.36.0 / PR 39
-
-The test-only optimization continues from `ee831a0` on
-`fix/m4-material-lifetime-trace`, based on `develop/m4` commit
-`9553c8d10d6cd8f0987b1310d0ee89d3b519dc49`. The full
-[CI run 40228207181](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40228207181)
-on `ee831a0` passed all 693 tests on Windows and Ubuntu, package production,
-and `ci-required`. Windows tests took 2,418.236 s; Ubuntu took 225.682 s.
-This run supersedes the earlier timeout failure on `c15ffaa` for that source
-revision.
-
-The focused Python 3.12.14 run passed 103 affected tests in 19.564 s across
-`test_trace_test_support`, `test_wall_material_edit`,
-`test_native_material_columns`, `test_wall_material_http`,
-`test_property_probe`, `test_trace_cleanup` and `test_journal_cleanup`.
-Fixture selection/cleanup, JSON rejection, real journal persistence and the
-real-fsync spy passed. In a local Linux benchmark of the same cases, 6,200
-real-trace disk records took 0.720 s; 6,200 in-memory events with zero disk
-records took 0.269 s. This is a local result and does not estimate Windows
-performance.
-
-The test-only optimization uses fixture-scoped in-memory trace recording for
-routine material workflows while retaining explicit durable trace, journal,
-storage-failure and real-storage HTTP coverage. It does not change runtime
-code, budgets, journals, guards or package version. These new test changes are
-not covered by run 40228207181; required CI for the updated candidate remains
-pending. See the [test selection policy](testing-policy.md#material-trace-selection).
-The exact-ZIP check and bounded native preview also remain pending. After the
-owner checks CI and the exact ZIP, run only the original 240 mm Wall preview
-described above. No need to repeat the accepted Column Apply/readback or
-request the missing crash dump.
-
-Earlier M4 scopes remain partial and are summarized below.
+The candidate starts from `c666b3288c6fd22aa0b635498fdfb0d30eb21553` on
+`fix/m4-material-assignment`. **263 distinct focused checks passed** on Linux,
+Python 3.12.14: 243 material/edit/ownership/contracts/identity/property/trace
+checks including version consistency, plus 20 HTTP/MCP checks for material,
+recovery, Column launcher and component identity. The launcher checks passed
+after `uv sync --frozen` replaced stale local editable metadata (0.1.0) with
+0.37.0. Diff, local documentation links and the unchanged attachment check
+also passed.
+Full Windows/Ubuntu CI, `ci-required`, exact-ZIP verification, upgrade/restore
+verification and the bounded native trial are pending. Do not infer full CI,
+package acceptance or native PASS from focused tests or SDK API availability.
 
 ## Prior work needed for continuation
 
-M0–M3 are accepted only for their recorded fixture scopes. Retained M4
-observations include bounded journal archival; W1 read/write and no-op reports;
-one grouped delete/Undo of three Columns; four scalar family/type pairs; and
-Wall Enum ID 120. Boolean/CheckBox has only post-Undo readback evidence,
-without raw Apply, and is not a complete accepted cycle. Slab/MultiSlab
-ownership and the earlier unresolved execution remain open.
+M0–M3 are accepted only for their recorded fixture scopes. Prior M4 observations
+include bounded journal archival; W1 read/write and no-op reports; one grouped
+delete/Undo of three Columns; four scalar family/type pairs; and Wall Enum ID
+120. Boolean/CheckBox lacks raw Apply evidence. The 0.36.0 Column native
+Apply/readback is one completed scope and must not be repeated. Native validation of Slab/MultiSlab
+field ownership and the earlier unresolved execution remain open; see
+[validation status](validation-status.md).
 
-[Validation status](validation-status.md) records these scopes and the raw
-evidence needed to avoid repeating accepted work. Old release narratives and
-trial instructions are available through Git history; use this handoff for
-the next action. API research notes remain reference material for their stated
-scope, not current release status.
-
-Preserve exact target binding, fresh revalidation/readback, journal and trace
-history, replay protection and all write/Undo guards. Never retry setters
-after an unknown result or delete unresolved records to free capacity.
+Preserve exact target binding, complete owner evidence, fresh revalidation and
+readback, journals and trace history, replay protection and all write/Undo
+guards. Never retry setters after an unknown result or delete unresolved records
+to free capacity.

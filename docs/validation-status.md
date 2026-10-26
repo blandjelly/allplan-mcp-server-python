@@ -3,34 +3,34 @@
 Current candidate and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
 [development plan](office-editing-development-plan.pl.md).
-The full-CI baseline for the current test-only optimization is `ee831a0` on
-`fix/m4-material-lifetime-trace`, based on `develop/m4` commit
-`9553c8d10d6cd8f0987b1310d0ee89d3b519dc49`. Full
-[CI run 40228207181](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40228207181)
-on `ee831a0` passed all 693 tests on both Windows and Ubuntu, package
-production, and the required `ci-required` gate. Windows test time was
-2,418.236 s; Ubuntu was 225.682 s. This supersedes the earlier Windows timeout
-failure on `c15ffaa` for `ee831a0`.
+The current candidate is 0.37.0 on `fix/m4-material-assignment`, based on
+`develop/m4` commit `c666b3288c6fd22aa0b635498fdfb0d30eb21553`. Focused
+affected tests: **263 distinct checks passed** on Linux/Python 3.12.14
+(243 material/edit/ownership/contracts/identity/property/trace/version checks
+and 20 HTTP/MCP material/recovery/launcher/identity checks). Launcher checks
+passed after `uv sync --frozen` corrected stale 0.1.0 editable metadata to
+0.37.0; no runtime identity guard was changed. Diff, local documentation links
+and byte-for-byte attachment preservation also passed. Full Windows/Ubuntu CI,
+`ci-required`, exact-ZIP verification, required upgrade/restore checks and the
+bounded native trial are pending. Do not use earlier CI as validation of this source. The previous
+baseline [CI run 40228207181](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40228207181)
+passed 693 tests on Windows and Ubuntu and package production for `ee831a0`;
+it does not validate 0.37.0.
 
-The optimization continuing from `ee831a0` passed 103 affected tests in
-19.564 s on Python 3.12.14: `test_trace_test_support`,
-`test_wall_material_edit`, `test_native_material_columns`,
-`test_wall_material_http`, `test_property_probe`, `test_trace_cleanup` and
-`test_journal_cleanup`. Fixture selection/cleanup, JSON rejection, real journal
-storage and the real-fsync spy passed. Required CI for these new test changes
-is still pending; run 40228207181 validates only `ee831a0`.
-
-A local Linux benchmark of identical cases recorded 6,200 events in both
-configurations: real trace wrote 6,200 disk records in 0.720 s; the in-memory
-trace wrote zero disk records in 0.269 s. This local measurement does not
-estimate Windows performance. Routine material fixtures and most material HTTP
-tests use a fixture-scoped in-memory trace; durable ordering/storage-failure
-tests, production journal/storage tests, and one full Wall HTTP
-preview/highlight/apply/readback/replay flow retain real trace storage and
-fsync. See the [testing policy](testing-policy.md#material-trace-selection).
-Runtime code, budgets, journals, guards and package version are unchanged.
-The exact-ZIP verification and bounded native preview remain pending as
-described in the [handoff](next-model-handoff.md).
+Candidate scope: native material uses runtime class dispatch for Beam and
+SkeletonBeam (`BeamElement` or `StructuralBeamElement`) and Slab/MultiSlab
+(`SlabElement`, root `SlabProperties.Material`/`SetMaterial`); Wall stays
+single-tier and Column support is retained. Slab child writes require its
+direct MultiSlab parent and parent/child overlap blocks the plan. Project
+attribute requests can explicitly bind `property_owner="selected_element"`
+to the exact ref with complete lineage and children; requests without that
+owner still block aggregate/child writes. Native material evidence allows up to
+10 seconds, while the M1 scan remains 5 seconds and client timeout 30 seconds.
+The candidate also reduces repeated Wall scalar trace events from 594 to 454
+for the simple Wall case and skips native destination observations on excluded
+or nonmatching peers while retaining the M1 fingerprint and drift checks.
+Existing guards, journals, replay protection and trace retention remain in
+force.
 
 ## Accepted baseline and scoped M4 observations
 
@@ -91,21 +91,24 @@ pairs. Missing fixtures and blocked paths are separate from PASS.
   readback for this Column only. The supplied evidence does not include a
   no-op, drift, UI Undo or restoration result; do not repeat this write/readback
   trial.
-- **0.36.0 next native check:** After required CI and exact-ZIP verification,
-  owner runs only preview on the original 240 mm Wall. Preserve the first new
-  durable trace or failure and stop; no Apply for blocked or unknown preview.
-  This focused crash trial is not full native acceptance. Keep the 200 mm
-  Wall/opening `component_child_owner_mismatch` unresolved and do not repeat it.
-  Candidate work retains both existing native reads and their material
-  comparison, keeps the first owners alive through the full read, and includes
-  `tier` in `_detailed_snapshot` so the final snapshot uses coherent
-  `native`/`props`/`tier`. It adds durable `model_edit.observe` trace for
-  preview/revalidation/source observations, with the same root reference
-  metadata on traced SDK reads, preserving existing guards.
-  The uploaded `m4-native-probe.jsonl` measured 2,096,914 bytes; source
-  `NativeProbeTrace.MAX_BYTES` is 8 MiB. Preserve trace and journal history.
-  Do not add auto cleanup/delete; if storage blocks, retain its snapshot and
-  follow existing reviewed snapshot and confirmation procedure.
+- **0.36.0 material observation (2026-10-26):** The owner reported no PythonHost
+  interruption or Allplan crash. The user reported project attribute `Materiał`
+  Apply/readback success for Wall, Column and Beam, and failure for Slab. The
+  same user says native Beam material succeeded, but the supplied conversation
+  log records native `Column` Apply/readback as completed, `native_material_type_unsupported`
+  for SkeletonBeam and MultiSlab, and a Wall preview timeout at 5 seconds. The
+  Beam native result is contradictory and unresolved; do not claim Beam native
+  PASS. Do not repeat the completed native Column Apply/readback. The raw log
+  is [preserved unchanged](test-results/evidence/conversation-log-0.36.0-2026-10-26.md),
+  SHA-256 `6146fa08928b650f74d0f08fdadc00b6e8bf0b514c92484714a18d08c3aa9910`.
+- **0.37.0 bounded native trial:** After the owner checks required CI for the
+  final source, verifies the exact ZIP and upgrade/restore procedures, trial
+  only the changed native-material and explicit Slab attribute-owner paths.
+  Preserve the first blocked/unknown result and exact refs. A write requires
+  fresh readback and the appropriate UI Undo/restoration check. Do not repeat
+  the completed Column route, request missing dumps, or retry setters after an
+  unknown result. New runtime code has focused checks passing; full CI and native
+  validation remain pending. Preserve all existing trace/journal history and safeguards.
 - **Wall material — 0.33.0 native trial:** on drawing 101, the query found one
   original 240 mm `Ściana, prosta` (`Wall_TypeUUID`) with material observed as
   `Beton`. Query reported `scan_complete=true` but
@@ -161,11 +164,19 @@ pairs. Missing fixtures and blocked paths are separate from PASS.
   `1bdccbc1-6931-46fd-9f1f-f7b8657ac284`; these are not identities freshly
   verified by the 0.32.0 report. The supplied container UUID
   `abecfaf0-ad01-45e1-91df-4b32ed9960ae` likewise has unverified lineage.
-- **Slab/MultiSlab:** the [0.27.0 log](test-results/evidence/allplan-chat-log-0.27.0-2026-10-23.md)
-  retains the parent-lineage conflict; the
+- **Slab/MultiSlab:** the 0.36.0 user report says the project `Materiał`
+  attribute write did not work for Slab. Candidate 0.37.0 adds explicit
+  `target.property_owner="selected_element"`, exact ref binding, complete
+  lineage/children checks and parent/child overlap blocking. This is not native
+  Allplan acceptance; ownerless old requests remain blocked for a child or
+  aggregate, and no automatic redirect is allowed. The
+  [0.27.0 log](test-results/evidence/allplan-chat-log-0.27.0-2026-10-23.md)
+  retains the earlier parent-lineage conflict; the
   [latest raw attribute probe](test-results/evidence/0.31.0-2026-10-24/slab-multislab-readonly-evidence.json)
   retains view differences, incomplete Slab evidence and unestablished field
-  ownership. No new Slab/MultiSlab write was performed.
+  ownership. The 0.36.0 native log reports MultiSlab as unsupported. Candidate
+  0.37.0 accepts only runtime `SlabElement` and root `SlabProperties.Material`;
+  it does not redirect or substitute a tier owner. Native validation is pending.
 - **Multiview recovery:** the [owner follow-up](test-results/evidence/m4-agent-followup-blocker-2026-10-19.md)
   records unresolved execution `4388b04e39a14fac811db4f58723d01f`.
   Native resolution has not been recorded.

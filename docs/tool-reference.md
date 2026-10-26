@@ -405,22 +405,39 @@ blocked target. This reporting does not relax exact lineage, subtree
 completeness, exclusion, confirmation, fresh absence/parent checks, or
 unknown-result recovery.
 
-### `native_material` — experimental standalone Wall and Column
+### `native_material` — experimental architectural material
 
 The public request is unchanged: an exact nonempty string up to 255 characters
 and `target={"kind":"native_material","tier_index":1}`. It must be the only
 change in its plan. A standalone `Wall_TypeUUID` represented by `WallElement`
 must have exactly one native tier; a standalone `Column_TypeUUID` represented
-by `ColumnElement` is also supported. Other element families and multi-tier
-Walls remain outside the contract. No catalog lookup, existence claim, alias
+by `ColumnElement` is also supported. `Beam_TypeUUID` and `SkeletonBeam_TypeUUID`
+require a live `BeamElement` or `StructuralBeamElement`; the class is checked,
+not inferred from the adapter name. `Slab_TypeUUID` and `MultiSlab_TypeUUID`
+require a live `SlabElement`. A Slab may be standalone or a direct child of a
+MultiSlab; the exact selected object remains the target. Multi-tier Walls
+remain outside the contract. No catalog lookup, existence claim, alias
 resolution, surface edit or attribute substitution occurs.
 
 The report field is `native.material`; the plan binds evidence in
 `resource.native_material_state`. The Wall route calls
 `GetWallTierProperties(1).SetMaterial(exact_string)`. The Column route calls
-`ColumnProperties.SetMaterial(exact_string)`. Both reattach the same
+`ColumnProperties.SetMaterial(exact_string)`. Beam and Slab use the matching
+`BeamProperties`, `StructuralBeamProperties` or `SlabProperties` setter. For
+Slab this is the selected element's `Properties.Material`, without redirecting
+to `GetSlabTierProperties(1)` or another adapter. `tier_index=1` retains the
+existing request shape; it selects the Wall tier only. All routes reattach the same
 `Properties` through `SetProperties` and submit the existing native root with
-`ModifyElements`.
+`ModifyElements`. Slab aggregate child geometry/metadata is observed where
+available. Editing both an aggregate and its selected child in one plan blocks
+the plan.
+
+Native material observations skip decisively nonmatching and explicitly
+excluded peers, which stay in the M1 source fingerprint so new matches still
+invalidate Apply. Material evidence has a 10-second bound including durable
+trace I/O; M1 scanning retains its 5-second limit and the client timeout is
+unchanged. Completed Wall scalar evidence is reused on the retained property
+owners instead of reading every property twice.
 
 Exact root/type, current material, setter availability, active foreground
 drawing and existing target, journal and write guards are required. Geometry
@@ -440,7 +457,16 @@ Standard attribute ID 508 is omitted from unrelated metadata invariants because
 it may reflect the native Material being changed. This is not an attribute
 write or a hard-coded attribute binding. Generic typed attribute edits remain
 separate: “Material” as an attribute does not establish native material
-semantics. See the [0.35.0 API details](m4-editing-api-0.32.0.md), current
+semantics. For a Slab/MultiSlab attribute request, use for example
+`target={"kind":"attribute","attribute_id":508,"property_owner":"selected_element"}`
+only after verifying the project's exact name/ID binding. Narrow `native_types`
+to the intended owner and review its exact ref, view, lineage and children in
+`resource.component_ownership`. This explicit choice authorizes the selected
+adapter for `ChangeAttributes`; it does not claim that Slab and MultiSlab are
+equivalent. Missing ownership evidence, changed lineage, overlapping parent/child
+targets and unreadable or computed-only values still block writes. Omitted
+`property_owner` retains the existing aggregate/child block; layer ownership is
+unchanged. See the [API details](m4-editing-api-0.32.0.md), current
 [trial](next-model-handoff.md), and
 [validation status](validation-status.md). Native Allplan acceptance is not
 established by the implementation or automated checks.
