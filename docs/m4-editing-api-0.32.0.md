@@ -1,4 +1,4 @@
-# Native material editing — candidate 0.37.0
+# Native material editing — candidate 0.38.0
 
 ## Request and native property owner
 
@@ -69,12 +69,21 @@ preview. Available evidence remains in the state fingerprint and is compared
 during revalidation and fresh readback. A changed observation conflicts before
 setters; drift or incomplete required readback after a write leaves the result
 unknown. Recovery uses the original execution ID and never retries setters.
+The full optional preservation snapshot is now captured only on the exact
+wrapper reviewed as the setter target. Other live wrappers receive core reads
+for native material and required owner, which must agree with that selected
+wrapper. Consensus and setter preflight each start a separate 10-second
+material evidence budget, including trace I/O; they do not reuse an expired M1
+scan budget, which remains 5 seconds. Missing views, owner/material
+disagreement, or unreadable required evidence remain blocked or unknown.
 
 Completed Wall hierarchy/component observations remain in partial evidence if
 a later optional detail fails. Property reads are independent. Across live
 views, consensus covers the required native value and structural owner; the
 chosen exact view retains its own preservation fingerprint. Other views'
-different optional coverage is not a material-value conflict. A failed complete
+different optional coverage does not invalidate the material value, but strict
+preservation drift on the selected wrapper remains unknown in ordinary
+revalidation and Apply readback. A failed complete
 Column child inventory reports a diagnostic; it cannot prove preservation of
 unread children.
 
@@ -127,6 +136,32 @@ native root object is submitted with its updated properties. Exact target
 binding, plan hashes, fresh pre-write revalidation, journal safeguards,
 post-write readback and unknown-result recovery remain in force. Automated
 checks and API availability do not establish native Allplan acceptance.
+
+## Reviewed reconciliation of native-material preservation drift
+
+Candidate 0.38.0 permits a narrow review path when every remaining unknown
+outcome is a native-material change and every exact live representation agrees
+on the current material and original bound owner. An unacknowledged recover may
+return `recovery.reconciliation` with `hash`, exact `targets`, `meaning`, and a
+ready-to-submit `request`. Each representation includes `changed_sections`
+and before/current preservation hashes. Missing views or owners, unreadable
+evidence, material disagreement, or any unknown non-material operation
+suppresses this proposal and preserves the journal lock.
+
+The agent inspects each target and compares changed sections with the current
+model, including UI or geometry review when needed. After review it submits
+that returned request with `reconciliation_hash` and
+`acknowledgement="reviewed_material_reconciliation"` in the same session. The
+bridge rereads every exact view under the journal lock and accepts only an
+unchanged proposal hash. Changed evidence requires a fresh unacknowledged
+recover and a new review. Acceptance records reason
+`reviewed_material_preservation_conflict`, retains `original_outcome`, and sets
+`preservation_verified=false`; it also retains `reconciliation_evidence`, the
+accepted `reconciliation_hash`, and the review acknowledgement. This is
+read-only reconciliation; it proves
+neither setter causality nor preservation, does not report applied success or
+retry a setter, and does not delete journal history. Any new edit requires a
+fresh preview after the recovery blocker clears.
 
 The 0.35.0 evidence confirms one Column Apply/readback and three interrupted
 Wall material previews followed by native access violations. Their underlying

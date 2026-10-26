@@ -3,19 +3,16 @@
 Current candidate and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
 [development plan](office-editing-development-plan.pl.md).
-The current candidate is 0.37.0 on `fix/m4-material-assignment`, based on
-`develop/m4` commit `c666b3288c6fd22aa0b635498fdfb0d30eb21553`. Focused
-affected tests: **263 distinct checks passed** on Linux/Python 3.12.14
-(243 material/edit/ownership/contracts/identity/property/trace/version checks
-and 20 HTTP/MCP material/recovery/launcher/identity checks). Launcher checks
-passed after `uv sync --frozen` corrected stale 0.1.0 editable metadata to
-0.37.0; no runtime identity guard was changed. Diff, local documentation links
-and byte-for-byte attachment preservation also passed. Full Windows/Ubuntu CI,
-`ci-required`, exact-ZIP verification, required upgrade/restore checks and the
-bounded native trial are pending. Do not use earlier CI as validation of this source. The previous
+The prepared source candidate is 0.38.0 on `fix/m4-material-recovery`, based on
+`develop/m4` SHA `24a0b342f576f331924a55b6c33e36e8d595d3c3`. **188 distinct
+focused checks passed**: 177 unit checks across 10 affected modules and 11
+MCP/HTTP checks. Version consistency across metadata, lock and server is
+0.38.0. Full Windows/Ubuntu CI, `ci-required`, exact-package verification,
+upgrade/restore checks and native validation are pending. Do not use earlier CI
+as validation of this source. The previous
 baseline [CI run 40228207181](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40228207181)
 passed 693 tests on Windows and Ubuntu and package production for `ee831a0`;
-it does not validate 0.37.0.
+it does not validate 0.38.0.
 
 Candidate scope: native material uses runtime class dispatch for Beam and
 SkeletonBeam (`BeamElement` or `StructuralBeamElement`) and Slab/MultiSlab
@@ -26,6 +23,13 @@ attribute requests can explicitly bind `property_owner="selected_element"`
 to the exact ref with complete lineage and children; requests without that
 owner still block aggregate/child writes. Native material evidence allows up to
 10 seconds, while the M1 scan remains 5 seconds and client timeout 30 seconds.
+Material observation, consensus and setter preflight use independent 10-second
+evidence budgets; M1 scan remains 5 seconds. A regression fixture adds another
+same-view Wall root wrapper without its own optional child graph: the old
+consensus produced unknown, while the candidate applied with one setter and
+recovery unblocked. This confirms fixture behavior only; the native root cause
+is unproven.
+
 The candidate also reduces repeated Wall scalar trace events from 594 to 454
 for the simple Wall case and skips native destination observations on excluded
 or nonmatching peers while retaining the M1 fingerprint and drift checks.
@@ -61,6 +65,27 @@ Do not repeat these accepted scopes or generalize them to other family/type
 pairs. Missing fixtures and blocked paths are separate from PASS.
 
 ## Evidence for unresolved cases
+
+- **0.37.0 native Wall material and journal recovery (2026-10-26):** the
+  supplied conversation log reports a 240 mm Wall in drawing 101 with material
+  `Beton`; Apply to `Beton1` stopped as `unknown` because the control read was
+  unavailable. Recovery under the same execution also could not read it, while
+  an independent `wall_sample` returned `Beton1` and the owner confirmed the UI
+  value. The owner reports PASS for the intended value on the 240 mm Wall
+  without openings. This
+  supports that the requested material was observed after the write, but does
+  not reconcile the execution journal. The later 200 mm Wall request, which
+  the owner identifies as the Wall with a door/opening, remained blocked by
+  `scan_limit_exceeded`, including after diagnostic trace archival and
+  PythonHost restart; the log does not include a separate component identity
+  and no setter was issued. A subsequent
+  Column Apply was blocked by the retained recovery guard. Recovery of
+  `87a45065d5e14e3a9ac8c54756e273a0` remained `stopped/unknown` with
+  `representation_read_unavailable`; no setter was retried. Preserve this
+  journal record and lock; trace archival did not archive or resolve it. The
+  log records no 0.37.0 native material trial for Column, Beam or Slab. The
+  owner's conversation log is [preserved byte-for-byte](test-results/evidence/0.37.0-2026-10-26/allplan-conversation-log.md),
+  SHA-256 `2070900576de55caed20a2b37fc5f081eb584b75d10983b64e9cb71e31dfec49`.
 
 - **0.35.0 native material preview crash:** Three previews on 25.10.2026
   crashed Allplan with `C0000005` reading address `690`. At 17:34:17.597,

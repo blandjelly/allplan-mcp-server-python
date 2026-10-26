@@ -156,6 +156,208 @@ class WallMaterialEditTests(unittest.TestCase):
             "geometry": self.tier.GetModelGeometry.return_value.stream,
         }
 
+    def live_alternate_wall_view(self, index):
+        alias = self.alternate_wall_view(index)
+        alias.GetCommonProperties.return_value.Layer = 17
+        for name in ("IsNull", "IsDeleted", "IsValid", "IsInActiveDocument", "IsInActiveLayer", "IsLabelElement"):
+            getattr(alias, name).return_value = getattr(self.root, name)()
+        return alias
+
+    def drifted_opening_execution(self):
+        opening, _, _ = self.auxiliary_tree()
+        plan = self.preview()
+        self.native.highlight(plan)
+        setter = self.native.base.ModifyElements.side_effect
+        def modify(doc, elements):
+            result = setter(doc, elements)
+            opening.GetModelGeometry.return_value.stream = "regenerated-opening"
+            return result
+        self.native.base.ModifyElements.side_effect = modify
+        execution_id = uuid4().hex
+        result = self.native.apply(plan, execution_id)
+        self.assertEqual(result["outcomes"][0]["state"], "unknown")
+        return execution_id, plan, opening
+
+    def test_opening_drift_can_be_reviewed_and_reconciled_without_retry_or_erasure(self):
+        execution_id, plan, _ = self.drifted_opening_execution()
+        recovery = self.native.recover(execution_id)
+        self.assertTrue(recovery["write_blocked"])
+        proposal = recovery["recovery"]["reconciliation"]
+        self.assertEqual(proposal["targets"][0]["readback"]["value"], "C35/45")
+        self.assertIn("auxiliary_components", proposal["targets"][0]["representations"][0]["preservation"]["changed_sections"])
+        result = self.native.call(proposal["request"])
+        self.assertFalse(result["write_blocked"])
+        outcome = result["outcomes"][0]
+        self.assertEqual(outcome["state"], "reconciled")
+        self.assertFalse(outcome["preservation_verified"])
+        self.assertEqual(outcome["original_outcome"]["state"], "unknown")
+        self.assertEqual(result["next_action"]["action"], "preview")
+        self.assertTrue(self.native.apply(plan, execution_id)["replayed"])
+        self.native.base.ModifyElements.assert_called_once()
+        fresh = self.preview(changes=[{"target": {"kind": "native_material", "tier_index": 1}, "value": "Beton1"}])
+        self.native.highlight(fresh)
+        self.assertEqual(self.native.apply(fresh, uuid4().hex)["outcomes"][0]["state"], "applied")
+        self.assertEqual(self.native.base.ModifyElements.call_count, 2)
+
+    def test_reconciliation_rejects_evidence_drift_and_requires_fresh_review(self):
+        execution_id, _, opening = self.drifted_opening_execution()
+        proposal = self.native.recover(execution_id)["recovery"]["reconciliation"]
+        opening.GetModelGeometry.return_value.stream = "changed-again"
+        self.native.assert_code("repair_conflict", lambda: self.native.call(proposal["request"]))
+        result = self.native.recover(execution_id)
+        self.assertTrue(result["write_blocked"])
+        self.assertNotEqual(result["recovery"]["reconciliation"]["hash"], proposal["hash"])
+        self.native.base.ModifyElements.assert_called_once()
+
+    def test_reconciliation_never_uses_ui_claim_when_native_read_disappears(self):
+        execution_id, _, _ = self.drifted_opening_execution()
+        proposal = self.native.recover(execution_id)["recovery"]["reconciliation"]
+        self.native.base.GetElement.side_effect = RuntimeError("unavailable")
+        self.native.assert_code("repair_conflict", lambda: self.native.call(proposal["request"]))
+        result = self.native.recover(execution_id)
+        self.assertTrue(result["write_blocked"])
+        self.assertNotIn("reconciliation", result["recovery"])
+        self.native.base.ModifyElements.assert_called_once()
+
+    def test_reconciliation_cannot_accept_a_missing_reviewed_view(self):
+        execution_id, _, _ = self.drifted_opening_execution()
+        alias = self.live_alternate_wall_view(70)
+        self.native.base.ElementsSelectService.SelectAllElements.return_value = [alias]
+        result = self.native.recover(execution_id)
+        self.assertTrue(result["write_blocked"])
+        self.assertNotIn("reconciliation", result["recovery"])
+
+    def test_reconciliation_requires_matching_values_from_every_live_view(self):
+        execution_id, _, _ = self.drifted_opening_execution()
+        alias = self.live_alternate_wall_view(70)
+        self.native.base.ElementsSelectService.SelectAllElements.return_value = [self.root, alias]
+        original = self.native.base.GetElement.side_effect
+        def get(adapter):
+            native = original(adapter)
+            if adapter is alias:
+                native.Properties.GetWallTierProperties(1).Material = "other"
+            return native
+        self.native.base.GetElement.side_effect = get
+        result = self.native.recover(execution_id)
+        self.assertTrue(result["write_blocked"])
+        self.assertNotIn("reconciliation", result["recovery"])
+
+    def test_unreviewed_hash_and_unpaired_reconciliation_are_rejected(self):
+        execution_id, _, _ = self.drifted_opening_execution()
+        request = {"schema_version": "m4-model-edit-1", "action": "recover", "execution_id": execution_id,
+                   "reconciliation_hash": "a" * 64, "acknowledgement": "reviewed_material_reconciliation"}
+        self.native.assert_code("repair_conflict", lambda: self.native.call(request))
+        for key in ("reconciliation_hash", "acknowledgement"):
+            invalid = {name: value for name, value in request.items() if name != key}
+            with self.assertRaises(ValidationError):
+                TypeAdapter(ModelEditRequest).validate_python(invalid)
+            self.native.assert_code("invalid_payload", lambda: self.native.call(invalid))
+
+    def test_reconciliation_survives_executor_restart_and_keeps_audit_evidence(self):
+        execution_id, _, _ = self.drifted_opening_execution()
+        proposal = self.native.recover(execution_id)["recovery"]["reconciliation"]
+        plans = self.native.handler.repair_plans
+        previous = plans.executor
+        plans.executor = type(previous)(plans, previous.path)
+        result = self.native.call(proposal["request"])
+        self.assertFalse(result["write_blocked"])
+        plans.executor = type(previous)(plans, previous.path)
+        result = self.native.recover(execution_id)
+        outcome = result["outcomes"][0]
+        self.assertFalse(result["write_blocked"])
+        self.assertEqual(outcome["reconciliation_evidence"], proposal["targets"][0])
+        self.assertEqual(outcome["original_outcome"]["state"], "unknown")
+        self.native.base.ModifyElements.assert_called_once()
+
+    def test_reconciliation_persistence_failure_keeps_original_unknown_record(self):
+        execution_id, _, _ = self.drifted_opening_execution()
+        proposal = self.native.recover(execution_id)["recovery"]["reconciliation"]
+        executor = self.native.handler.repair_plans.executor
+        original = executor.load(execution_id)
+        with patch("os.replace", side_effect=OSError("storage unavailable")):
+            self.native.assert_code("repair_journal_unavailable", lambda: self.native.call(proposal["request"]))
+        self.assertEqual(executor.load(execution_id), original)
+        self.native.base.ModifyElements.assert_called_once()
+
+    def test_material_consensus_uses_bounded_evidence_budget_not_m1_scan_budget(self):
+        plan = self.preview()
+        change = plan["changes"][0]
+        queries = self.native.handler.model_queries
+        module = importlib.import_module(self.native.module.__package__ + ".native_model_edit")
+        wall = importlib.import_module(self.native.module.__package__ + ".wall_material")
+        original = wall.read
+        for elapsed in (6.0, 10.0):
+            now = [0.0]
+            queries.clock = lambda: now[0]
+            def slow(*args, **kwargs):
+                result = original(*args, **kwargs)
+                now[0] = elapsed
+                return result
+            with patch.object(wall, "read", side_effect=slow):
+                if elapsed < 10:
+                    result = module.read_consensus(self.native.base, queries, [self.root], change)
+                    self.assertEqual(result["status"], "observed")
+                else:
+                    self.native.assert_code("scan_limit_exceeded", lambda: module.read_consensus(
+                        self.native.base, queries, [self.root], change))
+        self.native.base.ModifyElements.assert_not_called()
+
+    def test_material_preflight_does_not_reuse_expired_enumeration_clock(self):
+        plan = self.preview()
+        change = plan["changes"][0]
+        queries = self.native.handler.model_queries
+        module = importlib.import_module(self.native.module.__package__ + ".native_model_edit")
+        wall = importlib.import_module(self.native.module.__package__ + ".wall_material")
+        now = [0.0]
+        queries.clock = lambda: now[0]
+        original = wall.read
+        def slow(*args, **kwargs):
+            result = original(*args, **kwargs)
+            now[0] = 6.0
+            return result
+        with patch.object(wall, "read", side_effect=slow):
+            element = module.resolve(self.native.coord.GetInputViewDocument(), self.native.base, queries, change, writable=True)
+        self.assertIs(element, self.root)
+        self.native.base.ModifyElements.assert_not_called()
+
+    def test_opening_wall_readback_accepts_new_same_view_wrapper_without_its_own_child_tree(self):
+        self.auxiliary_tree()
+        plan = self.preview()
+        self.native.highlight(plan)
+        alias = self.live_alternate_wall_view(70)
+        alias.GetElementUUID.return_value = self.root.GetElementUUID()
+        setter = self.native.base.ModifyElements.side_effect
+        def modify(doc, elements):
+            result = setter(doc, elements)
+            # Allplan can expose another wrapper of the same native view
+            # after regeneration. Its optional child graph is not the graph
+            # bound on the reviewed wrapper; its owner/material must agree.
+            self.native.base.ElementsSelectService.SelectAllElements.return_value = [self.root, alias]
+            return result
+        self.native.base.ModifyElements.side_effect = modify
+        execution_id = uuid4().hex
+        result = self.native.apply(plan, execution_id)
+        self.assertEqual(result["outcomes"][0]["state"], "applied", result)
+        self.assertEqual(len(result["outcomes"][0]["representation_consensus"]["representations"]), 2)
+        recovered = self.native.recover(execution_id)
+        self.assertFalse(recovered["write_blocked"])
+        self.assertNotIn("reconciliation", recovered["recovery"])
+        self.native.base.ModifyElements.assert_called_once()
+
+    def test_opening_preservation_is_read_once_not_for_every_view(self):
+        self.auxiliary_tree()
+        alias = self.live_alternate_wall_view(70)
+        self.native.base.ElementsSelectService.SelectAllElements.return_value = [self.root, alias]
+        module = importlib.import_module(self.native.module.__package__ + ".wall_material")
+        with patch.object(module, "_detailed_snapshot", wraps=module._detailed_snapshot) as detailed:
+            plan = self.preview()
+            self.assertTrue(plan["apply_available"], plan)
+            self.assertEqual(detailed.call_count, 1)
+        self.native.highlight(plan)
+        result = self.native.apply(plan, uuid4().hex)
+        self.assertEqual(result["outcomes"][0]["state"], "applied", result)
+        self.native.base.ModifyElements.assert_called_once()
+
     def test_preview_highlight_apply_readback_replay_and_no_op_preserve_other_properties(self):
         before = self.snapshot_invariants()
         plan = self.preview()

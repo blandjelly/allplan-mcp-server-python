@@ -5,12 +5,14 @@
 M4 jest częściowo odebrane. Aktualną wersję, dostawę i konkretne następne
 zadanie opisuje [handoff](next-model-handoff.md). Ten plan utrzymuje pozostałe
 prace i warunki ich zamknięcia, zgodnie z [polityką dokumentacji](documentation-policy.md).
-Kandydat 0.37.0 na `fix/m4-material-assignment`, bazujący na
-`develop/m4` `c666b3288c6fd22aa0b635498fdfb0d30eb21553`, rozszerza natywny
-materiał na Beam/SkeletonBeam i Slab/MultiSlab oraz dodaje jawnego ownera
-atrybutu `selected_element` dla Slab/MultiSlab. 263 distinct focused checks
-przeszły na Linux/Python 3.12.14; pełne CI, weryfikacja ZIP/upgrade/restore
-i krótka próba natywna są pending; bieżący
+Kandydat źródłowy 0.38.0 na `fix/m4-material-recovery` dodaje przeglądaną
+reconciliation dla nierozstrzygniętego wyniku native material przy zachowaniu
+blokad dla brakujących, niezgodnych lub nieczytelnych reprezentacji. 177 focused
+unit checks i 11 MCP/HTTP checks przeszło; version consistency potwierdza 0.38.0.
+Test regresyjny Wall/opening potwierdza pojedynczy setter i odblokowane recover
+po dodatkowym wrapperze bez własnego opcjonalnego drzewa dzieci. To test fixture,
+nie walidacja natywna. Pełne CI, weryfikacja paczki/upgrade/restore i
+próba natywna są pending; bieżący
 zakres i warunki opisuje [handoff](next-model-handoff.md).
 
 Dowody wcześniejszych prób są w [statusie walidacji](validation-status.md);
@@ -33,10 +35,10 @@ Wieloplikowość i cały projekt wymagają osobnego projektu oraz odbioru.
 
 | Priorytet | Co pozostało / warunek dalszej pracy |
 | --- | --- |
-| 1 — dziennik i recovery | Uzupełnić brakujące dowody restart/replay oraz unknown/corrupt/unverifiable poza już odebranym zakresem. PASS próby dziennika bez pełnego raw logu nie potwierdza osobno każdego podkroku. Chronić nierozliczone rekordy. |
+| 1 — dziennik i recovery | Sprawdzić 0.38.0 na istniejącym execution `87a45065d5e14e3a9ac8c54756e273a0`: najpierw recover bez acknowledgement, potem przeczytać wszystkie targets/meaning/changed sections/hashes i zweryfikować bieżący model. Akceptować wyłącznie przedstawiony niezmieniony `reconciliation_hash` z `acknowledgement=reviewed_material_reconciliation`; recovery ponownie czyta wszystkie dokładne widoki pod lockiem. Rekord otrzymuje reason `reviewed_material_preservation_conflict`, zachowuje `original_outcome`, `reconciliation_evidence`, hash i acknowledgement, ma `preservation_verified=false`; to nie jest applied success ani dowód przyczynowości settera i nie usuwa historii. Brak widoku/ownera, nieczytelność lub rozbieżność zostawia lock. Nie ponawiać settera. [Dowód 0.37](test-results/evidence/0.37.0-2026-10-26/allplan-conversation-log.md), [handoff](next-model-handoff.md). |
 | 2 — Slab/MultiSlab | 0.37.0 dodaje jawne `target.property_owner="selected_element"` dla dokładnego ref, przy pełnym lineage i children; parent/child overlap pozostaje zablokowany, a stare requesty bez ownera nadal blokują child/aggregate. Nie ma automatycznego redirectu. Pozostaje natywna walidacja wybranego ownera atrybutu i ścieżki `SlabProperties.Material`; różne view UUID, zbieżne bounds i wcześniejszy `property_owner=not_established` nie dowodzą fizycznej równoważności. |
 | 3 — warstwa i no-op | Uzupełnić wyłącznie nieodebrane przypadki. W1 read/write, pojedyncze Undo i zgłoszony no-op nie dowodzą grupowego Undo ani pełnego pokrycia rodzin. No-op nie ma drogi Apply. |
-| 4 — natywny materiał | Kandydat 0.37.0 dopuszcza `BeamElement`/`StructuralBeamElement` dla Beam/SkeletonBeam oraz `SlabElement` dla Slab/MultiSlab; Slab używa root `SlabProperties.Material`/`SetMaterial`, child tylko przy bezpośrednim MultiSlab parent. Wall pozostaje single-tier, Column bez zmian. 0.36.0 nie zgłosił crasha, ale native Beam ma sprzeczne relacje: user zgłasza sukces, załączony log ma SkeletonBeam/MultiSlab `native_material_type_unsupported` i tylko Column Apply/readback; Beam PASS nie ustalono. Po CI i exact ZIP wykonać krótką próbę tylko zmienionych dróg; nie powtarzać Column, nie żądać brakujących dumpów ani nie ponawiać 200 mm Wall/opening z unresolved owner mismatch. Materiał native, atrybut `Materiał` i `Materiał łatwopalny` pozostają odrębnymi polami. [Handoff](next-model-handoff.md), [status](validation-status.md#evidence-for-unresolved-cases). |
+| 4 — natywny materiał | Zachować ograniczenia routingu z 0.37.0: runtime classes i exact owner dla Beam/SkeletonBeam oraz Slab/MultiSlab; Slab child tylko z bezpośrednim MultiSlab parent; Wall single-tier. Nie rozszerzać zakresu rodzin na podstawie API availability. Dla Wall z drzwiami/otworem: po ewentualnej reviewed reconciliation execution `87a45065d5e14e3a9ac8c54756e273a0`, wykonać świeży preview i dopiero rozpatrywać nową próbę; 0.37.0 preview został zablokowany przez `scan_limit_exceeded`, root cause nieustalony. Właściciel zgłosił PASS wartości materiału na Wall 240 mm bez otworów (`Beton1` potwierdzone UI/sondą), ale journal result pozostał unknown. Native Beam PASS nadal nieustalony; Column/Beam/Slab nie były testowane w 0.37.0. [Handoff](next-model-handoff.md), [status](validation-status.md#evidence-for-unresolved-cases). |
 | 4 — delete i selekcja | Zachować odebrany grouped Column delete/Undo; pozostałe rodziny/poddrzewa wymagają oddzielnego dowodu. Native selection set/clear/readback nadal unsupported. Highlight nie jest selekcją. |
 | 5 — typy i rodziny | Domknąć owner-specific roundtrip oraz macierz rodzin/typów. Column Enum `Status` ID 49 pozostaje BLOCKED (`<niezdefiniowany>`, brak potwierdzonej etykiety). Wall CheckBox ID 1371 nie ma surowego Apply; fixture SDK Boolean brak. Beam/SkeletonBeam material route z 0.37.0 jest opisany w priorytecie 4, ale jego native trial pozostaje pending; inne typed attribute gaps rodzin wymagają osobnych dowodów. Date/vector/object wymagają dokładnych kontraktów setter payload i typed readback; sam symbol lub konstruktor SDK nie wystarcza. |
 

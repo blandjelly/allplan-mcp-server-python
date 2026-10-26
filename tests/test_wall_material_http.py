@@ -37,6 +37,28 @@ class WallMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
 
         self.bridge_handler.handle = handle
 
+    async def test_opening_reconciliation_over_http_preserves_history_and_never_retries(self):
+        native = fixture_module.WallMaterialEditTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        execution_id, plan, _ = native.drifted_opening_execution()
+        self.route_model_edit(native.native)
+        async with Client(self.url, timeout=MATERIAL_HTTP_TIMEOUT) as client:
+            recover = {"schema_version": "m4-model-edit-1", "action": "recover", "execution_id": execution_id}
+            result = (await client.call_tool("model_edit", {"request": recover})).data
+            self.assertTrue(result["write_blocked"])
+            proposal = result["recovery"]["reconciliation"]["request"]
+            invalid = {key: value for key, value in proposal.items() if key != "acknowledgement"}
+            self.assertTrue((await client.call_tool("model_edit", {"request": invalid}, raise_on_error=False)).is_error)
+            accepted = (await client.call_tool("model_edit", {"request": proposal})).data
+            self.assertFalse(accepted["write_blocked"])
+            self.assertEqual(accepted["outcomes"][0]["original_outcome"]["state"], "unknown")
+            self.assertFalse(accepted["outcomes"][0]["preservation_verified"])
+            again = (await client.call_tool("model_edit", {"request": recover})).data
+            self.assertFalse(again["write_blocked"])
+            self.assertEqual(again["outcomes"][0]["reconciliation_hash"], proposal["reconciliation_hash"])
+            native.native.base.ModifyElements.assert_called_once()
+
     async def test_beam_and_aggregate_slab_native_material_over_public_mcp(self):
         fixtures = family_fixtures.NativeMaterialFamiliesTests()
         self.addCleanup(fixtures.doCleanups)

@@ -290,8 +290,9 @@ def observe(plans, doc, base, settings, request):
                     "status": "not_checked", "value": None, "reason": "destination_not_requested_for_non_target"}
                 continue
             representations = live.get((element["ref"]["drawing_file"], element["ref"]["model_uuid"]), {})
+            selected = next((adapter for view in sorted(representations) for adapter in representations[view]), None)
             values = [(view, trace.call("Native.material_observation", lambda adapter=adapter, view=view:
-                       material_observation(base, adapter, check, trace=trace,
+                       material_observation(base, adapter, check, trace=trace, preservation=adapter is selected,
                                             trace_ref={**element["ref"], "view_uuid": view}),
                        drawing_file=element["ref"]["drawing_file"], model_uuid=element["ref"]["model_uuid"],
                        view_uuid=view))

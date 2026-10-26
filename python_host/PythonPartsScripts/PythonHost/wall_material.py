@@ -343,7 +343,7 @@ def _optional(callback, check, stage):
         check()
 
 
-def snapshot(base, adapter, check=lambda: None, *, material_observation=None, trace=None, trace_ref=None):
+def snapshot(base, adapter, check=lambda: None, *, material_observation=None, trace=None, trace_ref=None, preservation=True):
     """Require the field owner and material, not geometry or hidden metadata.
 
     Available invariant evidence is still bound into revalidation/readback.
@@ -385,6 +385,11 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None, tr
         raise ComponentReadError("material_setters", "native_material_setters_unavailable")
 
     state = {"hierarchy": hierarchy, "tier_count": 1 if is_wall else None}
+    if not preservation:
+        state.update(schema_version=_STATE_SCHEMA, native_class=class_name,
+                     material_owner=_MATERIAL_OWNERS[class_name])
+        check()
+        return material, state, native, props
     detailed = None
     if is_wall:
         # Boost.Python may expose borrowed children. Retain the first owner
@@ -456,7 +461,7 @@ def observation(base, element, check=lambda: None):
     return (value, state) if state is not None else (preservation, None)
 
 
-def preview_observation(base, element, check=lambda: None, *, trace=None, trace_ref=None):
+def preview_observation(base, element, check=lambda: None, *, trace=None, trace_ref=None, preservation=True):
     """Separate a readable material string from eligibility to preserve the Wall.
 
     Eligibility requires the native property owner and available setters.
@@ -465,7 +470,7 @@ def preview_observation(base, element, check=lambda: None, *, trace=None, trace_
     value = {}
     try:
         material, state, _, _ = snapshot(base, element, check, material_observation=value,
-                                       trace=trace, trace_ref=trace_ref)
+                                       trace=trace, trace_ref=trace_ref, preservation=preservation)
         return {"status": "observed", "value": material}, state, {"status": "observed", "value": True}
     except BridgeError:
         raise
@@ -501,12 +506,30 @@ def valid_change(change):
             and target.get("view_uuid") == change.get("target_view_uuid"))
 
 
-def read(base, element, change, check=lambda: None):
+def bound_owner(state, change):
+    """Required ownership must match independently of optional preservation."""
+    expected = change["resource"]["native_material_state"]
+    return (state is not None and _supported_lineage(state.get("hierarchy"))
+            and state.get("native_class") == expected.get("native_class")
+            and state.get("material_owner") == expected.get("material_owner")
+            and state.get("tier_count") == expected.get("tier_count")
+            and [_identity_key(ref) for ref in state["hierarchy"]["lineage"]]
+                == [_identity_key(ref) for ref in expected["hierarchy"]["lineage"]])
+
+
+def read(base, element, change, check=lambda: None, *, preservation=True):
     if not valid_change(change):
         raise BridgeError("target_not_writable", "Native material requires an exact reviewed architectural property owner.", 409)
-    value, state = observation(base, element, check)
-    if fingerprint(state) != fingerprint(change["resource"]["native_material_state"]):
-        return {"status": "not_checked", "value": None, "reason": "wall_material_invariants_changed"}
+    value, state, _ = preview_observation(base, element, check, preservation=preservation)
+    if not bound_owner(state, change):
+        return {"status": "not_checked", "value": None, "reason": "native_material_owner_unavailable"}
+    if preservation and fingerprint(state) != fingerprint(change["resource"]["native_material_state"]):
+        expected = change["resource"]["native_material_state"]
+        return {"status": "not_checked", "value": None, "reason": "wall_material_invariants_changed",
+                "material_readback": value,
+                "preservation": {"before_sha256": fingerprint(expected), "current_sha256": fingerprint(state),
+                    "changed_sections": sorted(key for key in set(expected) | set(state)
+                                               if expected.get(key) != state.get(key))}}
     return value
 
 
