@@ -43,12 +43,12 @@ ZIP/upgrade/restore evidence are not supplied by the new owner log and are
 not inferred from the merge or the native test.
 
 **Owner report, 2026-10-26:** PASS for native material on the Wall without
-openings, Wall with door/window, and Column. The owner-supplied conversation
-summary reports the requested values after recovery; preservation remains
-unverified because hierarchy/components changed. The original attachment is
-retained with the chat/local workspace and is not published in this repository.
-Beam
-native material did not succeed: queries returned zero Beam/SkeletonBeam
+openings, Wall with door/window, and Column. The
+[owner-supplied conversation log](test-results/evidence/0.39.0-2026-10-26/allplan-conversation-log.md)
+is published unchanged with the owner's explicit consent. It reports the
+requested values after recovery; preservation remains unverified because
+hierarchy/components changed. Beam native material did not succeed: queries
+returned zero Beam/SkeletonBeam
 matches with two representation conflicts. Slab native readback remained
 blank after two reported attempts. Material-attribute success was
 reported on two SkeletonBeams and both MultiSlab/Slab representations of one
