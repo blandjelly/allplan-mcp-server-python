@@ -34,9 +34,29 @@ modules and 11 MCP/HTTP checks. Version consistency across metadata, lock and
 server is 0.38.0. The opening Wall regression covers a new same-view wrapper
 without its own optional child graph: baseline consensus returns unknown, while
 the candidate applies with one setter and recovery unblocks. This confirms the
-fixture path only; native root cause remains unproven. Required Windows/Ubuntu
-CI, `ci-required`, exact package and upgrade/restore verification, and native
-validation remain pending.
+fixture path only; native root cause remains unproven.
+
+The first full CI run [40331698187](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40331698187)
+failed on Windows job [121602568658](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40331698187/job/121602568658):
+726 tests ran with one error in
+`test_material_edit_with_axis_preview_highlight_apply_and_replay_over_http`.
+Its durable-trace HTTP Apply exceeded the production 30-second host timeout;
+Ubuntu passed, while package production was skipped and `ci-required` failed.
+Diagnosis: this test's fake native query clock stays frozen while real trace
+`fsync` is slow on Windows. The test-only adjustment is complete: give this
+sole durable HTTP flow a 120-second host subprocess timeout and 130-second
+client timeout, keep the production default at 30 seconds and other HTTP
+timeouts at 40 seconds, retain real trace/fsync/journal behavior, and report
+per-phase elapsed time and event/fsync counts. Product behavior and version
+remain 0.38.0. Final focused validation of the adjustment passed 15 tests across
+the durable HTTP flow, client, trace support and UI-stall smoke check.
+
+Linux profiling before/after the test-only change showed preview 0.141/0.126 s,
+highlight 0.116/0.111 s, Apply 0.152/0.143 s, and replay 0.020/0.021 s. Event
+and real-fsync counts were identical: preview 666 records/667 fsyncs, highlight
+1,998/1,332, Apply 3,996/2,006, replay 3,996/0. These Linux timings do not
+predict Windows performance. A fresh Windows/Ubuntu CI run is still required;
+exact package, upgrade/restore and native verification are also pending.
 
 After required CI and exact-package verification, install 0.38.0 and reload
 PythonHost as required by the setup procedure; keep the original Allplan
@@ -65,10 +85,12 @@ native acceptance is pending. See [validation status](validation-status.md#evide
 
 ## Current candidate — 0.38.0
 
-The 0.38.0 candidate is prepared on `fix/m4-material-recovery`. Full
-Windows/Ubuntu CI, `ci-required`, exact-package and upgrade/restore verification,
-and native validation are pending. Do not infer package acceptance or native
-PASS from focused checks or SDK API availability.
+The 0.38.0 candidate is prepared on `fix/m4-material-recovery`. The initial
+Windows/Ubuntu CI failed on the durable material HTTP flow as described above;
+the test-only timeout/metrics correction and final focused checks now pass, but
+fresh full CI is pending. Native validation, exact-package and upgrade/restore
+verification remain pending. Do not infer package acceptance or native PASS
+from focused checks or SDK API availability.
 
 ## Prior work needed for continuation
 

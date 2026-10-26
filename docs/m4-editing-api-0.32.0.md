@@ -72,9 +72,9 @@ unknown. Recovery uses the original execution ID and never retries setters.
 The full optional preservation snapshot is now captured only on the exact
 wrapper reviewed as the setter target. Other live wrappers receive core reads
 for native material and required owner, which must agree with that selected
-wrapper. Consensus and setter preflight each start a separate 10-second
-material evidence budget, including trace I/O; they do not reuse an expired M1
-scan budget, which remains 5 seconds. Missing views, owner/material
+wrapper. Preview observation, consensus and setter preflight each start a
+separate 10-second material evidence budget, including trace I/O; they do not
+reuse an expired M1 scan budget, which remains 5 seconds. Missing views, owner/material
 disagreement, or unreadable required evidence remain blocked or unknown.
 
 Completed Wall hierarchy/component observations remain in partial evidence if

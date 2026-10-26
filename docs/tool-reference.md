@@ -437,10 +437,10 @@ excluded peers, which stay in the M1 source fingerprint so new matches still
 invalidate Apply. Preview captures the full optional preservation snapshot
 only on the exact reviewed setter wrapper. Other live representations receive
 core material and bound-owner reads, which must agree with that wrapper.
-Preview and consensus use the same 10-second material evidence budget,
-including durable trace I/O. Setter preflight starts its own 10-second budget;
-it does not reuse an expired 5-second M1 enumeration budget. M1 scanning keeps
-its 5-second limit and the client timeout is unchanged. Completed Wall scalar
+Preview observation, consensus and setter preflight each have a separate
+10-second material evidence budget, including durable trace I/O; preflight does
+not reuse an expired 5-second M1 enumeration budget. M1 scanning keeps its
+5-second limit and the client timeout is unchanged. Completed Wall scalar
 evidence is reused on retained property owners instead of reading every
 property twice.
 

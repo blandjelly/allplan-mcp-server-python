@@ -9,10 +9,15 @@ Kandydat źródłowy 0.38.0 na `fix/m4-material-recovery` dodaje przeglądaną
 reconciliation dla nierozstrzygniętego wyniku native material przy zachowaniu
 blokad dla brakujących, niezgodnych lub nieczytelnych reprezentacji. 177 focused
 unit checks i 11 MCP/HTTP checks przeszło; version consistency potwierdza 0.38.0.
-Test regresyjny Wall/opening potwierdza pojedynczy setter i odblokowane recover
-po dodatkowym wrapperze bez własnego opcjonalnego drzewa dzieci. To test fixture,
-nie walidacja natywna. Pełne CI, weryfikacja paczki/upgrade/restore i
-próba natywna są pending; bieżący
+Test Wall/opening potwierdza pojedynczy setter i odblokowane recover po
+dodatkowym wrapperze bez własnego opcjonalnego drzewa dzieci (baseline: unknown).
+To test fixture, nie walidacja natywna. Run CI
+[40331698187](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40331698187)
+zakończył się błędem Windows w durable material HTTP (`726` testów, jeden błąd),
+a Ubuntu przeszło; package job pominięto, `ci-required` failed. Poprawka
+test-only dla durable HTTP flow i 15 testów focused po zmianie przeszły; runtime
+pozostaje 0.38.0. Nowe CI, odbiór native i paczki nadal pending. Lokalne pomiary
+Linux i limity tego wyniku podaje [handoff](next-model-handoff.md); bieżący
 zakres i warunki opisuje [handoff](next-model-handoff.md).
 
 Dowody wcześniejszych prób są w [statusie walidacji](validation-status.md);

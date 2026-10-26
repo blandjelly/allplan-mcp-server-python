@@ -7,9 +7,14 @@ The prepared source candidate is 0.38.0 on `fix/m4-material-recovery`, based on
 `develop/m4` SHA `24a0b342f576f331924a55b6c33e36e8d595d3c3`. **188 distinct
 focused checks passed**: 177 unit checks across 10 affected modules and 11
 MCP/HTTP checks. Version consistency across metadata, lock and server is
-0.38.0. Full Windows/Ubuntu CI, `ci-required`, exact-package verification,
-upgrade/restore checks and native validation are pending. Do not use earlier CI
-as validation of this source. The previous
+0.38.0. CI run
+[40331698187](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40331698187)
+failed on Windows in the durable material HTTP flow (726 tests, one error);
+Ubuntu passed, package job was skipped and `ci-required` failed. A test-only
+timeout/phase-metrics adjustment is complete and 15 focused tests passed after
+it; runtime stays 0.38.0. A fresh full CI run is pending.
+Exact-package, upgrade/restore and native validation are also pending. Do not
+use earlier CI as validation of this source. The previous
 baseline [CI run 40228207181](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40228207181)
 passed 693 tests on Windows and Ubuntu and package production for `ee831a0`;
 it does not validate 0.38.0.
@@ -21,10 +26,9 @@ single-tier and Column support is retained. Slab child writes require its
 direct MultiSlab parent and parent/child overlap blocks the plan. Project
 attribute requests can explicitly bind `property_owner="selected_element"`
 to the exact ref with complete lineage and children; requests without that
-owner still block aggregate/child writes. Native material evidence allows up to
-10 seconds, while the M1 scan remains 5 seconds and client timeout 30 seconds.
-Material observation, consensus and setter preflight use independent 10-second
-evidence budgets; M1 scan remains 5 seconds. A regression fixture adds another
+owner still block aggregate/child writes. Material observation, consensus and
+setter preflight each use an independent 10-second evidence budget; M1 scan
+remains 5 seconds and client timeout 30 seconds. A regression fixture adds another
 same-view Wall root wrapper without its own optional child graph: the old
 consensus produced unknown, while the candidate applied with one setter and
 recovery unblocked. This confirms fixture behavior only; the native root cause
