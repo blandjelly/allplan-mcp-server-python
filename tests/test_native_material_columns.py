@@ -147,6 +147,112 @@ class ColumnMaterialTests(unittest.TestCase):
         self.assertEqual(recovered["outcomes"][0]["state"], "reconciled")
         self.native.base.ModifyElements.assert_called_once()
 
+    def replaced_view_execution(self, *, lost_reply=False):
+        alias = self.alternate_view()
+        self.native.base.ElementsSelectService.SelectAllElements.return_value = [self.root]
+        def replace(doc, elements):
+            result = self.modify(doc, elements)
+            self.native.base.ElementsSelectService.SelectAllElements.return_value = [alias]
+            if lost_reply:
+                raise RuntimeError("lost response after regeneration")
+            return result
+        self.native.base.ModifyElements.side_effect = replace
+        plan = self.preview()
+        self.native.highlight(plan)
+        execution = uuid4().hex
+        result = self.native.apply(plan, execution)
+        self.assertEqual(result["outcomes"][0]["state"], "unknown", result)
+        if not lost_reply:
+            self.assertFalse(result["outcomes"][0]["representation_consensus"]["reviewed_view_present"])
+        return execution, plan, alias
+
+    def test_replaced_column_view_recovers_after_restart_and_unblocks_without_retry(self):
+        for lost_reply in (False, True):
+            with self.subTest(lost_reply=lost_reply):
+                f = ColumnMaterialTests()
+                f.setUp()
+                self.addCleanup(f.doCleanups)
+                execution, plan, alias = f.replaced_view_execution(lost_reply=lost_reply)
+                self.assertEqual(f.properties.Material, "C35/45")
+                executor = f.native.handler.repair_plans.executor
+                f.native.handler.repair_plans.executor = type(executor)(executor.plans, executor.path)
+                recovered = f.native.recover(execution)
+                self.assertTrue(recovered["write_blocked"])
+                proposal = recovered["recovery"]["reconciliation"]
+                target = proposal["targets"][0]
+                self.assertFalse(target["reviewed_view_present"])
+                self.assertEqual(target["readback"], {"status": "observed", "value": "C35/45"})
+                self.assertEqual(target["representations"][0]["view_uuid"], alias.GetElementUUID())
+                resolved = f.native.call(proposal["request"])
+                self.assertFalse(resolved["write_blocked"])
+                self.assertFalse(resolved["outcomes"][0]["preservation_verified"])
+                self.assertEqual(resolved["outcomes"][0]["original_outcome"]["state"], "unknown")
+                self.assertTrue(f.native.apply(plan, execution)["replayed"])
+                f.native.base.ModifyElements.assert_called_once()
+
+    def test_replacement_view_disagreement_unreadable_or_changed_owner_keeps_lock(self):
+        for defect in ("material", "unreadable", "owner", "missing"):
+            with self.subTest(defect=defect):
+                f = ColumnMaterialTests()
+                f.setUp()
+                self.addCleanup(f.doCleanups)
+                execution, _, alias = f.replaced_view_execution()
+                if defect == "missing":
+                    alias.GetModelElementUUID.return_value = str(uuid4())
+                elif defect == "owner":
+                    f.native.parents[id(alias)] = f.native.element(99, name="Macro_TypeUUID")
+                else:
+                    other = f.alternate_view()
+                    other.GetElementUUID.return_value = str(uuid4())
+                    f.native.base.ElementsSelectService.SelectAllElements.return_value = [alias, other]
+                    def get_element(adapter):
+                        if adapter is other and defect == "unreadable":
+                            raise AttributeError("unavailable native representation")
+                        props = copy.deepcopy(f.properties)
+                        if adapter is other:
+                            props.Material = "other"
+                            props.Priority += 1
+                        return ColumnElement(props)
+                    f.native.base.GetElement.side_effect = get_element
+                recovered = f.native.recover(execution)
+                self.assertTrue(recovered["write_blocked"])
+                self.assertNotIn("reconciliation", recovered["recovery"])
+                f.native.base.ModifyElements.assert_called_once()
+
+    def test_replaced_view_before_apply_still_blocks_without_setter(self):
+        alias = self.alternate_view()
+        plan = self.preview()
+        self.native.highlight(plan)
+        self.native.base.ElementsSelectService.SelectAllElements.return_value = [alias]
+        self.native.assert_code("repair_conflict", lambda: self.native.apply(plan))
+        self.native.base.ModifyElements.assert_not_called()
+
+    def test_every_replacement_view_preservation_is_bound_to_reconciliation_hash(self):
+        execution, _, alias = self.replaced_view_execution()
+        other = self.alternate_view()
+        other.GetElementUUID.return_value = str(uuid4())
+        self.native.base.ElementsSelectService.SelectAllElements.return_value = [alias, other]
+        priority = [22]
+        def get_element(adapter):
+            props = copy.deepcopy(self.properties)
+            if adapter is other:
+                props.Priority = priority[0]
+            return ColumnElement(props)
+        self.native.base.GetElement.side_effect = get_element
+        recovered = self.native.recover(execution)
+        proposal = recovered["recovery"]["reconciliation"]
+        representations = proposal["targets"][0]["representations"]
+        self.assertEqual(len(representations), 2)
+        self.assertTrue(all("preservation" in item for item in representations))
+        self.assertNotEqual(representations[0]["preservation"]["current_sha256"],
+                            representations[1]["preservation"]["current_sha256"])
+        priority[0] += 1
+        self.native.assert_code("repair_conflict", lambda: self.native.call(proposal["request"]))
+        fresh = self.native.recover(execution)["recovery"]["reconciliation"]
+        self.assertNotEqual(fresh["hash"], proposal["hash"])
+        self.assertFalse(self.native.call(fresh["request"])["write_blocked"])
+        self.native.base.ModifyElements.assert_called_once()
+
     def test_column_missing_material_or_setter_and_wrong_target_still_block(self):
         for defect in ("material", "setter", "native_type", "nested"):
             with self.subTest(defect=defect):

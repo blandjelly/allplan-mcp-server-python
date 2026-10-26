@@ -1,4 +1,4 @@
-# Native material editing — candidate 0.38.0
+# Native material editing — candidate 0.39.0
 
 ## Request and native property owner
 
@@ -14,16 +14,24 @@ The eligible root is a standalone `Wall_TypeUUID` represented by
 `GetWallTierProperties(1).Material` / `SetMaterial`. A Column uses its
 `ColumnProperties.Material` / `SetMaterial`. `Beam_TypeUUID` and
 `SkeletonBeam_TypeUUID` support the live `BeamElement` or
-`StructuralBeamElement` representation, checked at runtime. Their owners are
-`BeamProperties.Material` and `StructuralBeamProperties.Material` respectively.
+`StructuralBeamElement` representation, checked at runtime. `BeamElement` uses
+`BeamProperties.Material`; `StructuralBeamElement` uses
+`StructuralBeamProperties.Material`. Their element accessors differ: the
+`BeamElement` route uses `Properties` / `SetProperties`; the
+`StructuralBeamElement` route uses `.StructuralBeamProperties` /
+`SetStructuralBeamProperties(properties)`. `GetStructuralBeamProperties()` is
+an SDK alias for reading that property; `StructuralBeamElement` does not use
+generic `Properties` / `SetProperties`.
 `Slab_TypeUUID` and `MultiSlab_TypeUUID` require `SlabElement` and use exactly
 `SlabProperties.Material` / `SetMaterial` on the selected element. The Slab
 route does not substitute `GetSlabTierProperties(1)` or redirect to another
 adapter. A Slab child may have a directly observed MultiSlab parent; other
 nested roots remain blocked. `tier_index=1` is retained for request compatibility
-and selects a property tier only for Wall. All routes mutate the existing
-represented native object, call `SetProperties` with its properties, then
-submit that object through `ModifyElements`. A missing enumerated tier child
+and selects a property tier only for Wall. Each route mutates the existing
+represented native object, reattaches properties through that element class's
+documented setter (`SetProperties` for Wall, Column, Beam and Slab;
+`SetStructuralBeamProperties` for StructuralBeamElement), then submits that
+object through `ModifyElements`. A missing enumerated tier child
 does not disqualify a single-tier Wall when its native properties report one
 tier. Multi-tier Walls remain outside this candidate. Parent and child Slab
 targets in one plan are blocked as overlapping owners.
@@ -45,8 +53,12 @@ Additional SDK contracts are [BeamElement](https://pythonparts.allplan.com/2026/
 [StructuralBeamProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/StructuralBeamProperties/),
 [SlabElement](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/SlabElement/)
 and [SlabProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/SlabProperties/).
-The 2026 references establish those property/setter APIs, not a universal
-SkeletonBeam-to-class mapping. The selected MultiSlab's `SlabElement`
+The 2026 references establish those property/accessor APIs, not a universal
+SkeletonBeam-to-class mapping. The [StructuralBeamElement reference](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/StructuralBeamElement/)
+documents `.StructuralBeamProperties`, its getter alias, and
+`SetStructuralBeamProperties(StructuralBeamProperties)`; do not infer generic
+`Properties` / `SetProperties` support from the parallel BeamElement API. The
+selected MultiSlab's `SlabElement`
 representation was previously reported in the [retained owner log](test-results/evidence/allplan-chat-log-0.27.0-2026-10-23.md);
 runtime class checks remain mandatory. The root and tier Slab material fields
 have separate documented owners and are not assumed equivalent.
@@ -69,21 +81,36 @@ preview. Available evidence remains in the state fingerprint and is compared
 during revalidation and fresh readback. A changed observation conflicts before
 setters; drift or incomplete required readback after a write leaves the result
 unknown. Recovery uses the original execution ID and never retries setters.
-The full optional preservation snapshot is now captured only on the exact
-wrapper reviewed as the setter target. Other live wrappers receive core reads
-for native material and required owner, which must agree with that selected
-wrapper. Preview observation, consensus and setter preflight each start a
-separate 10-second material evidence budget, including trace I/O; they do not
-reuse an expired M1 scan budget, which remains 5 seconds. Missing views, owner/material
-disagreement, or unreadable required evidence remain blocked or unknown.
+Before any setter, the exact reviewed view and bound property owner must be
+available; no substitute view is eligible for the write. The full optional
+preservation snapshot is captured on that exact wrapper. Other live wrappers
+may contribute required core reads, but native material and bound owner must
+agree with the selected wrapper. Preview observation, consensus and setter
+preflight each start a separate 10-second material evidence budget, including
+trace I/O; they do not reuse an expired M1 scan budget, which remains 5 seconds.
+Missing views, owner/material disagreement, or unreadable required evidence
+remain blocked or unknown.
+
+After a setter has been issued, Apply readback and recovery remain read-only.
+If the exact bound view is unavailable, the bridge attempts a full preservation
+snapshot on every currently present wrapper for that same bound property owner.
+Unavailable optional fields remain explicit `not_checked`: they neither block
+otherwise complete required reads nor prove preservation. Missing/unreadable
+required owner or material, or disagreement between wrappers, keeps the result
+unknown and recovery blocked. A changed view or observed preservation drift
+also stays unknown; the [reviewed reconciliation](#reviewed-reconciliation-of-native-material-preservation-drift)
+is read-only. The bridge never binds a replacement setter target or retries
+the write.
 
 Completed Wall hierarchy/component observations remain in partial evidence if
 a later optional detail fails. Property reads are independent. Across live
 views, consensus covers the required native value and structural owner; the
 chosen exact view retains its own preservation fingerprint. Other views'
-different optional coverage does not invalidate the material value, but strict
-preservation drift on the selected wrapper remains unknown in ordinary
-revalidation and Apply readback. A failed complete
+different optional coverage does not invalidate the material value during
+prewrite consensus. Ordinary prewrite revalidation remains bound to the exact
+selected wrapper and treats its preservation drift as a conflict. After a
+write, unavailable optional fields on current wrappers remain explicit
+`not_checked` and do not establish preservation. A failed complete
 Column child inventory reports a diagnostic; it cannot prove preservation of
 unread children.
 
@@ -139,22 +166,21 @@ checks and API availability do not establish native Allplan acceptance.
 
 ## Reviewed reconciliation of native-material preservation drift
 
-Candidate 0.38.0 permits a narrow review path when every remaining unknown
-outcome is a native-material change and every exact live representation agrees
-on the current material and original bound owner. An unacknowledged recover may
-return `recovery.reconciliation` with `hash`, exact `targets`, `meaning`, and a
-ready-to-submit `request`. Each representation includes `changed_sections`
-and before/current preservation hashes. Missing views or owners, unreadable
-evidence, material disagreement, or any unknown non-material operation
-suppresses this proposal and preserves the journal lock.
-
-The agent inspects each target and compares changed sections with the current
-model, including UI or geometry review when needed. After review it submits
-that returned request with `reconciliation_hash` and
-`acknowledgement="reviewed_material_reconciliation"` in the same session. The
-bridge rereads every exact view under the journal lock and accepts only an
-unchanged proposal hash. Changed evidence requires a fresh unacknowledged
-recover and a new review. Acceptance records reason
+Reviewed reconciliation applies only to remaining unknown native-material
+outcomes. A proposal requires readable required material and owner evidence
+with consensus; unknown non-material outcomes, missing current wrappers or
+required evidence failures keep the journal lock. Optional reads that return
+`not_checked` do not prove preservation or by themselves block required
+material/owner consensus. Prewrite and setter binding remain on the exact
+reviewed view. A proposal includes `hash`, exact `targets`, `meaning`, each
+target's `reviewed_view_uuid` and `reviewed_view_present`, `changed_sections`,
+before/current preservation hashes, and the exact request to submit after
+review. The caller reviews those targets and submits the returned request
+unchanged with `reconciliation_hash` and
+`acknowledgement="reviewed_material_reconciliation"` in the same session. Under
+the journal lock the bridge rereads each named wrapper and accepts only an
+unchanged proposal hash with the same owner and material consensus. Changed
+evidence requires a fresh unacknowledged recover and a new review. Acceptance records reason
 `reviewed_material_preservation_conflict`, retains `original_outcome`, and sets
 `preservation_verified=false`; it also retains `reconciliation_evidence`, the
 accepted `reconciliation_hash`, and the review acknowledgement. This is
@@ -163,13 +189,7 @@ neither setter causality nor preservation, does not report applied success or
 retry a setter, and does not delete journal history. Any new edit requires a
 fresh preview after the recovery blocker clears.
 
-The 0.35.0 evidence confirms one Column Apply/readback and three interrupted
-Wall material previews followed by native access violations. Their underlying
-cause remains unproven, and neither old heap-corruption dump diagnoses those
-events. The supplied 0.36.0 trial reports no crash, Wall preview budget failures,
-successful Column native Apply/readback, unsupported SkeletonBeam/MultiSlab
-native material, and blocked Slab attribute ownership. The user's native Beam
-success statement differs from the log and remains unresolved. The next
-candidate's changed routes need the bounded trial after CI and exact-ZIP
-verification in the [handoff](next-model-handoff.md). Prior material
-observations and their limits remain in [validation status](validation-status.md).
+Historical native crashes and family-specific outcomes are retained with their
+evidence in [validation status](validation-status.md). This SDK note describes
+API contracts only; the current candidate and required owner trials are in the
+[handoff](next-model-handoff.md).

@@ -746,6 +746,8 @@ class RepairExecutor:
                     and resolution.get("reconciliation_readback", {}).get("status") == "observed"):
                 candidates.append({"index": index, "ref": change["ref"],
                     "readback": resolution["reconciliation_readback"],
+                    "reviewed_view_uuid": change.get("target_view_uuid"),
+                    "reviewed_view_present": resolution.get("reviewed_view_present"),
                     "representations": resolution["representations"]})
             if record["outcomes"][index]["state"] == "unknown" and state in {"new_value_observed", "old_value_observed"}:
                 record["outcomes"][index].update(state="reconciled", reason=state, readback=value)

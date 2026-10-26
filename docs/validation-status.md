@@ -3,42 +3,29 @@
 Current candidate and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
 [development plan](office-editing-development-plan.pl.md).
-The prepared source candidate is 0.38.0 on `fix/m4-material-recovery`, based on
-`develop/m4` SHA `24a0b342f576f331924a55b6c33e36e8d595d3c3`. **188 distinct
-focused checks passed**: 177 unit checks across 10 affected modules and 11
-MCP/HTTP checks. Version consistency across metadata, lock and server is
-0.38.0. CI run
-[40331698187](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40331698187)
-failed on Windows in the durable material HTTP flow (726 tests, one error);
-Ubuntu passed, package job was skipped and `ci-required` failed. A test-only
-timeout/phase-metrics adjustment is complete and 15 focused tests passed after
-it; runtime stays 0.38.0. A fresh full CI run is pending.
-Exact-package, upgrade/restore and native validation are also pending. Do not
-use earlier CI as validation of this source. The previous
-baseline [CI run 40228207181](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40228207181)
-passed 693 tests on Windows and Ubuntu and package production for `ee831a0`;
-it does not validate 0.38.0.
+The current source candidate is **0.39.0** on `fix/m4-native-material-readback`,
+based on `develop/m4` at `fb67fab`. Focused results and version consistency are
+in the [handoff](next-model-handoff.md). CI, exact package, upgrade/restore and
+native acceptance are pending with the owner. Current API and recovery behavior
+are in [native material API evidence](m4-editing-api-0.32.0.md).
 
-Candidate scope: native material uses runtime class dispatch for Beam and
-SkeletonBeam (`BeamElement` or `StructuralBeamElement`) and Slab/MultiSlab
-(`SlabElement`, root `SlabProperties.Material`/`SetMaterial`); Wall stays
-single-tier and Column support is retained. Slab child writes require its
-direct MultiSlab parent and parent/child overlap blocks the plan. Project
-attribute requests can explicitly bind `property_owner="selected_element"`
-to the exact ref with complete lineage and children; requests without that
-owner still block aggregate/child writes. Material observation, consensus and
-setter preflight each use an independent 10-second evidence budget; M1 scan
-remains 5 seconds and client timeout 30 seconds. A regression fixture adds another
-same-view Wall root wrapper without its own optional child graph: the old
-consensus produced unknown, while the candidate applied with one setter and
-recovery unblocked. This confirms fixture behavior only; the native root cause
-is unproven.
+## Latest owner observations
 
-The candidate also reduces repeated Wall scalar trace events from 594 to 454
-for the simple Wall case and skips native destination observations on excluded
-or nonmatching peers while retaining the M1 fingerprint and drift checks.
-Existing guards, journals, replay protection and trace retention remain in
-force.
+The preserved [0.38.0 conversation log](test-results/evidence/0.38.0-2026-10-26/allplan-conversation-log.md)
+reports Allplan 2026.1 and bridge integrity, but runtime and hotfix verification
+were unconfirmed. The owner/UI reported both Wall values as `TEST` and reviewed
+their preservation conflicts through reconciliation. A Column at X=0,Y=0 showed
+the requested value in UI, but Apply/readback remained unknown because the
+planned view was unavailable; recover also could not read it. The log contains
+no Column execution ID. Two Beam previews failed on `AttributeError` before a
+setter. One MultiSlab had empty material and a ready preview, but Apply was
+blocked by the Column recovery lock, so no Slab setter ran. These observations
+do not establish CI, exact ZIP or complete native acceptance.
+
+Separately, the owner observed a project Material attribute value matching the
+native material value. The report does not identify an attribute ID; known API
+mapping of standard Material to ID 508 is a separate fact. Equality is only
+correlation/reflection evidence, not proof that the two setters are equivalent.
 
 ## Accepted baseline and scoped M4 observations
 
@@ -130,14 +117,6 @@ pairs. Missing fixtures and blocked paths are separate from PASS.
   PASS. Do not repeat the completed native Column Apply/readback. The raw log
   is [preserved unchanged](test-results/evidence/conversation-log-0.36.0-2026-10-26.md),
   SHA-256 `6146fa08928b650f74d0f08fdadc00b6e8bf0b514c92484714a18d08c3aa9910`.
-- **0.37.0 bounded native trial:** After the owner checks required CI for the
-  final source, verifies the exact ZIP and upgrade/restore procedures, trial
-  only the changed native-material and explicit Slab attribute-owner paths.
-  Preserve the first blocked/unknown result and exact refs. A write requires
-  fresh readback and the appropriate UI Undo/restoration check. Do not repeat
-  the completed Column route, request missing dumps, or retry setters after an
-  unknown result. New runtime code has focused checks passing; full CI and native
-  validation remain pending. Preserve all existing trace/journal history and safeguards.
 - **Wall material — 0.33.0 native trial:** on drawing 101, the query found one
   original 240 mm `Ściana, prosta` (`Wall_TypeUUID`) with material observed as
   `Beton`. Query reported `scan_complete=true` but

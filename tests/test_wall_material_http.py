@@ -1,7 +1,9 @@
 """Public MCP HTTP contract for native Wall material editing."""
 import unittest
+import copy
 import json
 import os
+import sys
 from time import perf_counter
 from unittest.mock import patch
 from types import SimpleNamespace
@@ -81,6 +83,7 @@ class WallMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
         self.addCleanup(fixtures.doCleanups)
         async with Client(self.url, timeout=MATERIAL_HTTP_TIMEOUT) as client:
             for kind, cls in (("SkeletonBeam_TypeUUID", family_fixtures.BeamElement),
+                              ("SkeletonBeam_TypeUUID", family_fixtures.StructuralBeamElement),
                               ("MultiSlab_TypeUUID", family_fixtures.SlabElement)):
                 with self.subTest(kind=kind):
                     native = fixtures.fixture(kind, cls)
@@ -96,6 +99,57 @@ class WallMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
                     self.assertEqual(result["outcomes"][0]["readback"]["value"], "C35/45")
                     self.assertTrue((await client.call_tool("model_edit", {"request": request})).data["replayed"])
                     native.native.base.ModifyElements.assert_called_once()
+
+    async def test_column_replacement_reconciliation_unblocks_empty_slab_material_over_http(self):
+        native = column_fixtures.ColumnMaterialTests()
+        native.setUp()
+        self.addCleanup(native.doCleanups)
+        execution, _, alias = native.replaced_view_execution()
+        slab = native.native.element(98, name="MultiSlab_TypeUUID")
+        for method in ("IsNull", "IsDeleted", "IsValid", "IsInActiveDocument", "IsInActiveLayer", "IsLabelElement"):
+            getattr(slab, method).return_value = getattr(native.root, method)()
+        slab.GetCommonProperties.return_value.Layer = 17
+        properties = [copy.deepcopy(native.properties)]
+        properties[0].Material = ""
+        sys.modules["NemAll_Python_ArchElements"].SlabElement = family_fixtures.SlabElement
+        native.native.base.GetElement.side_effect = lambda adapter: (
+            family_fixtures.SlabElement(copy.deepcopy(properties[0])) if adapter is slab
+            else column_fixtures.ColumnElement(copy.deepcopy(native.properties)))
+        native.native.base.ElementsSelectService.SelectAllElements.return_value = [alias, slab]
+        def modify(doc, elements):
+            self.assertIsInstance(elements[0], family_fixtures.SlabElement)
+            properties[0] = copy.deepcopy(elements[0].Properties)
+            return elements
+        native.native.base.ModifyElements.side_effect = modify
+        self.route_model_edit(native.native)
+        request = native.fixture.request(native_types=["MultiSlab_TypeUUID"])
+        async with Client(self.url, timeout=MATERIAL_HTTP_TIMEOUT) as client:
+            async def preview_apply_request():
+                plan = (await client.call_tool("model_edit", {"request": request})).data
+                self.assertTrue(plan["apply_available"], plan)
+                self.assertEqual(plan["changes"][0]["old_value"]["value"], "")
+                highlighted = (await client.call_tool("model_edit", {
+                    "request": plan["next_action"]["request"]})).data
+                return {**highlighted["next_action"]["request"], "execution_id": uuid4().hex}
+            blocked = await client.call_tool("model_edit", {"request": await preview_apply_request()},
+                                             raise_on_error=False)
+            self.assertTrue(blocked.is_error)
+            native.native.base.ModifyElements.assert_called_once()
+            recovery = (await client.call_tool("model_edit", {"request": {
+                "action": "recover", "execution_id": execution}})).data
+            self.assertTrue(recovery["write_blocked"])
+            target = recovery["recovery"]["reconciliation"]["targets"][0]
+            self.assertFalse(target["reviewed_view_present"])
+            self.assertEqual(target["readback"]["value"], "C35/45")
+            accepted = (await client.call_tool("model_edit", {"request":
+                recovery["recovery"]["reconciliation"]["request"]})).data
+            self.assertFalse(accepted["write_blocked"])
+            applied_request = await preview_apply_request()
+            result = (await client.call_tool("model_edit", {"request": applied_request})).data
+            self.assertEqual(result["state"], "completed", result)
+            self.assertEqual(properties[0].Material, "C35/45")
+            self.assertTrue((await client.call_tool("model_edit", {"request": applied_request})).data["replayed"])
+            self.assertEqual(native.native.base.ModifyElements.call_count, 2)
 
     async def test_explicit_aggregate_material_attribute_owner_over_public_mcp(self):
         native = ownership_fixtures.EditOwnershipTests()
