@@ -219,13 +219,19 @@ class WallMaterialEditTests(unittest.TestCase):
         self.assertNotIn("reconciliation", result["recovery"])
         self.native.base.ModifyElements.assert_called_once()
 
-    def test_reconciliation_cannot_accept_a_missing_reviewed_view(self):
+    def test_missing_reviewed_view_requires_full_preservation_review_on_replacement(self):
         execution_id, _, _ = self.drifted_opening_execution()
         alias = self.live_alternate_wall_view(70)
         self.native.base.ElementsSelectService.SelectAllElements.return_value = [alias]
         result = self.native.recover(execution_id)
         self.assertTrue(result["write_blocked"])
-        self.assertNotIn("reconciliation", result["recovery"])
+        proposal = result["recovery"]["reconciliation"]
+        target = proposal["targets"][0]
+        self.assertFalse(target["reviewed_view_present"])
+        self.assertEqual(target["reviewed_view_uuid"], self.root.GetElementUUID())
+        self.assertIn("hierarchy", target["representations"][0]["preservation"]["changed_sections"])
+        self.assertFalse(self.native.call(proposal["request"])["write_blocked"])
+        self.native.base.ModifyElements.assert_called_once()
 
     def test_reconciliation_requires_matching_values_from_every_live_view(self):
         execution_id, _, _ = self.drifted_opening_execution()

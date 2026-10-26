@@ -13,8 +13,13 @@ class BeamElement(columns.ColumnElement):
     pass
 
 
-class StructuralBeamElement(columns.ColumnElement):
-    pass
+class StructuralBeamElement:
+    """2026 structural API deliberately has no Properties/SetProperties."""
+    def __init__(self, properties):
+        self.StructuralBeamProperties = properties
+
+    def SetStructuralBeamProperties(self, properties):
+        self.StructuralBeamProperties = properties
 
 
 class SlabElement(columns.ColumnElement):
@@ -34,7 +39,9 @@ class NativeMaterialFamiliesTests(unittest.TestCase):
         def modify(doc, elements):
             self.assertEqual(len(elements), 1)
             self.assertIsInstance(elements[0], native_class)
-            f.properties = copy.deepcopy(elements[0].Properties)
+            props = (elements[0].StructuralBeamProperties if native_class is StructuralBeamElement
+                     else elements[0].Properties)
+            f.properties = copy.deepcopy(props)
             return elements
 
         f.native.base.ModifyElements.side_effect = modify
@@ -47,6 +54,8 @@ class NativeMaterialFamiliesTests(unittest.TestCase):
                           ("MultiSlab_TypeUUID", SlabElement)):
             with self.subTest(kind=kind, representation=cls.__name__):
                 f = self.fixture(kind, cls)
+                if kind == "MultiSlab_TypeUUID":
+                    f.properties.Material = ""
                 before = copy.deepcopy(vars(f.properties))
                 plan = f.preview()
                 self.assertTrue(plan["apply_available"], plan)
@@ -64,6 +73,18 @@ class NativeMaterialFamiliesTests(unittest.TestCase):
                 f.native.base.ModifyElements.assert_called_once()
                 f.native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
                 self.assertEqual(f.preview()["state"], "no_op")
+
+    def test_structural_beam_requires_its_documented_setter(self):
+        f = self.fixture("SkeletonBeam_TypeUUID", StructuralBeamElement)
+        class WrongSetter(StructuralBeamElement):
+            SetStructuralBeamProperties = None
+            def SetProperties(self, properties):
+                raise AssertionError("Generic setter must never be used")
+        f.native.base.GetElement.side_effect = lambda _: WrongSetter(copy.deepcopy(f.properties))
+        plan = f.preview()
+        self.assertFalse(plan["apply_available"], plan)
+        self.assertFalse(plan["changes"])
+        f.native.base.ModifyElements.assert_not_called()
 
     def test_slab_tier_is_an_exact_target_without_redirection_to_aggregate(self):
         f = self.fixture("Slab_TypeUUID", SlabElement)

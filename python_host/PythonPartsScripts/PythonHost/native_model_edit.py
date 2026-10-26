@@ -233,6 +233,9 @@ def read_consensus(base, queries, elements, change, diagnostics=None):
     material = change.get("operation") == "set_native_material"
     selected = next((element for element in elements
                      if guid(element.GetElementUUID()) == change.get("target_view_uuid")), None)
+    if material:
+        evidence.update(reviewed_view_uuid=change.get("target_view_uuid"),
+                        reviewed_view_present=selected is not None)
     seconds = queries.SCAN_SECONDS
     if material:
         from .model_edit import MATERIAL_EVIDENCE_SECONDS
@@ -247,13 +250,14 @@ def read_consensus(base, queries, elements, change, diagnostics=None):
         valid = all(lifecycle[method].get("status") == "observed"
                     and lifecycle[method].get("value") is expected
                     for method, expected in (("IsNull", False), ("IsDeleted", False), ("IsValid", True)))
-        # Only one wrapper's preservation was bound by preview. Every other
-        # wrapper still has to prove the same required owner and material.
+        # Writable resolution still requires the exact reviewed view. This
+        # read-only path can see regenerated views after ModifyElements. If
+        # that view is gone, capture full preservation on EVERY live wrapper;
+        # drift (including changed view identity) stays unknown, but agreed
+        # native material/ownership can support reviewed reconciliation.
         if valid and material:
             from .wall_material import read as read_material
-            value = read_material(base, element, change, check, preservation=element is selected)
-            if selected is None:
-                value = {"status": "not_checked", "value": None, "reason": "reviewed_view_missing"}
+            value = read_material(base, element, change, check, preservation=selected is None or element is selected)
         else:
             value = (read(base, queries, element, change) if valid else
                  {"status": "not_checked", "value": None, "reason": "representation_lifecycle_unavailable"})

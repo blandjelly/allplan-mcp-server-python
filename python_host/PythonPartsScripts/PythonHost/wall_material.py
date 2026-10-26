@@ -37,6 +37,11 @@ _NATIVE_CLASSES = {
 _MATERIAL_OWNERS = {"WallElement": "wall_tier_1", "ColumnElement": "column_properties",
                     "BeamElement": "beam_properties", "StructuralBeamElement": "structural_beam_properties",
                     "SlabElement": "slab_properties"}
+_PROPERTY_ACCESSORS = {"StructuralBeamElement": ("StructuralBeamProperties", "SetStructuralBeamProperties")}
+
+
+def _property_accessors(class_name):
+    return _PROPERTY_ACCESSORS.get(class_name, ("Properties", "SetProperties"))
 
 
 def _supported_lineage(hierarchy):
@@ -369,7 +374,8 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None, tr
     if len(matching_classes) != 1:
         raise ComponentReadError("material_native_representation", "native_material_representation_unsupported")
     class_name = matching_classes[0]
-    props = read(lambda: native.Properties, "material_properties", api=class_name + ".Properties")
+    property_name, setter_name = _property_accessors(class_name)
+    props = read(lambda: getattr(native, property_name), "material_properties", api=class_name + "." + property_name)
     is_wall = kind == "Wall_TypeUUID"
     if is_wall and integer(read(lambda: props.TierCount, "material_tier_count", api="WallProperties.TierCount")) != 1:
         raise ComponentReadError("material_tier_count", "wall_material_single_tier_required")
@@ -381,7 +387,7 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None, tr
         raise ComponentReadError("material_value", "native_material_string_unavailable")
     if material_observation is not None:
         material_observation.update(status="observed", value=material)
-    if not callable(getattr(tier, "SetMaterial", None)) or not callable(getattr(native, "SetProperties", None)):
+    if not callable(getattr(tier, "SetMaterial", None)) or not callable(getattr(native, setter_name, None)):
         raise ComponentReadError("material_setters", "native_material_setters_unavailable")
 
     state = {"hierarchy": hierarchy, "tier_count": 1 if is_wall else None}
@@ -545,6 +551,7 @@ def write(base, element, change, doc=None, check=lambda: None):
     final_write_guard(base, element, change, doc, check)
     owner = props.GetWallTierProperties(1) if change["native_type"] == "Wall_TypeUUID" else props
     owner.SetMaterial(change["new_value"])
-    native.SetProperties(props)
+    _, setter_name = _property_accessors(state["native_class"])
+    getattr(native, setter_name)(props)
     check()
     return base.ModifyElements(doc, [native])
