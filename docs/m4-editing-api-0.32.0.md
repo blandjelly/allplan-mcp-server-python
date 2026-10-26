@@ -67,8 +67,8 @@ the bridge's failed update.
 
 ### Native result and unresolved inference
 
-The 0.39.0 owner log, summarized in
-[validation status](validation-status.md#latest-owner-observations), reports
+The [0.39.0 owner log](test-results/evidence/0.39.0-2026-10-26/allplan-conversation-log.md),
+summarized in [validation status](validation-status.md#latest-owner-observations), reports
 zero native Beam/SkeletonBeam query matches with representation
 conflicts, then successful Material-attribute writes on two SkeletonBeams.
 This does not exercise a confirmed native Beam setter. Slab native readback
