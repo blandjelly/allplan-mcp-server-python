@@ -5,9 +5,13 @@ audits and reviewed edits. M4 development uses
 [`develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/tree/develop/m4);
 main integration is separate.
 
-Current source candidate: **0.38.0** on `fix/m4-material-recovery`; 177 unit
-checks and 11 MCP/HTTP checks passed, with version consistency at 0.38.0. Full
-CI, package verification and native Allplan validation are pending.
+Latest tested version: **0.39.0**, merged into `develop/m4` through
+[PR #42](https://github.com/blandjelly/allplan-mcp-server-python/pull/42).
+The owner reports native-material PASS for the Wall, Wall with door/window
+and Column; Beam discovery and Slab native-material persistence remain open.
+Material-attribute writes succeeded on the reported SkeletonBeam and Slab
+targets. Preservation, delivery evidence and remaining gates are distinguished
+in the handoff; this is partial M4 acceptance.
 The most recently package-verified candidate remains **0.32.0**. Use the
 [current handoff](docs/next-model-handoff.md) for version status and the next
 task, and the
@@ -47,3 +51,4 @@ For eligible native-material preservation conflicts, review the proposed
 reconciliation against the current model before submitting its exact hash and
 acknowledgement; this read-only action does not report an applied success.
 The cloud workspace cannot access Windows localhost.
+
