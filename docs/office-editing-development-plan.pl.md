@@ -26,12 +26,69 @@ Wieloplikowość i cały projekt wymagają osobnego projektu oraz odbioru.
 
 | Priorytet | Co pozostało / warunek dalszej pracy |
 | --- | --- |
-| 1 — kandydat 0.39.0 i recovery | Po oznaczeniu finalnego source PR jako Ready CI uruchamia się automatycznie; owner monitoruje wymagane checks, weryfikuje exact ZIP i upgrade/restore, instaluje wersję i reloaduje PythonHost. `inspect_journal` ustala ID Column execution; recover wyłącznie read-only. Szczegóły review/acknowledgement i blokad podaje [handoff](next-model-handoff.md). |
-| 2 — Beam i Slab/MultiSlab native material | Nowy log: dwa Beam previews zakończone `AttributeError` przed setterem; MultiSlab miał pusty materiał i gotowy preview, lecz Apply zablokował Column journal. Po odblokowaniu wykonać nowe próby tych family/target scope. StructuralBeam używa `.StructuralBeamProperties` / `SetStructuralBeamProperties`; Slab/MultiSlab zapisuje wybrany `SlabElement` przez `SlabProperties`. API nie zastępuje native readback i preservation dowodu. Nie powtarzać Wall writes ani wcześniejszego Column Apply/readback. |
-| 3 — atrybuty Slab/MultiSlab | Zachować jawne `target.property_owner="selected_element"` dla dokładnego ref, pełne lineage/children i blokadę parent/child overlap; nie ma redirectu. Równość project Material attribute i natywnego materiału jest tylko korelacją/reflection observation, nie dowodem równoważności setterów. Pozostałe owner-specific roundtrip wymagają osobnych dowodów. |
-| 4 — warstwa i no-op | Uzupełnić wyłącznie nieodebrane przypadki. W1 read/write, pojedyncze Undo i zgłoszony no-op nie dowodzą grupowego Undo ani pełnego pokrycia rodzin. No-op nie ma drogi Apply. |
-| 5 — delete i selekcja | Zachować odebrany grouped Column delete/Undo; pozostałe rodziny/poddrzewa wymagają oddzielnego dowodu. Native selection set/clear/readback nadal unsupported. Highlight nie jest selekcją. |
+| 1 — dostawa i recovery: częściowo potwierdzone | 0.39.0 jest scalone; owner zgłasza uzgodnienie bieżących Wall/Column/Slab i PASS wartości Wall/Wall z otworem/Column. Log nie zawiera ID ani pełnego journalu, CI i dowodu exact ZIP/upgrade/restore. Pozostało ustalić rzeczywiście nierozliczone rekordy i zachować unknown/preservation; nie powtarzać odebranych zapisów. |
+| 2 — Beam i Slab/MultiSlab native material: otwarte | Beam/SkeletonBeam query zwróciło 0 przy dwóch konfliktach reprezentacji, choć później attribute query znalazło dwie SkeletonBeam. Slab po próbach nadal ma pusty natywny materiał. Rozdzielić błąd discovery/pokrycia od braku persistence i właściciela Slab. SDK udostępnia Material dla obu rodzin; brak pola w ogólnej palecie nie dowodzi braku obsługi. [Porównanie API](m4-editing-api-0.32.0.md#native-material-material-attribute-and-surface). |
+| 3 — atrybuty Slab/MultiSlab: zgłoszony PASS wartości | Log 0.39.0 potwierdza raportowaną wartość atrybutu na MultiSlab i jego Slab; brak surowych payloadów z ID/typem/ref/owner i readbackiem. Zachować `target.property_owner="selected_element"`, pełne lineage/children i blokadę overlap, bez redirectu. Nie traktować sukcesu atrybutu jako sukcesu materiału natywnego. |
+| 4 — warstwa i no-op: częściowo odebrane | Zachować W1 read/write, pojedyncze Undo i zgłoszony no-op w ich dotychczasowym zakresie. Pozostałe pary rodzina/właściciel oraz grupowe Undo wymagają dowodu; poniżej kryteria zamknięcia. No-op nie ma drogi Apply. |
+| 5 — delete i selekcja: częściowo odebrane / brak funkcji | Zachować grouped Column delete/Undo i obserwację Wall subtree. Inne deklarowane rodziny/poddrzewa wymagają dowodu. Native selection set/clear/readback nadal unsupported; highlight nie zamyka selekcji. |
 | 6 — typy i rodziny | Domknąć owner-specific roundtrip oraz macierz rodzin/typów. Column Enum `Status` ID 49 pozostaje BLOCKED (`<niezdefiniowany>`, brak potwierdzonej etykiety). Wall CheckBox ID 1371 nie ma surowego Apply; fixture SDK Boolean brak. Inne typed attribute gaps rodzin wymagają osobnych dowodów. Date/vector/object wymagają dokładnych kontraktów setter payload i typed readback; sam symbol lub konstruktor SDK nie wystarcza. |
+
+### Dowody potrzebne do zamknięcia punktów 1–5
+
+Punkty odnoszą się do pojedynczego aktywnego rysunku i istniejącego limitu
+1–32 zmian. Podsumowanie nowego logu jest w [statusie walidacji](validation-status.md#latest-owner-observations);
+pełny załącznik pozostaje w rozmowie/lokalnym workspace, poza publicznym repo.
+Zachować zgłoszone PASS, uzupełniać wyłącznie brakujący dowód lub zmieniony
+przepływ; nie powtarzać zakończonych Apply dla samego odtworzenia logu.
+
+1. **Dostawa i recovery:** powiązać instalację 0.39.0 z konkretnym source,
+   wymaganym wynikiem CI, dokładnym ZIP/manifestem i buildem Allplana oraz
+   wymaganym upgrade/restore. Odczytać bieżący `inspect_journal`; dla każdego
+   nadal unknown zachować ID, pierwotny wynik, materiał/owner, zmienione sekcje
+   i wynik read-only recovery/reconciliation. Zamknięcie: znany stan wszystkich
+   blokujących rekordów bieżącego workflow i rozliczone bramki dostawy.
+   Reconciliation nie zmienia unknown w applied ani nie dowodzi preservation;
+   otwarte różnice pozostają przypisane do konkretnego elementu.
+2. **Natywny materiał Beam/Slab:** najpierw zestawić odczyty na tych samych
+   dokładnych ref/view/owner: kompletność query, konflikty, typ adaptera,
+   klasę natywną, właściwości Material oraz ID/nazwę/typ/wartość atrybutu.
+   Skorzystać z istniejących journal/trace, aby ustalić cel i wynik prób Slab.
+   Ordinary Beam wymaga własnego fixture, jeśli ma wejść do odbioru; obecny
+   log nie dowodzi jego obecności (`fixture_missing`). Zamknięcie: wyjaśnione
+   discovery dwóch SkeletonBeam, poprawiona i odebrana każda deklarowana
+   ścieżka native owner → właściwy setter → świeży readback/UI, z dowodem
+   zachowania geometrii, poziomów, połączeń i składników oraz odpowiednim
+   Undo/odtworzeniem dla nowego przepływu. No-op, drift i replay nie mogą
+   uruchamiać dodatkowych setterów. Jeśli konkretna modyfikacja SDK okaże się
+   unsupported, udokumentować dokładny typ/build i uzgodnić zakres produktu;
+   nie zastępować jej po cichu atrybutem. Wall/Column PASS wartości zachować;
+   ich preservation/Undo nadal nie są potwierdzone przez ten log.
+3. **Atrybuty Slab/MultiSlab:** uzupełnić z istniejących zapisów dokładne
+   payloady i typed readback: nazwa↔ID, typ, file/model/view, wybrany owner,
+   lineage/children, plan i execution. Oddzielić dowód dla aggregate od child
+   i wykazać, że nie były nakładającymi się celami jednego planu. Zamknięcie:
+   owner-specific roundtrip i właściwy Undo/restoration dla deklarowanego
+   zakresu oraz zachowane blokady overlap, stale i replay. Po wykonanym
+   zapisie atrybutu wystarczy odczytać obie ścieżki materiału, by zbadać ich
+   sprzężenie; nie trzeba ponawiać odebranego zapisu. Brak payloadu w logu
+   nie unieważnia owner PASS wartości ani nie dowodzi obejścia blokady.
+4. **Warstwa i no-op:** sporządzić macierz zadeklarowanych rodzin/właścicieli
+   z istniejących dowodów, wskazać tylko brakujące pary. Dla nich potrzebne są
+   dokładne cele, stara/nowa warstwa, preview/revalidation, świeży readback/UI
+   i Undo z odczytem przywrócenia; jeśli wspierana jest grupa, dowód jednego
+   grupowego Undo. Zamknięcie: udokumentowane pokrycie deklarowanej macierzy,
+   no-op z zerem setterów i bez Apply, działający highlight/clear oraz
+   zachowane konflikty po zmianie zakresu/wartości i replay. Nie rozszerzać
+   wyniku pojedynczego W1/Undo na pozostałe rodziny ani grupę.
+5. **Delete i selekcja:** dla brakujących deklarowanych rodzin/poddrzew
+   potrzebne są disposable fixture, lista dokładnych ref i zależności,
+   preview, usunięcie z readbackiem braku właściwego poddrzewa, zachowanie
+   sąsiadów oraz Undo i odczyt odtworzenia. Zachować gotowy grouped Column
+   wynik. Selekcja wymaga osobno udokumentowanego kontraktu natywnego
+   set/clear/readback, implementacji i próby z porównaniem dokładnego zbioru
+   w API/UI, także po clear. Zamknięcie pełnego punktu wymaga obu części;
+   pozostawienie selekcji unsupported wymaga jawnej decyzji o ograniczeniu
+   zakresu. Highlight, query selection cache i native selection to różne stany.
 
 Historyczne unresolved execution IDs i broad property discovery pozostają
 zachowane w [statusie walidacji](validation-status.md#evidence-for-unresolved-cases);
@@ -68,3 +125,4 @@ testów](testing-policy.md#required-github-check). Bramka nie zastępuje odbioru
 ZIP ani Allplana.
 [Tool reference](tool-reference.md), [API evidence](m4-attribute-api-evidence.md)
 i [macierz typów](m4-attribute-type-coverage.md) pozostają źródłami kontraktów API.
+
