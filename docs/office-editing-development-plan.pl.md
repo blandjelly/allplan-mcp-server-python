@@ -36,8 +36,9 @@ Wieloplikowość i cały projekt wymagają osobnego projektu oraz odbioru.
 ### Dowody potrzebne do zamknięcia punktów 1–5
 
 Punkty odnoszą się do pojedynczego aktywnego rysunku i istniejącego limitu
-1–32 zmian. Podsumowanie nowego logu jest w [statusie walidacji](validation-status.md#latest-owner-observations);
-pełny załącznik pozostaje w rozmowie/lokalnym workspace, poza publicznym repo.
+1–32 zmian. Podsumowanie nowego logu jest w [statusie walidacji](validation-status.md#latest-owner-observations),
+a [pełny załącznik](test-results/evidence/0.39.0-2026-10-26/allplan-conversation-log.md)
+został umieszczony w repozytorium bez zmian, za wyraźną zgodą właściciela.
 Zachować zgłoszone PASS, uzupełniać wyłącznie brakujący dowód lub zmieniony
 przepływ; nie powtarzać zakończonych Apply dla samego odtworzenia logu.
 
