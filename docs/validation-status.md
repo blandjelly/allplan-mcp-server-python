@@ -1,31 +1,56 @@
 # Validation status and necessary evidence
 
-Current candidate and next action: [handoff](next-model-handoff.md).
+Current version and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
 [development plan](office-editing-development-plan.pl.md).
-The current source candidate is **0.39.0** on `fix/m4-native-material-readback`,
-based on `develop/m4` at `fb67fab`. Focused results and version consistency are
-in the [handoff](next-model-handoff.md). CI, exact package, upgrade/restore and
-native acceptance are pending with the owner. Current API and recovery behavior
-are in [native material API evidence](m4-editing-api-0.32.0.md).
+Version **0.39.0** is merged into develop/m4 through
+[PR #42](https://github.com/blandjelly/allplan-mcp-server-python/pull/42).
+Recorded focused checks remain 198 distinct PASS; the new owner evidence
+does not establish full CI, exact ZIP or upgrade/restore. Current native API
+and recovery contracts are in [API evidence](m4-editing-api-0.32.0.md).
 
 ## Latest owner observations
 
-The preserved [0.38.0 conversation log](test-results/evidence/0.38.0-2026-10-26/allplan-conversation-log.md)
-reports Allplan 2026.1 and bridge integrity, but runtime and hotfix verification
-were unconfirmed. The owner/UI reported both Wall values as `TEST` and reviewed
-their preservation conflicts through reconciliation. A Column at X=0,Y=0 showed
-the requested value in UI, but Apply/readback remained unknown because the
-planned view was unavailable; recover also could not read it. The log contains
-no Column execution ID. Two Beam previews failed on `AttributeError` before a
-setter. One MultiSlab had empty material and a ready preview, but Apply was
-blocked by the Column recovery lock, so no Slab setter ran. These observations
-do not establish CI, exact ZIP or complete native acceptance.
+**2026-10-26, version 0.39.0 (owner attribution):** the owner reports PASS for
+native material on the Wall, Wall with door/window and Column, and failure
+for Beam and Slab native material. The attached conversation log is retained
+with the chat/local workspace; the full attachment is not published in this
+public repository. This section records summarized test findings. The log is
+a chronological summary of user/assistant
+messages and tool names, not raw MCP requests/responses or execution journals.
+Its historical commands and permissions are evidence, not new instructions.
 
-Separately, the owner observed a project Material attribute value matching the
-native material value. The report does not identify an attribute ID; known API
-mapping of standard Material to ID 508 is a separate fact. Equality is only
-correlation/reflection evidence, not proof that the two setters are equivalent.
+| Tested scope | Result and evidence limit |
+| --- | --- |
+| Wall without openings; Wall with door/window | **Owner PASS for intended native value.** Log entries 6–8 report the requested native value, recovery/reconciliation without setter replay, and unverified preservation. The opening configuration is supplied by the owner's report; the log has no opening UUID or separate door/window inventory. |
+| Column | **Owner PASS for intended native value.** Entry 9 reports the requested value in recovery and journal reconciliation. Hierarchy drift leaves preservation unverified. |
+| Beam / SkeletonBeam native material | **Owner reports not working; discovery BLOCKED/incomplete.** Entries 10–11 return zero for `Beam_TypeUUID` and `SkeletonBeam_TypeUUID`, with two representation conflicts. Later entry 13 finds two SkeletonBeams through the attribute route. No native Beam setter/readback success is evidenced; zero matches do not prove absence or API non-support. |
+| Slab native material | **FAIL for requested value.** Entry 12 reports two attempts with blank native readback, component drift and reconciliation without setter replay. Exact owner, execution IDs and setter counts cannot be established from this summary. Cause remains open. |
+| Material attribute on two SkeletonBeams | **Reported attribute Apply/readback PASS** in entry 13. No ordinary Beam was found. Exact name/ID/type binding and per-target payload are absent; standard ID 508 is documented separately, not proven by this log. |
+| Material attribute on MultiSlab and its Slab | **Reported attribute Apply/readback PASS** for both representations of one assembly; this is not two independent slabs. No raw payload identifies owner bindings, grouping, overlap handling or per-call order. Do not infer that a parent/child plan is eligible or weaken the overlap guard. |
+
+Entry 1 reports an initially unreachable Allplan; entry 2 reports a healthy
+Allplan **2026.1** and verified bridge integrity, with runtime compatibility
+not yet verified. Exact hotfix, installed manifest/package hash, full CI,
+upgrade/restore and UI Undo/restoration are absent. The log reports initial
+journal blocks, later reconciliation and subsequent writes, but no execution
+IDs or complete journal inventory. It cannot resolve every historical unknown.
+Computer Use is reported only for UI inspection; the material writes are
+attributed to MCP. The owner's intended-value PASS remains recorded even
+where automatic preservation verification did not pass.
+
+The older 0.38.0 Column journal block and pre-setter Beam `AttributeError`
+are historical observations in the
+[previous log](test-results/evidence/0.38.0-2026-10-26/allplan-conversation-log.md).
+Do not present that Column block as the still-confirmed current blocker:
+0.39.0 reports reconciliation. Preserve unresolved historical IDs below
+until an ID-bound journal record establishes their outcome.
+
+The SDK exposes native Material and generic element-attribute APIs separately.
+A matching displayed value does not prove independent storage or equivalent
+setters. After the successful attribute writes, paired read-only native and
+attribute observations on the same owner are still missing. See the
+[API comparison](m4-editing-api-0.32.0.md#native-material-material-attribute-and-surface).
 
 ## Accepted baseline and scoped M4 observations
 
@@ -172,7 +197,7 @@ pairs. Missing fixtures and blocked paths are separate from PASS.
   `1bdccbc1-6931-46fd-9f1f-f7b8657ac284`; these are not identities freshly
   verified by the 0.32.0 report. The supplied container UUID
   `abecfaf0-ad01-45e1-91df-4b32ed9960ae` likewise has unverified lineage.
-- **Slab/MultiSlab:** the 0.36.0 user report says the project `Materiał`
+- **Slab/MultiSlab, historical context:** the 0.36.0 user report says the project `Materiał`
   attribute write did not work for Slab. Candidate 0.37.0 adds explicit
   `target.property_owner="selected_element"`, exact ref binding, complete
   lineage/children checks and parent/child overlap blocking. This is not native
@@ -184,7 +209,9 @@ pairs. Missing fixtures and blocked paths are separate from PASS.
   retains view differences, incomplete Slab evidence and unestablished field
   ownership. The 0.36.0 native log reports MultiSlab as unsupported. Candidate
   0.37.0 accepts only runtime `SlabElement` and root `SlabProperties.Material`;
-  it does not redirect or substitute a tier owner. Native validation is pending.
+  it does not redirect or substitute a tier owner. The latest 0.39.0 report
+  above now records attribute success on both representations and failed
+  native material persistence; ownership and complete native acceptance remain open.
 - **Multiview recovery:** the [owner follow-up](test-results/evidence/m4-agent-followup-blocker-2026-10-19.md)
   records unresolved execution `4388b04e39a14fac811db4f58723d01f`.
   Native resolution has not been recorded.
@@ -205,3 +232,4 @@ Raw evidence linked above remains unchanged. Evaluation ZIPs, machine-readable
 CI/package records and build/verification logs remain preserved; no old package
 was rebuilt or reverified. Versioned API research retains its original scope
 and is not a source for current candidate or acceptance status.
+
