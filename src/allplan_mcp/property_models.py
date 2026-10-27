@@ -105,8 +105,26 @@ class AttributeEvidenceProbeInput(ComponentIdentityProbeInput):
         return self
 
 
+class ProbeParentRef(ContractModel):
+    model_uuid: str = Field(pattern=r"^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$")
+    view_uuid: str = Field(pattern=r"^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$")
+
+    @model_validator(mode="after")
+    def nonzero_identities(self):
+        if "00000000-0000-0000-0000-000000000000" in (self.model_uuid, self.view_uuid):
+            raise ValueError("parent_ref identities must be nonzero canonical UUIDs.")
+        return self
+
+
 class MaterialComparisonProbeInput(AttributeEvidenceProbeInput):
     phase: Literal["material_comparison"]
+    parent_ref: ProbeParentRef = Field(default=None)
+
+    @model_validator(mode="after")
+    def distinct_parent(self):
+        if self.parent_ref is not None and self.parent_ref.model_uuid == self.model_uuid:
+            raise ValueError("parent_ref must identify a different model.")
+        return self
 
 
 class LayerNameProbeInput(ContractModel):

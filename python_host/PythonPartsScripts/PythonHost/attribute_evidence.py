@@ -69,12 +69,18 @@ def probe_attribute_evidence(queries, doc, base, settings, request, trace, check
             or len(snapshot["scope"]["included_files"]) != 1
             or snapshot["scope"]["included_files"][0]["state"] != "active_foreground"):
         raise BridgeError("probe_scope_unavailable", "Attribute evidence requires one complete foreground drawing.", 409)
-    matches = [item for item in snapshot["elements"] if item["ref"]["model_uuid"] == request["model_uuid"]]
-    if (len(matches) != 1 or matches[0]["view_identity_not_checked"]
-            or request["view_uuid"] not in matches[0]["view_uuids"]):
-        raise BridgeError("probe_scope_unavailable", "Exact model/view identity is missing or conflicting.", 409)
-    wrappers = live.get((request["drawing_file"], request["model_uuid"]), {}).get(request["view_uuid"], [])
-    unique = {id(adapter): adapter for adapter in wrappers}
+    resolution = None
+    if compare_material and "parent_ref" in request:
+        from .material_probe import resolve_slab_child
+        element, unique, resolution = resolve_slab_child(request, snapshot, live, owners, trace, check)
+    else:
+        matches = [item for item in snapshot["elements"] if item["ref"]["model_uuid"] == request["model_uuid"]]
+        if (len(matches) != 1 or matches[0]["view_identity_not_checked"]
+                or request["view_uuid"] not in matches[0]["view_uuids"]):
+            raise BridgeError("probe_scope_unavailable", "Exact model/view identity is missing or conflicting.", 409)
+        element = matches[0]
+        wrappers = live.get((request["drawing_file"], request["model_uuid"]), {}).get(request["view_uuid"], [])
+        unique = {id(adapter): adapter for adapter in wrappers}
     if not 1 <= len(unique) <= 16:
         raise BridgeError("probe_scope_unavailable", "Attribute evidence supports at most 16 exact-view wrappers.", 409)
 
@@ -208,7 +214,7 @@ def probe_attribute_evidence(queries, doc, base, settings, request, trace, check
                                     for item in metadata)
     check()
     report = {"state": "observed" if complete else "not_checked", "evidence_complete": complete, "scope": snapshot["scope"],
-            "ref": matches[0]["ref"], "view_uuid": request["view_uuid"], "attribute_ids": ids,
+            "ref": element["ref"], "view_uuid": request["view_uuid"], "attribute_ids": ids,
             "metadata": metadata, "representations": representations, "representation_count": len(unique),
             "representation_consensus": consensus, "source_fingerprint": snapshot["source_fingerprint"],
             "presence_semantics": "read_modes_separate; ReadAll_omission_does_not_prove_absence",
@@ -217,6 +223,11 @@ def probe_attribute_evidence(queries, doc, base, settings, request, trace, check
             "bounds_used_for_identity": False, "physical_target_equivalence": "not_established"}
     if compare_material:
         report.update(coverage=snapshot["coverage"], counts=snapshot["counts"],
-                      other_view_uuids=[view for view in matches[0]["view_uuids"] if view != request["view_uuid"]],
+                      other_view_uuids=[view for view in element["view_uuids"] if view != request["view_uuid"]],
                       storage_coupling="not_established", persistence="not_checked")
+    if resolution is not None:
+        report["identity_resolution"] = resolution
+        report["source_fingerprint"] = fingerprint({"scan": snapshot["source_fingerprint"], "resolution": resolution})
+        if len(json.dumps(report, ensure_ascii=False, allow_nan=False).encode()) > 512 * 1024:
+            raise BridgeError("scan_limit_exceeded", "Material child evidence exceeded its 512 KiB result budget.", 409)
     return report

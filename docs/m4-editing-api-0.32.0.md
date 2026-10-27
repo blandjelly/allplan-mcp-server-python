@@ -10,7 +10,7 @@ and acceptance belong in the [handoff](next-model-handoff.md).
 | Requested field | API owner and persistence route | What success establishes |
 | --- | --- | --- |
 | Native architectural Material | `ArchBaseProperties.Material: str`, `GetMaterial()` / `SetMaterial(str)` on the actual property owner. Reattach the properties to the existing element and submit it with `ModifyElements`. | Only a fresh native read from the same owner establishes the retained native value; method availability alone does not. |
-| Element attribute named Material / Materiał | Resolve the element's exact name↔ID/type; `GetAttributes` reads ID/value pairs and `ElementsAttributeService.ChangeAttributes` writes them through the selected adapter. The official read-access example identifies standard Material as ID 508. | Typed attribute readback establishes that attribute value on that owner. The supplied 0.39.0 log omits its actual ID/payload. This is an element attribute, not the separate document/project-attributes API. |
+| Element attribute named Material / Materiał | Resolve the element's exact name↔ID/type; `GetAttributes` reads ID/value pairs and `ElementsAttributeService.ChangeAttributes` writes them through the selected adapter. The official read-access example identifies standard Material as ID 508. | Typed attribute readback establishes that attribute value on that owner. The 0.39.0 write log omits its actual ID/payload; the read-only 0.40.0 probe later observed live ID 508 ↔ `Materiał`, SDK `String`, on two SkeletonBeams and a MultiSlab. This is an element attribute, not the separate document/project-attributes API. |
 | Rendering Surface | `ArchBaseProperties.Surface` / `SetSurface`, separate from Material; GUI surface controls affect animation appearance. | A surface/texture result, not a structural material assignment. The current native-material operation does not target Surface. |
 
 The [ArchBaseProperties reference](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/ArchBaseProperties/)
@@ -69,43 +69,33 @@ the bridge's failed update.
 
 The [0.39.0 owner log](test-results/evidence/0.39.0-2026-10-26/allplan-conversation-log.md),
 summarized in [validation status](validation-status.md#latest-owner-observations), reports
-zero native Beam/SkeletonBeam query matches with representation
-conflicts, then successful Material-attribute writes on two SkeletonBeams.
-This does not exercise a confirmed native Beam setter. Slab native readback
-stayed blank after attempts; later attribute readback matched the requested value on MultiSlab
-and its Slab. There is no paired native read after that attribute write, so
-the log does not show whether it affected native Material. Owner, persistence
-and discovery remain separate unresolved questions. Compare both read paths
-on the same exact element/owner first, preserve raw values including blanks,
-and retain unknown journal outcomes. Never silently substitute an attribute
-write for a requested native-material change. Current closure work is in
-[plan items 1–3](office-editing-development-plan.pl.md#dowody-potrzebne-do-zamknięcia-punktów-15).
+zero native Beam/SkeletonBeam query matches with representation conflicts,
+then reported Material-attribute writes on two SkeletonBeams and on a
+MultiSlab/Slab representation pair. These reports do not establish native Beam
+setter success or the owner/payload of the attribute writes. The historical
+Slab native readback stayed blank after attempts; its exact owner and execution
+IDs are not established by that summary. Preserve the unknown outcomes and do
+not attribute an earlier Slab write to an execution without direct evidence.
 
-The read-only comparison of 2026-10-27 is preserved in the
-[comparison log](test-results/evidence/0.39.0-2026-10-27/allplan-comparison-log.md).
-It identifies two SkeletonBeams as `StructuralBeamElement` and the
-MultiSlab as `SlabElement`, but does not read native Material or establish the
-writable property owner. SkeletonBeam 1's query view differs from the parent
-view reported by the ownership edge. SkeletonBeam 2 has a complete lineage
-with a `SkeletonAxis`; the MultiSlab lineage includes its Slab child. The
-separate Slab child probe did not resolve one complete semantic component.
-These findings localize the next read and leave query/view interpretation,
-child resolution and persistence open.
+The earlier read-only comparison of 2026-10-27 is preserved in the
+[0.39.0 comparison log](test-results/evidence/0.39.0-2026-10-27/allplan-comparison-log.md).
+The 0.40.0 getter-only comparison now supplies paired native-material and
+attribute observations on the two SkeletonBeams and the MultiSlab. The exact
+values and limits are summarized in the [current handoff](next-model-handoff.md)
+and [validation status](validation-status.md#latest-owner-observations), with raw
+responses under [the preserved evidence directory](test-results/evidence/0.40.0-2026-10-27/). These observations do not establish that those wrappers were the
+write owners for earlier attribute Apply reports, shared storage, or persistence.
+The exact Slab child and writable owner remain unresolved.
 
-Candidate 0.40.0 adds the bounded getter-only `material_comparison` phase to
-`model_property_probe`. On the exact drawing/model/view and up to 16 explicit
-attribute IDs, it reports ancestry/children, native class, stored and
-computable attribute values with name↔ID/type metadata, and per-wrapper native
-Material. Runtime dispatch is limited to Beam/SkeletonBeam represented by
-`BeamElement` or `StructuralBeamElement`, and Slab/MultiSlab represented by
-`SlabElement`. The StructuralBeam accessor differs from ordinary Beam.
-Per-wrapper conflicts remain visible; the probe does not redirect targets or
-call setters. A blank Material is an observed blank, while unavailable reads
-remain `not_checked`. Missing attribute rows do not prove absence, and equal
-attribute/native values do not prove coupled storage. Runtime class/property
-access establishes a readable representation only; it does not establish a
-writable owner or persistence. This candidate has no CI, exact-package or new
-Allplan acceptance yet.
+The child request with explicit model/view and `include_parent=true` returned
+`probe_scope_unavailable`; the parent MultiSlab result was not a child read.
+This does not establish a native SelectAll omission or cause. Candidate 0.41.0
+adds exact-parent getter resolution only to `material_comparison`; its scope,
+bounds, trace rules and only authorized next owner request are in the
+[handoff](next-model-handoff.md). No scan/query/write guard changes, owner
+redirect or setter retry is implied.
+
+Current closure work is in [plan items 1–3](office-editing-development-plan.pl.md#dowody-potrzebne-do-zamknięcia-punktów-15).
 
 ## Request and native property owner
 

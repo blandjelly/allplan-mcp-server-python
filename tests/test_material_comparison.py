@@ -264,6 +264,275 @@ class MaterialComparisonTests(unittest.TestCase):
                 self.assert_code("invalid_payload", lambda: self.probe(**request))
         self.coord.GetInputViewDocument.assert_not_called()
 
+    def slab_child_fixture(self, *, durable=False):
+        child = self.element(2, name="Slab_TypeUUID", attrs=[(508, "child-attribute")])
+        parent = self.element(3, name="MultiSlab_TypeUUID")
+        self.material_fixture([parent], durable=durable)  # SelectAll exposes only the aggregate.
+        self.target = child
+        self.parents[id(child)] = parent
+        self.children[id(parent)] = [child]
+        for adapter in (child, parent):
+            adapter.IsDeleted.return_value = False
+        self.natives[id(child)] = SlabElement(" ")
+        self.natives[id(parent)] = SlabElement("parent-native")
+        self.parent_ref = {"model_uuid": parent.GetModelElementUUID(), "view_uuid": parent.GetElementUUID()}
+        return child, parent
+
+    def test_explicit_parent_finds_unenumerated_child_without_substituting_aggregate(self):
+        child, parent = self.slab_child_fixture()
+        self.assert_code("probe_scope_unavailable", self.comparison)
+        self.base.GetElement.assert_not_called()
+        result = self.comparison(parent_ref=self.parent_ref, include_parent=True)
+        self.assertEqual(result["state"], "observed", result)
+        row = result["representations"][0]
+        self.assertEqual(row["target"]["value"]["native_material"]["value"], " ")
+        self.assertEqual(row["target"]["value"]["read_modes"]["ReadAll"]["value"][0]["value"], "child-attribute")
+        self.assertEqual(row["parent"]["value"]["evidence"]["native_material"]["value"], "parent-native")
+        self.assertEqual(result["ref"]["model_uuid"], child.GetModelElementUUID())
+        self.assertEqual(result["ref"]["type_uuid"], child.GetElementAdapterType().GetGuid())
+        self.assertEqual(result["counts"]["matched_model_identities"], 1)  # direct scan only
+        self.assertFalse(result["identity_resolution"]["target_in_direct_scan"])
+        self.assertTrue(result["identity_resolution"]["child_inventory_complete"])
+        self.assertEqual(result["identity_resolution"]["parent_ref"]["model_uuid"], parent.GetModelElementUUID())
+        self.assertEqual([call.args[0] for call in self.base.GetElement.call_args_list], [child, parent])
+
+    def test_explicit_parent_preserves_alternate_parent_view_without_claiming_equivalence(self):
+        child, parent = self.slab_child_fixture()
+        alternate = self.element(3, name="MultiSlab_TypeUUID")
+        alternate.GetElementUUID.return_value = "10000000-0000-4000-8000-000000000099"
+        alternate.IsDeleted.return_value = False
+        self.parents[id(child)] = alternate
+        self.children[id(alternate)] = [child]
+        self.natives[id(alternate)] = SlabElement("alternate-parent")
+        result = self.comparison(parent_ref=self.parent_ref, include_parent=True)
+        resolution = result["identity_resolution"]
+        self.assertNotEqual(resolution["child_parent_edges"][0]["parent"]["view_uuid"], resolution["parent_ref"]["view_uuid"])
+        self.assertEqual(result["representations"][0]["parent"]["value"]["evidence"]["ref"]["view_uuid"], alternate.GetElementUUID())
+        self.assertEqual(result["physical_target_equivalence"], "not_established")
+
+    def test_explicit_parent_rejects_wrong_or_missing_exact_refs_before_value_reads(self):
+        child, parent = self.slab_child_fixture()
+        for changes in (
+            {"view_uuid": "10000000-0000-4000-8000-000000000099"},
+            {"model_uuid": "00000000-0000-4000-8000-000000000099"},
+            {"parent_ref": {**self.parent_ref, "view_uuid": "10000000-0000-4000-8000-000000000099"}},
+            {"parent_ref": {**self.parent_ref, "model_uuid": "00000000-0000-4000-8000-000000000099"}},
+        ):
+            with self.subTest(changes=changes):
+                self.assert_code("probe_scope_unavailable", lambda: self.comparison(**{"parent_ref": self.parent_ref, **changes}))
+        self.base.GetElement.assert_not_called()
+        child.GetAttributes.assert_not_called()
+        parent.GetAttributes.assert_not_called()
+
+    def test_explicit_parent_never_scans_children_of_other_families_or_other_roots(self):
+        child, parent = self.slab_child_fixture()
+        unrelated = self.element(4, name="MultiSlab_TypeUUID")
+        self.base.ElementsSelectService.SelectAllElements.return_value = [parent, unrelated]
+        parent.GetElementAdapterType.return_value.GetTypeName.return_value = "Wall_TypeUUID"
+        self.assert_code("probe_scope_unavailable", lambda: self.comparison(parent_ref=self.parent_ref))
+        service = self.adapter_module.BaseElementAdapterChildElementsService.GetChildModelElements
+        service.assert_not_called()
+        self.base.GetElement.assert_not_called()
+
+    def test_explicit_parent_rejects_cross_file_stale_wrong_family_and_wrong_edge(self):
+        for failure in ("cross_file", "deleted_child", "null_parent", "wrong_family", "wrong_edge", "null_edge", "deleted_edge"):
+            with self.subTest(failure=failure):
+                child, parent = self.slab_child_fixture()
+                if failure == "cross_file":
+                    child.GetDrawingfileNumber.return_value = 102
+                elif failure == "deleted_child":
+                    child.IsDeleted.return_value = True
+                elif failure == "null_parent":
+                    parent.IsNull.return_value = True
+                elif failure == "wrong_family":
+                    child.GetElementAdapterType.return_value.GetTypeName.return_value = "Beam_TypeUUID"
+                elif failure == "wrong_edge":
+                    self.parents[id(child)] = self.element(4, name="MultiSlab_TypeUUID")
+                elif failure == "null_edge":
+                    self.parents[id(child)] = self.null_adapter()
+                else:
+                    edge = self.element(3, name="MultiSlab_TypeUUID")
+                    edge.IsDeleted.return_value = True
+                    self.parents[id(child)] = edge
+                self.assert_code("probe_scope_unavailable", lambda: self.comparison(parent_ref=self.parent_ref))
+                self.base.GetElement.assert_not_called()
+                child.GetAttributes.assert_not_called()
+
+    def test_explicit_parent_requires_child_membership_on_every_parent_wrapper(self):
+        child, parent = self.slab_child_fixture()
+        second = self.element(3, name="MultiSlab_TypeUUID")
+        second.IsDeleted.return_value = False
+        self.base.ElementsSelectService.SelectAllElements.return_value = [parent, second]
+        self.children[id(second)] = []
+        self.assert_code("probe_scope_unavailable", lambda: self.comparison(parent_ref=self.parent_ref))
+        self.base.GetElement.assert_not_called()
+        child.GetAttributes.assert_not_called()
+
+    def test_explicit_parent_keeps_all_child_wrappers_and_conflicting_materials(self):
+        child, parent = self.slab_child_fixture()
+        second = self.element(2, name="Slab_TypeUUID", attrs=[(508, "second")])
+        second.IsDeleted.return_value = False
+        self.parents[id(second)] = parent
+        self.children[id(parent)].append(second)
+        self.natives[id(second)] = SlabElement("different")
+        result = self.comparison(parent_ref=self.parent_ref)
+        self.assertEqual(result["representation_count"], 2)
+        self.assertFalse(result["representation_consensus"])
+        self.assertEqual(result["state"], "not_checked")
+        self.assertEqual({r["target"]["value"]["native_material"]["value"] for r in result["representations"]}, {" ", "different"})
+
+    def test_explicit_parent_includes_direct_wrappers_instead_of_hiding_conflicts(self):
+        child, parent = self.slab_child_fixture()
+        direct = self.element(2, name="Slab_TypeUUID", attrs=[(508, "direct")])
+        direct.IsDeleted.return_value = False
+        self.parents[id(direct)] = parent
+        self.natives[id(direct)] = SlabElement("direct")
+        self.base.ElementsSelectService.SelectAllElements.return_value = [parent, direct]
+        result = self.comparison(parent_ref=self.parent_ref)
+        self.assertTrue(result["identity_resolution"]["target_in_direct_scan"])
+        self.assertEqual(result["representation_count"], 2)
+        self.assertFalse(result["representation_consensus"])
+
+    def test_explicit_parent_distinguishes_other_direct_view_from_exact_target_presence(self):
+        child, parent = self.slab_child_fixture()
+        other_view = self.element(2, name="Slab_TypeUUID")
+        other_view.GetElementUUID.return_value = "10000000-0000-4000-8000-000000000099"
+        self.base.ElementsSelectService.SelectAllElements.return_value = [parent, other_view]
+        result = self.comparison(parent_ref=self.parent_ref)
+        self.assertFalse(result["identity_resolution"]["target_in_direct_scan"])
+        self.assertEqual(result["other_view_uuids"], [other_view.GetElementUUID()])
+        self.assertEqual(result["representation_count"], 1)
+        self.base.GetElement.assert_called_once_with(child)
+        other_view.GetAttributes.assert_not_called()
+
+    def test_explicit_parent_bounds_child_visits_and_parent_and_target_wrappers(self):
+        for limit in ("children", "parents", "targets"):
+            with self.subTest(limit=limit):
+                child, parent = self.slab_child_fixture()
+                if limit == "children":
+                    self.children[id(parent)] = [self.element(i + 10) for i in range(257)]
+                    expected = "scan_limit_exceeded"
+                elif limit == "parents":
+                    self.base.ElementsSelectService.SelectAllElements.return_value = [self.element(3, name="MultiSlab_TypeUUID") for _ in range(17)]
+                    expected = "probe_scope_unavailable"
+                else:
+                    self.children[id(parent)] = [self.element(2, name="Slab_TypeUUID") for _ in range(17)]
+                    expected = "probe_scope_unavailable"
+                self.assert_code(expected, lambda: self.comparison(parent_ref=self.parent_ref))
+                self.base.GetElement.assert_not_called()
+                child.GetAttributes.assert_not_called()
+
+    def test_explicit_parent_getter_failure_is_not_retried_or_exposed(self):
+        child, parent = self.slab_child_fixture()
+        service = self.adapter_module.BaseElementAdapterChildElementsService.GetChildModelElements
+        service.side_effect = RuntimeError("private native detail")
+        try:
+            self.comparison(parent_ref=self.parent_ref)
+        except self.module.BridgeError as exc:
+            self.assertEqual(exc.code, "probe_scope_unavailable")
+            self.assertNotIn("private", str(exc))
+        else:
+            self.fail("Expected a closed child read failure")
+        service.assert_called_once_with(parent, True)
+        self.base.GetElement.assert_not_called()
+        child.GetAttributes.assert_not_called()
+
+    def test_explicit_parent_trace_failure_and_budget_stop_before_further_reads(self):
+        child, parent = self.slab_child_fixture()
+        trace_class = sys.modules[self.handler.property_probes.__module__].NativeProbeTrace
+        record = trace_class.record
+        def fail(trace, api, state, **details):
+            if api == "MaterialChild.GetChildModelElements" and state == "started":
+                raise self.module.BridgeError("probe_trace_unavailable", "trace unavailable", 409)
+            return record(trace, api, state, **details)
+        service = self.adapter_module.BaseElementAdapterChildElementsService.GetChildModelElements
+        with patch.object(trace_class, "record", fail):
+            self.assert_code("probe_trace_unavailable", lambda: self.comparison(parent_ref=self.parent_ref))
+        service.assert_not_called()
+        now = [0.0]
+        self.handler.model_queries.clock = lambda: now[0]
+        def slow(*args):
+            now[0] = self.handler.model_queries.SCAN_SECONDS
+            return [child]
+        service.side_effect = slow
+        self.assert_code("scan_limit_exceeded", lambda: self.comparison(parent_ref=self.parent_ref))
+        self.base.GetElement.assert_not_called()
+        child.GetAttributes.assert_not_called()
+
+    def test_explicit_parent_allows_256_children_and_ignores_unrelated_root_children(self):
+        child, parent = self.slab_child_fixture()
+        siblings = [self.element(i + 10) for i in range(255)]
+        self.children[id(parent)] = [child, *siblings]
+        for sibling in siblings:
+            self.parents[id(sibling)] = parent
+        unrelated = self.element(999, name="MultiSlab_TypeUUID")
+        self.base.ElementsSelectService.SelectAllElements.return_value = [parent, unrelated]
+        result = self.comparison(parent_ref=self.parent_ref)
+        self.assertEqual(result["identity_resolution"]["child_visits"], 256)
+        for call in self.adapter_module.BaseElementAdapterChildElementsService.GetChildModelElements.call_args_list:
+            self.assertIsNot(call.args[0], unrelated)
+        for sibling in siblings:
+            sibling.GetAttributes.assert_not_called()
+        self.base.GetElement.assert_called_once_with(child)
+
+    def test_explicit_parent_contract_is_strict_and_phase_specific_before_document(self):
+        self.slab_child_fixture()
+        contract = TypeAdapter(PropertyProbeRequest)
+        for changes in (
+            {"parent_ref": None}, {"parent_ref": {}},
+            {"parent_ref": {**self.parent_ref, "view_uuid": "00000000-0000-0000-0000-000000000000"}},
+            {"parent_ref": {**self.parent_ref, "model_uuid": self.target.GetModelElementUUID()}},
+            {"parent_ref": {**self.parent_ref, "drawing_file": 101}},
+            {"parent_ref": self.parent_ref, "phase": "attribute_evidence"},
+        ):
+            with self.subTest(changes=changes):
+                request = self.request(**changes)
+                with self.assertRaises(ValidationError):
+                    contract.validate_python(request)
+                self.assert_code("invalid_payload", lambda: self.probe(**request))
+        self.coord.GetInputViewDocument.assert_not_called()
+
+    def test_explicit_parent_retains_child_container_through_native_read(self):
+        child, parent = self.slab_child_fixture()
+        refs, test = [], self
+        class Owner(list):
+            pass
+        def children(adapter, include_hidden):
+            owner = Owner([child] if adapter is parent else [])
+            refs.append(weakref.ref(owner))
+            return owner
+        self.adapter_module.BaseElementAdapterChildElementsService.GetChildModelElements.side_effect = children
+        class Properties:
+            @property
+            def Material(self):
+                test.assertIsNotNone(refs[0]())
+                return " "
+        self.natives[id(child)].Properties = Properties()
+        self.comparison(parent_ref=self.parent_ref)
+        self.assertTrue(refs)
+        self.assertTrue(all(ref() is None for ref in refs))
+
+    def test_explicit_parent_durable_trace_precedes_child_sdk_call_and_storage_failure_stops(self):
+        child, parent = self.slab_child_fixture(durable=True)
+        service = self.adapter_module.BaseElementAdapterChildElementsService.GetChildModelElements
+        def children(adapter, include_hidden):
+            records = [json.loads(line) for line in self.path.read_text().splitlines()]
+            if adapter is parent:
+                self.assertEqual(records[-1]["api"], "MaterialChild.GetChildModelElements")
+                self.assertEqual(records[-1]["state"], "started")
+                self.assertEqual(records[-1]["model_uuid"], child.GetModelElementUUID())
+                self.assertEqual(records[-1]["parent_view_uuid"], self.parent_ref["view_uuid"])
+                return [child]
+            return []
+        service.side_effect = children
+        self.comparison(parent_ref=self.parent_ref)
+        self.handler.property_probes.trace_path = self.path.parent
+        service.reset_mock()
+        self.base.GetElement.reset_mock()
+        self.assert_code("probe_trace_unavailable", lambda: self.comparison(parent_ref=self.parent_ref))
+        service.assert_not_called()
+        self.base.GetElement.assert_not_called()
+
     def test_durable_trace_precedes_material_getter_and_storage_failure_stops_reads(self):
         target = self.material_fixture(durable=True)
         test = self

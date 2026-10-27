@@ -1,0 +1,354 @@
+{
+  "arguments": {
+    "request": {
+      "phase": "material_comparison",
+      "drawing_file": 101,
+      "model_uuid": "8f13565b-abfc-4ce2-8b1d-7d133fe1a10d",
+      "view_uuid": "5f6e4603-6282-4ae0-9d02-ad089e73b859",
+      "attribute_ids": [
+        508
+      ]
+    }
+  },
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"schema_version\":\"m4-property-probe-1\",\"phase\":\"material_comparison\",\"probe_id\":\"a822050593f445f0bb3c3095d69826db\",\"read_only\":true,\"model_data_changed\":false,\"usable_for_write\":false,\"runtime_verified\":false,\"status\":\"ready_for_isolated_owner_probe\",\"trace_file\":\"Local/.allplan-mcp/logs/m4-native-probe.jsonl\",\"native_calls_not_automatically_retried\":true,\"native_selection\":\"not_requested\",\"state\":\"observed\",\"evidence_complete\":true,\"scope\":{\"requested\":{\"drawing_files\":[101],\"include_passive\":false,\"visibility\":\"api_select_all\"},\"included_files\":[{\"drawing_file\":101,\"state\":\"active_foreground\",\"write_eligibility\":\"not_checked\"}]},\"ref\":{\"query_session_id\":\"50135d66d2e04e15af1424726d18d78f\",\"project_key\":\"7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f\",\"document_id\":0,\"drawing_file\":101,\"model_uuid\":\"8f13565b-abfc-4ce2-8b1d-7d133fe1a10d\",\"type_uuid\":\"53808df6-89e0-427e-81d6-1bd662823db1\",\"durable_identity_verified\":false,\"component_kind\":\"model_identity\"},\"view_uuid\":\"5f6e4603-6282-4ae0-9d02-ad089e73b859\",\"attribute_ids\":[508],\"metadata\":[{\"attribute_id\":508,\"type_binding\":{\"status\":\"observed\",\"value\":{\"matching_sdk_members\":[\"String\"],\"binding_status\":\"matched\",\"runtime_type\":{\"module\":\"NemAll_Python_BaseElements\",\"name\":\"AttributeType\"},\"writable_codec\":\"not_established\"}},\"name\":{\"status\":\"observed\",\"value\":\"Materiał\"},\"name_id_round_trip\":{\"status\":\"observed\",\"value\":508}}],\"representations\":[{\"target\":{\"status\":\"observed\",\"value\":{\"ref\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8f13565b-abfc-4ce2-8b1d-7d133fe1a10d\",\"view_uuid\":\"5f6e4603-6282-4ae0-9d02-ad089e73b859\",\"type_name\":\"SkeletonBeam_TypeUUID\",\"type_uuid\":\"53808df6-89e0-427e-81d6-1bd662823db1\"},\"ancestry\":{\"status\":\"observed\",\"value\":{\"schema_version\":\"m4-component-ownership-1\",\"target\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8f13565b-abfc-4ce2-8b1d-7d133fe1a10d\",\"view_uuid\":\"5f6e4603-6282-4ae0-9d02-ad089e73b859\",\"type_name\":\"SkeletonBeam_TypeUUID\",\"type_uuid\":\"53808df6-89e0-427e-81d6-1bd662823db1\"},\"lineage\":[{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8f13565b-abfc-4ce2-8b1d-7d133fe1a10d\",\"view_uuid\":\"5f6e4603-6282-4ae0-9d02-ad089e73b859\",\"type_name\":\"SkeletonBeam_TypeUUID\",\"type_uuid\":\"53808df6-89e0-427e-81d6-1bd662823db1\"}],\"terminal_root\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8f13565b-abfc-4ce2-8b1d-7d133fe1a10d\",\"view_uuid\":\"5f6e4603-6282-4ae0-9d02-ad089e73b859\",\"type_name\":\"SkeletonBeam_TypeUUID\",\"type_uuid\":\"53808df6-89e0-427e-81d6-1bd662823db1\"},\"parent_chain_complete\":true,\"children_complete\":false,\"children\":[],\"child_parent_edges\":[],\"property_owner\":\"not_established\",\"physical_target_equivalence\":\"not_established\"}},\"children\":{\"status\":\"observed\",\"value\":{\"schema_version\":\"m4-component-ownership-1\",\"target\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8f13565b-abfc-4ce2-8b1d-7d133fe1a10d\",\"view_uuid\":\"5f6e4603-6282-4ae0-9d02-ad089e73b859\",\"type_name\":\"SkeletonBeam_TypeUUID\",\"type_uuid\":\"53808df6-89e0-427e-81d6-1bd662823db1\"},\"lineage\":[{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8f13565b-abfc-4ce2-8b1d-7d133fe1a10d\",\"view_uuid\":\"5f6e4603-6282-4ae0-9d02-ad089e73b859\",\"type_name\":\"SkeletonBeam_TypeUUID\",\"type_uuid\":\"53808df6-89e0-427e-81d6-1bd662823db1\"}],\"terminal_root\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8f13565b-abfc-4ce2-8b1d-7d133fe1a10d\",\"view_uuid\":\"5f6e4603-6282-4ae0-9d02-ad089e73b859\",\"type_name\":\"SkeletonBeam_TypeUUID\",\"type_uuid\":\"53808df6-89e0-427e-81d6-1bd662823db1\"},\"parent_chain_complete\":true,\"children_complete\":true,\"children\":[{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"2f91fb33-5e4d-481f-a775-2522adfbce42\",\"view_uuid\":\"2f91fb33-5e4d-481f-a775-2522adfbce42\",\"type_name\":\"AttributeContainer_TypeUUID\",\"type_uuid\":\"572686a1-0ae5-4d22-88d1-35eeaea3f234\"},{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"26007d81-ecfc-4702-b8aa-1d1fb3aec2a7\",\"view_uuid\":\"d6e727cd-31a6-44e4-92c6-a2346758be8b\",\"type_name\":\"SkeletonAxis_TypeUUID\",\"type_uuid\":\"fe1247bf-f5f8-41d2-93c5-b7dfc6f0d693\"}],\"child_parent_edges\":[{\"child\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"26007d81-ecfc-4702-b8aa-1d1fb3aec2a7\",\"view_uuid\":\"d6e727cd-31a6-44e4-92c6-a2346758be8b\",\"type_name\":\"SkeletonAxis_TypeUUID\",\"type_uuid\":\"fe1247bf-f5f8-41d2-93c5-b7dfc6f0d693\"},\"parent\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8f13565b-abfc-4ce2-8b1d-7d133fe1a10d\",\"view_uuid\":\"5f6e4603-6282-4ae0-9d02-ad089e73b859\",\"type_name\":\"SkeletonBeam_TypeUUID\",\"type_uuid\":\"53808df6-89e0-427e-81d6-1bd662823db1\"}},{\"child\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"2f91fb33-5e4d-481f-a775-2522adfbce42\",\"view_uuid\":\"2f91fb33-5e4d-481f-a775-2522adfbce42\",\"type_name\":\"AttributeContainer_TypeUUID\",\"type_uuid\":\"572686a1-0ae5-4d22-88d1-35eeaea3f234\"},\"parent\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8f13565b-abfc-4ce2-8b1d-7d133fe1a10d\",\"view_uuid\":\"5f6e4603-6282-4ae0-9d02-ad089e73b859\",\"type_name\":\"SkeletonBeam_TypeUUID\",\"type_uuid\":\"53808df6-89e0-427e-81d6-1bd662823db1\"}}],\"property_owner\":\"not_established\",\"physical_target_equivalence\":\"not_established\"}},\"native_representation\":{\"status\":\"observed\",\"value\":{\"module\":\"NemAll_Python_ArchElements\",\"name\":\"StructuralBeamElement\"}},\"read_modes\":{\"ReadAll\":{\"status\":\"observed\",\"value\":[{\"attribute_id\":508,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"TEST1\",\"encoding\":\"json_scalar\"}]},\"ReadAllAndComputable\":{\"status\":\"observed\",\"value\":[{\"attribute_id\":508,\"runtime_type\":{\"module\":\"builtins\",\"name\":\"str\"},\"status\":\"observed\",\"value\":\"TEST1\",\"encoding\":\"json_scalar\"}]}},\"property_owner\":\"not_established\",\"setter_payload\":\"not_established\",\"native_material\":{\"status\":\"observed\",\"value\":\" \",\"access_path\":\"StructuralBeamElement.StructuralBeamProperties.Material\",\"owner_ref\":{\"drawing_file\":101,\"signed_drawing_file\":101,\"model_uuid\":\"8f13565b-abfc-4ce2-8b1d-7d133fe1a10d\",\"view_uuid\":\"5f6e4603-6282-4ae0-9d02-ad089e73b859\",\"type_name\":\"SkeletonBeam_TypeUUID\",\"type_uuid\":\"53808df6-89e0-427e-81d6-1bd662823db1\"},\"writable_owner\":\"not_established\"}}},\"parent\":{\"status\":\"not_requested\",\"value\":null}}],\"representation_count\":1,\"representation_consensus\":true,\"source_fingerprint\":\"c057b213309bbdc83e1c92f43d6442f3e126830ecc161f6ccaee61f86b8a1212\",\"presence_semantics\":\"read_modes_separate; ReadAll_omission_does_not_prove_absence\",\"property_write_available\":false,\"property_owner\":\"not_established\",\"date_vector_setter_available\":false,\"setter_calls_started\":0,\"bounds_used_for_identity\":false,\"physical_target_equivalence\":\"not_established\",\"coverage\":{\"scan_complete\":true,\"requested_scope_complete\":true,\"layer_resolution\":\"adapter\",\"attribute_read_mode\":\"stored\",\"returned_fields_complete\":true,\"returned_fields_not_checked\":0,\"whole_project\":false,\"unloaded_files\":\"not_enumerated\",\"visibility\":\"api_select_all_screen_and_occlusion_not_checked\",\"count_kind\":\"unique_file_model_uuid_not_top_level_components\",\"native_component_counts\":\"not_checked\",\"supported_component_types\":[\"Beam_TypeUUID\",\"Column_TypeUUID\",\"MultiSlab_TypeUUID\",\"SkeletonBeam_TypeUUID\",\"Slab_TypeUUID\",\"Wall_TypeUUID\",\"WindowDoor_TypeUUID\"],\"geometry_units_offset\":\"not_checked\"},\"counts\":{\"raw_adapters_visited\":26,\"in_scope_adapters\":26,\"matched_model_identities\":26,\"nonmatching_model_identities\":0,\"predicate_not_checked\":0,\"identity_not_checked\":0,\"conflicting_model_identities\":0,\"duplicate_representations\":0,\"file_identity_not_checked\":0,\"file_state_conflicts\":0,\"hierarchy_not_checked\":0,\"stale_adapters_skipped\":0,\"non_component_adapters\":0},\"other_view_uuids\":[],\"storage_coupling\":\"not_established\",\"persistence\":\"not_checked\",\"probe_fingerprint\":\"167169ca954f97a070ae3537d8f7ce911b5bc69cbdc74c3e4cc483b348c75c4b\",\"request_id\":\"d2d85e7f-9d4c-4e19-9deb-144eff427680\",\"host_session_id\":\"ffb92cf1-fa28-4cbc-9d95-3dbcbd21528a\"}"
+      }
+    ],
+    "structuredContent": {
+      "schema_version": "m4-property-probe-1",
+      "phase": "material_comparison",
+      "probe_id": "a822050593f445f0bb3c3095d69826db",
+      "read_only": true,
+      "model_data_changed": false,
+      "usable_for_write": false,
+      "runtime_verified": false,
+      "status": "ready_for_isolated_owner_probe",
+      "trace_file": "Local/.allplan-mcp/logs/m4-native-probe.jsonl",
+      "native_calls_not_automatically_retried": true,
+      "native_selection": "not_requested",
+      "state": "observed",
+      "evidence_complete": true,
+      "scope": {
+        "requested": {
+          "drawing_files": [
+            101
+          ],
+          "include_passive": false,
+          "visibility": "api_select_all"
+        },
+        "included_files": [
+          {
+            "drawing_file": 101,
+            "state": "active_foreground",
+            "write_eligibility": "not_checked"
+          }
+        ]
+      },
+      "ref": {
+        "query_session_id": "50135d66d2e04e15af1424726d18d78f",
+        "project_key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+        "document_id": 0,
+        "drawing_file": 101,
+        "model_uuid": "8f13565b-abfc-4ce2-8b1d-7d133fe1a10d",
+        "type_uuid": "53808df6-89e0-427e-81d6-1bd662823db1",
+        "durable_identity_verified": false,
+        "component_kind": "model_identity"
+      },
+      "view_uuid": "5f6e4603-6282-4ae0-9d02-ad089e73b859",
+      "attribute_ids": [
+        508
+      ],
+      "metadata": [
+        {
+          "attribute_id": 508,
+          "type_binding": {
+            "status": "observed",
+            "value": {
+              "matching_sdk_members": [
+                "String"
+              ],
+              "binding_status": "matched",
+              "runtime_type": {
+                "module": "NemAll_Python_BaseElements",
+                "name": "AttributeType"
+              },
+              "writable_codec": "not_established"
+            }
+          },
+          "name": {
+            "status": "observed",
+            "value": "Materiał"
+          },
+          "name_id_round_trip": {
+            "status": "observed",
+            "value": 508
+          }
+        }
+      ],
+      "representations": [
+        {
+          "target": {
+            "status": "observed",
+            "value": {
+              "ref": {
+                "drawing_file": 101,
+                "signed_drawing_file": 101,
+                "model_uuid": "8f13565b-abfc-4ce2-8b1d-7d133fe1a10d",
+                "view_uuid": "5f6e4603-6282-4ae0-9d02-ad089e73b859",
+                "type_name": "SkeletonBeam_TypeUUID",
+                "type_uuid": "53808df6-89e0-427e-81d6-1bd662823db1"
+              },
+              "ancestry": {
+                "status": "observed",
+                "value": {
+                  "schema_version": "m4-component-ownership-1",
+                  "target": {
+                    "drawing_file": 101,
+                    "signed_drawing_file": 101,
+                    "model_uuid": "8f13565b-abfc-4ce2-8b1d-7d133fe1a10d",
+                    "view_uuid": "5f6e4603-6282-4ae0-9d02-ad089e73b859",
+                    "type_name": "SkeletonBeam_TypeUUID",
+                    "type_uuid": "53808df6-89e0-427e-81d6-1bd662823db1"
+                  },
+                  "lineage": [
+                    {
+                      "drawing_file": 101,
+                      "signed_drawing_file": 101,
+                      "model_uuid": "8f13565b-abfc-4ce2-8b1d-7d133fe1a10d",
+                      "view_uuid": "5f6e4603-6282-4ae0-9d02-ad089e73b859",
+                      "type_name": "SkeletonBeam_TypeUUID",
+                      "type_uuid": "53808df6-89e0-427e-81d6-1bd662823db1"
+                    }
+                  ],
+                  "terminal_root": {
+                    "drawing_file": 101,
+                    "signed_drawing_file": 101,
+                    "model_uuid": "8f13565b-abfc-4ce2-8b1d-7d133fe1a10d",
+                    "view_uuid": "5f6e4603-6282-4ae0-9d02-ad089e73b859",
+                    "type_name": "SkeletonBeam_TypeUUID",
+                    "type_uuid": "53808df6-89e0-427e-81d6-1bd662823db1"
+                  },
+                  "parent_chain_complete": true,
+                  "children_complete": false,
+                  "children": [],
+                  "child_parent_edges": [],
+                  "property_owner": "not_established",
+                  "physical_target_equivalence": "not_established"
+                }
+              },
+              "children": {
+                "status": "observed",
+                "value": {
+                  "schema_version": "m4-component-ownership-1",
+                  "target": {
+                    "drawing_file": 101,
+                    "signed_drawing_file": 101,
+                    "model_uuid": "8f13565b-abfc-4ce2-8b1d-7d133fe1a10d",
+                    "view_uuid": "5f6e4603-6282-4ae0-9d02-ad089e73b859",
+                    "type_name": "SkeletonBeam_TypeUUID",
+                    "type_uuid": "53808df6-89e0-427e-81d6-1bd662823db1"
+                  },
+                  "lineage": [
+                    {
+                      "drawing_file": 101,
+                      "signed_drawing_file": 101,
+                      "model_uuid": "8f13565b-abfc-4ce2-8b1d-7d133fe1a10d",
+                      "view_uuid": "5f6e4603-6282-4ae0-9d02-ad089e73b859",
+                      "type_name": "SkeletonBeam_TypeUUID",
+                      "type_uuid": "53808df6-89e0-427e-81d6-1bd662823db1"
+                    }
+                  ],
+                  "terminal_root": {
+                    "drawing_file": 101,
+                    "signed_drawing_file": 101,
+                    "model_uuid": "8f13565b-abfc-4ce2-8b1d-7d133fe1a10d",
+                    "view_uuid": "5f6e4603-6282-4ae0-9d02-ad089e73b859",
+                    "type_name": "SkeletonBeam_TypeUUID",
+                    "type_uuid": "53808df6-89e0-427e-81d6-1bd662823db1"
+                  },
+                  "parent_chain_complete": true,
+                  "children_complete": true,
+                  "children": [
+                    {
+                      "drawing_file": 101,
+                      "signed_drawing_file": 101,
+                      "model_uuid": "2f91fb33-5e4d-481f-a775-2522adfbce42",
+                      "view_uuid": "2f91fb33-5e4d-481f-a775-2522adfbce42",
+                      "type_name": "AttributeContainer_TypeUUID",
+                      "type_uuid": "572686a1-0ae5-4d22-88d1-35eeaea3f234"
+                    },
+                    {
+                      "drawing_file": 101,
+                      "signed_drawing_file": 101,
+                      "model_uuid": "26007d81-ecfc-4702-b8aa-1d1fb3aec2a7",
+                      "view_uuid": "d6e727cd-31a6-44e4-92c6-a2346758be8b",
+                      "type_name": "SkeletonAxis_TypeUUID",
+                      "type_uuid": "fe1247bf-f5f8-41d2-93c5-b7dfc6f0d693"
+                    }
+                  ],
+                  "child_parent_edges": [
+                    {
+                      "child": {
+                        "drawing_file": 101,
+                        "signed_drawing_file": 101,
+                        "model_uuid": "26007d81-ecfc-4702-b8aa-1d1fb3aec2a7",
+                        "view_uuid": "d6e727cd-31a6-44e4-92c6-a2346758be8b",
+                        "type_name": "SkeletonAxis_TypeUUID",
+                        "type_uuid": "fe1247bf-f5f8-41d2-93c5-b7dfc6f0d693"
+                      },
+                      "parent": {
+                        "drawing_file": 101,
+                        "signed_drawing_file": 101,
+                        "model_uuid": "8f13565b-abfc-4ce2-8b1d-7d133fe1a10d",
+                        "view_uuid": "5f6e4603-6282-4ae0-9d02-ad089e73b859",
+                        "type_name": "SkeletonBeam_TypeUUID",
+                        "type_uuid": "53808df6-89e0-427e-81d6-1bd662823db1"
+                      }
+                    },
+                    {
+                      "child": {
+                        "drawing_file": 101,
+                        "signed_drawing_file": 101,
+                        "model_uuid": "2f91fb33-5e4d-481f-a775-2522adfbce42",
+                        "view_uuid": "2f91fb33-5e4d-481f-a775-2522adfbce42",
+                        "type_name": "AttributeContainer_TypeUUID",
+                        "type_uuid": "572686a1-0ae5-4d22-88d1-35eeaea3f234"
+                      },
+                      "parent": {
+                        "drawing_file": 101,
+                        "signed_drawing_file": 101,
+                        "model_uuid": "8f13565b-abfc-4ce2-8b1d-7d133fe1a10d",
+                        "view_uuid": "5f6e4603-6282-4ae0-9d02-ad089e73b859",
+                        "type_name": "SkeletonBeam_TypeUUID",
+                        "type_uuid": "53808df6-89e0-427e-81d6-1bd662823db1"
+                      }
+                    }
+                  ],
+                  "property_owner": "not_established",
+                  "physical_target_equivalence": "not_established"
+                }
+              },
+              "native_representation": {
+                "status": "observed",
+                "value": {
+                  "module": "NemAll_Python_ArchElements",
+                  "name": "StructuralBeamElement"
+                }
+              },
+              "read_modes": {
+                "ReadAll": {
+                  "status": "observed",
+                  "value": [
+                    {
+                      "attribute_id": 508,
+                      "runtime_type": {
+                        "module": "builtins",
+                        "name": "str"
+                      },
+                      "status": "observed",
+                      "value": "TEST1",
+                      "encoding": "json_scalar"
+                    }
+                  ]
+                },
+                "ReadAllAndComputable": {
+                  "status": "observed",
+                  "value": [
+                    {
+                      "attribute_id": 508,
+                      "runtime_type": {
+                        "module": "builtins",
+                        "name": "str"
+                      },
+                      "status": "observed",
+                      "value": "TEST1",
+                      "encoding": "json_scalar"
+                    }
+                  ]
+                }
+              },
+              "property_owner": "not_established",
+              "setter_payload": "not_established",
+              "native_material": {
+                "status": "observed",
+                "value": " ",
+                "access_path": "StructuralBeamElement.StructuralBeamProperties.Material",
+                "owner_ref": {
+                  "drawing_file": 101,
+                  "signed_drawing_file": 101,
+                  "model_uuid": "8f13565b-abfc-4ce2-8b1d-7d133fe1a10d",
+                  "view_uuid": "5f6e4603-6282-4ae0-9d02-ad089e73b859",
+                  "type_name": "SkeletonBeam_TypeUUID",
+                  "type_uuid": "53808df6-89e0-427e-81d6-1bd662823db1"
+                },
+                "writable_owner": "not_established"
+              }
+            }
+          },
+          "parent": {
+            "status": "not_requested",
+            "value": null
+          }
+        }
+      ],
+      "representation_count": 1,
+      "representation_consensus": true,
+      "source_fingerprint": "c057b213309bbdc83e1c92f43d6442f3e126830ecc161f6ccaee61f86b8a1212",
+      "presence_semantics": "read_modes_separate; ReadAll_omission_does_not_prove_absence",
+      "property_write_available": false,
+      "property_owner": "not_established",
+      "date_vector_setter_available": false,
+      "setter_calls_started": 0,
+      "bounds_used_for_identity": false,
+      "physical_target_equivalence": "not_established",
+      "coverage": {
+        "scan_complete": true,
+        "requested_scope_complete": true,
+        "layer_resolution": "adapter",
+        "attribute_read_mode": "stored",
+        "returned_fields_complete": true,
+        "returned_fields_not_checked": 0,
+        "whole_project": false,
+        "unloaded_files": "not_enumerated",
+        "visibility": "api_select_all_screen_and_occlusion_not_checked",
+        "count_kind": "unique_file_model_uuid_not_top_level_components",
+        "native_component_counts": "not_checked",
+        "supported_component_types": [
+          "Beam_TypeUUID",
+          "Column_TypeUUID",
+          "MultiSlab_TypeUUID",
+          "SkeletonBeam_TypeUUID",
+          "Slab_TypeUUID",
+          "Wall_TypeUUID",
+          "WindowDoor_TypeUUID"
+        ],
+        "geometry_units_offset": "not_checked"
+      },
+      "counts": {
+        "raw_adapters_visited": 26,
+        "in_scope_adapters": 26,
+        "matched_model_identities": 26,
+        "nonmatching_model_identities": 0,
+        "predicate_not_checked": 0,
+        "identity_not_checked": 0,
+        "conflicting_model_identities": 0,
+        "duplicate_representations": 0,
+        "file_identity_not_checked": 0,
+        "file_state_conflicts": 0,
+        "hierarchy_not_checked": 0,
+        "stale_adapters_skipped": 0,
+        "non_component_adapters": 0
+      },
+      "other_view_uuids": [],
+      "storage_coupling": "not_established",
+      "persistence": "not_checked",
+      "probe_fingerprint": "167169ca954f97a070ae3537d8f7ce911b5bc69cbdc74c3e4cc483b348c75c4b",
+      "request_id": "d2d85e7f-9d4c-4e19-9deb-144eff427680",
+      "host_session_id": "ffb92cf1-fa28-4cbc-9d95-3dbcbd21528a"
+    },
+    "isError": false
+  }
+}

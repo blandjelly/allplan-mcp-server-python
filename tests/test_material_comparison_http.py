@@ -58,6 +58,42 @@ class MaterialComparisonHTTPTests(unittest.IsolatedAsyncioTestCase):
         native.base.GetElement.assert_called_once_with(native.target)
         native.base.ModifyElements.assert_not_called()
 
+    async def test_unenumerated_slab_child_uses_only_explicit_parent_without_writes(self):
+        native = self.native_bridge()
+        child, parent = native.slab_child_fixture()
+        async with Client(self.url, timeout=10) as client:
+            blocked = await client.call_tool("model_property_probe", {"request": native.request()}, raise_on_error=False)
+            self.assertTrue(blocked.is_error)
+            self.assertIn("probe_scope_unavailable", str(blocked))
+            result = (await client.call_tool("model_property_probe", {"request": native.request(
+                parent_ref=native.parent_ref, include_parent=True)})).data
+        self.assertEqual(result["ref"]["model_uuid"], child.GetModelElementUUID())
+        self.assertFalse(result["identity_resolution"]["target_in_direct_scan"])
+        row = result["representations"][0]
+        self.assertEqual(row["target"]["value"]["native_material"]["value"], " ")
+        self.assertEqual(row["parent"]["value"]["evidence"]["native_material"]["value"], "parent-native")
+        native.base.ModifyElements.assert_not_called()
+        native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+        native.base.DeleteElements.assert_not_called()
+        self.assertFalse(native.handler.model_queries.selections)
+
+    async def test_parent_contract_rejects_invalid_hint_before_bridge_and_never_guesses_missing_view(self):
+        native = self.native_bridge()
+        child, parent = native.slab_child_fixture()
+        async with Client(self.url, timeout=10) as client:
+            for hint in (None, {}, {**native.parent_ref, "model_uuid": child.GetModelElementUUID()},
+                         {**native.parent_ref, "view_uuid": "00000000-0000-0000-0000-000000000000"}):
+                rejected = await client.call_tool("model_property_probe", {"request": native.request(parent_ref=hint)}, raise_on_error=False)
+                self.assertTrue(rejected.is_error)
+            self.assertFalse(self.bridge_handler.calls)
+            wrong = {**native.parent_ref, "view_uuid": "10000000-0000-4000-8000-000000000099"}
+            rejected = await client.call_tool("model_property_probe", {"request": native.request(parent_ref=wrong)}, raise_on_error=False)
+            self.assertTrue(rejected.is_error)
+            self.assertIn("probe_scope_unavailable", str(rejected))
+        native.base.GetElement.assert_not_called()
+        child.GetAttributes.assert_not_called()
+        native.base.ModifyElements.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

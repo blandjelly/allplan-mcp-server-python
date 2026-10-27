@@ -1,0 +1,316 @@
+{
+  "health": {
+    "arguments": {},
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"ok\":true,\"allplan_version\":\"2026.1\",\"runtime\":{\"version\":\"2026.1\",\"allplan_release\":{\"Version\":\"2026.1\",\"MainReleaseName\":\"2026\",\"SubReleaseName\":\"2026.1\",\"WindowsReleaseName\":\"\"},\"executable_versions\":{\"status\":\"observed\",\"file_version\":\"16.1617.8659.814\",\"product_version\":\"2026.0.1.0\",\"source\":\"running_process_executable\"},\"hotfix\":{\"status\":\"not_checked\",\"value\":null},\"embedded_python\":{\"version\":\"3.13.13\",\"implementation\":\"CPython\"},\"bridge_package\":{\"version\":\"0.40.0\",\"source_commit\":\"fca3da9820e684a41cd1c1e4300734a57e7bdbbb\",\"integrity\":\"sha256-verified\",\"bridge_files\":{\"Library/PythonHost/StartPythonHost.pyp\":\"b1aba49ed554eeefa9e44f4e9a6f06992e74d4f2916277ef451de11d72167813\",\"PythonPartsScripts/PythonHost/attribute_codecs.py\":\"3153abaa7873c7056b5d48ea3f31390b4d668fd8be6b463911b0b4ccef6accd8\",\"PythonPartsScripts/PythonHost/attribute_evidence.py\":\"23c3d29d6d6fe3b80216cd250b30623dea0c10e271dce531fcd87cf491407ab0\",\"PythonPartsScripts/PythonHost/audit_contracts.py\":\"155b10200982c879f3bd0226ea8f26c00e15118f8b5f3df532c7937ac3e8f035\",\"PythonPartsScripts/PythonHost/column_layer.py\":\"a1476471d37d029d9447c96d40a3cebdb3acbe7d793885c416a51b14785b5c1b\",\"PythonPartsScripts/PythonHost/component_ownership.py\":\"83d94247a8c8267b406378353f530dd04162d688689deb19f8d76b60bc4c7d52\",\"PythonPartsScripts/PythonHost/identity_probe.py\":\"225500ad7150e4e8d62755fd5b20da382cfdbabb4731033c401333bc17a98d7a\",\"PythonPartsScripts/PythonHost/journal_maintenance.py\":\"8e3baf465533a1d11ef71a6d9f7f3c8015fee2b4568bfcf9dc0c9bb6f48d8666\",\"PythonPartsScripts/PythonHost/layer_names.py\":\"b62568c214ba91bd2eaec466f8c96a328b831a6579f6569cac01b00a1f030827\",\"PythonPartsScripts/PythonHost/mark_numbering.py\":\"dc6f7b87ba26aed1db1b50c6925b35df9509fb8b841e17fdb9d6e791666b51f4\",\"PythonPartsScripts/PythonHost/material_probe.py\":\"943df8fc7245160fee16cb5eba8b83c4dc00d9f8ab0ec9f2ba514e08cf93805c\",\"PythonPartsScripts/PythonHost/model_audit.py\":\"50c74918d1b23d93f182ff01ea5859e0ea2b39ee54a70a13f0d8ee2346acbcd0\",\"PythonPartsScripts/PythonHost/model_context.py\":\"8af4dfa1ac72523bb4b5fb4a068e5e202276118a95cf378d734082465e88d013\",\"PythonPartsScripts/PythonHost/model_delete.py\":\"9617a83d02ee493fc1e13bc3857167f5a9a194c36a947361138c187f57765226\",\"PythonPartsScripts/PythonHost/model_edit.py\":\"aae9432ae8d89bd9de2663b2aa97a866d7b9f454f8596234376ddeb4e6a7b4df\",\"PythonPartsScripts/PythonHost/model_edit_contracts.py\":\"e71ea79fee07e777571e477acca28087a2cd9f375740cc1b2777799aac402129\",\"PythonPartsScripts/PythonHost/model_metadata.py\":\"c1339766382fd52de47fb66e11d87106942b67cf5dc743088739473738802d4a\",\"PythonPartsScripts/PythonHost/model_properties.py\":\"36cdee753aba383047d8c7213279edaf6fc4e385e24c7811aa8c482f695cef10\",\"PythonPartsScripts/PythonHost/model_query.py\":\"4c900562694b600246523751ba1058dd717773d6d96a3edb1290d34e50d20abc\",\"PythonPartsScripts/PythonHost/model_repair.py\":\"127f5add0cf1618203d593e5c3fc80c26d139abfd270a7368e1809c08b765db2\",\"PythonPartsScripts/PythonHost/model_scope.py\":\"a80b72eda1ddac1563bdbdf73aafce9164c21304c82bfb72a2adb9e1f2c5f2b9\",\"PythonPartsScripts/PythonHost/model_selection.py\":\"baf239dad4db5d98878cf6c41b32a4e3069f464d46674081bde048d5d3f3eb5a\",\"PythonPartsScripts/PythonHost/native_model_edit.py\":\"09eac9db9b0cad01cded0611ec8be7210522ad3f81a8d2d45892457a8121087f\",\"PythonPartsScripts/PythonHost/native_readers.py\":\"0db916ffe748795eeb6125161153f49ec4366acc7d01eeb11100c32f42b9b8f6\",\"PythonPartsScripts/PythonHost/native_repairs.py\":\"961a62164349dc62b05a3f65f042c122ca179cf94a0bbd8619cbeb77d0b16117\",\"PythonPartsScripts/PythonHost/profile_contracts.py\":\"bed1c0099c2dfdc5fc48374cd78c16ea1ea0a6df3309deb919322b060d7a46b6\",\"PythonPartsScripts/PythonHost/property_contracts.py\":\"5fc1cf2b71b28b33c63168b47812335df90c83f5c8aa43923bf5cd6422c1e1cf\",\"PythonPartsScripts/PythonHost/property_probe.py\":\"6aca438f0f1209a3509421b0ac08c3b93a7646d3057ddc0673813d13135869c4\",\"PythonPartsScripts/PythonHost/PythonHostHandler.py\":\"dde16a2c73768ca9eb6d10d2c6c868615449895fb2dbb8338487e16d2e75df6b\",\"PythonPartsScripts/PythonHost/query_contracts.py\":\"39d7a760d7d4ba017d54aa2059c4e9bf708df22b08ef0589ff8deae179ab8405\",\"PythonPartsScripts/PythonHost/repair_contracts.py\":\"28c0536f12f79727879bd76d8608a95d8cf82307124e0e9fac5a04e33bdd143b\",\"PythonPartsScripts/PythonHost/repair_execution.py\":\"40f3d70e4edd64efa39588194dbfdb22e5afcb33b8c390f64d39968758407999\",\"PythonPartsScripts/PythonHost/runtime_info.py\":\"6d46a44d0c8e8d3c1d757a22b4012a9919eb782bb8ea60577a1e229acfde91a2\",\"PythonPartsScripts/PythonHost/sandbox/__init__.py\":\"b895513c191ba9ea7a8748f3aef1c6c9d74875b990d8ef41e10faf3904e0e586\",\"PythonPartsScripts/PythonHost/sandbox/const.py\":\"168b93f376d54ddaf67ac62ffc5fb7e94570ab24e1f828d0732effa097e659d4\",\"PythonPartsScripts/PythonHost/sandbox/executor.py\":\"c06f9810291a1c9e6f3deb7939d4b6615905d15c6662a6e69d7973b3fcbf0f6a\",\"PythonPartsScripts/PythonHost/sandbox/validator.py\":\"5a4d3bf2bb6d2556512285a778083385c5c5049a398bc7a77cdaab9c5d8ddaec\",\"PythonPartsScripts/PythonHost/spatial_contracts.py\":\"40820192b5500782cab4fb3fe837244989283861c143079b245f8f2e223ee086\",\"PythonPartsScripts/PythonHost/StartPythonHost.py\":\"c3d5ee42531d2621e9d3055214ff8fc8fb25b29a1a9dc3790e3feb00ac609e51\",\"PythonPartsScripts/PythonHost/transport.py\":\"f9e5985567631346d84b612898f6cc306cc0d0729624053aab823ea1f14db9dd\",\"PythonPartsScripts/PythonHost/wall_filter.py\":\"dbc96f807153783837ce33dac114e866e1fb5993e490aa429889dce3fc333dee\",\"PythonPartsScripts/PythonHost/wall_layer.py\":\"42688d728c5c0bbc0d3700c9110b12988fc246f38b994929897d83f6ab2f399d\",\"PythonPartsScripts/PythonHost/wall_material.py\":\"fc40ca2009e27a5f6730373220e7d0bcb1b146f7841bbd306738a7158546401e\",\"PythonPartsScripts/PythonHost/wall_probe.py\":\"539cf24dfcf1e6e1355105f34a8fcbc32df6f42b143d02128c65f202a0cdb97b\"}},\"installed_bridge_integrity\":{\"status\":\"verified\",\"mismatches\":[]},\"compatibility\":{\"target_major\":\"2026\",\"major_matches\":true,\"runtime_verified\":false},\"request_id\":\"701ad697-988e-4109-b954-49cf260dad7e\",\"host_session_id\":\"ffb92cf1-fa28-4cbc-9d95-3dbcbd21528a\",\"ui_dispatch_exception_boundary\":\"contained_result_error_v1\",\"ui_dispatch_mode\":\"timer_queue_v1\"},\"external_python\":\"3.14.8\",\"mcp_package_version\":\"0.40.0\",\"request_id\":\"701ad697-988e-4109-b954-49cf260dad7e\",\"allplan_host_url\":\"http://127.0.0.1:5679\"}"
+        }
+      ],
+      "structuredContent": {
+        "ok": true,
+        "allplan_version": "2026.1",
+        "runtime": {
+          "version": "2026.1",
+          "allplan_release": {
+            "Version": "2026.1",
+            "MainReleaseName": "2026",
+            "SubReleaseName": "2026.1",
+            "WindowsReleaseName": ""
+          },
+          "executable_versions": {
+            "status": "observed",
+            "file_version": "16.1617.8659.814",
+            "product_version": "2026.0.1.0",
+            "source": "running_process_executable"
+          },
+          "hotfix": {
+            "status": "not_checked",
+            "value": null
+          },
+          "embedded_python": {
+            "version": "3.13.13",
+            "implementation": "CPython"
+          },
+          "bridge_package": {
+            "version": "0.40.0",
+            "source_commit": "fca3da9820e684a41cd1c1e4300734a57e7bdbbb",
+            "integrity": "sha256-verified",
+            "bridge_files": {
+              "Library/PythonHost/StartPythonHost.pyp": "b1aba49ed554eeefa9e44f4e9a6f06992e74d4f2916277ef451de11d72167813",
+              "PythonPartsScripts/PythonHost/attribute_codecs.py": "3153abaa7873c7056b5d48ea3f31390b4d668fd8be6b463911b0b4ccef6accd8",
+              "PythonPartsScripts/PythonHost/attribute_evidence.py": "23c3d29d6d6fe3b80216cd250b30623dea0c10e271dce531fcd87cf491407ab0",
+              "PythonPartsScripts/PythonHost/audit_contracts.py": "155b10200982c879f3bd0226ea8f26c00e15118f8b5f3df532c7937ac3e8f035",
+              "PythonPartsScripts/PythonHost/column_layer.py": "a1476471d37d029d9447c96d40a3cebdb3acbe7d793885c416a51b14785b5c1b",
+              "PythonPartsScripts/PythonHost/component_ownership.py": "83d94247a8c8267b406378353f530dd04162d688689deb19f8d76b60bc4c7d52",
+              "PythonPartsScripts/PythonHost/identity_probe.py": "225500ad7150e4e8d62755fd5b20da382cfdbabb4731033c401333bc17a98d7a",
+              "PythonPartsScripts/PythonHost/journal_maintenance.py": "8e3baf465533a1d11ef71a6d9f7f3c8015fee2b4568bfcf9dc0c9bb6f48d8666",
+              "PythonPartsScripts/PythonHost/layer_names.py": "b62568c214ba91bd2eaec466f8c96a328b831a6579f6569cac01b00a1f030827",
+              "PythonPartsScripts/PythonHost/mark_numbering.py": "dc6f7b87ba26aed1db1b50c6925b35df9509fb8b841e17fdb9d6e791666b51f4",
+              "PythonPartsScripts/PythonHost/material_probe.py": "943df8fc7245160fee16cb5eba8b83c4dc00d9f8ab0ec9f2ba514e08cf93805c",
+              "PythonPartsScripts/PythonHost/model_audit.py": "50c74918d1b23d93f182ff01ea5859e0ea2b39ee54a70a13f0d8ee2346acbcd0",
+              "PythonPartsScripts/PythonHost/model_context.py": "8af4dfa1ac72523bb4b5fb4a068e5e202276118a95cf378d734082465e88d013",
+              "PythonPartsScripts/PythonHost/model_delete.py": "9617a83d02ee493fc1e13bc3857167f5a9a194c36a947361138c187f57765226",
+              "PythonPartsScripts/PythonHost/model_edit.py": "aae9432ae8d89bd9de2663b2aa97a866d7b9f454f8596234376ddeb4e6a7b4df",
+              "PythonPartsScripts/PythonHost/model_edit_contracts.py": "e71ea79fee07e777571e477acca28087a2cd9f375740cc1b2777799aac402129",
+              "PythonPartsScripts/PythonHost/model_metadata.py": "c1339766382fd52de47fb66e11d87106942b67cf5dc743088739473738802d4a",
+              "PythonPartsScripts/PythonHost/model_properties.py": "36cdee753aba383047d8c7213279edaf6fc4e385e24c7811aa8c482f695cef10",
+              "PythonPartsScripts/PythonHost/model_query.py": "4c900562694b600246523751ba1058dd717773d6d96a3edb1290d34e50d20abc",
+              "PythonPartsScripts/PythonHost/model_repair.py": "127f5add0cf1618203d593e5c3fc80c26d139abfd270a7368e1809c08b765db2",
+              "PythonPartsScripts/PythonHost/model_scope.py": "a80b72eda1ddac1563bdbdf73aafce9164c21304c82bfb72a2adb9e1f2c5f2b9",
+              "PythonPartsScripts/PythonHost/model_selection.py": "baf239dad4db5d98878cf6c41b32a4e3069f464d46674081bde048d5d3f3eb5a",
+              "PythonPartsScripts/PythonHost/native_model_edit.py": "09eac9db9b0cad01cded0611ec8be7210522ad3f81a8d2d45892457a8121087f",
+              "PythonPartsScripts/PythonHost/native_readers.py": "0db916ffe748795eeb6125161153f49ec4366acc7d01eeb11100c32f42b9b8f6",
+              "PythonPartsScripts/PythonHost/native_repairs.py": "961a62164349dc62b05a3f65f042c122ca179cf94a0bbd8619cbeb77d0b16117",
+              "PythonPartsScripts/PythonHost/profile_contracts.py": "bed1c0099c2dfdc5fc48374cd78c16ea1ea0a6df3309deb919322b060d7a46b6",
+              "PythonPartsScripts/PythonHost/property_contracts.py": "5fc1cf2b71b28b33c63168b47812335df90c83f5c8aa43923bf5cd6422c1e1cf",
+              "PythonPartsScripts/PythonHost/property_probe.py": "6aca438f0f1209a3509421b0ac08c3b93a7646d3057ddc0673813d13135869c4",
+              "PythonPartsScripts/PythonHost/PythonHostHandler.py": "dde16a2c73768ca9eb6d10d2c6c868615449895fb2dbb8338487e16d2e75df6b",
+              "PythonPartsScripts/PythonHost/query_contracts.py": "39d7a760d7d4ba017d54aa2059c4e9bf708df22b08ef0589ff8deae179ab8405",
+              "PythonPartsScripts/PythonHost/repair_contracts.py": "28c0536f12f79727879bd76d8608a95d8cf82307124e0e9fac5a04e33bdd143b",
+              "PythonPartsScripts/PythonHost/repair_execution.py": "40f3d70e4edd64efa39588194dbfdb22e5afcb33b8c390f64d39968758407999",
+              "PythonPartsScripts/PythonHost/runtime_info.py": "6d46a44d0c8e8d3c1d757a22b4012a9919eb782bb8ea60577a1e229acfde91a2",
+              "PythonPartsScripts/PythonHost/sandbox/__init__.py": "b895513c191ba9ea7a8748f3aef1c6c9d74875b990d8ef41e10faf3904e0e586",
+              "PythonPartsScripts/PythonHost/sandbox/const.py": "168b93f376d54ddaf67ac62ffc5fb7e94570ab24e1f828d0732effa097e659d4",
+              "PythonPartsScripts/PythonHost/sandbox/executor.py": "c06f9810291a1c9e6f3deb7939d4b6615905d15c6662a6e69d7973b3fcbf0f6a",
+              "PythonPartsScripts/PythonHost/sandbox/validator.py": "5a4d3bf2bb6d2556512285a778083385c5c5049a398bc7a77cdaab9c5d8ddaec",
+              "PythonPartsScripts/PythonHost/spatial_contracts.py": "40820192b5500782cab4fb3fe837244989283861c143079b245f8f2e223ee086",
+              "PythonPartsScripts/PythonHost/StartPythonHost.py": "c3d5ee42531d2621e9d3055214ff8fc8fb25b29a1a9dc3790e3feb00ac609e51",
+              "PythonPartsScripts/PythonHost/transport.py": "f9e5985567631346d84b612898f6cc306cc0d0729624053aab823ea1f14db9dd",
+              "PythonPartsScripts/PythonHost/wall_filter.py": "dbc96f807153783837ce33dac114e866e1fb5993e490aa429889dce3fc333dee",
+              "PythonPartsScripts/PythonHost/wall_layer.py": "42688d728c5c0bbc0d3700c9110b12988fc246f38b994929897d83f6ab2f399d",
+              "PythonPartsScripts/PythonHost/wall_material.py": "fc40ca2009e27a5f6730373220e7d0bcb1b146f7841bbd306738a7158546401e",
+              "PythonPartsScripts/PythonHost/wall_probe.py": "539cf24dfcf1e6e1355105f34a8fcbc32df6f42b143d02128c65f202a0cdb97b"
+            }
+          },
+          "installed_bridge_integrity": {
+            "status": "verified",
+            "mismatches": []
+          },
+          "compatibility": {
+            "target_major": "2026",
+            "major_matches": true,
+            "runtime_verified": false
+          },
+          "request_id": "701ad697-988e-4109-b954-49cf260dad7e",
+          "host_session_id": "ffb92cf1-fa28-4cbc-9d95-3dbcbd21528a",
+          "ui_dispatch_exception_boundary": "contained_result_error_v1",
+          "ui_dispatch_mode": "timer_queue_v1"
+        },
+        "external_python": "3.14.8",
+        "mcp_package_version": "0.40.0",
+        "request_id": "701ad697-988e-4109-b954-49cf260dad7e",
+        "allplan_host_url": "http://127.0.0.1:5679"
+      },
+      "isError": false
+    }
+  },
+  "context": {
+    "arguments": {},
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"schema_version\":\"m1-context-probe-1\",\"read_only\":true,\"runtime_verified\":false,\"project\":{\"status\":\"observed\",\"value\":{\"name\":\"Kopia MCP_QA_DEMO\",\"host\":\"DESKTOP-H6NH5R7\",\"key\":\"7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f\",\"key_status\":\"observed\",\"key_kind\":\"name_host_path_sha256\",\"durable_identity_verified\":false,\"path_lookup_attempts\":[{\"argument_order\":\"project_name_host_name\",\"status\":\"observed\",\"value\":{\"error\":-1,\"path\":\"\"}},{\"argument_order\":\"host_name_project_name\",\"status\":\"observed\",\"value\":{\"error\":0,\"path\":\"D:\\\\Programy\\\\Allplan\\\\Data\\\\Prj\\\\Kopia MCP_QA_DEMO.prj\"}}]}},\"document_id\":{\"status\":\"observed\",\"value\":0},\"active_drawing_file\":{\"status\":\"observed\",\"value\":101},\"loaded_drawing_files\":{\"status\":\"observed\",\"value\":[{\"number\":101,\"state\":\"active_foreground\",\"name\":{\"status\":\"observed\",\"value\":\"\"},\"write_eligibility\":\"not_checked\"}]},\"units\":{\"canonical_length\":\"mm\",\"canonical_angle\":\"deg\",\"input_length\":{\"status\":\"observed\",\"value\":3},\"input_angle\":{\"status\":\"observed\",\"value\":1},\"input_unit_encoding\":\"Allplan 2026 LengthUnits/AngleUnits enum\",\"geometry_conversion\":\"not_checked\"},\"project_offset\":{\"status\":\"observed\",\"value\":{\"xyz\":[0.0,0.0,0.0],\"unit\":\"api_native\",\"conversion_to_mm\":\"not_checked\",\"application_to_model_coordinates\":\"not_checked\"}},\"levels\":{\"status\":\"not_checked\",\"value\":null},\"capabilities\":{\"context\":\"probe_only\",\"model_query\":\"implemented_runtime_pending\",\"reusable_selections\":\"session_bound_read_only_runtime_pending\",\"geometry_query\":\"implemented_runtime_pending\",\"native_hierarchy_query\":\"implemented_runtime_pending\",\"demo_profile_binding\":\"implemented_read_only_runtime_pending\",\"model_write\":\"not_supported_by_this_tool\",\"model_properties\":\"blocked_after_native_crash\",\"model_highlight\":\"ready_for_owner_test\",\"native_UI_selection\":\"unsupported_by_current_interactor\"},\"coverage\":{\"file_inventory\":\"loaded_only\",\"unloaded_files\":\"not_enumerated\",\"visibility\":\"API_selection_semantics_not_verified\",\"native_component_counts\":\"not_checked\"},\"identity_sample\":{\"requested\":0,\"items\":[],\"coverage\":\"not_requested\"},\"runtime\":{\"version\":\"2026.1\",\"allplan_release\":{\"Version\":\"2026.1\",\"MainReleaseName\":\"2026\",\"SubReleaseName\":\"2026.1\",\"WindowsReleaseName\":\"\"},\"executable_versions\":{\"status\":\"observed\",\"file_version\":\"16.1617.8659.814\",\"product_version\":\"2026.0.1.0\",\"source\":\"running_process_executable\"},\"hotfix\":{\"status\":\"not_checked\",\"value\":null},\"embedded_python\":{\"version\":\"3.13.13\",\"implementation\":\"CPython\"},\"bridge_package\":{\"version\":\"0.40.0\",\"source_commit\":\"fca3da9820e684a41cd1c1e4300734a57e7bdbbb\",\"integrity\":\"sha256-verified\",\"bridge_files\":{\"Library/PythonHost/StartPythonHost.pyp\":\"b1aba49ed554eeefa9e44f4e9a6f06992e74d4f2916277ef451de11d72167813\",\"PythonPartsScripts/PythonHost/attribute_codecs.py\":\"3153abaa7873c7056b5d48ea3f31390b4d668fd8be6b463911b0b4ccef6accd8\",\"PythonPartsScripts/PythonHost/attribute_evidence.py\":\"23c3d29d6d6fe3b80216cd250b30623dea0c10e271dce531fcd87cf491407ab0\",\"PythonPartsScripts/PythonHost/audit_contracts.py\":\"155b10200982c879f3bd0226ea8f26c00e15118f8b5f3df532c7937ac3e8f035\",\"PythonPartsScripts/PythonHost/column_layer.py\":\"a1476471d37d029d9447c96d40a3cebdb3acbe7d793885c416a51b14785b5c1b\",\"PythonPartsScripts/PythonHost/component_ownership.py\":\"83d94247a8c8267b406378353f530dd04162d688689deb19f8d76b60bc4c7d52\",\"PythonPartsScripts/PythonHost/identity_probe.py\":\"225500ad7150e4e8d62755fd5b20da382cfdbabb4731033c401333bc17a98d7a\",\"PythonPartsScripts/PythonHost/journal_maintenance.py\":\"8e3baf465533a1d11ef71a6d9f7f3c8015fee2b4568bfcf9dc0c9bb6f48d8666\",\"PythonPartsScripts/PythonHost/layer_names.py\":\"b62568c214ba91bd2eaec466f8c96a328b831a6579f6569cac01b00a1f030827\",\"PythonPartsScripts/PythonHost/mark_numbering.py\":\"dc6f7b87ba26aed1db1b50c6925b35df9509fb8b841e17fdb9d6e791666b51f4\",\"PythonPartsScripts/PythonHost/material_probe.py\":\"943df8fc7245160fee16cb5eba8b83c4dc00d9f8ab0ec9f2ba514e08cf93805c\",\"PythonPartsScripts/PythonHost/model_audit.py\":\"50c74918d1b23d93f182ff01ea5859e0ea2b39ee54a70a13f0d8ee2346acbcd0\",\"PythonPartsScripts/PythonHost/model_context.py\":\"8af4dfa1ac72523bb4b5fb4a068e5e202276118a95cf378d734082465e88d013\",\"PythonPartsScripts/PythonHost/model_delete.py\":\"9617a83d02ee493fc1e13bc3857167f5a9a194c36a947361138c187f57765226\",\"PythonPartsScripts/PythonHost/model_edit.py\":\"aae9432ae8d89bd9de2663b2aa97a866d7b9f454f8596234376ddeb4e6a7b4df\",\"PythonPartsScripts/PythonHost/model_edit_contracts.py\":\"e71ea79fee07e777571e477acca28087a2cd9f375740cc1b2777799aac402129\",\"PythonPartsScripts/PythonHost/model_metadata.py\":\"c1339766382fd52de47fb66e11d87106942b67cf5dc743088739473738802d4a\",\"PythonPartsScripts/PythonHost/model_properties.py\":\"36cdee753aba383047d8c7213279edaf6fc4e385e24c7811aa8c482f695cef10\",\"PythonPartsScripts/PythonHost/model_query.py\":\"4c900562694b600246523751ba1058dd717773d6d96a3edb1290d34e50d20abc\",\"PythonPartsScripts/PythonHost/model_repair.py\":\"127f5add0cf1618203d593e5c3fc80c26d139abfd270a7368e1809c08b765db2\",\"PythonPartsScripts/PythonHost/model_scope.py\":\"a80b72eda1ddac1563bdbdf73aafce9164c21304c82bfb72a2adb9e1f2c5f2b9\",\"PythonPartsScripts/PythonHost/model_selection.py\":\"baf239dad4db5d98878cf6c41b32a4e3069f464d46674081bde048d5d3f3eb5a\",\"PythonPartsScripts/PythonHost/native_model_edit.py\":\"09eac9db9b0cad01cded0611ec8be7210522ad3f81a8d2d45892457a8121087f\",\"PythonPartsScripts/PythonHost/native_readers.py\":\"0db916ffe748795eeb6125161153f49ec4366acc7d01eeb11100c32f42b9b8f6\",\"PythonPartsScripts/PythonHost/native_repairs.py\":\"961a62164349dc62b05a3f65f042c122ca179cf94a0bbd8619cbeb77d0b16117\",\"PythonPartsScripts/PythonHost/profile_contracts.py\":\"bed1c0099c2dfdc5fc48374cd78c16ea1ea0a6df3309deb919322b060d7a46b6\",\"PythonPartsScripts/PythonHost/property_contracts.py\":\"5fc1cf2b71b28b33c63168b47812335df90c83f5c8aa43923bf5cd6422c1e1cf\",\"PythonPartsScripts/PythonHost/property_probe.py\":\"6aca438f0f1209a3509421b0ac08c3b93a7646d3057ddc0673813d13135869c4\",\"PythonPartsScripts/PythonHost/PythonHostHandler.py\":\"dde16a2c73768ca9eb6d10d2c6c868615449895fb2dbb8338487e16d2e75df6b\",\"PythonPartsScripts/PythonHost/query_contracts.py\":\"39d7a760d7d4ba017d54aa2059c4e9bf708df22b08ef0589ff8deae179ab8405\",\"PythonPartsScripts/PythonHost/repair_contracts.py\":\"28c0536f12f79727879bd76d8608a95d8cf82307124e0e9fac5a04e33bdd143b\",\"PythonPartsScripts/PythonHost/repair_execution.py\":\"40f3d70e4edd64efa39588194dbfdb22e5afcb33b8c390f64d39968758407999\",\"PythonPartsScripts/PythonHost/runtime_info.py\":\"6d46a44d0c8e8d3c1d757a22b4012a9919eb782bb8ea60577a1e229acfde91a2\",\"PythonPartsScripts/PythonHost/sandbox/__init__.py\":\"b895513c191ba9ea7a8748f3aef1c6c9d74875b990d8ef41e10faf3904e0e586\",\"PythonPartsScripts/PythonHost/sandbox/const.py\":\"168b93f376d54ddaf67ac62ffc5fb7e94570ab24e1f828d0732effa097e659d4\",\"PythonPartsScripts/PythonHost/sandbox/executor.py\":\"c06f9810291a1c9e6f3deb7939d4b6615905d15c6662a6e69d7973b3fcbf0f6a\",\"PythonPartsScripts/PythonHost/sandbox/validator.py\":\"5a4d3bf2bb6d2556512285a778083385c5c5049a398bc7a77cdaab9c5d8ddaec\",\"PythonPartsScripts/PythonHost/spatial_contracts.py\":\"40820192b5500782cab4fb3fe837244989283861c143079b245f8f2e223ee086\",\"PythonPartsScripts/PythonHost/StartPythonHost.py\":\"c3d5ee42531d2621e9d3055214ff8fc8fb25b29a1a9dc3790e3feb00ac609e51\",\"PythonPartsScripts/PythonHost/transport.py\":\"f9e5985567631346d84b612898f6cc306cc0d0729624053aab823ea1f14db9dd\",\"PythonPartsScripts/PythonHost/wall_filter.py\":\"dbc96f807153783837ce33dac114e866e1fb5993e490aa429889dce3fc333dee\",\"PythonPartsScripts/PythonHost/wall_layer.py\":\"42688d728c5c0bbc0d3700c9110b12988fc246f38b994929897d83f6ab2f399d\",\"PythonPartsScripts/PythonHost/wall_material.py\":\"fc40ca2009e27a5f6730373220e7d0bcb1b146f7841bbd306738a7158546401e\",\"PythonPartsScripts/PythonHost/wall_probe.py\":\"539cf24dfcf1e6e1355105f34a8fcbc32df6f42b143d02128c65f202a0cdb97b\"}},\"installed_bridge_integrity\":{\"status\":\"verified\",\"mismatches\":[]},\"compatibility\":{\"target_major\":\"2026\",\"major_matches\":true,\"runtime_verified\":false}},\"request_id\":\"f727b1e3-4cc0-4600-863f-bea05af12d37\",\"host_session_id\":\"ffb92cf1-fa28-4cbc-9d95-3dbcbd21528a\"}"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": "m1-context-probe-1",
+        "read_only": true,
+        "runtime_verified": false,
+        "project": {
+          "status": "observed",
+          "value": {
+            "name": "Kopia MCP_QA_DEMO",
+            "host": "DESKTOP-H6NH5R7",
+            "key": "7448128bfbd2aec31109fe19c3bbe8f3908fdaf6c66f77a35dfc9e1ba112714f",
+            "key_status": "observed",
+            "key_kind": "name_host_path_sha256",
+            "durable_identity_verified": false,
+            "path_lookup_attempts": [
+              {
+                "argument_order": "project_name_host_name",
+                "status": "observed",
+                "value": {
+                  "error": -1,
+                  "path": ""
+                }
+              },
+              {
+                "argument_order": "host_name_project_name",
+                "status": "observed",
+                "value": {
+                  "error": 0,
+                  "path": "D:\\Programy\\Allplan\\Data\\Prj\\Kopia MCP_QA_DEMO.prj"
+                }
+              }
+            ]
+          }
+        },
+        "document_id": {
+          "status": "observed",
+          "value": 0
+        },
+        "active_drawing_file": {
+          "status": "observed",
+          "value": 101
+        },
+        "loaded_drawing_files": {
+          "status": "observed",
+          "value": [
+            {
+              "number": 101,
+              "state": "active_foreground",
+              "name": {
+                "status": "observed",
+                "value": ""
+              },
+              "write_eligibility": "not_checked"
+            }
+          ]
+        },
+        "units": {
+          "canonical_length": "mm",
+          "canonical_angle": "deg",
+          "input_length": {
+            "status": "observed",
+            "value": 3
+          },
+          "input_angle": {
+            "status": "observed",
+            "value": 1
+          },
+          "input_unit_encoding": "Allplan 2026 LengthUnits/AngleUnits enum",
+          "geometry_conversion": "not_checked"
+        },
+        "project_offset": {
+          "status": "observed",
+          "value": {
+            "xyz": [
+              0,
+              0,
+              0
+            ],
+            "unit": "api_native",
+            "conversion_to_mm": "not_checked",
+            "application_to_model_coordinates": "not_checked"
+          }
+        },
+        "levels": {
+          "status": "not_checked",
+          "value": null
+        },
+        "capabilities": {
+          "context": "probe_only",
+          "model_query": "implemented_runtime_pending",
+          "reusable_selections": "session_bound_read_only_runtime_pending",
+          "geometry_query": "implemented_runtime_pending",
+          "native_hierarchy_query": "implemented_runtime_pending",
+          "demo_profile_binding": "implemented_read_only_runtime_pending",
+          "model_write": "not_supported_by_this_tool",
+          "model_properties": "blocked_after_native_crash",
+          "model_highlight": "ready_for_owner_test",
+          "native_UI_selection": "unsupported_by_current_interactor"
+        },
+        "coverage": {
+          "file_inventory": "loaded_only",
+          "unloaded_files": "not_enumerated",
+          "visibility": "API_selection_semantics_not_verified",
+          "native_component_counts": "not_checked"
+        },
+        "identity_sample": {
+          "requested": 0,
+          "items": [],
+          "coverage": "not_requested"
+        },
+        "runtime": {
+          "version": "2026.1",
+          "allplan_release": {
+            "Version": "2026.1",
+            "MainReleaseName": "2026",
+            "SubReleaseName": "2026.1",
+            "WindowsReleaseName": ""
+          },
+          "executable_versions": {
+            "status": "observed",
+            "file_version": "16.1617.8659.814",
+            "product_version": "2026.0.1.0",
+            "source": "running_process_executable"
+          },
+          "hotfix": {
+            "status": "not_checked",
+            "value": null
+          },
+          "embedded_python": {
+            "version": "3.13.13",
+            "implementation": "CPython"
+          },
+          "bridge_package": {
+            "version": "0.40.0",
+            "source_commit": "fca3da9820e684a41cd1c1e4300734a57e7bdbbb",
+            "integrity": "sha256-verified",
+            "bridge_files": {
+              "Library/PythonHost/StartPythonHost.pyp": "b1aba49ed554eeefa9e44f4e9a6f06992e74d4f2916277ef451de11d72167813",
+              "PythonPartsScripts/PythonHost/attribute_codecs.py": "3153abaa7873c7056b5d48ea3f31390b4d668fd8be6b463911b0b4ccef6accd8",
+              "PythonPartsScripts/PythonHost/attribute_evidence.py": "23c3d29d6d6fe3b80216cd250b30623dea0c10e271dce531fcd87cf491407ab0",
+              "PythonPartsScripts/PythonHost/audit_contracts.py": "155b10200982c879f3bd0226ea8f26c00e15118f8b5f3df532c7937ac3e8f035",
+              "PythonPartsScripts/PythonHost/column_layer.py": "a1476471d37d029d9447c96d40a3cebdb3acbe7d793885c416a51b14785b5c1b",
+              "PythonPartsScripts/PythonHost/component_ownership.py": "83d94247a8c8267b406378353f530dd04162d688689deb19f8d76b60bc4c7d52",
+              "PythonPartsScripts/PythonHost/identity_probe.py": "225500ad7150e4e8d62755fd5b20da382cfdbabb4731033c401333bc17a98d7a",
+              "PythonPartsScripts/PythonHost/journal_maintenance.py": "8e3baf465533a1d11ef71a6d9f7f3c8015fee2b4568bfcf9dc0c9bb6f48d8666",
+              "PythonPartsScripts/PythonHost/layer_names.py": "b62568c214ba91bd2eaec466f8c96a328b831a6579f6569cac01b00a1f030827",
+              "PythonPartsScripts/PythonHost/mark_numbering.py": "dc6f7b87ba26aed1db1b50c6925b35df9509fb8b841e17fdb9d6e791666b51f4",
+              "PythonPartsScripts/PythonHost/material_probe.py": "943df8fc7245160fee16cb5eba8b83c4dc00d9f8ab0ec9f2ba514e08cf93805c",
+              "PythonPartsScripts/PythonHost/model_audit.py": "50c74918d1b23d93f182ff01ea5859e0ea2b39ee54a70a13f0d8ee2346acbcd0",
+              "PythonPartsScripts/PythonHost/model_context.py": "8af4dfa1ac72523bb4b5fb4a068e5e202276118a95cf378d734082465e88d013",
+              "PythonPartsScripts/PythonHost/model_delete.py": "9617a83d02ee493fc1e13bc3857167f5a9a194c36a947361138c187f57765226",
+              "PythonPartsScripts/PythonHost/model_edit.py": "aae9432ae8d89bd9de2663b2aa97a866d7b9f454f8596234376ddeb4e6a7b4df",
+              "PythonPartsScripts/PythonHost/model_edit_contracts.py": "e71ea79fee07e777571e477acca28087a2cd9f375740cc1b2777799aac402129",
+              "PythonPartsScripts/PythonHost/model_metadata.py": "c1339766382fd52de47fb66e11d87106942b67cf5dc743088739473738802d4a",
+              "PythonPartsScripts/PythonHost/model_properties.py": "36cdee753aba383047d8c7213279edaf6fc4e385e24c7811aa8c482f695cef10",
+              "PythonPartsScripts/PythonHost/model_query.py": "4c900562694b600246523751ba1058dd717773d6d96a3edb1290d34e50d20abc",
+              "PythonPartsScripts/PythonHost/model_repair.py": "127f5add0cf1618203d593e5c3fc80c26d139abfd270a7368e1809c08b765db2",
+              "PythonPartsScripts/PythonHost/model_scope.py": "a80b72eda1ddac1563bdbdf73aafce9164c21304c82bfb72a2adb9e1f2c5f2b9",
+              "PythonPartsScripts/PythonHost/model_selection.py": "baf239dad4db5d98878cf6c41b32a4e3069f464d46674081bde048d5d3f3eb5a",
+              "PythonPartsScripts/PythonHost/native_model_edit.py": "09eac9db9b0cad01cded0611ec8be7210522ad3f81a8d2d45892457a8121087f",
+              "PythonPartsScripts/PythonHost/native_readers.py": "0db916ffe748795eeb6125161153f49ec4366acc7d01eeb11100c32f42b9b8f6",
+              "PythonPartsScripts/PythonHost/native_repairs.py": "961a62164349dc62b05a3f65f042c122ca179cf94a0bbd8619cbeb77d0b16117",
+              "PythonPartsScripts/PythonHost/profile_contracts.py": "bed1c0099c2dfdc5fc48374cd78c16ea1ea0a6df3309deb919322b060d7a46b6",
+              "PythonPartsScripts/PythonHost/property_contracts.py": "5fc1cf2b71b28b33c63168b47812335df90c83f5c8aa43923bf5cd6422c1e1cf",
+              "PythonPartsScripts/PythonHost/property_probe.py": "6aca438f0f1209a3509421b0ac08c3b93a7646d3057ddc0673813d13135869c4",
+              "PythonPartsScripts/PythonHost/PythonHostHandler.py": "dde16a2c73768ca9eb6d10d2c6c868615449895fb2dbb8338487e16d2e75df6b",
+              "PythonPartsScripts/PythonHost/query_contracts.py": "39d7a760d7d4ba017d54aa2059c4e9bf708df22b08ef0589ff8deae179ab8405",
+              "PythonPartsScripts/PythonHost/repair_contracts.py": "28c0536f12f79727879bd76d8608a95d8cf82307124e0e9fac5a04e33bdd143b",
+              "PythonPartsScripts/PythonHost/repair_execution.py": "40f3d70e4edd64efa39588194dbfdb22e5afcb33b8c390f64d39968758407999",
+              "PythonPartsScripts/PythonHost/runtime_info.py": "6d46a44d0c8e8d3c1d757a22b4012a9919eb782bb8ea60577a1e229acfde91a2",
+              "PythonPartsScripts/PythonHost/sandbox/__init__.py": "b895513c191ba9ea7a8748f3aef1c6c9d74875b990d8ef41e10faf3904e0e586",
+              "PythonPartsScripts/PythonHost/sandbox/const.py": "168b93f376d54ddaf67ac62ffc5fb7e94570ab24e1f828d0732effa097e659d4",
+              "PythonPartsScripts/PythonHost/sandbox/executor.py": "c06f9810291a1c9e6f3deb7939d4b6615905d15c6662a6e69d7973b3fcbf0f6a",
+              "PythonPartsScripts/PythonHost/sandbox/validator.py": "5a4d3bf2bb6d2556512285a778083385c5c5049a398bc7a77cdaab9c5d8ddaec",
+              "PythonPartsScripts/PythonHost/spatial_contracts.py": "40820192b5500782cab4fb3fe837244989283861c143079b245f8f2e223ee086",
+              "PythonPartsScripts/PythonHost/StartPythonHost.py": "c3d5ee42531d2621e9d3055214ff8fc8fb25b29a1a9dc3790e3feb00ac609e51",
+              "PythonPartsScripts/PythonHost/transport.py": "f9e5985567631346d84b612898f6cc306cc0d0729624053aab823ea1f14db9dd",
+              "PythonPartsScripts/PythonHost/wall_filter.py": "dbc96f807153783837ce33dac114e866e1fb5993e490aa429889dce3fc333dee",
+              "PythonPartsScripts/PythonHost/wall_layer.py": "42688d728c5c0bbc0d3700c9110b12988fc246f38b994929897d83f6ab2f399d",
+              "PythonPartsScripts/PythonHost/wall_material.py": "fc40ca2009e27a5f6730373220e7d0bcb1b146f7841bbd306738a7158546401e",
+              "PythonPartsScripts/PythonHost/wall_probe.py": "539cf24dfcf1e6e1355105f34a8fcbc32df6f42b143d02128c65f202a0cdb97b"
+            }
+          },
+          "installed_bridge_integrity": {
+            "status": "verified",
+            "mismatches": []
+          },
+          "compatibility": {
+            "target_major": "2026",
+            "major_matches": true,
+            "runtime_verified": false
+          }
+        },
+        "request_id": "f727b1e3-4cc0-4600-863f-bea05af12d37",
+        "host_session_id": "ffb92cf1-fa28-4cbc-9d95-3dbcbd21528a"
+      },
+      "isError": false
+    }
+  }
+}
