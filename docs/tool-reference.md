@@ -156,7 +156,7 @@ is required, with only its declared parameters:
 | element_attributes | drawing_file, model_uuid, view_uuid; optional name_contains, offset, limit: one exact foreground semantic component, paged ReadAll values and targeted name/ID roundtrip plus SDK scalar type metadata. |
 | component_identity | drawing_file, model_uuid, view_uuid: one exact direct foreground adapter, bounded full parent chain and direct children, and represented native Python type from GetElement; no attributes, geometry, metadata, UI or setters. |
 | attribute_evidence | drawing_file, model_uuid, view_uuid, 1–16 distinct observed attribute_ids, optional include_parent=false: complete model_identity scan, up to 16 exact-view wrappers, separate ancestry/children observations, native representation, requested ReadAll and ReadAllAndComputable values, and targeted runtime type metadata. Result is capped at 512 KiB. It never infers field owner or setter payload. |
-| material_comparison | drawing_file, model_uuid, view_uuid, explicit 1–16 distinct attribute_ids, optional include_parent=false: exact-view model_identity scan and per-wrapper ancestry/children, native class, ReadAll/ReadAllAndComputable, targeted attribute name↔ID/type metadata, plus getter-only native Material on runtime BeamElement/StructuralBeamElement or SlabElement owners. Candidate 0.41.0 adds optional exact MultiSlab parent_ref={model_uuid,view_uuid} to resolve a Slab direct child, including one absent from the scan. It retains per-wrapper conflicts; it does not infer a writable owner, redirect, or call setters. |
+| material_comparison | drawing_file, model_uuid, view_uuid, explicit 1–16 distinct attribute_ids, optional include_parent=false: exact-view model_identity scan and per-wrapper ancestry/children, native class, ReadAll/ReadAllAndComputable, targeted attribute name↔ID/type metadata, plus getter-only native Material on runtime BeamElement/StructuralBeamElement or SlabElement owners. Since 0.41.0, optional exact MultiSlab parent_ref={model_uuid,view_uuid} resolves a Slab direct child whose exact view may be absent from the scan. It retains per-wrapper conflicts; it does not infer a writable owner, redirect, or call setters. |
 | layer_name | layer_name or legacy layer_short_name: exact full/short name lookup with fresh ID/name round trips; requests catalog search when the SDK lacks full-name lookup. |
 | layer_catalog | layer_name, optional offset/limit (default/max 8192 IDs): read-only Allplan 2026 name search over bounded ID pages, with a 3-second soft page budget, continuation and user-confirmation candidates. |
 | wall_sample | drawing_file (required integer) and optional model_uuid: one foreground file and one exact native Wall root; reads tier count and, only for a single-tier Wall, tier 1 thickness and raw material. |
@@ -205,8 +205,9 @@ observed empty string remains an observed blank; an unavailable getter or
 owner is `not_checked`. Omitted ReadAll values do not prove absence, and equal
 attribute/native values do not prove coupled persistence. It has no setter,
 owner redirect, or changed write guard. The 0.40.0 native observations cover
-the two retained SkeletonBeams and MultiSlab, not the blocked Slab child or any
-write/persistence claim; see the [handoff](next-model-handoff.md).
+the two retained SkeletonBeams and MultiSlab. The separate 0.41.0 trial also
+read the exact Slab child and its immediate parent; neither result establishes
+writes or persistence. See [validation status](validation-status.md#latest-owner-observations).
 
 For example, the retained second SkeletonBeam can be compared with the
 standard Material ID 508 as a documented candidate. The returned metadata
@@ -217,7 +218,7 @@ binding or proof of stored attribute presence:
 {"phase":"material_comparison","drawing_file":101,"model_uuid":"8f13565b-abfc-4ce2-8b1d-7d133fe1a10d","view_uuid":"5f6e4603-6282-4ae0-9d02-ad089e73b859","attribute_ids":[508]}
 ```
 
-Candidate 0.41.0 accepts `parent_ref` only in `material_comparison`. It selects
+Version 0.41.0 accepts `parent_ref` only in `material_comparison`. It selects
 one exact MultiSlab model/view from the complete foreground scan and reads
 only its direct children to resolve the requested Slab model/view. Every parent
 wrapper must expose that exact child. The route is bounded to 16 parent and
@@ -228,15 +229,19 @@ wrappers, including direct-scan wrappers, contribute evidence; value conflicts
 remain visible. Different views on structural parent edges remain explicit
 and do not establish interchangeable property owners.
 
-For the retained blocked child, the next owner trial uses this request after
-CI and exact-ZIP installation. `include_parent=true` separately reads the
+The retained child trial completed with this request on 0.41.0.
+`include_parent=true` separately reads the
 child's actual immediate parent; it does not substitute that parent for the
 child. `identity_resolution` records the explicit enumeration parent, observed
 child-parent edges, inventory fingerprint and whether the child appeared in
 the direct scan. The returned `counts`/`coverage` still describe that direct
 scan; `source_fingerprint` also binds the child-resolution evidence. This new
-route has no native acceptance yet. Do not repeat the completed Beam/MultiSlab
-probes or any setter:
+route has a bounded getter-only PASS: child and separate parent both returned
+native Material `" "` and attribute 508 `"TEST1"`, with complete evidence and
+zero setters. The [preserved result](test-results/evidence/0.41.0-2026-10-27/02-slab-child.json)
+does not establish writable ownership or view equivalence. This is the
+completed request, not a pending owner trial; do not repeat it or the completed
+Beam/MultiSlab probes or any historical setter:
 
 ```json
 {"phase":"material_comparison","drawing_file":101,"model_uuid":"8a693925-ae20-4dda-91d1-3951af3c0a52","view_uuid":"a0fcd7b3-85c8-4f83-99b7-59e8a3463c94","attribute_ids":[508],"parent_ref":{"model_uuid":"bf097d95-8275-4229-ac74-27bbea26c211","view_uuid":"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9"},"include_parent":true}
@@ -252,13 +257,18 @@ representation across pages; it does not turn a structural inventory into
 field ownership, nor merge Slab/MultiSlab targets. See the
 [0.26.0 short trial](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/m4-single-drawing-0.26.0.pl.md).
 
-From 0.24.0, typed model-edit plans include slab ownership evidence. Slab
-children and all MultiSlab aggregate writes are blocked pending an explicit
-property-owner adapter; no automatic redirection or bounds-based merging is
-allowed. A standalone Slab binds its hierarchy into the plan, rechecks it
-before writing, and rejects changed/unavailable ownership at fresh readback
-or recovery. Old slab plans without ownership evidence cannot authorize new
-setters; exact-ID journal replay remains setter-free.
+Typed Slab/MultiSlab edits require field-specific ownership evidence. Attribute
+edits on aggregates or directly parented Slabs require explicit
+`target.property_owner="selected_element"` and complete lineage/children;
+organizational layer edits remain blocked for those target shapes. Native
+Material uses its separate selected `SlabProperties` contract, including a
+directly MultiSlab-owned Slab, as described in the
+[material API contract](m4-editing-api-0.32.0.md#request-and-native-property-owner).
+No route redirects an owner or merges targets by bounds. Plans recheck bound
+ownership before writing and at fresh readback/recovery. Old plans without
+the required field-specific evidence cannot authorize new setters; exact-ID
+journal replay remains setter-free. The diagnostic `parent_ref` is not an
+edit target or write authorization.
 
 For `wall_sample`, `drawing_file` is required and must identify one foreground
 file. Optional `model_uuid` must be canonical and nonzero; explicit null is

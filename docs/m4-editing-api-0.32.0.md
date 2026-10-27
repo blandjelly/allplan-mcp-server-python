@@ -85,15 +85,62 @@ values and limits are summarized in the [current handoff](next-model-handoff.md)
 and [validation status](validation-status.md#latest-owner-observations), with raw
 responses under [the preserved evidence directory](test-results/evidence/0.40.0-2026-10-27/). These observations do not establish that those wrappers were the
 write owners for earlier attribute Apply reports, shared storage, or persistence.
-The exact Slab child and writable owner remain unresolved.
+The [0.41.0 request and response](test-results/evidence/0.41.0-2026-10-27/02-slab-child.json)
+now separately read the exact Slab child and its actual immediate MultiSlab
+parent using explicit `parent_ref` and `include_parent=true`. Both return
+`SlabElement.Properties.Material` exactly `" "` and attribute 508 `"TEST1"` in
+both read modes; metadata confirms `Materiał` / SDK `String`. The preserved
+edge and separate parent read retain their exact model/view identities.
+The [trace](test-results/evidence/0.41.0-2026-10-27/03-trace.jsonl) completes
+without setters. This resolves the earlier `probe_scope_unavailable` for the
+retained exact request, without establishing its native cause, a writable
+owner, shared storage or persistence. The diagnostic route does not change
+query membership, write guards or setter resolution.
 
-The child request with explicit model/view and `include_parent=true` returned
-`probe_scope_unavailable`; the parent MultiSlab result was not a child read.
-This does not establish a native SelectAll omission or cause. Candidate 0.41.0
-adds exact-parent getter resolution only to `material_comparison`; its scope,
-bounds, trace rules and only authorized next owner request are in the
-[handoff](next-model-handoff.md). No scan/query/write guard changes, owner
-redirect or setter retry is implied.
+### Exact child edit targeting — proposed contract, not an available API
+
+The native-material adapter already accepts selected `SlabElement.Properties`
+with the direct Slab → MultiSlab lineage. It reattaches the properties and
+submits the existing object; the ordinary Slab attribute/layer owner guard is
+not the native-material path. There is no evidence here that another
+`SetMaterial` implementation or an attribute substitution fixes persistence.
+
+There is a separate targeting gap: `model_edit` preview accepts criteria and
+native types, chooses a view from the semantic scan, and binds that choice in
+the plan. It cannot request this exact child/parent view pair. Its Apply
+resolver enumerates SelectAllElements again and requires the reviewed view.
+In the 0.41.0 identity probe the requested child view was absent from the direct
+scan while another view was reported. This motivates explicit targeting; it
+does not prove the semantic scan loses the Slab model or explain the earlier
+failed native write. Before implementing a new path:
+
+1. Define an opt-in exact child and parent identity contract for a single
+   foreground drawing and native-material change. Keep criteria-based edits
+   unchanged; never silently expand their targets through child traversal.
+2. Bind child and parent drawing/model/type/view, the independently verified
+   immediate-parent edge, child inventory and selected property owner into
+   the reviewed plan and source fingerprint. A parent hint only locates the
+   child; it does not make the parent the mutation owner. Resolve every
+   matching wrapper within explicit count/time/trace budgets and retain the
+   native collections through their use.
+3. Repeat that identity/edge verification at preview, revalidation and fresh
+   pre-setter resolution. Missing, stale, conflicting or replaced views/parents,
+   changed inventory or owner disagreement must stop before setters. Preserve
+   complete peer/source revalidation, no-op handling, parent/child overlap
+   rejection, final write guards, journaling and exact-ID replay protection.
+4. Keep post-write readback and recovery read-only and bound to the reviewed
+   owner. A regenerated view can be observed under existing recovery rules;
+   it must never authorize a replacement setter or an automatic retry. Value
+   disagreement or preservation drift retains the unknown outcome.
+5. Cover direct-scan exact-view absence, a different reported view, duplicate
+   wrappers, lifetime, child/parent drift, conflicts, budgets and zero setters
+   for stale/no-op/replay paths with focused checks. Only then prepare the
+   required CI/ZIP candidate and a justified isolated exact-owner native trial
+   with preview, readback/UI, preservation and Undo/restoration evidence.
+
+This is a proposed targeting extension. Neither implementing it nor a getter
+PASS would establish material persistence; retain existing unknown outcomes
+and do not replay historical Slab setters as a diagnostic experiment.
 
 Current closure work is in [plan items 1–3](office-editing-development-plan.pl.md#dowody-potrzebne-do-zamknięcia-punktów-15).
 
