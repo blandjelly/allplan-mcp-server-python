@@ -1,43 +1,60 @@
 # Current M4 handoff
 
-## Next task — verify candidate 0.42.1, then run one native trial
+## Next task — diagnose exact Slab inventory conflict; retain recovery lock
 
-Complete required CI/package production and exact-ZIP verification for 0.42.1.
-Then on a disposable fixture create a fresh preview (the prior plan expired),
-review/highlight the exact target, and perform one trial with Apply, fresh
-readback, preservation and Undo/restoration. See [plan items 1–3](office-editing-development-plan.pl.md#pozostałe-prace-i-nierozwiązane-błędy).
+Analyze the exact-target inventory comparison on the fresh execution resolver
+against the retained 0.42.1 evidence before another native write. Determine
+which inventory/parent-edge evidence differs; the error alone does not prove
+actual model drift. Preserve exact view/owner binding, budgets, journals and
+unknown outcomes. Execution `a8a31c72975541feb1c36a2e8cbb8f65` remains unknown
+and blocks writes; recovery must stay read-only under that ID. Do not retry
+Apply, delete its journal or acknowledge a reconciliation without reviewed
+supporting evidence. Closure requires a diagnosed cause and focused regression
+coverage; a further native trial is justified only by a changed flow and after
+resolving the existing outcome. See [plan items 1–2](office-editing-development-plan.pl.md#pozostałe-prace-i-nierozwiązane-błędy).
 
-**Latest candidate 0.42.1:** on `codex/m4-fix-exact-slab-042`, based on
-`develop/m4` `58512959` (PR #48 merged; installed source `3cd243f`). Native-
-material-only previews now report `criteria.native_material_ownership` from
-the selected native state instead of running the unrelated generic multi-view
-component ownership comparison. Attribute/layer ownership guards and exact
-target, material, preservation, setter, readback and recovery safeguards are
-unchanged. **161 unique focused checks PASS** including version consistency:
-154 non-HTTP checks and 7 HTTP checks. The initial HTTP attempt was blocked by
-sandbox socket creation; the network-enabled rerun passed all 7. This is not
-full CI.
+## Latest version and native evidence
 
+**0.42.1**, source `eecdfeb818407962cf4e853a912cf3c652da8345`, is merged
+as [PR #49](https://github.com/blandjelly/allplan-mcp-server-python/pull/49)
+into `develop/m4` (`29c7f487`). The owner confirmed CI and ZIP passed in this
+chat; these are owner-reported results, without a CI run/ZIP identity in the
+new JSON or independent upgrade/restore verification. Earlier **161 focused
+checks PASS** remain separate from CI and native acceptance. This update
+changes documentation/evidence only, with no new package or runtime tests.
+
+[Raw 0.42.1 evidence](test-results/evidence/0.42.1-2026-10-27/allplan-0421-native-test-evidence.json)
+is retained unchanged (steps 0–14). Health binds the installed bridge to the
+source above, integrity verified with no mismatches, on Allplan 2026.1.
+In drawing 101 the exact Slab child/parent preview observes Material `" "`
+against requested `C35/45`, one eligible change, and observed
+`native_material_ownership` (`SlabElement`, `slab_properties`). Both highlights
+submit one child model identity/adapter; UI visibility remains unverified.
 The [exact-target contract](m4-editing-api-0.32.0.md#exact-child-native-material-target-0420)
-limits the opt-in to one Slab child and its exact MultiSlab parent in one
-foreground drawing, with no predicate, attributes or exclusions. It binds the
-exact target and inventory through preview, revalidation, final setter and
-readback/recovery; highlight targets the child, never its parent. Regenerated
-or missing views stay unknown, without replacement-view fallback.
+and its exact view/inventory safeguards remain in force.
 
-The supplied Allplan evidence contains only health, context and preview. The
-installed 0.42.0 bridge reports source `3cd243f`, verified integrity, and
-Allplan 2026.1 (executable 16.1617.8659.814). Its preview matched the exact
-Slab child, observed current Material `" "` against requested `C35/45`, and
-reported `usable_for_write=true`; `setter_calls_started=0`. The agent stopped
-before highlight. The old `criteria.component_ownership` result was an
-aggregate ancillary conflict. Supplied evidence has no per-view observations
-to establish its cause; a distinct-view fixture reproduced the report, but
-this does not establish native owner conflict or failed write. Raw evidence is
-preserved [unchanged here](test-results/evidence/0.42.0-2026-10-27/allplan-042-native-test-evidence.json).
-This does not establish native acceptance or exact ZIP verification.
+The first Apply (`33abafa85e3549e68c885bade046d336`) is rejected with
+`repair_recovery_required`. Inspection finds an older Wall execution
+`3f2a8c9d7b5e4a1c9f8e6d3c2b1a0e9f`; its read-only recovery observes Material
+`TEST` with preservation drift. A subsequent acknowledged reconciliation
+records `reviewed_material_preservation_conflict`, `preservation_verified=false`,
+`stopped/reconciled`, and clears that blocker. This is no applied/preservation
+PASS for the Wall. The log also retains an automatic-review rejection of an
+initial recovery request; the later recovery results are recorded separately.
 
-Do not repeat the completed 0.41 getter or historical setters.
+After fresh preview/highlight, Apply `a8a31c72975541feb1c36a2e8cbb8f65`
+returns `stopped`, outcome `unknown`, `repair_conflict` at `fresh_resolve`:
+**"Exact child inventory or parent edge changed."** Target preflight had
+agreed material reads on both live views and the reviewed view present;
+that does not establish that the later exact inventory matches. Read-only
+recovery repeats the conflict at `recovery_resolve`, with
+`write_blocked=true`, `recovery_required`. No successful Slab write/readback,
+preservation, UI acceptance or Undo/restoration is established. Do not infer
+setter success or absence from this unknown outcome. No further retry is due.
+
+The earlier [0.42.0 preview-only evidence](test-results/evidence/0.42.0-2026-10-27/allplan-042-native-test-evidence.json)
+and the completed 0.41 getter remain valid in their original scopes; do not
+repeat their historical setters/getters to recreate evidence.
 
 ## Previous candidate and native evidence
 
