@@ -5,7 +5,7 @@ audits and reviewed edits. M4 development uses
 [`develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/tree/develop/m4);
 main integration is separate.
 
-Latest tested version: **0.39.0**, merged into `develop/m4` through
+Latest tested baseline: **0.39.0**, merged into `develop/m4` through
 [PR #42](https://github.com/blandjelly/allplan-mcp-server-python/pull/42).
 The owner reports native-material PASS for the Wall, Wall with door/window
 and Column; Beam discovery and Slab native-material persistence remain open.
@@ -17,6 +17,14 @@ The most recently package-verified candidate remains **0.32.0**. Use the
 task, and the
 [development plan](docs/office-editing-development-plan.pl.md) for remaining
 work and unresolved errors. M4 remains partially accepted.
+
+Candidate **0.40.0** adds a bounded getter-only comparison of native Material
+and explicitly requested attributes for Beam/SkeletonBeam and Slab/MultiSlab.
+Focused checks: **92 unit + 6 MCP/HTTP PASS**. Full CI, exact ZIP verification
+and native acceptance are pending.
+The 2026-10-27 [read-only Allplan comparison](docs/test-results/evidence/0.39.0-2026-10-27/allplan-comparison-log.md)
+found the two SkeletonBeams and the MultiSlab/Slab lineage but did not read
+native Material or establish writable owners.
 
 ## Documentation
 

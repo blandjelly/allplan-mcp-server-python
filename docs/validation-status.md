@@ -5,11 +5,58 @@ Remaining development and unresolved errors:
 [development plan](office-editing-development-plan.pl.md).
 Version **0.39.0** is merged into develop/m4 through
 [PR #42](https://github.com/blandjelly/allplan-mcp-server-python/pull/42).
-Recorded focused checks remain 198 distinct PASS; the new owner evidence
-does not establish full CI, exact ZIP or upgrade/restore. Current native API
+Candidate **0.40.0** adds a getter-only material comparison. Its focused checks
+are **92 unit + 6 MCP/HTTP PASS** on Linux/Python 3.12.14, including version
+consistency. The 0.39.0 native observations below remain separate; full CI,
+exact ZIP, upgrade/restore and new native acceptance are pending. Current native API
 and recovery contracts are in [API evidence](m4-editing-api-0.32.0.md).
 
+## Delivery and CI evidence
+
+Historical GitHub checks for the final 0.39.0 PR head
+`959280e807099a04cf63f5e47d85b7e4ecd05c55` confirm successful
+[Windows/Ubuntu Python 3.12 jobs, package production and ci-required](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40383968336).
+Only four documentation files differ from runtime/test source `811a1bde`.
+The earlier draft run skipped product jobs; it is not the final validation.
+This establishes baseline CI and package production, but no exact-ZIP
+installation/upgrade/restore or attribution of the owner's installed package.
+It does not validate candidate 0.40.0. Branch-protection inspection returned
+`403 Resource not accessible by integration`; whether `ci-required` is
+configured as required on `develop/m4` remains unconfirmed.
+
 ## Latest owner observations
+
+**2026-10-27, bounded Allplan comparison:** the owner reports an archived M4
+trace and a read-only comparison in active drawing 101/document 0. Its query
+covered 26 model identities, with zero conflicting model identities and zero
+duplicate representations; unloaded files and screen occlusion were not
+checked. The [comparison log](test-results/evidence/0.39.0-2026-10-27/allplan-comparison-log.md)
+is preserved unchanged. SkeletonBeam 1 is top-level in the query, but its query
+view `d9f3d9b1-a005-4789-b929-c39b291d1cd0` differs from the parent view
+`efb18c61-fab3-42f4-b79b-9f41d05da940` on its ownership edge. SkeletonBeam 2
+is top-level with a complete `SkeletonAxis` lineage. Both have runtime class
+`StructuralBeamElement`; the writable property owner was not established.
+MultiSlab has runtime class `SlabElement` and complete lineage including its
+Slab child. The child’s exact component probe did not resolve one complete
+semantic component. Native Material was not read for any target. Project
+attribute name search found no `material` match on SkeletonBeam 2 or MultiSlab;
+this does not establish absence because ReadAll omissions are unknown. No
+attribute ID/type/value was resolved as a complete set. Preserve the earlier
+owner-reported attribute PASS without treating this comparison as a reversal.
+
+| Target | Exact identity/evidence | Remaining interpretation |
+| --- | --- | --- |
+| SkeletonBeam 1 | Model `2dfa6117-d481-4588-8647-d24049d61d29`; query view `d9f3d9b1-a005-4789-b929-c39b291d1cd0`; query says top-level; native `StructuralBeamElement`. | Parent-edge view differs (`efb18c61-fab3-42f4-b79b-9f41d05da940`). Owner and native Material unread. Earlier attribute read was blocked by ambiguous root representations. |
+| SkeletonBeam 2 | Model `8f13565b-abfc-4ce2-8b1d-7d133fe1a10d`; view `5f6e4603-6282-4ae0-9d02-ad089e73b859`; query says top-level; complete lineage includes `SkeletonAxis`; native `StructuralBeamElement`. | Owner and native Material unread. Complete name search found no `material` match, but ReadAll omission coverage is unknown. |
+| MultiSlab | Model `bf097d95-8275-4229-ac74-27bbea26c211`; view `b4a59b5b-c0ae-4c1e-9d59-df5761390eb9`; query says top-level; complete lineage includes Slab; native `SlabElement`. | Owner and native Material unread. No complete material attribute binding was resolved. |
+| Slab child | Model `8a693925-ae20-4dda-91d1-3951af3c0a52`; view `a0fcd7b3-85c8-4f83-99b7-59e8a3463c94`; query reports under MultiSlab. | Exact component probe did not resolve one complete semantic component; no separate class, owner, Material or attribute result. |
+
+This comparison narrows the next read but establishes neither a Beam
+discovery root cause nor Slab persistence/ownership. Its missing native Material
+read is a probe-scope gap, not evidence of a blank value. The new getter-only
+`material_comparison` probe phase is documented in the [tool reference](tool-reference.md#model_property_probe--isolated-read-phases);
+candidate implementation and focused checks do not establish Allplan
+acceptance, CI, exact ZIP, upgrade/restore or a changed write route.
 
 **2026-10-26, version 0.39.0 (owner attribution):** the owner reports PASS for
 native material on the Wall, Wall with door/window and Column, and failure
@@ -79,6 +126,41 @@ exact installed manifest/build and do not establish exact-ZIP acceptance.
 
 Do not repeat these accepted scopes or generalize them to other family/type
 pairs. Missing fixtures and blocked paths are separate from PASS.
+
+### Declared family and owner evidence for layer and delete
+
+Property metadata discovery declares six families (`Column`, `Wall`, `Beam`,
+`SkeletonBeam`, `Slab`, `MultiSlab`); model-edit plans declare those six plus
+`WindowDoor`. Deletion allows top-level roots from that edit list and also a
+`WindowDoor` directly owned by a Wall. Generic layer mutation is exposed for
+declared edit types, while Wall has a separate tier-aware `set_wall_layer`
+route. Slab/MultiSlab layer writes remain subject to explicit ownership
+checks. These code declarations describe available routes and guards, not
+native acceptance. The retained evidence is scoped as follows.
+
+| Operation / declared owner | Retained native evidence | Missing evidence or scope limit |
+| --- | --- | --- |
+| Layer, Column | 0.30.0 no-op is specifically reported for Column/W1. | Exact refs and raw preview/revalidation showing zero setters and no Apply are absent. No changed Column layer write/Undo trial is identified. |
+| Layer, Wall | A 20 cm Wall was reported moved to `Ogólne03` (ID 3702) in 0.27.0; no raw request or restoration result is retained. W1 generic read/write report does not identify this Wall. | Exact identity, fresh owner-bound readback/Undo and restoration are absent; no proof for tier-aware `set_wall_layer` route. |
+| Layer, “Beam” report (type unknown) | 0.27.0 reports two elements described generically as “belki” moved to W1 with readback; their adapter type is not recorded. | Do not attribute this to `Beam_TypeUUID` without exact type evidence. Exact refs, owner, Undo and restoration are absent. |
+| Layer, SkeletonBeam | No SkeletonBeam-specific W1/layer trial is identified. | Pair-specific trial, readback, Undo and restoration are missing; the generic “belki” report does not prove this family. |
+| Layer, Slab | No Slab-specific layer trial is identified. | For a standalone root, fixture availability is not established and pair-specific trial/Undo are missing. A parented Slab child is blocked by the current owner contract for layer writes. |
+| Layer, MultiSlab | No MultiSlab-specific layer trial is identified. | Aggregate layer writes are blocked by the current owner contract; no trial or group behavior is established. |
+| Layer, WindowDoor | The generic edit family list declares `WindowDoor_TypeUUID`; no opening-specific layer trial is identified. | Fixture availability, exact target, readback and Undo/restoration are not established. |
+| Layer, family not identified | Owner reports W1 reads/writes and one UI Undo per changed element. No raw requests, exact targets or family bindings are retained. | Keep separate from every family-specific row; do not treat it as family-specific PASS. Pair-level payload and restoration reads are missing. |
+| Delete, Column root | Three W1 Columns were deleted with fresh absence readback; owner reported one UI Undo restored all three. This is the accepted grouped Column scope. | Exact refs and fresh post-Undo restoration read are absent; do not extend to another family/subtree. |
+| Delete, Wall root/subtree | 0.27.0 reports deletion of one 240 mm Wall and a fresh native read confirming the Wall and five descendants absent. | Undo/restoration, exact dependency inventory and neighbor preservation were not reported. This does not establish a trial of `WindowDoor` alone. |
+| Delete, Beam root | No Beam-root delete trial is identified. The generic “belki” W1 report does not establish a native Beam adapter or a disposable delete target. | Fixture availability is not established; exact refs, absence readback, neighbor preservation and Undo/restoration are missing. |
+| Delete, SkeletonBeam root | Two SkeletonBeams were present in the 2026-10-27 comparison, but no delete trial is identified. | A disposable test fixture is not established; exact refs, absence readback, neighbor preservation and Undo/restoration are missing. |
+| Delete, Slab root | No Slab-root delete trial is identified; the observed Slab was a MultiSlab child. | Standalone Slab fixture availability is not established by the bounded comparison; no root deletion, absence readback or Undo/restoration evidence. |
+| Delete, parented Slab child | This combination is blocked by the owner contract: deletion permits a top-level component root or a directly Wall-owned `WindowDoor`, not a child Slab. | Do not classify the absent child trial as a missing fixture or request an owner trial for this forbidden target shape. |
+| Delete, MultiSlab root | A MultiSlab was present in the 2026-10-27 comparison, but no delete trial is identified. | A disposable test fixture is not established; no subtree absence, neighbor-preservation or Undo/restoration evidence. |
+| Delete, WindowDoor root/opening | Code permits a top-level `WindowDoor` root or a directly Wall-owned opening with complete subtree evidence; no separate opening deletion result is identified. | Fixture availability is not established; no exact opening refs, absence readback or Undo/restoration evidence. |
+
+Evidence sources: [0.27.0 observations](test-results/evidence/allplan-chat-log-0.27.0-2026-10-23.md), [0.29.0 Column deletion](test-results/evidence/allplan-test-log-0.29.0-2026-10-23.md), and [0.30.0 typed trials](test-results/evidence/0.30.0-2026-10-23/allplan-attribute-trials-log.md). The current declaration is in [ModelEditPreview](../src/allplan_mcp/model_edit_models.py) and [model_delete](../python_host/PythonPartsScripts/PythonHost/model_delete.py).
+
+The evidence and closure criteria for the missing pairs remain in [development
+plan priorities 4–5](office-editing-development-plan.pl.md#dowody-potrzebne-do-zamknięcia-punktów-15).
 
 ## Evidence for unresolved cases
 

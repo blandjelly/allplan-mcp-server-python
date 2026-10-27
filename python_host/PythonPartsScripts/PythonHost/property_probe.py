@@ -348,7 +348,7 @@ class PropertyProbeService:
         elif phase == "drawing_identity":
             from .identity_probe import probe_drawing_identity
             result.update(probe_drawing_identity(self.queries, doc, base, settings, request, trace, budget))
-        elif phase == "attribute_evidence":
+        elif phase in ("attribute_evidence", "material_comparison"):
             from .attribute_evidence import probe_attribute_evidence
             result.update(probe_attribute_evidence(self.queries, doc, base, settings, request, trace, budget))
         elif phase == "column_sample":

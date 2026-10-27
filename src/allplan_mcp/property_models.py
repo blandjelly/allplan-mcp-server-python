@@ -105,6 +105,10 @@ class AttributeEvidenceProbeInput(ComponentIdentityProbeInput):
         return self
 
 
+class MaterialComparisonProbeInput(AttributeEvidenceProbeInput):
+    phase: Literal["material_comparison"]
+
+
 class LayerNameProbeInput(ContractModel):
     phase: Literal["layer_name"]
     layer_short_name: str | None = Field(default=None, min_length=1, max_length=16)
@@ -131,4 +135,4 @@ class LayerCatalogProbeInput(ContractModel):
         return self
 
 
-PropertyProbeRequest = Annotated[ColumnProbeInput | WallProbeInput | AttributeNameProbeInput | AttributeDefinitionProbeInput | ElementAttributesProbeInput | ComponentIdentityProbeInput | DrawingIdentityProbeInput | AttributeEvidenceProbeInput | LayerNameProbeInput | LayerCatalogProbeInput, Field(discriminator="phase")]
+PropertyProbeRequest = Annotated[ColumnProbeInput | WallProbeInput | AttributeNameProbeInput | AttributeDefinitionProbeInput | ElementAttributesProbeInput | ComponentIdentityProbeInput | DrawingIdentityProbeInput | AttributeEvidenceProbeInput | MaterialComparisonProbeInput | LayerNameProbeInput | LayerCatalogProbeInput, Field(discriminator="phase")]

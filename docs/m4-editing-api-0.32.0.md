@@ -81,6 +81,32 @@ and retain unknown journal outcomes. Never silently substitute an attribute
 write for a requested native-material change. Current closure work is in
 [plan items 1–3](office-editing-development-plan.pl.md#dowody-potrzebne-do-zamknięcia-punktów-15).
 
+The read-only comparison of 2026-10-27 is preserved in the
+[comparison log](test-results/evidence/0.39.0-2026-10-27/allplan-comparison-log.md).
+It identifies two SkeletonBeams as `StructuralBeamElement` and the
+MultiSlab as `SlabElement`, but does not read native Material or establish the
+writable property owner. SkeletonBeam 1's query view differs from the parent
+view reported by the ownership edge. SkeletonBeam 2 has a complete lineage
+with a `SkeletonAxis`; the MultiSlab lineage includes its Slab child. The
+separate Slab child probe did not resolve one complete semantic component.
+These findings localize the next read and leave query/view interpretation,
+child resolution and persistence open.
+
+Candidate 0.40.0 adds the bounded getter-only `material_comparison` phase to
+`model_property_probe`. On the exact drawing/model/view and up to 16 explicit
+attribute IDs, it reports ancestry/children, native class, stored and
+computable attribute values with name↔ID/type metadata, and per-wrapper native
+Material. Runtime dispatch is limited to Beam/SkeletonBeam represented by
+`BeamElement` or `StructuralBeamElement`, and Slab/MultiSlab represented by
+`SlabElement`. The StructuralBeam accessor differs from ordinary Beam.
+Per-wrapper conflicts remain visible; the probe does not redirect targets or
+call setters. A blank Material is an observed blank, while unavailable reads
+remain `not_checked`. Missing attribute rows do not prove absence, and equal
+attribute/native values do not prove coupled storage. Runtime class/property
+access establishes a readable representation only; it does not establish a
+writable owner or persistence. This candidate has no CI, exact-package or new
+Allplan acceptance yet.
+
 ## Request and native property owner
 
 The public request remains
