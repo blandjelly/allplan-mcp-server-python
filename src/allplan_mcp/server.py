@@ -439,6 +439,14 @@ def model_property_probe(request: PropertyProbeRequest) -> dict[str, Any]:
     JSON representations and runtime types stay separate; unknown objects are never
     coerced. Ancestry and child-read failures are independent observations. This
     diagnoses Slab/MultiSlab and date/vector blockers without enabling setters.
+    material_comparison uses the same exact identity and explicit attribute_ids
+    contract to compare native Beam/SkeletonBeam or Slab/MultiSlab Material with
+    those attributes. It reads only the runtime class's documented property
+    accessor and Material, plus attribute name/ID roundtrip and type. Per-wrapper
+    failures and conflicts remain visible; blank native strings stay blank.
+    Optional parent reads never redirect the target or establish a writable
+    owner. Equal values do not prove storage coupling. No setter is inspected
+    or invoked, and all existing write eligibility rules remain in force.
     drawing_identity explicitly inventories direct model/view identities in one
     foreground drawing, including children and unsupported families. It returns
     at most 32 views per page (offset/limit), with per-view hierarchy/native-type

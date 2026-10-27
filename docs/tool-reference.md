@@ -156,6 +156,7 @@ is required, with only its declared parameters:
 | element_attributes | drawing_file, model_uuid, view_uuid; optional name_contains, offset, limit: one exact foreground semantic component, paged ReadAll values and targeted name/ID roundtrip plus SDK scalar type metadata. |
 | component_identity | drawing_file, model_uuid, view_uuid: one exact direct foreground adapter, bounded full parent chain and direct children, and represented native Python type from GetElement; no attributes, geometry, metadata, UI or setters. |
 | attribute_evidence | drawing_file, model_uuid, view_uuid, 1–16 distinct observed attribute_ids, optional include_parent=false: complete model_identity scan, up to 16 exact-view wrappers, separate ancestry/children observations, native representation, requested ReadAll and ReadAllAndComputable values, and targeted runtime type metadata. Result is capped at 512 KiB. It never infers field owner or setter payload. |
+| material_comparison (candidate 0.40.0) | drawing_file, model_uuid, view_uuid, explicit 1–16 distinct attribute_ids, optional include_parent=false: exact-view model_identity scan and per-wrapper ancestry/children, native class, ReadAll/ReadAllAndComputable, targeted attribute name↔ID/type metadata, plus getter-only native Material on runtime BeamElement/StructuralBeamElement or SlabElement owners. It retains per-wrapper conflicts; it does not infer a writable owner, redirect, or call setters. |
 | layer_name | layer_name or legacy layer_short_name: exact full/short name lookup with fresh ID/name round trips; requests catalog search when the SDK lacks full-name lookup. |
 | layer_catalog | layer_name, optional offset/limit (default/max 8192 IDs): read-only Allplan 2026 name search over bounded ID pages, with a 3-second soft page budget, continuation and user-confirmation candidates. |
 | wall_sample | drawing_file (required integer) and optional model_uuid: one foreground file and one exact native Wall root; reads tier count and, only for a single-tier Wall, tier 1 thickness and raw material. |
@@ -193,6 +194,31 @@ reads are complete; `state=observed` requires that complete result. Partial
 evidence returns `state=not_checked` while retaining collected data. Even a
 complete result is evidence only: it does not
 establish field ownership or a writable setter. No writes are started.
+
+Candidate 0.40.0 adds `material_comparison` as an explicit, bounded
+read-only phase. It uses the same exact identity scope and attribute evidence,
+and reads native Material only for runtime `BeamElement.Properties`,
+`StructuralBeamElement.StructuralBeamProperties`, or `SlabElement.Properties`
+on the allowlisted Beam, SkeletonBeam, Slab and MultiSlab adapter types. It
+retains each wrapper's result and conflicts instead of collapsing views. An
+observed empty string remains an observed blank; an unavailable getter or
+owner is `not_checked`. Omitted ReadAll values do not prove absence, and equal
+attribute/native values do not prove coupled persistence. It has no setter,
+owner redirect, or changed write guard. This candidate phase has not received
+Allplan acceptance, CI or exact-package verification; see the [handoff](next-model-handoff.md).
+
+For example, the retained second SkeletonBeam can be compared with the
+standard Material ID 508 as a documented candidate. The returned metadata
+must establish its actual project name/ID/type; this request is not a write
+binding or proof of stored attribute presence:
+
+```json
+{"phase":"material_comparison","drawing_file":101,"model_uuid":"8f13565b-abfc-4ce2-8b1d-7d133fe1a10d","view_uuid":"5f6e4603-6282-4ae0-9d02-ad089e73b859","attribute_ids":[508]}
+```
+
+Use the exact child model/view with `include_parent=true` to observe a Slab
+and its immediate MultiSlab separately. Reads are sequential, not an atomic
+snapshot; preserve the report and trace before another phase.
 
 Candidate 0.26.0 adds `drawing_identity` for a bounded inventory of one
 foreground drawing. This inventories model/view identity, lineage, and native

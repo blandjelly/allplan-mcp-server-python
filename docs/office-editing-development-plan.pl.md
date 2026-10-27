@@ -26,8 +26,8 @@ Wieloplikowość i cały projekt wymagają osobnego projektu oraz odbioru.
 
 | Priorytet | Co pozostało / warunek dalszej pracy |
 | --- | --- |
-| 1 — dostawa i recovery: częściowo potwierdzone | 0.39.0 jest scalone; owner zgłasza uzgodnienie bieżących Wall/Column/Slab i PASS wartości Wall/Wall z otworem/Column. Log nie zawiera ID ani pełnego journalu, CI i dowodu exact ZIP/upgrade/restore. Pozostało ustalić rzeczywiście nierozliczone rekordy i zachować unknown/preservation; nie powtarzać odebranych zapisów. |
-| 2 — Beam i Slab/MultiSlab native material: otwarte | Beam/SkeletonBeam query zwróciło 0 przy dwóch konfliktach reprezentacji, choć później attribute query znalazło dwie SkeletonBeam. Slab po próbach nadal ma pusty natywny materiał. Rozdzielić błąd discovery/pokrycia od braku persistence i właściciela Slab. SDK udostępnia Material dla obu rodzin; brak pola w ogólnej palecie nie dowodzi braku obsługi. [Porównanie API](m4-editing-api-0.32.0.md#native-material-material-attribute-and-surface). |
+| 1 — dostawa i recovery: częściowo potwierdzone | 0.39.0 jest scalone; owner zgłasza uzgodnienie bieżących Wall/Column/Slab i PASS wartości Wall/Wall z otworem/Column. Końcowe CI Windows/Ubuntu 3.12, build i `ci-required` dla 0.39.0 są potwierdzone w [statusie dostawy](validation-status.md#delivery-and-ci-evidence). Brak powiązania instalacji z exact ZIP/upgrade/restore oraz pełnego journalu z ID. Pozostało ustalić rzeczywiście nierozliczone rekordy i zachować unknown/preservation; nie powtarzać odebranych zapisów. |
+| 2 — natywny materiał Beam/Slab/MultiSlab: otwarte | Wcześniejsze zapytanie o materiał natywny nie znalazło belek i zgłosiło dwa konflikty reprezentacji. Odczytowe porównanie z 2026-10-27 później znalazło obie SkeletonBeam i MultiSlab, ale ujawniło rozbieżność view dla pierwszej belki: zapytanie i krawędź do rodzica wskazują różne UUID. Klasy runtime to `StructuralBeamElement`/`SlabElement`; w tym porównaniu nie odczytano materiału natywnego ani nie ustalono właściciela zapisu. Wcześniejsza próba zapisu dla Slab zakończyła się pustym odczytem materiału natywnego; właściciel pozostał nieustalony. Próba identyfikacji dziecka Slab nie zwróciła kompletnego komponentu semantycznego. Kandydat dodaje fazę odczytu wyłącznie przez gettery, by uzyskać brakujące porównanie; nie potwierdza trwałości zapisu ani nie zezwala na modyfikacje. Zachować dokładne referencje, konflikty dla każdego wrappera i wartości puste. [Porównanie API](m4-editing-api-0.32.0.md#native-material-material-attribute-and-surface). |
 | 3 — atrybuty Slab/MultiSlab: zgłoszony PASS wartości | Log 0.39.0 potwierdza raportowaną wartość atrybutu na MultiSlab i jego Slab; brak surowych payloadów z ID/typem/ref/owner i readbackiem. Zachować `target.property_owner="selected_element"`, pełne lineage/children i blokadę overlap, bez redirectu. Nie traktować sukcesu atrybutu jako sukcesu materiału natywnego. |
 | 4 — warstwa i no-op: częściowo odebrane | Zachować W1 read/write, pojedyncze Undo i zgłoszony no-op w ich dotychczasowym zakresie. Pozostałe pary rodzina/właściciel oraz grupowe Undo wymagają dowodu; poniżej kryteria zamknięcia. No-op nie ma drogi Apply. |
 | 5 — delete i selekcja: częściowo odebrane / brak funkcji | Zachować grouped Column delete/Undo i obserwację Wall subtree. Inne deklarowane rodziny/poddrzewa wymagają dowodu. [Analiza API selekcji](m4-native-selection-api.md) rozdziela programowe set/clear/readback od interactive pick i preselekcji. Brak potwierdzonego kompletnego kontraktu; native selection nadal unsupported, highlight nie zamyka selekcji. |
@@ -38,22 +38,31 @@ Wieloplikowość i cały projekt wymagają osobnego projektu oraz odbioru.
 Punkty odnoszą się do pojedynczego aktywnego rysunku i istniejącego limitu
 1–32 zmian. Podsumowanie nowego logu jest w [statusie walidacji](validation-status.md#latest-owner-observations),
 a [pełny załącznik](test-results/evidence/0.39.0-2026-10-26/allplan-conversation-log.md)
-został umieszczony w repozytorium bez zmian, za wyraźną zgodą właściciela.
+oraz [porównanie 2026-10-27](test-results/evidence/0.39.0-2026-10-27/allplan-comparison-log.md)
+zostały umieszczone w repozytorium bez zmian, za zgodą właściciela.
 Zachować zgłoszone PASS, uzupełniać wyłącznie brakujący dowód lub zmieniony
 przepływ; nie powtarzać zakończonych Apply dla samego odtworzenia logu.
 
 1. **Dostawa i recovery:** powiązać instalację 0.39.0 z konkretnym source,
-   wymaganym wynikiem CI, dokładnym ZIP/manifestem i buildem Allplana oraz
+   potwierdzonym CI dla końcowego head PR, dokładnym ZIP/manifestem i buildem Allplana oraz
    wymaganym upgrade/restore. Odczytać bieżący `inspect_journal`; dla każdego
    nadal unknown zachować ID, pierwotny wynik, materiał/owner, zmienione sekcje
    i wynik read-only recovery/reconciliation. Zamknięcie: znany stan wszystkich
    blokujących rekordów bieżącego workflow i rozliczone bramki dostawy.
    Reconciliation nie zmienia unknown w applied ani nie dowodzi preservation;
    otwarte różnice pozostają przypisane do konkretnego elementu.
-2. **Natywny materiał Beam/Slab:** najpierw zestawić odczyty na tych samych
-   dokładnych ref/view/owner: kompletność query, konflikty, typ adaptera,
-   klasę natywną, właściwości Material oraz ID/nazwę/typ/wartość atrybutu.
-   Skorzystać z istniejących journal/trace, aby ustalić cel i wynik prób Slab.
+2. **Natywny materiał Beam/Slab:** kandydat dodaje fazę odczytu tylko do
+   getterów `material_comparison`. Dla dokładnego drawing/model/view, jawnej
+   listy 1–16 identyfikatorów atrybutów i opcjonalnego `include_parent` ma
+   zestawiać dla każdego wrappera łańcuch przodków i listę potomków, klasę natywną, ReadAll i
+   ReadAllAndComputable, nazwę↔ID/typ oraz natywny materiał rodzin
+   Beam/SkeletonBeam/Slab/MultiSlab. Zachować pusty materiał natywny jako zaobserwowaną
+   wartość; brak w ReadAll nie dowodzi braku atrybutu, a zgodność wartości nie
+   dowodzi wspólnego przechowywania. Ten odczyt nie ustala właściciela zapisu
+   i nie zmienia wcześniejszych PASS. Po wdrożeniu użyć go na dokładnych
+   ref/view z porównania 2026-10-27, zachowując konflikty per wrapper.
+   Najpierw sprawdzić istniejące journal/trace prób Slab, by ustalić ich cel
+   i wynik; nigdy nie ponawiać setterów dla unknown.
    Ordinary Beam wymaga własnego fixture, jeśli ma wejść do odbioru; obecny
    log nie dowodzi jego obecności (`fixture_missing`). Zamknięcie: wyjaśnione
    discovery dwóch SkeletonBeam, poprawiona i odebrana każda deklarowana
@@ -73,15 +82,19 @@ przepływ; nie powtarzać zakończonych Apply dla samego odtworzenia logu.
    zapisie atrybutu wystarczy odczytać obie ścieżki materiału, by zbadać ich
    sprzężenie; nie trzeba ponawiać odebranego zapisu. Brak payloadu w logu
    nie unieważnia owner PASS wartości ani nie dowodzi obejścia blokady.
-4. **Warstwa i no-op:** sporządzić macierz zadeklarowanych rodzin/właścicieli
-   z istniejących dowodów, wskazać tylko brakujące pary. Dla nich potrzebne są
+4. **Warstwa i no-op:** macierz istniejących odczytów i braków jest w
+   [statusie walidacji](validation-status.md#declared-family-and-owner-evidence-for-layer-and-delete).
+   Zachować jedynie wykazane zakresy i wskazać brakujące zadeklarowane
+   pary rodzina/właściciel. Dla nich potrzebne są
    dokładne cele, stara/nowa warstwa, preview/revalidation, świeży readback/UI
    i Undo z odczytem przywrócenia; jeśli wspierana jest grupa, dowód jednego
    grupowego Undo. Zamknięcie: udokumentowane pokrycie deklarowanej macierzy,
    no-op z zerem setterów i bez Apply, działający highlight/clear oraz
    zachowane konflikty po zmianie zakresu/wartości i replay. Nie rozszerzać
    wyniku pojedynczego W1/Undo na pozostałe rodziny ani grupę.
-5. **Delete i selekcja:** dla brakujących deklarowanych rodzin/poddrzew
+5. **Delete i selekcja:** zachować wskazaną w [macierzy](validation-status.md#declared-family-and-owner-evidence-for-layer-and-delete)
+   grupową próbę Column oraz obserwację Wall subtree; dla brakujących
+   zadeklarowanych rodzin/poddrzew
    potrzebne są disposable fixture, lista dokładnych ref i zależności,
    preview, usunięcie z readbackiem braku właściwego poddrzewa, zachowanie
    sąsiadów oraz Undo i odczyt odtworzenia. Zachować gotowy grouped Column

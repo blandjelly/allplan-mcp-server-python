@@ -31,9 +31,9 @@ def validate_probe(request):
                 or request["model_uuid"] == "00000000-0000-0000-0000-000000000000"):
             invalid("model_uuid must name one canonical nonzero model UUID.")
         return
-    if request["phase"] in ("element_attributes", "component_identity", "attribute_evidence"):
+    if request["phase"] in ("element_attributes", "component_identity", "attribute_evidence", "material_comparison"):
         extra = ({"name_contains", "offset", "limit"} if request["phase"] == "element_attributes" else
-                 {"attribute_ids", "include_parent"} if request["phase"] == "attribute_evidence" else set())
+                 {"attribute_ids", "include_parent"} if request["phase"] in ("attribute_evidence", "material_comparison") else set())
         keys(request, {"schema_version", "phase", "drawing_file", "model_uuid", "view_uuid"} | extra,
              {"schema_version", "phase", "drawing_file", "model_uuid", "view_uuid"})
         bounded_int(request["drawing_file"], 1, 2147483647, "drawing_file")
@@ -43,7 +43,7 @@ def validate_probe(request):
                     or not re.fullmatch(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}", value)
                     or value == "00000000-0000-0000-0000-000000000000"):
                 invalid(f"{field} must be one canonical nonzero UUID.")
-        if request["phase"] == "attribute_evidence":
+        if request["phase"] in ("attribute_evidence", "material_comparison"):
             ids = request.get("attribute_ids")
             if (not isinstance(ids, list) or not 1 <= len(ids) <= 16
                     or any(type(ident) is not int or not 1 <= ident <= 2147483647 for ident in ids)
