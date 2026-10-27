@@ -30,6 +30,15 @@ native-material result. SDK methods and UI material controls exist for Beam
 and Slab; they do not prove persistence on the tested build. See the
 [material/API comparison](m4-editing-api-0.32.0.md#native-material-material-attribute-and-surface).
 
+Scalability analysis (2026-10-27) is in the
+[implementation plan, S0–S5](implementation-plan.md#analiza-skalowania-developm4-i-ergonomii-mcp).
+The 200-result bound is per page; repeated scans and independent scan/cache
+budgets limit larger reads. More than 32 changes should use a reviewed durable
+manifest and sequential batches, initially in one drawing. Start that work
+with profiling and MCP ergonomics; larger writes depend on the relevant native
+gates above. This is documentation only, with diff/link checks and no runtime
+tests, builds or new native acceptance; the current limits are unchanged.
+
 ## Latest tested version — 0.39.0
 
 [PR #42](https://github.com/blandjelly/allplan-mcp-server-python/pull/42) is merged

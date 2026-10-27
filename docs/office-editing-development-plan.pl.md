@@ -96,11 +96,17 @@ zachowane w [statusie walidacji](validation-status.md#evidence-for-unresolved-ca
 nie kasować ich journalu ani nie wznawiać szerokiego probe.
 Brak fixture oznaczać `fixture_missing`, nierozstrzygnięty kontrakt — BLOCKED.
 
-## Po domknięciu priorytetów 1–6
+## Skalowanie i dalsze rozszerzenia
 
-1. Zaprojektować wykonanie wieloplikowe: manifest, deterministyczne partie,
-   jawne wyniki częściowe, timeout/restart i pomiary dla ponad 32 zmian oraz
-   ponad 200 wyników. Nie deklarować wspólnego Undo ani atomowości bez dowodów.
+1. Skalowanie i ergonomia MCP: [analiza i etapy S0–S5](implementation-plan.md#analiza-skalowania-developm4-i-ergonomii-mcp)
+   rozdzielają większy odczyt, wykonanie ponad 32 zmian w jednym rysunku oraz
+   późniejszą wieloplikowość. 200 jest limitem strony, nie całej selekcji;
+   rzeczywiste bariery obejmują pełne ponowne skany, 10000 adapterów, czas,
+   pamięć i dziennik. Pomiary, ergonomię i odczyt można rozwijać wcześniej;
+   większe zapisy zależą od odbioru konkretnej operacji. Warunek zamknięcia:
+   kompletne wyniki, mniej skanów/roundtripów potwierdzone pomiarem, trwały
+   manifest/partie i restart bez powtórzonych setterów. Nie deklarować wspólnego
+   Undo ani atomowości bez dowodów.
 2. Osobno zaplanować cały projekt: enumerację niezaładowanych plików,
    aktywację, przywrócenie kontekstu i raportowanie niekompletności.
    Brak dostępu nie może oznaczać zera wyników.
