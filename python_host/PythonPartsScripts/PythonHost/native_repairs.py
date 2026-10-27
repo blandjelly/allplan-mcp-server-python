@@ -80,10 +80,10 @@ def read(base, queries, element, change):
                            "active_foreground")[change["field"]]
 
 
-def write(base, element, change, doc=None, check=lambda: None):
+def write(base, element, change, doc=None, check=lambda: None, *, trace=None):
     if change.get("adapter_version") == "m4-model-edit-1":
         from . import native_model_edit
-        return native_model_edit.write(base, element, change, doc, check)
+        return native_model_edit.write(base, element, change, doc, check, trace=trace)
     import NemAll_Python_IFW_ElementAdapter as adapters
     targets = adapters.BaseElementAdapterList()
     targets.append(element)

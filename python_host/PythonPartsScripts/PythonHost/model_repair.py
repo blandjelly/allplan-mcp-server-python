@@ -21,6 +21,9 @@ class RepairPlanService:
         self.queries = queries
         from pathlib import Path
         self.trace_path = Path(__file__).resolve().parents[2] / ".allplan-mcp/logs/m4-native-probe.jsonl"
+        from .property_probe import NativeProbeTrace
+        # Resolve against the current service path, including fixture overrides.
+        self.queries.material_trace_factory = lambda phase: NativeProbeTrace(self.trace_path, phase)
         self.plans = OrderedDict()
         # Invalidated evidence is inspectable once, never executable. Both caches
         # share the existing count/byte/TTL limits and disappear on host restart.

@@ -32,7 +32,7 @@ def _query_scope(scope):
 
 def _preview(request):
     keys(request, {"schema_version", "action", "scope", "native_types", "predicate", "attribute_ids",
-                   "attribute_read_mode", "changes", "exclude_model_uuids", "max_adapters"}, {"schema_version", "action"})
+                   "attribute_read_mode", "changes", "exclude_model_uuids", "max_adapters", "exact_target"}, {"schema_version", "action"})
     scope = request.get("scope", "open_drawings")
     _query_scope(scope)
     native_types = request.get("native_types", DEFAULT_NATIVE_TYPES)
@@ -130,6 +130,24 @@ def _preview(request):
                 invalid(f"Layer {field} must be a bounded nonempty string.")
         else:
             invalid("target.kind must be attribute, layer, native_material or delete.")
+    if "exact_target" in request:
+        t = request["exact_target"]
+        keys(t, {"drawing_file", "model_uuid", "view_uuid", "parent_ref"},
+             {"drawing_file", "model_uuid", "view_uuid", "parent_ref"})
+        bounded_int(t["drawing_file"], 1, 2147483647, "drawing_file")
+        p = t["parent_ref"]
+        keys(p, {"model_uuid", "view_uuid"}, {"model_uuid", "view_uuid"})
+        for ref in (t, p):
+            for k in ("model_uuid", "view_uuid"):
+                if (not isinstance(ref[k], str) or not UUID.fullmatch(ref[k])
+                        or ref[k] == "00000000-0000-0000-0000-000000000000"):
+                    invalid("Exact target references require canonical nonzero UUIDs.")
+        if (t["model_uuid"] == p["model_uuid"] or native_types != ["Slab_TypeUUID"]
+                or predicate is not None or request.get("exclude_model_uuids") or ids
+                or len(changes) != 1 or changes[0]["target"]["kind"] != "native_material"
+                or not isinstance(scope, dict) or scope["drawing_files"] != [t["drawing_file"]]
+                or scope["include_passive"]):
+            invalid("exact_target requires one foreground Slab native-material edit without criteria or exclusions.")
     if len(referenced_ids) > 32:
         invalid("At most 32 distinct attribute IDs may be read or edited.")
     exceptions = request.get("exclude_model_uuids", [])

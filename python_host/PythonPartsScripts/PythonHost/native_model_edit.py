@@ -74,6 +74,19 @@ def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapte
         if queries.clock() - started >= queries.SCAN_SECONDS:
             raise BridgeError("scan_limit_exceeded", "Edit resolution time budget exceeded.", 409)
 
+    exact = (change.get("resource") or {}).get("exact_target_binding")
+    if exact is not None:
+        from .exact_material_target import locate
+        if (change.get("operation") != "set_native_material" or native_type != "Slab_TypeUUID"
+                or exact["target"]["model_uuid"] != ref["model_uuid"]
+                or exact["target"]["drawing_file"] != ref["drawing_file"]
+                or exact["target"]["view_uuid"] != change.get("target_view_uuid")):
+            _conflict("Exact material binding does not match the reviewed change.")
+        factory = getattr(queries, "material_trace_factory", None)
+        trace = factory("exact_material_resolution") if factory else None
+        base, _ = locate(doc, base, exact["target"], budget, trace, expected=exact["inventory_fingerprint"])
+        if adapter_owners is not None:
+            adapter_owners.append(base)
     owner = base.ElementsSelectService.SelectAllElements(doc)
     if adapter_owners is not None:
         adapter_owners.append(owner)
@@ -477,7 +490,7 @@ def _slab_ownership(element, change, check=lambda: None):
         _conflict("Slab ownership changed or became unavailable since preview.")
 
 
-def write(base, element, change, doc=None, check=lambda: None):
+def write(base, element, change, doc=None, check=lambda: None, *, trace=None):
     """Invoke an established setter only for the explicit evaluation adapter."""
     if change.get("adapter_version") != "m4-model-edit-1":
         raise BridgeError("target_not_writable", "Native model edit adapter version is not enabled.", 409)
@@ -486,7 +499,7 @@ def write(base, element, change, doc=None, check=lambda: None):
         return delete(base, element, change, doc, check)
     if change.get("operation") == "set_native_material":
         from .wall_material import write as set_material
-        return set_material(base, element, change, doc, check)
+        return set_material(base, element, change, doc, check, trace=trace)
     # Also guard the final native boundary, including a missing native_type in
     # a malformed change. No legacy plan can bypass the new slab owner gate.
     try:

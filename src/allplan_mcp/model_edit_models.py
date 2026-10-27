@@ -128,6 +128,13 @@ def _validate_predicate(node, depth=0, budget=None):
         raise ValueError("Unknown model_query predicate operator.")
 
 
+class ExactSlabTarget(ContractModel):
+    drawing_file: Annotated[int, Field(ge=1, le=2147483647)]
+    model_uuid: Annotated[str, Field(pattern=r"^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$")]
+    view_uuid: Annotated[str, Field(pattern=r"^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$")]
+    parent_ref: dict[str, str]
+
+
 class ModelEditPreview(ContractModel):
     schema_version: Literal["m4-model-edit-1"] = "m4-model-edit-1"
     action: Literal["preview"]
@@ -139,6 +146,7 @@ class ModelEditPreview(ContractModel):
                                  "Wall_TypeUUID", "Slab_TypeUUID", "MultiSlab_TypeUUID", "WindowDoor_TypeUUID"], max_length=16)
     attribute_ids: list[Annotated[int, Field(ge=1, le=2147483647)]] = Field(default_factory=list, max_length=32)
     attribute_read_mode: Literal["stored", "all_and_computable"] = "stored"
+    exact_target: ExactSlabTarget | None = None
     predicate: Predicate | None = None
     changes: list[Edit] = Field(min_length=1, max_length=16)
     exclude_model_uuids: list[Annotated[str, Field(pattern=r"^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$")]] = Field(default_factory=list, max_length=100)
@@ -150,6 +158,22 @@ class ModelEditPreview(ContractModel):
             raise ValueError("Deletion must be the only change in a plan.")
         if any(isinstance(edit, NativeMaterialEdit) for edit in self.changes) and len(self.changes) != 1:
             raise ValueError("Native material must be the only change in a plan.")
+        if "exact_target" in self.model_fields_set and self.exact_target is None:
+            raise ValueError("exact_target cannot be null.")
+        if self.exact_target is not None:
+            t = self.exact_target
+            zero = "00000000-0000-0000-0000-000000000000"
+            if (set(t.parent_ref) != {"model_uuid", "view_uuid"}
+                    or any(not re.fullmatch(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}", v)
+                           or v == zero for v in t.parent_ref.values())
+                    or t.model_uuid == zero or t.view_uuid == zero
+                    or t.parent_ref["model_uuid"] == t.model_uuid
+                    or self.native_types != ["Slab_TypeUUID"] or self.predicate is not None
+                    or self.exclude_model_uuids or self.attribute_ids
+                    or len(self.changes) != 1 or not isinstance(self.changes[0], NativeMaterialEdit)
+                    or not isinstance(self.scope, QueryScope)
+                    or self.scope.drawing_files != [t.drawing_file] or self.scope.include_passive):
+                raise ValueError("exact_target requires one explicit foreground Slab native-material target without criteria or exclusions.")
         _validate_predicate(self.predicate.model_dump(by_alias=True, exclude_unset=True) if self.predicate else None)
         if len(set(self.native_types)) != len(self.native_types):
             raise ValueError("native_types must be distinct.")

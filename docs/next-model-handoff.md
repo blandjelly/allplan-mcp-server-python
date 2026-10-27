@@ -1,87 +1,90 @@
 # Current M4 handoff
 
-## Next task — finish the bounded Slab child getter probe
+## Next task — verify candidate 0.42.0, then run one native trial
 
-Continue on the M4 topic branch based on **develop/m4**; main integration is a
-separate task. Candidate 0.41.0 adds optional
-`parent_ref={model_uuid,view_uuid}` only to getter-only
-`model_property_probe` `material_comparison`. It identifies an exact MultiSlab
-wrapper from a complete foreground scan, then uses documented
-`GetChildModelElements` for the exact drawing/model/view of its Slab child.
-Retain exact child and parent refs, including differing views. Do not redirect
-the child to the parent or a writable owner. Preserve current scan/query/write
-guards, trace and budgets, and native container lifetime. Bound the probe to at
-most 16 exact parent/target wrappers and 256 child visits total. The SDK double
-reproduces a child absent from the direct scan; the native cause is unknown,
-and supplied evidence does not show that SelectAll omits Slab.
+Candidate 0.42.0 adds an opt-in `model_edit` `exact_target` for one Slab child
+and its exact MultiSlab parent. The request is limited to one foreground
+drawing, `native_types=["Slab_TypeUUID"]`, no predicate, attributes or
+exclusions, and one native Material change. The bounded resolver retains the
+complete direct inventory and injects only the explicitly resolved child for
+this opt-in. Preview binds the exact target and child inventory fingerprint;
+revalidation, target preflight and the final setter boundary resolve and compare
+them again. Highlight first verifies the exact child target, then presents all
+representations of that child model UUID; it never targets the parent. Readback
+and recovery require the same exact inventory and reviewed view. A regenerated
+or missing view stays unknown; this opt-in has no replacement-view fallback.
+See the [implemented API contract](m4-editing-api-0.32.0.md#exact-child-native-material-target-0420).
 
-After 0.41.0 CI and exact-ZIP verification/installation, ask the owner to run
-only the retained Slab child probe with an explicit exact `parent_ref`,
-`include_parent=true`, and attribute ID 508, using the
-[exact request](tool-reference.md#model_property_probe--isolated-read-phases) and preserving trace.
-Do not repeat the three successful 0.40.0 probes or any setter. Broad property
-discovery stays suspended.
+This candidate is on `codex/m4-material-read-evidence`, for PR #48 based on
+`develop/m4` merge commit `dd741fa`. **230 related focused checks plus 9 final
+exact-target/public HTTP checks PASS**, including version consistency. Full CI
+and package production, exact ZIP
+verification/installation, and native acceptance for 0.42.0 remain pending.
+After the required CI and exact-ZIP gate, run one reviewed exact-owner trial on
+a disposable fixture with preview, highlight, Apply, fresh readback,
+preservation and Undo/restoration. Do not repeat the completed 0.41 getter or
+historical setters. See [plan items 1–3](office-editing-development-plan.pl.md#pozostałe-prace-i-nierozwiązane-błędy).
 
-## Latest candidate and native evidence
+## Previous candidate and native evidence
 
-Candidate **0.41.0**, branch `codex/m4-child-material-probe`, is based on
-develop/m4 `7bb20d6e` (merged [PR #46](https://github.com/blandjelly/allplan-mcp-server-python/pull/46)).
-**82 focused unit checks (including version consistency) + 8 MCP/HTTP checks
-PASS** on Linux/Python 3.12.14. Full candidate CI, exact ZIP/upgrade/restore
-and native acceptance remain pending. The 0.40.0 head `fca3da98` passed
-Windows/Ubuntu Python 3.12 CI, package production and `ci-required`;
-[health and delivery evidence](validation-status.md#delivery-and-ci-evidence)
-bind its installed bridge to that source with verified file hashes, while exact
-ZIP installation/upgrade/restore remains unverified.
+Candidate **0.41.0**, source `f775168aaf8fdb043c269ff09d6ffda9fcea17c9`, is
+merged to `develop/m4` as PR #47 / `dd741fa`. The 82 focused checks and 8
+MCP/HTTP checks are earlier focused results, separate from CI. GitHub Actions
+run [40550057327](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40550057327)
+completed successfully for configuration, Ubuntu and Windows Python 3.12
+portable jobs, package production and `ci-required`. The earlier run
+40549970082 failed and is not validation. The supplied report records the
+owner's CI/ZIP confirmation; exact installed ZIP identity and upgrade/restore
+were not independently verified. The later documentation-only update was
+commit `a26` and did not change runtime or create a package.
 
-**Read-only Allplan comparison, 2026-10-27 (0.40.0):** both SkeletonBeams
-(`StructuralBeamElement`) and the MultiSlab (`SlabElement`) returned native
-Material exactly `" "`; attribute 508 resolved live as `Materiał` / SDK
-`String`, roundtrip ID 508, and returned `TEST1` in both `ReadAll` and
-`ReadAllAndComputable`. Native Material and attribute 508 are separate observed
-values; owner equivalence, shared storage and persistence are unknown. All three
-successful probes were `usable_for_write=false`. The exact Slab child request
-was blocked with `probe_scope_unavailable`; no child or separate parent read
-completed. MultiSlab's observed child edge does not establish child values.
-SkeletonBeam 1's target and parent-edge views still differ. Do not infer that
-SelectAll omits Slab or assign a native cause. The complete 31-record journal
-inspection showed `87a45065d5e14e3a9ac8c54756e273a0` as `stopped`,
-`reconciled: 1`, integrity verified, `requires_recovery=false`; this does not
-establish applied success or preservation. `4388b04e39a14fac811db4f58723d01f`
-was absent from those 31 returned records, which does not establish its archive
-state. Keep earlier Slab writes unassigned to an execution without direct
-proof. Raw evidence and limits are in [validation status](validation-status.md#latest-owner-observations)
-and [the preserved 0.40.0 files](test-results/evidence/0.40.0-2026-10-27/).
+Installed bridge health reported 0.41.0, source commit `f775168aaf8fdb043c269ff09d6ffda9fcea17c9`,
+and `installed_bridge_integrity=verified` with no mismatches.
 
-The owner-reported 0.39.0 intended-value PASS remains recorded for native
-material on Wall, Wall with opening, and Column, and for attribute writes on two
-SkeletonBeams and the MultiSlab/Slab representations of one assembly. Keep
-those results separate from preservation, Undo, exact package attribution and
-the 0.40 getter observations. Do not repeat completed writes. A native write
-change requires a freshly reviewed exact-owner preview, Apply, readback and
-preservation evidence. See the [API comparison](m4-editing-api-0.32.0.md#native-material-material-attribute-and-surface)
-and [development plan](office-editing-development-plan.pl.md).
+**Read-only Allplan probe, 2026-10-27:** the exact Slab child and its separately
+read immediate MultiSlab parent both returned native Material exactly `" "`
+and attribute 508 `TEST1` in `ReadAll` and `ReadAllAndComputable`. The child and
+parent refs/views were retained separately; the other-view UUID `37a3c6a2-d40a-4005-a830-3d212c9bd165`
+remains a distinct representation observation. `target_in_direct_scan=false`
+applies only to this exact child/view probe and does not diagnose `SelectAll` or
+`model_edit` coverage. The read was complete for its requested scope, but
+`usable_for_write=false`, `setter_calls_started=0`; it establishes no writable
+owner, shared storage, persistence or child/parent equivalence. Preserve the
+four raw evidence files in [the 0.41.0 evidence directory](test-results/evidence/0.41.0-2026-10-27/).
+The earlier SkeletonBeam 1 target/parent-edge view discrepancy remains open;
+do not generalize the Slab result to that beam or to ordinary Beam, whose
+fixture is not established.
 
-## Other active boundaries
+The exact-target contract does not change native setter semantics or establish
+Allplan write acceptance. Preserve the 0.41.0 result below as getter-only
+evidence; it does not prove that the semantic edit scan loses this Slab or
+explain the earlier failed write.
 
-Scalability analysis (2026-10-27) is in the [implementation plan, S0–S5](implementation-plan.md#analiza-skalowania-developm4-i-ergonomii-mcp).
-The 200-result bound is per page; repeated scans and independent scan/cache
-budgets limit larger reads. More than 32 changes should use a reviewed durable
-manifest and sequential batches, initially in one drawing. Larger writes depend
-on the relevant native gates above.
+The earlier report of 0.39.0 intended-value PASS for native Material on Wall,
+Wall with opening and Column, and for attribute writes on two SkeletonBeams and
+the Slab/MultiSlab assembly remains limited to those reported results. It does
+not establish preservation, Undo, exact package attribution or owner binding
+for the historic Slab attribute writes. Do not repeat accepted writes just to
+recreate evidence.
 
-Native selection research for priority 5 is in the [API analysis](m4-native-selection-api.md).
-The inspected public 2026 API documents interactive pick, but no complete
-arbitrary replace/clear/current-state readback contract was found. Resolve the
-installed SDK contract and scope/lifecycle of `GetPreSelectedElements` with
-the bounded experiment in that note. `select` remains unsupported; interactive
-pick would be a separate feature. This does not change the Beam/Slab material
-scope or accepted delete evidence.
+## Recovery and other boundaries
 
-Preserve target/owner binding, fresh revalidation, journals/traces, replay
-protection, write/Undo guards and unknown outcomes. Never remove records to
-free a recovery lock or retry a setter to resolve unknown state. Earlier broad
-property and native preview crashes have unproven causes; do not repeat them.
-Read [AGENTS](../AGENTS.md), the [documentation policy](documentation-policy.md)
-and [testing policy](testing-policy.md). Required-check configuration for
-develop/m4 still needs confirmation.
+Retain unresolved execution history: `87a45065d5e14e3a9ac8c54756e273a0` was
+reported `stopped`, `reconciled: 1`, integrity verified,
+`requires_recovery=false`; this does not prove applied success or preservation.
+`4388b04e39a14fac811db4f58723d01f` was absent from the inspected 31 records,
+which does not establish its archive state. Do not delete journal records or
+repeat the inspection without new evidence. Unknown outcomes stay unknown;
+recovery is read-only and uses the original execution ID.
+
+Scalability remains bounded by the 200-result page, 10,000 adapter, time,
+memory and journal limits. More than 32 changes requires a reviewed durable
+manifest and sequential batches in one drawing; larger writes depend on
+operation-specific native acceptance. See [implementation plan S0–S5](implementation-plan.md#analiza-skalowania-developm4-i-ergonomii-mcp).
+
+Native selection remains unsupported pending an installed-SDK contract for
+replace, clear and independent readback. See [selection API analysis](m4-native-selection-api.md).
+Preserve exact target/owner binding, revalidation, journals, trace, replay
+protection, write and Undo guards, and unknown outcomes. Do not repeat broad
+property discovery or earlier crashes with unproven causes. Required-check
+configuration for `develop/m4` still needs owner confirmation.

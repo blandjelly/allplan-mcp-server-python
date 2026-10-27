@@ -3,16 +3,58 @@
 Current version and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
 [development plan](office-editing-development-plan.pl.md).
-Version **0.40.0** is merged into develop/m4 through
-[PR #46](https://github.com/blandjelly/allplan-mcp-server-python/pull/46).
-Candidate **0.41.0** adds an exact-parent read route for the blocked Slab child
-probe. **82 focused unit + 8 MCP/HTTP checks PASS** on Linux/Python 3.12.14,
-including version consistency. Full candidate CI, exact ZIP/upgrade/restore
-and native acceptance remain pending. Owner-supplied 0.40.0 getter evidence
-below does not establish writes or persistence. Current API and recovery contracts are in
+Candidate **0.42.0** is in progress on `codex/m4-material-read-evidence`, based
+on `develop/m4` merge commit `dd741fa`, for [PR #48](https://github.com/blandjelly/allplan-mcp-server-python/pull/48).
+**230 related focused checks plus 9 final exact-target/public HTTP checks PASS**,
+including version consistency. Full CI/package, exact ZIP verification and
+native acceptance are pending. The new exact-target request contract and its
+limits are documented in [API evidence](m4-editing-api-0.32.0.md) and
+[tool reference](tool-reference.md).
+
+Previous candidate **0.41.0** is merged into develop/m4 through
+[PR #47](https://github.com/blandjelly/allplan-mcp-server-python/pull/47).
+The exact-parent Slab child getter route passed the bounded native trial below;
+this does not establish native material writes or persistence. Historical focused
+checks and full CI are separate from that native result. Exact delivered
+ZIP/upgrade/restore verification remains incomplete. Current API and recovery contracts are in
 [API evidence](m4-editing-api-0.32.0.md).
 
+## Candidate 0.42.0 — exact Slab child target
+
+The opt-in `model_edit.exact_target` binds one foreground Slab child to an exact
+MultiSlab parent and is restricted to one native Material change with
+`native_types=["Slab_TypeUUID"]`, no predicate, attribute IDs or exclusions,
+and the matching one-drawing foreground scope. Preview retains the complete
+direct inventory and adds only the explicitly resolved child to that scoped
+inventory. It binds target and child inventory fingerprint. Revalidation,
+Apply preflight and final setter boundary repeat bounded identity, view,
+inventory and direct-edge checks. Highlight first validates that target, then
+submits all representations of the child model UUID; it never targets the
+parent.
+
+Fresh readback and recovery remain bound to the reviewed inventory and view. If
+that exact view is missing or regenerated, this mode has no replacement-view
+fallback and the outcome remains unknown. Recovery is read-only under the same
+execution ID. This is an implemented candidate contract, not proof of native
+write acceptance or persistence. Do not infer that the 0.41.0 exact probe's
+`target_in_direct_scan=false` diagnoses `model_edit` semantic scan coverage or
+the earlier write failure. See the [exact-target API contract](m4-editing-api-0.32.0.md#exact-child-native-material-target-0420).
+
 ## Delivery and CI evidence
+
+The 0.41.0 source `f775168aaf8fdb043c269ff09d6ffda9fcea17c9` passed
+[run 40550057327](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40550057327):
+configuration, full Windows/Ubuntu Python 3.12 test jobs, package production and
+`ci-required` all completed successfully, including their test/build steps.
+The earlier failed run `40549970082` is not the accepted CI evidence. The
+[health response](test-results/evidence/0.41.0-2026-10-27/01-health-context.json)
+binds the installed bridge to that source and reports verified file integrity
+with no mismatches. The [supplied report](test-results/evidence/0.41.0-2026-10-27/raport.md)
+records the owner's CI/ZIP confirmation and a local sidecar SHA-256; it also
+states that independent verification of the exact installed ZIP was not obtained.
+Keep exact-ZIP, upgrade and restore gates unverified. The prior candidate's
+**82 focused unit + 8 MCP/HTTP checks PASS** remain historical focused results,
+not a new local run. No replacement package or new build was produced here.
 
 The final 0.40.0 PR head `fca3da9820e684a41cd1c1e4300734a57e7bdbbb`
 passed [Windows/Ubuntu Python 3.12, package and ci-required](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40499946308).
@@ -37,6 +79,48 @@ It does not validate later candidates. Branch-protection inspection returned
 configured as required on `develop/m4` remains unconfirmed.
 
 ## Latest owner observations
+
+**2026-10-27, 0.41.0 exact Slab child and separate immediate-parent read: PASS
+for this getter scope only.** All four supplied files are preserved unchanged
+in [the evidence directory](test-results/evidence/0.41.0-2026-10-27/).
+Health reports Allplan 2026.1, bridge/MCP 0.41.0, embedded CPython 3.13.13,
+external Python 3.14.8 and installed bridge integrity verified. Hotfix remains
+`not_checked`, runtime compatibility `runtime_verified=false`. The project was
+`Kopia MCP_QA_DEMO`, foreground drawing 101; durable project identity remains
+unverified.
+
+The [single request/response](test-results/evidence/0.41.0-2026-10-27/02-slab-child.json)
+retains child model `8a693925-ae20-4dda-91d1-3951af3c0a52`, view
+`a0fcd7b3-85c8-4f83-99b7-59e8a3463c94`, `Slab_TypeUUID`, and explicit parent
+model `bf097d95-8275-4229-ac74-27bbea26c211`, view
+`b4a59b5b-c0ae-4c1e-9d59-df5761390eb9`, `MultiSlab_TypeUUID`.
+`identity_resolution.method=exact_parent_children` and the observed child-parent
+edge identify the same immediate parent that was separately read. Both native
+representations are `SlabElement`; both `SlabElement.Properties.Material`
+values are exactly `" "` (one space), while attribute 508 is `"TEST1"` in both
+`ReadAll` and `ReadAllAndComputable`. Metadata binds 508 ↔ `Materiał`, SDK
+`String`, with a live name/ID roundtrip. This closes the previous exact child
+read blocker for this request; it does not diagnose its earlier native cause.
+
+One target representation and one enumeration-parent representation were read,
+with consensus and complete evidence; two child visits completed the parent
+inventory. `target_in_direct_scan=false` refers to the requested exact view;
+`other_view_uuids` contains `37a3c6a2-d40a-4005-a830-3d212c9bd165`. This neither
+proves that the Slab model is absent from SelectAllElements nor establishes
+view equivalence or a failure of the separate semantic edit scan. The direct
+scan reports 26 identities, zero identity/file conflicts and complete
+scan/requested-scope/returned-field coverage. Whole-project, unloaded files,
+screen/occlusion and geometry-unit/offset coverage remain outside the result.
+
+The [trace](test-results/evidence/0.41.0-2026-10-27/03-trace.jsonl) contains
+365 ordered records for probe `d7b68f7e6ce645b68a022f76c762d318`: 182 matched
+started/returned pairs and one final completed record, with no failed or
+unmatched calls and no material/attribute/model setter calls. The response
+reports `read_only=true`, `model_data_changed=false`, `usable_for_write=false`
+and `setter_calls_started=0`. Native selection was not requested. Writable
+owner, shared storage, persistence and physical/view equivalence remain
+unestablished. Do not repeat this child probe, the completed 0.40.0 probes,
+or historical setters to recreate evidence.
 
 **2026-10-27, 0.40.0 getter-only material comparison:** the supplied raw
 responses are preserved unchanged in [the evidence directory](test-results/evidence/0.40.0-2026-10-27/);
@@ -125,8 +209,9 @@ until an ID-bound journal record establishes their outcome.
 The SDK exposes native Material and generic element-attribute APIs separately.
 A matching displayed value does not prove independent storage or equivalent
 setters. The 0.40.0 results supply paired getter observations on both retained
-SkeletonBeams and MultiSlab; the separate Slab child and historical write-owner
-bindings remain unresolved. See the
+SkeletonBeams and MultiSlab; 0.41.0 additionally reads the exact Slab child and
+its separate immediate parent. Historical write-owner bindings and native
+material persistence remain unresolved. See the
 [API comparison](m4-editing-api-0.32.0.md#native-material-material-attribute-and-surface).
 
 ## Accepted baseline and scoped M4 observations
