@@ -1,0 +1,23 @@
+{
+  "arguments": {
+    "request": {
+      "phase": "material_comparison",
+      "drawing_file": 101,
+      "model_uuid": "8a693925-ae20-4dda-91d1-3951af3c0a52",
+      "view_uuid": "a0fcd7b3-85c8-4f83-99b7-59e8a3463c94",
+      "attribute_ids": [
+        508
+      ],
+      "include_parent": true
+    }
+  },
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Error calling tool 'model_property_probe': Exact model/view identity is missing or conflicting. [code=probe_scope_unavailable, request_id=e8e7078e-2723-4ff9-91f6-40cd83811409]"
+      }
+    ],
+    "isError": true
+  }
+}

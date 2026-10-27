@@ -447,6 +447,13 @@ def model_property_probe(request: PropertyProbeRequest) -> dict[str, Any]:
     Optional parent reads never redirect the target or establish a writable
     owner. Equal values do not prove storage coupling. No setter is inspected
     or invoked, and all existing write eligibility rules remain in force.
+    If a Slab child is absent from the direct scan, material_comparison accepts
+    parent_ref={model_uuid, view_uuid} for one exact MultiSlab view in that same
+    drawing. It inspects only its direct children (256 total visits, 16 parent
+    and target wrappers), validates the child/parent edge, and retains both
+    exact identities and any parent-view difference. include_parent separately
+    reads the child's actual immediate parent. This never changes query or
+    write eligibility and never substitutes the aggregate for the target.
     drawing_identity explicitly inventories direct model/view identities in one
     foreground drawing, including children and unsupported families. It returns
     at most 32 views per page (offset/limit), with per-view hierarchy/native-type

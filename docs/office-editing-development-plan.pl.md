@@ -26,9 +26,9 @@ Wieloplikowość i cały projekt wymagają osobnego projektu oraz odbioru.
 
 | Priorytet | Co pozostało / warunek dalszej pracy |
 | --- | --- |
-| 1 — dostawa i recovery: częściowo potwierdzone | 0.39.0 jest scalone; owner zgłasza uzgodnienie bieżących Wall/Column/Slab i PASS wartości Wall/Wall z otworem/Column. Końcowe CI Windows/Ubuntu 3.12, build i `ci-required` dla 0.39.0 są potwierdzone w [statusie dostawy](validation-status.md#delivery-and-ci-evidence). Brak powiązania instalacji z exact ZIP/upgrade/restore oraz pełnego journalu z ID. Pozostało ustalić rzeczywiście nierozliczone rekordy i zachować unknown/preservation; nie powtarzać odebranych zapisów. |
-| 2 — natywny materiał Beam/Slab/MultiSlab: otwarte | Wcześniejsze zapytanie o materiał natywny nie znalazło belek i zgłosiło dwa konflikty reprezentacji. Odczytowe porównanie z 2026-10-27 później znalazło obie SkeletonBeam i MultiSlab, ale ujawniło rozbieżność view dla pierwszej belki: zapytanie i krawędź do rodzica wskazują różne UUID. Klasy runtime to `StructuralBeamElement`/`SlabElement`; w tym porównaniu nie odczytano materiału natywnego ani nie ustalono właściciela zapisu. Wcześniejsza próba zapisu dla Slab zakończyła się pustym odczytem materiału natywnego; właściciel pozostał nieustalony. Próba identyfikacji dziecka Slab nie zwróciła kompletnego komponentu semantycznego. Kandydat dodaje fazę odczytu wyłącznie przez gettery, by uzyskać brakujące porównanie; nie potwierdza trwałości zapisu ani nie zezwala na modyfikacje. Zachować dokładne referencje, konflikty dla każdego wrappera i wartości puste. [Porównanie API](m4-editing-api-0.32.0.md#native-material-material-attribute-and-surface). |
-| 3 — atrybuty Slab/MultiSlab: zgłoszony PASS wartości | Log 0.39.0 potwierdza raportowaną wartość atrybutu na MultiSlab i jego Slab; brak surowych payloadów z ID/typem/ref/owner i readbackiem. Zachować `target.property_owner="selected_element"`, pełne lineage/children i blokadę overlap, bez redirectu. Nie traktować sukcesu atrybutu jako sukcesu materiału natywnego. |
+| 1 — dostawa i recovery: częściowo potwierdzone | Źródło 0.40.0 `fca3da98` przeszło CI Windows/Ubuntu 3.12, package i `ci-required`; health potwierdza ten commit i integralność zainstalowanego bridge’a. Exact ZIP/upgrade/restore pozostają niepotwierdzone. Inspekcja 31 rekordów już wykonana: `87a…` jest `stopped/reconciled`, verified, `requires_recovery=false`, bez dowodu applied/preservation; `4388…` nie występuje w 31 wynikach, archiwum nieustalone. Nie odtwarzać tej inspekcji bez nowej przesłanki ani odebranych zapisów. [Status i następny krok](next-model-handoff.md). |
+| 2 — natywny materiał Beam/Slab/MultiSlab: otwarte | Odczyt 0.40.0 na obu SkeletonBeam i MultiSlab: native Material dokładnie `" "`, atrybut 508 `TEST1` w obu trybach; owner zapisu i trwałość nieustalone. Discovery po konfliktach zapytania i różne view celu/krawędzi rodzica SkeletonBeam 1 pozostają otwarte. Dokładny child Slab jest zablokowany `probe_scope_unavailable`, przyczyna natywna nieustalona. Kandydat 0.41.0 dodaje odczyt przez jawnego rodzica; po CI/exact ZIP tylko zachowany child z `parent_ref`, `include_parent=true`, ID 508 i trace. Nie ponawiać trzech udanych sond ani setterów. [Szczegóły](next-model-handoff.md). |
+| 3 — atrybuty Slab/MultiSlab: zgłoszony PASS wartości | Raportowany Apply/readback PASS z 0.39.0 pozostaje, ale historyczne payloady/owner binding brakują. Odczyt 0.40.0 i dalsze ograniczenia są w [handoffie](next-model-handoff.md); child read nadal blocked. Zachować `target.property_owner="selected_element"`, lineage/children i overlap guard; nie utożsamiać atrybutu z native Material. |
 | 4 — warstwa i no-op: częściowo odebrane | Zachować W1 read/write, pojedyncze Undo i zgłoszony no-op w ich dotychczasowym zakresie. Pozostałe pary rodzina/właściciel oraz grupowe Undo wymagają dowodu; poniżej kryteria zamknięcia. No-op nie ma drogi Apply. |
 | 5 — delete i selekcja: częściowo odebrane / brak funkcji | Zachować grouped Column delete/Undo i obserwację Wall subtree. Inne deklarowane rodziny/poddrzewa wymagają dowodu. [Analiza API selekcji](m4-native-selection-api.md) rozdziela programowe set/clear/readback od interactive pick i preselekcji. Brak potwierdzonego kompletnego kontraktu; native selection nadal unsupported, highlight nie zamyka selekcji. |
 | 6 — typy i rodziny | Domknąć owner-specific roundtrip oraz macierz rodzin/typów. Column Enum `Status` ID 49 pozostaje BLOCKED (`<niezdefiniowany>`, brak potwierdzonej etykiety). Wall CheckBox ID 1371 nie ma surowego Apply; fixture SDK Boolean brak. Inne typed attribute gaps rodzin wymagają osobnych dowodów. Date/vector/object wymagają dokładnych kontraktów setter payload i typed readback; sam symbol lub konstruktor SDK nie wystarcza. |
@@ -36,52 +36,43 @@ Wieloplikowość i cały projekt wymagają osobnego projektu oraz odbioru.
 ### Dowody potrzebne do zamknięcia punktów 1–5
 
 Punkty odnoszą się do pojedynczego aktywnego rysunku i istniejącego limitu
-1–32 zmian. Podsumowanie nowego logu jest w [statusie walidacji](validation-status.md#latest-owner-observations),
-a [pełny załącznik](test-results/evidence/0.39.0-2026-10-26/allplan-conversation-log.md)
-oraz [porównanie 2026-10-27](test-results/evidence/0.39.0-2026-10-27/allplan-comparison-log.md)
-zostały umieszczone w repozytorium bez zmian, za zgodą właściciela.
+1–32 zmian. Podsumowanie wyników i ograniczeń jest w [statusie walidacji](validation-status.md#latest-owner-observations).
+[Załącznik 0.39.0](test-results/evidence/0.39.0-2026-10-26/allplan-conversation-log.md)
+i [porównanie 2026-10-27](test-results/evidence/0.39.0-2026-10-27/allplan-comparison-log.md)
+pozostają zachowane; siedem plików dowodowych 0.40.0 skopiowano bez zmian do
+[test-results/evidence/0.40.0-2026-10-27](test-results/evidence/0.40.0-2026-10-27/).
 Zachować zgłoszone PASS, uzupełniać wyłącznie brakujący dowód lub zmieniony
 przepływ; nie powtarzać zakończonych Apply dla samego odtworzenia logu.
 
-1. **Dostawa i recovery:** powiązać instalację 0.39.0 z konkretnym source,
-   potwierdzonym CI dla końcowego head PR, dokładnym ZIP/manifestem i buildem Allplana oraz
-   wymaganym upgrade/restore. Odczytać bieżący `inspect_journal`; dla każdego
-   nadal unknown zachować ID, pierwotny wynik, materiał/owner, zmienione sekcje
-   i wynik read-only recovery/reconciliation. Zamknięcie: znany stan wszystkich
-   blokujących rekordów bieżącego workflow i rozliczone bramki dostawy.
-   Reconciliation nie zmienia unknown w applied ani nie dowodzi preservation;
-   otwarte różnice pozostają przypisane do konkretnego elementu.
-2. **Natywny materiał Beam/Slab:** kandydat dodaje fazę odczytu tylko do
-   getterów `material_comparison`. Dla dokładnego drawing/model/view, jawnej
-   listy 1–16 identyfikatorów atrybutów i opcjonalnego `include_parent` ma
-   zestawiać dla każdego wrappera łańcuch przodków i listę potomków, klasę natywną, ReadAll i
-   ReadAllAndComputable, nazwę↔ID/typ oraz natywny materiał rodzin
-   Beam/SkeletonBeam/Slab/MultiSlab. Zachować pusty materiał natywny jako zaobserwowaną
-   wartość; brak w ReadAll nie dowodzi braku atrybutu, a zgodność wartości nie
-   dowodzi wspólnego przechowywania. Ten odczyt nie ustala właściciela zapisu
-   i nie zmienia wcześniejszych PASS. Po wdrożeniu użyć go na dokładnych
-   ref/view z porównania 2026-10-27, zachowując konflikty per wrapper.
-   Najpierw sprawdzić istniejące journal/trace prób Slab, by ustalić ich cel
-   i wynik; nigdy nie ponawiać setterów dla unknown.
-   Ordinary Beam wymaga własnego fixture, jeśli ma wejść do odbioru; obecny
-   log nie dowodzi jego obecności (`fixture_missing`). Zamknięcie: wyjaśnione
-   discovery dwóch SkeletonBeam, poprawiona i odebrana każda deklarowana
-   ścieżka native owner → właściwy setter → świeży readback/UI, z dowodem
-   zachowania geometrii, poziomów, połączeń i składników oraz odpowiednim
-   Undo/odtworzeniem dla nowego przepływu. No-op, drift i replay nie mogą
-   uruchamiać dodatkowych setterów. Jeśli konkretna modyfikacja SDK okaże się
-   unsupported, udokumentować dokładny typ/build i uzgodnić zakres produktu;
-   nie zastępować jej po cichu atrybutem. Wall/Column PASS wartości zachować;
-   ich preservation/Undo nadal nie są potwierdzone przez ten log.
-3. **Atrybuty Slab/MultiSlab:** uzupełnić z istniejących zapisów dokładne
-   payloady i typed readback: nazwa↔ID, typ, file/model/view, wybrany owner,
-   lineage/children, plan i execution. Oddzielić dowód dla aggregate od child
-   i wykazać, że nie były nakładającymi się celami jednego planu. Zamknięcie:
-   owner-specific roundtrip i właściwy Undo/restoration dla deklarowanego
-   zakresu oraz zachowane blokady overlap, stale i replay. Po wykonanym
-   zapisie atrybutu wystarczy odczytać obie ścieżki materiału, by zbadać ich
-   sprzężenie; nie trzeba ponawiać odebranego zapisu. Brak payloadu w logu
-   nie unieważnia owner PASS wartości ani nie dowodzi obejścia blokady.
+1. **Dostawa i recovery:** CI i powiązanie źródła z bridge’em 0.40.0 są
+   potwierdzone. Pozostaje wskazać dokładny ZIP/hash i wymagane wyniki instalacji,
+   upgrade/restore. `inspect_journal` zwrócił kompletne 31 rekordów bez nowych
+   blockerów; nie powtarzać go dla samego odtworzenia dowodu. Zachować pierwotne
+   wyniki i późniejsze uzgodnienie `87a…`, bez rozszerzania go na applied lub
+   preservation. Nieobecność `4388…` w tej inspekcji nie rozstrzyga archiwum.
+   Zamknięcie wymaga rozliczenia dostawy i każdej nadal istotnej sprawy o
+   nieznanym wyniku, bez ponawiania setterów.
+2. **Natywny materiał Beam/Slab:** odczyty obu ścieżek na SkeletonBeam i
+   MultiSlab już wykonano; wartości i ograniczenia są w [handoffie](next-model-handoff.md).
+   Osobny odczyt child Slab nadal jest zablokowany; 0.41.0 dodaje wskazaną tam
+   ścieżkę przez dokładnego rodzica. Dla zwykłego Beam nie ustalono fixture
+   (`fixture_missing`). Następna próba właściciela obejmuje tylko zachowany
+   child z `parent_ref`, `include_parent=true` i ID 508, po CI i weryfikacji ZIP.
+
+   Każda zmieniona natywna ścieżka zapisu wymaga świeżego preview, przejrzanego
+   Apply na dokładnym właścicielu, świeżego odczytu/UI, dowodu zachowania
+   geometrii, poziomów, połączeń i składników oraz Undo/odtworzenia. No-op,
+   drift i replay nie mogą uruchamiać dodatkowych setterów. Dla unsupported
+   SDK trzeba podać dokładny typ/build i jawny zakres produktu, bez cichego
+   zastąpienia atrybutem. Zachować PASS Wall/Column oraz niepotwierdzone
+   preservation/Undo.
+3. **Atrybuty Slab/MultiSlab:** zachować zgłoszony PASS wartości 0.39.0.
+   Brakuje dokładnych historycznych payloadów Apply, powiązania właścicieli,
+   kolejności grupowania oraz Undo/odtworzenia. Nie wyciągać wniosków o
+   dopuszczalności nakładających się celów parent/child. Odczyt 0.40.0 opisuje
+   [handoff](next-model-handoff.md); nie ponawiać udanych zapisów dla odtworzenia
+   dowodu. Zamknięcie wymaga istniejących dokładnych payloadów lub osobno
+   uzasadnionego zmienionego przepływu, z zachowaniem blokad overlap, stale i replay.
 4. **Warstwa i no-op:** macierz istniejących odczytów i braków jest w
    [statusie walidacji](validation-status.md#declared-family-and-owner-evidence-for-layer-and-delete).
    Zachować jedynie wykazane zakresy i wskazać brakujące zadeklarowane

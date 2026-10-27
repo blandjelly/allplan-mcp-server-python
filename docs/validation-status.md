@@ -3,15 +3,27 @@
 Current version and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
 [development plan](office-editing-development-plan.pl.md).
-Version **0.39.0** is merged into develop/m4 through
-[PR #42](https://github.com/blandjelly/allplan-mcp-server-python/pull/42).
-Candidate **0.40.0** adds a getter-only material comparison. Its focused checks
-are **92 unit + 6 MCP/HTTP PASS** on Linux/Python 3.12.14, including version
-consistency. The 0.39.0 native observations below remain separate; full CI,
-exact ZIP, upgrade/restore and new native acceptance are pending. Current native API
-and recovery contracts are in [API evidence](m4-editing-api-0.32.0.md).
+Version **0.40.0** is merged into develop/m4 through
+[PR #46](https://github.com/blandjelly/allplan-mcp-server-python/pull/46).
+Candidate **0.41.0** adds an exact-parent read route for the blocked Slab child
+probe. **82 focused unit + 8 MCP/HTTP checks PASS** on Linux/Python 3.12.14,
+including version consistency. Full candidate CI, exact ZIP/upgrade/restore
+and native acceptance remain pending. Owner-supplied 0.40.0 getter evidence
+below does not establish writes or persistence. Current API and recovery contracts are in
+[API evidence](m4-editing-api-0.32.0.md).
 
 ## Delivery and CI evidence
+
+The final 0.40.0 PR head `fca3da9820e684a41cd1c1e4300734a57e7bdbbb`
+passed [Windows/Ubuntu Python 3.12, package and ci-required](https://github.com/blandjelly/allplan-mcp-server-python/actions/runs/40499946308).
+Each selected job and its test/build step completed successfully; the earlier
+cancelled run is not the validation. The supplied
+[health response](test-results/evidence/0.40.0-2026-10-27/01-health-context.json)
+reports that exact bridge source commit and installed file integrity verified
+with no mismatches, binding the native getter observations to that bridge
+source. It does not identify the delivered ZIP/hash or verify upgrade/restore.
+No artifact was downloaded or rebuilt here. This baseline does not validate
+the changed 0.41.0 source.
 
 Historical GitHub checks for the final 0.39.0 PR head
 `959280e807099a04cf63f5e47d85b7e4ecd05c55` confirm successful
@@ -20,43 +32,60 @@ Only four documentation files differ from runtime/test source `811a1bde`.
 The earlier draft run skipped product jobs; it is not the final validation.
 This establishes baseline CI and package production, but no exact-ZIP
 installation/upgrade/restore or attribution of the owner's installed package.
-It does not validate candidate 0.40.0. Branch-protection inspection returned
+It does not validate later candidates. Branch-protection inspection returned
 `403 Resource not accessible by integration`; whether `ci-required` is
 configured as required on `develop/m4` remains unconfirmed.
 
 ## Latest owner observations
 
-**2026-10-27, bounded Allplan comparison:** the owner reports an archived M4
-trace and a read-only comparison in active drawing 101/document 0. Its query
-covered 26 model identities, with zero conflicting model identities and zero
-duplicate representations; unloaded files and screen occlusion were not
-checked. The [comparison log](test-results/evidence/0.39.0-2026-10-27/allplan-comparison-log.md)
-is preserved unchanged. SkeletonBeam 1 is top-level in the query, but its query
-view `d9f3d9b1-a005-4789-b929-c39b291d1cd0` differs from the parent view
-`efb18c61-fab3-42f4-b79b-9f41d05da940` on its ownership edge. SkeletonBeam 2
-is top-level with a complete `SkeletonAxis` lineage. Both have runtime class
-`StructuralBeamElement`; the writable property owner was not established.
-MultiSlab has runtime class `SlabElement` and complete lineage including its
-Slab child. The child’s exact component probe did not resolve one complete
-semantic component. Native Material was not read for any target. Project
-attribute name search found no `material` match on SkeletonBeam 2 or MultiSlab;
-this does not establish absence because ReadAll omissions are unknown. No
-attribute ID/type/value was resolved as a complete set. Preserve the earlier
-owner-reported attribute PASS without treating this comparison as a reversal.
+**2026-10-27, 0.40.0 getter-only material comparison:** the supplied raw
+responses are preserved unchanged in [the evidence directory](test-results/evidence/0.40.0-2026-10-27/);
+[owner report](test-results/evidence/0.40.0-2026-10-27/raport.md) summarizes
+them. Allplan 2026.1, bridge 0.40.0, source `fca3da98`, installed bridge SHA-256 verified with no
+mismatches; runtime compatibility remains `runtime_verified=false`, and the
+hotfix was not checked. Project `Kopia MCP_QA_DEMO`, drawing 101 foreground.
+Each successful probe reports complete scan/requested scope/returned fields for
+that drawing, but not whole-project or unloaded-file coverage, screen visibility,
+native component counts, geometry units/offset, write eligibility or durable
+identity. The trace path is reported, but its file was not available for
+independent call-level audit. No Apply, setter, Undo, deletion, layer change or
+journal maintenance occurred.
 
-| Target | Exact identity/evidence | Remaining interpretation |
-| --- | --- | --- |
-| SkeletonBeam 1 | Model `2dfa6117-d481-4588-8647-d24049d61d29`; query view `d9f3d9b1-a005-4789-b929-c39b291d1cd0`; query says top-level; native `StructuralBeamElement`. | Parent-edge view differs (`efb18c61-fab3-42f4-b79b-9f41d05da940`). Owner and native Material unread. Earlier attribute read was blocked by ambiguous root representations. |
-| SkeletonBeam 2 | Model `8f13565b-abfc-4ce2-8b1d-7d133fe1a10d`; view `5f6e4603-6282-4ae0-9d02-ad089e73b859`; query says top-level; complete lineage includes `SkeletonAxis`; native `StructuralBeamElement`. | Owner and native Material unread. Complete name search found no `material` match, but ReadAll omission coverage is unknown. |
-| MultiSlab | Model `bf097d95-8275-4229-ac74-27bbea26c211`; view `b4a59b5b-c0ae-4c1e-9d59-df5761390eb9`; query says top-level; complete lineage includes Slab; native `SlabElement`. | Owner and native Material unread. No complete material attribute binding was resolved. |
-| Slab child | Model `8a693925-ae20-4dda-91d1-3951af3c0a52`; view `a0fcd7b3-85c8-4f83-99b7-59e8a3463c94`; query reports under MultiSlab. | Exact component probe did not resolve one complete semantic component; no separate class, owner, Material or attribute result. |
+All three successful probes resolved attribute 508 as `Materiał`, SDK `String`,
+with a live name↔ID roundtrip. `ReadAll` and `ReadAllAndComputable` both returned
+`TEST1`; the native getter returned exactly one space (`" "`). Thus native
+Material and attribute 508 are distinct observed fields with different values
+on these wrappers. This does not establish owner equivalence, shared storage,
+write ownership or persistence. All successful results say
+`usable_for_write=false`; property/writable owner and physical equivalence are
+not established.
 
-This comparison narrows the next read but establishes neither a Beam
-discovery root cause nor Slab persistence/ownership. Its missing native Material
-read is a probe-scope gap, not evidence of a blank value. The new getter-only
-`material_comparison` probe phase is documented in the [tool reference](tool-reference.md#model_property_probe--isolated-read-phases);
-candidate implementation and focused checks do not establish Allplan
-acceptance, CI, exact ZIP, upgrade/restore or a changed write route.
+| Target | Wrapper and observed identity | Native Material | Attribute 508 | Limits |
+| --- | --- | --- | --- | --- |
+| SkeletonBeam 1 | `StructuralBeamElement`; model `2dfa6117-d481-4588-8647-d24049d61d29`, target view `d9f3d9b1-a005-4789-b929-c39b291d1cd0`; root lineage complete. Children include AttributeContainer `9a86b9d7-d1fa-4cb1-b06f-5ab043cb6004` and SkeletonAxis `1ae5ed7b-6eb2-46c7-a336-0bef55d0d78a` / view `1b43e246-c34a-4037-a68e-11ec73de9a59`. | `" "`, `StructuralBeamElement.StructuralBeamProperties.Material`, owner_ref is target. | `TEST1` in both read modes. | Parent edges carry view `efb18c61-fab3-42f4-b79b-9f41d05da940`, different from target view; equivalence unresolved. Probe `3d2ae565171c4ba7a2e357058119cca3`. |
+| SkeletonBeam 2 | `StructuralBeamElement`; model `8f13565b-abfc-4ce2-8b1d-7d133fe1a10d`, view `5f6e4603-6282-4ae0-9d02-ad089e73b859`; root lineage complete. Children include AttributeContainer `2f91fb33-5e4d-481f-a775-2522adfbce42` and SkeletonAxis `26007d81-ecfc-4702-b8aa-1d1fb3aec2a7` / view `d6e727cd-31a6-44e4-92c6-a2346758be8b`. | `" "`, `StructuralBeamElement.StructuralBeamProperties.Material`, owner_ref is target. | `TEST1` in both read modes. | Property/writable owner unknown. Probe `a822050593f445f0bb3c3095d69826db`. |
+| MultiSlab | `SlabElement`; model `bf097d95-8275-4229-ac74-27bbea26c211`, view `b4a59b5b-c0ae-4c1e-9d59-df5761390eb9`; root lineage complete. Children include Slab `8a693925-ae20-4dda-91d1-3951af3c0a52` / view `a0fcd7b3-85c8-4f83-99b7-59e8a3463c94` and AttributeContainer `f0b54fce-8fdb-4f4e-86b2-9a59d6d499d7`. | `" "`, `SlabElement.Properties.Material`, owner_ref is the MultiSlab wrapper only. | `TEST1` in both read modes. | Child value was not read; parent observation does not establish child value or owner. Probe `c105c234f79f4378bf2491f22ec4f638`. |
+| Slab child | Exact request used model `8a693925-ae20-4dda-91d1-3951af3c0a52`, view `a0fcd7b3-85c8-4f83-99b7-59e8a3463c94`, `include_parent=true`, attribute `[508]`. | Not read. | Not read. | Blocked with `probe_scope_unavailable`; no child wrapper or separate parent read completed. This does not show that SelectAll omits Slab; native cause is unknown. Request `e8e7078e-2723-4ff9-91f6-40cd83811409`. |
+
+The journal inspection was complete and read-only: 31 of 512 records, 481
+remaining slots, no `new_execution_blockers`, and no records with
+`requires_recovery=true`. Execution `87a45065d5e14e3a9ac8c54756e273a0` remains
+`stopped`, integrity `verified`, one change `reconciled`, and
+`requires_recovery=false`. This later observation updates its previously reported
+`stopped/unknown` state; preserve that historical result and do not infer
+ordinary applied success or preservation. Execution
+`4388b04e39a14fac811db4f58723d01f` is absent from these 31 results; this does
+not establish whether an archived record exists or connect any earlier Slab
+write to that execution. Do not associate historical Slab writes with an
+execution absent exact evidence. The probe logs and journal do not identify
+execution IDs for earlier Slab setter attempts.
+
+These are read observations only. They do not change the earlier intended-value
+PASS reports for attribute writes on two SkeletonBeams and the MultiSlab/Slab
+representations of one assembly, nor establish their owner bindings, undo, or
+preservation. The [0.40.0 evidence](test-results/evidence/0.40.0-2026-10-27/)
+contains the seven supplied files byte-for-byte. The [0.39.0 comparison log](test-results/evidence/0.39.0-2026-10-27/allplan-comparison-log.md)
+remains the record of the earlier query, not this material-comparison result.
 
 **2026-10-26, version 0.39.0 (owner attribution):** the owner reports PASS for
 native material on the Wall, Wall with door/window and Column, and failure
@@ -95,8 +124,9 @@ until an ID-bound journal record establishes their outcome.
 
 The SDK exposes native Material and generic element-attribute APIs separately.
 A matching displayed value does not prove independent storage or equivalent
-setters. After the successful attribute writes, paired read-only native and
-attribute observations on the same owner are still missing. See the
+setters. The 0.40.0 results supply paired getter observations on both retained
+SkeletonBeams and MultiSlab; the separate Slab child and historical write-owner
+bindings remain unresolved. See the
 [API comparison](m4-editing-api-0.32.0.md#native-material-material-attribute-and-surface).
 
 ## Accepted baseline and scoped M4 observations

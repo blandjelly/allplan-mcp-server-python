@@ -12,7 +12,7 @@ PROBE_SCHEMA = "m4-property-probe-1"
 def validate_probe(request):
     keys(request, {"schema_version", "phase", "drawing_file", "attribute_name", "attribute_id", "layer_short_name",
                    "layer_name", "offset", "limit", "candidate_ids",
-                   "model_uuid", "view_uuid", "name_contains", "attribute_ids", "include_parent"},
+                   "model_uuid", "view_uuid", "name_contains", "attribute_ids", "include_parent", "parent_ref"},
          {"schema_version", "phase"})
     if request["schema_version"] != PROBE_SCHEMA:
         invalid(f"schema_version must be {PROBE_SCHEMA}.")
@@ -34,6 +34,8 @@ def validate_probe(request):
     if request["phase"] in ("element_attributes", "component_identity", "attribute_evidence", "material_comparison"):
         extra = ({"name_contains", "offset", "limit"} if request["phase"] == "element_attributes" else
                  {"attribute_ids", "include_parent"} if request["phase"] in ("attribute_evidence", "material_comparison") else set())
+        if request["phase"] == "material_comparison":
+            extra.add("parent_ref")
         keys(request, {"schema_version", "phase", "drawing_file", "model_uuid", "view_uuid"} | extra,
              {"schema_version", "phase", "drawing_file", "model_uuid", "view_uuid"})
         bounded_int(request["drawing_file"], 1, 2147483647, "drawing_file")
@@ -51,6 +53,17 @@ def validate_probe(request):
                 invalid("attribute_ids must contain 1 to 16 distinct positive IDs.")
             if type(request.get("include_parent", False)) is not bool:
                 invalid("include_parent must be a boolean.")
+            if "parent_ref" in request:
+                parent = request["parent_ref"]
+                keys(parent, {"model_uuid", "view_uuid"}, {"model_uuid", "view_uuid"})
+                for field in ("model_uuid", "view_uuid"):
+                    value = parent[field]
+                    if (not isinstance(value, str)
+                            or not re.fullmatch(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}", value)
+                            or value == "00000000-0000-0000-0000-000000000000"):
+                        invalid(f"parent_ref.{field} must be one canonical nonzero UUID.")
+                if parent["model_uuid"] == request["model_uuid"]:
+                    invalid("parent_ref must identify a different model.")
             return
         if request["phase"] == "component_identity":
             return
