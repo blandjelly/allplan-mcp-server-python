@@ -321,6 +321,14 @@ def observe(plans, doc, base, settings, request):
                 element["native_material_preservation"] = {
                     "status": "not_checked", "value": None, "reason": "native_material_representation_conflict",
                     "diagnostic": {"stage": "material_representation_consensus", "error_type": "RepresentationConflict"}}
+            # Report the same required native owner used by the planner. The
+            # reviewed view keeps its exact lineage and preservation evidence;
+            # other representations participate in the material consensus above.
+            state = element.get("native_material_state")
+            element["native_material_ownership"] = (
+                {"status": "observed", "value": {key: copy.deepcopy(state[key])
+                    for key in ("native_class", "material_owner", "hierarchy")}}
+                if state is not None else copy.deepcopy(element["native_material_preservation"]))
     if delete_requested:
         from .model_delete import ownership as delete_ownership
         for element in snapshot["elements"]:
@@ -335,9 +343,13 @@ def observe(plans, doc, base, settings, request):
     # Semantic enumeration intentionally retains a Slab and its MultiSlab as
     # distinct identities. Observe ancestry before deciding which can be edited;
     # equal geometry is never a reason to merge or redirect them.
+    # Native material has its own required owner/lineage and optional component
+    # tree in native_material_state. The generic attribute/layer comparison
+    # includes view UUIDs, so applying it to that route would report an unrelated
+    # ownership conflict for otherwise agreeing representations of one model.
     from .component_ownership import observation as ownership_observation
     for element in snapshot["elements"]:
-        if element["fields"]["type_name"].get("value") not in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
+        if material_requested or element["fields"]["type_name"].get("value") not in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
             continue
         representations = live.get((element["ref"]["drawing_file"], element["ref"]["model_uuid"]), {})
         evidence = [trace.call("Slab.component_ownership", lambda adapter=adapter:
@@ -439,6 +451,9 @@ def observe(plans, doc, base, settings, request):
                   and element.get("native_material_preservation", {}).get("status") == "not_checked"],
               "component_ownership": [{"ref": element["ref"], "observation": element["component_ownership"]}
                                       for element in snapshot["elements"] if "component_ownership" in element],
+              "native_material_ownership": [
+                  {"ref": element["ref"], "observation": element["native_material_ownership"]}
+                  for element in snapshot["elements"] if "native_material_ownership" in element],
               "criterion_failures": [
                   {"ref": element["ref"], "fields": {
                       field: copy.deepcopy(element["fields"][field])

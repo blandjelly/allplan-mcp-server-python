@@ -1,29 +1,43 @@
 # Current M4 handoff
 
-## Next task — verify candidate 0.42.0, then run one native trial
+## Next task — verify candidate 0.42.1, then run one native trial
 
-Candidate 0.42.0 adds an opt-in `model_edit` `exact_target` for one Slab child
-and its exact MultiSlab parent. The request is limited to one foreground
-drawing, `native_types=["Slab_TypeUUID"]`, no predicate, attributes or
-exclusions, and one native Material change. The bounded resolver retains the
-complete direct inventory and injects only the explicitly resolved child for
-this opt-in. Preview binds the exact target and child inventory fingerprint;
-revalidation, target preflight and the final setter boundary resolve and compare
-them again. Highlight first verifies the exact child target, then presents all
-representations of that child model UUID; it never targets the parent. Readback
-and recovery require the same exact inventory and reviewed view. A regenerated
-or missing view stays unknown; this opt-in has no replacement-view fallback.
-See the [implemented API contract](m4-editing-api-0.32.0.md#exact-child-native-material-target-0420).
+Complete required CI/package production and exact-ZIP verification for 0.42.1.
+Then on a disposable fixture create a fresh preview (the prior plan expired),
+review/highlight the exact target, and perform one trial with Apply, fresh
+readback, preservation and Undo/restoration. See [plan items 1–3](office-editing-development-plan.pl.md#pozostałe-prace-i-nierozwiązane-błędy).
 
-This candidate is on `codex/m4-material-read-evidence`, for PR #48 based on
-`develop/m4` merge commit `dd741fa`. **230 related focused checks plus 9 final
-exact-target/public HTTP checks PASS**, including version consistency. Full CI
-and package production, exact ZIP
-verification/installation, and native acceptance for 0.42.0 remain pending.
-After the required CI and exact-ZIP gate, run one reviewed exact-owner trial on
-a disposable fixture with preview, highlight, Apply, fresh readback,
-preservation and Undo/restoration. Do not repeat the completed 0.41 getter or
-historical setters. See [plan items 1–3](office-editing-development-plan.pl.md#pozostałe-prace-i-nierozwiązane-błędy).
+**Latest candidate 0.42.1:** on `codex/m4-fix-exact-slab-042`, based on
+`develop/m4` `58512959` (PR #48 merged; installed source `3cd243f`). Native-
+material-only previews now report `criteria.native_material_ownership` from
+the selected native state instead of running the unrelated generic multi-view
+component ownership comparison. Attribute/layer ownership guards and exact
+target, material, preservation, setter, readback and recovery safeguards are
+unchanged. **161 unique focused checks PASS** including version consistency:
+154 non-HTTP checks and 7 HTTP checks. The initial HTTP attempt was blocked by
+sandbox socket creation; the network-enabled rerun passed all 7. This is not
+full CI.
+
+The [exact-target contract](m4-editing-api-0.32.0.md#exact-child-native-material-target-0420)
+limits the opt-in to one Slab child and its exact MultiSlab parent in one
+foreground drawing, with no predicate, attributes or exclusions. It binds the
+exact target and inventory through preview, revalidation, final setter and
+readback/recovery; highlight targets the child, never its parent. Regenerated
+or missing views stay unknown, without replacement-view fallback.
+
+The supplied Allplan evidence contains only health, context and preview. The
+installed 0.42.0 bridge reports source `3cd243f`, verified integrity, and
+Allplan 2026.1 (executable 16.1617.8659.814). Its preview matched the exact
+Slab child, observed current Material `" "` against requested `C35/45`, and
+reported `usable_for_write=true`; `setter_calls_started=0`. The agent stopped
+before highlight. The old `criteria.component_ownership` result was an
+aggregate ancillary conflict. Supplied evidence has no per-view observations
+to establish its cause; a distinct-view fixture reproduced the report, but
+this does not establish native owner conflict or failed write. Raw evidence is
+preserved [unchanged here](test-results/evidence/0.42.0-2026-10-27/allplan-042-native-test-evidence.json).
+This does not establish native acceptance or exact ZIP verification.
+
+Do not repeat the completed 0.41 getter or historical setters.
 
 ## Previous candidate and native evidence
 
