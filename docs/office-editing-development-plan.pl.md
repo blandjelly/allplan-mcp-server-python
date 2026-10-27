@@ -30,7 +30,7 @@ Wieloplikowość i cały projekt wymagają osobnego projektu oraz odbioru.
 | 2 — Beam i Slab/MultiSlab native material: otwarte | Beam/SkeletonBeam query zwróciło 0 przy dwóch konfliktach reprezentacji, choć później attribute query znalazło dwie SkeletonBeam. Slab po próbach nadal ma pusty natywny materiał. Rozdzielić błąd discovery/pokrycia od braku persistence i właściciela Slab. SDK udostępnia Material dla obu rodzin; brak pola w ogólnej palecie nie dowodzi braku obsługi. [Porównanie API](m4-editing-api-0.32.0.md#native-material-material-attribute-and-surface). |
 | 3 — atrybuty Slab/MultiSlab: zgłoszony PASS wartości | Log 0.39.0 potwierdza raportowaną wartość atrybutu na MultiSlab i jego Slab; brak surowych payloadów z ID/typem/ref/owner i readbackiem. Zachować `target.property_owner="selected_element"`, pełne lineage/children i blokadę overlap, bez redirectu. Nie traktować sukcesu atrybutu jako sukcesu materiału natywnego. |
 | 4 — warstwa i no-op: częściowo odebrane | Zachować W1 read/write, pojedyncze Undo i zgłoszony no-op w ich dotychczasowym zakresie. Pozostałe pary rodzina/właściciel oraz grupowe Undo wymagają dowodu; poniżej kryteria zamknięcia. No-op nie ma drogi Apply. |
-| 5 — delete i selekcja: częściowo odebrane / brak funkcji | Zachować grouped Column delete/Undo i obserwację Wall subtree. Inne deklarowane rodziny/poddrzewa wymagają dowodu. Native selection set/clear/readback nadal unsupported; highlight nie zamyka selekcji. |
+| 5 — delete i selekcja: częściowo odebrane / brak funkcji | Zachować grouped Column delete/Undo i obserwację Wall subtree. Inne deklarowane rodziny/poddrzewa wymagają dowodu. [Analiza API selekcji](m4-native-selection-api.md) rozdziela programowe set/clear/readback od interactive pick i preselekcji. Brak potwierdzonego kompletnego kontraktu; native selection nadal unsupported, highlight nie zamyka selekcji. |
 | 6 — typy i rodziny | Domknąć owner-specific roundtrip oraz macierz rodzin/typów. Column Enum `Status` ID 49 pozostaje BLOCKED (`<niezdefiniowany>`, brak potwierdzonej etykiety). Wall CheckBox ID 1371 nie ma surowego Apply; fixture SDK Boolean brak. Inne typed attribute gaps rodzin wymagają osobnych dowodów. Date/vector/object wymagają dokładnych kontraktów setter payload i typed readback; sam symbol lub konstruktor SDK nie wystarcza. |
 
 ### Dowody potrzebne do zamknięcia punktów 1–5
@@ -90,6 +90,10 @@ przepływ; nie powtarzać zakończonych Apply dla samego odtworzenia logu.
    w API/UI, także po clear. Zamknięcie pełnego punktu wymaga obu części;
    pozostawienie selekcji unsupported wymaga jawnej decyzji o ograniczeniu
    zakresu. Highlight, query selection cache i native selection to różne stany.
+   Następny krok selekcji: ustalić kontrakt replace/clear/niezależnego readbacku
+   w SDK zainstalowanego builda i wykonać [wąski eksperyment](m4-native-selection-api.md#7-minimalny-eksperyment-i-pytania-rozstrzygające).
+   `GetPreSelectedElements` wymaga rozstrzygnięcia scope/lifecycle; interaktywny
+   `StartElementSelect` sam nie spełnia kierunku query → dokładna selekcja UI.
 
 Historyczne unresolved execution IDs i broad property discovery pozostają
 zachowane w [statusie walidacji](validation-status.md#evidence-for-unresolved-cases);

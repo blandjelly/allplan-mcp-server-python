@@ -39,6 +39,16 @@ with profiling and MCP ergonomics; larger writes depend on the relevant native
 gates above. This is documentation only, with diff/link checks and no runtime
 tests, builds or new native acceptance; the current limits are unchanged.
 
+Native selection research for priority 5 is in the
+[API analysis](m4-native-selection-api.md). The inspected public 2026 API
+documents interactive pick, but no complete arbitrary replace/clear/current-state
+readback contract was found. Next selection step: resolve that contract for the
+installed SDK and the scope/lifecycle of `GetPreSelectedElements` with the bounded
+experiment in the note. Cursor identification and consumed pick results are not
+global selection readback. `select` remains unsupported; interactive pick would
+be a separate feature. This is documentation only, with no new native acceptance;
+the Beam/Slab diagnostic task above and accepted delete scope remain unchanged.
+
 ## Latest tested version — 0.39.0
 
 [PR #42](https://github.com/blandjelly/allplan-mcp-server-python/pull/42) is merged
