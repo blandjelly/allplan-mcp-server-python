@@ -150,10 +150,15 @@ separates those reports. The supplied
 log contains no highlight, Apply or readback, and the owner confirmed the agent
 stopped before highlight. It does not demonstrate a failed native write.
 
-This contract provides target binding, not native Allplan acceptance or proof
-of persistence. The candidate still requires CI, exact ZIP verification and
-one justified disposable-copy native trial with a fresh reviewed
-preview/highlight/Apply, readback, preservation and Undo.
+The [0.42.1 native trial](test-results/evidence/0.42.1-2026-10-27/allplan-0421-native-test-evidence.json)
+confirms the native owner report and highlight API submission, but Apply stops
+at `fresh_resolve` with `Exact child inventory or parent edge changed.`
+Recovery repeats the conflict and leaves execution
+`a8a31c72975541feb1c36a2e8cbb8f65` unknown with writes blocked. Preflight
+material consensus across two views is not proof of identical exact inventory.
+The log does not identify which inventory/edge changed or establish native
+write acceptance, preservation or Undo. Diagnose this boundary before another
+trial; retain the exact binding and original read-only recovery ID.
 The 0.41.0 getter PASS, including `target_in_direct_scan=false` for its exact
 requested view, neither proves that the model edit scan loses the Slab nor
 diagnoses the earlier write failure.
