@@ -30,6 +30,56 @@ class ExactMaterialTargetTests(unittest.TestCase):
     def preview(self):
         return self.f.native.call(self.request)
 
+    def alternate_view(self):
+        f = self.f
+        alias = copy.deepcopy(f.root)
+        alias.GetElementUUID.return_value = str(uuid4())
+        f.native.parents[id(alias)] = self.parent
+        f.native.children[id(alias)] = []
+        f.native.base.ElementsSelectService.SelectAllElements.return_value = [self.parent, alias]
+        return alias
+
+    def test_material_ownership_report_uses_reviewed_view_with_multiple_representations(self):
+        f = self.f
+        self.alternate_view()
+        plan = self.preview()
+        self.assertTrue(plan["apply_available"], plan)
+        self.assertEqual(plan["criteria"]["component_ownership"], [])
+        entry, = plan["criteria"]["native_material_ownership"]
+        self.assertEqual(entry["ref"], plan["changes"][0]["ref"])
+        self.assertEqual(entry["observation"]["status"], "observed")
+        owner = entry["observation"]["value"]
+        self.assertEqual(owner["material_owner"], "slab_properties")
+        self.assertEqual(owner["native_class"], "SlabElement")
+        self.assertEqual(owner["hierarchy"], plan["changes"][0]["resource"]["native_material_state"]["hierarchy"])
+        self.assertEqual(owner["hierarchy"]["target"]["view_uuid"], self.target["view_uuid"])
+        self.assertEqual(owner["hierarchy"]["lineage"][1]["view_uuid"], self.target["parent_ref"]["view_uuid"])
+        self.assertEqual(plan["setter_calls_started"], 0)
+        self.assertEqual(plan["next_action"]["request"]["action"], "highlight")
+        f.native.highlight(plan)
+        self.assertEqual(f.native.apply(plan)["state"], "completed")
+        f.native.base.ModifyElements.assert_called_once()
+
+    def test_conflicting_material_views_report_unavailable_owner_and_block(self):
+        f = self.f
+        alias = self.alternate_view()
+
+        def get_element(adapter):
+            props = copy.deepcopy(f.properties)
+            if adapter is alias:
+                props.Material = "different material"
+            return families.SlabElement(props)
+
+        f.native.base.GetElement.side_effect = get_element
+        plan = self.preview()
+        self.assertFalse(plan["usable_for_write"], plan)
+        self.assertFalse(plan["changes"])
+        entry, = plan["criteria"]["native_material_ownership"]
+        self.assertEqual(entry["observation"]["status"], "not_checked")
+        self.assertEqual(entry["observation"]["reason"], "native_material_representation_conflict")
+        self.assertIsNone(entry["observation"]["value"])
+        f.native.base.ModifyElements.assert_not_called()
+
     def test_missing_direct_child_preview_highlight_apply_replay_and_noop(self):
         f = self.f
         plan = self.preview()

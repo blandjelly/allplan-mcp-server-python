@@ -130,10 +130,30 @@ it does not fall back to a replacement view. Recovery is read-only under the
 original execution ID and never retries a setter. Existing material setter,
 preservation, journal, overlap, stale and replay guards remain in force.
 
+Native-material previews report `criteria.native_material_ownership` from the
+same selected `native_material_state` used by the planner: the native class,
+property owner and exact hierarchy, including the reviewed view. Unavailable
+required evidence or disagreeing material representations remain `not_checked`
+and block planning. The generic `criteria.component_ownership` remains for
+other operations and is empty on the exclusive native-material route. Its
+attribute/layer checks compare complete adapter observations, including view
+UUIDs, and must not be used as a second native-material owner verdict. The
+selected native state still retains its component-tree preservation evidence.
+
+The [installed 0.42.0 preview evidence](test-results/evidence/0.42.0-2026-10-27/allplan-042-native-test-evidence.json)
+reports one usable exact Slab plan with old Material `" "`, requested `C35/45`
+and zero setters. Its ancillary `slab_ownership_representation_conflict` can be
+reproduced by comparing different view identities in a fixture; the log does
+not include the individual generic observations needed to prove that was the
+native cause. The native material owner checks passed. Candidate 0.42.1
+separates those reports. The supplied
+log contains no highlight, Apply or readback, and the owner confirmed the agent
+stopped before highlight. It does not demonstrate a failed native write.
+
 This contract provides target binding, not native Allplan acceptance or proof
-of persistence. Focused checks pass; candidate 0.42.0 still requires required
-CI, exact ZIP verification and one justified disposable-copy native trial with
-reviewed preview/highlight/Apply, fresh readback, preservation and Undo.
+of persistence. The candidate still requires CI, exact ZIP verification and
+one justified disposable-copy native trial with a fresh reviewed
+preview/highlight/Apply, readback, preservation and Undo.
 The 0.41.0 getter PASS, including `target_in_direct_scan=false` for its exact
 requested view, neither proves that the model edit scan loses the Slab nor
 diagnoses the earlier write failure.

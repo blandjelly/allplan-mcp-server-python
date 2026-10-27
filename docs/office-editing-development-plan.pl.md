@@ -26,8 +26,8 @@ Wieloplikowość i cały projekt wymagają osobnego projektu oraz odbioru.
 
 | Priorytet | Co pozostało / warunek dalszej pracy |
 | --- | --- |
-| 1 — dostawa i recovery: częściowo potwierdzone | Dla źródła 0.41.0 `f775168aaf8fdb043c269ff09d6ffda9fcea17c9`, merged PR #47 / `dd741fa`, run `40550057327` potwierdza configuration, Windows/Ubuntu Python 3.12, package i `ci-required`; wcześniejszy `40549970082` był nieudany. Raport właściciela potwierdza CI/ZIP, ale dokładny zainstalowany ZIP i upgrade/restore nie są niezależnie zweryfikowane. Bieżący kandydat 0.42.0 jest w pracy dla PR #48; jego CI/package i exact-ZIP pozostają pending. Zachować historię `87a…` (`stopped/reconciled`, `requires_recovery=false`, bez dowodu applied/preservation) i `4388…` (brak w 31 rekordach nie ustala archiwum); nie powtarzać inspekcji bez nowej przesłanki ani setterów. [Status i następny krok](next-model-handoff.md). |
-| 2 — native Material Beam/Slab/MultiSlab: odbiór 0.42.0 pending | Getter-only PASS 0.41.0 i jego ograniczenia są opisane w [handoffie](next-model-handoff.md). Kandydat 0.42.0 implementuje jawny `exact_target` dla jednego Slab child/parent w `model_edit`; **230 related checks plus 9 final exact-target/public HTTP checks PASS**, w tym version consistency. CI/package, exact ZIP oraz native acceptance są pending. Przed jednym trialem na disposable fixture zachować positive/negative kontrole exact refs/views, stale/parent drift, overlap, replay, granic enumeracji oraz read-only unknown recovery. Następnie wymagane są required CI i exact ZIP. Próba obejmuje dokładny preview/highlight/Apply, świeży readback, preservation i Undo/restoration. Nie przypisywać 0.41 `target_in_direct_scan=false` do semantic `model_edit` ani przyczyny SelectAll. Nie powtarzać historical setters. [Implemented exact-target contract](m4-editing-api-0.32.0.md#exact-child-native-material-target-0420). |
+| 1 — dostawa i recovery: częściowo potwierdzone | Dla źródła 0.41.0 `f775168aaf8fdb043c269ff09d6ffda9fcea17c9`, merged PR #47 / `dd741fa`, run `40550057327` potwierdza configuration, Windows/Ubuntu Python 3.12, package i `ci-required`; wcześniejszy `40549970082` był nieudany. Raport właściciela potwierdza CI/ZIP, ale dokładny zainstalowany ZIP i upgrade/restore nie są niezależnie zweryfikowane. Kandydat 0.42.1 jest w pracy na `codex/m4-fix-exact-slab-042`, oparty na `develop/m4` `58512959`; CI/package i exact-ZIP pozostają pending. Zachować historię `87a…` (`stopped/reconciled`, `requires_recovery=false`, bez dowodu applied/preservation) i `4388…` (brak w 31 rekordach nie ustala archiwum); nie powtarzać inspekcji bez nowej przesłanki ani setterów. [Status i następny krok](next-model-handoff.md). |
+| 2 — native Material Beam/Slab/MultiSlab: odbiór pending | Getter-only PASS 0.41.0 oraz bieżące dowody, ograniczenia i warunki trialu są opisane w [handoffie](next-model-handoff.md) i w szczegółach punktu 2 poniżej. Nie powtarzać historycznych setterów. |
 | 3 — atrybuty Slab/MultiSlab: zgłoszony PASS wartości, owner niepełny | Raportowany Apply/readback PASS z 0.39.0 pozostaje, ale historyczne payloady i exact owner binding brakują. Getter 0.41.0 ID 508 `TEST1` na child i parent nie przypisuje właściciela historycznego zapisu ani nie dowodzi sprzężenia z native Material. Zachować `target.property_owner="selected_element"`, lineage/children i overlap guard; nie utożsamiać atrybutu z native Material. Nie ponawiać accepted writes dla odtworzenia dowodu. |
 | 4 — warstwa i no-op: częściowo odebrane | Zachować W1 read/write, pojedyncze Undo i zgłoszony no-op w ich dotychczasowym zakresie. Pozostałe pary rodzina/właściciel oraz grupowe Undo wymagają dowodu; poniżej kryteria zamknięcia. No-op nie ma drogi Apply. |
 | 5 — delete i selekcja: częściowo odebrane / brak funkcji | Zachować grouped Column delete/Undo i obserwację Wall subtree. Inne deklarowane rodziny/poddrzewa wymagają dowodu. [Analiza API selekcji](m4-native-selection-api.md) rozdziela programowe set/clear/readback od interactive pick i preselekcji. Brak potwierdzonego kompletnego kontraktu; native selection nadal unsupported, highlight nie zamyka selekcji. |
@@ -75,17 +75,28 @@ przepływ; nie powtarzać zakończonych Apply dla samego odtworzenia logu.
    odtworzony w innym view target pozostaje unknown, bez fallbacku. Diagnostic
    resolver nie jest sam write authorization.
 
-   Focused: 230 related checks plus 9 final exact-target/public HTTP checks PASS,
-   w tym version consistency; final checks obejmują regeneration→unknown,
-   replay/recover, final-boundary budget i brak exact child w semantic scan bez
-   fałszywego no-op. Przed native trialem wymagane są positive i
-   negative checks dla missing/stale/conflicting refs, parent/child/view drift,
-   incomplete inventory, budgets, overlap, no-op/replay i unknown recovery,
-   potem required CI i exact ZIP. Następnie jeden reviewed exact-owner preview,
-   highlight, Apply i świeży readback/UI na disposable fixture; sprawdzić
-   zachowanie geometrii, poziomów, połączeń i składników oraz Undo/readback
-   restoration. Nie powtarzać 0.41 getter ani historycznych setterów. Zwykły
-   Beam pozostaje `fixture_missing`; nie rozszerzać wyniku na inne rodziny.
+   Kandydat 0.42.1 zmienia wyłącznie raport native-material-only preview:
+   zastępuje niezależne porównanie generic `component_ownership` polem
+   `native_material_ownership` z wybranego native state/eligibility. Dokładne
+   view/lineage i preservation fingerprints, exact-target binding oraz
+   revalidation/final setter/readback/recovery guards pozostają; generic
+   ścieżka i zapory atrybutów/warstw bez zmian. Focused checks PASS; szczegóły
+   są w [handoffie](next-model-handoff.md).
+
+   Dowód z Allplana 2026.1 wiąże zainstalowany 0.42.0 z source `3cd243f`,
+   integrity verified. Preview exact child jest `usable_for_write`, czyta
+   Material `" "` wobec `C35/45`; agent zakończył przed highlight,
+   `setter_calls_started=0`. Raport `component_ownership` zawiera agregatowy
+   konflikt; zachowany dowód nie ma per-view danych rozstrzygających przyczynę.
+   Podobny wynik odtworzono w fixture z różnymi view, ale nie dowodzi to
+   konfliktu native owner ani failed write. Surowy dowód jest [zachowany bez
+   zmian](test-results/evidence/0.42.0-2026-10-27/allplan-042-native-test-evidence.json).
+   Po required CI i
+   exact ZIP wykonać świeży preview (poprzedni plan wygasł), reviewed highlight,
+   Apply, świeży readback/UI, sprawdzenie geometrii, poziomów, połączeń,
+   składników oraz Undo/restoration na disposable fixture. Nie powtarzać 0.41
+   getter ani historycznych setterów. Zwykły Beam pozostaje `fixture_missing`;
+   nie rozszerzać wyniku na inne rodziny.
 3. **Atrybuty Slab/MultiSlab:** zachować zgłoszony PASS wartości 0.39.0.
    Brakuje dokładnych historycznych payloadów Apply i powiązania właścicieli,
    kolejności grupowania oraz Undo/odtworzenia. Getter 0.41.0 ID 508 na

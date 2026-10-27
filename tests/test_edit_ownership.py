@@ -103,6 +103,21 @@ class EditOwnershipTests(unittest.TestCase):
         self.assertEqual(self.apply(plan)["state"], "completed")
         self.assertEqual(dict(aggregate.GetAttributes.return_value)[508], "Beton1")
 
+    def test_attribute_owner_still_requires_exact_ownership_consensus_across_views(self):
+        slab, aggregate = self.material_slabs()
+        alias = copy.deepcopy(slab)
+        alias.GetElementUUID.return_value = str(uuid4())
+        self.parents[id(alias)] = aggregate
+        self.children[id(alias)] = []
+        self.base.ElementsSelectService.SelectAllElements.return_value = [slab, aggregate, alias]
+        plan = self.explicit_material_plan("Slab_TypeUUID")
+        self.assertFalse(plan["apply_available"], plan)
+        self.assertEqual(plan["criteria"]["native_material_ownership"], [])
+        entry, = plan["criteria"]["component_ownership"]
+        self.assertEqual(entry["observation"]["reason"], "slab_ownership_representation_conflict")
+        self.assertEqual(plan["blocked"][0]["reason"], "slab_ownership_unavailable")
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
     def test_explicit_parent_child_material_overlap_blocks_before_setters(self):
         self.material_slabs()
         request = self.request(predicate=None, native_types=["Slab_TypeUUID", "MultiSlab_TypeUUID"], changes=[{

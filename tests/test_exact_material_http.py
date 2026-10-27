@@ -16,6 +16,7 @@ class ExactMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
         fixture = fixtures.ExactMaterialTargetTests()
         fixture.setUp()
         self.addCleanup(fixture.doCleanups)
+        fixture.alternate_view()
         self.route_model_edit(fixture.f.native)
         async with Client(self.url, timeout=30) as client:
             for updates in ({"exact_target": None}, {"native_types": ["MultiSlab_TypeUUID"]}):
@@ -24,6 +25,11 @@ class ExactMaterialHTTPTests(unittest.IsolatedAsyncioTestCase):
             self.assertFalse(self.bridge_handler.calls)
             plan = (await client.call_tool("model_edit", {"request": fixture.request})).data
             self.assertTrue(plan["apply_available"], plan)
+            self.assertEqual(plan["criteria"]["component_ownership"], [])
+            owner, = plan["criteria"]["native_material_ownership"]
+            self.assertEqual(owner["observation"]["value"]["material_owner"], "slab_properties")
+            self.assertEqual(owner["observation"]["value"]["hierarchy"]["target"]["view_uuid"],
+                             fixture.target["view_uuid"])
             highlighted = (await client.call_tool("model_edit", {"request": plan["next_action"]["request"]})).data
             request = {**highlighted["next_action"]["request"], "execution_id": uuid4().hex}
             result = (await client.call_tool("model_edit", {"request": request})).data
