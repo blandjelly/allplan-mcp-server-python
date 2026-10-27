@@ -1,26 +1,31 @@
 # Current M4 handoff
 
-## Next task — exact-target native Material for a Slab child
+## Next task — verify candidate 0.42.0, then run one native trial
 
-Continue from the M4 source merged into **develop/m4**: candidate 0.41.0 source
-`f775168aaf8fdb043c269ff09d6ffda9fcea17c9`, merged PR #47, merge commit
-`dd741fa`. The next development task is the
-[proposed exact-child edit contract](m4-editing-api-0.32.0.md#exact-child-edit-targeting--proposed-contract-not-an-available-api),
-which is not implemented. Bind explicit child/parent model/view identities
-through preview, revalidation and Apply, with bounded enumeration, fresh
-property-owner checks, retained native containers and read-only unknown recovery.
-Do not broaden predicate results or treat the diagnostic resolver as write
-authorization. Cover stale/missing/conflicting identities, view/parent drift,
-overlap, no-op and replay before the required CI/ZIP candidate and a justified
-isolated native trial with readback, preservation and Undo.
+Candidate 0.42.0 adds an opt-in `model_edit` `exact_target` for one Slab child
+and its exact MultiSlab parent. The request is limited to one foreground
+drawing, `native_types=["Slab_TypeUUID"]`, no predicate, attributes or
+exclusions, and one native Material change. The bounded resolver retains the
+complete direct inventory and injects only the explicitly resolved child for
+this opt-in. Preview binds the exact target and child inventory fingerprint;
+revalidation, target preflight and the final setter boundary resolve and compare
+them again. Highlight first verifies the exact child target, then presents all
+representations of that child model UUID; it never targets the parent. Readback
+and recovery require the same exact inventory and reviewed view. A regenerated
+or missing view stays unknown; this opt-in has no replacement-view fallback.
+See the [implemented API contract](m4-editing-api-0.32.0.md#exact-child-native-material-target-0420).
 
-The getter PASS does not prove that the semantic edit scan loses this Slab or
-explain its earlier failed write. The native Material path already supports
-selected Slab properties with a direct MultiSlab parent; changing its setter
-or weakening `slab_write_blocker` is not justified. Do not repeat historical
-setters or the completed getter trials. See [plan items 1–3](office-editing-development-plan.pl.md#pozostałe-prace-i-nierozwiązane-błędy).
+This candidate is on `codex/m4-material-read-evidence`, for PR #48 based on
+`develop/m4` merge commit `dd741fa`. **230 related focused checks plus 9 final
+exact-target/public HTTP checks PASS**, including version consistency. Full CI
+and package production, exact ZIP
+verification/installation, and native acceptance for 0.42.0 remain pending.
+After the required CI and exact-ZIP gate, run one reviewed exact-owner trial on
+a disposable fixture with preview, highlight, Apply, fresh readback,
+preservation and Undo/restoration. Do not repeat the completed 0.41 getter or
+historical setters. See [plan items 1–3](office-editing-development-plan.pl.md#pozostałe-prace-i-nierozwiązane-błędy).
 
-## Latest source and verification
+## Previous candidate and native evidence
 
 Candidate **0.41.0**, source `f775168aaf8fdb043c269ff09d6ffda9fcea17c9`, is
 merged to `develop/m4` as PR #47 / `dd741fa`. The 82 focused checks and 8
@@ -30,8 +35,8 @@ completed successfully for configuration, Ubuntu and Windows Python 3.12
 portable jobs, package production and `ci-required`. The earlier run
 40549970082 failed and is not validation. The supplied report records the
 owner's CI/ZIP confirmation; exact installed ZIP identity and upgrade/restore
-were not independently verified. This evidence/documentation change keeps
-runtime and version unchanged and produces no new package.
+were not independently verified. The later documentation-only update was
+commit `a26` and did not change runtime or create a package.
 
 Installed bridge health reported 0.41.0, source commit `f775168aaf8fdb043c269ff09d6ffda9fcea17c9`,
 and `installed_bridge_integrity=verified` with no mismatches.
@@ -49,6 +54,11 @@ four raw evidence files in [the 0.41.0 evidence directory](test-results/evidence
 The earlier SkeletonBeam 1 target/parent-edge view discrepancy remains open;
 do not generalize the Slab result to that beam or to ordinary Beam, whose
 fixture is not established.
+
+The exact-target contract does not change native setter semantics or establish
+Allplan write acceptance. Preserve the 0.41.0 result below as getter-only
+evidence; it does not prove that the semantic edit scan loses this Slab or
+explain the earlier failed write.
 
 The earlier report of 0.39.0 intended-value PASS for native Material on Wall,
 Wall with opening and Column, and for attribute writes on two SkeletonBeams and

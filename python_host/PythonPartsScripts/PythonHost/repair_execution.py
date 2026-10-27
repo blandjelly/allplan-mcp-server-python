@@ -574,7 +574,11 @@ class RepairExecutor:
                         def write_budget():
                             if self.plans.queries.clock() - started >= 20:
                                 raise BridgeError("scan_limit_exceeded", "Native mutation preflight exceeded execution budget.", 409)
-                        native_repairs.write(base, element, change, doc=doc, check=write_budget)
+                        extra = {}
+                        if (change.get("resource") or {}).get("exact_target_binding") is not None:
+                            from .property_probe import NativeProbeTrace
+                            extra["trace"] = NativeProbeTrace(self.plans.trace_path, "exact_material_pre_setter")
+                        native_repairs.write(base, element, change, doc=doc, check=write_budget, **extra)
                     else:
                         native_repairs.write(base, element, change)
                     if index == 0 and request.get("evaluation_stop"):

@@ -97,50 +97,72 @@ retained exact request, without establishing its native cause, a writable
 owner, shared storage or persistence. The diagnostic route does not change
 query membership, write guards or setter resolution.
 
-### Exact child edit targeting — proposed contract, not an available API
+### Exact-child native Material target (0.42.0)
 
-The native-material adapter already accepts selected `SlabElement.Properties`
-with the direct Slab → MultiSlab lineage. It reattaches the properties and
-submits the existing object; the ordinary Slab attribute/layer owner guard is
-not the native-material path. There is no evidence here that another
-`SetMaterial` implementation or an attribute substitution fixes persistence.
+The `model_edit` preview request accepts optional `exact_target` only for one
+native Material edit to a Slab child in one foreground drawing. It requires
+`native_types=["Slab_TypeUUID"]`, no predicate, attribute IDs or exclusions,
+and the `scope` must be `{drawing_files:[target drawing],
+include_passive:false,visibility:"api_select_all"}`.
+The exact target contains the child's drawing/model/view and its parent's
+model/view. Exact refs are canonical nonzero UUIDs; the parent model must differ
+from the child. This mode does not silently extend ordinary predicate-based
+selection.
 
-There is a separate targeting gap: `model_edit` preview accepts criteria and
-native types, chooses a view from the semantic scan, and binds that choice in
-the plan. It cannot request this exact child/parent view pair. Its Apply
-resolver enumerates SelectAllElements again and requires the reviewed view.
-In the 0.41.0 identity probe the requested child view was absent from the direct
-scan while another view was reported. This motivates explicit targeting; it
-does not prove the semantic scan loses the Slab model or explain the earlier
-failed native write. Before implementing a new path:
+The resolver first retains the complete direct `SelectAllElements` inventory,
+then uses the exact MultiSlab parent to resolve the child and verifies the
+immediate parent edge. It includes the explicitly resolved child in the scoped
+inventory for this opt-in while preserving every direct peer in the M1 scan.
+Limits are 10,000 direct adapters, at most 16 parent wrappers and 16 child
+target wrappers, 256 child visits, and the existing bounded operation/trace
+budgets. The plan binds the exact target and child inventory fingerprint. The
+same bounded identity, view, inventory and edge checks run on revalidation,
+Apply target preflight and at the final write boundary. Missing, stale, duplicate
+or conflicting identities, changed views/parent edges, or changed inventory
+stop the write. The selected Slab child remains the `SlabProperties` owner; the
+parent is a locator, never a replacement target.
 
-1. Define an opt-in exact child and parent identity contract for a single
-   foreground drawing and native-material change. Keep criteria-based edits
-   unchanged; never silently expand their targets through child traversal.
-2. Bind child and parent drawing/model/type/view, the independently verified
-   immediate-parent edge, child inventory and selected property owner into
-   the reviewed plan and source fingerprint. A parent hint only locates the
-   child; it does not make the parent the mutation owner. Resolve every
-   matching wrapper within explicit count/time/trace budgets and retain the
-   native collections through their use.
-3. Repeat that identity/edge verification at preview, revalidation and fresh
-   pre-setter resolution. Missing, stale, conflicting or replaced views/parents,
-   changed inventory or owner disagreement must stop before setters. Preserve
-   complete peer/source revalidation, no-op handling, parent/child overlap
-   rejection, final write guards, journaling and exact-ID replay protection.
-4. Keep post-write readback and recovery read-only and bound to the reviewed
-   owner. A regenerated view can be observed under existing recovery rules;
-   it must never authorize a replacement setter or an automatic retry. Value
-   disagreement or preservation drift retains the unknown outcome.
-5. Cover direct-scan exact-view absence, a different reported view, duplicate
-   wrappers, lifetime, child/parent drift, conflicts, budgets and zero setters
-   for stale/no-op/replay paths with focused checks. Only then prepare the
-   required CI/ZIP candidate and a justified isolated exact-owner native trial
-   with preview, readback/UI, preservation and Undo/restoration evidence.
+Highlight re-resolves the exact child first, then presents all representations
+of the selected child model UUID; it never targets the parent. Fresh readback
+and recovery stay bound to the exact reviewed inventory and view. If the
+reviewed view is absent or regenerated, the exact-target path remains unknown;
+it does not fall back to a replacement view. Recovery is read-only under the
+original execution ID and never retries a setter. Existing material setter,
+preservation, journal, overlap, stale and replay guards remain in force.
 
-This is a proposed targeting extension. Neither implementing it nor a getter
-PASS would establish material persistence; retain existing unknown outcomes
-and do not replay historical Slab setters as a diagnostic experiment.
+This contract provides target binding, not native Allplan acceptance or proof
+of persistence. Focused checks pass; candidate 0.42.0 still requires required
+CI, exact ZIP verification and one justified disposable-copy native trial with
+reviewed preview/highlight/Apply, fresh readback, preservation and Undo.
+The 0.41.0 getter PASS, including `target_in_direct_scan=false` for its exact
+requested view, neither proves that the model edit scan loses the Slab nor
+diagnoses the earlier write failure.
+
+Example using the retained 0.41.0 target refs; replace the value with the exact
+reviewed native material string. Do not apply this sample to repeat historical
+Slab writes:
+
+```json
+{
+  "schema_version": "m4-model-edit-1",
+  "action": "preview",
+  "scope": {"drawing_files": [101], "include_passive": false, "visibility": "api_select_all"},
+  "native_types": ["Slab_TypeUUID"],
+  "exact_target": {
+    "drawing_file": 101,
+    "model_uuid": "8a693925-ae20-4dda-91d1-3951af3c0a52",
+    "view_uuid": "a0fcd7b3-85c8-4f83-99b7-59e8a3463c94",
+    "parent_ref": {
+      "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+      "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9"
+    }
+  },
+  "changes": [{
+    "target": {"kind": "native_material", "tier_index": 1},
+    "value": "EXACT_REVIEWED_MATERIAL"
+  }]
+}
+```
 
 Current closure work is in [plan items 1–3](office-editing-development-plan.pl.md#dowody-potrzebne-do-zamknięcia-punktów-15).
 

@@ -273,9 +273,19 @@ def observe(plans, doc, base, settings, request):
     if layer_requested or "layer_id" in predicate_fields(request.get("predicate")):
         query["layer_resolution"] = "component"
     live, owners = {}, []
+    exact = request.get("exact_target")
+    exact_digest = None
+    if exact is not None:
+        from .exact_material_target import locate
+        base, exact_digest = locate(doc, base, exact, check, trace)
     snapshot = trace.call("M1.semantic_component_scan", lambda: plans.queries._scan(
         doc, base, settings, query, adapter_sink=live, adapter_owners=owners))
     check()
+    if exact is not None:
+        matches = [e for e in snapshot["elements"] if e["ref"]["model_uuid"] == exact["model_uuid"]]
+        if (len(matches) != 1 or matches[0]["view_identity_not_checked"]
+                or exact["view_uuid"] not in matches[0]["view_uuids"]):
+            raise BridgeError("repair_conflict", "The explicit child is missing or conflicting in the semantic scan.", 409)
     if material_requested:
         from .wall_material import preview_observation as material_observation, consensus_key
         for element in snapshot["elements"]:
@@ -283,6 +293,10 @@ def observe(plans, doc, base, settings, request):
             # native destination reads for a decisively excluded/nonmatching
             # peer. Revalidation still detects when that peer starts matching.
             criterion = request.get("predicate")
+            if exact is not None and element["ref"]["model_uuid"] != exact["model_uuid"]:
+                element["fields"]["native.material"] = {"status": "not_checked", "value": None,
+                                                        "reason": "outside_exact_target"}
+                continue
             if (element["ref"]["model_uuid"] in request.get("exclude_model_uuids", [])
                     or ("native.material" not in predicate_fields(criterion)
                         and evaluate_criterion(criterion, element["fields"]) is False)):
@@ -290,13 +304,14 @@ def observe(plans, doc, base, settings, request):
                     "status": "not_checked", "value": None, "reason": "destination_not_requested_for_non_target"}
                 continue
             representations = live.get((element["ref"]["drawing_file"], element["ref"]["model_uuid"]), {})
-            selected = next((adapter for view in sorted(representations) for adapter in representations[view]), None)
+            views = sorted(representations, key=lambda view: (view != exact["view_uuid"], view)) if exact else sorted(representations)
+            selected = next((adapter for view in views for adapter in representations[view]), None)
             values = [(view, trace.call("Native.material_observation", lambda adapter=adapter, view=view:
                        material_observation(base, adapter, check, trace=trace, preservation=adapter is selected,
                                             trace_ref={**element["ref"], "view_uuid": view}),
                        drawing_file=element["ref"]["drawing_file"], model_uuid=element["ref"]["model_uuid"],
                        view_uuid=view))
-                      for view in sorted(representations) for adapter in representations[view]]
+                      for view in views for adapter in representations[view]]
             if values and len({consensus_key(value) for _, value in values}) == 1 and not element["view_identity_not_checked"]:
                 (element["fields"]["native.material"], element["native_material_state"],
                  element["native_material_preservation"]) = values[0][1]
@@ -380,7 +395,10 @@ def observe(plans, doc, base, settings, request):
     checks = []
     for element in snapshot["elements"]:
         values = element["fields"]
-        match = evaluate_criterion(request.get("predicate"), values)
+        match = (element["ref"]["model_uuid"] == exact["model_uuid"] if exact else
+                 evaluate_criterion(request.get("predicate"), values))
+        if exact and match:
+            element["exact_target_binding"] = {"target": copy.deepcopy(exact), "inventory_fingerprint": exact_digest}
         decision = ("excluded" if element["ref"]["model_uuid"] in excluded else
                     "unknown" if match is None else "matched" if match else "nonmatching")
         checks.append({"ref": element["ref"], "decision": decision})
@@ -501,7 +519,10 @@ def preview(plans, doc, base, settings, request):
             if element.get("view_identity_not_checked") or not element.get("view_uuids"):
                 blocked.append({"ref": element["ref"], "field": bound["field"], "reason": "target_view_unavailable"})
                 continue
-            change["target_view_uuid"] = sorted(element["view_uuids"])[0]
+            change["target_view_uuid"] = (request["exact_target"]["view_uuid"] if "exact_target" in request
+                                          else sorted(element["view_uuids"])[0])
+            if "exact_target_binding" in element:
+                change["resource"]["exact_target_binding"] = copy.deepcopy(element["exact_target_binding"])
             if bound["operation"] == "delete_element":
                 from .model_delete import blocker as delete_blocker
                 ownership = element.get("delete_ownership")
@@ -620,6 +641,14 @@ def highlight(plans, doc, base, settings, ifw, request):
     if report["report_fingerprint"] != entry["plan"]["evidence_fingerprint"]:
         raise BridgeError("repair_conflict", "Model edit evidence changed before highlight.", 409)
     # model_selection compares M1 source, whereas the plan also binds presence/resource evidence.
+    if "exact_target" in entry["request"]:
+        from .exact_material_target import locate
+        started = plans.queries.clock()
+        def check():
+            if plans.queries.clock() - started >= plans.queries.SCAN_SECONDS:
+                raise BridgeError("scan_limit_exceeded", "Exact highlight resolution expired.", 409)
+        base, _ = locate(doc, base, entry["request"]["exact_target"], check,
+                         plans.queries.material_trace_factory("exact_material_highlight"))
     raw_snapshot = plans.queries._scan(doc, base, settings, query)
     ident = uuid4().hex
     if len(plans.queries.selections) >= plans.queries.MAX_SELECTIONS:

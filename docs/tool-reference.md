@@ -267,8 +267,9 @@ directly MultiSlab-owned Slab, as described in the
 No route redirects an owner or merges targets by bounds. Plans recheck bound
 ownership before writing and at fresh readback/recovery. Old plans without
 the required field-specific evidence cannot authorize new setters; exact-ID
-journal replay remains setter-free. The diagnostic `parent_ref` is not an
-edit target or write authorization.
+journal replay remains setter-free. The `parent_ref` used by getter-only
+`material_comparison` remains read-only; `model_edit.exact_target` is a separate
+hash-bound exact-target contract with its own revalidation and write guards.
 
 For `wall_sample`, `drawing_file` is required and must identify one foreground
 file. Optional `model_uuid` must be canonical and nonzero; explicit null is
@@ -424,6 +425,61 @@ native Material have separate API bindings; whether they reflect the same
 value must be checked on the actual element. Visual surface is a separate target.
 Date/vector/object attribute codecs and general attribute catalog discovery
 are outside this contract.
+
+### `exact_target` — native Material on one exact Slab child
+
+Candidate 0.42.0 adds an opt-in exact target to `model_edit` preview. It accepts
+one `Slab_TypeUUID` child in one explicit foreground drawing, with exact child
+model/view and immediate MultiSlab parent model/view refs. It is limited to
+`native_types=["Slab_TypeUUID"]`, one native Material change, no predicate,
+attribute IDs or exclusions, and
+`scope={"drawing_files":[drawing_file],"include_passive":false,
+"visibility":"api_select_all"}`. Parent and child model UUIDs must differ.
+
+The host keeps the complete direct inventory and adds the explicitly resolved
+child only for this opt-in. It bounds the direct scan to 10,000 adapters, parent
+and child wrappers to 16 each, and child visits to 256. The reviewed plan binds
+the exact target and inventory fingerprint. Preview, revalidation, Apply
+preflight and final setter boundary recheck child/parent identity, views, direct
+edge and inventory. Missing, stale or conflicting refs, parent/view drift or
+changed inventory block the write. The child stays the selected
+`SlabProperties` owner; no target is redirected or inferred from matching
+values.
+
+Highlight verifies the exact child, then submits all representations of that
+child model UUID for highlighting; it never highlights the MultiSlab parent.
+Fresh readback/recovery require the reviewed exact inventory and view. If the
+view is absent or regenerated, the outcome remains unknown without a replacement
+view fallback. Recovery remains read-only under the original execution ID.
+The new target contract does not establish native Allplan acceptance or
+persistence; candidate 0.42.0 needs its required CI, exact ZIP gate and one
+disposable-copy native trial before this path is accepted.
+
+```json
+{
+  "schema_version": "m4-model-edit-1",
+  "action": "preview",
+  "scope": {"drawing_files": [101], "include_passive": false, "visibility": "api_select_all"},
+  "native_types": ["Slab_TypeUUID"],
+  "exact_target": {
+    "drawing_file": 101,
+    "model_uuid": "8a693925-ae20-4dda-91d1-3951af3c0a52",
+    "view_uuid": "a0fcd7b3-85c8-4f83-99b7-59e8a3463c94",
+    "parent_ref": {
+      "model_uuid": "bf097d95-8275-4229-ac74-27bbea26c211",
+      "view_uuid": "b4a59b5b-c0ae-4c1e-9d59-df5761390eb9"
+    }
+  },
+  "changes": [{
+    "target": {"kind": "native_material", "tier_index": 1},
+    "value": "EXACT_REVIEWED_MATERIAL"
+  }]
+}
+```
+
+Replace the placeholder with the exact reviewed material string. This selector
+does not use attribute 508 as a native Material proxy. Keep ordinary
+predicate-based `model_edit` requests unchanged.
 
 ### `delete` — exact component root only
 

@@ -3,13 +3,42 @@
 Current version and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
 [development plan](office-editing-development-plan.pl.md).
-Version **0.41.0** is merged into develop/m4 through
+Candidate **0.42.0** is in progress on `codex/m4-material-read-evidence`, based
+on `develop/m4` merge commit `dd741fa`, for [PR #48](https://github.com/blandjelly/allplan-mcp-server-python/pull/48).
+**230 related focused checks plus 9 final exact-target/public HTTP checks PASS**,
+including version consistency. Full CI/package, exact ZIP verification and
+native acceptance are pending. The new exact-target request contract and its
+limits are documented in [API evidence](m4-editing-api-0.32.0.md) and
+[tool reference](tool-reference.md).
+
+Previous candidate **0.41.0** is merged into develop/m4 through
 [PR #47](https://github.com/blandjelly/allplan-mcp-server-python/pull/47).
 The exact-parent Slab child getter route passed the bounded native trial below;
 this does not establish native material writes or persistence. Historical focused
 checks and full CI are separate from that native result. Exact delivered
 ZIP/upgrade/restore verification remains incomplete. Current API and recovery contracts are in
 [API evidence](m4-editing-api-0.32.0.md).
+
+## Candidate 0.42.0 — exact Slab child target
+
+The opt-in `model_edit.exact_target` binds one foreground Slab child to an exact
+MultiSlab parent and is restricted to one native Material change with
+`native_types=["Slab_TypeUUID"]`, no predicate, attribute IDs or exclusions,
+and the matching one-drawing foreground scope. Preview retains the complete
+direct inventory and adds only the explicitly resolved child to that scoped
+inventory. It binds target and child inventory fingerprint. Revalidation,
+Apply preflight and final setter boundary repeat bounded identity, view,
+inventory and direct-edge checks. Highlight first validates that target, then
+submits all representations of the child model UUID; it never targets the
+parent.
+
+Fresh readback and recovery remain bound to the reviewed inventory and view. If
+that exact view is missing or regenerated, this mode has no replacement-view
+fallback and the outcome remains unknown. Recovery is read-only under the same
+execution ID. This is an implemented candidate contract, not proof of native
+write acceptance or persistence. Do not infer that the 0.41.0 exact probe's
+`target_in_direct_scan=false` diagnoses `model_edit` semantic scan coverage or
+the earlier write failure. See the [exact-target API contract](m4-editing-api-0.32.0.md#exact-child-native-material-target-0420).
 
 ## Delivery and CI evidence
 

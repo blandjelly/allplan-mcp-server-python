@@ -494,6 +494,20 @@ def valid_change(change):
     ref = change.get("ref") or {}
     kind = change.get("native_type")
     class_name = (evidence or {}).get("native_class")
+    exact = resource.get("exact_target_binding")
+    if exact is not None:
+        if not isinstance(exact, dict) or set(exact) != {"target", "inventory_fingerprint"}:
+            return False
+        hint = exact.get("target")
+        if not isinstance(hint, dict) or not isinstance(hint.get("parent_ref"), dict):
+            return False
+        lineage = evidence["hierarchy"]["lineage"]
+        if (kind != "Slab_TypeUUID" or len(lineage) != 2
+                or any(hint.get(key) != target.get(key) for key in ("drawing_file", "model_uuid", "view_uuid"))
+                or any(hint["parent_ref"].get(key) != lineage[1].get(key) for key in ("model_uuid", "view_uuid"))
+                or not isinstance(exact["inventory_fingerprint"], str)
+                or len(exact["inventory_fingerprint"]) != 64):
+            return False
     return (change.get("operation") == "set_native_material" and kind in _NATIVE_CLASSES
             and change.get("field") == "native.material" and change.get("property_role") == "native_material"
             and resource.get("tier_index") == 1 and resource.get("data_type") == "text"
@@ -539,9 +553,16 @@ def read(base, element, change, check=lambda: None, *, preservation=True):
     return value
 
 
-def write(base, element, change, doc=None, check=lambda: None):
+def write(base, element, change, doc=None, check=lambda: None, *, trace=None):
     if not valid_change(change):
         raise BridgeError("target_not_writable", "Native material change is not bound.", 409)
+    exact = (change.get("resource") or {}).get("exact_target_binding")
+    if exact is not None:
+        from .exact_material_target import locate
+        # Repeat inventory/edge validation at the final mutation boundary.
+        # The facade retains enumeration containers through snapshot/setter.
+        base, _ = locate(doc if doc is not None else element.GetDocument(), base,
+                         exact["target"], check, trace, expected=exact["inventory_fingerprint"])
     material, state, native, props = snapshot(base, element, check)
     if state != change["resource"]["native_material_state"] or material != change["old_value"]["value"]:
         raise BridgeError("repair_conflict", "Wall material or preservation evidence changed before setter.", 409)

@@ -26,8 +26,8 @@ Wieloplikowość i cały projekt wymagają osobnego projektu oraz odbioru.
 
 | Priorytet | Co pozostało / warunek dalszej pracy |
 | --- | --- |
-| 1 — dostawa i recovery: częściowo potwierdzone | Dla źródła 0.41.0 `f775168aaf8fdb043c269ff09d6ffda9fcea17c9`, merged PR #47 / `dd741fa`, GitHub run `40550057327` potwierdza sukces configuration, Windows/Ubuntu Python 3.12, package i `ci-required`; wcześniejszy run `40549970082` był nieudany. Raport odnotowuje potwierdzenie poprawności CI/ZIP przez właściciela, ale dokładny zainstalowany ZIP i upgrade/restore nie są niezależnie zweryfikowane. Health wiąże bridge z `f775168aaf8fdb043c269ff09d6ffda9fcea17c9`, integrity verified. Zachować historię `87a…` (`stopped/reconciled`, `requires_recovery=false`, bez dowodu applied/preservation) i `4388…` (brak w 31 rekordach nie ustala archiwum); nie powtarzać inspekcji bez nowej przesłanki ani setterów. [Status i następny krok](next-model-handoff.md). |
-| 2 — native Material Beam/Slab/MultiSlab: exact-target binding otwarte | Getter-only PASS 0.41.0: exact Slab child i osobny immediate MultiSlab parent zwróciły Material `" "` oraz ID 508 `TEST1` w obu trybach. Próba była complete dla żądanego scope, `usable_for_write=false`, zero setterów; nie dowodzi writable ownera, wspólnego storage, persistence ani równoważności child/parent. `target_in_direct_scan=false` dotyczy tylko dokładnego view sondy; nie dowodzi utraty modelu przez semantic scan ani przyczyny SelectAll. Kod material edit już obsługuje selected Slab properties, bez blokady `slab_write_blocker`; brakującym kontraktem jest jawny exact target child+parent przez preview→revalidation→Apply. Zaprojektować bounded resolution/checks na każdym etapie, zachować identyczność view/lineage, overlap, replay i read-only unknown recovery. Po negative/stale checks, wymaganym CI i exact ZIP dopiero jeden natywny trial na disposable fixture z exact-owner preview/Apply/readback, preservation i Undo. Nie powtarzać historycznych setterów. [Szczegóły](next-model-handoff.md). |
+| 1 — dostawa i recovery: częściowo potwierdzone | Dla źródła 0.41.0 `f775168aaf8fdb043c269ff09d6ffda9fcea17c9`, merged PR #47 / `dd741fa`, run `40550057327` potwierdza configuration, Windows/Ubuntu Python 3.12, package i `ci-required`; wcześniejszy `40549970082` był nieudany. Raport właściciela potwierdza CI/ZIP, ale dokładny zainstalowany ZIP i upgrade/restore nie są niezależnie zweryfikowane. Bieżący kandydat 0.42.0 jest w pracy dla PR #48; jego CI/package i exact-ZIP pozostają pending. Zachować historię `87a…` (`stopped/reconciled`, `requires_recovery=false`, bez dowodu applied/preservation) i `4388…` (brak w 31 rekordach nie ustala archiwum); nie powtarzać inspekcji bez nowej przesłanki ani setterów. [Status i następny krok](next-model-handoff.md). |
+| 2 — native Material Beam/Slab/MultiSlab: odbiór 0.42.0 pending | Getter-only PASS 0.41.0 i jego ograniczenia są opisane w [handoffie](next-model-handoff.md). Kandydat 0.42.0 implementuje jawny `exact_target` dla jednego Slab child/parent w `model_edit`; **230 related checks plus 9 final exact-target/public HTTP checks PASS**, w tym version consistency. CI/package, exact ZIP oraz native acceptance są pending. Przed jednym trialem na disposable fixture zachować positive/negative kontrole exact refs/views, stale/parent drift, overlap, replay, granic enumeracji oraz read-only unknown recovery. Następnie wymagane są required CI i exact ZIP. Próba obejmuje dokładny preview/highlight/Apply, świeży readback, preservation i Undo/restoration. Nie przypisywać 0.41 `target_in_direct_scan=false` do semantic `model_edit` ani przyczyny SelectAll. Nie powtarzać historical setters. [Implemented exact-target contract](m4-editing-api-0.32.0.md#exact-child-native-material-target-0420). |
 | 3 — atrybuty Slab/MultiSlab: zgłoszony PASS wartości, owner niepełny | Raportowany Apply/readback PASS z 0.39.0 pozostaje, ale historyczne payloady i exact owner binding brakują. Getter 0.41.0 ID 508 `TEST1` na child i parent nie przypisuje właściciela historycznego zapisu ani nie dowodzi sprzężenia z native Material. Zachować `target.property_owner="selected_element"`, lineage/children i overlap guard; nie utożsamiać atrybutu z native Material. Nie ponawiać accepted writes dla odtworzenia dowodu. |
 | 4 — warstwa i no-op: częściowo odebrane | Zachować W1 read/write, pojedyncze Undo i zgłoszony no-op w ich dotychczasowym zakresie. Pozostałe pary rodzina/właściciel oraz grupowe Undo wymagają dowodu; poniżej kryteria zamknięcia. No-op nie ma drogi Apply. |
 | 5 — delete i selekcja: częściowo odebrane / brak funkcji | Zachować grouped Column delete/Undo i obserwację Wall subtree. Inne deklarowane rodziny/poddrzewa wymagają dowodu. [Analiza API selekcji](m4-native-selection-api.md) rozdziela programowe set/clear/readback od interactive pick i preselekcji. Brak potwierdzonego kompletnego kontraktu; native selection nadal unsupported, highlight nie zamyka selekcji. |
@@ -54,27 +54,38 @@ przepływ; nie powtarzać zakończonych Apply dla samego odtworzenia logu.
    Nie powtarzać inspekcji bez nowej przesłanki, nie usuwać journalu ani nie
    ponawiać setterów. Zamknięcie wymaga rozliczenia delivery i nierozliczonych
    unknown outcomes.
-2. **Native Material Beam/Slab:** getter-only Slab child + osobny bezpośredni
-   parent probe 0.41.0 jest PASS tylko dla odczytu wskazanych refs/views
-   i wartości z handoffu; raw files zachowuje katalog evidence 0.41.0.
-   `target_in_direct_scan=false` dotyczy tego exact child/view probe, nie
-   diagnozuje semantic scan ani SelectAll. Kod natywnego materialu już
-   obsługuje selected Slab adapter i jego `SlabProperties`; luka nie dotyczy
-   `SetMaterial` ani `slab_write_blocker`, lecz braku osobnego jawnego
-   exact-target contract w `model_edit` (request obecnie jest predicate-based).
-   Zaprojektować i implementować ograniczone wiązanie exact child+parent w
-   preview, revalidation, Apply preflight i fresh readback. Każdy etap ponownie
-   potwierdza refs/views, bez przekierowania do rodzica ani rozszerzania
-   predicate; zachować limity enumeracji, fingerprint, overlap, stale, journal,
-   replay i unknown safeguards. Diagnostic resolver nie nadaje write authority.
-   Dodać focused negative checks: missing/stale/conflicting parent/child,
-   view drift, niepełne lub rozbieżne wrappers, overlap, replay; unknown recovery
-   pozostaje read-only dla tego samego execution ID. Przed natywnym zapisem
-   wymagane są te kontrole, full CI i exact ZIP verification. Następnie jeden
-   reviewed exact-owner trial na disposable fixture: preview, Apply, świeży
-   readback/UI, preservation geometrii/poziomów/połączeń/składników oraz Undo
-   i odczyt przywrócenia. Nie powtarzać historycznych setterów. Zwykły Beam
-   pozostaje `fixture_missing`; nie rozszerzać wyniku na rodzinę Beam.
+2. **Native Material Beam/Slab:** 0.41.0 getter-only PASS dla wskazanego Slab
+   child i osobnego immediate parent pozostaje ograniczony do odczytu; oba
+   zwróciły native Material `" "` oraz ID 508 `TEST1`, zero setterów.
+   `target_in_direct_scan=false` dotyczy exact child/view sondy i nie diagnozuje
+   semantic edit scan ani SelectAll. Kod już obsługuje selected Slab
+   `SlabProperties` z bezpośrednim MultiSlab parent; brakującą częścią było
+   jawne dokładne targetowanie w edit lifecycle, nie setter ani `slab_write_blocker`.
+
+   Kandydat 0.42.0 dodaje `exact_target={drawing_file,model_uuid,view_uuid,
+   parent_ref:{model_uuid,view_uuid}}` wyłącznie dla jednego native Material
+   targetu, jednego foreground drawing, `native_types=["Slab_TypeUUID"]`, bez
+   predicate, attribute IDs i exclusions. Zachowuje pełny inventory direct
+   scan i włącza jawnie odnalezione dziecko tylko w tym opt-in. Plan wiąże exact
+   target oraz fingerprint inventory/krawędzi; helper powtarza bounded
+   enumerację na preview, revalidation, Apply preflight i final setter boundary.
+   Highlight weryfikuje exact target, po czym prezentuje wszystkie
+   reprezentacje tego dziecka po model UUID, nigdy parent. Fresh readback i
+   recovery wymagają tego samego exact inventory/view; zmieniony lub
+   odtworzony w innym view target pozostaje unknown, bez fallbacku. Diagnostic
+   resolver nie jest sam write authorization.
+
+   Focused: 230 related checks plus 9 final exact-target/public HTTP checks PASS,
+   w tym version consistency; final checks obejmują regeneration→unknown,
+   replay/recover, final-boundary budget i brak exact child w semantic scan bez
+   fałszywego no-op. Przed native trialem wymagane są positive i
+   negative checks dla missing/stale/conflicting refs, parent/child/view drift,
+   incomplete inventory, budgets, overlap, no-op/replay i unknown recovery,
+   potem required CI i exact ZIP. Następnie jeden reviewed exact-owner preview,
+   highlight, Apply i świeży readback/UI na disposable fixture; sprawdzić
+   zachowanie geometrii, poziomów, połączeń i składników oraz Undo/readback
+   restoration. Nie powtarzać 0.41 getter ani historycznych setterów. Zwykły
+   Beam pozostaje `fixture_missing`; nie rozszerzać wyniku na inne rodziny.
 3. **Atrybuty Slab/MultiSlab:** zachować zgłoszony PASS wartości 0.39.0.
    Brakuje dokładnych historycznych payloadów Apply i powiązania właścicieli,
    kolejności grupowania oraz Undo/odtworzenia. Getter 0.41.0 ID 508 na
