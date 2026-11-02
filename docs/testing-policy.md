@@ -8,6 +8,7 @@ separate when reporting results. Codex owns implementation and focused tests;
 GitHub Actions runs full CI and builds; the owner supervises CI, verifies
 delivery and merges after all required gates pass.
 An explicit owner pause takes precedence over this procedure.
+**Codex** in this policy means the coding agent in use (Codex or Claude Code).
 
 M4 topic branches and PRs use **develop/m4** as their base; main integration
 is a separate task. Ref/PR consolidation with unchanged runtime follows the

@@ -1,30 +1,16 @@
 # Allplan MCP Server
 
-Allplan MCP connects a local Codex client to Allplan 2026 for model queries,
-audits and reviewed edits. M4 development uses
+Allplan MCP connects a local MCP client (Codex or Claude Code) to Allplan 2026
+for model queries, audits and reviewed edits. M4 development uses
 [`develop/m4`](https://github.com/blandjelly/allplan-mcp-server-python/tree/develop/m4);
-main integration is separate.
+main integration is separate. Agent instructions: [AGENTS.md](AGENTS.md)
+(Claude Code: [CLAUDE.md](CLAUDE.md)).
 
-Latest tested baseline: **0.39.0**, merged into `develop/m4` through
-[PR #42](https://github.com/blandjelly/allplan-mcp-server-python/pull/42).
-The owner reports native-material PASS for the Wall, Wall with door/window
-and Column; Beam discovery and Slab native-material persistence remain open.
-Material-attribute writes succeeded on the reported SkeletonBeam and Slab
-targets. Preservation, delivery evidence and remaining gates are distinguished
-in the handoff; this is partial M4 acceptance.
-The most recently package-verified candidate remains **0.32.0**. Use the
-[current handoff](docs/next-model-handoff.md) for version status and the next
-task, and the
-[development plan](docs/office-editing-development-plan.pl.md) for remaining
-work and unresolved errors. M4 remains partially accepted.
-
-Candidate **0.40.0** adds a bounded getter-only comparison of native Material
-and explicitly requested attributes for Beam/SkeletonBeam and Slab/MultiSlab.
-Focused checks: **92 unit + 6 MCP/HTTP PASS**. Full CI, exact ZIP verification
-and native acceptance are pending.
-The 2026-10-27 [read-only Allplan comparison](docs/test-results/evidence/0.39.0-2026-10-27/allplan-comparison-log.md)
-found the two SkeletonBeams and the MultiSlab/Slab lineage but did not read
-native Material or establish writable owners.
+M4 goal: typed, reviewed editing of attributes and supported native properties
+of Columns, Beams, Walls and Slabs. Current version **0.42.1**; M4 remains
+partially accepted. Version, delivery, native evidence and the next task are
+kept only in the [current handoff](docs/next-model-handoff.md); remaining work
+and blockers in the [development plan](docs/office-editing-development-plan.pl.md).
 
 ## Documentation
 
@@ -47,10 +33,12 @@ trial instructions are available in Git history, not as current work plans.
 
 ## Local Windows setup
 
-Download the verified ZIP from the [current package record](evaluation-packages/0.32.0/README.md)
-and follow [Windows setup](docs/windows-setup.md). External Python **3.11+**
+Use the ZIP produced by the GitHub Actions package job for the version in the
+[handoff](docs/next-model-handoff.md) and follow [Windows setup](docs/windows-setup.md).
+[`evaluation-packages/`](evaluation-packages/) is a historical archive (0.7.0–0.33.0;
+0.32.0 is the last package verified there). External Python **3.11+**
 and internet access for locked dependencies are required.
-Allplan, Python and Codex are not bundled.
+Allplan, Python and the MCP client are not bundled.
 
 Preserve `Local/.allplan-mcp/repairs`, diagnostic traces and archives, the
 original project, package logs and execution IDs. A lost write reply is an

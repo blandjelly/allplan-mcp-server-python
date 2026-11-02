@@ -44,16 +44,15 @@ pozostają zachowane; surowe dowody getter-only PASS 0.41.0 są w
 Zachować zgłoszone PASS, uzupełniać wyłącznie brakujący dowód lub zmieniony
 przepływ; nie powtarzać zakończonych Apply dla samego odtworzenia logu.
 
-1. **Dostawa i recovery:** dla źródła 0.41.0 CI, package i `ci-required`
-   potwierdza run `40550057327`; raport odnotowuje potwierdzenie poprawności
-   CI/ZIP przez właściciela, ale exact installed ZIP identity i upgrade/restore
-   pozostają niezależnie niezweryfikowane. Health wiąże installed bridge z commitem
-   `f775168aaf8fdb043c269ff09d6ffda9fcea17c9`, integrity verified. Inspekcja
-   31 rekordów już wykonana: `87a…` pozostaje stopped/reconciled bez dowodu
-   applied/preservation; brak `4388…` w tych rekordach nie ustala archiwum.
-   Nie powtarzać inspekcji bez nowej przesłanki, nie usuwać journalu ani nie
-   ponawiać setterów. Zamknięcie wymaga rozliczenia delivery i nierozliczonych
-   unknown outcomes.
+1. **Dostawa i recovery:** dla 0.42.1 (`eecdfeb`) właściciel potwierdził CI
+   i ZIP; health wiąże installed bridge z tym źródłem, integrity verified.
+   Identyfikator runu CI, hash ZIP oraz upgrade/restore nie są niezależnie
+   zweryfikowane. Inspekcja 31 rekordów już wykonana: `87a…` pozostaje
+   stopped/reconciled bez dowodu applied/preservation; brak `4388…` w tych
+   rekordach nie ustala archiwum. Nie powtarzać inspekcji bez nowej przesłanki,
+   nie usuwać journalu ani nie ponawiać setterów. Zamknięcie wymaga rozliczenia
+   delivery i nierozliczonych unknown outcomes, w tym Slab
+   `a8a31c72975541feb1c36a2e8cbb8f65`.
 2. **Native Material Beam/Slab:** 0.41.0 getter-only PASS dla wskazanego Slab
    child i osobnego immediate parent pozostaje ograniczony do odczytu; oba
    zwróciły native Material `" "` oraz ID 508 `TEST1`, zero setterów.

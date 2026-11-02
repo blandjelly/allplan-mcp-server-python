@@ -3,12 +3,13 @@
 Current version and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
 [development plan](office-editing-development-plan.pl.md).
-Candidate **0.42.0** is in progress on `codex/m4-material-read-evidence`, based
-on `develop/m4` merge commit `dd741fa`, for [PR #48](https://github.com/blandjelly/allplan-mcp-server-python/pull/48).
-**230 related focused checks plus 9 final exact-target/public HTTP checks PASS**,
-including version consistency. Full CI/package, exact ZIP verification and
-native acceptance are pending. The new exact-target request contract and its
-limits are documented in [API evidence](m4-editing-api-0.32.0.md) and
+Current version **0.42.1** (PR #49, source `eecdfeb`) and its native result are
+summarized in the [handoff](next-model-handoff.md); this file retains older
+evidence. **0.42.0** (exact Slab child target) was merged through
+[PR #48](https://github.com/blandjelly/allplan-mcp-server-python/pull/48); its
+**230 related focused checks plus 9 exact-target/public HTTP checks PASS** are
+historical focused results. The exact-target request contract and its limits
+are documented in [API evidence](m4-editing-api-0.32.0.md) and
 [tool reference](tool-reference.md).
 
 Previous candidate **0.41.0** is merged into develop/m4 through
@@ -19,7 +20,7 @@ checks and full CI are separate from that native result. Exact delivered
 ZIP/upgrade/restore verification remains incomplete. Current API and recovery contracts are in
 [API evidence](m4-editing-api-0.32.0.md).
 
-## Candidate 0.42.0 — exact Slab child target
+## 0.42.0 — exact Slab child target
 
 The opt-in `model_edit.exact_target` binds one foreground Slab child to an exact
 MultiSlab parent and is restricted to one native Material change with

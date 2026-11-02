@@ -1,6 +1,6 @@
 # Diagnostics and recovery
 
-Use local Windows Codex with StartPythonHost and **Launch Allplan MCP.cmd**
+Use a local Windows Codex or Claude Code client with StartPythonHost and **Launch Allplan MCP.cmd**
 running. **Diagnostics.cmd** saves read-only discovery/version/integrity/context
 data under package logs. [Windows setup](windows-setup.md).
 
