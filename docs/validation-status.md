@@ -3,9 +3,8 @@
 Current version and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
 [development plan](development-plan.md).
-Current version **0.42.1** (PR #49, source `eecdfeb`) and its native result are
-summarized in the [handoff](next-model-handoff.md), 0.43.0 is the candidate
-there; per-pair status is in the [coverage matrix](m4-coverage-matrix.md); this
+Current installed version **0.43.0** (PR #51) with its native trial, and the
+0.43.1 candidate, are summarized in the [handoff](next-model-handoff.md); per-pair status is in the [coverage matrix](m4-coverage-matrix.md); this
 file retains older evidence. **0.42.0** (exact Slab child target) was merged through
 [PR #48](https://github.com/blandjelly/allplan-mcp-server-python/pull/48); its
 **230 related focused checks plus 9 exact-target/public HTTP checks PASS** are

@@ -4,6 +4,28 @@ from .query_contracts import SCHEMA, fingerprint
 from .transport import BridgeError
 
 
+def identity_failure(snapshot, request, matches):
+    """Name the cause of an unresolved exact model/view identity (no guessing).
+
+    The direct scan only lists models that have their own adapter. A root that
+    is reachable only through child adapters (or whose representations disagree)
+    is reported with the cause, so the caller can pick a different probe phase.
+    """
+    model = request["model_uuid"]
+    conflict = any(item.get("reason") == "representation_conflict" and item.get("model_uuid") == model
+                   for item in snapshot.get("not_checked_samples", []))
+    if conflict:
+        cause = "its direct representations disagree in the fields read"
+    elif not matches:
+        cause = "no direct adapter has this model UUID (it may be reachable only through child adapters)"
+    elif matches[0]["view_identity_not_checked"]:
+        cause = "a representation view UUID could not be read"
+    else:
+        cause = "the view is not among the direct views %s" % sorted(matches[0]["view_uuids"])
+    return BridgeError("probe_scope_unavailable",
+                       "Requested model/view identity is missing or conflicting: %s." % cause, 409)
+
+
 def probe_identity(queries, doc, base, settings, request, trace, check):
     # Direct adapters are essential here: resolving to a terminal root would
     # hide a Slab tier's identity behind its MultiSlab parent.
@@ -25,7 +47,7 @@ def probe_identity(queries, doc, base, settings, request, trace, check):
     matches = [item for item in snapshot["elements"] if item["ref"]["model_uuid"] == request["model_uuid"]]
     if (len(matches) != 1 or matches[0]["view_identity_not_checked"]
             or request["view_uuid"] not in matches[0]["view_uuids"]):
-        raise BridgeError("probe_scope_unavailable", "Requested model/view identity is missing or conflicting.", 409)
+        raise identity_failure(snapshot, request, matches)
     element = matches[0]
     wrappers = live.get((request["drawing_file"], request["model_uuid"]), {}).get(request["view_uuid"], [])
     # Keep every native wrapper alive and require consensus, never select an

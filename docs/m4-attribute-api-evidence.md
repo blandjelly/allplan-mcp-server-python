@@ -33,6 +33,8 @@ reads and successful completeness is reported. It does not justify changing an
 existing `ReadAll` route or converting errors, applicability uncertainty, or
 missing adapter coverage into “absent.”
 
+From 0.43.1 the probe also reads roots with several views (all views must agree;
+see the [tool reference](tool-reference.md#model_property_probe--isolated-read-phases)).
 The isolated `element_attributes` probe now provides bounded search of values
 present on one explicitly identified foreground component. It requires the
 drawing file, model UUID, and view UUID; scans only the existing six supported

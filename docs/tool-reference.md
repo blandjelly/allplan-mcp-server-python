@@ -299,7 +299,11 @@ in the JSON query cache.
 
 `element_attributes` requires one active foreground drawing and exact nonzero
 `model_uuid`/`view_uuid`; it resolves one unambiguous semantic root adapter
-across the supported component families. `name_contains` is a case-insensitive
+across the supported component families. A root with several views (the
+architectural Beam has two) is accepted from 0.43.1 when the requested view is
+one of them, every view has live adapters and all of them are read; values are
+returned only if all agree (`view_uuids` lists the views), otherwise the result
+is `conflicting_view_attributes` with per-view fingerprints and no values. `name_contains` is a case-insensitive
 substring filter over names returned by `ReadAll` (maximum 64 characters).
 `offset` is 0–255 and `limit` is 1–32 (default 32). Each returned row includes
 the raw value, attribute ID, observed name and name/ID roundtrip, and targeted

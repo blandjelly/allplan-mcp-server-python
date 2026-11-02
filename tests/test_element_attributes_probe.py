@@ -117,24 +117,59 @@ class ElementAttributesProbeTests(unittest.TestCase):
         self.assertEqual(result["attributes"][0]["attribute_id"], 83)
         self.root.GetAttributes.assert_called_once()
 
-    def test_multiple_views_or_conflicting_root_fields_still_block(self):
-        for conflict in ("view", "display_name"):
-            with self.subTest(conflict=conflict):
+    OTHER_VIEW = "10000000-0000-4000-8000-000000000099"
+
+    def add_second_view(self, attrs=None, display_name=None):
+        wrapper = self.element(ident=9, attrs=attrs or [(83, "R60"), (20001, 7), (20002, True)])
+        wrapper.GetModelElementUUID.return_value = self.root.GetModelElementUUID.return_value
+        wrapper.GetElementUUID.return_value = self.OTHER_VIEW
+        wrapper.GetElementAdapterType.return_value.GetGuid.return_value = self.root.GetElementAdapterType.return_value.GetGuid.return_value
+        wrapper.GetDisplayName.return_value = display_name or self.root.GetDisplayName.return_value
+        self.base.ElementsSelectService.SelectAllElements.return_value.append(wrapper)
+        return wrapper
+
+    def test_root_with_two_views_reads_every_view_and_requires_agreement(self):
+        # An architectural Beam ("Podciag") exposes two root views.
+        for requested in ("10000000-0000-4000-8000-000000000001", self.OTHER_VIEW):
+            with self.subTest(requested=requested):
                 self.setup_element()
-                wrapper = self.element(ident=9, attrs=[(83, "R60"), (20001, 7), (20002, True)])
-                wrapper.GetModelElementUUID.return_value = self.root.GetModelElementUUID.return_value
-                wrapper.GetElementAdapterType.return_value.GetGuid.return_value = self.root.GetElementAdapterType.return_value.GetGuid.return_value
-                if conflict == "view":
-                    wrapper.GetElementUUID.return_value = "10000000-0000-4000-8000-000000000099"
-                else:
-                    wrapper.GetElementUUID.return_value = self.root.GetElementUUID.return_value
-                    wrapper.GetDisplayName.return_value = "Different component"
-                self.base.ElementsSelectService.SelectAllElements.return_value.append(wrapper)
-                with self.assertRaises(self.module.BridgeError) as error:
-                    self.probe()
-                self.assertEqual(error.exception.code, "probe_scope_unavailable")
-                self.root.GetAttributes.assert_not_called()
-                wrapper.GetAttributes.assert_not_called()
+                wrapper = self.add_second_view()
+                result = self.probe(view_uuid=requested)
+                self.assertEqual(result["view_uuids"], sorted(["10000000-0000-4000-8000-000000000001", self.OTHER_VIEW]))
+                self.assertEqual(result["adapter_attribute_consistency"], "consistent")
+                self.assertEqual(result["adapter_attribute_representation_count"], 2)
+                self.assertEqual([row["attribute_id"] for row in result["attributes"]], [83, 20001, 20002])
+                self.root.GetAttributes.assert_called_once()
+                wrapper.GetAttributes.assert_called_once()
+
+    def test_root_views_with_different_attributes_report_conflict_without_values(self):
+        self.setup_element()
+        wrapper = self.add_second_view(attrs=[(83, "R30"), (20001, 7), (20002, True)])
+        result = self.probe()
+        self.assertEqual(result["attributes"]["status"], "not_checked")
+        self.assertEqual(result["attributes"]["reason"], "conflicting_view_attributes")
+        self.assertEqual(len(result["attributes"]["view_attribute_fingerprints"]), 2)
+        self.assertEqual(result["adapter_attribute_consistency"], "conflicting")
+        self.assertFalse(result["listing_complete"])
+        self.root.GetAttributes.assert_called_once()
+        wrapper.GetAttributes.assert_called_once()
+
+    def test_conflicting_root_fields_still_block(self):
+        self.setup_element()
+        wrapper = self.add_second_view(display_name="Different component")
+        with self.assertRaises(self.module.BridgeError) as error:
+            self.probe()
+        self.assertEqual(error.exception.code, "probe_scope_unavailable")
+        self.root.GetAttributes.assert_not_called()
+        wrapper.GetAttributes.assert_not_called()
+
+    def test_unrequested_view_not_in_root_views_still_blocks(self):
+        self.setup_element()
+        self.add_second_view()
+        with self.assertRaises(self.module.BridgeError) as error:
+            self.probe(view_uuid="10000000-0000-4000-8000-000000000077")
+        self.assertEqual(error.exception.code, "probe_scope_unavailable")
+        self.root.GetAttributes.assert_not_called()
 
     def test_unfiltered_metadata_failures_keep_raw_rows_and_allow_pagination(self):
         self.setup_element()

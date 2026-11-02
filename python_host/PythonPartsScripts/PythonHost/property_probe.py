@@ -406,27 +406,34 @@ class PropertyProbeService:
             element = matches[0]
             ref = element["ref"]
             representations = live.get((ref["drawing_file"], ref["model_uuid"]), {})
-            views = representations.get(request["view_uuid"], [])
             # M1 has already grouped these adapters by root model/view identity
-            # and rejected disagreement in the fields it reads. Distinct Python
-            # wrappers can represent that same native root, so verify their
-            # attributes too before choosing a representation.
-            if (len(element["view_uuids"]) != 1
-                    or element["view_uuids"] != [request["view_uuid"]]
-                    or set(representations) != {request["view_uuid"]}
-                    or not views):
+            # and rejected disagreement in the fields it reads. A root may have
+            # several representations (Beam "Podciag" has two views): all of
+            # them must be live, enumerated and read, and their attributes must
+            # agree before any value is reported. Distinct Python wrappers can
+            # represent the same native root, so verify them too.
+            view_uuids = sorted(element["view_uuids"])
+            if (request["view_uuid"] not in view_uuids
+                    or not 1 <= len(view_uuids) <= 8
+                    or set(representations) != set(view_uuids)
+                    or any(not representations[view] for view in view_uuids)):
                 raise BridgeError("probe_scope_unavailable", "The requested component has ambiguous root adapter representations; no attributes were read.", 409)
             unique_views = []
+            adapter_views = []
             seen_adapter_objects = set()
-            for adapter in views:
-                if id(adapter) not in seen_adapter_objects:
-                    seen_adapter_objects.add(id(adapter))
-                    unique_views.append(adapter)
+            for view in view_uuids:
+                for adapter in representations[view]:
+                    if id(adapter) not in seen_adapter_objects:
+                        seen_adapter_objects.add(id(adapter))
+                        unique_views.append(adapter)
+                        adapter_views.append(view)
+            if len(unique_views) > 16:
+                raise BridgeError("probe_scope_unavailable", "Attribute listing supports at most 16 root wrappers; no attributes were read.", 409)
             adapter_attributes = [
                 read("BaseElementAdapter.GetAttributes(ReadAll)",
                      lambda adapter=adapter: attribute_values(adapter, base, budget),
                      drawing_file=ref["drawing_file"], model_uuid=ref["model_uuid"],
-                     view_uuid=request["view_uuid"], representation_index=index + 1,
+                     view_uuid=adapter_views[index], representation_index=index + 1,
                      representation_count=len(unique_views))
                 for index, adapter in enumerate(unique_views)
             ]
@@ -442,10 +449,18 @@ class PropertyProbeService:
                               listing_complete=False, presence_semantics="ReadAll_only_omissions_unknown",
                               writable="not_established")
             elif len({fingerprint(item["value"]) for item in adapter_attributes}) != 1:
+                per_view = {}
+                for view, item in zip(adapter_views, adapter_attributes):
+                    per_view.setdefault(view, set()).add(fingerprint(item["value"]))
+                across_views = all(len(prints) == 1 for prints in per_view.values())
                 attrs = {"status": "not_checked", "value": None,
-                         "reason": "conflicting_adapter_attributes",
-                         "representation_count": len(unique_views)}
+                         "reason": ("conflicting_view_attributes" if across_views
+                                    else "conflicting_adapter_attributes"),
+                         "representation_count": len(unique_views),
+                         "view_attribute_fingerprints": {view: sorted(prints)
+                                                         for view, prints in sorted(per_view.items())}}
                 result.update(scope=snapshot["scope"], ref=ref, attributes=attrs,
+                              view_uuids=view_uuids,
                               adapter_attribute_consistency="conflicting",
                               listing_complete=False,
                               presence_semantics="ReadAll_only_omissions_unknown",
@@ -507,6 +522,7 @@ class PropertyProbeService:
                               attributes=page, total_matches=total, offset=offset,
                               adapter_attribute_consistency="consistent",
                               adapter_attribute_representation_count=len(unique_views),
+                              view_uuids=view_uuids,
                               total_matches_status="not_checked" if unknown_filter_names else "observed",
                               next_offset=(offset + len(page) if offset + len(page) < total else None),
                               listing_complete=(offset + len(page) >= total and unknown_filter_names == 0),
