@@ -41,7 +41,7 @@ split does not waive any required validation or native Allplan gate.
 Run only focused affected tests and their dependent tests as you iterate. Use
 HTTP checks for changes to MCP, transport, or launcher behavior. Do not run the
 full local suite or build packages after every change. For documentation,
-logs, or AGENTS-only changes, review the diff and links; skip runtime tests,
+logs, or agent-instruction changes (`AGENTS.md`, `CLAUDE.md`, `.claude/`), review the diff and links; skip runtime tests,
 builds, hash checks, and reruns.
 
 ### Material trace selection
@@ -83,7 +83,8 @@ review. The current [workflow](../.github/workflows/portable.yml) handles
 `ready_for_review`; this event compares the full PR diff and selects the
 required matrix through [ci_policy.py](../utils/ci_policy.py). Codex must mark
 final product candidates Ready for review to trigger that validation before
-handoff. Documentation-only PRs run configuration and the lightweight
+handoff. Documentation-only PRs (paths listed in `DOCUMENTATION` in
+`ci_policy.py`: agent instructions, `README.md`, `docs/`, `evaluation-packages/`) run configuration and the lightweight
 `ci-required` gate; they require only diff and link checks, without product
 tests or builds. A passing run for an earlier source
 revision does not validate later runtime changes.
