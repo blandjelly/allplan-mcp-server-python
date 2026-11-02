@@ -2,14 +2,15 @@
 
 Current version and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
-[development plan](office-editing-development-plan.pl.md).
+[development plan](development-plan.md).
 Current version **0.42.1** (PR #49, source `eecdfeb`) and its native result are
-summarized in the [handoff](next-model-handoff.md); this file retains older
-evidence. **0.42.0** (exact Slab child target) was merged through
+summarized in the [handoff](next-model-handoff.md), 0.43.0 is the candidate
+there; per-pair status is in the [coverage matrix](m4-coverage-matrix.md); this
+file retains older evidence. **0.42.0** (exact Slab child target) was merged through
 [PR #48](https://github.com/blandjelly/allplan-mcp-server-python/pull/48); its
 **230 related focused checks plus 9 exact-target/public HTTP checks PASS** are
 historical focused results. The exact-target request contract and its limits
-are documented in [API evidence](m4-editing-api-0.32.0.md) and
+are documented in [API evidence](m4-editing-api.md#native-material-editing--api-contracts) and
 [tool reference](tool-reference.md).
 
 Previous candidate **0.41.0** is merged into develop/m4 through
@@ -18,7 +19,7 @@ The exact-parent Slab child getter route passed the bounded native trial below;
 this does not establish native material writes or persistence. Historical focused
 checks and full CI are separate from that native result. Exact delivered
 ZIP/upgrade/restore verification remains incomplete. Current API and recovery contracts are in
-[API evidence](m4-editing-api-0.32.0.md).
+[API evidence](m4-editing-api.md#native-material-editing--api-contracts).
 
 ## 0.42.0 — exact Slab child target
 
@@ -33,13 +34,14 @@ inventory and direct-edge checks. Highlight first validates that target, then
 submits all representations of the child model UUID; it never targets the
 parent.
 
-Fresh readback and recovery remain bound to the reviewed inventory and view. If
+Fresh readback and recovery remain bound to the reviewed view (from 0.43.0 a
+post-setter inventory change is reported as a diff, not raised). If
 that exact view is missing or regenerated, this mode has no replacement-view
 fallback and the outcome remains unknown. Recovery is read-only under the same
 execution ID. This is an implemented candidate contract, not proof of native
 write acceptance or persistence. Do not infer that the 0.41.0 exact probe's
 `target_in_direct_scan=false` diagnoses `model_edit` semantic scan coverage or
-the earlier write failure. See the [exact-target API contract](m4-editing-api-0.32.0.md#exact-child-native-material-target-0420).
+the earlier write failure. See the [exact-target API contract](m4-editing-api.md#exact-child-native-material-target-0420).
 
 ## Delivery and CI evidence
 
@@ -213,7 +215,7 @@ setters. The 0.40.0 results supply paired getter observations on both retained
 SkeletonBeams and MultiSlab; 0.41.0 additionally reads the exact Slab child and
 its separate immediate parent. Historical write-owner bindings and native
 material persistence remain unresolved. See the
-[API comparison](m4-editing-api-0.32.0.md#native-material-material-attribute-and-surface).
+[API comparison](m4-editing-api.md#native-material-material-attribute-and-surface).
 
 ## Accepted baseline and scoped M4 observations
 
@@ -276,7 +278,7 @@ native acceptance. The retained evidence is scoped as follows.
 Evidence sources: [0.27.0 observations](test-results/evidence/allplan-chat-log-0.27.0-2026-10-23.md), [0.29.0 Column deletion](test-results/evidence/allplan-test-log-0.29.0-2026-10-23.md), and [0.30.0 typed trials](test-results/evidence/0.30.0-2026-10-23/allplan-attribute-trials-log.md). The current declaration is in [ModelEditPreview](../src/allplan_mcp/model_edit_models.py) and [model_delete](../python_host/PythonPartsScripts/PythonHost/model_delete.py).
 
 The evidence and closure criteria for the missing pairs remain in [development
-plan priorities 4–5](office-editing-development-plan.pl.md#dowody-potrzebne-do-zamknięcia-punktów-15).
+plan priorities 4–5](development-plan.md#evidence-needed-to-close-items-18).
 
 ## Evidence for unresolved cases
 
@@ -417,7 +419,7 @@ plan priorities 4–5](office-editing-development-plan.pl.md#dowody-potrzebne-do
   Allplan 2026-1-7 failed during `/model-properties`; no native stack
   established the reader/cause. Broad discovery remains suspended.
 
-The [backlog](office-editing-development-plan.pl.md) specifies the remaining
+The [backlog](development-plan.md) specifies the remaining
 contracts, fixture gaps and acceptance criteria. Preserve all target,
 revalidation, journal, replay and unknown-result guards.
 

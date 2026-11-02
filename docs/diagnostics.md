@@ -4,6 +4,13 @@ Use a local Windows Codex or Claude Code client with StartPythonHost and **Launc
 running. **Diagnostics.cmd** saves read-only discovery/version/integrity/context
 data under package logs. [Windows setup](windows-setup.md).
 
+From 0.43.0 **Launch Allplan MCP.cmd** also sets `ALLPLAN_MCP_EVIDENCE_DIR` to
+`logs/evidence`: every bridge call appends a `request` line before sending and
+a `response` or `error` line afterwards to `evidence-YYYYMMDD.jsonl`. The
+request line survives a lost reply. Capture is best effort and never changes a
+call; execution journals remain the authority for write outcomes. Supply these
+files as raw trial evidence instead of chat summaries.
+
 `ui_dispatch_unavailable` means the queued operation was cancelled before native
 execution. `host_timeout` identifies a lost read-only host response; a lost write
 still returns `execution_unknown`. OAuth discovery 404s alone do not diagnose

@@ -1,68 +1,70 @@
-# M4 — analiza API natywnej selekcji Allplan
+# M4 — Allplan native selection API analysis
 
-Analiza z 2026-10-27 dla `develop/m4`, rewizja
-`4315d177d27a4af70524dc4dd0fb64e95e8d2ac1`, produkt 0.39.0.
-Dotyczy części **selekcja** punktu 5 [planu rozwoju](office-editing-development-plan.pl.md).
-Nie zmienia zakresu odebranego delete ani nie zamyka całego punktu 5.
-Źródła zewnętrzne dotyczą PythonParts API **2026**; raportowany przez właściciela
-runtime to Allplan **2026.1**, bez ustalenia dokładnego hotfixa w ostatnim logu.
-Poniżej oddzielono fakty z kodu/dokumentacji, projekt implementacji i wymagane
-obserwacje natywne. W tej pracy nie uruchamiano Allplana ani nie zmieniano runtime.
+Analysis of 2026-10-27 for `develop/m4`, revision
+`4315d177d27a4af70524dc4dd0fb64e95e8d2ac1`, product 0.39.0.
+It covers the **selection** part of item 8 of the [development plan](development-plan.md).
+It does not change the accepted delete scope or close the whole item.
+External sources concern the PythonParts API **2026**; the owner-reported
+runtime is Allplan **2026.1**, without the exact hotfix in the latest log.
+Facts from code/documentation, the implementation design and the required
+native observations are separated below. Allplan was not run and runtime was
+not changed for this work.
 
-## 1. Wniosek i rekomendacja
+## 1. Conclusion and recommendation
 
-**Publiczne API dokumentuje interaktywną selekcję użytkownika, ale w sprawdzonych
-źródłach nie znaleziono kompletnego kontraktu programowego ustawienia dowolnej
-listy adapterów jako bieżącej selekcji UI, wyczyszczenia jej i niezależnego
-odczytu całego zaznaczenia.** Nie jest to dowód, że taka możliwość nie istnieje
-w innych interfejsach lub wersjach SDK.
+**The public API documents interactive user selection, but the checked
+sources contain no complete programmatic contract for setting an arbitrary
+adapter list as the current UI selection, clearing it, and independently
+reading the whole selection.** This does not prove that such a capability is
+absent from other interfaces or SDK versions.
 
-Wymaganie M4 oznacza przepływ `wynik query → dokładne zaznaczenie w Allplanie`.
-`StartElementSelect` realizuje inny przepływ: `wybór użytkownika w Allplanie →
-lista adapterów`. Można zaprojektować i wdrożyć ten drugi jako osobną funkcję,
-lecz nie zastępuje on wymaganego `select` i nie zamyka punktu 5.
+The M4 requirement is the flow `query result → exact selection in Allplan`.
+`StartElementSelect` implements a different flow: `user selection in Allplan
+→ adapter list`. The latter can be designed and delivered as a separate
+feature, but it does not replace the required `select` or close the item.
 
-Rekomendowane postępowanie:
+Recommended course:
 
-1. Ustalić kontrakt **replace / clear / read-current** dla zainstalowanego SDK;
-   najpierw dokumentacja i wąski eksperyment opisany w sekcji 7. Brakujące
-   odpowiedzi skierować do producenta, bez zgadywania setterów.
-2. Po potwierdzeniu kontraktu podłączyć mały backend natywny do istniejącego
-   `model_selection`, zachowując pełną rewalidację query i wątek UI.
-3. Osobno rozważyć `begin_pick` lub import preselekcji, jeśli potrzebny jest
-   wybór zakresu przez użytkownika. Nazwy i wyniki muszą jasno odróżniać tę
-   funkcję od programowego ustawiania selekcji.
+1. Establish the **replace / clear / read-current** contract for the installed
+   SDK; documentation first, then the narrow experiment in section 7. Send
+   missing answers to the vendor instead of guessing setters.
+2. After the contract is confirmed, connect a small native backend to the
+   existing `model_selection`, keeping full query revalidation and the UI thread.
+3. Separately consider `begin_pick` or importing preselection if a
+   user-chosen scope is needed. Names and results must clearly distinguish this
+   from programmatically setting the selection.
 
-Do czasu potwierdzenia backendu obecne `action=select` powinno nadal jawnie
-zwracać `unsupported`, bez automatycznej zamiany na highlight. To techniczny
-stan otwartej pracy, nie decyzja o usunięciu wymagania z produktu.
+Until a backend is confirmed, the current `action=select` should keep
+returning `unsupported` explicitly, without an automatic fallback to
+highlight. This is the technical state of open work, not a decision to drop
+the requirement.
 
-## 2. Co istnieje w M4
+## 2. What exists in M4
 
-| Miejsce | Stan i znaczenie dla implementacji |
+| Location | State and meaning for implementation |
 | --- | --- |
-| [Modele MCP](../src/allplan_mcp/property_models.py), `HighlightInput`, `SelectionRequest` | `highlight` i `select` przyjmują `selection_id` oraz wyjątki UUID; osobno jest `clear_highlight`. Nie ma `clear_selection` ani odczytu natywnego stanu. |
-| [Tool MCP](../src/allplan_mcp/server.py), `model_selection` | Przekazuje `m4-selection-1` na `/model-selection`; opis rozdziela highlight i selection, nie nadaje prawa do zapisu. |
-| [Walidator hosta](../python_host/PythonPartsScripts/PythonHost/property_contracts.py), `validate_selection` | Druga, niezależna walidacja payloadu przed SDK. Nowe akcje trzeba dodać po obu stronach. |
-| [Prezentacja](../python_host/PythonPartsScripts/PythonHost/model_selection.py), `present_selection` | `select` kończy się przed skanem i wywołaniami UI. Highlight skanuje ponownie pełne query, sprawdza fingerprint, TTL, adaptery i budżet, następnie czyści highlight i podświetla wynik. |
-| [Query](../python_host/PythonPartsScripts/PythonHost/model_query.py), `ModelQueryService` | Cache JSON, bez trwałych adapterów: TTL 300 s, maks. 8 wpisów, skan 5 s. `selection_id` identyfikuje wynik zapytania w sesji hosta, nie natywny selection set. |
-| [Handler](../python_host/PythonPartsScripts/PythonHost/PythonHostHandler.py) | Wspólny punkt dostępu do serwisów. Dziś `select` omija unieważnienie prezentacji planów, ponieważ nic nie wykonuje; przy implementacji trzeba ponownie ustalić tę regułę. |
-| [Interactor](../python_host/PythonPartsScripts/PythonHost/StartPythonHost.py) i [dispatcher](../python_host/PythonPartsScripts/PythonHost/transport.py) | `DispatcherTimer` co 50 ms uruchamia pracę natywną na UI. HTTP tylko kolejkuje żądania. `process_mouse_msg` jest pusty; ESC zatrzymuje cały host. |
-| [Testy prezentacji](../tests/test_model_properties.py) | Sprawdzają pełne query mimo paginacji, stale/TTL przed UI, `unsupported` bez wywołań, `unknown` po awarii UI. To mocki, nie dowód działania zaznaczenia w Allplanie. |
+| [MCP models](../src/allplan_mcp/property_models.py), `HighlightInput`, `SelectionRequest` | `highlight` and `select` take a `selection_id` and UUID exceptions; `clear_highlight` is separate. There is no `clear_selection` or native state read. |
+| [MCP tool](../src/allplan_mcp/server.py), `model_selection` | Sends `m4-selection-1` to `/model-selection`; the description separates highlight and selection and grants no write right. |
+| [Host validator](../python_host/PythonPartsScripts/PythonHost/property_contracts.py), `validate_selection` | A second, independent payload validation before the SDK. New actions must be added on both sides. |
+| [Presentation](../python_host/PythonPartsScripts/PythonHost/model_selection.py), `present_selection` | `select` ends before the scan and UI calls. Highlight rescans the full query, checks fingerprint, TTL, adapters and budget, then clears highlights and highlights the result. |
+| [Query](../python_host/PythonPartsScripts/PythonHost/model_query.py), `ModelQueryService` | JSON cache without durable adapters: TTL 300 s, max 8 entries, 5 s scan. `selection_id` identifies a query result in the host session, not a native selection set. |
+| [Handler](../python_host/PythonPartsScripts/PythonHost/PythonHostHandler.py) | Shared service access point. Today `select` skips invalidation of plan presentations because it does nothing; this rule must be revisited when implemented. |
+| [Interactor](../python_host/PythonPartsScripts/PythonHost/StartPythonHost.py) and [dispatcher](../python_host/PythonPartsScripts/PythonHost/transport.py) | A 50 ms `DispatcherTimer` runs native work on the UI. HTTP only queues requests. `process_mouse_msg` is empty; ESC stops the whole host. |
+| [Presentation tests](../tests/test_model_properties.py) | Check the full query despite paging, stale/TTL before UI, `unsupported` without calls, `unknown` after a UI failure. These are mocks, not proof of selection in Allplan. |
 
-Obecny highlight przesyła wszystkie rozpoznane reprezentacje widokowe modelu.
-`requested_adapters` może być większe niż liczba modeli. Wynik pozostawia
-`selected` i `highlighted` jako `null`: samo wywołanie SDK nie dowodzi stanu UI.
-`clear_highlight` czyści wszystkie podświetlenia bieżącego dokumentu, także
-pochodzące z innych źródeł. Tych semantyk nie wolno automatycznie przenosić na
-native selection.
+The current highlight submits all recognized view representations of a model.
+`requested_adapters` can exceed the number of models. The result leaves
+`selected` and `highlighted` as `null`: the SDK call alone does not prove the
+UI state. `clear_highlight` clears all highlights of the current document,
+including those from other sources. These semantics must not be carried over
+to native selection automatically.
 
-## 3. Co faktycznie zapewnia API 2026
+## 3. What the 2026 API actually provides
 
-### Ustawianie i wybór interaktywny
+### Interactive setting and choice
 
 [`InputFunctionStarter`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/InputFunctionStarter/)
-udostępnia:
+provides:
 
 ```python
 StartElementSelect(text, selectSetting, postSel, markSelectedElements,
@@ -70,256 +72,263 @@ StartElementSelect(text, selectSetting, postSel, markSelectedElements,
 RemoveFunction()
 ```
 
-Pierwsze wywołanie rozpoczyna interaktywny wybór; argumenty opisują filtr,
-odbiornik wyniku i tryb. Nie ma argumentu wejściowego `BaseElementAdapterList`.
-`markSelectedElements=True` nie jest udokumentowanym sposobem wstrzyknięcia
-istniejącej listy ani gwarancją trwałej selekcji po zakończeniu funkcji.
-`RemoveFunction` usuwa funkcję wejścia, nie stanowi udokumentowanego
-`clear_selection`.
+The first call starts an interactive choice; its arguments describe the
+filter, the result receiver and the mode. There is no input
+`BaseElementAdapterList` argument. `markSelectedElements=True` is not a
+documented way to inject an existing list nor a guarantee of a persistent
+selection after the function ends. `RemoveFunction` removes the input function;
+it is not a documented `clear_selection`.
 
 [`SelectionMode`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/SelectionMode/)
-rozróżnia `eSelectGeometry` (wybrany element), `eSelectObject` (również elementy
-powiązane i dzieci) i `eSelectSubObject` (część powiązań). Dla M4 ważne jest
-ryzyko rozszerzenia ściany o oś, etykiety, kontener atrybutów lub dzieci.
-Na początek należy jawnie wybrać `eSelectGeometry` i sprawdzić rzeczywiste
-tożsamości; nazwa trybu sama nie dowodzi zgodności z semantycznym modelem query.
+distinguishes `eSelectGeometry` (the chosen element), `eSelectObject` (also
+related elements and children) and `eSelectSubObject` (part of the relations).
+For M4 the risk is widening a wall to its axis, labels, attribute container or
+children. Start with an explicit `eSelectGeometry` and check actual
+identities; the mode name alone does not prove agreement with the semantic
+query model.
 
 [`MultiElementSelectInteractor`](https://pythonparts.allplan.com/2026/api_reference/ScriptObjectInteractors/MultiElementSelectInteractor/MultiElementSelectInteractor/)
-jest wyższą warstwą dla script object. Nadal obsługuje wybór użytkownika;
-przepisanie działającego hosta na script object nie dostarcza brakującego settera.
+is a higher layer for script objects. It still handles user choice; rewriting
+the working host as a script object does not supply the missing setter.
 
-### Odczyty — trzy różne znaczenia „selected”
+### Reads — three different meanings of "selected"
 
-| API | Udokumentowany wynik | Granica dowodu |
+| API | Documented result | Evidence limit |
 | --- | --- | --- |
-| [`PostElementSelection.GetSelectedElements(doc)`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/PostElementSelection/) | `BaseElementAdapterList` pobrana i usunięta z kontenera wyniku interakcji. | Odczyt konsumujący. Drugi pusty wynik nie dowodzi wyczyszczenia zaznaczenia w UI. |
-| [`SelectElementsService.GetPreSelectedElements(doc, filter)`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/SelectElementsService/) | Lista elementów preselekcji spełniających `SelectionQuery`. | Kandydat do odczytu preselekcji. Moment odczytu względem startu narzędzia, trwałość, konsumowanie i przydatność jako readback po set/clear nie są ustalone. |
-| [`CoordinateInput.GetSelectedElements()`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/CoordinateInput/) | Lista elementów w tej samej odległości od kursora, związana z identyfikacją wejścia. | Nie jest udokumentowanym odczytem całego zaznaczenia UI. Także `GetSelectedElement()` dotyczy identyfikacji elementu w wejściu. |
+| [`PostElementSelection.GetSelectedElements(doc)`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/PostElementSelection/) | `BaseElementAdapterList` taken and removed from the interaction result container. | A consuming read. A second empty result does not prove the UI selection was cleared. |
+| [`SelectElementsService.GetPreSelectedElements(doc, filter)`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/SelectElementsService/) | List of preselected elements matching a `SelectionQuery`. | Candidate for reading preselection. Timing relative to tool start, persistence, consumption and use as readback after set/clear are not established. |
+| [`CoordinateInput.GetSelectedElements()`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/CoordinateInput/) | Elements at the same distance from the cursor, tied to input identification. | Not a documented read of the whole UI selection. `GetSelectedElement()` also concerns element identification during input. |
 
-Preselekcja zasługuje na osobny eksperyment, a nie z góry na odrzucenie.
-Nie wolno jednak filtrować potencjalnego readbacku wyłącznie do żądanego zbioru:
-ukryłoby to przypadkowo zaznaczone elementy dodatkowe i dało fałszywy PASS.
+Preselection deserves its own experiment rather than early rejection. A
+potential readback must never be filtered only to the requested set: that
+would hide accidentally selected extra elements and give a false PASS.
 
-### Wyszukiwanie, podświetlenie i stan adaptera
+### Search, highlight and adapter state
 
 - [`SelectElementsService.SelectByPolygon` / `SelectByRect`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/SelectElementsService/)
-  zwracają adaptery wyszukane przez geometrię, projekcję i filtr. Nie przyjmują
-  listy adapterów do ustawienia. Oficjalny przykład
+  return adapters found by geometry, projection and filter. They do not take an
+  adapter list to set. The official example
   [SlopedGeneralOpening.py](https://github.com/NemetschekAllplan/PythonPartsExamples/blob/8e2c252477e20bc9afac8918f78a8eeabd473a81/PythonPartsExampleScripts/ArchitectureExamples/Objects/SlopedGeneralOpening.py)
-  osobno podświetla wynik. Brak podstaw, by sam wynik query traktować jako
-  programowe zastąpienie zaznaczenia.
+  highlights the result separately. There is no basis to treat a query result
+  as a programmatic replacement of the selection.
 - [`BaseElements.ElementsSelectService`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/ElementsSelectService/)
-  to inna klasa niż `IFW_Input.SelectElementsService`. Jej `SelectAllElements`
-  i `SelectElementsByIfcGuid` służą do pobrania listy elementów. Pierwszej już
-  używa skaner M4; nie oznacza to zaznaczenia całego modelu w UI.
+  is a different class from `IFW_Input.SelectElementsService`. Its
+  `SelectAllElements` and `SelectElementsByIfcGuid` return element lists. The
+  M4 scanner already uses the former; it does not select the whole model in the UI.
 - [`HighlightService`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/HighlightService/)
-  ma `HighlightElements(eleList)` i `CancelAllHighlightedElements(documentID)`.
+  has `HighlightElements(eleList)` and `CancelAllHighlightedElements(documentID)`.
   [GetObjectByAttributeValue.py](https://github.com/NemetschekAllplan/PythonPartsExamples/blob/8e2c252477e20bc9afac8918f78a8eeabd473a81/PythonPartsExampleScripts/ObjectAccessExamples/GetObjectByAttributeValue.py)
-  pokazuje query, highlight i redraw. Nie dokumentuje set/clear/readback selekcji.
+  shows query, highlight and redraw. It does not document selection set/clear/readback.
 - [`BaseElementAdapter`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_ElementAdapter/BaseElementAdapter/)
-  ma `IsActive()` opisane jako sprawdzenie aktywacji, lecz bez wystarczającego
-  kontraktu, aby utożsamić je z bieżącą selekcją UI. Spis metod nie zawiera
-  `IsSelected`/`SetSelected`. Ani `IsActive`, ani `SetVisibilityState` nie
-  uzasadniają implementacji setterów zaznaczenia.
+  has `IsActive()` described as an activation check, without a contract strong
+  enough to equate it with the current UI selection. Its method list has no
+  `IsSelected`/`SetSelected`. Neither `IsActive` nor `SetVisibilityState`
+  justifies implementing selection setters.
 
-Przykład [SelectObjectsByAttributeID.py](https://github.com/NemetschekAllplan/PythonPartsExamples/blob/8e2c252477e20bc9afac8918f78a8eeabd473a81/PythonPartsExampleScripts/ModelObjectExamples/SelectionExamples/SelectObjectsByAttributeID.py)
-potwierdza drogę `StartElementSelect → callback → PostElementSelection`.
-Przykłady przypięto do rewizji `8e2c252477e20bc9afac8918f78a8eeabd473a81`;
-nie są dowodem odbioru M4 na aktualnym buildzie. Wcześniejsze ustalenia są w
-[notatce 0.25](m4-editing-api-0.25.0.md#native-selection-remains-interactive)
-i [notatce 0.28](m4-editing-api-0.28.0.md#selecting-existing-query-results).
+The example [SelectObjectsByAttributeID.py](https://github.com/NemetschekAllplan/PythonPartsExamples/blob/8e2c252477e20bc9afac8918f78a8eeabd473a81/PythonPartsExampleScripts/ModelObjectExamples/SelectionExamples/SelectObjectsByAttributeID.py)
+confirms the path `StartElementSelect → callback → PostElementSelection`.
+Examples are pinned to revision `8e2c252477e20bc9afac8918f78a8eeabd473a81`;
+they are not M4 acceptance on the current build. Earlier findings are in the
+[0.25 note](m4-editing-api.md#native-selection-remains-interactive)
+and the [0.28 note](m4-editing-api.md#selecting-existing-query-results).
 
-## 4. Projekt programowego set/clear/readback — po potwierdzeniu API
+## 4. Design of programmatic set/clear/readback — after the API is confirmed
 
-Poniższe nazwy są **propozycją kontraktu M4, nie istniejącymi metodami Allplana**.
-Minimalny backend powinien rozdzielać `replace_exact`, `clear` i `read_current`,
-z deklaracją scope, obsługiwanych buildów, tożsamości oraz synchroniczności.
-Brak dowolnej części nie pozwala ogłosić pełnej obsługi punktu 5.
+The names below are **a proposed M4 contract, not existing Allplan methods**.
+A minimal backend should separate `replace_exact`, `clear` and `read_current`,
+with declared scope, supported builds, identity and synchronicity. Missing any
+part does not allow announcing full support of the item.
 
-### Kontrakt MCP
+### MCP contract
 
-| Proponowana akcja | Kontrakt |
+| Proposed action | Contract |
 | --- | --- |
-| `select` | Pełny, świeżo sprawdzony wynik `selection_id` minus jawne wyjątki; semantyka replace, bez cichego add/toggle. Wynik po niezależnym odczycie. |
-| `read_selection` | Nowy odczyt bieżącego stanu backendu, bez wymogu żywego query ID. Osobno czas obserwacji, kontekst, kompletność i zakres odczytu. |
-| `clear_selection` | Jawnie określony zakres czyszczenia i świeży odczyt pustego zbioru w tym samym zakresie. Niezależne od `clear_highlight`. |
+| `select` | The full, freshly checked `selection_id` result minus explicit exceptions; replace semantics, no silent add/toggle. Result after an independent read. |
+| `read_selection` | A new read of the backend's current state, without requiring a live query ID. Observation time, context, completeness and read scope reported separately. |
+| `clear_selection` | An explicitly declared clearing scope and a fresh read of an empty set in the same scope. Independent of `clear_highlight`. |
 
-Rozszerzenie wymaga spójnej wersji schematu po obu stronach (np. nowego
-`m4-selection-2`) i obsługi starszego hosta przez jawny błąd/unsupported.
-Nie zmieniać po cichu znaczenia `clear_highlight` ani utożsamiać identyfikatora
-zapytania z identyfikatorem operacji UI.
+The extension needs a consistent schema version on both sides (for example a
+new `m4-selection-2`) and an explicit error/unsupported for an older host.
+Do not silently change the meaning of `clear_highlight` or equate a query
+identifier with a UI operation identifier.
 
-### Tożsamości i rewalidacja
+### Identities and revalidation
 
-Pierwszy obsługiwany zakres: jeden jawnie wskazany aktywny rysunek, bez aktywacji
-plików i bez zmiany warstw. Liczba zaznaczeń nie jest automatycznie ograniczona
-limitem 32 zmian modelu; potrzebny jest osobny budżet i odbiór wydajności.
-200 to limit strony query, nie pełnego zbioru do zaznaczenia.
+First supported scope: one explicitly named active drawing, without file
+activation or layer changes. The number of selected elements is not limited by
+the 32-change model limit; it needs its own budget and performance acceptance.
+200 is the query page limit, not the full set to select.
 
-Przed UI odtworzyć całe zapytanie, sprawdzić kontekst, TTL, fingerprint,
-kompletność i brak niejednoznacznych reprezentacji. Nie wybierać tylko pierwszej
-strony ani próbki. Dla exact selection odrzucić wynik niekompletny lub o nieznanej
-tożsamości; ujawnienie omissions bez blokady nie wystarcza do obietnicy „wszystkie”.
+Before the UI, rebuild the whole query, check context, TTL, fingerprint,
+completeness and absence of ambiguous representations. Do not select only the
+first page or a sample. For exact selection reject an incomplete result or one
+with unknown identity; disclosing omissions without blocking is not enough
+for an "all" promise.
 
-Klucz modelu to co najmniej `(drawing_file, model_uuid)` wewnątrz przypisanego
-projektu/dokumentu/sesji. Osobno zachować `view_uuid` adaptera i relacje
-parent/child. Obecne wyjątki `exclude_model_uuids` i wewnętrzne
-`target_model_uuids` nie kwalifikują pliku. Przy rozszerzaniu zakresu trzeba
-przejść na pełne ref albo odrzucać niejednoznaczność; nie zakładać globalnej
-unikalności UUID między rysunkami.
+The model key is at least `(drawing_file, model_uuid)` within the bound
+project/document/session. Keep the adapter `view_uuid` and parent/child
+relations separately. The current `exclude_model_uuids` exceptions and
+internal `target_model_uuids` do not qualify the file. When widening scope,
+switch to full refs or reject ambiguity; do not assume UUIDs are globally
+unique across drawings.
 
-Nie kopiować automatycznie wszystkich view adapterów z highlightu do native
-selection. Najpierw ustalić, czy setter/readback operuje modelem, reprezentacją
-czy obiektem z zależnościami. Nie przekierowywać Slab na MultiSlab, otworu na
-ścianę ani child na parent. Każde rozszerzenie zbioru musi być widoczne.
+Do not copy all highlight view adapters to native selection automatically.
+First establish whether setter/readback operate on the model, a
+representation or an object with dependencies. Do not redirect Slab to
+MultiSlab, an opening to its wall or a child to its parent. Every widening of
+the set must be visible.
 
-### Przebieg operacji
+### Operation flow
 
 ```text
-MCP → walidacja payloadu → kolejka UI
-    → pełna rewalidacja query → rozstrzygnięcie dokładnych adapterów
-    → odczyt zastępowanego zakresu → backend.replace_exact
-    → backend.read_current → porównanie zbiorów → wynik JSON
+MCP → payload validation → UI queue
+    → full query revalidation → resolution of exact adapters
+    → read of the replaced scope → backend.replace_exact
+    → backend.read_current → set comparison → JSON result
 ```
 
-To projekt, nie wykonywalny pseudokod SDK. Wszystkie wywołania natywne pozostają
-na wątku UI. Adaptery oraz ich właścicieli utrzymywać przy życiu przez wywołanie;
-w cache i odpowiedzi przechowywać JSON/ref, nie wskaźniki SDK. Jeśli setter
-kończy się asynchronicznie, potrzebny jest callback/automat stanów, a nie
-założenie, że wynik jest gotowy przed końcem bieżącego ticka.
+This is a design, not executable SDK pseudocode. All native calls stay on the
+UI thread. Keep adapters and their owners alive through the call; store
+JSON/refs, not SDK pointers, in the cache and response. If the setter
+completes asynchronously, a callback/state machine is needed rather than an
+assumption that the result is ready before the current tick ends.
 
-Nie wyznaczać sukcesu przez porównanie liczników. Dla żądanego zbioru `E` i
-niezależnie odczytanego `A` raportować `missing = E − A`, `unexpected = A − E`,
-nierozpoznane adaptery oraz kompletność. `verified` wymaga obu różnic pustych,
-pełnego odczytu i zgodnego kontekstu. Porównanie musi obejmować również obiekty
-spoza rodzin znanych query, jeśli mogły pozostać zaznaczone. Odczyt filtrowany
-tylko do `E` nie może wykryć `unexpected`.
+Do not decide success by comparing counts. For a requested set `E` and an
+independently read `A`, report `missing = E − A`, `unexpected = A − E`,
+unrecognized adapters and completeness. `verified` needs both differences
+empty, a complete read and a matching context. The comparison must also cover
+objects outside query-known families if they could stay selected. A read
+filtered only to `E` cannot detect `unexpected`.
 
-Po clear `A` musi być puste w zadeklarowanym zakresie. Błąd odczytu nie oznacza
-pustego zbioru. Przed wywołaniem UI można zwrócić `unsupported`/`blocked` z
-`ui_calls_started=false`; po wywołaniu i utracie pewności — `unknown`, a przy
-pełnym odczycie rozbieżności — jawny `mismatch`. `submitted` nie jest `verified`.
+After clear, `A` must be empty in the declared scope. A read error does not
+mean an empty set. Before the UI call, `unsupported`/`blocked` may be returned
+with `ui_calls_started=false`; after the call and loss of certainty —
+`unknown`; with a complete read showing a difference — an explicit `mismatch`.
+`submitted` is not `verified`.
 
-Selekcja pozostaje `model_data_changed=false`, `usable_for_write=false`.
-Nie uruchamia Apply, delete, Undo ani setterów właściwości. Zmiana prezentacji
-wymaga przeglądu reguły unieważniania prezentacji planów w handlerze, ale nie
-może osłabić istniejących blokad zapisu, journalu czy recovery.
+Selection stays `model_data_changed=false`, `usable_for_write=false`. It runs
+no Apply, delete, Undo or property setters. A presentation change requires a
+review of the plan-presentation invalidation rule in the handler, but must not
+weaken existing write locks, the journal or recovery.
 
-Po utracie odpowiedzi nie ponawiać automatycznie replace/clear: użytkownik
-mógł już zmienić zaznaczenie. Identyfikator operacji i status w sesji pozwolą
-rozliczyć żądanie; wymagają nowego rejestru/statusu operacji. Obecny bridge
-`request_id` służy korelacji logów i sam nie dowodzi wykonania. Readback pozostaje
-świeżą obserwacją. Po utracie rejestru wynik nierozliczonej operacji jest nieznany.
-Restart unieważnia
-sesję i query ID, nie dowodzi wyczyszczenia native selection. Bez kontraktu
-odczytu nie obiecywać automatycznego przywrócenia wcześniejszego wyboru.
+After a lost reply do not repeat replace/clear automatically: the user may
+already have changed the selection. An operation identifier and in-session
+status allow accounting for the request; they need a new operation
+registry/status. The current bridge `request_id` correlates logs and does not
+by itself prove execution. Readback stays a fresh observation. After loss of
+the registry an unresolved operation's result is unknown. Restart invalidates
+the session and query IDs and does not prove native selection was cleared.
+Without a read contract do not promise automatic restoration of an earlier
+choice.
 
-## 5. Osobna funkcja: interaktywny wybór przez użytkownika
+## 5. Separate feature: interactive choice by the user
 
-To wykonalny kierunek oparty na udokumentowanym API, wymagający integracji i
-próby natywnej. Proponowany kontrakt to `begin_pick → status/result → cancel_pick`,
-z osobnym `operation_id`. HTTP ma szybko zwrócić `awaiting_user`; nie wolno
-blokować UI ani odpowiedzi HTTP do czasu kliknięcia przez człowieka.
+This is a feasible direction based on the documented API, requiring
+integration and a native trial. Proposed contract:
+`begin_pick → status/result → cancel_pick`, with a separate `operation_id`.
+HTTP should return `awaiting_user` quickly; do not block the UI or the HTTP
+response until a human clicks.
 
-[Podręcznik selekcji](https://pythonparts.allplan.com/2026/manual/features/input/selection/)
-opisuje przejęcie obsługi myszy do zakończenia wyboru, możliwość zmiany filtra
-przez użytkownika oraz ryzyko awarii przy ponownym starcie aktywnej funkcji
-lub usuwaniu funkcji nieaktywnej. Dlatego host potrzebuje automatu stanów
-`idle → starting → awaiting_user → completed/cancelled/unknown`, pojedynczego
-właściciela funkcji wejścia i odrębnej obsługi ESC podczas wyboru.
+The [selection manual](https://pythonparts.allplan.com/2026/manual/features/input/selection/)
+describes taking over mouse handling until the choice ends, the user being able
+to change the filter, and the risk of a crash when restarting an active
+function or removing an inactive one. The host therefore needs a state machine
+`idle → starting → awaiting_user → completed/cancelled/unknown`, a single owner
+of the input function and separate ESC handling during the choice.
 
-W proponowanej integracji wzorzec SDK wykorzystuje wznowione `process_mouse_msg`
-do pobrania wyniku po zakończeniu interakcji; obecny host tego nie implementuje.
-Callback nie służy do cyklicznego odczytywania wyniku w trakcie wyboru.
-`PostElementSelection` pobrać
-raz, zamienić na ograniczony snapshot ref i ponownie sprawdzić scope/typy/relacje.
-Nie ufać samemu filtrowi. Pusty wynik jest poprawnym zakończeniem, a nie powodem
-automatycznego restartu. `RemoveFunction` wywoływać wyłącznie dla nadal aktywnej
-funkcji należącej do hosta; po normalnym zakończeniu nie usuwać jej ponownie.
+In the proposed integration the SDK pattern uses a resumed `process_mouse_msg`
+to fetch the result after the interaction ends; the current host does not
+implement this. The callback is not for polling the result during the choice.
+Fetch `PostElementSelection` once, convert it into a bounded ref snapshot and
+re-check scope/types/relations. Do not trust the filter alone. An empty result
+is a valid completion, not a reason for an automatic restart. Call
+`RemoveFunction` only for a still active function owned by the host; do not
+remove it again after a normal completion.
 
-Podczas oczekiwania inne mutacje UI oraz Apply/delete/Undo powinny otrzymywać
-`selection_busy`. Zezwolić na status/cancel i tylko sprawdzone odczyty; zachowanie
-timera w natywnej pętli wejścia trzeba potwierdzić. ESC, zmiana projektu/rysunku
-i zatrzymanie hosta muszą kończyć operację bez podwójnego cleanup i bez
-pozostawienia aktywnej funkcji. Stan `starting/unknown` nie uprawnia do ślepego
-`RemoveFunction` ani do drugiego startu.
+While waiting, other UI mutations and Apply/delete/Undo should get
+`selection_busy`. Allow status/cancel and only checked reads; the timer
+behaviour in the native input loop must be confirmed. ESC, a project/drawing
+change and host stop must end the operation without double cleanup and without
+leaving an active function. A `starting/unknown` state does not authorize a
+blind `RemoveFunction` or a second start.
 
-Wynik nazywać `interactive_pick`, z `readback_kind=interaction_result`.
-Nie przedstawiać go jako trwałej selekcji UI ani jako wyniku `read_selection`.
-Można utworzyć osobny snapshot wejściowego zakresu; nadal nie jest on zgodą
-na zapis i musi przejść zwykłe preview/revalidation przed edycją.
+Name the result `interactive_pick`, with `readback_kind=interaction_result`.
+Do not present it as a persistent UI selection or as a `read_selection` result.
+A separate snapshot of the input scope may be created; it is still no write
+consent and must pass normal preview/revalidation before editing.
 
-## 6. Warianty i koszt techniczny
+## 6. Variants and technical cost
 
-| Wariant | Co daje | Ocena |
+| Variant | What it gives | Assessment |
 | --- | --- | --- |
-| Publiczny backend replace/clear/read-current | Spełnia docelowy kierunek query → native UI, jeżeli kontrakt zostanie potwierdzony. | Preferowany; obecnie BLOCKED brakiem kompletnego kontraktu. |
-| `StartElementSelect` + wynik callbacku | Użytkownik wskazuje elementy natywnymi gestami. | Realny odrębny feature; średnia złożoność lifecycle, nie zamyka obecnego wymagania. |
-| `GetPreSelectedElements` | Potencjalny import wcześniej zaznaczonego zakresu. | Najmniejszy eksperyment odczytu; semantyka i zakres wymagają sprawdzenia. |
-| Inny oficjalny SDK/rozszerzenie producenta | Potencjalnie brakujący setter i readback. | Do rozpoznania z producentem; nie potwierdzono tu konkretnej ścieżki C++/.NET. Dochodzą instalacja, ABI/build i most do hosta. |
-| Highlight, geometria prostokąta lub syntetyczne kliknięcia | Prezentacja albo próba odtworzenia gestu. | Nie zapewniają udokumentowanego exact set/clear/readback; nie stanowią zamiennika wymagania. |
+| Public replace/clear/read-current backend | Meets the target query → native UI direction if the contract is confirmed. | Preferred; currently BLOCKED by a missing complete contract. |
+| `StartElementSelect` + callback result | The user chooses elements with native gestures. | A real separate feature; medium lifecycle complexity, does not close the current requirement. |
+| `GetPreSelectedElements` | Potential import of a previously selected scope. | The smallest read experiment; semantics and scope need checking. |
+| Another official SDK/vendor extension | Potentially the missing setter and readback. | To be clarified with the vendor; no concrete C++/.NET path is confirmed here. Adds installation, ABI/build and a bridge to the host. |
+| Highlight, rectangle geometry or synthetic clicks | Presentation or an attempt to reproduce a gesture. | Do not provide a documented exact set/clear/readback; not a substitute for the requirement. |
 
-Największy koszt nie leży w dodaniu nowej akcji MCP, lecz w ustaleniu
-semantyki native selection i w bezpiecznej integracji pętli UI. Bez brakującego
-kontraktu nie ma podstaw do wiarygodnej estymacji pełnej implementacji.
+The largest cost is not adding a new MCP action but establishing native
+selection semantics and safely integrating the UI loop. Without the missing
+contract there is no basis for a credible estimate of the full implementation.
 
-## 7. Minimalny eksperyment i pytania rozstrzygające
+## 7. Minimal experiment and deciding questions
 
-To projekt przyszłej próby, **nie wykonany test i nie żądanie ponowienia
-odebranych operacji modelu**. Działać na małym rysunku testowym; zapisać build
-Allplana, SDK/stuby, wersję paczki i dokładne ref elementów. Nie wznawiać
-szerokiego property discovery ani historycznych prób prowadzących do crasha.
+This is the design of a future trial, **not an executed test and not a request
+to repeat accepted model operations**. Work on a small test drawing; record
+the Allplan build, SDK/stubs, package version and exact element refs. Do not
+resume broad property discovery or historic trials that led to crashes.
 
-1. Sprawdzić lokalne stuby tylko wymienionych klas oraz oficjalną odpowiedź
-   producenta o setterze, clear i globalnym readbacku. Samo istnienie symbolu
-   nie jest dowodem jego semantyki. Nie wywoływać zgadywanych metod.
-2. Dla ręcznego wyboru `{A, B}`, następnie `{B}` i pustego zbioru sprawdzić
-   `GetPreSelectedElements` przed/w trakcie/po wejściu do hosta oraz powtórny
-   odczyt. Odróżnić od wyniku pod kursorem i od samego highlightu. Ustalić,
-   czy odczyt konsumuje stan i czy filtr naprawdę obejmuje cały zakres.
-   Porównać filtr zawężający z wariantem niezawężającym, po sprawdzeniu jego
-   konstrukcji w bindingach 2026. Sam pusty `SelectionQuery` nie dowodzi
-   globalnego ani kompletnego readbacku.
-3. Dla osobnego pick sprawdzić jedno zakończenie, pusty wynik i anulowanie;
-   zapisać kolejność callbacków, działanie timera, zakres `markSelectedElements`
-   oraz to, co pozostaje po zakończeniu. Bez celowego podwójnego start/Remove.
-4. Dopiero po ustaleniu settera wykonać `{A, B} → {B} → ∅`, z obcym wcześniejszym
-   zaznaczeniem `C`, porównując pełne dokładne ref API i UI. Jeśli backend
-   nie daje takiego readbacku, odnotować BLOCKED zamiast uznawać podświetlenie
-   za sukces. Kontrolować brak zmiany danych modelu i historii Undo.
-5. Dopiero dla działającej ścieżki rozszerzyć macierz o Wall z otworami,
-   Slab/MultiSlab, reprezentacje widokowe, warstwy pasywne/ukryte, zmianę
-   kontekstu, utratę odpowiedzi, ESC i restart. Nie rozszerzać odbioru z jednej
-   rodziny na pozostałe; brak przykładu oznaczać `fixture_missing`.
+1. Check local stubs of the listed classes only, and the vendor's official
+   answer about a setter, clear and a global readback. A symbol's existence is
+   not proof of its semantics. Do not call guessed methods.
+2. For a manual choice `{A, B}`, then `{B}` and an empty set, check
+   `GetPreSelectedElements` before/during/after entering the host and a
+   repeated read. Distinguish it from the under-cursor result and from
+   highlight. Establish whether the read consumes the state and whether the
+   filter really covers the whole scope. Compare a narrowing filter with a
+   non-narrowing variant after checking its construction in the 2026 bindings.
+   An empty `SelectionQuery` alone does not prove a global or complete readback.
+3. For a separate pick check one completion, an empty result and cancellation;
+   record callback order, timer behaviour, the `markSelectedElements` scope and
+   what remains afterwards. No deliberate double start/Remove.
+4. Only after a setter is established run `{A, B} → {B} → ∅`, with a foreign
+   earlier selection `C`, comparing full exact refs in API and UI. If the
+   backend gives no such readback, record BLOCKED rather than accepting
+   highlight as success. Check that model data and Undo history do not change.
+5. Only for a working path extend the matrix to Wall with openings,
+   Slab/MultiSlab, view representations, passive/hidden layers, context
+   change, lost reply, ESC and restart. Do not extend acceptance from one family
+   to others; mark a missing example `fixture_missing`.
 
-Pytania do producenta: jaka publiczna metoda przyjmuje dokładne istniejące
-adaptery jako selekcję, czy replace jest atomowy, jak wyczyścić stan i jaki
-getter czyta go niezależnie od kursora/callbacku? Jaki jest scope
-(rysunek/dokument/widok/aplikacja), lifetime i zachowanie po końcu interaktora?
-Czy są normalizacje do parent/children? Czy `GetPreSelectedElements` konsumuje
-preselekcję i działa po programowym set/clear? Co dokładnie oznacza `IsActive()`?
-Czy te wywołania są wspierane z callbacku `DispatcherTimer` na UI w 2026.1?
-Czy `markSelectedElements` pozostawia selekcję po końcu funkcji i czy jej
-zbiór może różnić się od wyniku `PostElementSelection`?
+Questions for the vendor: which public method takes exact existing adapters as
+the selection, is replace atomic, how is the state cleared and which getter
+reads it independently of cursor/callback? What is the scope
+(drawing/document/view/application), lifetime and behaviour after the
+interactor ends? Are there normalizations to parent/children? Does
+`GetPreSelectedElements` consume the preselection and work after a
+programmatic set/clear? What exactly does `IsActive()` mean? Are these calls
+supported from a `DispatcherTimer` callback on the UI in 2026.1? Does
+`markSelectedElements` leave a selection after the function ends, and can that
+set differ from the `PostElementSelection` result?
 
-## 8. Weryfikacja przyszłej implementacji i warunek zamknięcia
+## 8. Verification of a future implementation and closure condition
 
-Testy jednostkowe powinny sprawdzać kontrakty MCP/hosta, pełny zbiór wszystkich
-stron, stale/TTL/context przed UI, różnice `missing/unexpected`, duplikaty
-reprezentacji, nierozpoznane ref, scope clear i `unknown` po rozpoczęciu UI.
-Dla pick: pojedynczy start, konsumpcja wyniku raz, brak podwójnego Remove,
-busy/cancel/stop oraz brak automatycznego restartu po pustym wyniku.
-Test HTTP ma potwierdzić szybki start/status i brak niejawnego retry; mock backendu
-nie jest dowodem dostępności prawdziwego API.
+Unit tests should check MCP/host contracts, the full set across all pages,
+stale/TTL/context before UI, `missing/unexpected` differences, duplicate
+representations, unrecognized refs, clear scope and `unknown` after UI start.
+For pick: a single start, the result consumed once, no double Remove,
+busy/cancel/stop and no automatic restart after an empty result. An HTTP test
+should confirm a fast start/status and no implicit retry; a mock backend does
+not prove that the real API exists.
 
-Produktowy kandydat wymaga kontroli z [polityki testów](testing-policy.md),
-odpowiedniego CI i dostawy oraz osobnej próby natywnej. Odbiór selekcji wymaga
-zgodności **całego dokładnego zbioru w API i UI po replace i po clear**,
-kontroli braku edycji modelu oraz zapisania builda i zakresu dowodu. Sam odczyt
-wyniku pick albo liczba podświetleń nie wystarcza. Pełny punkt 5 nadal wymaga
-także brakujących dowodów delete; istniejący grouped Column delete/Undo PASS
-pozostaje zachowany.
+A product candidate needs the checks of the [testing policy](testing-policy.md),
+the corresponding CI and delivery, and a separate native trial. Selection
+acceptance needs agreement of **the whole exact set in API and UI after replace
+and after clear**, a check that the model was not edited, and a record of the
+build and evidence scope. Reading a pick result or a highlight count is not
+enough. The full delete/selection item also needs the missing delete
+evidence; the existing grouped Column delete/Undo PASS is retained.
 
-Bieżący rezultat tej pracy to analiza dokumentacji i kodu, sprawdzenie diffu
-i odnośników. Brak nowego native PASS, implementacji selekcji, testów runtime
-lub buildów; ograniczenia 0.39.0 pozostają aktualne.
+The current result of this work is documentation and code analysis with a
+diff and link review. There is no new native PASS, selection implementation,
+runtime tests or builds; the 0.39.0 limits remain current.

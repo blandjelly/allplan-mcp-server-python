@@ -6,11 +6,12 @@ for model queries, audits and reviewed edits. M4 development uses
 main integration is separate. Agent instructions: [AGENTS.md](AGENTS.md)
 (Claude Code: [CLAUDE.md](CLAUDE.md)).
 
-M4 goal: typed, reviewed editing of attributes and supported native properties
-of Columns, Beams, Walls and Slabs. Current version **0.42.1**; M4 remains
+M4 goal: typed, reviewed editing of every API-exposed attribute, and where
+possible native properties, of Columns, Beams, Walls and Slabs. Installed
+baseline **0.42.1**, candidate **0.43.0**; M4 remains
 partially accepted. Version, delivery, native evidence and the next task are
 kept only in the [current handoff](docs/next-model-handoff.md); remaining work
-and blockers in the [development plan](docs/office-editing-development-plan.pl.md).
+and blockers in the [development plan](docs/development-plan.md).
 
 ## Documentation
 
@@ -18,13 +19,14 @@ and blockers in the [development plan](docs/office-editing-development-plan.pl.m
 | --- | --- |
 | [Documentation policy](docs/documentation-policy.md) | Keep the handoff and backlog concise; avoid redundant files. |
 | [Current handoff](docs/next-model-handoff.md) | Current version, delivery and next action. |
-| [Development plan](docs/office-editing-development-plan.pl.md) | Remaining work, blockers and acceptance criteria. |
+| [Development plan](docs/development-plan.md) | Remaining work, blockers and acceptance criteria. |
+| [Coverage matrix](docs/m4-coverage-matrix.md) | Family × field/type × operation status. |
 | [Validation status](docs/validation-status.md) | Concise accepted scopes and necessary source evidence. |
 | [Implementation plan](docs/implementation-plan.md) | M0–M3 baseline and later stages. |
 | [Windows setup](docs/windows-setup.md) / [diagnostics](docs/diagnostics.md) | Install, connect and recover unknown results. |
 | [Fixture guide](docs/fixture-guide.md) | Test geometry, resources and retained project state. |
 | [Tool reference](docs/tool-reference.md) / [M3 execution contract](docs/m3-execution-contract.md) | MCP requests and operational boundaries. |
-| [M4 operator guide](docs/m4-model-edit.pl.md) / [attribute API evidence](docs/m4-attribute-api-evidence.md) / [type coverage](docs/m4-attribute-type-coverage.md) | API contracts and their documented limits. |
+| [M4 operator guide](docs/m4-model-edit.md) / [editing API notes](docs/m4-editing-api.md) / [attribute API evidence](docs/m4-attribute-api-evidence.md) / [type coverage](docs/m4-attribute-type-coverage.md) | API contracts and their documented limits. |
 | [Architecture](docs/architecture.md) / [testing policy](docs/testing-policy.md) | Runtime boundary and required checks. |
 
 Versioned API research notes retain the scope stated in each note; current

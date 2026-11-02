@@ -6,7 +6,12 @@ handoff instructions in [the M4 handoff](docs/next-model-handoff.md).
 
 At the start of each chat, read [the documentation policy](docs/documentation-policy.md),
 [the testing policy](docs/testing-policy.md), [the current handoff](docs/next-model-handoff.md)
-and [the development plan](docs/office-editing-development-plan.pl.md).
+and [the development plan](docs/development-plan.md); use the
+[coverage matrix](docs/m4-coverage-matrix.md) for per-pair status.
+Project direction: edit every attribute the Allplan 2026 API exposes for
+Columns, Beams, Walls and Slabs, and their native properties where the API
+allows a safe, verifiable write. Documentation is English only; the owner may
+write instructions in Polish.
 Follow the documentation policy when updating project state; keep the handoff and
 plan concise and current, without adding release histories or redundant files.
 Identify the checkout, branch, source state, and change scope before choosing

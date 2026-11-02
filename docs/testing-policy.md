@@ -162,6 +162,9 @@ alone does not authorize Codex to build a replacement.
 ## Native Allplan checks
 
 Request an owner trial only for new or materially changed native behavior.
+From 0.43.0 the raw bridge capture in the package `logs/evidence/` is the
+preferred trial evidence; store supplied files unchanged under
+`docs/test-results/evidence/<version>-<date>/`.
 Do not repeat observations already accepted in the handoff or expand their
 acceptance scope. Keep native PASS distinct from automated test and CI PASS;
 record the tested scope and evidence in the handoff after a completed stage.

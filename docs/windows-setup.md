@@ -26,8 +26,10 @@ another server by guess. No tunnel or remote deployment is configured.
 
 ## Claude Code
 
-The package has no Claude Code helper; register the same endpoint once per
-Windows user (it is version-independent):
+From 0.43.0 run **Connect Claude Code.cmd** (it calls the `claude` CLI, is
+idempotent and reports, never overwrites, another server named `allplan`).
+For older packages register the same endpoint once per Windows user (it is
+version-independent):
 
 ```bat
 claude mcp add --transport http --scope user allplan http://127.0.0.1:8888/mcp
@@ -37,7 +39,7 @@ Check it with `claude mcp list` or `/mcp` inside a session; it is connected only
 while **Launch Allplan MCP.cmd** is running. Open the extracted package folder
 as the working folder (desktop app: local folder; CLI: `claude` in that folder)
 and give instructions in natural language, as in the
-[operator guide](m4-model-edit.pl.md#polecenia-dla-agenta). Tools appear as
+[operator guide](m4-model-edit.md#instructions-for-the-agent). Tools appear as
 `mcp__allplan__<tool>`; skills and profiles are MCP resources (`allplan://skills`,
 referenced with `@allplan:`). Pre-approve only read-only tools, e.g. in the
 folder's `.claude/settings.local.json`:
