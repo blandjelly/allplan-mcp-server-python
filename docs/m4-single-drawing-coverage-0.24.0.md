@@ -43,7 +43,7 @@ wrapper defect in the Wall preservation snapshot. The exact native branch for
 the first 0.30.0 diagnostic is unproven without raw lineage/children data. The
 second Wall-with-opening diagnostic `component_child_owner_mismatch` remains
 unresolved. See the [0.31.0 evaluation record](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/evaluation-packages/0.31.0/README.md),
-[API note](m4-editing-api-0.31.0.md) and
+[API note](m4-editing-api.md#m4-material-path-correction-for-candidate-0310) and
 [narrow native trial plan](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/m4-single-drawing-0.31.0.pl.md).
 
 The 0.30.0 `attribute_evidence` probe and no-op evidence contract do not add
@@ -236,7 +236,7 @@ material-path trial is [0.31.0](https://github.com/blandjelly/allplan-mcp-server
    date/vector/object payload and readback contracts remain open.
 
 These scoped outcomes do not close priorities 1–5. See the
-[development plan](office-editing-development-plan.pl.md),
+[development plan](development-plan.md),
 [0.30.0 owner observation](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-owner-observation-0.30.0-2026-10-23.md),
-[0.31.0 API note](m4-editing-api-0.31.0.md) and
+[0.31.0 API note](m4-editing-api.md#m4-material-path-correction-for-candidate-0310) and
 [0.31.0 trial plan](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/m4-single-drawing-0.31.0.pl.md).

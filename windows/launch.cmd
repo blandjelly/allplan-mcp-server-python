@@ -8,7 +8,9 @@ set "ALLPLAN_HOST_URL=http://127.0.0.1:5679"
 set "MCP_HOST=127.0.0.1"
 set "MCP_PORT=8888"
 set "MCP_PATH=/mcp"
+set "ALLPLAN_MCP_EVIDENCE_DIR=%CD%\logs\evidence"
 echo Keep this window open. MCP endpoint: http://127.0.0.1:8888/mcp
+echo Raw bridge evidence: %ALLPLAN_MCP_EVIDENCE_DIR%
 .venv\Scripts\allplan-mcp.exe
 set "ACTION_RESULT=%ERRORLEVEL%"
 pause

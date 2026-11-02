@@ -6,13 +6,20 @@ handoff instructions in [the M4 handoff](docs/next-model-handoff.md).
 
 At the start of each chat, read [the documentation policy](docs/documentation-policy.md),
 [the testing policy](docs/testing-policy.md), [the current handoff](docs/next-model-handoff.md)
-and [the development plan](docs/office-editing-development-plan.pl.md).
+and [the development plan](docs/development-plan.md); use the
+[coverage matrix](docs/m4-coverage-matrix.md) for per-pair status.
+Project direction: edit every attribute the Allplan 2026 API exposes for
+Columns, Beams, Walls and Slabs, and their native properties where the API
+allows a safe, verifiable write. Documentation is English only; the owner may
+write instructions in Polish.
 Follow the documentation policy when updating project state; keep the handoff and
 plan concise and current, without adding release histories or redundant files.
 Identify the checkout, branch, source state, and change scope before choosing
 checks. Keep focused, full CI, and native Allplan results distinct.
 Follow the testing policy as the single source of truth for test and build
 decisions and the responsibility split below. An explicit owner pause takes precedence.
+**Codex** below and in the project documents means the coding agent in use
+(Codex or Claude Code); Claude Code also reads [CLAUDE.md](CLAUDE.md).
 
 - Codex owns analysis, implementation, focused affected/dependent tests, version
   consistency checks, commit, push and PR preparation. Keep the PR in draft

@@ -5,11 +5,11 @@ from .transport import BridgeError
 
 
 def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapter_owners=None,
-            all_representations=False):
+            all_representations=False, post_write=False):
     if change.get("adapter_version") == "m4-model-edit-1":
         from . import native_model_edit
         return native_model_edit.resolve(doc, base, queries, change, writable, diagnostics, adapter_owners,
-                                         all_representations=all_representations)
+                                         all_representations=all_representations, post_write=post_write)
     ref = change["ref"]
     matches = {}
     started = queries.clock()
@@ -66,7 +66,10 @@ def observe(doc, base, queries, change, diagnostics=None):
         return observe_deleted(doc, base, queries, change, diagnostics)
     if change.get("adapter_version") == "m4-model-edit-1":
         from .native_model_edit import read_consensus
-        roots = resolve(doc, base, queries, change, adapter_owners=owners, all_representations=True)
+        # observe() runs only after a setter (fresh readback/recovery): an
+        # exact Slab inventory change is reported, never treated as success.
+        roots = resolve(doc, base, queries, change, diagnostics=diagnostics, adapter_owners=owners,
+                        all_representations=True, post_write=True)
         return read_consensus(base, queries, roots, change, diagnostics)
     element = resolve(doc, base, queries, change, adapter_owners=owners)
     return read(base, queries, element, change)

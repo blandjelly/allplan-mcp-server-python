@@ -57,7 +57,8 @@ class SelectionTests(unittest.TestCase):
             self.assertFalse(plan["run_portable"])
 
     def test_documentation_and_owner_logs_skip_product_jobs_even_on_main(self):
-        paths = ["AGENTS.md", "README.md", "docs/testing-policy.md", "docs/nested/guide.md",
+        paths = ["AGENTS.md", "CLAUDE.md", ".claude/settings.json", "README.md",
+                 "docs/testing-policy.md", "docs/nested/guide.md",
                  "evaluation-packages/0.18.2/native-acceptance/owner/report.json"]
         self.assertFalse(self.plan(paths, payload=event(base="main"))["run_portable"])
 

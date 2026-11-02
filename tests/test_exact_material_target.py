@@ -214,4 +214,84 @@ class ExactMaterialTargetTests(unittest.TestCase):
         f.native.base.ModifyElements.assert_called_once()
 
 
+    def exact_module(self):
+        return importlib.import_module(self.f.native.module.__package__ + ".exact_material_target")
+
+    def test_preview_binds_bounded_inventory_summary(self):
+        plan = self.preview()
+        binding = plan["changes"][0]["resource"]["exact_target_binding"]
+        summary = binding["inventory_summary"]
+        self.assertTrue(self.exact_module().valid_inventory_summary(summary))
+        self.assertEqual(summary["parents"][0]["children"],
+                         ["Slab_TypeUUID|%s|%s" % (self.target["model_uuid"], self.target["view_uuid"])])
+        self.assertFalse(summary["target_in_direct_scan"])
+
+    def test_post_setter_inventory_change_is_reported_unknown_and_recovery_reconciles(self):
+        # 0.42.1 native trial: the setter ran, then fresh_resolve rejected the
+        # pre-setter inventory fingerprint. Readback must report the drift
+        # instead of discarding the observation, and never claim success.
+        f = self.f
+        setter = f.native.base.ModifyElements.side_effect
+        sibling = f.native.element(91, name="AttributeContainer_TypeUUID")
+        def regenerate_children(*args):
+            result = setter(*args)
+            f.native.children[id(self.parent)] = [f.root, sibling]
+            return result
+        f.native.base.ModifyElements.side_effect = regenerate_children
+        plan = self.preview()
+        f.native.highlight(plan)
+        execution = uuid4().hex
+        result = f.native.apply(plan, execution)
+        outcome = result["outcomes"][0]
+        self.assertEqual(outcome["state"], "unknown", result)
+        self.assertEqual(outcome["reason"], "exact_inventory_changed_after_setter")
+        self.assertEqual(outcome["readback"]["value"], plan["changes"][0]["new_value"])
+        drift = outcome["representation_consensus"]["exact_inventory"]
+        self.assertEqual(drift["status"], "changed")
+        self.assertEqual(drift["diff"]["children_added"]["count"], 1)
+        self.assertIn("AttributeContainer_TypeUUID|", drift["diff"]["children_added"]["items"][0])
+        self.assertEqual(drift["diff"]["children_removed"]["count"], 0)
+        self.assertTrue(f.native.apply(plan, execution)["replayed"])
+        recovered = f.native.recover(execution)
+        self.assertEqual(recovered["outcomes"][0]["state"], "reconciled", recovered)
+        self.assertEqual(recovered["outcomes"][0]["reason"], "new_value_observed")
+        observation, = recovered["recovery"]["observations"]
+        self.assertEqual(observation["representation_consensus"]["exact_inventory"]["status"], "changed")
+        f.native.base.ModifyElements.assert_called_once()
+
+    def test_unchanged_post_setter_inventory_still_completes(self):
+        f = self.f
+        plan = self.preview()
+        f.native.highlight(plan)
+        result = f.native.apply(plan)
+        self.assertEqual(result["state"], "completed", result)
+        drift = result["outcomes"][0]["representation_consensus"]["exact_inventory"]
+        self.assertEqual(drift["status"], "unchanged")
+
+    def test_legacy_binding_without_summary_stays_valid_and_diff_is_explicit(self):
+        f = self.f
+        plan = self.preview()
+        change = copy.deepcopy(plan["changes"][0])
+        summary = change["resource"]["exact_target_binding"].pop("inventory_summary")
+        module = importlib.import_module(f.native.module.__package__ + ".wall_material")
+        self.assertTrue(module.valid_change(change))
+        diff = self.exact_module().inventory_diff(None, summary)
+        self.assertEqual(diff["status"], "expected_summary_unavailable")
+        tampered = copy.deepcopy(plan["changes"][0])
+        tampered["resource"]["exact_target_binding"]["inventory_summary"]["edges"] = "x"
+        self.assertFalse(module.valid_change(tampered))
+        tampered["resource"]["exact_target_binding"]["inventory_summary"] = summary
+        tampered["resource"]["exact_target_binding"]["extra"] = 1
+        self.assertFalse(module.valid_change(tampered))
+
+    def test_post_write_mode_cannot_resolve_a_writable_target(self):
+        f = self.f
+        plan = self.preview()
+        module = importlib.import_module(f.native.module.__package__ + ".native_model_edit")
+        with self.assertRaises(f.native.module.BridgeError):
+            module.resolve(f.native.handler.current_document(), f.native.base, f.native.handler.model_queries,
+                           plan["changes"][0], writable=True, post_write=True)
+        f.native.base.ModifyElements.assert_not_called()
+
+
 if __name__ == "__main__": unittest.main()

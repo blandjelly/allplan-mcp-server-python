@@ -263,7 +263,7 @@ edits on aggregates or directly parented Slabs require explicit
 organizational layer edits remain blocked for those target shapes. Native
 Material uses its separate selected `SlabProperties` contract, including a
 directly MultiSlab-owned Slab, as described in the
-[material API contract](m4-editing-api-0.32.0.md#request-and-native-property-owner).
+[material API contract](m4-editing-api.md#request-and-native-property-owner).
 No route redirects an owner or merges targets by bounds. Plans recheck bound
 ownership before writing and at fresh readback/recovery. Old plans without
 the required field-specific evidence cannot authorize new setters; exact-ID
@@ -448,12 +448,15 @@ values.
 
 Highlight verifies the exact child, then submits all representations of that
 child model UUID for highlighting; it never highlights the MultiSlab parent.
-Fresh readback/recovery require the reviewed exact inventory and view. If the
-view is absent or regenerated, the outcome remains unknown without a replacement
-view fallback. Recovery remains read-only under the original execution ID.
-The new target contract does not establish native Allplan acceptance or
-persistence; candidate 0.42.0 needs its required CI, exact ZIP gate and one
-disposable-copy native trial before this path is accepted.
+Fresh readback/recovery require the reviewed exact view, child type and parent
+edge. If the view is absent or regenerated, the outcome remains unknown without
+a replacement view fallback. From 0.43.0 a changed child inventory after the
+setter is reported in `representation_consensus.exact_inventory` with a bounded
+diff; Apply keeps it `unknown` (`exact_inventory_changed_after_setter`) and
+read-only recovery can reconcile from the observed value
+([contract](m4-editing-api.md#exact-child-native-material-target-0420)).
+Recovery remains read-only under the original execution ID. This path is not
+natively accepted yet.
 
 ```json
 {
@@ -511,7 +514,7 @@ execution ID; never retry the native setter. Per-target readback reports which
 targets and descendants are absent, present, or unresolved. A single native
 call does not itself establish Allplan UI Undo grouping; that requires a narrow
 owner trial. An official example passes multiple adapters to one
-`DeleteElements` call; see the [0.29.0 API evidence](m4-editing-api-0.29.0.md).
+`DeleteElements` call; see the [0.29.0 API evidence](m4-editing-api.md#m4-editing-api-evidence-for-0290).
 The evidence documents the call shape, not UI Undo behavior. The shared journal,
 exact target binding, confirmation, and setter-free replay/recovery safeguards
 apply.
@@ -589,7 +592,7 @@ adapter for `ChangeAttributes`; it does not claim that Slab and MultiSlab are
 equivalent. Missing ownership evidence, changed lineage, overlapping parent/child
 targets and unreadable or computed-only values still block writes. Omitted
 `property_owner` retains the existing aggregate/child block; layer ownership is
-unchanged. See the [API details](m4-editing-api-0.32.0.md), current
+unchanged. See the [API details](m4-editing-api.md#native-material-editing--api-contracts), current
 [trial](next-model-handoff.md), and
 [validation status](validation-status.md). Native Allplan acceptance is not
 established by the implementation or automated checks.
@@ -740,7 +743,7 @@ actual setters and one foreground drawing. More than 32 changes, multiple
 write drawings, and uncertain coverage are blocked before setters; there is no
 automatic batching or hidden partial multi-drawing Apply. Lost replies remain
 unknown and require recovery with the same execution ID. This is not full K6
-acceptance. See the [Polish operator guide](m4-model-edit.pl.md) and [Allplan
+acceptance. See the [operator guide](m4-model-edit.md) and [Allplan
 2026 API evidence](m4-attribute-api-evidence.md).
 
 For this evaluation route, public `apply_available` reports whether the
@@ -897,4 +900,4 @@ failure, maintenance fails safely and keeps the data. Oversized/unverifiable
 execution records are not deleted to unblock writes.
 
 [Owner trial](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/m4-journal-cleanup-0.23.0.pl.md) ·
-[Current development plan](office-editing-development-plan.pl.md).
+[Current development plan](development-plan.md).

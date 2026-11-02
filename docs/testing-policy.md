@@ -8,6 +8,7 @@ separate when reporting results. Codex owns implementation and focused tests;
 GitHub Actions runs full CI and builds; the owner supervises CI, verifies
 delivery and merges after all required gates pass.
 An explicit owner pause takes precedence over this procedure.
+**Codex** in this policy means the coding agent in use (Codex or Claude Code).
 
 M4 topic branches and PRs use **develop/m4** as their base; main integration
 is a separate task. Ref/PR consolidation with unchanged runtime follows the
@@ -40,7 +41,7 @@ split does not waive any required validation or native Allplan gate.
 Run only focused affected tests and their dependent tests as you iterate. Use
 HTTP checks for changes to MCP, transport, or launcher behavior. Do not run the
 full local suite or build packages after every change. For documentation,
-logs, or AGENTS-only changes, review the diff and links; skip runtime tests,
+logs, or agent-instruction changes (`AGENTS.md`, `CLAUDE.md`, `.claude/`), review the diff and links; skip runtime tests,
 builds, hash checks, and reruns.
 
 ### Material trace selection
@@ -82,7 +83,8 @@ review. The current [workflow](../.github/workflows/portable.yml) handles
 `ready_for_review`; this event compares the full PR diff and selects the
 required matrix through [ci_policy.py](../utils/ci_policy.py). Codex must mark
 final product candidates Ready for review to trigger that validation before
-handoff. Documentation-only PRs run configuration and the lightweight
+handoff. Documentation-only PRs (paths listed in `DOCUMENTATION` in
+`ci_policy.py`: agent instructions, `README.md`, `docs/`, `evaluation-packages/`) run configuration and the lightweight
 `ci-required` gate; they require only diff and link checks, without product
 tests or builds. A passing run for an earlier source
 revision does not validate later runtime changes.
@@ -160,6 +162,9 @@ alone does not authorize Codex to build a replacement.
 ## Native Allplan checks
 
 Request an owner trial only for new or materially changed native behavior.
+From 0.43.0 the raw bridge capture in the package `logs/evidence/` is the
+preferred trial evidence; store supplied files unchanged under
+`docs/test-results/evidence/<version>-<date>/`.
 Do not repeat observations already accepted in the handoff or expand their
 acceptance scope. Keep native PASS distinct from automated test and CI PASS;
 record the tested scope and evidence in the handoff after a completed stage.

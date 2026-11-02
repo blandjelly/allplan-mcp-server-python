@@ -10,7 +10,7 @@ import subprocess
 import tomllib
 
 
-DOCUMENTATION = ("AGENTS.md", "README.md", "docs/*", "evaluation-packages/*")
+DOCUMENTATION = ("AGENTS.md", "CLAUDE.md", ".claude/*", "README.md", "docs/*", "evaluation-packages/*")
 COMPATIBILITY = ("windows/*", "utils/register_python_host.*",
                  "utils/build_windows_package.py", "utils/ci_policy.py", "utils/ci_required.py",
                  ".github/workflows/*", ".python-version", "uv.toml")

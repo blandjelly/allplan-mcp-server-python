@@ -8,6 +8,8 @@ from urllib.parse import urljoin, urlparse
 from urllib.request import ProxyHandler, Request, build_opener
 from uuid import uuid4
 
+from allplan_mcp import evidence_log
+
 
 class AllplanHostError(RuntimeError):
     """Categorized bridge failure; a lost response never authorizes a write retry."""
@@ -28,6 +30,17 @@ class AllplanHostClient:
         request_headers = {"Content-Type": "application/json", "X-Request-ID": str(uuid4())}
         if headers:
             request_headers.update(headers)
+        evidence_log.record("request", path, request_headers["X-Request-ID"], request=payload or {})
+        try:
+            data = self._post(path, payload, request_headers)
+        except AllplanHostError as exc:
+            evidence_log.record("error", path, exc.request_id, error={"code": exc.code, "message": str(exc)})
+            raise
+        evidence_log.record("response", path, data.get("request_id"), response=data)
+        return data
+
+    def _post(self, path: str, payload: dict[str, Any] | None,
+              request_headers: dict[str, str]) -> dict[str, Any]:
         request_id = request_headers["X-Request-ID"]
         try:
             body = json.dumps(payload or {}, allow_nan=False).encode("utf-8")

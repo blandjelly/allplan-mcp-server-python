@@ -21,6 +21,10 @@ class WallFilterHTTPTests(unittest.IsolatedAsyncioTestCase):
         self.addCleanup(native.doCleanups)
         native.wall_fixture()
         native.handler.wall_filters.trace_path = native.path
+        # Behavior tests use a deterministic clock so slow Windows trace fsync
+        # cannot trip the five-second native read budget (scan_limit_exceeded);
+        # budget expiry is covered by tests.test_wall_filter with its own clock.
+        native.handler.wall_filters.queries.clock = lambda: 0.0
         original = self.bridge_handler.handle
 
         def handle(route, payload):

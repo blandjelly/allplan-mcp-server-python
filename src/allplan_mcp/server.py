@@ -27,7 +27,30 @@ DEFAULT_MCP_HOST = "127.0.0.1"
 DEFAULT_MCP_PORT = 8888
 DEFAULT_MCP_PATH = "/mcp"
 
-mcp = FastMCP("Allplan MCP Server")
+SERVER_INSTRUCTIONS = """\
+Allplan 2026 bridge for model queries and reviewed edits of Columns, Beams
+(Beam/SkeletonBeam), Walls and Slabs (Slab/MultiSlab). The user may write in
+Polish; keep their names and values exact.
+
+1. Start with allplan_health and get_model_context. Work only in the open
+   disposable project the user names; Apply is limited to one active drawing.
+2. Resolve every attribute by exact name or ID with model_property_probe
+   (phase attribute_name; element_attributes on one exact model/view UUID).
+   Never guess an ID or pick a similar-sounding field. The project attribute
+   Material and the native material are different targets.
+3. model_edit is preview -> highlight -> apply. Show the preview (targets,
+   old/new values, blockers) and get the user's explicit confirmation before
+   apply. Follow next_action and required_steps from each response.
+4. A lost reply, timeout or outcome 'unknown' means the setter may have run.
+   Never retry apply. Use action=recover with the same execution_id (read-only)
+   and report the result. Submit a reconciliation acknowledgement only after
+   the user reviewed the proposed evidence.
+5. Report read, highlight and write results separately; a highlight is not a
+   native selection and a preview is not a write.
+6. Bundled API/geometry skills are MCP resources under allplan://skills.
+"""
+
+mcp = FastMCP("Allplan MCP Server", instructions=SERVER_INSTRUCTIONS)
 skills_manager = SkillsManager()
 
 

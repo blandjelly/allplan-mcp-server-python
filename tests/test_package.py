@@ -33,7 +33,7 @@ class PackageTests(unittest.TestCase):
             package = next((work / "extracted").iterdir())
             manifest = registration.verify_package(package)
             self.assertEqual(manifest["integrity"], "sha256-verified")
-            for name in ("Setup.cmd", "Launch Allplan MCP.cmd", "Connect Codex.cmd",
+            for name in ("Setup.cmd", "Launch Allplan MCP.cmd", "Connect Codex.cmd", "Connect Claude Code.cmd",
                          "Diagnostics.cmd", "Restore bridge.cmd", "M3 Recover.cmd",
                          "M3 Workflow Recover.cmd", "M3 Numbering.cmd", "M3 Numbering Recover.cmd",
                          "M3 Conflict.cmd", "M3 Conflict Recover.cmd",
@@ -102,6 +102,34 @@ class PackageTests(unittest.TestCase):
             config.write_text('[mcp_servers.allplan_m0]\nurl = "https://other.invalid"\n')
             with self.assertRaisesRegex(ValueError, "not been overwritten"):
                 actions.connect_codex(config)
+
+    def test_claude_setup_uses_cli_is_idempotent_and_never_overwrites(self):
+        from types import SimpleNamespace
+        calls = []
+        state = {"configured": None}
+        def run(args, **kwargs):
+            calls.append(args[1:])
+            if args[2] == "get":
+                if state["configured"] is None:
+                    return SimpleNamespace(returncode=1, stdout="", stderr="not found")
+                return SimpleNamespace(returncode=0, stdout=f"allplan:\n  URL: {state['configured']}\n", stderr="")
+            state["configured"] = args[-1]
+            return SimpleNamespace(returncode=0, stdout="added", stderr="")
+        which = lambda name: "C:/bin/claude.exe" if name == "claude" else None
+        self.assertEqual(actions.connect_claude(run, which)["status"], "configured")
+        self.assertEqual(calls[-1], ["mcp", "add", "--transport", "http", "--scope", "user", "allplan", actions.MCP_URL])
+        self.assertEqual(actions.connect_claude(run, which)["status"], "already_configured")
+        self.assertEqual(sum(1 for call in calls if call[1] == "add"), 1)
+        state["configured"] = "https://other.invalid/mcp"
+        with self.assertRaisesRegex(ValueError, "not been overwritten"):
+            actions.connect_claude(run, which)
+        with self.assertRaisesRegex(ValueError, "claude mcp add --transport http"):
+            actions.connect_claude(run, lambda name: None)
+
+    def test_launcher_enables_evidence_capture_in_package_logs(self):
+        launcher = (ROOT / "windows/launch.cmd").read_text()
+        self.assertIn('set "ALLPLAN_MCP_EVIDENCE_DIR=%CD%\\logs\\evidence"', launcher)
+        self.assertIn('ALLPLAN_MCP_ENABLE_PYTHON_EXEC=0', launcher)
 
     def test_version_and_lock_agree(self):
         project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
