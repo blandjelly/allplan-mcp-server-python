@@ -11,7 +11,8 @@ same.
   `127.0.0.1:8888`; they can analyse, implement, run focused tests and push.
   Native Allplan trials are run by the owner on Windows.
 - Run focused tests with `uv run --frozen python -m unittest tests.<module> -v`
-  (full CI uses `discover -s tests`); choose
+  (full CI runs the same `discover -s tests` modules through
+  `utils/run_tests_parallel.py`); choose
   modules according to [the testing policy](docs/testing-policy.md).
 - Without an explicit owner request, do not subscribe to PR activity to wait
   for CI, download artifacts, rerun CI or merge (see the testing policy).

@@ -13,6 +13,7 @@ import tomllib
 DOCUMENTATION = ("AGENTS.md", "CLAUDE.md", ".claude/*", "README.md", "docs/*", "evaluation-packages/*")
 COMPATIBILITY = ("windows/*", "utils/register_python_host.*",
                  "utils/build_windows_package.py", "utils/ci_policy.py", "utils/ci_required.py",
+                 "utils/run_tests_parallel.py",
                  ".github/workflows/*", ".python-version", "uv.toml")
 
 

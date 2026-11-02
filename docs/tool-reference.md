@@ -254,10 +254,16 @@ without changing M1 query membership, selection state or write eligibility.
 From 0.44.0 a `SlabElement` owner's `native_material` also carries
 `slab_tiers`: the public member names of the installed `SlabProperties`
 binding class (`dir` on the class, no getter invoked), whether
-`GetSlabTierProperties` exists, and for tier 1 (and further tiers only within
-an observed `TierCount` of 1–16) the tier `Material` and its class members.
-Each read is traced and fails to `not_checked` independently. This is an API
-study for the Slab Material flow; it establishes no owner or setter.
+`GetSlabTierProperties` exists, `VariableTier`, and the tier `Material` with
+its class members. Tiers are **zero-based**: on Allplan 2026.1 (0.44.0 trial)
+`TierCount` was 1 and `GetSlabTierProperties(1)` raised `IndexError`; from
+0.44.1 tier 0 is read without a count and further tiers only within an
+observed `TierCount` of 1–16 (`tier_index_base=0`). Each read is traced and
+fails to `not_checked` independently. This is an API study for the Slab
+Material flow; it establishes no owner or setter. The observed
+`SlabProperties` members include `GetMaterial`/`SetMaterial`,
+`GetSlabTierProperties`, `GetTierCount`/`SetTierCount`, `VariableTier`,
+`Surface`, `Trade`, `Priority`, `CalculationMode` and `PlaneReferences`.
 
 Candidate 0.26.0 adds `drawing_identity` for a bounded inventory of one
 foreground drawing. This inventories model/view identity, lineage, and native
