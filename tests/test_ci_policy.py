@@ -98,7 +98,8 @@ class SelectionTests(unittest.TestCase):
 
     def test_critical_install_and_ci_paths_require_full_matrix(self):
         for path in ("windows/setup.cmd", "utils/register_python_host.py", "utils/build_windows_package.py",
-                     "utils/ci_policy.py", "utils/ci_required.py", ".github/workflows/portable.yml", ".python-version", "uv.toml"):
+                     "utils/ci_policy.py", "utils/ci_required.py", "utils/run_tests_parallel.py",
+                     ".github/workflows/portable.yml", ".python-version", "uv.toml"):
             with self.subTest(path=path):
                 self.assert_matrix(self.plan([path]), ["3.11", "3.12", "3.13"])
 

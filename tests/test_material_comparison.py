@@ -46,8 +46,11 @@ class TieredSlabProperties:
     def __init__(self, material, tiers):
         self._material, self._tiers, self._count = material, tiers, len(tiers)
 
+    VariableTier = property(lambda self: False)
+
     def GetSlabTierProperties(self, index):
-        return self._tiers[index - 1]
+        # Zero-based, as observed natively (index == TierCount raises IndexError).
+        return self._tiers[index]
 
 
 class MaterialComparisonTests(unittest.TestCase):
@@ -338,10 +341,12 @@ class MaterialComparisonTests(unittest.TestCase):
         self.assertEqual(tiers["tier_api"], "present")
         self.assertEqual(tiers["tier_count"], {"status": "observed", "value": 2})
         self.assertEqual([(t["tier_index"], t["status"], t["value"]) for t in tiers["tiers"]],
-                         [(1, "observed", "C35/45"), (2, "observed", "")])
+                         [(0, "observed", "C35/45"), (1, "observed", "")])
+        self.assertEqual(tiers["tier_index_base"], 0)
+        self.assertEqual(tiers["variable_tier"], {"status": "observed", "value": False})
         self.assertIn("Thickness", tiers["tiers"][0]["members"]["value"]["names"])
         self.assertIn("GetSlabTierProperties", tiers["properties_members"]["value"]["names"])
-        self.assertEqual(tiers["tiers"][0]["access_path"], "SlabProperties.GetSlabTierProperties(1).Material")
+        self.assertEqual(tiers["tiers"][0]["access_path"], "SlabProperties.GetSlabTierProperties(0).Material")
         parent_tiers = result["representations"][0]["parent"]["value"]["evidence"]["native_material"]["slab_tiers"]
         self.assertEqual(parent_tiers["tier_api"], "absent")
         self.assertEqual(result["setter_calls_started"], 0)

@@ -1,76 +1,63 @@
 # Current M4 handoff
 
-## Next task — native trial of 0.44.0: Slab tier read, first Beam attribute write
+## Next task — native trial of 0.44.1: Slab tier 0 Material, Beam native Material
 
-Start condition: candidate **0.44.0** passed full CI and the owner installed its
+Start condition: candidate **0.44.1** passed full CI and the owner installed its
 `package` artifact. Launch with **Launch Allplan MCP.cmd** and keep
 `logs/evidence/evidence-YYYYMMDD.jsonl` as the evidence
 ([plan items 2 and 6](development-plan.md#remaining-work-and-unresolved-errors)).
 
-1. **Health and trace.** `allplan_health`, then `fix_model_issues`
-   `inspect_journal`: `native_trace.auto_rotation` should report
-   `available=true` and `archive_bytes` ≈ 43 MB (seven segments). Do not force
-   a rotation; record one if it happens (`NativeProbeTrace.auto_rotate`).
-2. **Slab (read-only, zero setters).** Re-run the `material_comparison` from
-   the [tool reference](tool-reference.md#model_property_probe--isolated-read-phases)
-   (child `8a693925…`/`a0fcd7b3…`, `parent_ref` MultiSlab, `include_parent`).
-   Record `native_material.slab_tiers` on child and parent: the
-   `SlabProperties` member names, `tier_api`, `tier_count` and tier
-   `Material`. If a tier holds the visible material (or `C35/45` appears
-   there), the changed flow is a tier-owner write; if no tier API exists, the
-   member list decides the next candidate. No Slab Apply in this trial.
-3. **Beam (one disposable attribute write).** Re-query `Beam_TypeUUID`
-   (UUIDs may change). `model_edit` preview of one text attribute on the
-   Beam root — attribute `Materiał` 508 (`""`) → `TEST-BEAM` — then highlight,
-   Apply with a new `execution_id`, fresh readback, UI check and UI Undo with a
-   restoration preview. Stop at any preview blocker and record it (expected
-   risk: the target/parent-edge view discrepancy described below).
+1. **Slab (read-only, zero setters).** Repeat the `material_comparison` with
+   `attribute_ids=[508]`, `parent_ref` and `include_parent=true` (child
+   `8a693925…`/`a0fcd7b3…`, MultiSlab `bf097d95…`/`b4a59b5b…`; re-query UUIDs).
+   Record `slab_tiers.tiers[0]` (`Material`, members) and `variable_tier` on
+   child and parent. If tier 0 holds the UI-visible material, the next code
+   change is a tier-0 owner write (`SlabTierProperties` setter); otherwise
+   the member lists decide the next candidate. No Slab Apply.
+2. **Beam native Material (disposable).** Re-query `Beam_TypeUUID`; `model_edit`
+   preview with `target={"kind":"native_material","tier_index":1}`, value
+   `C30/37`, `native_types=["Beam_TypeUUID"]`; highlight, Apply with a new
+   `execution_id`, fresh readback, UI check, then UI Undo and a restoration
+   preview (or `material_comparison` on the Beam). Stop at any blocker.
 
-Completion: Slab tier observation and a decided changed flow in the plan;
-Beam attribute cycle recorded (or its blocker). Next after a Beam PASS:
-native Material on the Beam. Do not repeat the 0.40.0–0.43.1 probes.
+Completion: tier 0 observation and a decided Slab flow in the plan; Beam
+native Material cycle recorded (or its blocker). Do not repeat the
+0.40.0–0.44.0 probes or the Beam attribute write.
 
 ## Latest version
 
-**0.44.0** (candidate, branch `claude/m4-0440-trace-rotation`):
+**0.44.1** (candidate, branch `claude/m4-0441-slab-tier0-ci-speed`):
+`slab_tiers` reads tiers zero-based (tier 0 always, others within
+`TierCount`) and adds `variable_tier`. CI runs the same test modules through
+[run_tests_parallel.py](../utils/run_tests_parallel.py) with a uv cache
+([testing policy](testing-policy.md#candidate-and-ci-selection)); this is a CI
+change, so the full matrix applies. Focused checks PASS; a local parallel run
+of all 805 tests PASS (245 s sequential vs 70 s, Linux). Full CI, ZIP
+verification and native trial pending.
 
-- **Automatic trace archival.** A full 8 MiB `m4-native-probe.jsonl` segment
-  is moved verbatim to `m4-native-probe-archive/<sha256>.jsonl` before the
-  next native call, under the trace lock; nothing is deleted. It stops (and
-  the previous `probe_trace_unavailable` block + confirmed cleanup applies)
-  once the archive would exceed 256 MiB, its listing is incomplete, or on
-  collision/rename failure ([tool reference](tool-reference.md#confirmed-journal-maintenance--m4-0230)).
-  Execution records keep confirmation-only archival.
-- **Slab tier study.** `material_comparison` reports `slab_tiers` for each
-  `SlabElement` owner (read-only, traced).
+**0.44.0** (source `febdb72`, PR #53) is the installed baseline; health:
+Allplan 2026.1, `integrity=sha256-verified`. Owner trial,
+[raw evidence](test-results/evidence/0.44.0-2026-11-02/evidence-20261102.jsonl)
+(owner: UI identical to the log, Undo worked):
 
-Focused checks PASS (274 + 63: trace cleanup, property probe, journal
-cleanup/inspection and HTTP, material comparison and HTTP, component identity,
-element attributes, exact material target and HTTP, Wall probe/filter/material,
-Column layer, native model edit, package, MCP smoke, registration). Full CI,
-ZIP verification and native trial are pending.
+- **Trace.** `inspect_journal`: active 0.5 MB, archive seven segments
+  (43.6 MB, complete); no rotation was due.
+- **Slab tiers.** On the Slab child (both views), the MultiSlab and the parent
+  read: native Material `" "`, `tier_api=present`, `TierCount=1`,
+  `GetSlabTierProperties(1)` → `IndexError`, i.e. tiers are zero-based and
+  tier 0 was not read. Both SkeletonBeams: `StructuralBeamProperties.Material`
+  `" "`; Beam: `BeamElement.Properties.Material` `""`.
+- **Beam attribute write PASS.** Plan `9ea3c5f0…`, execution
+  `9eb643bf0b9547e5b537acfa3c91a006`: attribute 508 `""` → `TEST-BEAM`,
+  `completed`/`applied`, `readback_matches`; all three root representations
+  (views `362f80d3` ×2, `6035d406`) agreed before and after. UI showed the
+  value; UI Undo worked (owner-observed). The later `inspect` sample did not
+  include the Beam, so there is no post-Undo API read.
 
-**0.43.1** (source `4a517bc`, PR #52) is the installed baseline; health:
-Allplan 2026.1, `integrity=sha256-verified`. Owner-run read-only trial,
-[raw evidence](test-results/evidence/0.43.1-2026-11-02/evidence-20261102.jsonl)
-(owner: log agrees with the UI); zero setters:
-
-- **Beam read PASS (read-only).** Beam "Podciąg" model
-  `7cc9ac55-6111-4508-bae8-d33918dbe77e`, views `362f80d3-…`/`6035d406-…`:
-  `element_attributes` returned 44 attributes from three adapters on both
-  views, `consistent`; `Materiał` 508 = `""`, layer 3755, length 7.54,
-  `IfcBeam`. `component_identity` (view `6035d406`) now observes
-  `BeamElement` with children `WallAxis` and `AttributeContainer`, but their
-  parent edges point to the other root view `362f80d3` and
-  `other_view_uuids=[]` — the same target/parent-edge view pattern as
-  SkeletonBeam 1. Both SkeletonBeams also read (ID 508 present).
-- **Slab unchanged.** `material_comparison` child/parent: native Material
-  `" "` on both, ID 508 `TEST1`; MultiSlab child container is `b4e594f7…`
-  again (the Undo-restored inventory).
-- **Trace full.** Three element-attribute pages and a filter read failed with
-  `probe_trace_unavailable` (8 MiB, six archives ≈ 35 MB); the owner ran the
-  confirmed cleanup (archive `b23a9a2e…`) and the reads succeeded. 0.44.0
-  automates this rotation.
+**0.43.1** (`4a517bc`, PR #52) read-only trial
+([raw evidence](test-results/evidence/0.43.1-2026-11-02/evidence-20261102.jsonl)):
+Beam listing of 44 attributes on both views, `consistent`; the trace filled
+and was archived by confirmed cleanup (automated from 0.44.0).
 
 **0.43.0** (source `1be4072`, PR #51) trial
 ([raw evidence](test-results/evidence/0.43.0-2026-11-02/evidence-20261102.jsonl)):

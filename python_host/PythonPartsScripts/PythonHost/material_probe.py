@@ -212,16 +212,28 @@ def slab_tier_evidence(props, read):
     The setter on SlabProperties.Material has left the observed value blank,
     so this records which members the installed binding exposes and reads
     the tier Material values through GetSlabTierProperties when present.
-    Tier 1 is read without a count; further tiers only within an observed,
-    bounded TierCount. Nothing here establishes ownership or persistence.
+    Native 0.44.0 observation (Allplan 2026.1): TierCount=1 and index 1
+    raised IndexError, so tiers are zero-based. Tier 0 is read without a
+    count; further tiers only within an observed, bounded TierCount.
+    Nothing here establishes ownership or persistence.
     """
     evidence = {"properties_members": read("SlabProperties.members", lambda: _members(type(props))),
-                "tier_api": "absent", "tier_count": {"status": "not_checked", "value": None,
-                                                     "reason": "tier_count_member_absent"},
+                "tier_api": "absent", "tier_index_base": 0,
+                "tier_count": {"status": "not_checked", "value": None,
+                               "reason": "tier_count_member_absent"},
+                "variable_tier": {"status": "not_checked", "value": None,
+                                  "reason": "variable_tier_member_absent"},
                 "tiers": [], "writable_owner": "not_established"}
     if not callable(getattr(type(props), "GetSlabTierProperties", None)):
         return evidence
     evidence["tier_api"] = "present"
+    if hasattr(type(props), "VariableTier"):
+        def variable_tier():
+            value = props.VariableTier
+            if type(value) not in (bool, int):
+                raise ValueError("VariableTier must be a boolean scalar")
+            return value
+        evidence["variable_tier"] = read("SlabProperties.VariableTier", variable_tier)
     count = 1
     if hasattr(type(props), "TierCount"):
         def tier_count():
@@ -232,7 +244,7 @@ def slab_tier_evidence(props, read):
         evidence["tier_count"] = read("SlabProperties.TierCount", tier_count)
         if evidence["tier_count"]["status"] == "observed":
             count = evidence["tier_count"]["value"]
-    for index in range(1, count + 1):
+    for index in range(count):
         api = f"SlabProperties.GetSlabTierProperties({index})"
         tier = read(api, lambda index=index: props.GetSlabTierProperties(index))
         row = {"tier_index": index, "access_path": api + ".Material"}

@@ -75,6 +75,15 @@ faster Windows CI until the full Windows job confirms it.
 
 ## Candidate and CI selection
 
+Each full job runs every `tests/test*.py` module, the same set as
+`unittest discover -s tests`, through [run_tests_parallel.py](../utils/run_tests_parallel.py):
+modules are split across the runner's CPUs, heavy modules (the MCP smoke
+module starts one server per test) as disjoint chunks, and the job fails if
+any worker fails or runs no tests. The uv download cache is restored per OS,
+Python and `uv.lock`. Changing the runner is a CI change (six jobs). Local
+measurement (Linux, 4 workers, 805 tests): 245 s sequential, 70 s parallel;
+Windows timing is established only by the full Windows job.
+
 For each new candidate or package, GitHub Actions must run the full CI matrix
 on Windows and Ubuntu with Python 3.12. This full CI result replaces a full local test
 run. Keep a pull request in draft while iterating and return it to draft when
