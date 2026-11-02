@@ -496,8 +496,15 @@ def valid_change(change):
     class_name = (evidence or {}).get("native_class")
     exact = resource.get("exact_target_binding")
     if exact is not None:
-        if not isinstance(exact, dict) or set(exact) != {"target", "inventory_fingerprint"}:
+        # 0.43.0 adds an optional bounded inventory summary for post-setter
+        # drift diagnosis; journals from 0.42.x carry only the fingerprint.
+        if (not isinstance(exact, dict)
+                or set(exact) - {"inventory_summary"} != {"target", "inventory_fingerprint"}):
             return False
+        if "inventory_summary" in exact:
+            from .exact_material_target import valid_inventory_summary
+            if not valid_inventory_summary(exact["inventory_summary"]):
+                return False
         hint = exact.get("target")
         if not isinstance(hint, dict) or not isinstance(hint.get("parent_ref"), dict):
             return False

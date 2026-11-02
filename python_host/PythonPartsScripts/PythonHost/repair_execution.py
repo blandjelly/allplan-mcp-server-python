@@ -594,7 +594,11 @@ class RepairExecutor:
                     if resolution:
                         outcome["representation_consensus"] = resolution
                     outcome["readback"] = observed
-                    if new_value_observed(change, observed):
+                    if resolution.get("exact_inventory", {}).get("status") == "changed":
+                        # Evidence for read-only recovery, never applied success.
+                        outcome.update(state="unknown", reason="exact_inventory_changed_after_setter",
+                                       stage="readback")
+                    elif new_value_observed(change, observed):
                         outcome.update(state="applied", reason="readback_matches")
                     elif same_observation(change, observed, change["old_value"]):
                         outcome.update(state="failed", reason="readback_unchanged")

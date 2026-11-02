@@ -1469,3 +1469,17 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
             self.assertTrue(query["elements"][0]["fields"]["attribute:20017"]["computed_only"])
         native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
         native.base.AttributeService.GetEnumValues.assert_not_called()
+
+
+class ServerInstructionsTests(unittest.TestCase):
+    def test_initialize_returns_client_neutral_operator_rules(self):
+        from allplan_mcp.server import mcp
+
+        async def initialize():
+            async with Client(mcp) as client:
+                return client.initialize_result.instructions
+
+        text = asyncio.run(initialize())
+        for rule in ("preview -> highlight -> apply", "Never retry apply", "same execution_id",
+                     "Never guess an ID", "allplan://skills"):
+            self.assertIn(rule, text)

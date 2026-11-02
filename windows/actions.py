@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
+import subprocess
 import sys
 import tomllib
 from datetime import datetime, timezone
@@ -39,6 +40,32 @@ def connect_codex(config: Path) -> dict:
     return {"status": "configured", "config": str(config), "backup": str(backup) if backup else None}
 
 
+CLAUDE_SERVER = "allplan"
+
+
+def connect_claude(run=subprocess.run, which=shutil.which) -> dict:
+    """Register the loopback endpoint for Claude Code through its own CLI.
+
+    Claude Code owns its configuration format, so this never edits its files.
+    An existing server with this name at another URL is reported, not replaced.
+    """
+    executable = which("claude")
+    manual = f"claude mcp add --transport http --scope user {CLAUDE_SERVER} {MCP_URL}"
+    if executable is None:
+        raise ValueError(f"Claude Code CLI (claude) was not found on PATH. Install Claude Code or run manually: {manual}")
+    def call(*args):
+        return run([executable, "mcp", *args], capture_output=True, text=True, timeout=60)
+    existing = call("get", CLAUDE_SERVER)
+    if existing.returncode == 0:
+        if MCP_URL in (existing.stdout or ""):
+            return {"status": "already_configured", "server": CLAUDE_SERVER, "url": MCP_URL}
+        raise ValueError(f"Claude Code already has an MCP server named {CLAUDE_SERVER} with another configuration. Report this conflict; it has not been overwritten.")
+    added = call("add", "--transport", "http", "--scope", "user", CLAUDE_SERVER, MCP_URL)
+    if added.returncode != 0:
+        raise ValueError(f"claude mcp add failed ({added.returncode}): {(added.stderr or added.stdout or '').strip()[:500]}")
+    return {"status": "configured", "server": CLAUDE_SERVER, "url": MCP_URL, "scope": "user"}
+
+
 def choose_local() -> Path:
     from tkinter import Tk, filedialog
     window = Tk()
@@ -54,7 +81,7 @@ def choose_local() -> Path:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("action", choices=["verify", "install", "restore", "connect"])
+    parser.add_argument("action", choices=["verify", "install", "restore", "connect", "connect-claude"])
     args = parser.parse_args()
     logs = ROOT / "logs"
     logs.mkdir(exist_ok=True)
@@ -70,13 +97,17 @@ def main():
             input("Close Allplan, then press Enter to restore the previous bridge: ")
             installation = json.loads((logs / "installation.json").read_text(encoding="utf-8"))
             result = restore(Path(installation["allplan_local"]), installation["backup_id"])
+        elif args.action == "connect-claude":
+            verify_package(ROOT)
+            result = connect_claude()
+            print("Open this folder in Claude Code and check /mcp. Launch Allplan MCP.cmd must stay open.")
         else:
             verify_package(ROOT)
             result = connect_codex(Path.home() / ".codex/config.toml")
             print("Restart Codex on this Windows machine. Launch Allplan MCP.cmd must stay open.")
         (logs / f"{args.action}-result.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
         print(json.dumps(result, indent=2))
-    except (OSError, ValueError, KeyError) as exc:
+    except (OSError, ValueError, KeyError, subprocess.SubprocessError) as exc:
         print(f"{args.action.capitalize()} failed: {exc}")
         return 1
     return 0

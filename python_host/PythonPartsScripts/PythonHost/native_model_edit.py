@@ -56,7 +56,7 @@ def _typed_value(value, data_type):
 
 
 def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapter_owners=None,
-            all_representations=False):
+            all_representations=False, post_write=False):
     """Resolve one exact native component root from the current M1 enumeration."""
     ref = change.get("ref") or {}
     native_type = change.get("native_type")
@@ -84,7 +84,13 @@ def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapte
             _conflict("Exact material binding does not match the reviewed change.")
         factory = getattr(queries, "material_trace_factory", None)
         trace = factory("exact_material_resolution") if factory else None
-        base, _ = locate(doc, base, exact["target"], budget, trace, expected=exact["inventory_fingerprint"])
+        if post_write and (writable or not all_representations):
+            _conflict("Post-setter exact inventory observation is read-only.")
+        drift = {} if post_write else None
+        base, _ = locate(doc, base, exact["target"], budget, trace, expected=exact["inventory_fingerprint"],
+                         drift=drift, expected_summary=exact.get("inventory_summary"))
+        if drift is not None and diagnostics is not None:
+            diagnostics["exact_inventory"] = drift
         if adapter_owners is not None:
             adapter_owners.append(base)
     owner = base.ElementsSelectService.SelectAllElements(doc)

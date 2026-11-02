@@ -25,7 +25,8 @@ def payload_files(repo: Path) -> dict[str, bytes]:
         files[path.relative_to(repo).as_posix()] = path.read_bytes()
     # Place the no-code entry points at the top level for Explorer users.
     for name, action in {"Setup.cmd": "setup", "Launch Allplan MCP.cmd": "launch",
-                         "Connect Codex.cmd": "connect", "Diagnostics.cmd": "diagnostics",
+                         "Connect Codex.cmd": "connect", "Connect Claude Code.cmd": "connect-claude",
+                         "Diagnostics.cmd": "diagnostics",
                          "M3 Workflow Recover.cmd": "m3-workflow-recover",
                          "M3 Numbering.cmd": "m3-numbering",
                          "M3 Numbering Recover.cmd": "m3-numbering-recover",
