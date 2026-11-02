@@ -105,6 +105,12 @@ def main(argv=None):
     if not names:
         print("No test modules found", file=sys.stderr)
         return 1
+    # Windows runners default to a legacy console code page; test output holds
+    # Polish names, so workers and this process exchange and print UTF-8.
+    for stream in (sys.stdout, sys.stderr):
+        stream.reconfigure(encoding="utf-8", errors="replace")
+    # Only stdio changes; file I/O defaults stay as under plain discover.
+    env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
     started = time.monotonic()
 
     def run(bucket):
@@ -112,7 +118,7 @@ def main(argv=None):
         # never blocks on a full pipe buffer while another is being read.
         begun = time.monotonic()
         process = subprocess.run([sys.executable, str(Path(__file__).resolve()), "--worker", *bucket],
-                                 cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+                                 cwd=ROOT, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
                                  encoding="utf-8", errors="replace")
         return bucket, process.returncode, process.stdout, time.monotonic() - begun
 
