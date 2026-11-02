@@ -29,6 +29,27 @@ class SlabElement:
         self.Properties = SimpleNamespace(Material=material)
 
 
+class SlabTierProperties:
+    # Class-level members, as SDK bindings expose them to dir(type(obj)).
+    Material = property(lambda self: self._material)
+    Thickness = property(lambda self: 200.0)
+
+    def __init__(self, material):
+        self._material = material
+
+
+class TieredSlabProperties:
+    """Binding double exposing tier access; no setter is ever called."""
+    Material = property(lambda self: self._material)
+    TierCount = property(lambda self: self._count)
+
+    def __init__(self, material, tiers):
+        self._material, self._tiers, self._count = material, tiers, len(tiers)
+
+    def GetSlabTierProperties(self, index):
+        return self._tiers[index - 1]
+
+
 class MaterialComparisonTests(unittest.TestCase):
     setUp = identity.ComponentIdentityTests.setUp
     prepare_context = identity.ComponentIdentityTests.prepare_context
@@ -295,6 +316,47 @@ class MaterialComparisonTests(unittest.TestCase):
         self.assertTrue(result["identity_resolution"]["child_inventory_complete"])
         self.assertEqual(result["identity_resolution"]["parent_ref"]["model_uuid"], parent.GetModelElementUUID())
         self.assertEqual([call.args[0] for call in self.base.GetElement.call_args_list], [child, parent])
+
+    def test_slab_without_tier_api_reports_members_and_absent_tier_api(self):
+        self.slab_child_fixture()
+        result = self.comparison(parent_ref=self.parent_ref)
+        tiers = result["representations"][0]["target"]["value"]["native_material"]["slab_tiers"]
+        self.assertEqual(tiers["tier_api"], "absent")
+        self.assertEqual(tiers["tiers"], [])
+        self.assertEqual(tiers["properties_members"]["status"], "observed")
+        self.assertEqual(tiers["writable_owner"], "not_established")
+
+    def test_slab_tiers_are_read_within_bounded_count_without_setters(self):
+        child, parent = self.slab_child_fixture()
+        native = SlabElement(" ")
+        native.Properties = TieredSlabProperties(" ", [SlabTierProperties("C35/45"), SlabTierProperties("")])
+        self.natives[id(child)] = native
+        result = self.comparison(parent_ref=self.parent_ref, include_parent=True)
+        target = result["representations"][0]["target"]["value"]["native_material"]
+        self.assertEqual(target["value"], " ")
+        tiers = target["slab_tiers"]
+        self.assertEqual(tiers["tier_api"], "present")
+        self.assertEqual(tiers["tier_count"], {"status": "observed", "value": 2})
+        self.assertEqual([(t["tier_index"], t["status"], t["value"]) for t in tiers["tiers"]],
+                         [(1, "observed", "C35/45"), (2, "observed", "")])
+        self.assertIn("Thickness", tiers["tiers"][0]["members"]["value"]["names"])
+        self.assertIn("GetSlabTierProperties", tiers["properties_members"]["value"]["names"])
+        self.assertEqual(tiers["tiers"][0]["access_path"], "SlabProperties.GetSlabTierProperties(1).Material")
+        parent_tiers = result["representations"][0]["parent"]["value"]["evidence"]["native_material"]["slab_tiers"]
+        self.assertEqual(parent_tiers["tier_api"], "absent")
+        self.assertEqual(result["setter_calls_started"], 0)
+
+    def test_slab_tier_count_out_of_range_reads_only_first_tier(self):
+        child, _ = self.slab_child_fixture()
+        properties = TieredSlabProperties(" ", [SlabTierProperties("A")])
+        properties._count = 999
+        native = SlabElement(" ")
+        native.Properties = properties
+        self.natives[id(child)] = native
+        result = self.comparison(parent_ref=self.parent_ref)
+        tiers = result["representations"][0]["target"]["value"]["native_material"]["slab_tiers"]
+        self.assertEqual(tiers["tier_count"]["status"], "not_checked")
+        self.assertEqual([t["value"] for t in tiers["tiers"]], ["A"])
 
     def test_explicit_parent_preserves_alternate_parent_view_without_claiming_equivalence(self):
         child, parent = self.slab_child_fixture()

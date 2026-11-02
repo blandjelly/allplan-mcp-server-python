@@ -7,7 +7,7 @@ instead of repeating per-pair status in prose ([documentation policy](documentat
 Evidence and its limits are in [validation status](validation-status.md);
 open work is in the [development plan](development-plan.md).
 
-Status as of 0.43.0 trial and 0.43.1 candidate (2026-11-02). One active drawing, 1–32 changes per Apply.
+Status as of 0.43.1 trial and 0.44.0 candidate (2026-11-02). One active drawing, 1–32 changes per Apply.
 
 ## Legend
 
@@ -30,7 +30,7 @@ Status as of 0.43.0 trial and 0.43.1 candidate (2026-11-02). One active drawing,
 | Column | PASS (0.30.0) | PASS (0.30.0) | PASS (0.30.0) | CODE | BLOCKED (ID 49 `Status`, no confirmed label) | NONE |
 | Wall | PASS (0.30.0) | CODE | CODE | PARTIAL (ID 1371: post-Undo read only) | PASS (ID 120, 0.31.0) | NONE |
 | SkeletonBeam | REPORTED (ID 508, 0.39.0) | CODE | CODE | CODE | CODE | NONE |
-| Beam | CODE (fixture found; multi-view read in 0.43.1) | CODE | CODE | CODE | CODE | NONE |
+| Beam | PARTIAL (0.43.1: 44 attributes read on both views, consistent; ID 508 `""`; no write) | CODE | CODE | CODE | CODE | NONE |
 | Slab (MultiSlab child) | REPORTED (0.27.0, 0.39.0; owner binding open) | CODE | CODE | CODE | CODE | NONE |
 | MultiSlab | REPORTED (0.39.0; owner binding open) | CODE | CODE | CODE | CODE | NONE |
 
@@ -45,7 +45,7 @@ created; an existing definition can be added to an element (`add`/`upsert`).
 | Wall (single tier) | VALUE (0.37.0/0.39.0, preservation unverified) | NONE | REPORTED (`Ogólne03`, 0.27.0) | PARTIAL (subtree absent; no Undo) |
 | Wall (multi tier) | BLOCKED (one tier only) | NONE | CODE (tier-aware route) | — |
 | SkeletonBeam | BLOCKED (no successful write; view discrepancy) | NONE | CODE | FIXTURE (no disposable target) |
-| Beam | CODE (fixture found, untried) | NONE | FIXTURE | FIXTURE |
+| Beam | CODE (fixture found, untried; Material attribute 508 `""`) | NONE | FIXTURE | FIXTURE |
 | Slab (MultiSlab child) | PARTIAL (0.43.0: setter ran, readback unchanged `" "`, Undo restored inventory; no PASS) | NONE | BLOCKED (parented child) | BLOCKED (parented child) |
 | Slab (standalone) | CODE | NONE | FIXTURE | FIXTURE |
 | MultiSlab | CODE | NONE | BLOCKED (aggregate owner) | FIXTURE |

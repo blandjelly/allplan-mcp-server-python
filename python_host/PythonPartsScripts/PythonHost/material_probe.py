@@ -183,4 +183,64 @@ def native_material_evidence(base, adapter, ref, read):
         return value
 
     value = read(class_name.replace("Element", "Properties") + ".Material", material)
-    return represented, {**value, **binding}
+    result = {**value, **binding}
+    if class_name == "SlabElement":
+        result["slab_tiers"] = slab_tier_evidence(props, read)
+    return represented, result
+
+
+_MAX_MEMBERS = 128
+_MAX_TIERS = 16
+
+
+def _members(kind):
+    """List public binding member names of a class without invoking getters."""
+    names = sorted(name for name in dir(kind) if not name.startswith("_"))
+    return {"names": names[:_MAX_MEMBERS], "complete": len(names) <= _MAX_MEMBERS}
+
+
+def _bounded_material(owner):
+    value = owner.Material
+    if type(value) is not str or len(value) > 255:
+        raise ValueError("Native Material must be a bounded string")
+    return value
+
+
+def slab_tier_evidence(props, read):
+    """Read-only API study of Slab tier storage; never a writable owner.
+
+    The setter on SlabProperties.Material has left the observed value blank,
+    so this records which members the installed binding exposes and reads
+    the tier Material values through GetSlabTierProperties when present.
+    Tier 1 is read without a count; further tiers only within an observed,
+    bounded TierCount. Nothing here establishes ownership or persistence.
+    """
+    evidence = {"properties_members": read("SlabProperties.members", lambda: _members(type(props))),
+                "tier_api": "absent", "tier_count": {"status": "not_checked", "value": None,
+                                                     "reason": "tier_count_member_absent"},
+                "tiers": [], "writable_owner": "not_established"}
+    if not callable(getattr(type(props), "GetSlabTierProperties", None)):
+        return evidence
+    evidence["tier_api"] = "present"
+    count = 1
+    if hasattr(type(props), "TierCount"):
+        def tier_count():
+            value = props.TierCount
+            if type(value) is not int or not 1 <= value <= _MAX_TIERS:
+                raise ValueError("TierCount outside the bounded range")
+            return value
+        evidence["tier_count"] = read("SlabProperties.TierCount", tier_count)
+        if evidence["tier_count"]["status"] == "observed":
+            count = evidence["tier_count"]["value"]
+    for index in range(1, count + 1):
+        api = f"SlabProperties.GetSlabTierProperties({index})"
+        tier = read(api, lambda index=index: props.GetSlabTierProperties(index))
+        row = {"tier_index": index, "access_path": api + ".Material"}
+        if tier["status"] != "observed":
+            row.update(status=tier["status"], value=None, reason=tier.get("reason"))
+        else:
+            owner = tier["value"]
+            row.update(read("SlabTierProperties.Material", lambda owner=owner: _bounded_material(owner)))
+            row["members"] = read("SlabTierProperties.members", lambda owner=owner: _members(type(owner)))
+        evidence["tiers"].append(row)
+    return evidence

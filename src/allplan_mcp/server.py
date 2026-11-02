@@ -486,8 +486,9 @@ def model_property_probe(request: PropertyProbeRequest) -> dict[str, Any]:
     it neither finds all thin walls nor binds C35 or authorizes material writes.
     Other phases resolve one exact attribute/layer name or read one observed
     attribute ID's metadata. Every new native call is preceded by a flushed/fsynced
-    Local/.allplan-mcp/logs/m4-native-probe.jsonl entry. Unwritable/full tracing blocks
-    calls. M1 scan is logged as one existing service phase, not an individual API
+    Local/.allplan-mcp/logs/m4-native-probe.jsonl entry. A full 8 MiB segment is
+    archived verbatim automatically (up to 256 MiB of archive); unwritable tracing
+    or an exhausted archive budget blocks calls. M1 scan is logged as one existing service phase, not an individual API
     trace. Review one phase's evidence before requesting another; no automatic
     implicit batch, retries, GetEnumValues, highlighting, writes or resource creation.
     element_attributes requires one exact foreground drawing/model UUID/view UUID;
@@ -607,8 +608,10 @@ def fix_model_issues(request: RepairRequest) -> dict[str, Any]:
     confirmed_journal_cleanup. It archives bytes, never deletes unresolved,
     corrupt or oversized execution records, and preserves archived execution IDs
     for setter-free replay. Trace rotation and record archival do not edit Allplan.
-    Changed snapshots require a fresh preview and confirmation. Cleanup is never
-    automatic without user consent and never retries the interrupted model edit.
+    Changed snapshots require a fresh preview and confirmation. Execution-record
+    cleanup is never automatic; only full trace segments are archived (not deleted)
+    automatically within a 256 MiB archive budget. Cleanup never retries the
+    interrupted model edit.
     The retained mark-numbering gate has bounded native acceptance. The diagnostic
     evaluation_stop control requires disposable_copy_reviewed_recovery_test and
     only the retained unselected two-mark numbering fixture. It stops after the

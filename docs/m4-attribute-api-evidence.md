@@ -35,6 +35,10 @@ missing adapter coverage into “absent.”
 
 From 0.43.1 the probe also reads roots with several views (all views must agree;
 see the [tool reference](tool-reference.md#model_property_probe--isolated-read-phases)).
+Native observation (0.43.1, 2026-11-02, Allplan 2026.1): the architectural
+Beam "Podciąg" returned 44 `ReadAll` attributes from three adapters on its two
+root views, `adapter_attribute_consistency=consistent`; `Materiał` (508) is
+`""` ([raw evidence](test-results/evidence/0.43.1-2026-11-02/evidence-20261102.jsonl)).
 The isolated `element_attributes` probe now provides bounded search of values
 present on one explicitly identified foreground component. It requires the
 drawing file, model UUID, and view UUID; scans only the existing six supported

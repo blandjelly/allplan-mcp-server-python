@@ -41,7 +41,8 @@ identify the failing root. A missing dump does not justify repeating the crash
 on an unchanged candidate. The current bounded next trial is in the
 [handoff](next-model-handoff.md).
 
-Tracing preserves the existing 5-second read budget and 8 MiB trace limit.
+Tracing preserves the existing 5-second read budget and 8 MiB trace segment
+limit; full segments are archived automatically up to 256 MiB of archive.
 Storage or budget failures stop the operation; they do not authorize cleanup,
 fallback setters or automatic retry.
 
@@ -106,7 +107,8 @@ historical summaries, slots and invalid/unresolved blockers without native model
 access or reconciliation. It is not a backup or proof of current values.
 The active execution history holds at most **512 records**, and an individual
 record has a separate **1 MiB** limit. The active diagnostic trace has an
-**8 MiB** limit. At any capacity error, preserve the journal and trace. Never
+**8 MiB** segment limit; from 0.44.0 full segments move to its archive
+automatically until the archive holds **256 MiB**, then confirmed cleanup applies. At any capacity error, preserve the journal and trace. Never
 delete execution IDs to gain slots. Reviewed, confirmed archival through
 `fix_model_issues` preserves unresolved, corrupt and unverifiable records.
 See [validation status](validation-status.md) for its accepted scope and the

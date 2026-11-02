@@ -251,6 +251,14 @@ Reads are sequential, not an atomic snapshot; preserve the report and trace
 before another phase. The parent hint enables only this diagnostic route,
 without changing M1 query membership, selection state or write eligibility.
 
+From 0.44.0 a `SlabElement` owner's `native_material` also carries
+`slab_tiers`: the public member names of the installed `SlabProperties`
+binding class (`dir` on the class, no getter invoked), whether
+`GetSlabTierProperties` exists, and for tier 1 (and further tiers only within
+an observed `TierCount` of 1–16) the tier `Material` and its class members.
+Each read is traced and fails to `not_checked` independently. This is an API
+study for the Slab Material flow; it establishes no owner or setter.
+
 Candidate 0.26.0 adds `drawing_identity` for a bounded inventory of one
 foreground drawing. This inventories model/view identity, lineage, and native
 representation across pages; it does not turn a structural inventory into
@@ -867,7 +875,8 @@ including previously nonmatching peers; use it instead of a separate UUID handof
 
 The shared `fix_model_issues` tool offers storage maintenance without native
 model/document access. Keep the three limits distinct: active diagnostic trace
-`m4-native-probe.jsonl` is 8 MiB; active execution history holds 512 records;
+`m4-native-probe.jsonl` is 8 MiB per segment (automatically archived up to
+256 MiB, see below); active execution history holds 512 records;
 each execution record has a separate 1 MiB verification/persistence limit.
 A full trace can block a model-edit preview before any setters. A full execution
 journal blocks new IDs while retained-ID replay remains available.
@@ -887,6 +896,20 @@ journal blocks new IDs while retained-ID replay remains available.
 Appenders and rotation share an OS lock. No model operation is retried. Trace
 archives are preserved; preview uses bounded metadata samples, explicitly
 reporting incomplete archive coverage. They are not automatically expired.
+
+**Automatic trace rotation (0.44.0).** When the next trace event would exceed
+the 8 MiB segment, the writer, under the same lock and before the native call,
+moves the whole active segment verbatim to the same archive name and starts a
+new file whose first line (`NativeProbeTrace.auto_rotate`, `rotated`) names
+the previous segment and its size. Nothing is deleted or truncated. It runs
+only while the archive listing is complete and archive + segment stays within
+**256 MiB**; otherwise, or on an unsafe path, collision or rename failure, the
+trace blocks with `probe_trace_unavailable` exactly as before and the
+confirmed manual cleanup above (not limited by that budget) restores capacity.
+`preview_journal_cleanup`/`inspect_journal` report `auto_rotation`
+(`archive_bytes`, `archive_byte_limit`, `available`). A started/returned pair
+can span two segments. Execution records (`repair_records`) are never rotated
+automatically.
 
 `repair_records` moves only verified, resolved records to `repairs/archive/`.
 Running/unknown, corrupt, oversized, unsafe and colliding entries stay active.
