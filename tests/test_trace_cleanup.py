@@ -45,6 +45,83 @@ class NativeTraceCleanupTests(unittest.TestCase):
         self.assertEqual((record["phase"], record["api"], record["state"]),
                          ("cleanup_test", "test.api", "returned"))
 
+    def test_full_segment_rotates_automatically_without_losing_bytes(self):
+        original = b"x" * self.trace.MAX_BYTES
+        self.path.write_bytes(original)
+        self.trace(self.path, "auto_test").record("test.api", "started")
+        archive_dir = self.path.parent / "native-archive"
+        archived = archive_dir / (hashlib.sha256(original).hexdigest() + ".jsonl")
+        self.assertEqual(archived.read_bytes(), original)
+        lines = [json.loads(line) for line in self.path.read_text(encoding="utf-8").splitlines()]
+        self.assertEqual([(row["api"], row["state"]) for row in lines],
+                         [("NativeProbeTrace.auto_rotate", "rotated"), ("test.api", "started")])
+        self.assertEqual(lines[0]["previous_segment"], archived.name)
+        self.assertEqual(lines[0]["previous_segment_bytes"], len(original))
+        status = self.trace.inspect_storage(self.path)
+        self.assertFalse(status["full"])
+        self.assertEqual(status["archive"]["count"], 1)
+        self.assertEqual(status["auto_rotation"]["archive_bytes"], len(original))
+        self.assertTrue(status["auto_rotation"]["available"])
+        self.assertFalse(status["auto_rotation"]["deletes_records"])
+
+    def test_partial_segment_rotates_before_record_would_exceed_limit(self):
+        original = b"y" * (self.trace.MAX_BYTES - 10)
+        self.path.write_bytes(original)
+        self.trace(self.path, "auto_test").record("test.api", "returned")
+        archived = self.path.parent / "native-archive" / (hashlib.sha256(original).hexdigest() + ".jsonl")
+        self.assertEqual(archived.read_bytes(), original)
+        self.assertLess(self.path.stat().st_size, 4096)
+
+    def test_exhausted_auto_archive_budget_blocks_and_keeps_bytes(self):
+        original = b"z" * self.trace.MAX_BYTES
+        self.path.write_bytes(original)
+        archive_dir = self.path.parent / "native-archive"
+        archive_dir.mkdir()
+        old = archive_dir / ("1" * 64 + ".jsonl")
+        old.write_bytes(b"old archive")
+        with patch.object(self.trace, "AUTO_ARCHIVE_MAX_BYTES", self.trace.MAX_BYTES):
+            with self.assertRaises(self.trace_error()) as error:
+                self.trace(self.path, "auto_test").record("test.api", "started")
+            self.assertEqual(error.exception.code, "probe_trace_unavailable")
+            self.assertEqual(self.path.read_bytes(), original)
+            self.assertEqual(sorted(p.name for p in archive_dir.iterdir()), [old.name])
+            status = self.trace.inspect_storage(self.path)
+            self.assertFalse(status["auto_rotation"]["available"])
+            # Confirmed manual cleanup still archives beyond the automatic budget.
+            result = self.trace.rotate(self.path, status["snapshot_hash"])
+            self.assertEqual(result["state"], "archived")
+            self.trace(self.path, "auto_test").record("test.api", "started")
+        self.assertEqual((archive_dir / result["archive"]).read_bytes(), original)
+        self.assertEqual(old.read_bytes(), b"old archive")
+
+    def test_incomplete_archive_listing_or_collision_blocks_auto_rotation(self):
+        original = b"c" * self.trace.MAX_BYTES
+        self.path.write_bytes(original)
+        archive_dir = self.path.parent / "native-archive"
+        archive_dir.mkdir()
+        destination = archive_dir / (hashlib.sha256(original).hexdigest() + ".jsonl")
+        destination.write_bytes(b"different")
+        with self.assertRaises(self.trace_error()) as error:
+            self.trace(self.path, "auto_test").record("test.api", "started")
+        self.assertEqual(error.exception.code, "probe_trace_unavailable")
+        self.assertEqual(self.path.read_bytes(), original)
+        self.assertEqual(destination.read_bytes(), b"different")
+        destination.unlink()
+        for index in range(self.trace.MAX_ARCHIVE_PREVIEW + 1):
+            (archive_dir / f"{index:064x}.jsonl").write_bytes(b"a")
+        with self.assertRaises(self.trace_error()):
+            self.trace(self.path, "auto_test").record("test.api", "started")
+        self.assertEqual(self.path.read_bytes(), original)
+
+    def test_failed_auto_rotation_rename_keeps_trace_and_blocks(self):
+        original = b"r" * self.trace.MAX_BYTES
+        self.path.write_bytes(original)
+        with patch.object(os, "replace", side_effect=OSError("blocked rename")):
+            with self.assertRaises(self.trace_error()) as error:
+                self.trace(self.path, "auto_test").record("test.api", "started")
+        self.assertEqual(error.exception.code, "probe_trace_unavailable")
+        self.assertEqual(self.path.read_bytes(), original)
+
     def test_trace_accepts_more_than_the_previous_one_mib_capacity(self):
         self.path.write_bytes(b"x" * (1024 * 1024 + 1))
         self.trace(self.path, "capacity_test").record("test.api", "returned")

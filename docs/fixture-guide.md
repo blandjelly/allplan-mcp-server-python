@@ -50,6 +50,13 @@ read only the first Wall in model UUID order: **240 mm**, raw material
 read. The ten-component baseline above remains historical evidence, not a
 fresh count of this later fixture state. Keep both Walls; do not alter the
 fixture to force selection of the 200 mm Wall.
+
+Owner addition, **2026-11-02**: one architectural beam "Podciąg, wieniec"
+(`Beam_TypeUUID`, layer 3755, 7540 × 240 × 400 mm) in drawing 101, with two
+root views. Observed refs (re-query before use; UUIDs may change): model
+`7cc9ac55-6111-4508-bae8-d33918dbe77e`, views `362f80d3-0105-41f6-b1fe-64ae94a1749f`
+and `6035d406-ad2e-45e2-9bfc-46d28477e607`; it is the disposable target for the
+first Beam attribute and native Material writes.
 [Observation and original reports](https://github.com/blandjelly/allplan-mcp-server-python/blob/c42adf0377438dcb729df08b0527635301af2e50/docs/test-results/m4-wall-observation-0.18.2.md).
 
 ## Accepted observations and current state

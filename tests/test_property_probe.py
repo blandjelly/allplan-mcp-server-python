@@ -3,6 +3,7 @@ import json
 import importlib
 import tempfile
 import unittest
+from unittest.mock import patch
 import weakref
 from pathlib import Path
 
@@ -181,12 +182,25 @@ class PropertyProbeTests(unittest.TestCase):
 
     def test_trace_capacity_blocks_following_calls_without_pruning_old_evidence(self):
         self.fixture()
-        limit = importlib.import_module("test_allplan_host.property_probe").NativeProbeTrace.MAX_BYTES
-        data = b'x' * limit
+        trace = importlib.import_module("test_allplan_host.property_probe").NativeProbeTrace
+        data = b'x' * trace.MAX_BYTES
         self.path.write_bytes(data)
-        self.assert_code("probe_trace_unavailable", lambda: self.probe(phase="layer_name", layer_short_name="W1"))
+        # An exhausted automatic archive budget keeps the fail-closed block.
+        with patch.object(trace, "AUTO_ARCHIVE_MAX_BYTES", 0):
+            self.assert_code("probe_trace_unavailable", lambda: self.probe(phase="layer_name", layer_short_name="W1"))
         self.assertEqual(self.path.read_bytes(), data)
         self.base.LayerService.GetIDByShortName.assert_not_called()
+
+    def test_full_trace_rotates_automatically_before_the_next_native_call(self):
+        self.fixture()
+        trace = importlib.import_module("test_allplan_host.property_probe").NativeProbeTrace
+        data = b'x' * trace.MAX_BYTES
+        self.path.write_bytes(data)
+        result = self.probe(phase="layer_name", layer_short_name="W1")
+        self.assertEqual(result["resolution"]["status"], "resolved")
+        archive = self.path.parent / (self.path.stem + "-archive")
+        self.assertEqual([p.read_bytes() for p in archive.iterdir()], [data])
+        self.assertEqual(self.records()[0]["api"], "NativeProbeTrace.auto_rotate")
 
     def test_layer_name_probe_preserves_legacy_short_lookup_and_full_name_guidance(self):
         self.fixture()

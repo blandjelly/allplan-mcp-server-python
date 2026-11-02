@@ -24,6 +24,10 @@ class NativeProbeTrace:
     CHUNK_BYTES = 64 * 1024
     MAX_ARCHIVE_PREVIEW = 128
     MAX_ARCHIVE_RETRY_SCAN = 1024
+    # Automatic rotation moves a full active segment into the archive without
+    # deleting anything. It stops (fail closed) once the archive holds this many
+    # bytes or its listing is incomplete; confirmed manual cleanup still works.
+    AUTO_ARCHIVE_MAX_BYTES = 256 * 1024 * 1024
 
     @staticmethod
     def _fail(code, message, exc=None):
@@ -161,6 +165,51 @@ class NativeProbeTrace:
                 "bytes": total if complete else None,
                 "complete": complete, "archives": files}
 
+    @staticmethod
+    def _sync_directories(*directories):
+        if os.name != "nt":
+            for directory in directories:
+                descriptor = os.open(directory, os.O_RDONLY)
+                try:
+                    os.fsync(descriptor)
+                finally:
+                    os.close(descriptor)
+
+    @classmethod
+    def _auto_rotation_status(cls, archive):
+        used = archive["bytes"] if archive["complete"] else None
+        return {"enabled": True, "segment_byte_limit": cls.MAX_BYTES,
+                "archive_byte_limit": cls.AUTO_ARCHIVE_MAX_BYTES, "archive_bytes": used,
+                "available": used is not None and used + cls.MAX_BYTES <= cls.AUTO_ARCHIVE_MAX_BYTES,
+                "deletes_records": False}
+
+    @classmethod
+    def _auto_rotate_locked(cls, path):
+        """Archive the full active segment verbatim; caller holds the storage lock.
+
+        Raises OSError/ValueError (mapped to probe_trace_unavailable) when the
+        archive is unsafe, incomplete, over its automatic budget or colliding,
+        so the trace keeps blocking native calls instead of losing evidence.
+        """
+        archive_dir = path.parent / (path.stem + "-archive")
+        archive = cls._archives_info(archive_dir)
+        size, content_hash = cls._digest_file(path)
+        if (not archive["complete"]
+                or archive["bytes"] + size > cls.AUTO_ARCHIVE_MAX_BYTES):
+            raise OSError("Automatic trace archive budget exhausted")
+        if archive_dir.is_symlink():
+            raise ValueError("archive directory is a symlink")
+        archive_dir.mkdir(mode=0o700, exist_ok=True)
+        if archive_dir.is_symlink() or not archive_dir.is_dir():
+            raise ValueError("archive directory is unsafe")
+        archive_name = content_hash + ".jsonl"
+        destination = archive_dir / archive_name
+        if destination.is_symlink() or destination.exists():
+            raise OSError("Automatic trace archive destination already exists")
+        os.replace(path, destination)
+        cls._sync_directories(archive_dir, path.parent)
+        return archive_name, size
+
     @classmethod
     def inspect_storage(cls, path):
         """Return a bounded, read-only snapshot of the fixed trace and archives."""
@@ -177,6 +226,7 @@ class NativeProbeTrace:
             with cls._storage_lock(path):
                 snapshot = cls._snapshot(path)
                 snapshot["archive"] = cls._archives_info(path.parent / (path.stem + "-archive"))
+                snapshot["auto_rotation"] = cls._auto_rotation_status(snapshot["archive"])
                 snapshot["cleanup_available"] = snapshot["exists"] and snapshot["bytes"] > 0
                 snapshot.update(read_only=True, native_model_access=False, records_modified=False)
                 return snapshot
@@ -251,13 +301,7 @@ class NativeProbeTrace:
                 if destination.is_symlink() or destination.exists():
                     cls._fail("cleanup_archive_conflict", "Native trace archive destination already exists; both files were preserved.")
                 os.replace(path, destination)
-                if os.name != "nt":
-                    for directory in (archive_dir, path.parent):
-                        descriptor = os.open(directory, os.O_RDONLY)
-                        try:
-                            os.fsync(descriptor)
-                        finally:
-                            os.close(descriptor)
+                cls._sync_directories(archive_dir, path.parent)
                 return {"target": "native_trace", "state": "archived",
                         "snapshot_hash": snapshot["snapshot_hash"], "bytes": snapshot["bytes"],
                         "byte_limit": cls.MAX_BYTES, "archive": archive_name,
@@ -282,6 +326,19 @@ class NativeProbeTrace:
             path = self._check_path(self.path)
             path.parent.mkdir(parents=True, exist_ok=True)
             with self._storage_lock(path):
+                if len(data) > self.MAX_BYTES:
+                    raise OSError("Trace record exceeds segment capacity")
+                info = path.lstat() if path.exists() else None
+                if info is not None and not stat.S_ISREG(info.st_mode):
+                    raise ValueError("trace is not a regular file")
+                if info is not None and info.st_size and info.st_size + len(data) > self.MAX_BYTES:
+                    # Rotate before opening: Windows cannot rename an open file.
+                    archive_name, archived_bytes = self._auto_rotate_locked(path)
+                    marker = {"probe_id": self.probe_id, "phase": "trace_storage",
+                              "api": "NativeProbeTrace.auto_rotate", "state": "rotated",
+                              "at_utc": record["at_utc"], "previous_segment": archive_name,
+                              "previous_segment_bytes": archived_bytes}
+                    data = (json.dumps(marker, ensure_ascii=False) + "\n").encode() + data
                 with self._open_regular(path, os.O_CREAT | os.O_APPEND | os.O_WRONLY) as stream:
                     if os.fstat(stream.fileno()).st_size + len(data) > self.MAX_BYTES:
                         raise OSError("Trace capacity exceeded")
@@ -289,7 +346,7 @@ class NativeProbeTrace:
                     stream.flush()
                     os.fsync(stream.fileno())
         except OSError as exc:
-            raise BridgeError("probe_trace_unavailable", "M4 native trace is full or unwritable; no further native call may start. Run preview_journal_cleanup for target=native_trace, review its snapshot, then ask the user before cleanup_journal.", 409) from exc
+            raise BridgeError("probe_trace_unavailable", "M4 native trace is full (its automatic archive budget is exhausted) or unwritable; no further native call may start. Run preview_journal_cleanup for target=native_trace, review its snapshot, then ask the user before cleanup_journal.", 409) from exc
         except (ValueError, TypeError) as exc:
             raise BridgeError("probe_trace_unavailable", "M4 native trace path is unsafe or unavailable; no further native call may start. Run preview_journal_cleanup for target=native_trace, review its snapshot, then ask the user before cleanup_journal.", 409) from exc
 

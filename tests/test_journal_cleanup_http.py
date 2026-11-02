@@ -2,6 +2,7 @@
 import tempfile
 import importlib
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 from uuid import uuid4
 
@@ -48,6 +49,11 @@ class JournalCleanupHTTPTests(unittest.IsolatedAsyncioTestCase):
         trace_limit = importlib.import_module("test_allplan_host.property_probe").NativeProbeTrace.MAX_BYTES
         original = b"x" * trace_limit
         path.write_bytes(original)
+        # Automatic rotation is exhausted, so the reviewed manual flow applies.
+        trace_class = importlib.import_module("test_allplan_host.property_probe").NativeProbeTrace
+        budget = patch.object(trace_class, "AUTO_ARCHIVE_MAX_BYTES", 0)
+        budget.start()
+        self.addCleanup(budget.stop)
         request = native.request(changes=[{"target": {"kind": "attribute", "attribute_id": 935},
                                           "value": "F90"}])
         async with Client(self.url, timeout=10) as client:
