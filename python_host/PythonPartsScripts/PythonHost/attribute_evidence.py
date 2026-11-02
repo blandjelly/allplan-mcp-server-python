@@ -77,7 +77,8 @@ def probe_attribute_evidence(queries, doc, base, settings, request, trace, check
         matches = [item for item in snapshot["elements"] if item["ref"]["model_uuid"] == request["model_uuid"]]
         if (len(matches) != 1 or matches[0]["view_identity_not_checked"]
                 or request["view_uuid"] not in matches[0]["view_uuids"]):
-            raise BridgeError("probe_scope_unavailable", "Exact model/view identity is missing or conflicting.", 409)
+            from .identity_probe import identity_failure
+            raise identity_failure(snapshot, request, matches)
         element = matches[0]
         wrappers = live.get((request["drawing_file"], request["model_uuid"]), {}).get(request["view_uuid"], [])
         unique = {id(adapter): adapter for adapter in wrappers}

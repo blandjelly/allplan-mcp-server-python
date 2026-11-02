@@ -8,7 +8,7 @@ main integration is separate. Agent instructions: [AGENTS.md](AGENTS.md)
 
 M4 goal: typed, reviewed editing of every API-exposed attribute, and where
 possible native properties, of Columns, Beams, Walls and Slabs. Installed
-baseline **0.42.1**, candidate **0.43.0**; M4 remains
+baseline **0.43.0**, candidate **0.43.1**; M4 remains
 partially accepted. Version, delivery, native evidence and the next task are
 kept only in the [current handoff](docs/next-model-handoff.md); remaining work
 and blockers in the [development plan](docs/development-plan.md).

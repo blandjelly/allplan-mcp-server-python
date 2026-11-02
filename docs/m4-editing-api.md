@@ -191,6 +191,18 @@ The 0.41.0 getter PASS, including `target_in_direct_scan=false` for its exact
 requested view, neither proves that the model edit scan loses the Slab nor
 diagnoses the earlier write failure.
 
+The [0.43.0 native trial](test-results/evidence/0.43.0-2026-11-02/evidence-20261102.jsonl)
+(native observation, Allplan 2026.1) confirms that diagnosis. A new Apply
+(`9c6a0d32…`) ran `SetMaterial` + `ModifyElements` without a native error; the
+only inventory change was one `AttributeContainer_TypeUUID` child of the
+MultiSlab replaced by a new UUID (edges, parent and scalars equal;
+`diff.child_type_changes` names it from 0.43.1). The exact child's Material
+readback stayed `" "` after the setter, in recovery and in later previews, and
+did not become `C35/45`; after UI Undo the inventory fingerprint equals the
+pre-Apply one. Why the value does not change (property owner, tier-level
+storage, or a setter that is accepted but not applied in this build) is an open
+question, not a diagnosed cause. A drift report never authorizes a write.
+
 Example using the retained 0.41.0 target refs; replace the value with the exact
 reviewed native material string. Do not apply this sample to repeat historical
 Slab writes:

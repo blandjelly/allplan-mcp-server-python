@@ -1,86 +1,94 @@
 # Current M4 handoff
 
-## Next task — native trial of 0.43.0: resolve the Slab lock, then one reviewed Slab write
+## Next task — native trial of 0.43.1: read Beam (Podciąg) attributes; study why Slab Material stays blank
 
-Goal: close plan items 1–2 for the exact Slab child
-([plan](development-plan.md#remaining-work-and-unresolved-errors)).
-Start condition: candidate **0.43.0** passed full CI (six jobs: it changes
-`windows/` and the package builder), and the owner installed its ZIP from the
-GitHub Actions `package` artifact. Launch with **Launch Allplan MCP.cmd**: from
-0.43.0 it captures raw bridge requests/responses in the package
-`logs/evidence/evidence-YYYYMMDD.jsonl`; keep those files as the trial evidence.
+Start condition: candidate **0.43.1** passed full CI and the owner installed its
+`package` artifact. Launch with **Launch Allplan MCP.cmd** and keep
+`logs/evidence/evidence-YYYYMMDD.jsonl` as the evidence
+([plan items 2 and 6](development-plan.md#remaining-work-and-unresolved-errors)).
 
-1. `allplan_health`, `get_model_context` in `Kopia MCP_QA_DEMO`, drawing 101.
-2. Read-only `model_edit` `action=recover` for execution
-   `a8a31c72975541feb1c36a2e8cbb8f65` (no acknowledgement). Expected: the
-   observation carries `representation_consensus.exact_inventory` (status
-   `changed`, diff `expected_summary_unavailable` because the 0.42.1 plan has no
-   stored summary, plus the current bounded inventory) and the observed native
-   Material; the outcome becomes `reconciled` if the value is read. If a
-   reconciliation proposal appears, show it to the owner before any
-   acknowledgement. Never retry Apply.
-3. Only after the lock is cleared: one new preview → highlight → Apply on the
-   same child with an owner-chosen value different from the current one.
-   Expected with the current diagnosis: outcome `unknown`,
-   `exact_inventory_changed_after_setter`, readback with the new value and a
-   **complete diff** (children/edges added/removed, scalar changes). Then
-   read-only recovery (expected `reconciled`), UI check of the value, one UI
-   Undo and a fresh read of the restored value.
+1. **Beam (read-only).** `allplan_health`, then re-query `Beam_TypeUUID` in
+   drawing 101 (refs observed 2026-11-02: model
+   `7cc9ac55-6111-4508-bae8-d33918dbe77e`, views `362f80d3-…` and `6035d406-…`;
+   re-read them, UUIDs may change). Run `model_property_probe`
+   `element_attributes` (no filter, then `name_contains="material"`) with
+   either view. Expected: all root views are read and, if they agree, the
+   listing carries `view_uuids` (2) and `adapter_attribute_consistency=
+   "consistent"`; otherwise `conflicting_view_attributes` with per-view
+   fingerprints. Optionally run `component_identity` on the same refs: it may
+   still fail, but the message now names the cause (no direct adapter / view
+   not among direct views / representations disagree). Zero setters.
+2. **Slab (no new Apply).** The same `C35/45` payload must not be repeated.
+   Next agent step is read-only API study: compare `SlabProperties.Material`
+   on the child, the MultiSlab parent and tier properties
+   (`GetSlabTierProperties`) and decide on a changed flow before any trial.
+   Closure of plan item 2 needs a flow whose readback shows the new value.
 
-Completion: lock `a8a31c…` resolved, the post-setter diff recorded, the
-coverage-matrix cell for Slab native Material updated. Then decide (owner
-review of the diff) whether the observed drift category may count as applied
-in a later version. Do not change pre-setter guards. Do not repeat the 0.40.0,
-0.41.0 or 0.42.0 probes.
-
-Owner check in parallel (plan item 6): whether the installed Allplan offers an
-architectural beam (`Beam_TypeUUID`). In the Polish UI it is usually the
-**Podciąg / nadciąg** tool in the Architecture role (task area for walls,
-openings and components); the Actionbar search for "Podciąg" finds it. The
-SkeletonBeam found so far comes from the structural framing tools. If no
-architectural beam exists, the Beam scope is SkeletonBeam only.
+Completion: Beam attribute listing recorded (or its remaining blocker), Slab
+hypothesis and changed flow written in the plan. Do not repeat the 0.40.0,
+0.41.0, 0.42.0 or 0.43.0 probes. If the Beam listing works, the next task is one
+disposable Beam attribute write and then native Material on the Beam.
 
 ## Latest version
 
-**0.43.0** (candidate, branch `claude/m4-claude-code-setup`,
-[PR #51](https://github.com/blandjelly/allplan-mcp-server-python/pull/51), draft):
+**0.43.1** (candidate, branch `claude/m4-0431-multiview-beam-probe`):
+the `element_attributes` probe now accepts a root with several views
+(Beam Podciąg has two): it requires every view to have live adapters, reads all
+of them and reports values only if they agree (otherwise
+`conflicting_view_attributes` with per-view fingerprints; a requested view
+outside the root's views still blocks). Unresolved identity errors name their
+cause. The exact-inventory diff gains descriptive `child_type_changes`.
+Pre-setter guards, journals and write paths are untouched. Focused checks PASS
+(attribute probe, component identity, property probe, exact material target and
+HTTP, recovery HTTP, native model edit, material comparison, model properties);
+full CI, ZIP verification and native trial are pending.
 
-- **Slab diagnosis.** In 0.42.1 `fresh_resolve` runs after `SetMaterial` +
-  `ModifyElements`; both pre-setter inventory checks had passed with the
-  reviewed fingerprint, so the exact MultiSlab inventory changed across the
-  native submission. Post-setter observation (fresh readback and recovery) now
-  re-verifies the target view, child type and parent edge, and reports a
-  changed fingerprint with a bounded diff instead of raising; Apply keeps the
-  outcome unknown. New plans bind an `inventory_summary`; 0.42.x journal
-  bindings stay valid. Pre-setter guards and the final mutation boundary are
-  unchanged ([contract](m4-editing-api.md#exact-child-native-material-target-0420)).
-- Opt-in raw evidence capture (`ALLPLAN_MCP_EVIDENCE_DIR`), client-neutral MCP
-  server instructions, **Connect Claude Code.cmd** (uses the `claude` CLI,
-  never overwrites another server), Setup.cmd without a stale version.
-- Focused checks PASS (exact material, native material families/columns,
-  model edit, material comparison, ownership, identity, recovery, wall
-  material, delete, column layer, client, package, MCP smoke, CI policy).
-  Full CI, ZIP verification and native trial are pending.
+**0.43.0** (source `1be4072`, PR #51) is the installed baseline; health:
+Allplan 2026.1, `integrity=sha256-verified`. Owner-run native trial,
+[raw evidence](test-results/evidence/0.43.0-2026-11-02/evidence-20261102.jsonl)
+(the owner reports the log agrees with the UI and that UI Undo worked):
 
-**0.42.1** (source `eecdfeb`, PR #49, merged `29c7f487`) is the installed
-baseline: owner-confirmed CI and ZIP; health binds the bridge to that source,
-integrity verified, Allplan 2026.1. CI run identity, ZIP hash and
-upgrade/restore were not independently verified.
-[Raw 0.42.1 evidence](test-results/evidence/0.42.1-2026-10-27/allplan-0421-native-test-evidence.json)
-(steps 0–14) is retained unchanged.
+- **Lock cleared.** Read-only recovery of `a8a31c…` is `reconciled`
+  (`old_value_observed`, Material `" "`), `write_blocked=false`; this is not an
+  applied result. `exact_inventory` was `changed`
+  (`expected_summary_unavailable`: the 0.42.1 plan had no summary).
+- **Diagnosis confirmed.** New Apply `9c6a0d326b61440f8f11311c1ec569b9` (plan
+  `210a1b…`, requested `C35/45`) ends `unknown`,
+  `exact_inventory_changed_after_setter`. The only difference is one
+  `AttributeContainer_TypeUUID` child of the MultiSlab replaced by a new UUID
+  (`b4e594f7…` → `60c64a1a…`); edges, parent and scalars are unchanged.
+  Read-only recovery: `reconciled`, `old_value_observed`.
+- **No effect on the observed Material.** Readback after the setter, recovery
+  and the later previews all show `" "`, not `C35/45`; the setter and
+  `ModifyElements` ran without error and regenerated the container, but the
+  value did not change. After UI Undo the preview fingerprint equals the
+  pre-Apply one (`796cd7…`, container `b4e594f7…` again), so Undo restored the
+  inventory. Cause (wrong owner, tier-level storage or a no-op setter) is not
+  established. The drift category cannot count as applied while the value is
+  unchanged.
+- **Beam fixture found.** The owner added an architectural beam
+  "Podciąg, wieniec" (`Beam_TypeUUID`, layer 3755, 7540×240×400 mm, two root
+  views). `model_query` finds it; `element_attributes` was refused with
+  "ambiguous root adapter representations" because the probe required one
+  view (fixed in 0.43.1); `component_identity` failed with "missing or
+  conflicting" (cause unreported before 0.43.1; the direct scan may not list
+  this root).
+
+**0.42.1** (source `eecdfeb`, PR #49) was the earlier baseline: owner-confirmed
+CI and ZIP, CI run identity, ZIP hash and upgrade/restore not independently
+verified. [Raw 0.42.1 evidence](test-results/evidence/0.42.1-2026-10-27/allplan-0421-native-test-evidence.json)
+is retained unchanged.
 
 ## Key errors and necessary earlier context
 
-- **Slab `a8a31c72975541feb1c36a2e8cbb8f65` — unknown, write lock.** Preview
-  (drawing 101, child model `8a693925-ae20-4dda-91d1-3951af3c0a52`, view
+- **Slab executions.** `a8a31c72975541feb1c36a2e8cbb8f65` (0.42.1) is
+  `reconciled` by read-only recovery on 0.43.0 (value `" "`); `9c6a0d32…`
+  (0.43.0) is `reconciled`/`old_value_observed` after `unknown`. Target: drawing
+  101, child model `8a693925-ae20-4dda-91d1-3951af3c0a52`, view
   `a0fcd7b3-85c8-4f83-99b7-59e8a3463c94`, parent MultiSlab
-  `bf097d95-8275-4229-ac74-27bbea26c211` / `b4a59b5b-c0ae-4c1e-9d59-df5761390eb9`)
-  observed Material `" "` against requested `C35/45` with
-  `native_material_ownership` (`SlabElement`, `slab_properties`). Apply stopped
-  `unknown`, `repair_conflict` at `fresh_resolve`; recovery repeated it at
-  `recovery_resolve`. The write-ahead marker was saved before the setter, so
-  **the setter may have run**; the current value is unknown. Do not infer
-  setter success or absence; recover read-only with this ID.
+  `bf097d95-8275-4229-ac74-27bbea26c211` / `b4a59b5b-c0ae-4c1e-9d59-df5761390eb9`
+  (`native_material_ownership`: `SlabElement`, `slab_properties`). Neither
+  execution is an applied/preservation PASS; keep their journals.
 - **Wall `3f2a8c9d7b5e4a1c9f8e6d3c2b1a0e9f`** was cleared by reviewed
   reconciliation (`reviewed_material_preservation_conflict`,
   `preservation_verified=false`): not an applied/preservation PASS.

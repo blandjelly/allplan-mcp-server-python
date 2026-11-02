@@ -392,6 +392,25 @@ class ComponentIdentityTests(unittest.TestCase):
         self.assert_code("probe_scope_unavailable", lambda: self.probe(**request))
         target.GetAttributes.assert_not_called()
 
+    def test_unresolved_identity_names_its_cause_without_guessing(self):
+        target = self.element(81)
+        self.fixture([target])
+        self.base.GetElement.return_value = object()
+        base = {"phase": "component_identity", "drawing_file": 101}
+        cases = (
+            ("no direct adapter", {"model_uuid": "00000000-0000-4000-8000-000000000099",
+                                   "view_uuid": target.GetElementUUID.return_value}),
+            ("not among the direct views", {"model_uuid": target.GetModelElementUUID.return_value,
+                                            "view_uuid": "00000000-0000-4000-8000-000000000098"}),
+        )
+        for expected, ids in cases:
+            with self.subTest(expected=expected):
+                with self.assertRaises(self.module.BridgeError) as error:
+                    self.probe(**base, **ids)
+                self.assertEqual(error.exception.code, "probe_scope_unavailable")
+                self.assertIn("missing or conflicting", str(error.exception))
+                self.assertIn(expected, str(error.exception))
+
     def test_attribute_evidence_invalid_null_refs_duplicate_and_boolean_ids_precede_document(self):
         self.fixture([self.element(82)])
         valid = {"phase": "attribute_evidence", "drawing_file": 101,

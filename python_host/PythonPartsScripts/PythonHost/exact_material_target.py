@@ -67,7 +67,19 @@ def inventory_diff(expected, current):
               for key in ("parent_representation_count", "child_visits", "target_in_direct_scan")
               if expected[key] != current[key]}
     before, after = children(expected), children(current)
-    return {"status": "observed", "scalar_changes": scalar,
+
+    def by_type(values):
+        counts = {}
+        for value in values:
+            counts[value.split("|", 1)[0]] = counts.get(value.split("|", 1)[0], 0) + 1
+        return counts
+
+    # Per-type counts are descriptive (0.43.0 trial: one AttributeContainer
+    # child replaced by another UUID); they are not a verdict on benignness.
+    removed_types, added_types = by_type(before - after), by_type(after - before)
+    type_changes = {name: {"removed": removed_types.get(name, 0), "added": added_types.get(name, 0)}
+                    for name in sorted(set(removed_types) | set(added_types))}
+    return {"status": "observed", "scalar_changes": scalar, "child_type_changes": type_changes,
             "children_removed": listed(before - after), "children_added": listed(after - before),
             "edges_removed": listed(set(expected["edges"]) - set(current["edges"])),
             "edges_added": listed(set(current["edges"]) - set(expected["edges"])),

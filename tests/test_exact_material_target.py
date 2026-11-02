@@ -251,6 +251,8 @@ class ExactMaterialTargetTests(unittest.TestCase):
         self.assertEqual(drift["diff"]["children_added"]["count"], 1)
         self.assertIn("AttributeContainer_TypeUUID|", drift["diff"]["children_added"]["items"][0])
         self.assertEqual(drift["diff"]["children_removed"]["count"], 0)
+        self.assertEqual(drift["diff"]["child_type_changes"],
+                         {"AttributeContainer_TypeUUID": {"removed": 0, "added": 1}})
         self.assertTrue(f.native.apply(plan, execution)["replayed"])
         recovered = f.native.recover(execution)
         self.assertEqual(recovered["outcomes"][0]["state"], "reconciled", recovered)
@@ -267,6 +269,27 @@ class ExactMaterialTargetTests(unittest.TestCase):
         self.assertEqual(result["state"], "completed", result)
         drift = result["outcomes"][0]["representation_consensus"]["exact_inventory"]
         self.assertEqual(drift["status"], "unchanged")
+
+    def test_replaced_attribute_container_is_named_per_type_without_a_verdict(self):
+        # 0.43.0 trial: ModifyElements replaced the AttributeContainer child by a
+        # new UUID; edges and scalars stayed equal. The diff only describes it.
+        module = self.exact_module()
+        parent = "MultiSlab_TypeUUID|p|pv"
+        slab = "Slab_TypeUUID|s|sv"
+        edge = slab + ">" + parent
+
+        def summary(container):
+            return {"schema_version": module.INVENTORY_SUMMARY_SCHEMA, "parent_representation_count": 1,
+                    "child_visits": 2, "target_in_direct_scan": False, "edges": [edge],
+                    "parents": [{"parent": parent, "children": sorted([container, slab])}]}
+
+        diff = module.inventory_diff(summary("AttributeContainer_TypeUUID|a|a"),
+                                     summary("AttributeContainer_TypeUUID|b|b"))
+        self.assertEqual(diff["scalar_changes"], {})
+        self.assertEqual(diff["edges_added"]["count"] + diff["edges_removed"]["count"], 0)
+        self.assertEqual(diff["child_type_changes"],
+                         {"AttributeContainer_TypeUUID": {"removed": 1, "added": 1}})
+        self.assertNotIn("benign", str(diff).lower())
 
     def test_legacy_binding_without_summary_stays_valid_and_diff_is_explicit(self):
         f = self.f
