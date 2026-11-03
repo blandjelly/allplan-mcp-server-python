@@ -203,7 +203,7 @@ pre-Apply one. Why the value does not change (property owner, tier-level
 storage, or a setter that is accepted but not applied in this build) is an open
 question, not a diagnosed cause. A drift report never authorizes a write.
 
-#### Slab tier attribute writes and the parent-edge view (0.45.0 observation, 0.46.0 contract)
+#### Slab tier attribute writes and the UI material owner (0.45.0/0.46.0 observations, 0.47.0 contract)
 
 **Native observation (0.45.0, Allplan 2026.1,
 [raw evidence](test-results/evidence/0.45.0-2026-11-03/evidence-20261103.jsonl)).**
@@ -223,20 +223,45 @@ reverted, stored on a transient macro wrapper or shown from another
 representation. The `applied` outcomes overclaim: the consensus contained one
 of the tier's two wrappers.
 
-**Contract (0.46.0, automated tests only).** A `selected_element` attribute
-write on a Slab whose lineage is `[Slab, MultiSlab]` requires `exact_target`
-naming the tier's parent-edge view and the MultiSlab model/view; otherwise the
-plan blocks with `slab_tier_requires_exact_parent_edge_target`. With it, the
-planner binds the ownership evidence of the parent-edge view, the M1 field
-consensus and Apply preflight read every wrapper of the tier model,
-`ChangeAttributes` targets the parent-edge wrapper, and the fresh readback
-requires the new value on every wrapper. The post-setter exact inventory may
-differ only by a one-for-one `AttributeContainer_TypeUUID` replacement per
-parent (the 0.43.0 observation after `ModifyElements`), reported as
-`exact_inventory.accepted="attribute_containers_regenerated"`; any other
-change stays `unknown`. Open questions for the native trial: whether
-`ChangeAttributes` on the parent-edge wrapper persists, whether both wrappers
-then agree, and whether the UI shows it.
+**Native observation (0.46.0, Allplan 2026.1, bridge `6437bf2`,
+[raw evidence](test-results/evidence/0.46.0-2026-11-03/evidence-20261103.jsonl),
+[conversation](test-results/evidence/0.46.0-2026-11-03/agent_text.md)).**
+`material_comparison` on the tier's parent-edge view `a0fcd7b3…` with the
+MultiSlab `parent_ref` read attribute 508 **`TEST2`** on the tier `8a693925…`
+and **`TEST1`** on the MultiSlab `bf097d95…` (both read modes; native Material
+`" "` on both). The owner sees one slab object in the UI ("slab"), showing
+`TEST1`; the tier is not shown. The 0.46.0 exact-target tier preview was
+therefore `no_op`. A separate MultiSlab preview (`native_types=["MultiSlab_TypeUUID"]`,
+`property_owner="selected_element"`) and Apply `04569db1850748b2b029629c935dd36a`
+changed 508 `TEST1` → `TEST2` on view `b4a59b5b…` (`applied`,
+`readback_matches`, consensus complete/agreed); the owner saw `TEST2` in the
+UI, then UI Undo, and a fresh read returned `TEST1` on the MultiSlab and
+`TEST2` (unchanged) on the tier. Hence the slab material shown in the UI is
+the **MultiSlab's** attribute 508; the tier keeps its own stored value. The
+0.45.0 tier `applied` results most likely wrote that tier value (no other write
+touched the tier since; the 0.45.0 intermediate `TEST1` read is unexplained,
+possibly an unrecorded UI Undo); they were not UI-visible because the UI shows
+the parent. The 0.46.0 parent-edge tier route is still natively unobserved
+(its preview was `no_op`).
+
+**Contract (0.47.0, automated tests only).** A `selected_element` attribute
+write on a `[Slab, MultiSlab]` tier without `exact_target` is blocked as
+`slab_tier_not_shown_in_ui_use_multislab` (0.46.0 name:
+`slab_tier_requires_exact_parent_edge_target`); without `property_owner` it
+keeps `slab_has_parent_requires_explicit_property_owner`. For attribute
+changes both blocked rows carry `ui_owner` with the MultiSlab
+`drawing_file/model_uuid/view_uuid` and a `next_preview` hint
+(`native_types=["MultiSlab_TypeUUID"]`, `property_owner="selected_element"`).
+This is a hint, never a redirection: the caller previews the MultiSlab
+separately and checks that the change ref is that model. The 0.46.0
+exact-target tier route is unchanged and remains for an explicit tier-storage
+write: the reviewed owner evidence comes from the parent-edge view,
+`ChangeAttributes` runs on that wrapper, preflight and fresh readback require
+the same value on every wrapper of the tier, and after the setter only a
+one-for-one `AttributeContainer_TypeUUID` replacement per parent is accepted
+(`exact_inventory.accepted="attribute_containers_regenerated"`); any other
+change stays `unknown`. `material_comparison` on a view that is not a direct
+view now names the `parent_ref` route in its `probe_scope_unavailable` message.
 
 Example using the retained 0.41.0 target refs; replace the value with the exact
 reviewed native material string. Do not apply this sample to repeat historical

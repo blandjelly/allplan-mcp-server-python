@@ -267,8 +267,16 @@ class MaterialComparisonTests(unittest.TestCase):
 
     def test_wrong_view_and_wrapper_limit_stop_before_native_and_attribute_reads(self):
         target = self.material_fixture()
-        self.assert_code("probe_scope_unavailable", lambda: self.comparison(
-            view_uuid="10000000-0000-4000-8000-000000000099"))
+        with self.assertRaises(Exception) as error:
+            self.comparison(view_uuid="10000000-0000-4000-8000-000000000099")
+        self.assertEqual(error.exception.code, "probe_scope_unavailable")
+        # 0.46.0 trial: name the parent_ref route for a tier's parent-edge view.
+        self.assertIn("parent_ref", str(error.exception))
+        with self.assertRaises(Exception) as error:
+            self.comparison(view_uuid="10000000-0000-4000-8000-000000000099",
+                            parent_ref={"model_uuid": target.GetModelElementUUID(),
+                                        "view_uuid": target.GetElementUUID()})
+        self.assertNotIn("repeat with parent_ref", str(error.exception))
         wrappers = [self.element(name="SkeletonBeam_TypeUUID") for _ in range(17)]
         self.base.ElementsSelectService.SelectAllElements.return_value = wrappers
         self.target = wrappers[0]

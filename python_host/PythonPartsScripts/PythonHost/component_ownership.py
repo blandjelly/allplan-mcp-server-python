@@ -133,6 +133,30 @@ def observation(adapter, check=lambda: None, *, include_children=True):
         return failure(exc)
 
 
+TIER_NOT_UI_OWNER = "slab_tier_not_shown_in_ui_use_multislab"
+TIER_BLOCKERS = frozenset({TIER_NOT_UI_OWNER, "slab_has_parent_requires_explicit_property_owner"})
+
+
+def slab_ui_owner(evidence):
+    """The MultiSlab that Allplan shows for a [Slab, MultiSlab] tier, or None.
+
+    This is a hint for a separate preview, never a write redirection: the
+    caller must request the MultiSlab itself (0.46.0 owner observation).
+    """
+    value = evidence.get("value") if isinstance(evidence, dict) and evidence.get("status") == "observed" else None
+    lineage = value.get("lineage") if isinstance(value, dict) else None
+    if (not isinstance(lineage, list) or len(lineage) != 2 or not all(isinstance(ref, dict) for ref in lineage)
+            or lineage[0].get("type_name") != "Slab_TypeUUID" or lineage[1].get("type_name") != "MultiSlab_TypeUUID"):
+        return None
+    parent = lineage[1]
+    return {"drawing_file": parent.get("drawing_file"), "model_uuid": parent.get("model_uuid"),
+            "view_uuid": parent.get("view_uuid"), "type_name": "MultiSlab_TypeUUID",
+            "next_preview": {"native_types": ["MultiSlab_TypeUUID"],
+                             "target": {"property_owner": "selected_element"},
+                             "check": "the plan change ref.model_uuid equals this model_uuid; "
+                                      "exclude other MultiSlabs with exclude_model_uuids"}}
+
+
 def slab_write_blocker(evidence, change=None):
     """No automatic redirection from slab tiers or aggregates to a field owner."""
     if not isinstance(evidence, dict) or evidence.get("status") != "observed":
@@ -161,11 +185,11 @@ def slab_write_blocker(evidence, change=None):
                     and lineage[1].get("type_name") == "MultiSlab_TypeUUID"))):
             return "slab_explicit_property_owner_invalid"
         if len(lineage) == 2:
-            # 0.45.0 trial: ChangeAttributes on the SelectAllElements wrapper of
-            # a MultiSlab tier read back the new value once, later reads and the
-            # UI kept the old one. A tier write must name the tier's parent-edge
-            # representation through exact_target so the reviewed view and the
-            # post-setter consensus include it (0.46.0).
+            # 0.46.0 trial: the tier stores its own attribute 508 (it kept the
+            # 0.45.0 value), but Allplan shows the MultiSlab's value as the slab
+            # material. A tier write is therefore never the default material
+            # route: it needs exact_target on the tier's parent-edge view and
+            # changes only tier storage that the UI does not display (0.47.0).
             exact = resource.get("exact_target_binding")
             target_binding = exact.get("target") if isinstance(exact, dict) else None
             parent = lineage[1]
@@ -174,7 +198,7 @@ def slab_write_blocker(evidence, change=None):
                     or target_binding.get("view_uuid") != target.get("view_uuid")
                     or target_binding.get("parent_ref") != {"model_uuid": parent.get("model_uuid"),
                                                             "view_uuid": parent.get("view_uuid")}):
-                return "slab_tier_requires_exact_parent_edge_target"
+                return TIER_NOT_UI_OWNER
         return None
     if "property_owner" in resource:
         return "slab_explicit_property_owner_invalid"
