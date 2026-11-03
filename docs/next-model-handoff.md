@@ -33,7 +33,8 @@ The parent/child views still resolved and the edge parent view was unchanged
 preservation are not observed. A write-caused sibling/count change is the main
 hypothesis, not a result.
 
-0.42.2 (branch `develop/m4`, version in pyproject/lock/server) adds diagnostics
+0.42.2 ([PR #60](https://github.com/blandjelly/allplan-mcp-server-python/pull/60)
+from `claude/m4-0422-exact-inventory-diagnostics` to `develop/m4`) adds diagnostics
 only: per-section digests in new exact bindings and bounded identity-only
 `diagnostics` on exact-inventory conflicts in Apply outcomes and recovery
 observations. Guards, budgets and journal semantics are unchanged; legacy
