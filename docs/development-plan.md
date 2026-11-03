@@ -28,9 +28,9 @@ a separate design and acceptance.
 
 Other owner decisions (2026-11-02):
 
-- Priority: resolve the Slab material problem first (items 1–2).
-  Owner observations 2026-11-03: the Slab UI material is attribute 508 of
-  the MultiSlab, the object the UI shows (0.46.0).
+- Priority: resolve the Slab material problem first (items 1–2). Closed
+  2026-11-03: the Slab UI material is the MultiSlab's attribute 508 (0.46.0),
+  and the 0.47.0 plain-language trial changed and undid it (item 2).
 - Delivery: the ZIP is the GitHub Actions `package` artifact;
   `evaluation-packages/` is a historical archive (up to 0.33.0).
 - Beam: an architectural beam (`Beam_TypeUUID`, "Podciąg") exists in the
@@ -42,8 +42,8 @@ Other owner decisions (2026-11-02):
 | Priority | What remains / condition for further work |
 | --- | --- |
 | 1 — delivery and older unknowns | 0.42.1 CI/ZIP confirmed by the owner; CI run identity, ZIP hash and upgrade/restore are not independently verified (0.43.0 health: `sha256-verified`). The Slab locks (`a8a31c…`, `9c6a0d…`) are reconciled by read-only recovery with the value unchanged; neither is an applied result. Wall `3f2a8c9d7b5e4a1c9f8e6d3c2b1a0e9f` was reconciled by reviewed reconciliation, preservation=false. Keep the older histories `87a…` and `4388…` described in the handoff. Never retry Apply or delete a journal. |
-| 2 — Slab material: the UI shows the MultiSlab's attribute 508 | Owner observations: the slab UI material is attribute 508 (0.44.2), and it is the **MultiSlab's** value (0.46.0: tier `TEST2`, MultiSlab `TEST1`, UI `TEST1`; MultiSlab Apply `04569db1…` `TEST1`→`TEST2` `applied`, UI `TEST2`, UI Undo restored `TEST1`). The native Slab Material route is not pursued (0.43.0 setter left `" "`; guards kept). The 0.45.0 tier `applied` results most likely wrote tier storage the UI does not show. 0.47.0 blocks non-exact tier writes as `slab_tier_not_shown_in_ui_use_multislab` with a `ui_owner` hint and tells the agent to use the MultiSlab (CODE). Next: plain-language trial (handoff step 2). |
-| 3 — Slab/MultiSlab attributes | MultiSlab attribute 508 write PASS (0.46.0, UI and Undo). The 0.39.0 reported tier/assembly PASS lacks payloads and owner binding and may have written invisible tier storage. The exact parent-edge tier route (0.46.0) ran no setter yet (preview `no_op`); optional handoff step 3 checks it. Keep `target.property_owner="selected_element"`, lineage/children and the overlap guard. |
+| 2 — Slab material: closed | The slab UI material is the MultiSlab's attribute 508. 0.47.0 trial (2026-11-03): the tier hint blocks non-exact tier writes with `ui_owner`; a plain-language request became a MultiSlab 508 Apply (`3f9c2a7e…`, `applied`, UI, UI Undo, post-Undo read `TEST1`). The native Slab Material route is not pursued (0.43.0 setter left `" "`; guards kept). |
+| 3 — Slab/MultiSlab attributes: closed for attribute 508 | MultiSlab 508 PASS (0.46.0, 0.47.0). The exact parent-edge tier route wrote tier storage (0.47.0 `9b2e4d71…`, `TEST2`→`TEST1`, both tier wrappers agree, inventory unchanged; no UI Undo, not UI-visible). Other attribute types on Slab/MultiSlab continue under item 4. Keep `target.property_owner="selected_element"`, lineage/children and the overlap guard. |
 | 4 — attribute types × families | Close owner-specific roundtrips for every family/type pair in the [matrix](m4-coverage-matrix.md). Column Enum `Status` ID 49 is BLOCKED (`<niezdefiniowany>`, no confirmed label). Wall CheckBox ID 1371 has no raw Apply; no SDK Boolean fixture. Date/vector/object values need exact setter payload and typed readback contracts; an SDK symbol or constructor is not enough ([type coverage](m4-attribute-type-coverage.md)). |
 | 5 — native properties beyond Material (new) | Not started. First write an API note: which `WallTierProperties`, `ColumnProperties`, `BeamProperties`, `StructuralBeamProperties` and `SlabProperties` members (thickness, height/plane references, surface, priority, calculation mode, trade, hatch/filling) have documented setters, their owners and readback; then one property per family with preview, preservation and Undo evidence. The current preservation snapshot already reads many of these values. |
 | 6 — Beam: closed for attribute 508 and native Material | Fixture "Podciąg, wieniec" ([fixture guide](fixture-guide.md)). Attribute 508 write PASS (0.44.0, 0.45.0). Native Material PASS (0.46.0 `5a0bc366…`: `applied` with accepted `auxiliary_children_regenerated`, owner-reported UI and Undo, post-Undo `""`). Other Beam types and native properties continue under items 4–5. |
@@ -65,19 +65,14 @@ those files instead of chat summaries.
    establish its archive state. Do not repeat the inspection without a new
    reason. The Slab unknowns `a8a31c…` and `9c6a0d…` were reconciled by
    read-only recovery (value `" "`). Closure needs delivery accounting.
-2. **Slab material:** the UI material is the MultiSlab's attribute 508
-   (0.44.2, 0.46.0). Closure: one 0.47.0 plain-language request ("change the
-   slab material") that the agent turns into a MultiSlab attribute 508 Apply
-   ending `applied`, with the UI showing the value and UI Undo restoring it
-   ([contract](m4-editing-api.md#slab-tier-attribute-writes-and-the-ui-material-owner-04500460-observations-0470-contract)).
-   The native Slab Material route (0.41.0 getter, 0.42.x exact target, 0.43.0
-   setter leaving `" "`) stays guarded and is not pursued
-   ([evidence](test-results/evidence/0.43.0-2026-11-02/evidence-20261102.jsonl)).
-3. **Slab/MultiSlab attributes:** MultiSlab 508 PASS (0.46.0). For tiers:
-   the exact parent-edge route needs one native Apply (handoff step 3)
-   showing that all tier wrappers agree; the reported 0.39.0 tier result has
-   no payload or owner binding. Do not infer parent/child equivalence or relax
-   the overlap guard.
+2. **Slab material:** closed by the 0.47.0 plain-language trial
+   ([evidence](test-results/evidence/0.47.0-2026-11-03/evidence-20261103.jsonl),
+   [contract](m4-editing-api.md#slab-tier-attribute-writes-and-the-ui-material-owner-04500460-observations-0470-contract)).
+   The native Slab Material route stays guarded and is not pursued.
+3. **Slab/MultiSlab attributes:** closed for attribute 508 (MultiSlab PASS;
+   exact tier route VALUE with all wrappers agreeing). Persistence of the tier
+   value after save/reopen is not observed. Do not infer parent/child
+   equivalence or relax the overlap guard.
 4. **Attribute types × families:** one trial per open matrix cell with exact
    name↔ID binding, SDK type, Apply payload, typed readback and UI Undo. Dates
    need a documented or native-verified codec first.

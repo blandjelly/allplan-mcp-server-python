@@ -263,6 +263,20 @@ one-for-one `AttributeContainer_TypeUUID` replacement per parent is accepted
 change stays `unknown`. `material_comparison` on a view that is not a direct
 view now names the `parent_ref` route in its `probe_scope_unavailable` message.
 
+**Native observation (0.47.0, Allplan 2026.1, bridge `ceec638`,
+[raw evidence](test-results/evidence/0.47.0-2026-11-03/evidence-20261103.jsonl)).**
+The non-exact tier preview returned the `slab_tier_not_shown_in_ui_use_multislab`
+row with `ui_owner` = `bf097d95…`/`b4a59b5b…`, and the `material_comparison`
+error named `parent_ref`. A MultiSlab 508 Apply (`3f9c2a7e…`, `TEST1` →
+`TEST3`) was `applied` on `b4a59b5b…`; the owner saw it in the UI and undid
+it, and post-Undo reads returned MultiSlab `TEST1`, tier `TEST2`. The exact
+parent-edge tier Apply (`9b2e4d71…`, `TEST2` → `TEST1`) was `applied` with
+identical readback on both tier wrappers (`7f9df4e3…`, `a0fcd7b3…`),
+`exact_inventory.status="unchanged"`, so the AttributeContainer acceptance
+path was not exercised. The UI kept `TEST1`, which does not discriminate
+because tier and MultiSlab then held the same value; persistence after
+save/reopen was not observed.
+
 Example using the retained 0.41.0 target refs; replace the value with the exact
 reviewed native material string. Do not apply this sample to repeat historical
 Slab writes:

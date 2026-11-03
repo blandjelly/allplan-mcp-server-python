@@ -537,8 +537,9 @@ accepted only when each parent replaced its `AttributeContainer_TypeUUID`
 children one-for-one with every other child, edge and scalar identical
 (`exact_inventory.accepted="attribute_containers_regenerated"`); any other
 inventory change stays `unknown` (`exact_inventory_changed_after_setter`).
-Standalone Slabs and MultiSlab aggregates keep the ordinary route. Native
-acceptance of this tier route is pending.
+Standalone Slabs and MultiSlab aggregates keep the ordinary route. The tier
+route was observed natively in 0.47.0 (`applied`, both wrappers agreeing,
+inventory unchanged; no UI Undo).
 
 ### `delete` — exact component root only
 
