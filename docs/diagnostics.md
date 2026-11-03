@@ -70,7 +70,10 @@ Only when every remaining unknown is native material and all exact live views
 agree on material and original owner can the response offer
 `recovery.reconciliation`. Review its exact targets, `meaning`, per-view
 `changed_sections`, before/current preservation hashes and, for a changed
-`component_tree` (0.44.2), the bounded `component_tree_diff`. Compare them with
+`component_tree` (0.44.2), the bounded `component_tree_diff`. From 0.45.0 a
+Beam whose only drift is a one-for-one regeneration of its AttributeContainer/
+WallAxis children after the setter is reported as `applied` with
+`accepted_preservation_drift` instead of reaching recovery. Compare them with
 the current model; inspect UI or geometry when the differences require it.
 
 After review, use the returned `request` unchanged, including its exact

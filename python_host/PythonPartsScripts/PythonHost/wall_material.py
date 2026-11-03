@@ -544,7 +544,15 @@ def bound_owner(state, change):
                 == [_identity_key(ref) for ref in expected["hierarchy"]["lineage"]])
 
 
-def read(base, element, change, check=lambda: None, *, preservation=True):
+def read(base, element, change, check=lambda: None, *, preservation=True,
+         post_setter=False, accepted=None):
+    """Read the bound native material and compare preservation evidence.
+
+    ``post_setter`` is set only by the fresh readback/recovery path after a
+    setter. Only there may the family-specific regeneration of auxiliary
+    children be accepted; ``accepted`` then receives the bounded report.
+    Preflight and the final setter boundary stay byte-exact.
+    """
     if not valid_change(change):
         raise BridgeError("target_not_writable", "Native material requires an exact reviewed architectural property owner.", 409)
     value, state, _ = preview_observation(base, element, check, preservation=preservation)
@@ -558,6 +566,10 @@ def read(base, element, change, check=lambda: None, *, preservation=True):
         if "component_tree" in sections:
             report["component_tree_diff"] = component_tree_diff(expected.get("component_tree"),
                                                                 state.get("component_tree"))
+            if post_setter and regenerated_auxiliary_children(change["native_type"], expected, state):
+                if accepted is not None:
+                    accepted.update(report, accepted=REGENERATED_CHILDREN_ACCEPTANCE)
+                return value
         # The Wall-specific reason predates Beam/Column/Slab support; keep it
         # for Walls so earlier journals and reports read the same.
         reason = ("wall_material_invariants_changed" if change["native_type"] == "Wall_TypeUUID"
@@ -624,6 +636,85 @@ def component_tree_diff(expected, current):
             "children_removed": listed(before - after), "children_added": listed(after - before),
             "edges_removed": listed(edges(expected) - edges(current)),
             "edges_added": listed(edges(current) - edges(expected))}
+
+
+REGENERATED_CHILDREN_ACCEPTANCE = "auxiliary_children_regenerated"
+
+# Child types that ModifyElements replaces with new model UUIDs when the
+# native Material setter runs, per family. Native evidence: Beam 0.44.1 and
+# 0.44.2 (only these children regenerated, readback and UI showed the new
+# value, UI Undo restored the original children). No other family is listed
+# without equivalent evidence.
+REGENERABLE_CHILD_TYPES = {
+    "Beam_TypeUUID": frozenset({"AttributeContainer_TypeUUID", "WallAxis_TypeUUID"}),
+}
+
+
+def regenerated_auxiliary_children(native_type, expected, current):
+    """True only if the sole drift is a one-for-one regeneration of listed children.
+
+    Every other state section, the root, lineage, completeness flags and the
+    per-type child counts must be identical, and every removed/added child
+    must hang directly off the unchanged target root.
+    """
+    allowed = REGENERABLE_CHILD_TYPES.get(native_type)
+    if not allowed or not isinstance(expected, dict) or not isinstance(current, dict):
+        return False
+    if set(expected) != set(current) or any(expected[key] != current[key]
+                                            for key in expected if key != "component_tree"):
+        return False
+    before, after = expected.get("component_tree"), current.get("component_tree")
+    if not isinstance(before, dict) or not isinstance(after, dict) or set(before) != set(after):
+        return False
+    if any(before[key] != after[key] for key in before if key not in ("children", "child_parent_edges")):
+        return False
+    if before.get("children_complete") is not True or before.get("parent_chain_complete") is not True:
+        return False
+
+    def children(tree):
+        items = tree.get("children")
+        if not isinstance(items, list) or not all(isinstance(ref, dict) for ref in items):
+            return None
+        return items
+
+    def edges(tree):
+        items = tree.get("child_parent_edges")
+        if not isinstance(items, list) or not all(
+                isinstance(edge, dict) and isinstance(edge.get("child"), dict)
+                and isinstance(edge.get("parent"), dict) for edge in items):
+            return None
+        return {(_tree_key(edge["child"]), _tree_key(edge["parent"])) for edge in items}
+
+    old_children, new_children = children(before), children(after)
+    old_edges, new_edges = edges(before), edges(after)
+    if None in (old_children, new_children, old_edges, new_edges):
+        return False
+    old_keys = {_tree_key(ref) for ref in old_children}
+    new_keys = {_tree_key(ref) for ref in new_children}
+    if len(old_keys) != len(old_children) or len(new_keys) != len(new_children):
+        return False
+    removed, added = old_keys - new_keys, new_keys - old_keys
+    if not removed or not added:
+        return False
+
+    def types(keys):
+        counts = {}
+        for key in keys:
+            name = key.split("|", 1)[0]
+            counts[name] = counts.get(name, 0) + 1
+        return counts
+
+    if types(removed) != types(added) or not set(types(removed)) <= allowed:
+        return False
+    root = _tree_key(before["target"])
+    changed = removed | added
+    # Unchanged children keep their exact edges; each regenerated child has
+    # exactly one edge, to the unchanged reviewed root.
+    if {edge for edge in old_edges if edge[0] not in changed} != {
+            edge for edge in new_edges if edge[0] not in changed}:
+        return False
+    return ({edge for edge in old_edges if edge[0] in changed} == {(key, root) for key in removed}
+            and {edge for edge in new_edges if edge[0] in changed} == {(key, root) for key in added})
 
 
 def write(base, element, change, doc=None, check=lambda: None, *, trace=None):

@@ -7,7 +7,7 @@ instead of repeating per-pair status in prose ([documentation policy](documentat
 Evidence and its limits are in [validation status](validation-status.md);
 open work is in the [development plan](development-plan.md).
 
-Status as of 0.44.0 trial and 0.44.1 candidate (2026-11-02). One active drawing, 1–32 changes per Apply.
+Status as of 0.44.2 trial and 0.45.0 candidate (2026-11-03). One active drawing, 1–32 changes per Apply.
 
 ## Legend
 
@@ -31,7 +31,7 @@ Status as of 0.44.0 trial and 0.44.1 candidate (2026-11-02). One active drawing,
 | Wall | PASS (0.30.0) | CODE | CODE | PARTIAL (ID 1371: post-Undo read only) | PASS (ID 120, 0.31.0) | NONE |
 | SkeletonBeam | REPORTED (ID 508, 0.39.0) | CODE | CODE | CODE | CODE | NONE |
 | Beam | PASS (ID 508 `""`→`TEST-BEAM`, 0.44.0; UI Undo owner-observed, no post-Undo API read) | CODE | CODE | CODE | CODE | NONE |
-| Slab (MultiSlab child) | REPORTED (0.27.0, 0.39.0; owner binding open) | CODE | CODE | CODE | CODE | NONE |
+| Slab (MultiSlab child) | REPORTED (0.27.0, 0.39.0; owner binding open). ID 508 is the UI material (0.44.2 owner observation) | CODE | CODE | CODE | CODE | NONE |
 | MultiSlab | REPORTED (0.39.0; owner binding open) | CODE | CODE | CODE | CODE | NONE |
 
 Computed-only attributes are never written. Attribute definitions are never
@@ -45,8 +45,8 @@ created; an existing definition can be added to an element (`add`/`upsert`).
 | Wall (single tier) | VALUE (0.37.0/0.39.0, preservation unverified) | NONE | REPORTED (`Ogólne03`, 0.27.0) | PARTIAL (subtree absent; no Undo) |
 | Wall (multi tier) | BLOCKED (one tier only) | NONE | CODE (tier-aware route) | — |
 | SkeletonBeam | BLOCKED (no successful write; view discrepancy) | NONE | CODE | FIXTURE (no disposable target) |
-| Beam | OPEN (0.44.1: readback `C30/37` on all views, outcome `unknown` on `component_tree` drift; UI Undo, recovery `old_value_observed`) | NONE | FIXTURE | FIXTURE |
-| Slab (MultiSlab child) | PARTIAL (0.43.0: `SlabProperties` setter ran, readback unchanged `" "`; 0.44.0: one tier, zero-based; 0.44.1: tier 0 Material also `" "`) | NONE | BLOCKED (parented child) | BLOCKED (parented child) |
+| Beam | VALUE (0.44.2: `""`→`C30/37` on all views, UI `C30/37`, reviewed reconciliation of regenerated AttributeContainer/WallAxis; UI Undo restored `""` and the original children). 0.45.0 accepts that regeneration after the setter: `applied` not yet native-observed | NONE | FIXTURE | FIXTURE |
+| Slab (MultiSlab child) | PARTIAL, not the UI material (0.43.0 setter ran, readback `" "`; tier 0 also `" "`; 0.44.2 owner: UI shows `TEST1` = attribute 508). Use attribute 508 | NONE | BLOCKED (parented child) | BLOCKED (parented child) |
 | Slab (standalone) | CODE | NONE | FIXTURE | FIXTURE |
 | MultiSlab | CODE | NONE | BLOCKED (aggregate owner) | FIXTURE |
 | WindowDoor (opening) | — | NONE | CODE | CODE |

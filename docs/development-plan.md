@@ -29,6 +29,7 @@ a separate design and acceptance.
 Other owner decisions (2026-11-02):
 
 - Priority: resolve the Slab native Material problem first (items 1–2).
+  Owner observation 2026-11-03: the Slab UI material is attribute 508.
 - Delivery: the ZIP is the GitHub Actions `package` artifact;
   `evaluation-packages/` is a historical archive (up to 0.33.0).
 - Beam: an architectural beam (`Beam_TypeUUID`, "Podciąg") exists in the
@@ -40,11 +41,11 @@ Other owner decisions (2026-11-02):
 | Priority | What remains / condition for further work |
 | --- | --- |
 | 1 — delivery and older unknowns | 0.42.1 CI/ZIP confirmed by the owner; CI run identity, ZIP hash and upgrade/restore are not independently verified (0.43.0 health: `sha256-verified`). The Slab locks (`a8a31c…`, `9c6a0d…`) are reconciled by read-only recovery with the value unchanged; neither is an applied result. Wall `3f2a8c9d7b5e4a1c9f8e6d3c2b1a0e9f` was reconciled by reviewed reconciliation, preservation=false. Keep the older histories `87a…` and `4388…` described in the handoff. Never retry Apply or delete a journal. |
-| 2 — native Material Slab/MultiSlab: setter has no observable effect | 0.43.0 trial: the post-setter drift is only a regenerated `AttributeContainer` child; the Material readback stays `" "` (not `C35/45`); Undo restored the inventory. Open: why (owner, tier storage or accepted-but-not-applied setter). 0.44.0 native read: child, parent and standalone-view Slab all `TierCount=1`, `GetSlabTierProperties(1)` → `IndexError` (tiers are zero-based); members listed in the [tool reference](tool-reference.md#model_property_probe--isolated-read-phases). 0.44.1 native read: tier 0 `Material` is `" "` on child and MultiSlab, the same as `SlabProperties.Material`; tier 0 exposes `SetMaterial`, `SlabProperties` has no `SetSlabTierProperties`. Next: the owner records the UI material of the slab layer (read-only); the remaining API candidate is an opt-in tier-0 owner write (`GetSlabTierProperties(0).SetMaterial` on the retained properties, then `SetProperties`/`ModifyElements`, readback from tier 0), not yet implemented. Do not repeat the same Apply. See the handoff. |
+| 2 — Slab material: UI material is attribute 508 | Owner observation (0.44.2 trial): the UI shows the slab layer's material as `TEST1`, the value of attribute 508 ("Materiał"); `SlabProperties.Material` and tier 0 `Material` read `" "` (0.44.1), and the 0.43.0 `SlabProperties` setter left the readback unchanged. The native Slab Material route is therefore not the UI material for this shape; the tier-0 write candidate is dropped. Next: attribute 508 write on the Slab child with `property_owner="selected_element"` (item 3), UI check and Undo. Keep the native Slab route's guards; do not repeat its Apply. |
 | 3 — Slab/MultiSlab attributes: reported value PASS, owner incomplete | The reported 0.39.0 Apply/readback PASS stands, but historic payloads and exact owner binding are missing. The 0.41.0 getter (ID 508 `TEST1` on child and parent) does not assign the historic write owner or prove coupling with native Material. Keep `target.property_owner="selected_element"`, lineage/children and the overlap guard. Do not repeat accepted writes to recreate evidence. |
 | 4 — attribute types × families | Close owner-specific roundtrips for every family/type pair in the [matrix](m4-coverage-matrix.md). Column Enum `Status` ID 49 is BLOCKED (`<niezdefiniowany>`, no confirmed label). Wall CheckBox ID 1371 has no raw Apply; no SDK Boolean fixture. Date/vector/object values need exact setter payload and typed readback contracts; an SDK symbol or constructor is not enough ([type coverage](m4-attribute-type-coverage.md)). |
 | 5 — native properties beyond Material (new) | Not started. First write an API note: which `WallTierProperties`, `ColumnProperties`, `BeamProperties`, `StructuralBeamProperties` and `SlabProperties` members (thickness, height/plane references, surface, priority, calculation mode, trade, hatch/filling) have documented setters, their owners and readback; then one property per family with preview, preservation and Undo evidence. The current preservation snapshot already reads many of these values. |
-| 6 — Beam | Fixture "Podciąg, wieniec" (`Beam_TypeUUID`, two root views). Attribute 508 write PASS (0.44.0: Apply/readback on all three representations, UI and Undo owner-observed), despite the children's parent edges using the other root view (still open for SkeletonBeam 1). Native Material (0.44.1, execution `aa7189120e58435e80ca28dfc0996a31`): all three representations read `C30/37` after the write, but `component_tree` preservation drift (third view UUID regenerated) left it `unknown`; UI Undo, recovery `old_value_observed`. 0.44.2 reports `component_tree_diff`; next trial records it and decides reviewed reconciliation. |
+| 6 — Beam | Fixture "Podciąg, wieniec" (`Beam_TypeUUID`, two root views). Attribute 508 write PASS (0.44.0). Native Material: 0.44.1 and 0.44.2 (execution `457f34dbed6d45109ffb397c5d40321c`) both read `C30/37` on every view; the only drift was a one-for-one regeneration of the AttributeContainer and WallAxis children under the unchanged root. 0.44.2 was reconciled by reviewed reconciliation (UI `C30/37`), UI Undo restored `""` and the original children (fresh preview). 0.45.0 accepts exactly that post-setter regeneration as `applied`; next trial confirms `applied`, UI and Undo. |
 | 7 — layer and no-op: partially accepted | Keep W1 read/write, single Undo and the reported no-op in their scope. Remaining family/owner pairs and grouped Undo need evidence. No-op has no Apply path. |
 | 8 — delete and selection: partially accepted / missing | Keep grouped Column delete/Undo and the Wall subtree observation. Other declared families/subtrees need evidence. Native selection remains unsupported pending an installed-SDK set/clear/readback contract ([selection API](m4-native-selection-api.md)); highlight does not close selection. |
 
@@ -63,7 +64,9 @@ those files instead of chat summaries.
    establish its archive state. Do not repeat the inspection without a new
    reason. The Slab unknowns `a8a31c…` and `9c6a0d…` were reconciled by
    read-only recovery (value `" "`). Closure needs delivery accounting.
-2. **Native Material Slab:** 0.41.0 getter-only PASS (exact child and its
+2. **Slab material:** the owner observed (0.44.2) that the UI material is
+   attribute 508; closure now runs through item 3. History of the native route:
+   0.41.0 getter-only PASS (exact child and its
    immediate parent: native Material `" "`, ID 508 `TEST1`, zero setters).
    0.42.0 added the opt-in `exact_target`
    ([contract](m4-editing-api.md#exact-child-native-material-target-0420)); the
@@ -72,9 +75,7 @@ those files instead of chat summaries.
    the UI) shows only the MultiSlab's `AttributeContainer` child replaced, the
    readback still `" "` and Undo restoring the inventory
    ([evidence](test-results/evidence/0.43.0-2026-11-02/evidence-20261102.jsonl)).
-   Closure: a changed flow whose fresh readback/UI shows the new value, then
-   preservation and Undo/restoration; until then the drift category is not
-   accepted as applied.
+   The native Slab Material route stays guarded but is not pursued further.
 3. **Slab/MultiSlab attributes:** keep the reported 0.39.0 value PASS. Missing:
    exact historic payloads, owner bindings, grouping order and
    Undo/restoration. Do not infer parent/child equivalence or relax the
@@ -87,9 +88,9 @@ those files instead of chat summaries.
    described in item 5 of the table.
 6. **Beam:** the fixture exists; add it to the [fixture guide](fixture-guide.md)
    with its refs. Attribute listing (0.43.1) and one attribute write with UI
-   Undo (0.44.0) are observed. Closure: native Material with a reviewed
-   preservation outcome (applied, or reconciled after a reviewed
-   `component_tree_diff`) and Undo.
+   Undo (0.44.0) are observed; native Material was reconciled after a reviewed
+   `component_tree_diff` with UI and Undo (0.44.2). Closure: one 0.45.0 Apply
+   ending `applied` with `accepted_preservation_drift`, UI and Undo.
 7. **Layer and no-op:** the matrix of existing reads and gaps is in
    [validation status](validation-status.md#declared-family-and-owner-evidence-for-layer-and-delete).
    For missing pairs: exact targets, old/new layer, preview/revalidation,

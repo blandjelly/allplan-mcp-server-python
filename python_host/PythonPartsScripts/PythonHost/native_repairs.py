@@ -70,7 +70,7 @@ def observe(doc, base, queries, change, diagnostics=None):
         # exact Slab inventory change is reported, never treated as success.
         roots = resolve(doc, base, queries, change, diagnostics=diagnostics, adapter_owners=owners,
                         all_representations=True, post_write=True)
-        return read_consensus(base, queries, roots, change, diagnostics)
+        return read_consensus(base, queries, roots, change, diagnostics, post_setter=True)
     element = resolve(doc, base, queries, change, adapter_owners=owners)
     return read(base, queries, element, change)
 
