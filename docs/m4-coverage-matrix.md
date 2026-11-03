@@ -7,7 +7,7 @@ instead of repeating per-pair status in prose ([documentation policy](documentat
 Evidence and its limits are in [validation status](validation-status.md);
 open work is in the [development plan](development-plan.md).
 
-Status as of 0.46.0 trial and 0.47.0 candidate (2026-11-03). One active drawing, 1–32 changes per Apply.
+Status as of the 0.47.0 trial (2026-11-03). One active drawing, 1–32 changes per Apply.
 
 ## Legend
 
@@ -31,8 +31,8 @@ Status as of 0.46.0 trial and 0.47.0 candidate (2026-11-03). One active drawing,
 | Wall | PASS (0.30.0) | CODE | CODE | PARTIAL (ID 1371: post-Undo read only) | PASS (ID 120, 0.31.0) | NONE |
 | SkeletonBeam | REPORTED (ID 508, 0.39.0) | CODE | CODE | CODE | CODE | NONE |
 | Beam | PASS (ID 508 `""`→`TEST-BEAM`, 0.44.0; `""`→`C30/37`, 0.45.0, UI, UI Undo and post-Undo read `""`) | CODE | CODE | CODE | CODE | NONE |
-| Slab (MultiSlab child) | PARTIAL: tier storage, not shown in the UI. 0.46.0 read: tier ID 508 `TEST2` (most likely the 0.45.0 write) while the UI shows the MultiSlab's `TEST1`. Non-exact tier writes are blocked and name the MultiSlab (`ui_owner`, 0.47.0); the exact parent-edge tier route is CODE (0.46.0 preview `no_op`). Earlier REPORTED (0.27.0, 0.39.0) without owner binding | CODE | CODE | CODE | CODE | NONE |
-| MultiSlab | PASS (ID 508 `TEST1`→`TEST2`, 0.46.0 execution `04569db1…`: `applied` on view `b4a59b5b…`, UI `TEST2`, UI Undo and post-Undo read `TEST1`; this is the slab material shown in the UI) | CODE | CODE | CODE | CODE | NONE |
+| Slab (MultiSlab child) | VALUE (tier storage, not shown in the UI): exact parent-edge route, ID 508 `TEST2`→`TEST1`, 0.47.0 execution `9b2e4d71…`, `applied` with both tier wrappers agreeing and inventory unchanged; no UI Undo. Non-exact tier writes are blocked and name the MultiSlab (`ui_owner`, 0.47.0 native PASS). Earlier REPORTED (0.27.0, 0.39.0) without owner binding | CODE | CODE | CODE | CODE | NONE |
+| MultiSlab | PASS (ID 508, the slab material shown in the UI: 0.46.0 `04569db1…` `TEST1`→`TEST2`; 0.47.0 plain-language request `3f9c2a7e…` `TEST1`→`TEST3`, `applied` on view `b4a59b5b…`, UI, UI Undo and post-Undo read `TEST1`) | CODE | CODE | CODE | CODE | NONE |
 
 Computed-only attributes are never written. Attribute definitions are never
 created; an existing definition can be added to an element (`add`/`upsert`).
