@@ -238,8 +238,12 @@ def _writable(doc, base, queries, element, change, diagnostics, budget, *, prese
             _conflict("Native material or observed evidence changed before write.")
 
 
-def read_consensus(base, queries, elements, change, diagnostics=None):
-    """Observe every exact live root, preserving read evidence and never setting values."""
+def read_consensus(base, queries, elements, change, diagnostics=None, *, post_setter=False):
+    """Observe every exact live root, preserving read evidence and never setting values.
+
+    ``post_setter`` marks the fresh readback/recovery after a setter, where
+    the reviewed view may accept a listed auxiliary-child regeneration.
+    """
     from .repair_execution import same_observation
     started = queries.clock()
     evidence = {"method": "all_exact_live_root_representations", "representations": [],
@@ -274,9 +278,11 @@ def read_consensus(base, queries, elements, change, diagnostics=None):
         # that view is gone, capture full preservation on EVERY live wrapper;
         # drift (including changed view identity) stays unknown, but agreed
         # native material/ownership can support reviewed reconciliation.
+        accepted = {}
         if valid and material:
             from .wall_material import read as read_material
-            value = read_material(base, element, change, check, preservation=selected is None or element is selected)
+            value = read_material(base, element, change, check, preservation=selected is None or element is selected,
+                                  post_setter=post_setter, accepted=accepted)
         else:
             value = (read(base, queries, element, change) if valid else
                  {"status": "not_checked", "value": None, "reason": "representation_lifecycle_unavailable"})
@@ -287,7 +293,8 @@ def read_consensus(base, queries, elements, change, diagnostics=None):
                           for key, item in lifecycle.items()},
             "readback_status": value.get("status"), "readback_sha256": fingerprint(value),
             **({"reason": value["reason"]} if "reason" in value else {}),
-            **({"preservation": value["preservation"]} if "preservation" in value else {})})
+            **({"preservation": value["preservation"]} if "preservation" in value else {}),
+            **({"accepted_preservation_drift": accepted} if accepted else {})})
         observations.append(value)
         check()
     evidence["complete"] = True

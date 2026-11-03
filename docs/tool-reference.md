@@ -269,6 +269,13 @@ Material flow; it establishes no owner or setter. The observed
 `GetSlabTierProperties`, `GetTierCount`/`SetTierCount`, `VariableTier`,
 `Surface`, `Trade`, `Priority`, `CalculationMode` and `PlaneReferences`.
 
+Owner observation (0.44.2 trial, 2026-11-03): for the MultiSlab child slab
+layer the Allplan UI shows the material **`TEST1`**, i.e. the value of
+attribute 508 ("Materiał"), while `SlabProperties.Material` and tier 0
+`Material` both read `" "`. For this Slab shape the UI material is attribute
+508, not the native Material; use the attribute route with
+`property_owner="selected_element"` below.
+
 Candidate 0.26.0 adds `drawing_identity` for a bounded inventory of one
 foreground drawing. This inventories model/view identity, lineage, and native
 representation across pages; it does not turn a structural inventory into
@@ -729,8 +736,24 @@ report reason `native_material_invariants_changed` (Walls keep
 `wall_material_invariants_changed`); use UI/geometry review when needed. Missing
 views/owners, unreadable evidence, material disagreement or another unknown
 operation keeps the lock and produces no proposal.
-Ordinary preview, revalidation and readback still enforce the full preservation
-fingerprint; this recovery path does not weaken setter eligibility.
+Ordinary preview, revalidation and the final setter boundary still enforce the
+full preservation fingerprint; this recovery path does not weaken setter
+eligibility.
+
+**Regenerated auxiliary children (0.45.0).** Only the fresh readback and
+recovery after a setter accept one narrow drift: for `Beam_TypeUUID`,
+`ModifyElements` replacing `AttributeContainer_TypeUUID`/`WallAxis_TypeUUID`
+children one-for-one (same per-type counts, new model UUIDs) directly under
+the unchanged reviewed root. Every other state section, root, lineage,
+completeness flag and the edges of unchanged children must be identical, and
+all representations must still agree on the new value. The reviewed
+representation then carries `accepted_preservation_drift`
+(`accepted="auxiliary_children_regenerated"`, hashes, `changed_sections`,
+`component_tree_diff`) and the outcome can be `applied`. Any other drift, any
+other family and any drift before the setter keep the previous behaviour
+(`unknown` with a reconciliation proposal, or `repair_conflict`). Native basis:
+the 0.44.1/0.44.2 Beam trials, where only these children were regenerated, the
+UI showed `C30/37` and UI Undo restored the original children.
 
 After reviewing the offered evidence, submit the returned `request` with its
 unchanged `reconciliation_hash` and
