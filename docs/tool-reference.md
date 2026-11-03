@@ -269,6 +269,21 @@ Material flow; it establishes no owner or setter. The observed
 `GetSlabTierProperties`, `GetTierCount`/`SetTierCount`, `VariableTier`,
 `Surface`, `Trade`, `Priority`, `CalculationMode` and `PlaneReferences`.
 
+From 0.48.0 `material_comparison` also reads a single-tier Wall
+(`WallElement.Properties.GetWallTierProperties(1)`, only when `TierCount` is
+1; otherwise `wall_single_tier_required` without a tier read) and a Column
+(`ColumnElement.Properties`). Every observed `native_material` owner carries
+`native_properties`: getter-only `CalculationMode` (with `sdk_label` from the
+SDK code set `0 m3, 1 m2, 2 m, 3 Pcs, 4 kg`, `null` for other codes),
+`Priority` and `Trade` as bounded integers, plus `Thickness` on
+`WallTierProperties` and on each Slab tier row. Each value is read
+independently; a failed or non-integer read is `not_checked` and is not
+coerced, and none of these values affects `evidence_complete`. Pass
+`attribute_ids` such as `[508, 120, 209]` to read `Rodzaj rozliczenia` and
+trade on the same wrappers. `writable_owner` and `attribute_mirror` stay
+`not_established`; equal values do not prove shared storage
+([API note](m4-editing-api.md#native-properties-beyond-material--api-note-plan-item-5)).
+
 Owner observation (0.44.2 trial, 2026-11-03): for the MultiSlab child slab
 layer the Allplan UI shows the material **`TEST1`**, i.e. the value of
 attribute 508 ("Materiał"), while `SlabProperties.Material` and tier 0

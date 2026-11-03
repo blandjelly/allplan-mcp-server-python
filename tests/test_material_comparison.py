@@ -29,10 +29,47 @@ class SlabElement:
         self.Properties = SimpleNamespace(Material=material)
 
 
+class ArchProperties:
+    """ArchBaseProperties double: getters only; every setter fails the test."""
+
+    def __init__(self, material, calculation_mode=0, priority=100, trade=5, **extra):
+        self.Material, self.CalculationMode, self.Priority, self.Trade = material, calculation_mode, priority, trade
+        for name, value in extra.items():
+            setattr(self, name, value)
+
+    def __getattr__(self, name):
+        if name.startswith("Set"):
+            raise AssertionError("Setter must never be resolved: " + name)
+        raise AttributeError(name)
+
+
+class WallProperties:
+    # Not an ArchBaseProperties: no Material on the wall itself.
+    def __init__(self, tiers):
+        self.tiers, self.TierCount, self.tier_calls = tiers, len(tiers), []
+
+    def GetWallTierProperties(self, index):
+        self.tier_calls.append(index)
+        return self.tiers[index - 1]
+
+
+class WallElement:
+    def __init__(self, *tiers):
+        self.Properties = WallProperties(list(tiers))
+
+
+class ColumnElement:
+    def __init__(self, properties):
+        self.Properties = properties
+
+
 class SlabTierProperties:
     # Class-level members, as SDK bindings expose them to dir(type(obj)).
     Material = property(lambda self: self._material)
     Thickness = property(lambda self: 200.0)
+    CalculationMode = property(lambda self: 1)
+    Priority = property(lambda self: 50)
+    Trade = property(lambda self: 0)
 
     def __init__(self, material):
         self._material = material
@@ -80,7 +117,8 @@ class MaterialComparisonTests(unittest.TestCase):
             element.GetAttributes.return_value = [(508, "Żelbet")]
         self.natives = {id(element): StructuralBeamElement("native") for element in self.native_elements}
         self.base.GetElement.side_effect = lambda element: self.natives[id(element)]
-        arch = SimpleNamespace(BeamElement=BeamElement, StructuralBeamElement=StructuralBeamElement, SlabElement=SlabElement)
+        arch = SimpleNamespace(BeamElement=BeamElement, StructuralBeamElement=StructuralBeamElement, SlabElement=SlabElement,
+                               WallElement=WallElement, ColumnElement=ColumnElement)
         modules = patch.dict(sys.modules, {"NemAll_Python_ArchElements": arch})
         modules.start()
         self.addCleanup(modules.stop)
@@ -128,6 +166,75 @@ class MaterialComparisonTests(unittest.TestCase):
                 self.assertEqual(result["metadata"][0]["name_id_round_trip"]["value"], 508)
                 self.assertEqual(value["read_modes"]["ReadAll"]["value"][0]["value"], "Żelbet")
         self.assertFalse(self.path.exists())
+
+    def test_wall_and_column_native_properties_are_read_next_to_attributes_without_setters(self):
+        target = self.material_fixture()
+        self.base.AttributeService.GetAttributeName.side_effect = lambda doc, ident: {508: "Materiał", 120: "Rodzaj rozliczenia"}[ident]
+        self.base.AttributeService.GetAttributeID.side_effect = lambda doc, name: {"Materiał": 508, "Rodzaj rozliczenia": 120}[name]
+        target.GetAttributes.return_value = [(508, "Beton"), (120, 0)]
+        for kind, native, path in (
+            ("Wall_TypeUUID", WallElement(ArchProperties("Beton", Thickness=240.0)),
+             "WallElement.Properties.GetWallTierProperties(1)"),
+            ("Column_TypeUUID", ColumnElement(ArchProperties("Beton", calculation_mode=3)), "ColumnElement.Properties"),
+        ):
+            with self.subTest(kind=kind):
+                target.GetElementAdapterType.return_value.GetTypeName.return_value = kind
+                self.natives[id(target)] = native
+                result = self.comparison(attribute_ids=[508, 120])
+                self.assertEqual(result["state"], "observed", result)
+                material = result["representations"][0]["target"]["value"]["native_material"]
+                self.assertEqual((material["status"], material["value"]), ("observed", "Beton"))
+                self.assertEqual(material["access_path"], path + ".Material")
+                properties = material["native_properties"]
+                self.assertEqual(properties["writable_owner"], "not_established")
+                self.assertEqual(properties["attribute_mirror"], "not_established")
+                values = properties["values"]
+                self.assertEqual(values["CalculationMode"]["access_path"], path + ".CalculationMode")
+                self.assertEqual(values["Priority"]["value"], 100)
+                self.assertEqual(values["Trade"]["value"], 5)
+                if kind == "Wall_TypeUUID":
+                    self.assertEqual(properties["owner"], "WallTierProperties")
+                    self.assertEqual((values["CalculationMode"]["value"], values["CalculationMode"]["sdk_label"]), (0, "m3"))
+                    self.assertEqual(values["Thickness"]["value"], 240.0)
+                    self.assertEqual(native.Properties.tier_calls, [1])
+                else:
+                    self.assertEqual(properties["owner"], "ColumnProperties")
+                    self.assertEqual(values["CalculationMode"]["sdk_label"], "Pcs")
+                    self.assertNotIn("Thickness", values)
+
+    def test_multi_tier_wall_reads_no_tier_and_no_property(self):
+        target = self.material_fixture()
+        target.GetElementAdapterType.return_value.GetTypeName.return_value = "Wall_TypeUUID"
+        native = WallElement(ArchProperties("A"), ArchProperties("B"))
+        self.natives[id(target)] = native
+        result = self.comparison()
+        material = result["representations"][0]["target"]["value"]["native_material"]
+        self.assertEqual((material["status"], material["reason"], material["tier_count"]),
+                         ("not_checked", "wall_single_tier_required", 2))
+        self.assertNotIn("native_properties", material)
+        self.assertEqual(native.Properties.tier_calls, [])
+        self.assertFalse(result["evidence_complete"])
+
+    def test_invalid_native_property_values_are_not_coerced_and_stay_independent(self):
+        target = self.material_fixture()
+        target.GetElementAdapterType.return_value.GetTypeName.return_value = "Column_TypeUUID"
+        self.natives[id(target)] = ColumnElement(ArchProperties("X", calculation_mode=True, priority=2.0, trade=7))
+        result = self.comparison()
+        material = result["representations"][0]["target"]["value"]["native_material"]
+        values = material["native_properties"]["values"]
+        self.assertEqual(material["value"], "X")
+        self.assertEqual(values["CalculationMode"]["status"], "not_checked")
+        self.assertNotIn("sdk_label", values["CalculationMode"])
+        self.assertEqual(values["Priority"]["status"], "not_checked")
+        self.assertEqual((values["Trade"]["status"], values["Trade"]["value"]), ("observed", 7))
+        self.natives[id(target)] = ColumnElement(ArchProperties("X", calculation_mode=9))
+        values = self.comparison()["representations"][0]["target"]["value"]["native_material"]["native_properties"]["values"]
+        self.assertEqual((values["CalculationMode"]["value"], values["CalculationMode"]["sdk_label"]), (9, None))
+        self.natives[id(target)] = ColumnElement(SimpleNamespace(Material="X"))
+        result = self.comparison()
+        material = result["representations"][0]["target"]["value"]["native_material"]
+        self.assertTrue(all(row["status"] == "not_checked" for row in material["native_properties"]["values"].values()))
+        self.assertEqual(result["state"], "observed")
 
     def test_slab_child_and_optional_parent_keep_distinct_native_values_and_lineage(self):
         child = self.element(2, name="Slab_TypeUUID")
@@ -355,6 +462,10 @@ class MaterialComparisonTests(unittest.TestCase):
         self.assertIn("Thickness", tiers["tiers"][0]["members"]["value"]["names"])
         self.assertIn("GetSlabTierProperties", tiers["properties_members"]["value"]["names"])
         self.assertEqual(tiers["tiers"][0]["access_path"], "SlabProperties.GetSlabTierProperties(0).Material")
+        tier_values = tiers["tiers"][0]["native_properties"]["values"]
+        self.assertEqual(tier_values["Thickness"]["value"], 200.0)
+        self.assertEqual(tier_values["CalculationMode"]["sdk_label"], "m2")
+        self.assertEqual(tier_values["Thickness"]["access_path"], "SlabProperties.GetSlabTierProperties(0).Thickness")
         parent_tiers = result["representations"][0]["parent"]["value"]["evidence"]["native_material"]["slab_tiers"]
         self.assertEqual(parent_tiers["tier_api"], "absent")
         self.assertEqual(result["setter_calls_started"], 0)

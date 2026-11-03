@@ -499,6 +499,131 @@ evidence in [validation status](validation-status.md). This SDK note describes
 API contracts only; the current candidate and required owner trials are in the
 [handoff](next-model-handoff.md).
 
+## Native properties beyond Material — API note (plan item 5)
+
+Sources reviewed **2026-11-03** for the Python API **2026**:
+[ArchBaseProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/ArchBaseProperties/),
+[WallProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/WallProperties/),
+[WallTierProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/WallTierProperties/),
+[ColumnProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/ColumnProperties/),
+[VerticalElementProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/VerticalElementProperties/),
+[BeamProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/BeamProperties/),
+[StructuralBeamProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/StructuralBeamProperties/),
+[StructuralElementProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/StructuralElementProperties/),
+[SlabProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/SlabProperties/),
+[SlabTierProperties](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/SlabTierProperties/),
+[PlaneReferences](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/PlaneReferences/)
+and the [element modification manual](https://pythonparts.allplan.com/2026/manual/features/model_access/element_modification/).
+Each subsection keeps SDK documentation (**SDK**), hypotheses (**H**) and
+native observations (**N**) apart. No runtime write exists for any field below.
+
+### SDK: shared members and owners
+
+All five property classes derive from `ArchBaseProperties` (Column through
+`VerticalElementProperties`, StructuralBeam through
+`StructuralElementProperties`). `WallProperties` does **not**: shared members
+of a Wall live on `GetWallTierProperties(i)`. The SDK documents a writable
+property and an explicit setter for each shared member:
+
+| Member (type) | Setter | SDK meaning | Existing read |
+| --- | --- | --- | --- |
+| `CalculationMode` (int) | `SetCalculationMode(int)` | closed code set `0: m3`, `1: m2`, `2: m`, `3: Pcs`, `4: kg` | preservation snapshot |
+| `Priority` (int) | `SetPriority(int)` | priority; no range documented | preservation snapshot |
+| `Trade` (int) | `SetTrade(int)` | index into the enumeration attribute `trade` (`@209@`) | preservation snapshot |
+| `Hatch`, `Filling`, `Pattern`, `FaceStyle` (int) | `SetHatch`, `SetFilling`, `SetPattern`, `SetFaceStyle` | resource IDs; validity depends on the project's resources | preservation snapshot |
+| `Surface` (str) | `SetSurface(str)` | surface name and path (rendering, not material) | preservation snapshot |
+| `Factor` (float), `CircleDivision` (int), `Name` (str), `Status` (int) | matching `Set…` | formatting/quantity helpers | preservation snapshot |
+| `PlaneReferences` | `SetPlaneReferences(PlaneReferences)` | height/plane binding: bottom/top reference plane, offsets, elevations, `SetHeight`, dependencies | bounded `repr` only (no codec) |
+| `CommonProperties` | `SetCommonProperties` | pen, stroke, colour, layer | preservation snapshot |
+
+Family-specific geometry members (all with documented setters):
+
+| Owner | Members | Note |
+| --- | --- | --- |
+| `WallTierProperties` (Wall, one tier) | `Thickness` / `SetThickness(float)` | tier index 1 on the observed single-tier Walls; `WallProperties.GetThickness` is read-only (total) |
+| `VerticalElementProperties` (Column) | `Width`, `Depth`, `Radius`, `Angle`, `ShapeType`, `ShapePolygon`, `ProfileFullName`, `SetSize`, `SetCornerRadius` | cross-section; height is `PlaneReferences` |
+| `BeamProperties` (Beam) | `Width`, `ShapeType`, `ProfileFullName`, `Axis` | height is `PlaneReferences` |
+| `StructuralBeamProperties` (StructuralBeam) | start/end points, `SetHeightProperties(doc, PlaneReferences)`, anchor points, profile angle | element-level geometry; needs the document |
+| `SlabProperties` (Slab/MultiSlab) | `TierCount`, `VariableTier`, `GetSlabTierProperties(i)` → `SlabTierProperties.Thickness` / `SetThickness(float)` | tiers zero-based (N, 0.44.0) |
+
+Persistence route (SDK, modification manual): read the element's properties,
+change them, reassign them with the element class's setter (`SetProperties`,
+or `SetStructuralBeamProperties`) and submit the same native object with
+`ModifyElements`. The manual warns that `ModifyElements` may do nothing when
+an internal modification function is absent, so a setter on the Python object
+does not prove persistence.
+
+### Native observations relevant to the choice
+
+- **N:** the existing preservation snapshot reads `CalculationMode`,
+  `Priority`, `Trade`, `Thickness`, `Hatch`, `Filling`, `Surface` and the rest
+  of the scalar set on the bound owner for every native Material preview
+  (Wall tier 1, Column, Beam, Slab/MultiSlab) as optional reads. Their values
+  stay inside the plan's bound state and are not reported separately, so no
+  value of these fields has been observed by the owner.
+- **N (0.31.0):** Wall attribute ID 120 `Rodzaj rozliczenia` (Enum, `m3`/`m2`)
+  was written through `ChangeAttributes` with UI Undo. Its labels match the
+  `CalculationMode` code set.
+- **N (0.27.0 report):** a `Priorytet` attribute was written on two results
+  without an ID or payload in the log.
+- **N (0.43.0):** `SlabProperties.SetMaterial` ran, `ModifyElements` returned,
+  and the readback stayed `" "` — the Slab property route may not persist a
+  `SlabProperties` change. The UI slab material is the MultiSlab's attribute
+  508 (0.46.0).
+- **N (0.44.1/0.44.2/0.46.0):** a Beam native Material write regenerates the
+  Beam's `AttributeContainer`/`WallAxis` children one-for-one; this is the only
+  accepted drift (`auxiliary_children_regenerated`).
+- **H:** `CalculationMode` mirrors attribute 120 and `Trade` mirrors attribute
+  209 on the same element (SDK text names `@209@`; the 0.31.0 labels match).
+  If true, a native write changes an `AttributeContainer` value and the
+  preservation comparison must expect exactly that attribute to change; if
+  false, the two routes are separate storage. Not observed.
+
+### One candidate per family
+
+`CalculationMode` is the first candidate for all four families: a documented
+closed code set (no resource catalogue), no geometry change, an existing
+preservation read, and a probable independent readback through attribute 120.
+`Thickness` (Wall tier, Slab tier) is the second wave: it changes geometry, so
+the geometry stream, joins and neighbours become expected changes and need a
+separate acceptance rule. `Priority` is not first because it changes
+intersection results with neighbours. `Trade`, `Hatch`, `Filling`, `Surface`
+need a validated resource/enumeration value, and `PlaneReferences` has no
+portable codec.
+
+| Family | Owner and route | Preservation that must stay equal |
+| --- | --- | --- |
+| Wall (single tier) | `WallElement.Properties.GetWallTierProperties(1).SetCalculationMode`, `SetProperties`, `ModifyElements` | tier Material and all other tier scalars, common properties, `PlaneReferences`/`SurfaceElementProperties` repr, axis, geometry stream, attribute containers except a verified mirror, component tree |
+| Column | `ColumnElement.Properties.SetCalculationMode`, `SetProperties`, `ModifyElements` | Material, other scalars, common properties, plane references repr, cross-section members, geometry, attribute containers except a verified mirror, children |
+| Beam / StructuralBeam | `BeamProperties` via `Properties`/`SetProperties`, or `StructuralBeamProperties` via `SetStructuralBeamProperties`; class checked at runtime | as Column; the Beam's one-for-one `AttributeContainer`/`WallAxis` regeneration is the only accepted structural drift, and only after it is observed for this field |
+| Slab / MultiSlab | `SlabElement.Properties.SetCalculationMode` on the MultiSlab shown in the UI (the 0.46.0 owner); tier writes stay out | Material, tier count/thickness, other scalars, child tiers and their attribute containers. Highest risk: 0.43.0 suggests a `SlabProperties` change may not persist |
+
+Write/readback/Undo plan for each family (step 2 of item 5, not implemented):
+
+1. **Read-only precheck (no setter).** On the exact owner, read native
+   `CalculationMode`, `Priority`, `Trade` (and tier `Thickness`) next to
+   attributes 120 and 209 on the same wrapper. This decides the mirror
+   hypothesis before any write.
+2. **Preview.** Exact target and owner binding as for native Material; old
+   value must be one of codes 0–4; new value must be another code (no no-op
+   Apply); the plan binds the full preservation snapshot with the target field
+   excluded.
+3. **Apply.** Fresh revalidation, journal entry, final write guard, one setter
+   on the bound owner, reassignment, one `ModifyElements` call. No retry after
+   an unknown outcome.
+4. **Readback.** Fresh `GetElement` on every live wrapper: native
+   `CalculationMode` must equal the new code; attribute 120 is read as the
+   independent cross-check (expected to change only if the mirror was
+   observed in step 1); every other preservation field must be unchanged.
+5. **Undo.** One UI Undo; the restoration read must return the old code (and
+   the old attribute 120 value). The owner confirms the UI field
+   ("Rodzaj rozliczenia" in the properties palette).
+
+Open questions: whether the MultiSlab is also the UI owner of
+`CalculationMode` for a slab; whether the Beam regeneration repeats for a
+non-material field; whether `Trade` codes map one-to-one to the project's
+attribute 209 labels.
+
 
 
 ## Earlier findings by version
