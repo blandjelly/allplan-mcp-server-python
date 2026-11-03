@@ -72,9 +72,19 @@ class EditOwnershipTests(unittest.TestCase):
         self.attribute_catalog({508: "Materiał"})
         return slab, aggregate
 
+    def test_slab_tier_attribute_owner_without_exact_target_is_blocked(self):
+        # 0.45.0 trial: a write on the SelectAllElements wrapper of a MultiSlab
+        # tier read back once and did not persist in the UI.
+        self.material_slabs()
+        plan = self.explicit_material_plan("Slab_TypeUUID")
+        self.assertFalse(plan["apply_available"], plan)
+        self.assertEqual(plan["changes"], [])
+        self.assertEqual(plan["blocked"][0]["reason"], "slab_tier_requires_exact_parent_edge_target")
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
     def test_explicit_slab_material_owner_apply_readback_replay_no_op_without_redirect(self):
         slab, aggregate = self.material_slabs()
-        for kind, target, other in (("MultiSlab_TypeUUID", aggregate, slab), ("Slab_TypeUUID", slab, aggregate)):
+        for kind, target, other in (("MultiSlab_TypeUUID", aggregate, slab),):
             with self.subTest(kind=kind):
                 target.GetAttributes.return_value = [(508, "old")]
                 self.base.ElementsAttributeService.ChangeAttributes.reset_mock()
@@ -119,16 +129,27 @@ class EditOwnershipTests(unittest.TestCase):
         self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
 
     def test_explicit_parent_child_material_overlap_blocks_before_setters(self):
-        self.material_slabs()
+        slab, _ = self.material_slabs()
         request = self.request(predicate=None, native_types=["Slab_TypeUUID", "MultiSlab_TypeUUID"], changes=[{
             "target": {"kind": "attribute", "attribute_id": 508, "property_owner": "selected_element"},
             "value": "Beton1"}])
         plan = self.call(request)
         self.assertFalse(plan["apply_available"])
-        self.assertIn("overlapping_slab_property_owners", {row["reason"] for row in plan["blocked"]})
+        # The tier is blocked before the overlap guard can see two changes.
+        self.assertEqual({row["reason"] for row in plan["blocked"]},
+                         {"slab_tier_requires_exact_parent_edge_target"})
         execution = importlib.import_module(self.module.__package__ + ".repair_execution")
         forged = copy.deepcopy(plan)
         forged["state"], forged["blocked"] = "preview_ready", []
+        aggregate_change, = forged["changes"]
+        tier = copy.deepcopy(aggregate_change)
+        lineage = aggregate_change["resource"]["component_ownership"]["value"]["lineage"]
+        tier["ref"]["model_uuid"] = slab.GetModelElementUUID()
+        tier["resource"]["component_ownership"]["value"]["lineage"] = [
+            {**lineage[0], "model_uuid": tier["ref"]["model_uuid"], "type_name": "Slab_TypeUUID"}, lineage[0]]
+        forged["changes"].append(tier)
+        ownership = importlib.import_module(self.module.__package__ + ".component_ownership")
+        self.assertTrue(ownership.overlapping_slab_owners(forged["changes"]))
         self.assertFalse(execution.RepairExecutor.model_edit_scope(forged))
         self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
 
@@ -288,3 +309,167 @@ class EditOwnershipTests(unittest.TestCase):
         self.assertFalse(result["next_action"]["automatic_highlight_fallback"])
         self.module.AllplanIFW.HighlightService.HighlightElements.assert_not_called()
         self.base.ElementsSelectService.SelectAllElements.assert_not_called()
+
+
+class ExactTierAttributeTests(unittest.TestCase):
+    """0.46.0: a MultiSlab tier attribute is written on its parent-edge view."""
+    locals().update({name: value for name, value in vars(EditOwnershipTests).items()
+                     if not name.startswith("test_") and not name.startswith("__")})
+
+    def exact_tier(self, shared=True, container=False):
+        slab, aggregate = self.material_slabs()
+        edge = copy.deepcopy(slab)
+        edge.GetElementUUID.return_value = str(uuid4())
+        if shared:
+            edge.GetAttributes = slab.GetAttributes  # one native attribute store
+        self.parents[id(edge)] = aggregate
+        self.children[id(edge)] = []
+        self.children[id(aggregate)] = [edge]
+        if container:
+            box = self.element(97, name="AttributeContainer_TypeUUID")
+            self.parents[id(box)] = aggregate
+            self.children[id(box)] = []
+            self.children[id(aggregate)].append(box)
+        self.base.ElementsSelectService.SelectAllElements.return_value = [slab, aggregate]
+        self.exact = {"drawing_file": 101, "model_uuid": edge.GetModelElementUUID(),
+                      "view_uuid": edge.GetElementUUID(), "parent_ref": {
+                          "model_uuid": aggregate.GetModelElementUUID(),
+                          "view_uuid": aggregate.GetElementUUID()}}
+        return slab, aggregate, edge
+
+    def exact_plan(self, **change):
+        return self.preview(native_types=["Slab_TypeUUID"], predicate=None, exact_target=self.exact,
+                            changes=[{"target": {"kind": "attribute", "attribute_id": 508,
+                                                 "property_owner": "selected_element"},
+                                      "value": "Beton1", **change}])
+
+    def test_exact_tier_attribute_writes_parent_edge_view_and_reads_every_view(self):
+        slab, _, edge = self.exact_tier()
+        plan = self.exact_plan()
+        self.assertTrue(plan["apply_available"], plan)
+        change, = plan["changes"]
+        self.assertEqual(change["target_view_uuid"], self.exact["view_uuid"])
+        self.assertEqual(change["resource"]["component_ownership"]["value"]["target"]["view_uuid"],
+                         self.exact["view_uuid"])
+        self.assertEqual(change["resource"]["exact_target_binding"]["target"], self.exact)
+        self.highlight(plan)
+        execution = uuid4().hex
+        result = self.apply(plan, execution)
+        self.assertEqual(result["state"], "completed", result)
+        setter = self.base.ElementsAttributeService.ChangeAttributes
+        setter.assert_called_once()
+        self.assertIs(setter.call_args.args[1][0], edge)
+        outcome, = result["outcomes"]
+        self.assertEqual(outcome["readback"]["value"], "Beton1")
+        consensus = outcome["representation_consensus"]
+        self.assertEqual({row["view_uuid"] for row in consensus["representations"]},
+                         {slab.GetElementUUID(), edge.GetElementUUID()})
+        self.assertTrue(consensus["reviewed_view_present"])
+        self.assertEqual(consensus["exact_inventory"]["status"], "unchanged")
+        self.assertTrue(self.apply(plan, execution)["replayed"])
+        setter.assert_called_once()
+        self.assertEqual(self.exact_plan()["state"], "no_op")
+
+    def test_tier_write_that_other_view_does_not_show_stays_unknown(self):
+        # The 0.45.0 symptom inverted: the reviewed view changes, another
+        # wrapper of the same tier keeps the old value. Never applied.
+        slab, _, edge = self.exact_tier(shared=False)
+        edge.GetAttributes.return_value = list(slab.GetAttributes.return_value)
+        plan = self.exact_plan()
+        self.assertTrue(plan["apply_available"], plan)
+        self.highlight(plan)
+        execution = uuid4().hex
+        result = self.apply(plan, execution)
+        outcome, = result["outcomes"]
+        self.assertEqual(outcome["state"], "unknown", outcome)
+        self.assertFalse(outcome["representation_consensus"]["agreed"])
+        self.assertEqual(dict(slab.GetAttributes.return_value)[508], "old")
+        recovered = self.recover(execution)
+        self.assertEqual(recovered["outcomes"][0]["state"], "unknown")
+        self.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+
+    def test_regenerated_attribute_container_is_accepted_after_setter(self):
+        self.post_setter_drift("container")
+
+    def test_other_post_setter_inventory_drift_stays_unknown(self):
+        self.post_setter_drift("extra_child")
+
+    def post_setter_drift(self, drift):
+        _, aggregate, edge = self.exact_tier(container=True)
+        setter = self.base.ElementsAttributeService.ChangeAttributes
+        write = setter.side_effect
+
+        def regenerate(*args):
+            write(*args)
+            if drift == "container":
+                fresh = self.element(96, name="AttributeContainer_TypeUUID")
+                self.parents[id(fresh)] = aggregate
+                self.children[id(fresh)] = []
+                self.children[id(aggregate)] = [edge, fresh]
+            else:
+                extra = self.element(95, name="Slab_TypeUUID")
+                self.parents[id(extra)] = aggregate
+                self.children[id(extra)] = []
+                self.children[id(aggregate)].append(extra)
+
+        setter.side_effect = regenerate
+        plan = self.exact_plan()
+        self.assertTrue(plan["apply_available"], plan)
+        self.highlight(plan)
+        result = self.apply(plan)
+        outcome, = result["outcomes"]
+        inventory = outcome["representation_consensus"]["exact_inventory"]
+        self.assertEqual(inventory["status"], "changed")
+        if drift == "container":
+            self.assertEqual(outcome["state"], "applied", outcome)
+            self.assertEqual(inventory["accepted"], "attribute_containers_regenerated")
+        else:
+            self.assertEqual(outcome["state"], "unknown", outcome)
+            self.assertEqual(outcome["reason"], "exact_inventory_changed_after_setter")
+            self.assertNotIn("accepted", inventory)
+        setter.assert_called_once()
+
+    def test_exact_tier_attribute_contract_is_narrow(self):
+        from allplan_mcp.model_edit_models import ModelEditPreview
+        self.exact_tier()
+        owner = {"kind": "attribute", "attribute_id": 508, "property_owner": "selected_element"}
+        valid = self.request(native_types=["Slab_TypeUUID"], predicate=None, exact_target=self.exact,
+                             changes=[{"target": owner, "value": "Beton1"}])
+        ModelEditPreview.model_validate(valid)
+        for change in ({"target": owner, "value": "Beton1", "mode": "upsert"},
+                       {"target": owner, "value": "Beton1", "mode": "add"},
+                       {"target": {"kind": "attribute", "attribute_id": 508}, "value": "Beton1"},
+                       {"target": {"kind": "attribute", "name": "Materiał", "property_owner": "selected_element"},
+                        "value": "Beton1"},
+                       {"target": {"kind": "layer", "short_name": "W1"}}):
+            request = {**valid, "changes": [change]}
+            with self.subTest(change=change):
+                self.assert_code("invalid_payload", lambda: self.call(request))
+                with self.assertRaises(ValueError):
+                    ModelEditPreview.model_validate(request)
+        with self.assertRaises(ValueError):
+            ModelEditPreview.model_validate({**valid, "attribute_ids": [508]})
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+    def test_container_regeneration_classifier_is_one_for_one(self):
+        target = importlib.import_module(self.module.__package__ + ".exact_material_target")
+        tier, box, other = "Slab_TypeUUID|t|v", "AttributeContainer_TypeUUID|a|a", "AttributeContainer_TypeUUID|b|b"
+        parent = "MultiSlab_TypeUUID|m|v"
+
+        def summary(children, edges=(tier + ">" + parent,), **scalars):
+            return {"schema_version": target.INVENTORY_SUMMARY_SCHEMA, "parent_representation_count": 1,
+                    "child_visits": len(children), "target_in_direct_scan": True, **scalars,
+                    "edges": list(edges), "parents": [{"parent": parent, "children": list(children)}]}
+
+        before = summary([tier, box])
+        self.assertTrue(target.attribute_containers_regenerated(before, summary([tier, other])))
+        self.assertFalse(target.attribute_containers_regenerated(before, before))
+        self.assertFalse(target.attribute_containers_regenerated(before, summary([tier, box, other])))
+        self.assertFalse(target.attribute_containers_regenerated(before, summary([tier])))
+        self.assertFalse(target.attribute_containers_regenerated(
+            before, summary(["Slab_TypeUUID|t|w", other])))
+        self.assertFalse(target.attribute_containers_regenerated(
+            before, summary([tier, other], edges=())))
+        self.assertFalse(target.attribute_containers_regenerated(
+            before, summary([tier, other], target_in_direct_scan=False)))
+        self.assertFalse(target.attribute_containers_regenerated({"schema_version": "x"}, before))

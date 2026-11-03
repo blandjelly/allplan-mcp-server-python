@@ -203,6 +203,41 @@ pre-Apply one. Why the value does not change (property owner, tier-level
 storage, or a setter that is accepted but not applied in this build) is an open
 question, not a diagnosed cause. A drift report never authorizes a write.
 
+#### Slab tier attribute writes and the parent-edge view (0.45.0 observation, 0.46.0 contract)
+
+**Native observation (0.45.0, Allplan 2026.1,
+[raw evidence](test-results/evidence/0.45.0-2026-11-03/evidence-20261103.jsonl)).**
+The MultiSlab tier `8a693925…` has two wrappers in drawing 101: the
+`SelectAllElements` wrapper `7f9df4e3…` (`IsInMacro=true`; its own
+AttributeContainer child is edged to the other view) and the parent-edge
+wrapper `a0fcd7b3…`, returned only through the MultiSlab
+(`bf097d95…`/`b4a59b5b…`) child enumeration. A predicate preview of attribute
+508 with `property_owner="selected_element"` saw only `7f9df4e3…`; two Apply
+calls (`686a0ea5f98c47ad993fb570c389fbd8`, `010dc61bba7d4542ba8933d63bc4e7c5`)
+ran `ChangeAttributes` on it and read back `TEST2` on that single wrapper
+(`applied`), yet the owner saw the slab-layer material unchanged in the UI
+and a read about a minute after the first Apply returned `TEST1` on
+`7f9df4e3…`. The log contains no read of `a0fcd7b3…` after either setter and
+no owner Undo record, so it does not establish whether the setter was
+reverted, stored on a transient macro wrapper or shown from another
+representation. The `applied` outcomes overclaim: the consensus contained one
+of the tier's two wrappers.
+
+**Contract (0.46.0, automated tests only).** A `selected_element` attribute
+write on a Slab whose lineage is `[Slab, MultiSlab]` requires `exact_target`
+naming the tier's parent-edge view and the MultiSlab model/view; otherwise the
+plan blocks with `slab_tier_requires_exact_parent_edge_target`. With it, the
+planner binds the ownership evidence of the parent-edge view, the M1 field
+consensus and Apply preflight read every wrapper of the tier model,
+`ChangeAttributes` targets the parent-edge wrapper, and the fresh readback
+requires the new value on every wrapper. The post-setter exact inventory may
+differ only by a one-for-one `AttributeContainer_TypeUUID` replacement per
+parent (the 0.43.0 observation after `ModifyElements`), reported as
+`exact_inventory.accepted="attribute_containers_regenerated"`; any other
+change stays `unknown`. Open questions for the native trial: whether
+`ChangeAttributes` on the parent-edge wrapper persists, whether both wrappers
+then agree, and whether the UI shows it.
+
 Example using the retained 0.41.0 target refs; replace the value with the exact
 reviewed native material string. Do not apply this sample to repeat historical
 Slab writes:

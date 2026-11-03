@@ -160,6 +160,21 @@ def slab_write_blocker(evidence, change=None):
                     and target["type_name"] == "Slab_TypeUUID"
                     and lineage[1].get("type_name") == "MultiSlab_TypeUUID"))):
             return "slab_explicit_property_owner_invalid"
+        if len(lineage) == 2:
+            # 0.45.0 trial: ChangeAttributes on the SelectAllElements wrapper of
+            # a MultiSlab tier read back the new value once, later reads and the
+            # UI kept the old one. A tier write must name the tier's parent-edge
+            # representation through exact_target so the reviewed view and the
+            # post-setter consensus include it (0.46.0).
+            exact = resource.get("exact_target_binding")
+            target_binding = exact.get("target") if isinstance(exact, dict) else None
+            parent = lineage[1]
+            if (not isinstance(target_binding, dict)
+                    or target_binding.get("model_uuid") != target.get("model_uuid")
+                    or target_binding.get("view_uuid") != target.get("view_uuid")
+                    or target_binding.get("parent_ref") != {"model_uuid": parent.get("model_uuid"),
+                                                            "view_uuid": parent.get("view_uuid")}):
+                return "slab_tier_requires_exact_parent_edge_target"
         return None
     if "property_owner" in resource:
         return "slab_explicit_property_owner_invalid"

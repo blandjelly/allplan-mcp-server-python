@@ -128,6 +128,15 @@ def _validate_predicate(node, depth=0, budget=None):
         raise ValueError("Unknown model_query predicate operator.")
 
 
+def _exact_target_edit(edit) -> bool:
+    """Native Material, or one explicit selected-element attribute replace (0.46.0)."""
+    if isinstance(edit, NativeMaterialEdit):
+        return True
+    return (isinstance(edit, AttributeEdit) and edit.target.attribute_id is not None
+            and edit.target.name is None and edit.target.property_owner == "selected_element"
+            and edit.mode == "replace")
+
+
 class ExactSlabTarget(ContractModel):
     drawing_file: Annotated[int, Field(ge=1, le=2147483647)]
     model_uuid: Annotated[str, Field(pattern=r"^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$")]
@@ -170,10 +179,11 @@ class ModelEditPreview(ContractModel):
                     or t.parent_ref["model_uuid"] == t.model_uuid
                     or self.native_types != ["Slab_TypeUUID"] or self.predicate is not None
                     or self.exclude_model_uuids or self.attribute_ids
-                    or len(self.changes) != 1 or not isinstance(self.changes[0], NativeMaterialEdit)
+                    or len(self.changes) != 1 or not _exact_target_edit(self.changes[0])
                     or not isinstance(self.scope, QueryScope)
                     or self.scope.drawing_files != [t.drawing_file] or self.scope.include_passive):
-                raise ValueError("exact_target requires one explicit foreground Slab native-material target without criteria or exclusions.")
+                raise ValueError("exact_target requires one explicit foreground Slab native-material edit, or one "
+                                 "attribute_id replace with property_owner=selected_element, without criteria or exclusions.")
         _validate_predicate(self.predicate.model_dump(by_alias=True, exclude_unset=True) if self.predicate else None)
         if len(set(self.native_types)) != len(self.native_types):
             raise ValueError("native_types must be distinct.")

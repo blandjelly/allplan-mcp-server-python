@@ -77,7 +77,10 @@ def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapte
     exact = (change.get("resource") or {}).get("exact_target_binding")
     if exact is not None:
         from .exact_material_target import locate
-        if (change.get("operation") != "set_native_material" or native_type != "Slab_TypeUUID"
+        exact_attribute = (change.get("operation") == "set_attribute"
+                           and (change.get("resource") or {}).get("property_owner") == "selected_element")
+        if ((change.get("operation") != "set_native_material" and not exact_attribute)
+                or native_type != "Slab_TypeUUID"
                 or exact["target"]["model_uuid"] != ref["model_uuid"]
                 or exact["target"]["drawing_file"] != ref["drawing_file"]
                 or exact["target"]["view_uuid"] != change.get("target_view_uuid")):
@@ -88,7 +91,8 @@ def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapte
             _conflict("Post-setter exact inventory observation is read-only.")
         drift = {} if post_write else None
         base, _ = locate(doc, base, exact["target"], budget, trace, expected=exact["inventory_fingerprint"],
-                         drift=drift, expected_summary=exact.get("inventory_summary"))
+                         drift=drift, expected_summary=exact.get("inventory_summary"),
+                         accept_attribute_containers=exact_attribute)
         if drift is not None and diagnostics is not None:
             diagnostics["exact_inventory"] = drift
         if adapter_owners is not None:
@@ -256,9 +260,18 @@ def read_consensus(base, queries, elements, change, diagnostics=None, *, post_se
     material = change.get("operation") == "set_native_material"
     selected = next((element for element in elements
                      if guid(element.GetElementUUID()) == change.get("target_view_uuid")), None)
-    if material:
+    exact_attribute = (not material and change.get("operation") in {"set_attribute", "add_attribute"}
+                       and (change.get("resource") or {}).get("exact_target_binding") is not None)
+    if material or exact_attribute:
         evidence.update(reviewed_view_uuid=change.get("target_view_uuid"),
                         reviewed_view_present=selected is not None)
+    if exact_attribute and selected is None:
+        # The parent-edge view is the reviewed write target; without it the
+        # remaining wrappers cannot establish the tier's value.
+        evidence["complete"] = True
+        if diagnostics is not None:
+            diagnostics.update(evidence)
+        return {"status": "not_checked", "value": None, "reason": "reviewed_view_missing"}
     seconds = queries.SCAN_SECONDS
     if material:
         from .model_edit import MATERIAL_EVIDENCE_SECONDS
@@ -284,7 +297,10 @@ def read_consensus(base, queries, elements, change, diagnostics=None, *, post_se
             value = read_material(base, element, change, check, preservation=selected is None or element is selected,
                                   post_setter=post_setter, accepted=accepted)
         else:
-            value = (read(base, queries, element, change) if valid else
+            # An exact Slab tier verifies its reviewed owner on the reviewed
+            # view; the other wrappers of the same model must agree on value.
+            ownership = not exact_attribute or element is selected
+            value = (read(base, queries, element, change, ownership=ownership) if valid else
                  {"status": "not_checked", "value": None, "reason": "representation_lifecycle_unavailable"})
         # Retain raw agreed readback in the outcome, but do not duplicate up to
         # 8192 characters per view into the bounded durable journal.
@@ -318,7 +334,7 @@ def read_consensus(base, queries, elements, change, diagnostics=None, *, post_se
     return first
 
 
-def read(base, queries, element, change):
+def read(base, queries, element, change, *, ownership=True):
     """Read old layer/attribute state, preserving missing vs unreadable.
 
     For add_attribute, a caller may explicitly request the documented complete
@@ -332,7 +348,7 @@ def read(base, queries, element, change):
         from .model_delete import preflight
         preflight(element, change)
         return {"status": "observed", "value": True}
-    if change.get("native_type") in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
+    if ownership and change.get("native_type") in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
         try:
             _slab_ownership(element, change)
         except BridgeError as exc:
