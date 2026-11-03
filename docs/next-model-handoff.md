@@ -3,9 +3,9 @@
 ## Next task — native properties API note (plan item 5), owner picks the order of items 4–8
 
 The Slab material priority (plan items 2–3) is closed by the 0.47.0 trial
-below. The remaining M4 work is in the
+below. Plan item 1 is closed by owner decision. The remaining M4 work is in the
 [plan](development-plan.md#remaining-work-and-unresolved-errors); the owner
-decides which item goes first. Default proposal, because it needs no native
+decides which of items 4–8 goes first. Default proposal, because it needs no native
 trial to start: **item 5, step 1** — write the API note for native properties
 beyond Material. Scope: `WallTierProperties`, `ColumnProperties`,
 `BeamProperties`, `StructuralBeamProperties`, `SlabProperties` members
@@ -139,9 +139,10 @@ setter ran, readback stayed `" "`, UI Undo restored it; do not repeat.
   memory and journal limits; more than 32 changes needs a durable manifest
   ([S0–S5](implementation-plan.md#scaling-analysis-of-developm4-and-mcp-ergonomics)).
 - Native selection stays unsupported ([selection API](m4-native-selection-api.md)).
-- The owner confirms whether `ci-required` is configured as a required check;
-  direct pushes to `develop/m4` are rejected by repository rules, so changes go
-  through PRs.
+- `ci-required` is a required check on `develop/m4`; direct pushes are
+  rejected, so changes go through PRs. Plan item 1 (delivery accounting) is
+  closed by owner decision: full CI plus health integrity is the delivery
+  evidence. The execution safeguards above stay in force.
 
 Preserve exact target/owner binding, revalidation, journals, trace, replay
 protection, write and Undo guards, and unknown outcomes.
