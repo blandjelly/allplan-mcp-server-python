@@ -29,7 +29,7 @@ probes or the Beam attribute write.
 
 ## Latest version
 
-**0.44.2** (candidate, branch `develop/m4`): native-material preservation
+**0.44.2** (candidate, branch `claude/m4-0442-beam-tree-diff`): native-material preservation
 drift with a changed `component_tree` now carries a bounded
 `component_tree_diff` (root/flag changes, `lineage_changed`, per-type child
 counts, up to four removed/added children and edges); non-Wall families report
