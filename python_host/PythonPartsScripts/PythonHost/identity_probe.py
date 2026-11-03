@@ -22,6 +22,11 @@ def identity_failure(snapshot, request, matches):
         cause = "a representation view UUID could not be read"
     else:
         cause = "the view is not among the direct views %s" % sorted(matches[0]["view_uuids"])
+        if request.get("phase") == "material_comparison" and "parent_ref" not in request:
+            # 0.46.0 trial: a MultiSlab tier's parent-edge view is reachable
+            # only through its parent; the caller must name that parent.
+            cause += ("; for a Slab tier's parent-edge view repeat with parent_ref "
+                      "{model_uuid, view_uuid} of its MultiSlab")
     return BridgeError("probe_scope_unavailable",
                        "Requested model/view identity is missing or conflicting: %s." % cause, 409)
 

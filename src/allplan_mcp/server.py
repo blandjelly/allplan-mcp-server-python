@@ -326,11 +326,16 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     For a slab project attribute, bind target.property_owner=selected_element
     and narrow native_types to the intended Slab or MultiSlab owner. Inspect the
     exact ref and complete lineage in resource.component_ownership. A plan that
-    edits both a slab aggregate and its child is blocked. A Slab tier inside a
-    MultiSlab additionally needs exact_target (its parent-edge child view and
-    the MultiSlab model/view, from the MultiSlab's child edge) with one
-    attribute_id replace; otherwise it is blocked as
-    slab_tier_requires_exact_parent_edge_target. Never substitute the attribute
+    edits both a slab aggregate and its child is blocked. The slab material the
+    user sees in Allplan (attribute Materiał, ID 508) belongs to the MultiSlab:
+    for "change the slab material" preview native_types=["MultiSlab_TypeUUID"]
+    with property_owner=selected_element and check that the change ref is the
+    intended MultiSlab. A Slab tier inside a MultiSlab is not shown in the UI;
+    a tier attribute write without exact_target is blocked as
+    slab_tier_not_shown_in_ui_use_multislab, and blocked[].ui_owner names the
+    MultiSlab to preview instead. Write tier storage only when the user
+    explicitly asks for the tier, with exact_target (its parent-edge child view
+    and the MultiSlab model/view) and one attribute_id replace. Never substitute the attribute
     Materiał for native_material or the reverse: use the target kind the user
     or the trial instruction names. Other attribute types
     and computed-only/presence safeguards retain their existing requirements.

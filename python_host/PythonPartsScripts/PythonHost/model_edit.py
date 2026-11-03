@@ -563,11 +563,15 @@ def preview(plans, doc, base, settings, request):
             elif bound["operation"] == "set_native_material":
                 change["resource"]["native_material_state"] = copy.deepcopy(element["native_material_state"])
             elif change["native_type"] in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
-                from .component_ownership import slab_write_blocker
+                from .component_ownership import TIER_BLOCKERS, slab_ui_owner, slab_write_blocker
                 ownership = element.get("component_ownership")
                 reason = slab_write_blocker(ownership, change)
                 if reason:
-                    blocked.append({"ref": element["ref"], "field": bound["field"], "reason": reason})
+                    row = {"ref": element["ref"], "field": bound["field"], "reason": reason}
+                    ui_owner = slab_ui_owner(ownership) if reason in TIER_BLOCKERS else None
+                    if ui_owner is not None and change["operation"] in {"set_attribute", "add_attribute"}:
+                        row["ui_owner"] = ui_owner
+                    blocked.append(row)
                     continue
                 change["resource"]["component_ownership"] = copy.deepcopy(ownership)
             changes.append(change)

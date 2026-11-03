@@ -7,7 +7,7 @@ instead of repeating per-pair status in prose ([documentation policy](documentat
 Evidence and its limits are in [validation status](validation-status.md);
 open work is in the [development plan](development-plan.md).
 
-Status as of 0.44.2 trial and 0.45.0 candidate (2026-11-03). One active drawing, 1–32 changes per Apply.
+Status as of 0.46.0 trial and 0.47.0 candidate (2026-11-03). One active drawing, 1–32 changes per Apply.
 
 ## Legend
 
@@ -31,8 +31,8 @@ Status as of 0.44.2 trial and 0.45.0 candidate (2026-11-03). One active drawing,
 | Wall | PASS (0.30.0) | CODE | CODE | PARTIAL (ID 1371: post-Undo read only) | PASS (ID 120, 0.31.0) | NONE |
 | SkeletonBeam | REPORTED (ID 508, 0.39.0) | CODE | CODE | CODE | CODE | NONE |
 | Beam | PASS (ID 508 `""`→`TEST-BEAM`, 0.44.0; `""`→`C30/37`, 0.45.0, UI, UI Undo and post-Undo read `""`) | CODE | CODE | CODE | CODE | NONE |
-| Slab (MultiSlab child) | CODE (0.46.0 exact parent-edge target). ID 508 is the UI material (0.44.2). 0.45.0 non-exact write: false `applied`, UI unchanged; that route is now blocked. Earlier REPORTED (0.27.0, 0.39.0) without owner binding | CODE | CODE | CODE | CODE | NONE |
-| MultiSlab | REPORTED (0.39.0; owner binding open) | CODE | CODE | CODE | CODE | NONE |
+| Slab (MultiSlab child) | PARTIAL: tier storage, not shown in the UI. 0.46.0 read: tier ID 508 `TEST2` (most likely the 0.45.0 write) while the UI shows the MultiSlab's `TEST1`. Non-exact tier writes are blocked and name the MultiSlab (`ui_owner`, 0.47.0); the exact parent-edge tier route is CODE (0.46.0 preview `no_op`). Earlier REPORTED (0.27.0, 0.39.0) without owner binding | CODE | CODE | CODE | CODE | NONE |
+| MultiSlab | PASS (ID 508 `TEST1`→`TEST2`, 0.46.0 execution `04569db1…`: `applied` on view `b4a59b5b…`, UI `TEST2`, UI Undo and post-Undo read `TEST1`; this is the slab material shown in the UI) | CODE | CODE | CODE | CODE | NONE |
 
 Computed-only attributes are never written. Attribute definitions are never
 created; an existing definition can be added to an element (`add`/`upsert`).
@@ -45,8 +45,8 @@ created; an existing definition can be added to an element (`add`/`upsert`).
 | Wall (single tier) | VALUE (0.37.0/0.39.0, preservation unverified) | NONE | REPORTED (`Ogólne03`, 0.27.0) | PARTIAL (subtree absent; no Undo) |
 | Wall (multi tier) | BLOCKED (one tier only) | NONE | CODE (tier-aware route) | — |
 | SkeletonBeam | BLOCKED (no successful write; view discrepancy) | NONE | CODE | FIXTURE (no disposable target) |
-| Beam | VALUE (0.44.2: `""`→`C30/37` on all views, UI `C30/37`, reviewed reconciliation of regenerated AttributeContainer/WallAxis; UI Undo restored `""` and the original children). 0.45.0 accepts that regeneration after the setter: `applied` not yet native-observed (the 0.45.0 trial wrote attribute 508 instead) | NONE | FIXTURE | FIXTURE |
-| Slab (MultiSlab child) | PARTIAL, not the UI material (0.43.0 setter ran, readback `" "`; tier 0 also `" "`; 0.44.2 owner: UI shows `TEST1` = attribute 508). Use attribute 508 | NONE | BLOCKED (parented child) | BLOCKED (parented child) |
+| Beam | PASS (0.46.0 execution `5a0bc366…`: `""`→`C30/37`, `applied` with `accepted_preservation_drift.accepted="auxiliary_children_regenerated"` on view `362f80d3…`; owner-reported UI and UI Undo, post-Undo preview old value `""`) | NONE | FIXTURE | FIXTURE |
+| Slab (MultiSlab child) | PARTIAL, not the UI material (0.43.0 setter ran, readback `" "`; tier 0 also `" "`; 0.44.2 owner: UI shows `TEST1` = attribute 508). Use the MultiSlab's attribute 508 | NONE | BLOCKED (parented child) | BLOCKED (parented child) |
 | Slab (standalone) | CODE | NONE | FIXTURE | FIXTURE |
 | MultiSlab | CODE | NONE | BLOCKED (aggregate owner) | FIXTURE |
 | WindowDoor (opening) | — | NONE | CODE | CODE |

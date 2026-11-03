@@ -513,24 +513,32 @@ Replace the placeholder with the exact reviewed material string. This selector
 does not use attribute 508 as a native Material proxy. Keep ordinary
 predicate-based `model_edit` requests unchanged.
 
-**Slab tier attribute (0.46.0).** The same `exact_target` also accepts exactly
-one attribute change `{"target":{"kind":"attribute","attribute_id":ID,
-"property_owner":"selected_element"},"value":...}` in `replace` mode (no
-`name`-only target, `upsert`/`add` or `attribute_ids`). A Slab whose lineage is
-`[Slab, MultiSlab]` is otherwise blocked for attribute writes with
-`slab_tier_requires_exact_parent_edge_target`: in the 0.45.0 trial,
-`ChangeAttributes` on the tier's `SelectAllElements` wrapper (`IsInMacro=true`)
-read back the new value once while later reads and the UI kept the old one.
-With `exact_target`, the reviewed owner evidence comes from the parent-edge
-view, `ChangeAttributes` runs on that wrapper, and preflight and fresh readback
-require the same value on every wrapper of the tier model (disagreement stays
-`unknown`). After the setter, a changed exact inventory is accepted only when
-each parent replaced its `AttributeContainer_TypeUUID` children one-for-one
-with every other child, edge and scalar identical
+**Slab material shown in the UI (0.47.0).** Allplan shows a MultiSlab's
+attribute 508 (`Materiał`) as the slab material; its Slab tiers are not shown
+and store their own value (0.46.0 trial). To change the visible slab material,
+preview `native_types=["MultiSlab_TypeUUID"]` with
+`{"target":{"kind":"attribute","attribute_id":508,"property_owner":"selected_element"},"value_type":"text","value":...}`
+and check that the change ref is the intended MultiSlab (narrow with
+`exclude_model_uuids` if the drawing has several). A tier attribute write
+without `exact_target` is blocked as `slab_tier_not_shown_in_ui_use_multislab`;
+the blocked row's `ui_owner` names the MultiSlab model/view and the
+`next_preview` to run instead. Nothing is redirected automatically.
+
+**Slab tier attribute (0.46.0, explicit tier storage only).** The same
+`exact_target` also accepts exactly one attribute change
+`{"target":{"kind":"attribute","attribute_id":ID,"property_owner":"selected_element"},"value":...}`
+in `replace` mode (no `name`-only target, `upsert`/`add` or `attribute_ids`).
+Use it only when the tier itself is the requested target; the UI does not
+show the result. With `exact_target`, the reviewed owner evidence comes from
+the parent-edge view, `ChangeAttributes` runs on that wrapper, and preflight
+and fresh readback require the same value on every wrapper of the tier model
+(disagreement stays `unknown`). After the setter, a changed exact inventory is
+accepted only when each parent replaced its `AttributeContainer_TypeUUID`
+children one-for-one with every other child, edge and scalar identical
 (`exact_inventory.accepted="attribute_containers_regenerated"`); any other
 inventory change stays `unknown` (`exact_inventory_changed_after_setter`).
 Standalone Slabs and MultiSlab aggregates keep the ordinary route. Native
-acceptance is pending.
+acceptance of this tier route is pending.
 
 ### `delete` — exact component root only
 
