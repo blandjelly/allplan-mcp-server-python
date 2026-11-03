@@ -552,12 +552,78 @@ def read(base, element, change, check=lambda: None, *, preservation=True):
         return {"status": "not_checked", "value": None, "reason": "native_material_owner_unavailable"}
     if preservation and fingerprint(state) != fingerprint(change["resource"]["native_material_state"]):
         expected = change["resource"]["native_material_state"]
-        return {"status": "not_checked", "value": None, "reason": "wall_material_invariants_changed",
-                "material_readback": value,
-                "preservation": {"before_sha256": fingerprint(expected), "current_sha256": fingerprint(state),
-                    "changed_sections": sorted(key for key in set(expected) | set(state)
-                                               if expected.get(key) != state.get(key))}}
+        sections = sorted(key for key in set(expected) | set(state) if expected.get(key) != state.get(key))
+        report = {"before_sha256": fingerprint(expected), "current_sha256": fingerprint(state),
+                  "changed_sections": sections}
+        if "component_tree" in sections:
+            report["component_tree_diff"] = component_tree_diff(expected.get("component_tree"),
+                                                                state.get("component_tree"))
+        # The Wall-specific reason predates Beam/Column/Slab support; keep it
+        # for Walls so earlier journals and reports read the same.
+        reason = ("wall_material_invariants_changed" if change["native_type"] == "Wall_TypeUUID"
+                  else "native_material_invariants_changed")
+        return {"status": "not_checked", "value": None, "reason": reason,
+                "material_readback": value, "preservation": report}
     return value
+
+
+MAX_TREE_DIFF_ITEMS = 4
+
+
+def _tree_key(ref):
+    return "|".join(str(ref.get(key)) for key in ("type_name", "model_uuid", "view_uuid"))
+
+
+def component_tree_diff(expected, current):
+    """Name what changed in a bounded component tree; never judge benignness.
+
+    ModifyElements may regenerate auxiliary children (0.43.0 Slab, 0.44.1
+    Beam trials). This diff is review evidence for the existing reconciliation
+    path only: it does not verify preservation or authorize a setter.
+    """
+    def tree(value):
+        return value if isinstance(value, dict) and isinstance(value.get("target"), dict) else None
+
+    expected, current = tree(expected), tree(current)
+    if expected is None or current is None:
+        return {"status": "not_checked", "expected_observed": expected is not None,
+                "current_observed": current is not None}
+
+    def refs(value, name):
+        return {_tree_key(ref) for ref in value.get(name) or [] if isinstance(ref, dict)}
+
+    def edges(value):
+        return {_tree_key(edge.get("child") or {}) + ">" + _tree_key(edge.get("parent") or {})
+                for edge in value.get("child_parent_edges") or [] if isinstance(edge, dict)}
+
+    def listed(values):
+        values = sorted(values)
+        return {"count": len(values), "items": values[:MAX_TREE_DIFF_ITEMS],
+                "truncated": len(values) > MAX_TREE_DIFF_ITEMS}
+
+    def by_type(values):
+        counts = {}
+        for value in values:
+            name = value.split("|", 1)[0]
+            counts[name] = counts.get(name, 0) + 1
+        return counts
+
+    before, after = refs(expected, "children"), refs(current, "children")
+    removed, added = by_type(before - after), by_type(after - before)
+    root = {name: {"expected": _tree_key(expected[name]), "current": _tree_key(current[name])}
+            for name in ("target", "terminal_root")
+            if isinstance(expected.get(name), dict) and isinstance(current.get(name), dict)
+            and _tree_key(expected[name]) != _tree_key(current[name])}
+    flags = {name: {"expected": expected.get(name), "current": current.get(name)}
+             for name in ("parent_chain_complete", "children_complete")
+             if expected.get(name) != current.get(name)}
+    return {"status": "observed", "root_changes": root, "flag_changes": flags,
+            "lineage_changed": refs(expected, "lineage") != refs(current, "lineage"),
+            "child_type_changes": {name: {"removed": removed.get(name, 0), "added": added.get(name, 0)}
+                                   for name in sorted(set(removed) | set(added))},
+            "children_removed": listed(before - after), "children_added": listed(after - before),
+            "edges_removed": listed(edges(expected) - edges(current)),
+            "edges_added": listed(edges(current) - edges(expected))}
 
 
 def write(base, element, change, doc=None, check=lambda: None, *, trace=None):

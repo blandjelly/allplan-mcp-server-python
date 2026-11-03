@@ -26,8 +26,11 @@ def resolve_slab_child(request, snapshot, live, owners, trace, check, details=No
     """
     import NemAll_Python_IFW_ElementAdapter as adapters
 
-    def unavailable():
-        raise BridgeError("probe_scope_unavailable", "Exact Slab child/parent identity is unavailable or conflicting.", 409)
+    def unavailable(cause=None):
+        # The cause names only identities already read; it never selects a
+        # different view or owner for the caller.
+        raise BridgeError("probe_scope_unavailable", "Exact Slab child/parent identity is unavailable or conflicting"
+                          + (": %s." % cause if cause else "."), 409)
 
     def call(api, callback):
         check()
@@ -84,7 +87,10 @@ def resolve_slab_child(request, snapshot, live, owners, trace, check, details=No
             # A missing target on one parent wrapper is a conflict, not a vote
             # for the first wrapper which happened to expose it.
             if not found:
-                unavailable()
+                views = sorted({ref["view_uuid"] for ref in refs if ref["model_uuid"] == request["model_uuid"]})
+                unavailable(("the parent lists this child model under view(s) %s, not the requested view; "
+                             "use the parent-edge child view" % views) if views
+                            else "the parent does not list this child model")
             inventory.append({"parent": parent_ref, "children": sorted(refs, key=fingerprint)})
         for child in live.get((request["drawing_file"], request["model_uuid"]), {}).get(request["view_uuid"], []):
             candidates[id(child)] = child

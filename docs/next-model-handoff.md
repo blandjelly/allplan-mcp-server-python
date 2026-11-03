@@ -1,58 +1,78 @@
 # Current M4 handoff
 
-## Next task — native trial of 0.44.1: Slab tier 0 Material, Beam native Material
+## Next task — native trial of 0.44.2: Beam Material diff, Slab UI material
 
-Start condition: candidate **0.44.1** passed full CI and the owner installed its
+Start condition: candidate **0.44.2** passed full CI and the owner installed its
 `package` artifact. Launch with **Launch Allplan MCP.cmd** and keep
 `logs/evidence/evidence-YYYYMMDD.jsonl` as the evidence
 ([plan items 2 and 6](development-plan.md#remaining-work-and-unresolved-errors)).
 
-1. **Slab (read-only, zero setters).** Repeat the `material_comparison` with
-   `attribute_ids=[508]`, `parent_ref` and `include_parent=true` (child
-   `8a693925…`/`a0fcd7b3…`, MultiSlab `bf097d95…`/`b4a59b5b…`; re-query UUIDs).
-   Record `slab_tiers.tiers[0]` (`Material`, members) and `variable_tier` on
-   child and parent. If tier 0 holds the UI-visible material, the next code
-   change is a tier-0 owner write (`SlabTierProperties` setter); otherwise
-   the member lists decide the next candidate. No Slab Apply.
-2. **Beam native Material (disposable).** Re-query `Beam_TypeUUID`; `model_edit`
-   preview with `target={"kind":"native_material","tier_index":1}`, value
-   `C30/37`, `native_types=["Beam_TypeUUID"]`; highlight, Apply with a new
-   `execution_id`, fresh readback, UI check, then UI Undo and a restoration
-   preview (or `material_comparison` on the Beam). Stop at any blocker.
+1. **Beam native Material (disposable, changed report).** Re-query
+   `Beam_TypeUUID`; `model_edit` preview with
+   `target={"kind":"native_material","tier_index":1}`, value `C30/37`,
+   `native_types=["Beam_TypeUUID"]`; highlight, Apply with a new
+   `execution_id`. If the outcome is again `unknown`, record the
+   `component_tree_diff` of the reviewed view and check the UI. Only if the
+   diff shows nothing but regenerated auxiliary children (root, lineage and
+   other sections unchanged) and the UI shows `C30/37`, recover and submit the
+   offered `reviewed_material_reconciliation`; otherwise leave it unknown.
+   Then UI Undo and a fresh `material_comparison` on a **direct** Beam view.
+2. **Slab (read-only, owner observation).** Record what the Allplan UI shows
+   as the material of slab layer "Warstwa płyty" (child `8a693925…`, MultiSlab
+   `bf097d95…`). Use the child's parent-edge view (`a0fcd7b3…`), not the
+   query's direct view, for `material_comparison`. No Slab Apply.
 
-Completion: tier 0 observation and a decided Slab flow in the plan; Beam
-native Material cycle recorded (or its blocker). Do not repeat the
-0.40.0–0.44.0 probes or the Beam attribute write.
+Completion: the Beam diff recorded and the Beam outcome reviewed (reconciled
+or left unknown, plus Undo); the UI Slab material recorded so the plan can
+decide the tier-0 write candidate (item 2). Do not repeat the 0.40.0–0.44.1
+probes or the Beam attribute write.
 
 ## Latest version
 
-**0.44.1** (candidate, branch `claude/m4-0441-slab-tier0-ci-speed`):
-`slab_tiers` reads tiers zero-based (tier 0 always, others within
-`TierCount`) and adds `variable_tier`. CI runs the same test modules through
-[run_tests_parallel.py](../utils/run_tests_parallel.py) with a uv cache
-([testing policy](testing-policy.md#candidate-and-ci-selection)); this is a CI
-change, so the full matrix applies. Focused checks PASS; a local parallel run
-of all 805 tests PASS (245 s sequential vs 70 s, Linux). Full CI, ZIP
-verification and native trial pending.
+**0.44.2** (candidate, branch `claude/m4-0442-beam-tree-diff`): native-material preservation
+drift with a changed `component_tree` now carries a bounded
+`component_tree_diff` (root/flag changes, `lineage_changed`, per-type child
+counts, up to four removed/added children and edges); non-Wall families report
+`native_material_invariants_changed`. The Slab `parent_ref` probe names the
+parent-edge child view when the requested view is not listed. No guard,
+budget, journal or reconciliation rule changed; the diff never accepts drift.
+Focused checks PASS (270 tests in the affected material/edit/probe modules,
+plus 80 package/smoke/CI-policy tests for the version bump).
+Full CI, ZIP verification and native trial pending.
 
-**0.44.0** (source `febdb72`, PR #53) is the installed baseline; health:
-Allplan 2026.1, `integrity=sha256-verified`. Owner trial,
-[raw evidence](test-results/evidence/0.44.0-2026-11-02/evidence-20261102.jsonl)
-(owner: UI identical to the log, Undo worked):
+**0.44.1** (source `8e06fa4`, PR #54) is the installed baseline; health:
+Allplan 2026.1, `integrity=sha256-verified`. Owner trial 2026-11-03,
+[raw evidence](test-results/evidence/0.44.1-2026-11-03/evidence-20261103.jsonl):
 
-- **Trace.** `inspect_journal`: active 0.5 MB, archive seven segments
-  (43.6 MB, complete); no rotation was due.
-- **Slab tiers.** On the Slab child (both views), the MultiSlab and the parent
-  read: native Material `" "`, `tier_api=present`, `TierCount=1`,
-  `GetSlabTierProperties(1)` → `IndexError`, i.e. tiers are zero-based and
-  tier 0 was not read. Both SkeletonBeams: `StructuralBeamProperties.Material`
-  `" "`; Beam: `BeamElement.Properties.Material` `""`.
-- **Beam attribute write PASS.** Plan `9ea3c5f0…`, execution
-  `9eb643bf0b9547e5b537acfa3c91a006`: attribute 508 `""` → `TEST-BEAM`,
-  `completed`/`applied`, `readback_matches`; all three root representations
-  (views `362f80d3` ×2, `6035d406`) agreed before and after. UI showed the
-  value; UI Undo worked (owner-observed). The later `inspect` sample did not
-  include the Beam, so there is no post-Undo API read.
+- **Slab tier 0 (read-only).** The first request used the query's direct
+  child view `7f9df4e3…` and stopped with `probe_scope_unavailable` (the parent
+  lists the child under `a0fcd7b3…`). With `a0fcd7b3…`: child and MultiSlab
+  both `TierCount=1`, `VariableTier=1`, `GetSlabTierProperties(0).Material`
+  `" "` (same as `SlabProperties.Material`), attribute 508 `TEST1`, zero
+  setters. Tier 0 therefore does not expose a different material via the API;
+  its members include `SetMaterial`/`SetThickness`, and `SlabProperties` has
+  no `SetSlabTierProperties`.
+- **Beam native Material.** Plan `4873ded4…`, execution
+  `aa7189120e58435e80ca28dfc0996a31`: `""` → `C30/37`. After `ModifyElements`
+  all three root representations read `C30/37` (`reconciliation_readback`),
+  but the reviewed view's preservation changed only in `component_tree`
+  (reason then named `wall_material_invariants_changed`) and the third view
+  UUID was regenerated (`6035d406…` → `5aed7df4…`), so the outcome was
+  `unknown`. The first recovery offered a reconciliation (not acknowledged).
+  After UI Undo and a host restart, recovery read `""` on all views
+  (original view `6035d406…` back) → `reconciled`/`old_value_observed`. This is
+  no applied/preservation PASS; the 0.44.1 report did not say which children
+  changed, hence 0.44.2.
+- `material_comparison` on Beam view `362f80d3…` (the edit plan's view)
+  stopped because only `6035d406…` is a direct view; the direct view read
+  `""`. Use direct views for this probe.
+
+**0.44.0** (`febdb72`, PR #53) trial
+([raw evidence](test-results/evidence/0.44.0-2026-11-02/evidence-20261102.jsonl)):
+Slab tiers are zero-based (`GetSlabTierProperties(1)` → `IndexError`); Beam
+attribute 508 write PASS (execution `9eb643bf0b9547e5b537acfa3c91a006`,
+`""` → `TEST-BEAM` on all three representations, UI and UI Undo
+owner-observed, no post-Undo API read); trace archive automated.
 
 **0.43.1** (`4a517bc`, PR #52) read-only trial
 ([raw evidence](test-results/evidence/0.43.1-2026-11-02/evidence-20261102.jsonl)):
@@ -72,6 +92,9 @@ retained unchanged.
 
 ## Key errors and necessary earlier context
 
+- **Beam execution `aa7189120e58435e80ca28dfc0996a31`** (0.44.1) is
+  `reconciled`/`old_value_observed` after `unknown` and UI Undo; keep its
+  journal. Not an applied PASS.
 - **Slab executions.** `a8a31c72975541feb1c36a2e8cbb8f65` (0.42.1) is
   `reconciled` by read-only recovery on 0.43.0 (value `" "`); `9c6a0d32…`
   (0.43.0) is `reconciled`/`old_value_observed` after `unknown`. Target: drawing

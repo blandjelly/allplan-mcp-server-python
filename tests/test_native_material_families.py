@@ -161,6 +161,64 @@ class NativeMaterialFamiliesTests(unittest.TestCase):
         self.assertEqual(f.native.recover(execution)["outcomes"][0]["state"], "reconciled")
         f.native.base.ModifyElements.assert_called_once()
 
+    def test_beam_regenerated_child_is_named_in_preservation_diff_and_stays_unknown(self):
+        # 0.44.1 trial: readback C30/37 on every view, but ModifyElements
+        # replaced auxiliary children. Report the diff; do not accept it.
+        f = self.fixture("Beam_TypeUUID", BeamElement)
+        container = f.native.element(97, name="AttributeContainer_TypeUUID")
+        f.native.parents[id(container)] = f.root
+        f.native.children[id(f.root)] = [container]
+        setter = f.native.base.ModifyElements.side_effect
+        regenerated = f.native.element(96, name="AttributeContainer_TypeUUID")
+        f.native.parents[id(regenerated)] = f.root
+
+        def modify(doc, elements):
+            result = setter(doc, elements)
+            f.native.children[id(f.root)] = [regenerated]
+            return result
+
+        f.native.base.ModifyElements.side_effect = modify
+        plan = f.preview()
+        self.assertTrue(plan["apply_available"], plan)
+        f.native.highlight(plan)
+        execution = uuid4().hex
+        result = f.native.apply(plan, execution)
+        outcome = result["outcomes"][0]
+        self.assertEqual(outcome["state"], "unknown", outcome)
+        consensus = outcome["representation_consensus"]
+        self.assertEqual(consensus["reconciliation_readback"], {"status": "observed", "value": "C35/45"})
+        representation = consensus["representations"][0]
+        self.assertEqual(representation["reason"], "native_material_invariants_changed")
+        diff = representation["preservation"]["component_tree_diff"]
+        self.assertEqual(diff["status"], "observed")
+        self.assertEqual(diff["child_type_changes"],
+                         {"AttributeContainer_TypeUUID": {"removed": 1, "added": 1}})
+        self.assertEqual((diff["children_removed"]["count"], diff["children_added"]["count"]), (1, 1))
+        self.assertIn(container.GetModelElementUUID(), diff["children_removed"]["items"][0])
+        self.assertIn(regenerated.GetModelElementUUID(), diff["children_added"]["items"][0])
+        self.assertEqual(diff["root_changes"], {})
+        self.assertFalse(diff["lineage_changed"])
+        recovery = f.native.recover(execution)
+        self.assertTrue(recovery["write_blocked"])
+        target = recovery["recovery"]["reconciliation"]["targets"][0]
+        self.assertIn("component_tree_diff", target["representations"][0]["preservation"])
+        self.assertTrue(f.native.apply(plan, execution)["replayed"])
+        f.native.base.ModifyElements.assert_called_once()
+
+    def test_component_tree_diff_is_bounded_and_reports_unobserved_trees(self):
+        module = importlib.import_module(self.fixture("Beam_TypeUUID", BeamElement).native.module.__package__
+                                         + ".wall_material")
+        self.assertEqual(module.component_tree_diff(None, {"target": {}})["status"], "not_checked")
+        ref = lambda n: {"type_name": "AttributeContainer_TypeUUID", "model_uuid": "m%d" % n, "view_uuid": "v%d" % n}
+        root = {"type_name": "Beam_TypeUUID", "model_uuid": "r", "view_uuid": "a"}
+        before = {"target": root, "lineage": [root], "children": [ref(n) for n in range(10)]}
+        after = {"target": {**root, "view_uuid": "b"}, "lineage": [root], "children": []}
+        diff = module.component_tree_diff(before, after)
+        self.assertEqual(diff["children_removed"]["count"], 10)
+        self.assertEqual(len(diff["children_removed"]["items"]), module.MAX_TREE_DIFF_ITEMS)
+        self.assertTrue(diff["children_removed"]["truncated"])
+        self.assertEqual(diff["root_changes"]["target"]["current"], "Beam_TypeUUID|r|b")
+
 
 class MaterialEvidenceBudgetTests(unittest.TestCase):
     def setUp(self):

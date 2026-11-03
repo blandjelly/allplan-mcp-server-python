@@ -227,7 +227,11 @@ and a 512 KiB evidence result. Missing, stale, cross-file or conflicting
 identities stop before native Material/attribute values. All matching child
 wrappers, including direct-scan wrappers, contribute evidence; value conflicts
 remain visible. Different views on structural parent edges remain explicit
-and do not establish interchangeable property owners.
+and do not establish interchangeable property owners. The requested child view
+must be the one the parent lists; a `model_query` may return the child's other
+view (0.44.1 trial: `7f9df4e3…` instead of edge view `a0fcd7b3…`). From 0.44.2
+the `probe_scope_unavailable` message names the parent-edge view(s) for that
+child model; the probe never substitutes them.
 
 The retained child trial completed with this request on 0.41.0.
 `include_parent=true` separately reads the
@@ -716,7 +720,13 @@ native material and all exact live representations agree on current material
 and original owner. The unacknowledged `recover` response may include
 `recovery.reconciliation` (`hash`, `targets`, `meaning`, `request`). Inspect
 each exact target and its per-representation `changed_sections` and before/current
-hashes against the current model; use UI/geometry review when needed. Missing
+hashes against the current model. From 0.44.2, when `component_tree` changed the
+representation also carries `component_tree_diff`: root/flag changes,
+`lineage_changed`, per-type `child_type_changes`, and up to four removed/added
+children and edges (`type|model|view`) with counts and `truncated`. The diff
+names what changed and never judges whether it is benign. Non-Wall families
+report reason `native_material_invariants_changed` (Walls keep
+`wall_material_invariants_changed`); use UI/geometry review when needed. Missing
 views/owners, unreadable evidence, material disagreement or another unknown
 operation keeps the lock and produces no proposal.
 Ordinary preview, revalidation and readback still enforce the full preservation
