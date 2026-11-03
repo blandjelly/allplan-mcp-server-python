@@ -1,6 +1,6 @@
 [project]
 name = "allplan-mcp-server"
-version = "0.44.1"
+version = "0.44.2"
 description = "FastMCP bridge for controlling an Allplan Python host."
 readme = "README.md"
 requires-python = ">=3.11"

@@ -391,6 +391,19 @@ class MaterialComparisonTests(unittest.TestCase):
         child.GetAttributes.assert_not_called()
         parent.GetAttributes.assert_not_called()
 
+    def test_explicit_parent_names_the_parent_edge_view_for_a_direct_scan_child_view(self):
+        # 0.44.1 trial: the query returned the child's other view; the parent
+        # lists the child under its edge view. Name it, never substitute it.
+        child, parent = self.slab_child_fixture()
+        other = "10000000-0000-4000-8000-000000000099"
+        with self.assertRaises(Exception) as error:
+            self.comparison(parent_ref=self.parent_ref, view_uuid=other)
+        self.assertEqual(error.exception.code, "probe_scope_unavailable")
+        self.assertIn(child.GetElementUUID(), str(error.exception))
+        self.assertIn("parent-edge child view", str(error.exception))
+        self.base.GetElement.assert_not_called()
+        child.GetAttributes.assert_not_called()
+
     def test_explicit_parent_never_scans_children_of_other_families_or_other_roots(self):
         child, parent = self.slab_child_fixture()
         unrelated = self.element(4, name="MultiSlab_TypeUUID")

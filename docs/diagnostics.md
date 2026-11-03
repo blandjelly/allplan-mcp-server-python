@@ -69,7 +69,8 @@ current model, then recover with the original execution ID and no extra fields.
 Only when every remaining unknown is native material and all exact live views
 agree on material and original owner can the response offer
 `recovery.reconciliation`. Review its exact targets, `meaning`, per-view
-`changed_sections`, and before/current preservation hashes. Compare them with
+`changed_sections`, before/current preservation hashes and, for a changed
+`component_tree` (0.44.2), the bounded `component_tree_diff`. Compare them with
 the current model; inspect UI or geometry when the differences require it.
 
 After review, use the returned `request` unchanged, including its exact

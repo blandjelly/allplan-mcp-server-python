@@ -45,8 +45,8 @@ created; an existing definition can be added to an element (`add`/`upsert`).
 | Wall (single tier) | VALUE (0.37.0/0.39.0, preservation unverified) | NONE | REPORTED (`Ogólne03`, 0.27.0) | PARTIAL (subtree absent; no Undo) |
 | Wall (multi tier) | BLOCKED (one tier only) | NONE | CODE (tier-aware route) | — |
 | SkeletonBeam | BLOCKED (no successful write; view discrepancy) | NONE | CODE | FIXTURE (no disposable target) |
-| Beam | CODE (untried; native `BeamElement.Properties.Material` `""`) | NONE | FIXTURE | FIXTURE |
-| Slab (MultiSlab child) | PARTIAL (0.43.0: `SlabProperties` setter ran, readback unchanged `" "`; 0.44.0: one tier, zero-based; tier Material read in 0.44.1) | NONE | BLOCKED (parented child) | BLOCKED (parented child) |
+| Beam | OPEN (0.44.1: readback `C30/37` on all views, outcome `unknown` on `component_tree` drift; UI Undo, recovery `old_value_observed`) | NONE | FIXTURE | FIXTURE |
+| Slab (MultiSlab child) | PARTIAL (0.43.0: `SlabProperties` setter ran, readback unchanged `" "`; 0.44.0: one tier, zero-based; 0.44.1: tier 0 Material also `" "`) | NONE | BLOCKED (parented child) | BLOCKED (parented child) |
 | Slab (standalone) | CODE | NONE | FIXTURE | FIXTURE |
 | MultiSlab | CODE | NONE | BLOCKED (aggregate owner) | FIXTURE |
 | WindowDoor (opening) | — | NONE | CODE | CODE |
