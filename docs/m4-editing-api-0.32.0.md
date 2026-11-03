@@ -157,8 +157,29 @@ Recovery repeats the conflict and leaves execution
 `a8a31c72975541feb1c36a2e8cbb8f65` unknown with writes blocked. Preflight
 material consensus across two views is not proof of identical exact inventory.
 The log does not identify which inventory/edge changed or establish native
-write acceptance, preservation or Undo. Diagnose this boundary before another
-trial; retain the exact binding and original read-only recovery ID.
+write acceptance, preservation or Undo.
+
+**Diagnosed boundary (code + log, 0.42.2):** in `repair_execution` a locate
+failure before the setter ends as `conflict` at `pre_set_resolve`, and one at
+the final write boundary as `unknown` at `setter`. Stage `fresh_resolve` is set
+only after `native_repairs.write` returned, so the same fingerprint matched
+through preview, highlight, Apply preflight and the final pre-setter check,
+and `ModifyElements` returned before the first mismatch. The message also
+excludes a missing parent/child view (that is `probe_scope_unavailable`) and a
+changed edge view (`Exact child parent view changed.`). The changed part is one
+of the remaining resolution sections; most plausibly a post-write sibling
+inventory/count change, which remains a hypothesis. This is no proof of setter
+success, persistence or preservation.
+
+Candidate 0.42.2 keeps the full fingerprint as the only guard and adds
+diagnostics only. New plans also bind `inventory_sections` (one SHA-256 per
+resolution key); `valid_change` accepts the legacy binding without it. A
+conflict adds `diagnostics` (`m4-exact-inventory-diff-1`) to the journal outcome
+or recovery observation: expected/current fingerprints, current section
+digests, `changed_sections` (or `not_checked_legacy_binding`) and the current
+identity-only resolution up to 16 KiB. It contains no native property values,
+does not read Material after the conflict and never authorizes reconciliation,
+fallback or retry.
 The 0.41.0 getter PASS, including `target_in_direct_scan=false` for its exact
 requested view, neither proves that the model edit scan loses the Slab nor
 diagnoses the earlier write failure.

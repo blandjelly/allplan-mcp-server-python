@@ -15,9 +15,11 @@ from uuid import uuid4
 
 
 class BridgeError(Exception):
-    def __init__(self, code: str, message: str, status: int = 400):
+    def __init__(self, code: str, message: str, status: int = 400, details=None):
         super().__init__(message)
         self.code, self.status = code, status
+        # Optional host-generated, JSON-safe diagnostics; never native values.
+        self.details = details
 
 
 class UIRequestDispatcher:

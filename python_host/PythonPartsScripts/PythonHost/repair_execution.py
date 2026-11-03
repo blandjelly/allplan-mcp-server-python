@@ -17,8 +17,12 @@ def _error_details(exc):
     # Include only host-generated BridgeError text. Native exception strings
     # can contain object representations or local paths, so expose their type.
     message = str(exc) if isinstance(exc, BridgeError) else type(exc).__name__
-    return {"reason": getattr(exc, "code", type(exc).__name__),
-            "message": message[:512]}
+    result = {"reason": getattr(exc, "code", type(exc).__name__),
+              "message": message[:512]}
+    details = getattr(exc, "details", None) if isinstance(exc, BridgeError) else None
+    if isinstance(details, dict):
+        result["diagnostics"] = details
+    return result
 
 
 def same_observation(change, observed, expected):

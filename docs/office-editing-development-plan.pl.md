@@ -26,8 +26,8 @@ Wieloplikowość i cały projekt wymagają osobnego projektu oraz odbioru.
 
 | Priorytet | Co pozostało / warunek dalszej pracy |
 | --- | --- |
-| 1 — dostawa i recovery: otwarta blokada | Właściciel potwierdził CI i ZIP 0.42.1; health wiąże instalację z `eecdfeb`, integrity verified. Szczegółowa tożsamość ZIP i upgrade/restore nie są niezależnie zweryfikowane. Wall `3f2a8c9d7b5e4a1c9f8e6d3c2b1a0e9f` rozliczony przez reviewed reconciliation, preservation=false. Slab `a8a31c72975541feb1c36a2e8cbb8f65` pozostaje unknown/recovery_required; nie ponawiać Apply ani usuwać journalu. Zachować starsze historie `87a…` i `4388…` opisane w handoffie. |
-| 2 — native Material Beam/Slab/MultiSlab: konflikt exact inventory | Preview 0.42.1 potwierdza właściwy raport native owner; highlight API wysłany. Apply i recovery zatrzymane na konflikcie inventory/parent edge, brak odbioru zapisu/preservation/Undo. Następny krok: diagnoza porównania exact inventory przy fresh_resolve, bez nowego settera i bez osłabiania guardów. [Dowód i ograniczenia](next-model-handoff.md#latest-version-and-native-evidence). |
+| 1 — dostawa i recovery: otwarta blokada | Właściciel potwierdził CI i ZIP 0.42.1; health wiąże instalację z `eecdfeb`, integrity verified. Szczegółowa tożsamość ZIP i upgrade/restore nie są niezależnie zweryfikowane. Wall `3f2a8c9d7b5e4a1c9f8e6d3c2b1a0e9f` rozliczony przez reviewed reconciliation, preservation=false. Slab `a8a31c72975541feb1c36a2e8cbb8f65` pozostaje unknown/recovery_required (setter mógł zostać wykonany); nie ponawiać Apply ani usuwać journalu, recovery tylko read-only. Kandydat 0.42.2 czeka na CI/ZIP właściciela. Zachować starsze historie `87a…` i `4388…` opisane w handoffie. |
+| 2 — native Material Beam/Slab/MultiSlab: konflikt exact inventory | Preview 0.42.1 potwierdza właściwy raport native owner; highlight API wysłany. Apply i recovery zatrzymane na konflikcie inventory/parent edge, brak odbioru zapisu/preservation/Undo. Zdiagnozowano: konflikt powstaje dopiero po powrocie settera (`fresh_resolve`); wcześniejsze porównania się zgadzały. Kandydat 0.42.2 dodaje wyłącznie diagnostykę sekcji. Następny krok: read-only recovery `a8a3…` na 0.42.2 przez właściciela, klasyfikacja zmienionej sekcji, potem ewentualna decyzja o kontrakcie readbacku po zapisie bez osłabiania guardu przed setterem. [Diagnoza i test](next-model-handoff.md#next-task--owner-read-only-recovery-on-0422-then-classify-the-changed-section). |
 | 3 — atrybuty Slab/MultiSlab: zgłoszony PASS wartości, owner niepełny | Raportowany Apply/readback PASS z 0.39.0 pozostaje, ale historyczne payloady i exact owner binding brakują. Getter 0.41.0 ID 508 `TEST1` na child i parent nie przypisuje właściciela historycznego zapisu ani nie dowodzi sprzężenia z native Material. Zachować `target.property_owner="selected_element"`, lineage/children i overlap guard; nie utożsamiać atrybutu z native Material. Nie ponawiać accepted writes dla odtworzenia dowodu. |
 | 4 — warstwa i no-op: częściowo odebrane | Zachować W1 read/write, pojedyncze Undo i zgłoszony no-op w ich dotychczasowym zakresie. Pozostałe pary rodzina/właściciel oraz grupowe Undo wymagają dowodu; poniżej kryteria zamknięcia. No-op nie ma drogi Apply. |
 | 5 — delete i selekcja: częściowo odebrane / brak funkcji | Zachować grouped Column delete/Undo i obserwację Wall subtree. Inne deklarowane rodziny/poddrzewa wymagają dowodu. [Analiza API selekcji](m4-native-selection-api.md) rozdziela programowe set/clear/readback od interactive pick i preselekcji. Brak potwierdzonego kompletnego kontraktu; native selection nadal unsupported, highlight nie zamyka selekcji. |
@@ -83,6 +83,11 @@ przepływ; nie powtarzać zakończonych Apply dla samego odtworzenia logu.
    `a8a31c72975541feb1c36a2e8cbb8f65`, kończy się unknown/repair_conflict
    na `fresh_resolve`: `Exact child inventory or parent edge changed.`
    Recovery powtarza konflikt na `recovery_resolve` i utrzymuje blokadę zapisu.
+   Etap `fresh_resolve` oznacza, że fingerprint zgadzał się aż do granicy
+   settera, a `ModifyElements` zwrócił; zmiana nastąpiła po zapisie. Nie wiadomo,
+   która sekcja się zmieniła. 0.42.2 raportuje ją w `diagnostics` (bez wartości
+   natywnych, bez zmiany guardów). Zamknięcie: sklasyfikowana sekcja z recovery
+   na 0.42.2, regresja i rozliczony outcome `a8a3…`.
    Brak dowodu udanego Apply/readback, preservation i Undo/restoration.
    Zgodność obu odczytów materiału w preflight nie dowodzi zgodności inventory;
    sam komunikat nie rozstrzyga rzeczywistego driftu ani błędu porównania.

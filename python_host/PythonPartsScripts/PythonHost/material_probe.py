@@ -17,7 +17,7 @@ _CLASSES = {
 }
 
 
-def resolve_slab_child(request, snapshot, live, owners, trace, check):
+def resolve_slab_child(request, snapshot, live, owners, trace, check, inventory_sink=None):
     """Resolve only an exact Slab under an explicitly named MultiSlab view.
 
     SelectAllElements need not expose every child. This separate read route
@@ -126,6 +126,9 @@ def resolve_slab_child(request, snapshot, live, owners, trace, check):
                   "target_in_direct_scan": bool(direct and request["view_uuid"] in direct[0]["view_uuids"]),
                   "child_parent_edges": sorted(edges, key=fingerprint),
                   "inventory_fingerprint": fingerprint(sorted(inventory, key=fingerprint))}
+    if inventory_sink is not None:
+        # Identity refs only, outside the fingerprinted resolution shape.
+        inventory_sink.extend(sorted(inventory, key=fingerprint))
     return element, candidates, resolution
 
 

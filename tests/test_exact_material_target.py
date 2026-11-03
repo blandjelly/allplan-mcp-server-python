@@ -197,6 +197,70 @@ class ExactMaterialTargetTests(unittest.TestCase):
         self.assertEqual(f.native.recover(execution)["outcomes"][0]["state"], "unknown")
         f.native.base.ModifyElements.assert_called_once()
 
+    def test_post_setter_inventory_change_names_changed_sections_and_stays_unknown(self):
+        # 0.42.1 native pattern: inventory matched through the final pre-setter
+        # boundary and first differed at fresh_resolve after ModifyElements.
+        f = self.f
+        setter = f.native.base.ModifyElements.side_effect
+        sibling = f.native.element(91, name="Slab_TypeUUID")
+        def regenerate_siblings(*args):
+            result = setter(*args)
+            f.native.children[id(self.parent)] = [f.root, sibling]
+            return result
+        f.native.base.ModifyElements.side_effect = regenerate_siblings
+        plan = self.preview()
+        binding = plan["changes"][0]["resource"]["exact_target_binding"]
+        module = importlib.import_module(f.native.module.__package__ + ".exact_material_target")
+        self.assertTrue(module.valid_sections(binding["inventory_sections"]))
+        f.native.highlight(plan)
+        execution = uuid4().hex
+        outcome = f.native.apply(plan, execution)["outcomes"][0]
+        self.assertEqual((outcome["state"], outcome["stage"], outcome["reason"]),
+                         ("unknown", "fresh_resolve", "repair_conflict"), outcome)
+        diagnostics = outcome["diagnostics"]
+        self.assertEqual(diagnostics["expected_fingerprint"], binding["inventory_fingerprint"])
+        self.assertNotEqual(diagnostics["current_fingerprint"], binding["inventory_fingerprint"])
+        self.assertEqual(diagnostics["changed_sections"], ["child_visits", "inventory_fingerprint"])
+        self.assertEqual(diagnostics["current_resolution"]["child_visits"], 2)
+        inventory, = diagnostics["current_inventory"]
+        self.assertEqual(len(inventory["children"]), 2)
+        self.assertEqual(module.fingerprint(diagnostics["current_inventory"]),
+                         diagnostics["current_resolution"]["inventory_fingerprint"])
+        self.assertEqual(module.fingerprint(diagnostics["current_resolution"]), diagnostics["current_fingerprint"])
+        self.assertNotIn("Material", str(diagnostics))
+        self.assertNotIn("readback", outcome)
+        recovered = f.native.recover(execution)
+        self.assertEqual(recovered["outcomes"][0]["state"], "unknown")
+        self.assertTrue(recovered["write_blocked"])
+        observation, = recovered["recovery"]["observations"]
+        self.assertEqual((observation["stage"], observation["state"]), ("recovery_resolve", "unknown"))
+        self.assertEqual(observation["diagnostics"]["changed_sections"], ["child_visits", "inventory_fingerprint"])
+        self.assertNotIn("reconciliation", recovered["recovery"])
+        f.native.base.ModifyElements.assert_called_once()
+
+    def test_legacy_binding_without_sections_stays_guarded_and_reports_current_sections(self):
+        f = self.f
+        plan = self.preview()
+        change = copy.deepcopy(plan["changes"][0])
+        binding = change["resource"]["exact_target_binding"]
+        material = importlib.import_module(f.native.module.__package__ + ".wall_material")
+        module = importlib.import_module(f.native.module.__package__ + ".exact_material_target")
+        sections = binding.pop("inventory_sections")
+        self.assertTrue(material.valid_change(change))
+        for bad in ({**sections, "child_visits": "0"}, {k: v for k, v in sections.items() if k != "method"},
+                    {**sections, "extra": "0" * 64}):
+            binding["inventory_sections"] = bad
+            self.assertFalse(material.valid_change(change))
+        del binding["inventory_sections"]
+        doc = f.native.handler.current_document()
+        with self.assertRaises(f.native.module.BridgeError) as caught:
+            module.locate(doc, f.native.base, binding["target"], lambda: None, expected="0" * 64)
+        details = caught.exception.details
+        self.assertEqual(details["changed_sections"], "not_checked_legacy_binding")
+        self.assertEqual(details["current_fingerprint"], binding["inventory_fingerprint"])
+        self.assertEqual(details["current_sections"], sections)
+        f.native.base.ModifyElements.assert_not_called()
+
     def test_lost_response_recovery_never_repeats_setter(self):
         f = self.f
         setter = f.native.base.ModifyElements.side_effect

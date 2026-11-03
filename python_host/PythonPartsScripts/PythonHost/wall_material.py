@@ -496,7 +496,12 @@ def valid_change(change):
     class_name = (evidence or {}).get("native_class")
     exact = resource.get("exact_target_binding")
     if exact is not None:
-        if not isinstance(exact, dict) or set(exact) != {"target", "inventory_fingerprint"}:
+        # inventory_sections (0.42.2+) only names a changed section on conflict;
+        # the complete inventory_fingerprint remains the binding guard.
+        from .exact_material_target import valid_sections
+        if (not isinstance(exact, dict)
+                or set(exact) - {"inventory_sections"} != {"target", "inventory_fingerprint"}
+                or ("inventory_sections" in exact and not valid_sections(exact["inventory_sections"]))):
             return False
         hint = exact.get("target")
         if not isinstance(hint, dict) or not isinstance(hint.get("parent_ref"), dict):
@@ -562,7 +567,8 @@ def write(base, element, change, doc=None, check=lambda: None, *, trace=None):
         # Repeat inventory/edge validation at the final mutation boundary.
         # The facade retains enumeration containers through snapshot/setter.
         base, _ = locate(doc if doc is not None else element.GetDocument(), base,
-                         exact["target"], check, trace, expected=exact["inventory_fingerprint"])
+                         exact["target"], check, trace, expected=exact["inventory_fingerprint"],
+                         expected_sections=exact.get("inventory_sections"))
     material, state, native, props = snapshot(base, element, check)
     if state != change["resource"]["native_material_state"] or material != change["old_value"]["value"]:
         raise BridgeError("repair_conflict", "Wall material or preservation evidence changed before setter.", 409)

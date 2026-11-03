@@ -1,27 +1,55 @@
 # Current M4 handoff
 
-## Next task — diagnose exact Slab inventory conflict; retain recovery lock
+## Next task — owner read-only recovery on 0.42.2; then classify the changed section
 
-Analyze the exact-target inventory comparison on the fresh execution resolver
-against the retained 0.42.1 evidence before another native write. Determine
-which inventory/parent-edge evidence differs; the error alone does not prove
-actual model drift. Preserve exact view/owner binding, budgets, journals and
-unknown outcomes. Execution `a8a31c72975541feb1c36a2e8cbb8f65` remains unknown
-and blocks writes; recovery must stay read-only under that ID. Do not retry
-Apply, delete its journal or acknowledge a reconciliation without reviewed
-supporting evidence. Closure requires a diagnosed cause and focused regression
-coverage; a further native trial is justified only by a changed flow and after
-resolving the existing outcome. See [plan items 1–2](office-editing-development-plan.pl.md#pozostałe-prace-i-nierozwiązane-błędy).
+**Owner test (required next):** after CI/ZIP verification install candidate
+**0.42.2**, confirm health binds the bridge to its source, then run only
+`model_edit` `{"action":"recover","execution_id":"a8a31c72975541feb1c36a2e8cbb8f65"}`
+on the original disposable project/document. No preview, Apply, retry,
+acknowledgement or journal deletion. Supply the raw response, which should
+contain `recovery.observations[0].diagnostics` (`m4-exact-inventory-diff-1`).
 
-## Latest version and native evidence
+**Codex next:** compare `current_resolution`/`current_inventory` with the
+journal's expected fingerprint `76c3ad06232836b88f7da072b59f0b0caf5112b957758b51c4a9f42b3d8fcc4d`.
+This legacy binding has no section digests, so classify the changed sections
+offline: recompute that fingerprint with alternative scalar sections
+(`child_visits`, `parent_representation_count`, `target_in_direct_scan`, edge
+count) and the current `inventory_fingerprint`. No match means the child
+inventory itself changed. Only then decide, with owner review, whether
+post-write readback/recovery needs a narrower, still exact identity contract.
+Do not relax the pre-setter fingerprint guard. The execution remains unknown
+and blocks writes until a reviewed outcome exists.
+See [plan items 1–2](office-editing-development-plan.pl.md#pozostałe-prace-i-nierozwiązane-błędy).
+
+## Diagnosis and candidate 0.42.2
+
+Code plus the retained log show the conflict is **post-setter**: a pre-setter
+locate failure would end as `conflict`/`pre_set_resolve` or `unknown`/`setter`.
+`fresh_resolve` is set only after `native_repairs.write` returned. The
+fingerprint therefore matched through preview, highlight, Apply preflight and
+the final write boundary, and `ModifyElements` returned before the mismatch.
+The parent/child views still resolved and the edge parent view was unchanged
+(other messages otherwise). The setter may have run; Material, persistence and
+preservation are not observed. A write-caused sibling/count change is the main
+hypothesis, not a result.
+
+0.42.2 (branch `develop/m4`, version in pyproject/lock/server) adds diagnostics
+only: per-section digests in new exact bindings and bounded identity-only
+`diagnostics` on exact-inventory conflicts in Apply outcomes and recovery
+observations. Guards, budgets and journal semantics are unchanged; legacy
+bindings stay valid. See the [API note](m4-editing-api-0.32.0.md#exact-child-native-material-target-0420).
+Focused checks: 297 test executions OK (exact target, material, repair, model
+edit, recovery HTTP, transport, identity; 2 new regressions), plus package,
+CI-policy and MCP smoke (77). Full CI, ZIP and native results are pending.
+
+## Previous version 0.42.1 and native evidence
 
 **0.42.1**, source `eecdfeb818407962cf4e853a912cf3c652da8345`, is merged
 as [PR #49](https://github.com/blandjelly/allplan-mcp-server-python/pull/49)
 into `develop/m4` (`29c7f487`). The owner confirmed CI and ZIP passed in this
 chat; these are owner-reported results, without a CI run/ZIP identity in the
 new JSON or independent upgrade/restore verification. Earlier **161 focused
-checks PASS** remain separate from CI and native acceptance. This update
-changes documentation/evidence only, with no new package or runtime tests.
+checks PASS** remain separate from CI and native acceptance.
 
 [Raw 0.42.1 evidence](test-results/evidence/0.42.1-2026-10-27/allplan-0421-native-test-evidence.json)
 is retained unchanged (steps 0–14). Health binds the installed bridge to the

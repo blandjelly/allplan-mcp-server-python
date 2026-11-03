@@ -277,7 +277,8 @@ def observe(plans, doc, base, settings, request):
     exact_digest = None
     if exact is not None:
         from .exact_material_target import locate
-        base, exact_digest = locate(doc, base, exact, check, trace)
+        exact_sections = {}
+        base, exact_digest = locate(doc, base, exact, check, trace, sink=exact_sections)
     snapshot = trace.call("M1.semantic_component_scan", lambda: plans.queries._scan(
         doc, base, settings, query, adapter_sink=live, adapter_owners=owners))
     check()
@@ -410,7 +411,8 @@ def observe(plans, doc, base, settings, request):
         match = (element["ref"]["model_uuid"] == exact["model_uuid"] if exact else
                  evaluate_criterion(request.get("predicate"), values))
         if exact and match:
-            element["exact_target_binding"] = {"target": copy.deepcopy(exact), "inventory_fingerprint": exact_digest}
+            element["exact_target_binding"] = {"target": copy.deepcopy(exact), "inventory_fingerprint": exact_digest,
+                                               "inventory_sections": exact_sections["inventory_sections"]}
         decision = ("excluded" if element["ref"]["model_uuid"] in excluded else
                     "unknown" if match is None else "matched" if match else "nonmatching")
         checks.append({"ref": element["ref"], "decision": decision})

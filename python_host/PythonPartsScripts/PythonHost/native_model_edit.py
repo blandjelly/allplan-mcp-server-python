@@ -84,7 +84,8 @@ def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapte
             _conflict("Exact material binding does not match the reviewed change.")
         factory = getattr(queries, "material_trace_factory", None)
         trace = factory("exact_material_resolution") if factory else None
-        base, _ = locate(doc, base, exact["target"], budget, trace, expected=exact["inventory_fingerprint"])
+        base, _ = locate(doc, base, exact["target"], budget, trace, expected=exact["inventory_fingerprint"],
+                         expected_sections=exact.get("inventory_sections"))
         if adapter_owners is not None:
             adapter_owners.append(base)
     owner = base.ElementsSelectService.SelectAllElements(doc)
