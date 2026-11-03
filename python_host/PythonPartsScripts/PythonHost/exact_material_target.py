@@ -87,6 +87,64 @@ def inventory_diff(expected, current):
             "parents_current": sorted(p["parent"] for p in current["parents"])}
 
 
+ATTRIBUTE_CONTAINER = "AttributeContainer_TypeUUID"
+
+
+def attribute_containers_regenerated(expected, current):
+    """True only for a one-for-one AttributeContainer replacement per parent.
+
+    Every other child, every edge between non-container children and parents,
+    every scalar and every parent stay identical; each parent keeps the same
+    number of AttributeContainer children and container edges. Used only for
+    the post-setter readback of an exact Slab tier attribute write (0.46.0).
+    """
+    if not valid_inventory_summary(expected) or not valid_inventory_summary(current):
+        return False
+    if any(expected[key] != current[key]
+           for key in ("parent_representation_count", "child_visits", "target_in_direct_scan")):
+        return False
+
+    def container(key):
+        return key.split("|", 1)[0] == ATTRIBUTE_CONTAINER
+
+    def parents(summary):
+        rows = {}
+        for item in summary["parents"]:
+            if item["parent"] in rows or container(item["parent"]):
+                return None
+            rows[item["parent"]] = item["children"]
+        return rows
+
+    def edges(summary):
+        kept, containers = [], {}
+        for edge in summary["edges"]:
+            child, separator, parent = edge.partition(">")
+            if not separator:
+                return None, None
+            if container(child):
+                containers[parent] = containers.get(parent, 0) + 1
+            else:
+                kept.append(edge)
+        return sorted(kept), containers
+
+    before, after = parents(expected), parents(current)
+    if before is None or after is None or set(before) != set(after):
+        return False
+    replaced = False
+    for parent, children in before.items():
+        old_other = sorted(child for child in children if not container(child))
+        new_other = sorted(child for child in after[parent] if not container(child))
+        old_containers = {child for child in children if container(child)}
+        new_containers = {child for child in after[parent] if container(child)}
+        if old_other != new_other or len(old_containers) != len(new_containers):
+            return False
+        replaced = replaced or old_containers != new_containers
+    (old_edges, old_counts), (new_edges, new_counts) = edges(expected), edges(current)
+    if old_edges is None or new_edges is None or old_edges != new_edges or old_counts != new_counts:
+        return False
+    return replaced
+
+
 def _bounded(summary):
     return {**{key: summary[key] for key in ("parent_representation_count", "child_visits", "target_in_direct_scan")},
             "edges": summary["edges"][:MAX_DIFF_ITEMS],
@@ -94,7 +152,7 @@ def _bounded(summary):
 
 
 def locate(doc, base, target, check, trace=None, expected=None, *, evidence=None, drift=None,
-           expected_summary=None):
+           expected_summary=None, accept_attribute_containers=False):
     """Retain a complete direct inventory plus one explicitly enumerated child.
 
     This facade lives only for the enclosing operation. Ordinary query and edit
@@ -149,6 +207,10 @@ def locate(doc, base, target, check, trace=None, expected=None, *, evidence=None
                           "diff": inventory_diff(expected_summary, summary),
                           "meaning": "Post-setter inventory differs from the reviewed plan; target view and "
                                      "parent edge were re-verified. This is evidence, not write authorization."})
+            if accept_attribute_containers and attribute_containers_regenerated(expected_summary, summary):
+                # Read-only readback of an exact tier attribute write: the
+                # outcome still requires the new value on every representation.
+                drift["accepted"] = "attribute_containers_regenerated"
         elif expected is not None and drift is not None:
             drift.update({"status": "unchanged", "current_fingerprint": digest})
         for adapter in found.values():

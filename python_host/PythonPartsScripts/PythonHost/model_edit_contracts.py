@@ -24,6 +24,16 @@ def is_undefined_attribute_value(value):
 UUID = re.compile(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}")
 
 
+def _exact_target_change(change):
+    """Native Material, or one explicit selected-element attribute replace (0.46.0)."""
+    target = change["target"]
+    if target.get("kind") == "native_material":
+        return True
+    return (target.get("kind") == "attribute" and "attribute_id" in target and "name" not in target
+            and target.get("property_owner") == "selected_element"
+            and change.get("mode", "replace") == "replace")
+
+
 def _query_scope(scope):
     from .query_contracts import validate_request as validate_query
     validate_query({"schema_version": "m1-query-1", "action": "query", "scope": scope,
@@ -144,10 +154,11 @@ def _preview(request):
                     invalid("Exact target references require canonical nonzero UUIDs.")
         if (t["model_uuid"] == p["model_uuid"] or native_types != ["Slab_TypeUUID"]
                 or predicate is not None or request.get("exclude_model_uuids") or ids
-                or len(changes) != 1 or changes[0]["target"]["kind"] != "native_material"
+                or len(changes) != 1 or not _exact_target_change(changes[0])
                 or not isinstance(scope, dict) or scope["drawing_files"] != [t["drawing_file"]]
                 or scope["include_passive"]):
-            invalid("exact_target requires one foreground Slab native-material edit without criteria or exclusions.")
+            invalid("exact_target requires one foreground Slab native-material edit, or one attribute_id replace "
+                    "with property_owner=selected_element, without criteria or exclusions.")
     if len(referenced_ids) > 32:
         invalid("At most 32 distinct attribute IDs may be read or edited.")
     exceptions = request.get("exclude_model_uuids", [])

@@ -326,7 +326,13 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     For a slab project attribute, bind target.property_owner=selected_element
     and narrow native_types to the intended Slab or MultiSlab owner. Inspect the
     exact ref and complete lineage in resource.component_ownership. A plan that
-    edits both a slab aggregate and its child is blocked. Other attribute types
+    edits both a slab aggregate and its child is blocked. A Slab tier inside a
+    MultiSlab additionally needs exact_target (its parent-edge child view and
+    the MultiSlab model/view, from the MultiSlab's child edge) with one
+    attribute_id replace; otherwise it is blocked as
+    slab_tier_requires_exact_parent_edge_target. Never substitute the attribute
+    Materiał for native_material or the reverse: use the target kind the user
+    or the trial instruction names. Other attribute types
     and computed-only/presence safeguards retain their existing requirements.
     The exact string is a native property value, without catalog validation or
     catalog creation. The report field is native.material and resource evidence

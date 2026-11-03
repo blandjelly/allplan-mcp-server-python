@@ -353,6 +353,13 @@ def observe(plans, doc, base, settings, request):
         if material_requested or element["fields"]["type_name"].get("value") not in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
             continue
         representations = live.get((element["ref"]["drawing_file"], element["ref"]["model_uuid"]), {})
+        if exact is not None and element["ref"]["model_uuid"] == exact["model_uuid"]:
+            # The exact tier is reviewed on its parent-edge view; its other
+            # wrappers carry another view UUID by definition. They still take
+            # part in the M1 field consensus and the pre/post-setter value
+            # consensus, but the owner evidence is that of the reviewed view.
+            representations = {view: adapters for view, adapters in representations.items()
+                               if view == exact["view_uuid"]}
         evidence = [trace.call("Slab.component_ownership", lambda adapter=adapter:
                     ownership_observation(adapter, check))
                     for adapters in representations.values() for adapter in adapters]

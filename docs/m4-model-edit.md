@@ -78,7 +78,10 @@ opt-in `exact_target` ([contract](m4-editing-api.md#exact-child-native-material-
 
 A slab attribute can explicitly set `target.property_owner="selected_element"`.
 Narrow `native_types` to the intended Slab or MultiSlab and check its exact
-ref, view, lineage and children in the plan. One plan must not cover both an
+ref, view, lineage and children in the plan. A Slab tier inside a MultiSlab
+needs `exact_target` on its parent-edge view with one `attribute_id` replace
+(0.46.0, [contract](m4-editing-api.md#slab-tier-attribute-writes-and-the-parent-edge-view-0450-observation-0460-contract));
+without it the tier is blocked. One plan must not cover both an
 aggregate and its layer. A missing owner still blocks attributes of the
 aggregate and its child slab; organizational layers keep separate ownership
 limits.

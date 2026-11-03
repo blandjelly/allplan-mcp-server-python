@@ -455,7 +455,7 @@ value must be checked on the actual element. Visual surface is a separate target
 Date/vector/object attribute codecs and general attribute catalog discovery
 are outside this contract.
 
-### `exact_target` — native Material on one exact Slab child
+### `exact_target` — native Material or one attribute on one exact Slab child
 
 Candidate 0.42.0 adds an opt-in exact target to `model_edit` preview. It accepts
 one `Slab_TypeUUID` child in one explicit foreground drawing, with exact child
@@ -512,6 +512,25 @@ natively accepted yet.
 Replace the placeholder with the exact reviewed material string. This selector
 does not use attribute 508 as a native Material proxy. Keep ordinary
 predicate-based `model_edit` requests unchanged.
+
+**Slab tier attribute (0.46.0).** The same `exact_target` also accepts exactly
+one attribute change `{"target":{"kind":"attribute","attribute_id":ID,
+"property_owner":"selected_element"},"value":...}` in `replace` mode (no
+`name`-only target, `upsert`/`add` or `attribute_ids`). A Slab whose lineage is
+`[Slab, MultiSlab]` is otherwise blocked for attribute writes with
+`slab_tier_requires_exact_parent_edge_target`: in the 0.45.0 trial,
+`ChangeAttributes` on the tier's `SelectAllElements` wrapper (`IsInMacro=true`)
+read back the new value once while later reads and the UI kept the old one.
+With `exact_target`, the reviewed owner evidence comes from the parent-edge
+view, `ChangeAttributes` runs on that wrapper, and preflight and fresh readback
+require the same value on every wrapper of the tier model (disagreement stays
+`unknown`). After the setter, a changed exact inventory is accepted only when
+each parent replaced its `AttributeContainer_TypeUUID` children one-for-one
+with every other child, edge and scalar identical
+(`exact_inventory.accepted="attribute_containers_regenerated"`); any other
+inventory change stays `unknown` (`exact_inventory_changed_after_setter`).
+Standalone Slabs and MultiSlab aggregates keep the ordinary route. Native
+acceptance is pending.
 
 ### `delete` — exact component root only
 

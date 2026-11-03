@@ -1,71 +1,84 @@
 # Current M4 handoff
 
-## Next task — native trial of 0.45.0: Beam Material `applied`, Slab attribute 508
+## Next task — native trial of 0.46.0: Beam native Material, Slab tier attribute 508
 
-Start condition: candidate **0.45.0** passed full CI and the owner installed its
+Start condition: candidate **0.46.0** passed full CI and the owner installed its
 `package` artifact. Launch with **Launch Allplan MCP.cmd** and keep
 `logs/evidence/evidence-YYYYMMDD.jsonl` as the evidence
 ([plan items 2, 3 and 6](development-plan.md#remaining-work-and-unresolved-errors)).
+Give the agent the exact requests below; in 0.45.0 the agent replaced step 1
+with an attribute 508 write, so the native Material step was never run.
 
-1. **Beam native Material (disposable).** Re-query `Beam_TypeUUID`;
-   `model_edit` preview with `target={"kind":"native_material","tier_index":1}`,
-   value `C30/37`, `native_types=["Beam_TypeUUID"]`; highlight, Apply with a
-   new `execution_id`. Expected: outcome `applied` and, on the reviewed view,
+1. **Beam native Material (disposable).** Preview exactly
+   `{"action":"preview","native_types":["Beam_TypeUUID"],"changes":[{"target":{"kind":"native_material","tier_index":1},"value":"C30/37"}]}`
+   (not `kind:"attribute"`). Current state: attribute 508 `""` after the 0.45.0
+   Undo; native Material is expected `""`. Highlight, Apply with a new
+   `execution_id`. Expected: `applied` and, on view `362f80d3…`,
    `accepted_preservation_drift.accepted="auxiliary_children_regenerated"`.
    Record the UI material, then UI Undo and a fresh preview (no Apply) showing
-   old value `""` and the original children. If the outcome is `unknown`,
-   recover read-only and stop; do not acknowledge a reconciliation.
-2. **Slab attribute 508 (disposable).** The owner observed that the UI material
-   of slab layer "Warstwa płyty" is attribute 508 (`TEST1`). Preview with
-   `native_types=["Slab_TypeUUID"]`, `attribute_ids=[508]`,
-   `attribute_read_mode="stored"` and change
-   `{"target":{"kind":"attribute","attribute_id":508,"name":"Materiał","property_owner":"selected_element"},"value_type":"text","value":"TEST2","mode":"replace"}`.
-   Apply only if the plan has exactly one change on child `8a693925…`;
-   otherwise record the plan and stop. After Apply record the UI material of
-   the slab layer, then `material_comparison` on the child's parent-edge view
-   `a0fcd7b3…` with `include_parent=true` (child and MultiSlab 508), UI Undo
-   and the same read again.
+   old value `""`. If the outcome is `unknown`, recover read-only and stop; do
+   not acknowledge a reconciliation.
+2. **Slab tier attribute 508 (disposable).** First read-only:
+   `material_comparison` on child view `a0fcd7b3…` with `include_parent=true`,
+   and record the UI material of slab layer "Warstwa płyty". The 0.45.0 Applies
+   left the stored state unclear (see below); if the views disagree, stop and
+   report. Then preview with
+   `scope={"drawing_files":[101],"include_passive":false,"visibility":"api_select_all"}`,
+   `native_types=["Slab_TypeUUID"]`, `exact_target={"drawing_file":101,"model_uuid":"8a693925-ae20-4dda-91d1-3951af3c0a52","view_uuid":"a0fcd7b3-85c8-4f83-99b7-59e8a3463c94","parent_ref":{"model_uuid":"bf097d95-8275-4229-ac74-27bbea26c211","view_uuid":"b4a59b5b-c0ae-4c1e-9d59-df5761390eb9"}}`
+   and `changes=[{"target":{"kind":"attribute","attribute_id":508,"property_owner":"selected_element"},"value_type":"text","value":"TEST2","mode":"replace"}]`.
+   Apply only if the plan has one change with `target_view_uuid` `a0fcd7b3…`.
+   Record the outcome, `representation_consensus` (both views,
+   `exact_inventory`), the UI material, the same `material_comparison`, then UI
+   Undo and the read again. `unknown` → recover read-only and stop.
 
-Completion: Beam `applied` with UI and Undo (closes item 6 native Material at
-VALUE/PASS level); the Slab attribute 508 child write with UI and Undo, or the
-recorded plan that prevented it (item 3). Do not repeat the 0.40.0–0.44.2
-probes, the native Slab Material Apply or the Beam attribute write.
+Completion: Beam `applied` with UI and Undo (item 6); Slab tier `applied` with
+both views and the UI showing `TEST2`, then Undo (items 2–3), or the recorded
+outcome that shows the parent-edge write also does not persist. Do not repeat
+the 0.40.0–0.45.0 probes, the native Slab Material Apply, the Beam attribute
+write or the non-exact Slab attribute write.
 
 ## Latest version
 
-**0.45.0** (candidate, branch `claude/m4-0450-beam-regenerated-children`):
-after a setter, the fresh readback/recovery of a `Beam_TypeUUID` native
-Material accepts one drift only: `ModifyElements` replacing its
-`AttributeContainer_TypeUUID`/`WallAxis_TypeUUID` children one-for-one under
-the unchanged root, with every other section, root, lineage, flags and other
-edges identical and all views agreeing. The reviewed representation reports
-`accepted_preservation_drift`; the outcome can be `applied`. Preview,
-revalidation and the final setter boundary stay byte-exact; other families,
-other child types, count changes and pre-setter drift keep `unknown` /
-`repair_conflict` ([tool reference](tool-reference.md#native_material--experimental-architectural-material)).
-Focused checks PASS (257 tests in the affected material/edit/recovery modules,
-plus 80 package/MCP smoke/CI-policy tests for the version bump).
-Full CI, ZIP verification and native trial pending.
+**0.46.0** (candidate, branch `claude/m4-0460-slab-tier-exact-attribute`): a `selected_element`
+attribute write on a Slab tier inside a MultiSlab now requires `exact_target`
+on its parent-edge view; otherwise it is blocked
+(`slab_tier_requires_exact_parent_edge_target`). With it, `ChangeAttributes`
+runs on the parent-edge wrapper, preflight and readback require agreement on
+every wrapper of the tier, and a post-setter one-for-one AttributeContainer
+replacement is the only accepted inventory drift
+([contract](m4-editing-api.md#slab-tier-attribute-writes-and-the-parent-edge-view-0450-observation-0460-contract),
+[tool reference](tool-reference.md#exact_target--native-material-or-one-attribute-on-one-exact-slab-child)).
+The tool description now says not to substitute attribute `Materiał` for
+`native_material`. Focused checks PASS (402 tests in 21 affected
+model-edit/material/recovery/MCP/package modules, including 6 new tier
+tests); full CI, ZIP verification and native trial pending. The 0.45.0 Beam regeneration
+acceptance is unchanged and still not native-observed.
 
-**0.44.2** (source `4238a08`, PR #55) is the installed baseline. Owner trial
-2026-11-03, [raw evidence](test-results/evidence/0.44.2-2026-11-03/evidence-20261103.jsonl):
+**0.45.0** (source `207b299`, PR #56) is the installed baseline. Owner trial
+2026-11-03, [raw evidence](test-results/evidence/0.45.0-2026-11-03/evidence-20261103.jsonl):
 
-- **Beam native Material.** Plan `a5f6c4d7…`, execution
-  `457f34dbed6d45109ffb397c5d40321c`: `""` → `C30/37`, outcome `unknown`
-  (`native_material_invariants_changed`, only `component_tree` changed). The
-  `component_tree_diff`: no root/flag/lineage change; AttributeContainer
-  `b9f1cb84…` → `5d92036f…` and WallAxis `c40c8930…` → `4840a7fa…` (same view
-  `b10f6f8a…`), both still edged to the root view `362f80d3…`. All views read
-  `C30/37`; the third root view again regenerated (`6035d406…` → `7fb811fa…`).
-  The owner saw `C30/37` in the UI and acknowledged the offered reconciliation
-  → `reconciled`/`reviewed_material_preservation_conflict`,
-  `preservation_verified=false`. UI Undo: the owner saw the material empty; a
-  fresh preview read `""` with the original children. This is a VALUE result,
-  not an applied/preservation PASS; it is the basis for 0.45.0.
-- **Slab (read-only).** UI material of the slab layer: **`TEST1`** (owner).
-  `material_comparison` on view `a0fcd7b3…` with the parent: native Material
-  and tier 0 `" "`, attribute 508 `TEST1`, zero setters. The UI material is
-  attribute 508; the native tier-0 write candidate is dropped.
+- **Beam — attribute 508, not native Material.** The agent previewed
+  `target.kind="attribute"`, ID 508 instead of step 1. Execution
+  `47fa1ac745c848609da338b7da83fcb2`: `""` → `C30/37`, `applied` on all three
+  root views; the owner saw `C30/37` in the UI, UI Undo worked, and a later read
+  on view `6035d406…` returned `""` with the original children. Hence no
+  `accepted_preservation_drift`: that is native-Material-only. The 0.45.0
+  native Material acceptance remains untested.
+- **Slab tier — false `applied`.** Executions
+  `686a0ea5f98c47ad993fb570c389fbd8` and `010dc61bba7d4542ba8933d63bc4e7c5`
+  (attribute 508 `TEST1` → `TEST2`, non-exact preview) each reported `applied`
+  from one wrapper `7f9df4e3…` (`IsInMacro=true`); the UI material stayed
+  unchanged after both, and a read between them returned `TEST1`. The
+  parent-edge view `a0fcd7b3…` was never part of the consensus. No read follows
+  the second Apply, and Undo of the Slab writes is not recorded, so the current
+  stored value is unverified. This is the basis for 0.46.0.
+
+**0.44.2** (source `4238a08`, PR #55): Beam native Material execution
+`457f34dbed6d45109ffb397c5d40321c` read `C30/37` on every view with only a
+one-for-one AttributeContainer/WallAxis regeneration, reconciled after review
+(`preservation_verified=false`), UI Undo restored `""`; basis for 0.45.0. Slab
+read-only: UI material `TEST1` is attribute 508; native Material and tier 0
+read `" "` ([raw evidence](test-results/evidence/0.44.2-2026-11-03/evidence-20261103.jsonl)).
 
 **Earlier trials** (raw evidence retained unchanged):
 [0.44.1](test-results/evidence/0.44.1-2026-11-03/evidence-20261103.jsonl)
@@ -88,6 +101,10 @@ UI Undo restored it; do not repeat that payload.
 
 ## Key errors and necessary earlier context
 
+- **0.45.0 executions.** Beam `47fa1ac7…` (attribute 508) is `completed`
+  and UI-undone. Slab `686a0ea5…` and `010dc61b…` are journaled `completed`/
+  `applied` although the UI did not change: do not treat them as attribute 508
+  PASS and do not replay them; they need no recovery (not `unknown`).
 - **Beam executions.** `457f34dbed6d45109ffb397c5d40321c` (0.44.2) is
   `reconciled`/`reviewed_material_preservation_conflict`,
   `preservation_verified=false`, then UI-undone; `aa7189120e58435e80ca28dfc0996a31`
