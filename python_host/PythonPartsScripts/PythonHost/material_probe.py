@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import importlib
+import math
 
 from .component_ownership import identity, same_model_identity
 from .model_context import boolean
@@ -10,6 +11,8 @@ from .transport import BridgeError
 
 
 _CLASSES = {
+    "Wall_TypeUUID": ("WallElement",),
+    "Column_TypeUUID": ("ColumnElement",),
     "Beam_TypeUUID": ("BeamElement", "StructuralBeamElement"),
     "SkeletonBeam_TypeUUID": ("BeamElement", "StructuralBeamElement"),
     "Slab_TypeUUID": ("SlabElement",),
@@ -181,18 +184,83 @@ def native_material_evidence(base, adapter, ref, read):
     if props_result["status"] != "observed":
         return represented, {**props_result, **binding}
     props = props_result["value"]
+    owner, owner_name = props, class_name.replace("Element", "Properties")
+    if class_name == "WallElement":
+        # WallProperties is not an ArchBaseProperties: Material and the other
+        # shared members live on the tier. Only a single-tier Wall has one
+        # unambiguous owner (tier 1, as the native Material route uses).
+        def tier_count():
+            value = props.TierCount
+            if type(value) is not int:
+                raise ValueError("TierCount must be an integer")
+            return value
+        count = read("WallProperties.TierCount", tier_count)
+        if count["status"] != "observed" or count["value"] != 1:
+            reason = "wall_single_tier_required" if count["status"] == "observed" else count.get("reason")
+            return represented, {"status": "not_checked", "value": None, "reason": reason,
+                                 "tier_count": count.get("value"), **binding}
+        path = path + ".GetWallTierProperties(1)"
+        binding["access_path"] = path + ".Material"
+        tier = read("WallProperties.GetWallTierProperties(1)", lambda: props.GetWallTierProperties(1))
+        if tier["status"] != "observed":
+            return represented, {**tier, **binding}
+        owner, owner_name = tier["value"], "WallTierProperties"
 
     def material():
-        value = props.Material
+        value = owner.Material
         if type(value) is not str or len(value) > 255:
             raise ValueError("Native Material must be a bounded string")
         return value
 
-    value = read(class_name.replace("Element", "Properties") + ".Material", material)
+    value = read(owner_name + ".Material", material)
     result = {**value, **binding}
+    result["native_properties"] = native_property_evidence(owner, owner_name, path, read)
     if class_name == "SlabElement":
         result["slab_tiers"] = slab_tier_evidence(props, read)
     return represented, result
+
+
+# SDK 2026 ArchBaseProperties documents CalculationMode as this closed code
+# set. The label is the SDK's, not a project attribute label.
+CALCULATION_MODE_CODES = {0: "m3", 1: "m2", 2: "m", 3: "Pcs", 4: "kg"}
+_INTEGER_PROPERTIES = ("CalculationMode", "Priority", "Trade")
+_THICKNESS_OWNERS = ("WallTierProperties", "SlabTierProperties")
+
+
+def _bounded_integer(owner, name):
+    value = getattr(owner, name)
+    if type(value) is not int or abs(value) > 2147483647:
+        raise ValueError("Native property must be a bounded integer")
+    return value
+
+
+def _bounded_length(owner):
+    value = owner.Thickness
+    if type(value) not in (int, float) or not math.isfinite(value) or not 0 < value <= 1e7:
+        raise ValueError("Thickness must be a positive finite number")
+    return value
+
+
+def native_property_evidence(owner, owner_name, path, read):
+    """Getter-only native property values on one documented owner (plan item 5).
+
+    Each member is read independently; a failure stays visible as not_checked
+    and never coerces a value. Values are API evidence for the mirror question
+    (CalculationMode/attribute 120, Trade/attribute 209), not a writable owner,
+    storage coupling or persistence.
+    """
+    values = {}
+    for name in _INTEGER_PROPERTIES:
+        row = {"access_path": path + "." + name,
+               **read(owner_name + "." + name, lambda name=name: _bounded_integer(owner, name))}
+        if name == "CalculationMode" and row["status"] == "observed":
+            row["sdk_label"] = CALCULATION_MODE_CODES.get(row["value"])
+        values[name] = row
+    if owner_name in _THICKNESS_OWNERS:
+        values["Thickness"] = {"access_path": path + ".Thickness",
+                               **read(owner_name + ".Thickness", lambda: _bounded_length(owner))}
+    return {"owner": owner_name, "values": values, "writable_owner": "not_established",
+            "attribute_mirror": "not_established", "setter_calls_started": 0}
 
 
 _MAX_MEMBERS = 128
@@ -259,6 +327,7 @@ def slab_tier_evidence(props, read):
         else:
             owner = tier["value"]
             row.update(read("SlabTierProperties.Material", lambda owner=owner: _bounded_material(owner)))
+            row["native_properties"] = native_property_evidence(owner, "SlabTierProperties", api, read)
             row["members"] = read("SlabTierProperties.members", lambda owner=owner: _members(type(owner)))
         evidence["tiers"].append(row)
     return evidence

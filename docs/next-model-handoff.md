@@ -1,21 +1,39 @@
 # Current M4 handoff
 
-## Next task — native properties API note (plan item 5), owner picks the order of items 4–8
+## Next task — owner read-only trial of 0.48.0 native properties (plan item 5, step 1)
 
-The Slab material priority (plan items 2–3) is closed by the 0.47.0 trial
-below. Plan item 1 is closed by owner decision. The remaining M4 work is in the
-[plan](development-plan.md#remaining-work-and-unresolved-errors); the owner
-decides which of items 4–8 goes first. Default proposal, because it needs no native
-trial to start: **item 5, step 1** — write the API note for native properties
-beyond Material. Scope: `WallTierProperties`, `ColumnProperties`,
-`BeamProperties`, `StructuralBeamProperties`, `SlabProperties` members
-(thickness, height/plane references, surface, priority, calculation mode,
-trade, hatch/filling): which have documented setters, their owner (element,
-tier, parent), the modify call that persists them and an independent readback.
-Separate SDK documentation, hypothesis and native observation; extend
-[editing API notes](m4-editing-api.md) rather than adding a file. Completion:
-the note names one candidate property per family with a write/readback/Undo
-plan and the preservation fields it must keep; no runtime code yet.
+The API note for native properties beyond Material is written
+([API note](m4-editing-api.md#native-properties-beyond-material--api-note-plan-item-5)).
+It names `CalculationMode` (SDK codes `0 m3, 1 m2, 2 m, 3 Pcs, 4 kg`) as the
+first write candidate for every family and `Thickness` as the second wave.
+Before any setter, the note requires a read-only precheck: does native
+`CalculationMode` mirror attribute 120 `Rodzaj rozliczenia` (and `Trade`
+attribute 209) on the same owner? 0.48.0 adds exactly that read.
+
+**Start conditions:** 0.48.0 merged after full CI, installed, health reports
+bridge 0.48.0 with `sha256-verified`. **Action (getter-only, no Apply):** in
+drawing 101 run `model_property_probe` `phase="material_comparison"` with
+`attribute_ids=[508,120,209]` on:
+
+1. one single-tier Wall (for example model `06d71e4d-193b-483e-8a32-344ade3d612c`,
+   view `2d33e5a6-b4e8-444b-94e8-d4d0ae75d622`, the 0.31.0 attribute-120 Wall,
+   if it still exists; otherwise any single-tier Wall found by query);
+2. one Column found by query;
+3. the Beam: model `7cc9ac55-6111-4508-bae8-d33918dbe77e`, view
+   `362f80d3-0105-41f6-b1fe-64ae94a1749f`;
+4. the MultiSlab: model `bf097d95-8275-4229-ac74-27bbea26c211`, view
+   `b4a59b5b-c0ae-4c1e-9d59-df5761390eb9`; and the Slab child with the retained
+   0.41.0 request plus `attribute_ids=[508,120,209]` (tier rows carry
+   `Thickness`).
+
+For each element the owner notes the UI values of "Rodzaj rozliczenia",
+trade (possibly labelled "Branża") and priority in the properties palette. Attach the raw
+`logs/evidence/` capture. **Completion:** for every family, native
+`CalculationMode`/`Trade`/`Priority` values, attributes 120/209 and the UI
+values are recorded side by side; the API note's mirror hypothesis is marked
+observed, refuted or not determinable per family. Then step 2 (one
+`CalculationMode` write per family, plan item 5) can be designed with the
+right preservation rule. The owner may instead pick another of items 4–8.
 
 Do not repeat: the MultiSlab attribute 508 write (PASS 0.46.0 and 0.47.0),
 the exact parent-edge tier write (0.47.0), the Beam native Material write
@@ -23,6 +41,18 @@ the exact parent-edge tier write (0.47.0), the Beam native Material write
 probes.
 
 ## Latest version
+
+**0.48.0 candidate** (branch `claude/m4-0480-native-property-read`, PR to `develop/m4`, read-only change):
+`material_comparison` now also reads a single-tier Wall (tier 1) and a
+Column, and every observed native owner carries `native_properties` —
+getter-only `CalculationMode` (with SDK label), `Priority`, `Trade`, and
+`Thickness` on Wall/Slab tiers. Values are independent reads, never coerced,
+do not affect `evidence_complete`, and keep `writable_owner` /
+`attribute_mirror` `not_established`
+([tool reference](tool-reference.md)). No setter or write path changed.
+Focused checks PASS locally (`test_material_comparison` 38 incl. 3 new,
+its HTTP module, component identity, property probe, registration, package,
+CI policy). Full CI, ZIP and the native trial above are pending.
 
 **0.47.0** (source `ceec638`, merged as PR #58 / `0ad7a4c`) is installed;
 health on 2026-11-03 reports bridge 0.47.0, source

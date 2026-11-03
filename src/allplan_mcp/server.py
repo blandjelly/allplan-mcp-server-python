@@ -474,9 +474,14 @@ def model_property_probe(request: PropertyProbeRequest) -> dict[str, Any]:
     coerced. Ancestry and child-read failures are independent observations. This
     diagnoses Slab/MultiSlab and date/vector blockers without enabling setters.
     material_comparison uses the same exact identity and explicit attribute_ids
-    contract to compare native Beam/SkeletonBeam or Slab/MultiSlab Material with
-    those attributes. It reads only the runtime class's documented property
-    accessor and Material, plus attribute name/ID roundtrip and type. Per-wrapper
+    contract to compare native Wall (single tier only, tier 1), Column,
+    Beam/SkeletonBeam or Slab/MultiSlab Material with those attributes. It reads
+    only the runtime class's documented property accessor and Material, plus
+    attribute name/ID roundtrip and type. native_material.native_properties
+    adds getter-only CalculationMode (with the SDK code label m3/m2/m/Pcs/kg),
+    Priority and Trade on the same owner, and Thickness on a Wall or Slab tier;
+    pass attribute_ids [120, 209] to compare them with Rodzaj rozliczenia and
+    trade. These reads establish no attribute mirror or writable owner. Per-wrapper
     failures and conflicts remain visible; blank native strings stay blank.
     Optional parent reads never redirect the target or establish a writable
     owner. Equal values do not prove storage coupling. No setter is inspected

@@ -7,7 +7,7 @@ instead of repeating per-pair status in prose ([documentation policy](documentat
 Evidence and its limits are in [validation status](validation-status.md);
 open work is in the [development plan](development-plan.md).
 
-Status as of the 0.47.0 trial (2026-11-03). One active drawing, 1–32 changes per Apply.
+Status as of the 0.47.0 trial (2026-11-03); 0.48.0 adds getter-only reads only. One active drawing, 1–32 changes per Apply.
 
 ## Legend
 
@@ -41,21 +41,25 @@ created; an existing definition can be added to an element (`add`/`upsert`).
 
 | Family | Native Material | Other native properties | Organizational layer | Delete |
 | --- | --- | --- | --- | --- |
-| Column | VALUE (0.35.0 record, 0.39.0) | NONE | PARTIAL (no-op only) | PASS (grouped, 3 Columns + Undo, 0.29.0) |
-| Wall (single tier) | VALUE (0.37.0/0.39.0, preservation unverified) | NONE | REPORTED (`Ogólne03`, 0.27.0) | PARTIAL (subtree absent; no Undo) |
+| Column | VALUE (0.35.0 record, 0.39.0) | NONE (write); getter-only read CODE (0.48.0) | PARTIAL (no-op only) | PASS (grouped, 3 Columns + Undo, 0.29.0) |
+| Wall (single tier) | VALUE (0.37.0/0.39.0, preservation unverified) | NONE (write); getter-only read CODE (0.48.0) | REPORTED (`Ogólne03`, 0.27.0) | PARTIAL (subtree absent; no Undo) |
 | Wall (multi tier) | BLOCKED (one tier only) | NONE | CODE (tier-aware route) | — |
-| SkeletonBeam | BLOCKED (no successful write; view discrepancy) | NONE | CODE | FIXTURE (no disposable target) |
-| Beam | PASS (0.46.0 execution `5a0bc366…`: `""`→`C30/37`, `applied` with `accepted_preservation_drift.accepted="auxiliary_children_regenerated"` on view `362f80d3…`; owner-reported UI and UI Undo, post-Undo preview old value `""`) | NONE | FIXTURE | FIXTURE |
-| Slab (MultiSlab child) | PARTIAL, not the UI material (0.43.0 setter ran, readback `" "`; tier 0 also `" "`; 0.44.2 owner: UI shows `TEST1` = attribute 508). Use the MultiSlab's attribute 508 | NONE | BLOCKED (parented child) | BLOCKED (parented child) |
-| Slab (standalone) | CODE | NONE | FIXTURE | FIXTURE |
-| MultiSlab | CODE | NONE | BLOCKED (aggregate owner) | FIXTURE |
+| SkeletonBeam | BLOCKED (no successful write; view discrepancy) | NONE (write); getter-only read CODE (0.48.0) | CODE | FIXTURE (no disposable target) |
+| Beam | PASS (0.46.0 execution `5a0bc366…`: `""`→`C30/37`, `applied` with `accepted_preservation_drift.accepted="auxiliary_children_regenerated"` on view `362f80d3…`; owner-reported UI and UI Undo, post-Undo preview old value `""`) | NONE (write); getter-only read CODE (0.48.0) | FIXTURE | FIXTURE |
+| Slab (MultiSlab child) | PARTIAL, not the UI material (0.43.0 setter ran, readback `" "`; tier 0 also `" "`; 0.44.2 owner: UI shows `TEST1` = attribute 508). Use the MultiSlab's attribute 508 | NONE (write); getter-only read incl. tier `Thickness` CODE (0.48.0) | BLOCKED (parented child) | BLOCKED (parented child) |
+| Slab (standalone) | CODE | NONE (write); getter-only read CODE (0.48.0) | FIXTURE | FIXTURE |
+| MultiSlab | CODE | NONE (write); getter-only read CODE (0.48.0) | BLOCKED (aggregate owner) | FIXTURE |
 | WindowDoor (opening) | — | NONE | CODE | CODE |
 
 "Other native properties" means members of `WallTierProperties`,
 `ColumnProperties`, `BeamProperties`, `StructuralBeamProperties` and
 `SlabProperties` other than Material (thickness, height/plane references,
 surface, priority, calculation mode, trade, hatch/filling). The preservation
-snapshot already reads many of them; writing them is plan item 5.
+snapshot already reads many of them; writing them is plan item 5. The
+[API note](m4-editing-api.md#native-properties-beyond-material--api-note-plan-item-5)
+names `CalculationMode` as the first write candidate per family; 0.48.0 reports
+`CalculationMode`, `Priority`, `Trade` and tier `Thickness` through
+`material_comparison` without any setter.
 
 Selection: native selection is unsupported for every family; highlight is
 available and is not a selection ([selection API](m4-native-selection-api.md)).
