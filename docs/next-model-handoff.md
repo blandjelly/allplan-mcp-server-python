@@ -1,45 +1,41 @@
 # Current M4 handoff
 
-## Next task — owner Trade read on the Wall, then the 0.49.0 write design (plan item 5)
+## Next task — 0.49.0: `CalculationMode` write and slab guidance correction (plan items 3 and 5)
 
-Step 1 of item 5 (read-only precheck) is done; results, owner answers and
-their meaning are below and in the
+Step 1 of item 5 (read-only precheck, including the Wall Trade read) is done;
+results and owner decisions are below and in the
 [API note](m4-editing-api.md#native-observations-0480-read-only-precheck-2026-11-04).
 
-1. **Owner, read-only, installed 0.48.0, no new code:** the owner set
-   "Typ robót" = **"Roboty murarskie"** on the tested Wall (2026-11-04). Repeat
-   one `model_property_probe` `phase="material_comparison"`, drawing 101, model
-   `06d71e4d-193b-483e-8a32-344ade3d612c`, view `2d33e5a6-b4e8-444b-94e8-d4d0ae75d622`,
-   `attribute_ids=[508,120,209]`, and attach the raw `logs/evidence/` file.
-   **Completion:** native `Trade` code and attribute 209 value are recorded
-   next to the UI label; the `Trade` ↔ 209 mirror is marked consistent or
-   refuted for the Wall. The owner may restore "Typ robót" afterwards in the UI.
-2. **Then 0.49.0 (code + focused tests):** a native `CalculationMode` write
-   for **Column, single-tier Wall and Beam** following the API note's step 2
-   route. Preview: exact owner binding, old code 0–4, different new code.
-   Readback: native `CalculationMode` = new code **and** attribute 120 with the
-   matching label, reported separately so a diverging 120 is visible (it
-   decides the mirror), never auto-accepted. Preservation excludes only the
-   target field and attribute 120. **Slab:** no native `SlabProperties` write
-   (the MultiSlab's native `m2` is not what the UI shows); the UI
-   "Rodzaj rozliczenia" goes through attribute 120 on the MultiSlab ("Cały
-   obiekt") or on the tier ("Warstwa bieżąca"). Native trial afterwards:
-   Column first (its non-default `m` makes the strongest check), one write +
-   UI + UI Undo.
-3. **In the same or next version:** correct the Slab tier block
-   `slab_tier_not_shown_in_ui_use_multislab`, its tool description and the
-   agent guidance — the tier **is** shown in the UI in "Warstwa bieżąca" mode
-   (below). A slab request must resolve "whole object" (MultiSlab) vs "current
-   layer" (tier, exact parent-edge route) instead of assuming the MultiSlab.
-   Also design the owner's Wall-material rule (plan item 2a): a plain
-   "material" request changes both native tier Material and attribute 508.
+1. **Native `CalculationMode` write (code + focused tests)** for **Column,
+   single-tier Wall and Beam** following the API note's step 2 route.
+   Preview: exact owner binding, old code 0–4, different new code. Readback:
+   native `CalculationMode` = new code **and** attribute 120 with the matching
+   label, reported separately so a diverging 120 is visible (it decides the
+   mirror), never auto-accepted. Preservation excludes only the target field
+   and attribute 120. **Slab:** no native `SlabProperties` write (the
+   MultiSlab's native `m2` is not what the UI shows); the slab "Rodzaj
+   rozliczenia" goes through attribute 120 on the MultiSlab ("Cały obiekt").
+2. **Slab guidance (owner decision 2026-11-04, plan item 3):** "Cały obiekt"
+   (MultiSlab) stays the default target for every plain slab request; the
+   tier ("Warstwa bieżąca") is changed only when the request explicitly names
+   the layer, through the existing exact parent-edge route. Keep the 0.47.0
+   redirect behaviour, but rename the block reason
+   `slab_tier_not_shown_in_ui_use_multislab` (premise wrong: the tier is shown
+   in "Warstwa bieżąca") and update the tool description/agent guidance. A
+   MultiSlab preview should report the tier's differing value for the same
+   field (informational, no change) so the owner sees that the layer keeps its
+   own value.
+3. Design (not necessarily in 0.49.0) the Wall-material rule (plan item 2a).
 
-Do not repeat: the 0.48.0 precheck reads (except step 1 above), the MultiSlab
-attribute 508 write (PASS 0.46.0 and 0.47.0), the exact parent-edge tier write
-(0.47.0), the Beam native Material write (PASS 0.46.0), the native Slab
-Material Apply (0.43.0) or the 0.40.0–0.45.0 probes. For the Beam,
-`material_comparison` needs direct view `6035d406…`; `362f80d3…` fails
-`probe_scope_unavailable` (again in 0.48.0).
+Native trial afterwards: Column `CalculationMode` first (its non-default `m`
+makes the strongest check), one write + UI + UI Undo.
+
+Do not repeat: the 0.48.0 precheck and Trade reads, the MultiSlab attribute
+508 write (PASS 0.46.0 and 0.47.0), the exact parent-edge tier write (0.47.0),
+the Beam native Material write (PASS 0.46.0), the native Slab Material Apply
+(0.43.0) or the 0.40.0–0.45.0 probes. For the Beam, `material_comparison`
+needs direct view `6035d406…`; `362f80d3…` fails `probe_scope_unavailable`
+(again in 0.48.0).
 
 ## Latest version
 
@@ -82,15 +78,23 @@ What this means:
   `Typ_robót`, layer height 0.2000) — owner screenshots 2026-11-04, values
   equal to the API reads. This corrects the 0.46.0/0.47.0 conclusion that the
   tier is "not shown": those observations covered "Cały obiekt" only. The
-  0.47.0 block name and guidance must change (next task, point 3).
+  0.47.0 block name and guidance must change (next task, point 2). Owner
+  decision: plain slab requests target "Cały obiekt"; the layer only when
+  named.
 - **Priority** agrees with the UI on all four families; a later Priority
   write has a direct UI check. **Thickness** is native millimetres, the UI
   shows metres.
-- **Trade is not determinable:** every element is unset (UI empty). −1 and 0
-  both appear as "unset"; attribute 209 returns nothing, `<niezdefiniowany>`
-  or `""`. The owner did not find "−1" in the UI because it is the internal
-  "no trade" index. Mapping codes to labels needs an element with a chosen
-  "Typ robót" value.
+- **Trade (Wall read, [raw evidence](test-results/evidence/0.48.0-2026-11-04/evidence-20261104-trade.jsonl)):**
+  with UI "Typ robót" = "Roboty murarskie" the native tier `Trade` is **12**;
+  after the owner cleared the field it is **0** (initially −1; both mean
+  "empty" in the UI, and clearing does not restore −1). Attribute 209 is
+  `not_returned` in both reads and both read modes, so on the Wall the trade
+  is **not mirrored in attribute 209** — native `Trade` is the only API
+  route. Only one code↔label pair (12 = "Roboty murarskie") is known; a Trade
+  write needs the project's label list first. Each UI edit replaced the
+  Wall's `AttributeContainer` child (`e5c23326…` → `1b1db81d…` →
+  `6de43fdb…`), so a new container UUID alone does not indicate an agent
+  write.
 - **Wall has two UI materials:** native tier Material `TEST` in the element
   dialog ("Materiał/Ilości") and attribute 508 `Silikat` in the attributes
   palette. Owner decision (2026-11-04): a plain "material" request changes
@@ -102,8 +106,8 @@ What this means:
 Current stored state: MultiSlab 508 `TEST1`, tier 508 `TEST2`, native
 Material `" "` on both. The tier read `TEST1` after 0.47.0 `9b2e4d71…`; the
 owner is not sure whether they changed it since — cause unknown, no recovery
-needed (no execution is open). Wall "Typ robót" = "Roboty murarskie" (owner,
-not yet read).
+needed (no execution is open). Wall native `Trade` 0 ("Typ robót" empty,
+owner-cleared).
 
 **Earlier trials** (raw evidence retained unchanged):
 [0.47.0](test-results/evidence/0.47.0-2026-11-03/evidence-20261103.jsonl)

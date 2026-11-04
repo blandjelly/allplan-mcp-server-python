@@ -608,6 +608,12 @@ UI values are owner-reported.
 - **N:** the Wall shows two materials in the UI: native tier Material `TEST`
   in the element dialog ("Materiał/Ilości") and attribute 508 `Silikat` in the
   attributes palette.
+- **N (Wall Trade read, 2026-11-04, [raw evidence](test-results/evidence/0.48.0-2026-11-04/evidence-20261104-trade.jsonl)):**
+  UI "Typ robót" = "Roboty murarskie" → tier `Trade` 12; cleared in the UI →
+  0 (the initial −1 is not restored). Attribute 209 is `not_returned` in
+  both states and read modes: the Wall trade is **not** mirrored in attribute
+  209 (refutes the `@209@` mirror for the Wall). Each UI edit replaced the
+  Wall's `AttributeContainer` child UUID.
 - **N (owner, 2026-11-04):** the slab properties palette has two modes:
   "Cały obiekt" shows the MultiSlab (508 `TEST1`, 120 `m3`) and "Warstwa
   bieżąca" shows the tier (508 `TEST2`, 120 `m2`, priority 200, empty
@@ -616,7 +622,9 @@ UI values are owner-reported.
 Consequences for step 2: write `CalculationMode` natively only on Wall,
 Column and Beam, and treat attribute 120 as a separately reported readback
 whose change decides the mirror; route the slab calculation mode through the
-MultiSlab attribute 120. No `Trade` write until a labelled fixture exists.
+MultiSlab attribute 120 ("Cały obiekt" is the default slab owner by owner
+decision; the tier only when named). No `Trade` write until the project's
+code↔label list is read; only 12 = "Roboty murarskie" is known.
 
 ### One candidate per family
 
