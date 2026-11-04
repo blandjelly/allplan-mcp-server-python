@@ -528,26 +528,30 @@ Replace the placeholder with the exact reviewed material string. This selector
 does not use attribute 508 as a native Material proxy. Keep ordinary
 predicate-based `model_edit` requests unchanged.
 
-**Slab material shown in the UI (0.47.0).** Allplan shows a MultiSlab's
-attribute 508 (`Materiał`) as the slab material; its Slab tiers are not shown
-and store their own value (0.46.0 trial). To change the visible slab material,
+**Slab material shown in the UI (0.47.0, corrected 0.49.0).** The slab
+properties palette shows the MultiSlab in "Cały obiekt" mode (attribute 508
+`Materiał`) and a Slab tier in "Warstwa bieżąca" mode; the tier stores its own
+value (0.46.0 trial, owner 2026-11-04). Plain slab requests target "Cały
+obiekt" (owner decision). To change the slab material,
 preview `native_types=["MultiSlab_TypeUUID"]` with
 `{"target":{"kind":"attribute","attribute_id":508,"property_owner":"selected_element"},"value_type":"text","value":...}`
 and check that the change ref is the intended MultiSlab (narrow with
 `exclude_model_uuids` if the drawing has several). A tier attribute write
-without `exact_target` is blocked as `slab_tier_not_shown_in_ui_use_multislab`;
-the blocked row's `ui_owner` names the MultiSlab model/view and the
-`next_preview` to run instead. Nothing is redirected automatically. **Correction (owner, 2026-11-04):** the tier is shown in the palette's
-"Warstwa bieżąca" mode; the block name and this guidance are to be replaced by
-a whole-object/current-layer choice ([plan item 3](development-plan.md#remaining-work-and-unresolved-errors)).
-The code still behaves as described.
+without `exact_target` is blocked as `slab_tier_requires_exact_layer_target`
+(0.47.0 name `slab_tier_not_shown_in_ui_use_multislab`); the blocked row's
+`ui_owner` names the MultiSlab model/view, `ui_mode`/`tier_ui_mode` and the
+`next_preview` to run instead. Nothing is redirected automatically. Change the
+tier only when the request names the layer, through the exact route below. A
+MultiSlab attribute preview reports its tiers' values of the same attribute in
+`slab_tier_values` (`differs_from_new_value` per tier); the report is
+informational and the tier keeps its own value.
 
 **Slab tier attribute (0.46.0, explicit tier storage only).** The same
 `exact_target` also accepts exactly one attribute change
 `{"target":{"kind":"attribute","attribute_id":ID,"property_owner":"selected_element"},"value":...}`
 in `replace` mode (no `name`-only target, `upsert`/`add` or `attribute_ids`).
-Use it only when the tier itself is the requested target; the UI does not
-show the result. With `exact_target`, the reviewed owner evidence comes from
+Use it only when the request names the layer; the UI shows the result in the
+palette's "Warstwa bieżąca" mode. With `exact_target`, the reviewed owner evidence comes from
 the parent-edge view, `ChangeAttributes` runs on that wrapper, and preflight
 and fresh readback require the same value on every wrapper of the tier model
 (disagreement stays `unknown`). After the setter, a changed exact inventory is
@@ -600,6 +604,23 @@ Candidate 0.26.0 exposes delete diagnostics in
 blocked target. This reporting does not relax exact lineage, subtree
 completeness, exclusion, confirmation, fresh absence/parent checks, or
 unknown-result recovery.
+
+### `native_calculation_mode` — experimental calculation mode (0.49.0)
+
+`{"target":{"kind":"native_calculation_mode"},"value":"m3"}` sets the native
+`CalculationMode` ("Obmiar"/"Rodzaj rozliczenia") with the SDK label `m3`,
+`m2`, `m`, `Pcs`, `kg` or its code 0–4. It must be the only change, and the
+plan must not read or filter attribute 120. Supported: `Column_TypeUUID`,
+single-tier `Wall_TypeUUID`, `Beam_TypeUUID`, on the same owner and with the
+same preflight/journal/recovery safeguards as `native_material`. Slabs are
+blocked (`slab_calculation_mode_uses_multislab_attribute_120`, with an
+`attribute_route` hint: attribute 120 on the MultiSlab with
+`property_owner="selected_element"`). The report field is
+`native.calculation_mode` (integer code); evidence is
+`resource.native_property_state`. Readback compares the native code only;
+`representation_consensus.mirror_crosscheck` reports attribute 120 and a
+verdict for the owner, never folded into the result
+([contract](m4-editing-api.md#calculationmode-write-contract-0490)).
 
 ### `native_material` — experimental architectural material
 

@@ -80,7 +80,7 @@ class EditOwnershipTests(unittest.TestCase):
         self.assertFalse(plan["apply_available"], plan)
         self.assertEqual(plan["changes"], [])
         row, = plan["blocked"]
-        self.assertEqual(row["reason"], "slab_tier_not_shown_in_ui_use_multislab")
+        self.assertEqual(row["reason"], "slab_tier_requires_exact_layer_target")
         self.assertEqual(row["ref"]["model_uuid"], slab.GetModelElementUUID())
         self.assertEqual(row["ui_owner"]["model_uuid"], aggregate.GetModelElementUUID())
         self.assertEqual(row["ui_owner"]["view_uuid"], aggregate.GetElementUUID())
@@ -104,6 +104,38 @@ class EditOwnershipTests(unittest.TestCase):
         self.assertEqual(dict(aggregate.GetAttributes.return_value)[508], "Beton1")
         self.assertEqual(slab.GetAttributes.return_value, tier_before)
         self.base.ElementsAttributeService.ChangeAttributes.assert_called_once()
+
+    def test_multislab_preview_reports_the_tier_value_without_writing_it(self):
+        # Owner decision 2026-11-04: "Cały obiekt" is the default slab owner;
+        # the layer ("Warstwa bieżąca") keeps its own value, reported only.
+        slab, aggregate = self.material_slabs()
+        slab.GetAttributes.return_value = [(508, "TEST2")]
+        tier_before = copy.deepcopy(slab.GetAttributes.return_value)
+        hint = self.explicit_material_plan("Slab_TypeUUID")["blocked"][0]["ui_owner"]
+        self.assertEqual((hint["ui_mode"], hint["tier_ui_mode"]), ("Cały obiekt", "Warstwa bieżąca"))
+        plan = self.explicit_material_plan("MultiSlab_TypeUUID")
+        self.assertTrue(plan["apply_available"], plan)
+        report, = plan["slab_tier_values"]
+        self.assertEqual(report["ref"]["model_uuid"], aggregate.GetModelElementUUID())
+        tier, = report["tiers"]
+        self.assertEqual(tier["model_uuid"], slab.GetModelElementUUID())
+        self.assertEqual(tier["value"], {"status": "observed", "value": "TEST2"})
+        self.assertTrue(tier["differs_from_new_value"])
+        self.assertEqual([c["ref"]["model_uuid"] for c in plan["changes"]], [aggregate.GetModelElementUUID()])
+        self.highlight(plan)
+        self.assertEqual(self.apply(plan)["state"], "completed")
+        self.assertEqual(slab.GetAttributes.return_value, tier_before)
+        slab.GetAttributes.return_value = [(508, "Beton1")]
+        aggregate.GetAttributes.return_value = [(508, "old")]
+        tier, = self.explicit_material_plan("MultiSlab_TypeUUID")["slab_tier_values"][0]["tiers"]
+        self.assertFalse(tier["differs_from_new_value"])
+
+    def test_tier_value_change_after_preview_invalidates_the_multislab_plan(self):
+        slab, _ = self.material_slabs()
+        plan = self.explicit_material_plan("MultiSlab_TypeUUID")
+        slab.GetAttributes.return_value = [(508, "changed")]
+        self.assertEqual(self.call({**self.plan_request(plan), "action": "revalidate"})["state"], "conflict")
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
 
     def test_unowned_slab_tier_attribute_also_names_the_ui_owner(self):
         _, aggregate = self.slab_fixture()
@@ -173,7 +205,7 @@ class EditOwnershipTests(unittest.TestCase):
         self.assertFalse(plan["apply_available"])
         # The tier is blocked before the overlap guard can see two changes.
         self.assertEqual({row["reason"] for row in plan["blocked"]},
-                         {"slab_tier_not_shown_in_ui_use_multislab"})
+                         {"slab_tier_requires_exact_layer_target"})
         execution = importlib.import_module(self.module.__package__ + ".repair_execution")
         forged = copy.deepcopy(plan)
         forged["state"], forged["blocked"] = "preview_ready", []

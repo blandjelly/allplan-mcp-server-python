@@ -21,6 +21,19 @@ def is_undefined_attribute_value(value):
     return isinstance(value, str) and value in UNDEFINED_ATTRIBUTE_VALUES
 
 
+# SDK 2026 ArchBaseProperties.CalculationMode codes and their SDK labels.
+CALCULATION_MODE_LABELS = {"m3": 0, "m2": 1, "m": 2, "Pcs": 3, "kg": 4}
+
+
+def calculation_mode_code(value):
+    """Exact SDK label or code 0-4; never a project enum label or display text."""
+    if type(value) is int and value in CALCULATION_MODE_LABELS.values():
+        return value
+    if isinstance(value, str) and value in CALCULATION_MODE_LABELS:
+        return CALCULATION_MODE_LABELS[value]
+    return None
+
+
 UUID = re.compile(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}")
 
 
@@ -94,6 +107,13 @@ def _preview(request):
                 invalid("Native material must be an exact nonempty string of at most 255 characters.")
             if len(changes) != 1:
                 invalid("Native material must be the only change in a plan.")
+        elif target.get("kind") == "native_calculation_mode":
+            keys(change, {"target", "value"}, {"target", "value"})
+            keys(target, {"kind"}, {"kind"})
+            if calculation_mode_code(change["value"]) is None:
+                invalid("Native calculation mode must be an SDK label m3, m2, m, Pcs, kg or its code 0-4.")
+            if len(changes) != 1:
+                invalid("Native calculation mode must be the only change in a plan.")
         elif target.get("kind") == "attribute":
             keys(change, {"target", "value_type", "value", "mode"}, {"target", "value"})
             keys(target, {"kind", "attribute_id", "name", "property_owner"}, {"kind"})
@@ -139,7 +159,7 @@ def _preview(request):
             if not isinstance(name, str) or not name.strip() or len(name) > limit:
                 invalid(f"Layer {field} must be a bounded nonempty string.")
         else:
-            invalid("target.kind must be attribute, layer, native_material or delete.")
+            invalid("target.kind must be attribute, layer, native_material, native_calculation_mode or delete.")
     if "exact_target" in request:
         t = request["exact_target"]
         keys(t, {"drawing_file", "model_uuid", "view_uuid", "parent_ref"},
@@ -161,6 +181,12 @@ def _preview(request):
                     "with property_owner=selected_element, without criteria or exclusions.")
     if len(referenced_ids) > 32:
         invalid("At most 32 distinct attribute IDs may be read or edited.")
+    if (any(isinstance(c, dict) and isinstance(c.get("target"), dict)
+            and c["target"].get("kind") == "native_calculation_mode" for c in changes)
+            and 120 in referenced_ids):
+        # The post-Apply criteria comparison would read a possible mirror as
+        # unplanned drift; the change reports attribute 120 separately.
+        invalid("Attribute 120 is the reported calculation-mode cross-check; do not read or filter it in the same plan.")
     exceptions = request.get("exclude_model_uuids", [])
     if (not isinstance(exceptions, list) or len(exceptions) > 100
             or any(not isinstance(item, str) or not UUID.fullmatch(item) for item in exceptions)

@@ -1,5 +1,6 @@
 """Public request contract for typed, criterion-based model edits."""
 from typing import Annotated, Literal
+import json
 import re
 
 from pydantic import Field, model_validator
@@ -92,7 +93,17 @@ class NativeMaterialEdit(ContractModel):
         return self
 
 
-Edit = AttributeEdit | LayerEdit | DeleteEdit | NativeMaterialEdit
+class NativeCalculationModeTarget(ContractModel):
+    kind: Literal["native_calculation_mode"]
+
+
+class NativeCalculationModeEdit(ContractModel):
+    """SDK CalculationMode label or code; the host binds the integer code."""
+    target: NativeCalculationModeTarget
+    value: Literal["m3", "m2", "m", "Pcs", "kg"] | Annotated[int, Field(ge=0, le=4)]
+
+
+Edit = AttributeEdit | LayerEdit | DeleteEdit | NativeMaterialEdit | NativeCalculationModeEdit
 
 _QUERY_FIELDS = {"display_name", "type_name", "type_uuid", "layer_id", "drawing_file", "file_state",
                  "bounding_box_mm", "size_x_mm", "size_y_mm", "size_z_mm", "center_x_mm", "center_y_mm",
@@ -167,6 +178,13 @@ class ModelEditPreview(ContractModel):
             raise ValueError("Deletion must be the only change in a plan.")
         if any(isinstance(edit, NativeMaterialEdit) for edit in self.changes) and len(self.changes) != 1:
             raise ValueError("Native material must be the only change in a plan.")
+        if any(isinstance(edit, NativeCalculationModeEdit) for edit in self.changes):
+            if len(self.changes) != 1:
+                raise ValueError("Native calculation mode must be the only change in a plan.")
+            if 120 in self.attribute_ids or '"attribute:120"' in json.dumps(
+                    self.predicate.model_dump(by_alias=True, exclude_unset=True) if self.predicate else None):
+                raise ValueError("Attribute 120 is the reported calculation-mode cross-check; "
+                                 "do not read or filter it in the same plan.")
         if "exact_target" in self.model_fields_set and self.exact_target is None:
             raise ValueError("exact_target cannot be null.")
         if self.exact_target is not None:

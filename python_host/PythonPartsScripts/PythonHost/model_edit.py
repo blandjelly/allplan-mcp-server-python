@@ -109,6 +109,16 @@ def bind_changes(doc, base, request, check, trace):
             item = {"field": "native.material", "operation": "set_native_material", "property_role": "native_material",
                     "resource": {"tier_index": 1, "data_type": "text", "binding": "exact_native_material_string"},
                     "new_value": choice["value"]}
+        elif target["kind"] == "native_calculation_mode":
+            from .model_edit_contracts import calculation_mode_code
+            from .wall_material import CALCULATION_MODE_CODES, CALCULATION_MODE_MIRROR_ATTRIBUTE
+            code = calculation_mode_code(choice["value"])
+            item = {"field": "native.calculation_mode", "operation": "set_native_calculation_mode",
+                    "property_role": "native_property",
+                    "resource": {"data_type": "integer", "binding": "sdk_calculation_mode_code",
+                                 "new_label": CALCULATION_MODE_CODES[code],
+                                 "mirror_attribute_id": CALCULATION_MODE_MIRROR_ATTRIBUTE},
+                    "new_value": code}
         elif target["kind"] == "layer":
             from .layer_names import bounded_layer_id
             doc_id = integer(read("DocumentAdapter.GetDocumentID", doc.GetDocumentID))
@@ -237,7 +247,11 @@ def bind_changes(doc, base, request, check, trace):
 def observe(plans, doc, base, settings, request):
     validate_request(request)
     started = plans.queries.clock()
-    material_requested = any(c["target"]["kind"] == "native_material" for c in request["changes"])
+    native_kinds = {"native_material": ("native.material", "Material"),
+                    "native_calculation_mode": ("native.calculation_mode", "CalculationMode")}
+    native_kind = next((c["target"]["kind"] for c in request["changes"] if c["target"]["kind"] in native_kinds), None)
+    material_requested = native_kind is not None
+    native_field, sdk_field = native_kinds.get(native_kind, ("native.material", "Material"))
     evidence_seconds = (max(plans.queries.SCAN_SECONDS, MATERIAL_EVIDENCE_SECONDS)
                         if material_requested else plans.queries.SCAN_SECONDS)
     from .property_probe import NativeProbeTrace
@@ -269,7 +283,8 @@ def observe(plans, doc, base, settings, request):
              "attribute_ids": attribute_ids, "max_adapters": request.get("max_adapters", 5000)}
     layer_requested = any(b["operation"] == "set_layer" for b in binding)
     delete_requested = any(b["operation"] == "delete_element" for b in binding)
-    query["fields"] = [field for field in query["fields"] if field not in {"element_exists", "native.material"}]
+    query["fields"] = [field for field in query["fields"]
+                       if field not in {"element_exists", "native.material", "native.calculation_mode"}]
     if layer_requested or "layer_id" in predicate_fields(request.get("predicate")):
         query["layer_resolution"] = "component"
     live, owners = {}, []
@@ -288,37 +303,48 @@ def observe(plans, doc, base, settings, request):
                 or exact["view_uuid"] not in matches[0]["view_uuids"]):
             raise BridgeError("repair_conflict", "The explicit child is missing or conflicting in the semantic scan.", 409)
     if material_requested:
-        from .wall_material import preview_observation as material_observation, consensus_key
+        from .wall_material import (CALCULATION_MODE_TYPES, SLAB_CALCULATION_MODE_BLOCK, consensus_key,
+                                    mirror_crosscheck, preview_observation as material_observation)
         for element in snapshot["elements"]:
             # Keep every peer in the M1 source, but do not perform expensive
             # native destination reads for a decisively excluded/nonmatching
             # peer. Revalidation still detects when that peer starts matching.
             criterion = request.get("predicate")
             if exact is not None and element["ref"]["model_uuid"] != exact["model_uuid"]:
-                element["fields"]["native.material"] = {"status": "not_checked", "value": None,
+                element["fields"][native_field] = {"status": "not_checked", "value": None,
                                                         "reason": "outside_exact_target"}
                 continue
             if (element["ref"]["model_uuid"] in request.get("exclude_model_uuids", [])
-                    or ("native.material" not in predicate_fields(criterion)
+                    or (native_field not in predicate_fields(criterion)
                         and evaluate_criterion(criterion, element["fields"]) is False)):
-                element["fields"]["native.material"] = {
+                element["fields"][native_field] = {
                     "status": "not_checked", "value": None, "reason": "destination_not_requested_for_non_target"}
+                continue
+            kind = element["fields"]["type_name"].get("value")
+            if sdk_field != "Material" and kind not in CALCULATION_MODE_TYPES:
+                # No native getter on an unsupported owner: the MultiSlab's
+                # native SlabProperties is not what the UI shows (0.48.0).
+                reason = (SLAB_CALCULATION_MODE_BLOCK if kind in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}
+                          else "native_calculation_mode_family_unsupported")
+                element["fields"][native_field] = {"status": "not_checked", "value": None, "reason": reason}
+                element["native_material_preservation"] = {"status": "not_checked", "value": None, "reason": reason}
+                element["native_material_ownership"] = copy.deepcopy(element["native_material_preservation"])
                 continue
             representations = live.get((element["ref"]["drawing_file"], element["ref"]["model_uuid"]), {})
             views = sorted(representations, key=lambda view: (view != exact["view_uuid"], view)) if exact else sorted(representations)
             selected = next((adapter for view in views for adapter in representations[view]), None)
             values = [(view, trace.call("Native.material_observation", lambda adapter=adapter, view=view:
                        material_observation(base, adapter, check, trace=trace, preservation=adapter is selected,
-                                            trace_ref={**element["ref"], "view_uuid": view}),
+                                            trace_ref={**element["ref"], "view_uuid": view}, field=sdk_field),
                        drawing_file=element["ref"]["drawing_file"], model_uuid=element["ref"]["model_uuid"],
                        view_uuid=view))
                       for view in views for adapter in representations[view]]
             if values and len({consensus_key(value) for _, value in values}) == 1 and not element["view_identity_not_checked"]:
-                (element["fields"]["native.material"], element["native_material_state"],
+                (element["fields"][native_field], element["native_material_state"],
                  element["native_material_preservation"]) = values[0][1]
             else:
-                element["fields"]["native.material"] = {"status": "not_checked", "value": None,
-                                                            "reason": "native_material_representation_conflict"}
+                element["fields"][native_field] = {"status": "not_checked", "value": None,
+                                                    "reason": "native_material_representation_conflict"}
                 element["native_material_preservation"] = {
                     "status": "not_checked", "value": None, "reason": "native_material_representation_conflict",
                     "diagnostic": {"stage": "material_representation_consensus", "error_type": "RepresentationConflict"}}
@@ -330,6 +356,12 @@ def observe(plans, doc, base, settings, request):
                 {"status": "observed", "value": {key: copy.deepcopy(state[key])
                     for key in ("native_class", "material_owner", "hierarchy")}}
                 if state is not None else copy.deepcopy(element["native_material_preservation"]))
+            if sdk_field == "CalculationMode" and selected is not None:
+                # Before-state of the candidate mirror on the reviewed view:
+                # reported beside the native value, never part of it.
+                element["native_property_mirror"] = trace.call(
+                    "Native.calculation_mode_mirror", lambda: mirror_crosscheck(base, selected, None),
+                    drawing_file=element["ref"]["drawing_file"], model_uuid=element["ref"]["model_uuid"])
     if delete_requested:
         from .model_delete import ownership as delete_ownership
         for element in snapshot["elements"]:
@@ -366,6 +398,25 @@ def observe(plans, doc, base, settings, request):
         element["component_ownership"] = (evidence[0] if evidence and len({fingerprint(e) for e in evidence}) == 1
             and not element["view_identity_not_checked"] else
             {"status": "not_checked", "value": None, "reason": "slab_ownership_representation_conflict"})
+    # A MultiSlab attribute preview also reports its tiers' values of the same
+    # attribute: the layer keeps its own value ("Warstwa bieżąca"). This is
+    # evidence for review only; no tier joins the plan.
+    tier_ids = sorted({b["resource"]["attribute_id"] for b in binding if b["operation"] == "set_attribute"})
+    if tier_ids and exact is None:
+        from .component_ownership import multislab_tier_values
+        for element in snapshot["elements"]:
+            if (element["fields"]["type_name"].get("value") != "MultiSlab_TypeUUID"
+                    or element["ref"]["model_uuid"] in request.get("exclude_model_uuids", [])
+                    or evaluate_criterion(request.get("predicate"), element["fields"]) is False):
+                continue
+            representations = live.get((element["ref"]["drawing_file"], element["ref"]["model_uuid"]), {})
+            adapter = next((a for view in sorted(representations) for a in representations[view]), None)
+            if adapter is None:
+                continue
+            element["multislab_tier_values"] = trace.call(
+                "MultiSlab.tier_attribute_values", lambda adapter=adapter: multislab_tier_values(
+                    adapter, base, tier_ids, request.get("attribute_read_mode", "stored"), check),
+                drawing_file=element["ref"]["drawing_file"], model_uuid=element["ref"]["model_uuid"])
     if layer_requested:
         from .wall_layer import observe as observe_wall_layer
         import NemAll_Python_IFW_ElementAdapter as native_adapters
@@ -452,15 +503,15 @@ def observe(plans, doc, base, settings, request):
               "attribute_read_mode": request.get("attribute_read_mode", "stored"),
               "required_field_failures": required_failures,
               "operation_eligibility_failures": [
-                  {"ref": element["ref"], "field": "native.material",
-                   "old_value": copy.deepcopy(element["fields"]["native.material"]),
+                  {"ref": element["ref"], "field": native_field,
+                   "old_value": copy.deepcopy(element["fields"][native_field]),
                    "observation": copy.deepcopy(element["native_material_preservation"])}
                   for element in snapshot["elements"]
                   if decisions[fingerprint(element["ref"])] == "matched"
                   and element.get("native_material_preservation", {}).get("status") == "not_checked"],
               "component_ownership": [{"ref": element["ref"], "observation": element["component_ownership"]}
                                       for element in snapshot["elements"] if "component_ownership" in element],
-              "native_material_ownership": [
+              ("native_material_ownership" if sdk_field == "Material" else "native_property_ownership"): [
                   {"ref": element["ref"], "observation": element["native_material_ownership"]}
                   for element in snapshot["elements"] if "native_material_ownership" in element],
               "criterion_failures": [
@@ -471,6 +522,16 @@ def observe(plans, doc, base, settings, request):
                   for element in snapshot["elements"]
                   if decisions[fingerprint(element["ref"])] == "unknown"],
               "native_acceptance": "not_run", "runtime_verified": False}
+    if any("multislab_tier_values" in element for element in snapshot["elements"]):
+        report["multislab_tier_values"] = [
+            {"ref": element["ref"], "observation": element["multislab_tier_values"],
+             "informational": True, "tier_ui_mode": "Warstwa bieżąca"}
+            for element in snapshot["elements"] if "multislab_tier_values" in element]
+    if sdk_field == "CalculationMode":
+        report["native_property_mirror"] = [
+            {"ref": element["ref"], **element["native_property_mirror"],
+             "acceptance": "owner_review_required_not_part_of_readback"}
+            for element in snapshot["elements"] if "native_property_mirror" in element]
     report["report_fingerprint"] = fingerprint(report)
     check()
     return report, snapshot, query
@@ -487,12 +548,25 @@ def preview(plans, doc, base, settings, request):
         targets.append(copy.deepcopy(element["ref"]))
         for bound in report["binding"]:
             old = element["fields"][bound["field"]]
-            if bound["operation"] == "set_native_material" and not element.get("native_material_state"):
-                blocked.append({"ref": element["ref"], "field": bound["field"],
-                                "reason": ("native_material_preservation_unavailable"
-                                           if old.get("status") == "observed" else "old_value_unknown"),
-                                "old_value": copy.deepcopy(old),
-                                "observation": copy.deepcopy(element["native_material_preservation"])})
+            native_property = bound["operation"] in {"set_native_material", "set_native_calculation_mode"}
+            if native_property and not element.get("native_material_state"):
+                from .wall_material import SLAB_CALCULATION_MODE_BLOCK
+                family_reason = old.get("reason") if old.get("reason") in {
+                    SLAB_CALCULATION_MODE_BLOCK, "native_calculation_mode_family_unsupported"} else None
+                row = {"ref": element["ref"], "field": bound["field"],
+                       "reason": family_reason or ("native_material_preservation_unavailable"
+                                                   if old.get("status") == "observed" else "old_value_unknown"),
+                       "old_value": copy.deepcopy(old),
+                       "observation": copy.deepcopy(element["native_material_preservation"])}
+                if family_reason == SLAB_CALCULATION_MODE_BLOCK:
+                    # Owner decision 2026-11-04: plain slab requests target
+                    # "Cały obiekt" (the MultiSlab); the tier only when named.
+                    row["attribute_route"] = {
+                        "attribute_id": 120, "value": bound["resource"]["new_label"], "value_type": "enum",
+                        "default_owner": "MultiSlab_TypeUUID", "target": {"property_owner": "selected_element"},
+                        "tier_only_when_layer_named": "exact_target on the tier's parent-edge view",
+                        "note": "the project enum label must be confirmed by the attribute binding"}
+                blocked.append(row)
                 continue
             mode = bound.get("mode", "replace")
             absent = old.get("status") == "absent" and old.get("presence_proven") is True
@@ -562,6 +636,8 @@ def preview(plans, doc, base, settings, request):
                 change["resource"]["delete_ownership"] = copy.deepcopy(ownership)
             elif bound["operation"] == "set_native_material":
                 change["resource"]["native_material_state"] = copy.deepcopy(element["native_material_state"])
+            elif bound["operation"] == "set_native_calculation_mode":
+                change["resource"]["native_property_state"] = copy.deepcopy(element["native_material_state"])
             elif change["native_type"] in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
                 from .component_ownership import TIER_BLOCKERS, slab_ui_owner, slab_write_blocker
                 ownership = element.get("component_ownership")
@@ -575,6 +651,26 @@ def preview(plans, doc, base, settings, request):
                     continue
                 change["resource"]["component_ownership"] = copy.deepcopy(ownership)
             changes.append(change)
+    tier_values = {fingerprint(item["ref"]): item["observation"]
+                   for item in report.get("multislab_tier_values", [])}
+    differing_tiers = []
+    for change in changes:
+        observation = tier_values.get(fingerprint(change["ref"]))
+        if change["operation"] not in {"set_attribute", "add_attribute"} or observation is None:
+            continue
+        rows = []
+        if observation.get("status") == "observed":
+            for tier in observation["value"]:
+                value = tier["fields"].get(change["field"], {})
+                rows.append({"model_uuid": tier["model_uuid"], "view_uuid": tier["view_uuid"], "value": value,
+                             "differs_from_new_value": not (value.get("status") == "observed"
+                                                            and type(value.get("value")) is type(change["new_value"])
+                                                            and value.get("value") == change["new_value"])})
+        differing_tiers.append({"ref": change["ref"], "field": change["field"], "new_value": change["new_value"],
+                                "tiers": rows, "status": observation.get("status"),
+                                **({"reason": observation["reason"]} if "reason" in observation else {}),
+                                "effect": "none: the tier keeps its own value; change it only when the request "
+                                          "names the layer (exact_target)"})
     from .component_ownership import overlapping_slab_owners
     if overlapping_slab_owners(changes):
         blocked.append({"field": "material_owner", "reason": "overlapping_slab_property_owners"})
@@ -590,6 +686,7 @@ def preview(plans, doc, base, settings, request):
             "source_kind": KIND, "source_fingerprint": snapshot["source_fingerprint"],
             "evidence_fingerprint": report["report_fingerprint"], "scope": report["scope"], "coverage": report["coverage"],
             "changes": changes, "blocked": blocked, "highlight_targets": targets, "criteria": report,
+            **({"slab_tier_values": differing_tiers} if differing_tiers else {}),
             "capabilities": capability_probe(base), "counts": {**report["counts"], "changes": len(changes), "blocked": len(blocked),
                                                                 "highlight_targets": len(targets)},
             "requires_highlight": True, "native_selection": "unsupported_use_explicit_highlight",
@@ -598,7 +695,8 @@ def preview(plans, doc, base, settings, request):
             "limits": {"changes": plans.executor.MAX_CHANGES, "write_scope": "one_active_foreground_drawing",
                        "native_material_update": "experimental_native_architectural_material_optional_preservation",
                        "evidence_seconds": (max(MATERIAL_EVIDENCE_SECONDS, plans.queries.SCAN_SECONDS)
-                                            if any(b["operation"] == "set_native_material" for b in report["binding"])
+                                            if any(b["operation"] in {"set_native_material", "set_native_calculation_mode"}
+                                                   for b in report["binding"])
                                             else plans.queries.SCAN_SECONDS),
                        "deletion": "exact_component_roots_or_Wall_owned_openings_with_reviewed_subtrees"}}
     plan["undefined_policy"] = {

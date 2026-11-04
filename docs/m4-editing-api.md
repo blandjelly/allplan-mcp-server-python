@@ -248,7 +248,8 @@ which shows the parent ("Warstwa bieżąca" was not checked). The 0.46.0 parent-
 **Contract (0.47.0, automated tests only).** A `selected_element` attribute
 write on a `[Slab, MultiSlab]` tier without `exact_target` is blocked as
 `slab_tier_not_shown_in_ui_use_multislab` (0.46.0 name:
-`slab_tier_requires_exact_parent_edge_target`); without `property_owner` it
+`slab_tier_requires_exact_parent_edge_target`; renamed in 0.49.0 to
+`slab_tier_requires_exact_layer_target`, see below); without `property_owner` it
 keeps `slab_has_parent_requires_explicit_property_owner`. For attribute
 changes both blocked rows carry `ui_owner` with the MultiSlab
 `drawing_file/model_uuid/view_uuid` and a `next_preview` hint
@@ -263,6 +264,19 @@ one-for-one `AttributeContainer_TypeUUID` replacement per parent is accepted
 (`exact_inventory.accepted="attribute_containers_regenerated"`); any other
 change stays `unknown`. `material_comparison` on a view that is not a direct
 view now names the `parent_ref` route in its `probe_scope_unavailable` message.
+
+**Correction (0.49.0, automated tests only).** The tier is shown in the slab
+palette's "Warstwa bieżąca" mode (owner, 2026-11-04), so the 0.47.0 name
+stated a wrong premise. The block is renamed
+`slab_tier_requires_exact_layer_target`; behaviour is unchanged: plain slab
+requests target the MultiSlab ("Cały obiekt", owner decision), the tier only
+when the request names the layer, through `exact_target`. `ui_owner` adds
+`ui_mode="Cały obiekt"`, `tier_ui_mode="Warstwa bieżąca"` and `tier_route`.
+A MultiSlab attribute preview reads the same attribute on the MultiSlab's
+Slab tiers (children, at most 16) and reports them in `slab_tier_values` with
+`differs_from_new_value`; this is informational, the tier is never bound or
+written, and a tier change after preview invalidates the plan through the
+evidence fingerprint.
 
 **Native observation (0.47.0, Allplan 2026.1, bridge `ceec638`,
 [raw evidence](test-results/evidence/0.47.0-2026-11-03/evidence-20261103.jsonl)).**
@@ -516,7 +530,9 @@ Sources reviewed **2026-11-03** for the Python API **2026**:
 [PlaneReferences](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_ArchElements/PlaneReferences/)
 and the [element modification manual](https://pythonparts.allplan.com/2026/manual/features/model_access/element_modification/).
 Each subsection keeps SDK documentation (**SDK**), hypotheses (**H**) and
-native observations (**N**) apart. No runtime write exists for any field below.
+native observations (**N**) apart. 0.49.0 implements the `CalculationMode`
+write for Column, single-tier Wall and Beam ([contract](#calculationmode-write-contract-0490));
+no other field below has a runtime write.
 
 ### SDK: shared members and owners
 
@@ -585,7 +601,7 @@ does not prove persistence.
 
 Drawing 101, Allplan 2026.1, bridge 0.48.0 (`5faa86d`, `sha256-verified`),
 `setter_calls_started=0` ([raw evidence](test-results/evidence/0.48.0-2026-11-04/evidence-20261104.jsonl);
-per-element table in the [handoff](next-model-handoff.md#latest-version)).
+per-element table in the [handoff](next-model-handoff.md#installed-version-and-last-native-evidence)).
 UI values are owner-reported.
 
 - **N:** `CalculationMode` equals attribute 120 and the UI "Obmiar" on the
@@ -645,7 +661,8 @@ portable codec.
 | Beam / StructuralBeam | `BeamProperties` via `Properties`/`SetProperties`, or `StructuralBeamProperties` via `SetStructuralBeamProperties`; class checked at runtime | as Column; the Beam's one-for-one `AttributeContainer`/`WallAxis` regeneration is the only accepted structural drift, and only after it is observed for this field |
 | Slab / MultiSlab | `SlabElement.Properties.SetCalculationMode` on the MultiSlab shown in the UI (the 0.46.0 owner); tier writes stay out | Material, tier count/thickness, other scalars, child tiers and their attribute containers. Highest risk: 0.43.0 suggests a `SlabProperties` change may not persist |
 
-Write/readback/Undo plan for each family (step 2 of item 5, not implemented):
+Write/readback/Undo plan for each family (step 2 of item 5; implemented for
+Column, Wall and Beam in 0.49.0, see the contract below):
 
 1. **Read-only precheck (no setter).** On the exact owner, read native
    `CalculationMode`, `Priority`, `Trade` (and tier `Thickness`) next to
@@ -665,6 +682,48 @@ Write/readback/Undo plan for each family (step 2 of item 5, not implemented):
 5. **Undo.** One UI Undo; the restoration read must return the old code (and
    the old attribute 120 value). The owner confirms the UI field
    ("Rodzaj rozliczenia" in the properties palette).
+
+### `CalculationMode` write contract (0.49.0)
+
+Automated tests only; no native observation yet.
+
+- **Request:** `{"target":{"kind":"native_calculation_mode"},"value":LABEL_OR_CODE}`
+  with the SDK label `m3`, `m2`, `m`, `Pcs`, `kg` or the code 0–4, as the only
+  change. Attribute 120 may not be read or filtered in the same plan (it would
+  look like unplanned drift in the post-Apply criteria comparison).
+- **Families:** `Column_TypeUUID` (`ColumnProperties`), single-tier
+  `Wall_TypeUUID` (`GetWallTierProperties(1)`), `Beam_TypeUUID`
+  (`BeamProperties`, or `StructuralBeamProperties` with its own setter when
+  that class is live). `Slab_TypeUUID`/`MultiSlab_TypeUUID` are blocked as
+  `slab_calculation_mode_uses_multislab_attribute_120` without any native read;
+  the row's `attribute_route` names attribute 120 with
+  `property_owner="selected_element"` on the MultiSlab ("Cały obiekt"); the
+  tier only when the layer is named (exact target). SkeletonBeam and other
+  families are blocked as `native_calculation_mode_family_unsupported`.
+- **Binding:** field `native.calculation_mode`, operation
+  `set_native_calculation_mode`, `new_value` = integer code, `resource.new_label`
+  = SDK label, `resource.mirror_attribute_id=120`, owner evidence in
+  `resource.native_property_state` (schema `m4-native-calculation-mode-state-1`,
+  `native_field="CalculationMode"`). The old value must be an observed code
+  0–4 (otherwise `old_value_unknown`); an equal code is a no-op.
+- **Preservation:** the same snapshot as native Material with `CalculationMode`
+  removed from the scalar set and `Material` added; on Wall attribute
+  containers attribute 120 (not 508) is excluded. Preflight and the final
+  setter boundary are byte-exact. The Beam child regeneration accepted for
+  native Material (`auxiliary_children_regenerated`) is **not** accepted for
+  this field; such a drift stays `unknown` and goes through the reviewed
+  reconciliation route.
+- **Apply:** setter `SetCalculationMode(code)` on the bound owner,
+  `SetProperties`/`SetStructuralBeamProperties`, one `ModifyElements`.
+- **Readback:** native `CalculationMode` on every live wrapper decides
+  `applied`/`failed`/`unknown`. Attribute 120 is read separately on each
+  wrapper (`ReadAllAndComputable`) and reported in
+  `representation_consensus.mirror_crosscheck` (`matches_new_label`,
+  `matches_old_label`, `other_value`, `representations_disagree` or
+  `unavailable`, `acceptance="owner_review_required_not_part_of_readback"`);
+  the preview reports its before-value in `criteria.native_property_mirror`.
+  The verdict is evidence for the mirror question, never accepted
+  automatically in either direction.
 
 Open questions: whether the MultiSlab attribute 120 route changes the slab
 quantity mode as the UI expects (0.48.0: the native `SlabProperties` value is

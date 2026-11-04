@@ -330,12 +330,16 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     user sees in Allplan (attribute Materiał, ID 508) belongs to the MultiSlab:
     for "change the slab material" preview native_types=["MultiSlab_TypeUUID"]
     with property_owner=selected_element and check that the change ref is the
-    intended MultiSlab. A Slab tier inside a MultiSlab is not shown in the UI;
-    a tier attribute write without exact_target is blocked as
-    slab_tier_not_shown_in_ui_use_multislab, and blocked[].ui_owner names the
-    MultiSlab to preview instead. Write tier storage only when the user
-    explicitly asks for the tier, with exact_target (its parent-edge child view
-    and the MultiSlab model/view) and one attribute_id replace. Never substitute the attribute
+    intended MultiSlab. The slab properties palette shows the MultiSlab as
+    "Cały obiekt" and a Slab tier as "Warstwa bieżąca"; both are UI owners.
+    Plain slab requests target the MultiSlab ("Cały obiekt"). A tier attribute
+    write without exact_target is blocked as slab_tier_requires_exact_layer_target,
+    and blocked[].ui_owner names the MultiSlab to preview instead. Write the
+    tier only when the user explicitly names the layer, with exact_target (its
+    parent-edge child view and the MultiSlab model/view) and one attribute_id
+    replace. A MultiSlab attribute preview reports its tiers' values of the same
+    attribute in slab_tier_values (informational, never written); tell the user
+    when the layer keeps a different value. Never substitute the attribute
     Materiał for native_material or the reverse: use the target kind the user
     or the trial instruction names. Other attribute types
     and computed-only/presence safeguards retain their existing requirements.
@@ -347,6 +351,18 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     its drift is a conflict before a write or an unknown outcome after a write.
     Complex representations and optional streams provide bounded drift evidence;
     they do not prove preservation of every hidden auxiliary property.
+    Native calculation mode ("Obmiar"/"Rodzaj rozliczenia") uses
+    changes=[{target:{kind:native_calculation_mode},value:LABEL_OR_CODE}] as the
+    only edit, with the SDK label m3, m2, m, Pcs, kg or code 0-4, on a Column,
+    single-tier Wall or Beam_TypeUUID. It sets CalculationMode on the same
+    owner as native Material through ModifyElements. The old code must be 0-4
+    and differ from the new one; preservation excludes only CalculationMode and
+    attribute 120. Readback reports native.calculation_mode, and separately
+    representation_consensus.mirror_crosscheck with attribute 120 and a verdict;
+    a diverging attribute 120 is evidence for the owner, never auto-accepted.
+    Do not read or filter attribute 120 in the same plan. For a slab use
+    attribute 120 on the MultiSlab with property_owner=selected_element (no
+    native slab write; blocked as slab_calculation_mode_uses_multislab_attribute_120).
     Delete with changes=[{target:{kind:delete}}] as the only edit. This binds
     exact terminal component roots and their full bounded owned subtrees, or a
     WindowDoor opening directly owned by a Wall; it never uses the current UI

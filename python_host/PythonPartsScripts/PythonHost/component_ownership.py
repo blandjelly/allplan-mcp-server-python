@@ -133,15 +133,20 @@ def observation(adapter, check=lambda: None, *, include_children=True):
         return failure(exc)
 
 
-TIER_NOT_UI_OWNER = "slab_tier_not_shown_in_ui_use_multislab"
+# 0.49.0 rename (owner decision 2026-11-04): the tier IS shown in the UI, in
+# the slab palette's "Warstwa bieżąca" mode. A plain slab request targets
+# "Cały obiekt" (the MultiSlab); the tier needs an explicit layer request
+# through exact_target. The 0.47.0 name stated the wrong premise.
+TIER_NOT_UI_OWNER = "slab_tier_requires_exact_layer_target"
 TIER_BLOCKERS = frozenset({TIER_NOT_UI_OWNER, "slab_has_parent_requires_explicit_property_owner"})
 
 
 def slab_ui_owner(evidence):
-    """The MultiSlab that Allplan shows for a [Slab, MultiSlab] tier, or None.
+    """The MultiSlab ("Cały obiekt", the default slab owner) of a tier, or None.
 
     This is a hint for a separate preview, never a write redirection: the
-    caller must request the MultiSlab itself (0.46.0 owner observation).
+    caller must request the MultiSlab itself. The tier is shown as
+    "Warstwa bieżąca" and is changed only when the request names the layer.
     """
     value = evidence.get("value") if isinstance(evidence, dict) and evidence.get("status") == "observed" else None
     lineage = value.get("lineage") if isinstance(value, dict) else None
@@ -151,6 +156,9 @@ def slab_ui_owner(evidence):
     parent = lineage[1]
     return {"drawing_file": parent.get("drawing_file"), "model_uuid": parent.get("model_uuid"),
             "view_uuid": parent.get("view_uuid"), "type_name": "MultiSlab_TypeUUID",
+            "ui_mode": "Cały obiekt",
+            "tier_ui_mode": "Warstwa bieżąca",
+            "tier_route": "only when the request names the layer: exact_target with the tier's parent_ref",
             "next_preview": {"native_types": ["MultiSlab_TypeUUID"],
                              "target": {"property_owner": "selected_element"},
                              "check": "the plan change ref.model_uuid equals this model_uuid; "
@@ -185,11 +193,11 @@ def slab_write_blocker(evidence, change=None):
                     and lineage[1].get("type_name") == "MultiSlab_TypeUUID"))):
             return "slab_explicit_property_owner_invalid"
         if len(lineage) == 2:
-            # 0.46.0 trial: the tier stores its own attribute 508 (it kept the
-            # 0.45.0 value), but Allplan shows the MultiSlab's value as the slab
-            # material. A tier write is therefore never the default material
-            # route: it needs exact_target on the tier's parent-edge view and
-            # changes only tier storage that the UI does not display (0.47.0).
+            # The tier stores its own attributes (0.46.0) and the UI shows them
+            # in the "Warstwa bieżąca" palette mode (owner, 2026-11-04). Plain
+            # slab requests target the MultiSlab ("Cały obiekt"); a tier write
+            # needs an explicit layer request with exact_target on the tier's
+            # parent-edge view (0.47.0 route).
             exact = resource.get("exact_target_binding")
             target_binding = exact.get("target") if isinstance(exact, dict) else None
             parent = lineage[1]
@@ -227,3 +235,37 @@ def overlapping_slab_owners(changes):
         if any((ref["drawing_file"], ref["model_uuid"]) in selected for ref in lineage[1:]):
             return True
     return False
+
+
+MAX_REPORTED_TIERS = 16
+
+
+def multislab_tier_values(adapter, base, attribute_ids, read_mode="stored", check=lambda: None):
+    """Read the same attributes on a MultiSlab's Slab tiers; informational only.
+
+    A MultiSlab preview shows that the layer ("Warstwa bieżąca") keeps its own
+    value. No tier is selected, bound or written by this read.
+    """
+    import NemAll_Python_IFW_ElementAdapter as adapters
+    from .native_model_edit import attribute_fields
+
+    try:
+        children = adapters.BaseElementAdapterChildElementsService.GetChildModelElements(adapter, True)
+        tiers = []
+        for index, child in enumerate(children):
+            check()
+            if index >= 256:
+                return {"status": "not_checked", "value": None, "reason": "tier_child_limit"}
+            if text(child.GetElementAdapterType().GetTypeName()) != "Slab_TypeUUID":
+                continue
+            if len(tiers) >= MAX_REPORTED_TIERS:
+                return {"status": "not_checked", "value": None, "reason": "tier_report_limit"}
+            ref = identity(child)
+            tiers.append({"model_uuid": ref["model_uuid"], "view_uuid": ref["view_uuid"],
+                          "fields": attribute_fields(child, base, list(attribute_ids), read_mode)})
+        check()
+        return {"status": "observed", "value": sorted(tiers, key=fingerprint)}
+    except BridgeError:
+        raise
+    except Exception as exc:
+        return failure(exc, "multislab_tier_values")

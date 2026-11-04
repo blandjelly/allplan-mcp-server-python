@@ -31,7 +31,7 @@ Status as of the 0.48.0 read-only trial (2026-11-04). One active drawing, 1–32
 | Wall | PASS (0.30.0) | CODE | CODE | PARTIAL (ID 1371: post-Undo read only) | PASS (ID 120, 0.31.0) | NONE |
 | SkeletonBeam | REPORTED (ID 508, 0.39.0) | CODE | CODE | CODE | CODE | NONE |
 | Beam | PASS (ID 508 `""`→`TEST-BEAM`, 0.44.0; `""`→`C30/37`, 0.45.0, UI, UI Undo and post-Undo read `""`) | CODE | CODE | CODE | CODE | NONE |
-| Slab (MultiSlab child) | VALUE (tier storage; shown in the UI palette's "Warstwa bieżąca" mode, owner 2026-11-04, not checked after the write): exact parent-edge route, ID 508 `TEST2`→`TEST1`, 0.47.0 execution `9b2e4d71…`, `applied` with both tier wrappers agreeing and inventory unchanged; no UI Undo. Non-exact tier writes are blocked and name the MultiSlab (`ui_owner`, 0.47.0 native PASS). Earlier REPORTED (0.27.0, 0.39.0) without owner binding | CODE | CODE | CODE | CODE | NONE |
+| Slab (MultiSlab child) | VALUE (tier storage; shown in the UI palette's "Warstwa bieżąca" mode, owner 2026-11-04, not checked after the write): exact parent-edge route, ID 508 `TEST2`→`TEST1`, 0.47.0 execution `9b2e4d71…`, `applied` with both tier wrappers agreeing and inventory unchanged; no UI Undo. Non-exact tier writes are blocked and name the MultiSlab (`ui_owner`, 0.47.0 native PASS; reason renamed `slab_tier_requires_exact_layer_target` in 0.49.0). MultiSlab attribute previews report the tier value as `slab_tier_values` (0.49.0 CODE). Earlier REPORTED (0.27.0, 0.39.0) without owner binding | CODE | CODE | CODE | CODE | NONE |
 | MultiSlab | PASS (ID 508, the slab material shown in the UI: 0.46.0 `04569db1…` `TEST1`→`TEST2`; 0.47.0 plain-language request `3f9c2a7e…` `TEST1`→`TEST3`, `applied` on view `b4a59b5b…`, UI, UI Undo and post-Undo read `TEST1`) | CODE | CODE | CODE | CODE | NONE |
 
 Computed-only attributes are never written. Attribute definitions are never
@@ -41,14 +41,14 @@ created; an existing definition can be added to an element (`add`/`upsert`).
 
 | Family | Native Material | Other native properties | Organizational layer | Delete |
 | --- | --- | --- | --- | --- |
-| Column | VALUE (0.35.0 record, 0.39.0) | NONE (write); getter read observed (0.48.0), native `CalculationMode` = attr 120 = UI | PARTIAL (no-op only) | PASS (grouped, 3 Columns + Undo, 0.29.0) |
-| Wall (single tier) | VALUE (0.37.0/0.39.0, preservation unverified) | NONE (write); getter read observed (0.48.0), native `CalculationMode` = attr 120 = UI | REPORTED (`Ogólne03`, 0.27.0) | PARTIAL (subtree absent; no Undo) |
+| Column | VALUE (0.35.0 record, 0.39.0) | CODE (0.49.0 `CalculationMode` write, native trial pending; Column first); getter read observed (0.48.0), native `CalculationMode` = attr 120 = UI | PARTIAL (no-op only) | PASS (grouped, 3 Columns + Undo, 0.29.0) |
+| Wall (single tier) | VALUE (0.37.0/0.39.0, preservation unverified) | CODE (0.49.0 `CalculationMode` write, native trial pending); getter read observed (0.48.0), native `CalculationMode` = attr 120 = UI | REPORTED (`Ogólne03`, 0.27.0) | PARTIAL (subtree absent; no Undo) |
 | Wall (multi tier) | BLOCKED (one tier only) | NONE | CODE (tier-aware route) | — |
 | SkeletonBeam | BLOCKED (no successful write; view discrepancy) | NONE (write); getter-only read CODE (0.48.0), not read natively | CODE | FIXTURE (no disposable target) |
-| Beam | PASS (0.46.0 execution `5a0bc366…`: `""`→`C30/37`, `applied` with `accepted_preservation_drift.accepted="auxiliary_children_regenerated"` on view `362f80d3…`; owner-reported UI and UI Undo, post-Undo preview old value `""`) | NONE (write); getter read observed on view `6035d406…` (0.48.0), native `CalculationMode` = attr 120 = UI | FIXTURE | FIXTURE |
-| Slab (MultiSlab child) | PARTIAL, not the UI material (0.43.0 setter ran, readback `" "`; tier 0 also `" "`; 0.44.2 owner: UI shows `TEST1` = attribute 508). Use the MultiSlab's attribute 508 | NONE (write); getter read observed incl. tier `Thickness`, native = attr 120 `m2` (0.48.0) | BLOCKED (parented child) | BLOCKED (parented child) |
+| Beam | PASS (0.46.0 execution `5a0bc366…`: `""`→`C30/37`, `applied` with `accepted_preservation_drift.accepted="auxiliary_children_regenerated"` on view `362f80d3…`; owner-reported UI and UI Undo, post-Undo preview old value `""`) | CODE (0.49.0 `CalculationMode` write, native trial pending); getter read observed on view `6035d406…` (0.48.0), native `CalculationMode` = attr 120 = UI | FIXTURE | FIXTURE |
+| Slab (MultiSlab child) | PARTIAL, not the UI material (0.43.0 setter ran, readback `" "`; tier 0 also `" "`; 0.44.2 owner: UI shows `TEST1` = attribute 508). Use the MultiSlab's attribute 508 | BLOCKED for native `CalculationMode` (0.49.0: `slab_calculation_mode_uses_multislab_attribute_120`); getter read observed incl. tier `Thickness`, native = attr 120 `m2` (0.48.0) | BLOCKED (parented child) | BLOCKED (parented child) |
 | Slab (standalone) | CODE | NONE (write); getter-only read CODE (0.48.0), no fixture read | FIXTURE | FIXTURE |
-| MultiSlab | CODE | NONE (write); getter read observed (0.48.0): native `CalculationMode` `m2` ≠ attr 120/UI `m3`, native route not the UI owner | BLOCKED (aggregate owner) | FIXTURE |
+| MultiSlab | CODE | BLOCKED for native `CalculationMode` (native route not the UI owner: 0.48.0 native `m2` ≠ attr 120/UI `m3`); calculation mode goes through attribute 120 with `property_owner="selected_element"` (CODE, not yet trialled) | BLOCKED (aggregate owner) | FIXTURE |
 | WindowDoor (opening) | — | NONE | CODE | CODE |
 
 "Other native properties" means members of `WallTierProperties`,
@@ -63,7 +63,10 @@ names `CalculationMode` as the first write candidate per family; 0.48.0 reports
 Wall, Column, Beam, MultiSlab and Slab child: native `CalculationMode` equals
 attribute 120 and the UI on Wall/Column/Beam, but not on the MultiSlab (native
 `m2`, UI/attribute `m3`); see the [API note](m4-editing-api.md#native-observations-0480-read-only-precheck-2026-11-04).
-Standalone Slab and SkeletonBeam were not read.
+Standalone Slab and SkeletonBeam were not read. 0.49.0 adds the
+`native_calculation_mode` write for Column, single-tier Wall and
+`Beam_TypeUUID` only (SkeletonBeam and slabs are blocked); its attribute 120
+cross-check is reported separately and decides the mirror after the trial.
 
 Selection: native selection is unsupported for every family; highlight is
 available and is not a selection ([selection API](m4-native-selection-api.md)).
