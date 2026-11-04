@@ -577,7 +577,41 @@ does not prove persistence.
   209 on the same element (SDK text names `@209@`; the 0.31.0 labels match).
   If true, a native write changes an `AttributeContainer` value and the
   preservation comparison must expect exactly that attribute to change; if
-  false, the two routes are separate storage. Not observed.
+  false, the two routes are separate storage. Read-only result in the next
+  subsection; storage coupling needs a write.
+
+### Native observations (0.48.0 read-only precheck, 2026-11-04)
+
+Drawing 101, Allplan 2026.1, bridge 0.48.0 (`5faa86d`, `sha256-verified`),
+`setter_calls_started=0` ([raw evidence](test-results/evidence/0.48.0-2026-11-04/evidence-20261104.jsonl);
+per-element table in the [handoff](next-model-handoff.md#latest-version)).
+UI values are owner-reported.
+
+- **N:** `CalculationMode` equals attribute 120 and the UI "Obmiar" on the
+  single-tier Wall (0 `m3`), the Column (2 `m`) and the Beam (0 `m3`). The
+  hypothesis is *consistent* for these families; equal values do not prove
+  shared storage.
+- **N:** on the MultiSlab, `SlabElement.Properties.CalculationMode` is 1 `m2`
+  (tier 0 also `m2`) while attribute 120 and the UI show `m3`. The MultiSlab's
+  native `SlabProperties` matches its tier 0 and the Slab child (Material `" "`, `m2`,
+  Trade 0, thickness 200.0) and is **not** the UI owner of the calculation
+  mode — the same split as material (0.43.0, 0.46.0). The Slab child reads
+  `m2` natively and in attribute 120.
+- **N:** `Priority` equals the UI on all four (Wall 300, Column 100, Beam 100,
+  Slab 200). `Thickness` is in millimetres (Wall tier 240.0, Slab tier 200.0;
+  UI 0.2400 / 0.2000 m).
+- **N:** `Trade` is −1 on Wall, Column and Beam and 0 on both slab wrappers;
+  attribute 209 ("Typ_robót") is not returned, `<niezdefiniowany>` or `""`,
+  and the UI "Typ robót" is empty on all. The `Trade` ↔ 209 mapping is **not
+  determinable** without an element that has a chosen trade.
+- **N:** the Wall shows two materials in the UI: native tier Material `TEST`
+  in the element dialog ("Materiał/Ilości") and attribute 508 `Silikat` in the
+  attributes palette.
+
+Consequences for step 2: write `CalculationMode` natively only on Wall,
+Column and Beam, and treat attribute 120 as a separately reported readback
+whose change decides the mirror; route the slab calculation mode through the
+MultiSlab attribute 120. No `Trade` write until a labelled fixture exists.
 
 ### One candidate per family
 
@@ -619,8 +653,9 @@ Write/readback/Undo plan for each family (step 2 of item 5, not implemented):
    the old attribute 120 value). The owner confirms the UI field
    ("Rodzaj rozliczenia" in the properties palette).
 
-Open questions: whether the MultiSlab is also the UI owner of
-`CalculationMode` for a slab; whether the Beam regeneration repeats for a
+Open questions: whether the MultiSlab attribute 120 route changes the slab
+quantity mode as the UI expects (0.48.0: the native `SlabProperties` value is
+not what the UI shows); whether the Beam regeneration repeats for a
 non-material field; whether `Trade` codes map one-to-one to the project's
 attribute 209 labels.
 
