@@ -31,7 +31,7 @@ Status as of the 0.48.0 read-only trial (2026-11-04). One active drawing, 1–32
 | Wall | PASS (0.30.0) | CODE | CODE | PARTIAL (ID 1371: post-Undo read only) | PASS (ID 120, 0.31.0) | NONE |
 | SkeletonBeam | REPORTED (ID 508, 0.39.0) | CODE | CODE | CODE | CODE | NONE |
 | Beam | PASS (ID 508 `""`→`TEST-BEAM`, 0.44.0; `""`→`C30/37`, 0.45.0, UI, UI Undo and post-Undo read `""`) | CODE | CODE | CODE | CODE | NONE |
-| Slab (MultiSlab child) | VALUE (tier storage, not shown in the UI): exact parent-edge route, ID 508 `TEST2`→`TEST1`, 0.47.0 execution `9b2e4d71…`, `applied` with both tier wrappers agreeing and inventory unchanged; no UI Undo. Non-exact tier writes are blocked and name the MultiSlab (`ui_owner`, 0.47.0 native PASS). Earlier REPORTED (0.27.0, 0.39.0) without owner binding | CODE | CODE | CODE | CODE | NONE |
+| Slab (MultiSlab child) | VALUE (tier storage; shown in the UI palette's "Warstwa bieżąca" mode, owner 2026-11-04, not checked after the write): exact parent-edge route, ID 508 `TEST2`→`TEST1`, 0.47.0 execution `9b2e4d71…`, `applied` with both tier wrappers agreeing and inventory unchanged; no UI Undo. Non-exact tier writes are blocked and name the MultiSlab (`ui_owner`, 0.47.0 native PASS). Earlier REPORTED (0.27.0, 0.39.0) without owner binding | CODE | CODE | CODE | CODE | NONE |
 | MultiSlab | PASS (ID 508, the slab material shown in the UI: 0.46.0 `04569db1…` `TEST1`→`TEST2`; 0.47.0 plain-language request `3f9c2a7e…` `TEST1`→`TEST3`, `applied` on view `b4a59b5b…`, UI, UI Undo and post-Undo read `TEST1`) | CODE | CODE | CODE | CODE | NONE |
 
 Computed-only attributes are never written. Attribute definitions are never

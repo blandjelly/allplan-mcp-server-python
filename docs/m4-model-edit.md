@@ -85,7 +85,10 @@ the UI; without `exact_target` on its parent-edge view (one `attribute_id`
 replace) it is blocked as `slab_tier_not_shown_in_ui_use_multislab`, and the
 blocked row's `ui_owner` names the MultiSlab to preview instead (0.47.0,
 [contract](m4-editing-api.md#slab-tier-attribute-writes-and-the-ui-material-owner-04500460-observations-0470-contract)). One plan must not cover both an
-aggregate and its layer. A missing owner still blocks attributes of the
+aggregate and its layer. **Correction (owner, 2026-11-04):** the tier is shown in the palette's
+"Warstwa bieżąca" mode; the block name and this guidance are to be replaced by
+a whole-object/current-layer choice ([plan item 3](development-plan.md#remaining-work-and-unresolved-errors)).
+The code still behaves as described. A missing owner still blocks attributes of the
 aggregate and its child slab; organizational layers keep separate ownership
 limits.
 

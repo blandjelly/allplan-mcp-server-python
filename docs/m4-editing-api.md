@@ -230,7 +230,8 @@ of the tier's two wrappers.
 MultiSlab `parent_ref` read attribute 508 **`TEST2`** on the tier `8a693925…`
 and **`TEST1`** on the MultiSlab `bf097d95…` (both read modes; native Material
 `" "` on both). The owner sees one slab object in the UI ("slab"), showing
-`TEST1`; the tier is not shown. The 0.46.0 exact-target tier preview was
+`TEST1`; the tier is not shown (in the "Cały obiekt" palette mode; the
+"Warstwa bieżąca" mode shows the tier — owner, 2026-11-04). The 0.46.0 exact-target tier preview was
 therefore `no_op`. A separate MultiSlab preview (`native_types=["MultiSlab_TypeUUID"]`,
 `property_owner="selected_element"`) and Apply `04569db1850748b2b029629c935dd36a`
 changed 508 `TEST1` → `TEST2` on view `b4a59b5b…` (`applied`,
@@ -240,8 +241,8 @@ UI, then UI Undo, and a fresh read returned `TEST1` on the MultiSlab and
 the **MultiSlab's** attribute 508; the tier keeps its own stored value. The
 0.45.0 tier `applied` results most likely wrote that tier value (no other write
 touched the tier since; the 0.45.0 intermediate `TEST1` read is unexplained,
-possibly an unrecorded UI Undo); they were not UI-visible because the UI shows
-the parent. The 0.46.0 parent-edge tier route is still natively unobserved
+possibly an unrecorded UI Undo); they were not visible in "Cały obiekt" mode,
+which shows the parent ("Warstwa bieżąca" was not checked). The 0.46.0 parent-edge tier route is still natively unobserved
 (its preview was `no_op`).
 
 **Contract (0.47.0, automated tests only).** A `selected_element` attribute
@@ -607,6 +608,10 @@ UI values are owner-reported.
 - **N:** the Wall shows two materials in the UI: native tier Material `TEST`
   in the element dialog ("Materiał/Ilości") and attribute 508 `Silikat` in the
   attributes palette.
+- **N (owner, 2026-11-04):** the slab properties palette has two modes:
+  "Cały obiekt" shows the MultiSlab (508 `TEST1`, 120 `m3`) and "Warstwa
+  bieżąca" shows the tier (508 `TEST2`, 120 `m2`, priority 200, empty
+  `Typ_robót`). Both match the API reads; the tier is a UI-visible owner.
 
 Consequences for step 2: write `CalculationMode` natively only on Wall,
 Column and Beam, and treat attribute 120 as a separately reported readback
