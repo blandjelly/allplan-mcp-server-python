@@ -51,6 +51,9 @@ class TierProperties:
     def SetMaterial(self, value):
         self.Material = value
 
+    def SetCalculationMode(self, value):
+        self.CalculationMode = value
+
 
 class WallProperties:
     def __init__(self, material="C20/25", tier_count=1):

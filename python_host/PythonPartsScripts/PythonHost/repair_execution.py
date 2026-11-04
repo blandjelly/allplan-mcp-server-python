@@ -354,12 +354,12 @@ class RepairExecutor:
                     or change.get("native_type") not in COMPONENT_TYPES):
                 return False
             seen.add(key)
-            if change.get("operation") == "set_native_material":
+            if change.get("operation") in {"set_native_material", "set_native_calculation_mode"}:
                 from .wall_material import valid_change
                 capability = plan["capabilities"]["symbols"].get("ModifyElements", {})
                 if (not valid_change(change) or capability.get("status") != "observed"
                         or capability.get("callable") is not True
-                        or any(item.get("operation") != "set_native_material" for item in changes)):
+                        or any(item.get("operation") != change["operation"] for item in changes)):
                     return False
                 continue
             if change.get("operation") == "delete_element":
@@ -570,7 +570,8 @@ class RepairExecutor:
                 self.save(record)  # Write-ahead marker: a crash cannot authorize replay.
                 stage = "setter"
                 try:
-                    if change.get("operation") in {"delete_element", "set_native_material"}:
+                    if change.get("operation") in {"delete_element", "set_native_material",
+                                                   "set_native_calculation_mode"}:
                         def write_budget():
                             if self.plans.queries.clock() - started >= 20:
                                 raise BridgeError("scan_limit_exceeded", "Native mutation preflight exceeded execution budget.", 409)
@@ -751,7 +752,7 @@ class RepairExecutor:
             observations.append({"state": state, "readback": value, "stage": stage,
                                  **({"representation_consensus": resolution} if resolution else {}), **details})
             if (record["outcomes"][index]["state"] == "unknown"
-                    and change.get("operation") == "set_native_material"
+                    and change.get("operation") in {"set_native_material", "set_native_calculation_mode"}
                     and resolution.get("reconciliation_readback", {}).get("status") == "observed"):
                 candidates.append({"index": index, "ref": change["ref"],
                     "readback": resolution["reconciliation_readback"],
@@ -766,7 +767,7 @@ class RepairExecutor:
             digest = fingerprint({"execution_id": record["execution_id"], "changes": record["changes"],
                                   "evidence": candidates})
             reconciliation = {"hash": digest, "targets": candidates,
-                "meaning": "Current native material is agreed; preservation differs from the reviewed plan. "
+                "meaning": "Current native property value is agreed; preservation differs from the reviewed plan. "
                            "Review changed sections and the model before acknowledging. This does not prove preservation or setter causality.",
                 "request": {"schema_version": "m4-model-edit-1", "action": "recover",
                     "execution_id": record["execution_id"], "reconciliation_hash": digest,

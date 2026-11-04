@@ -17,6 +17,8 @@ _TYPES = {"text", "string", "integer", "real", "boolean", "enum"}
 _READ_ALL = "ReadAll"
 _READ_ALL_COMPUTABLE = "ReadAllAndComputable"
 _ADD_EVIDENCE = "absent_from_ReadAllAndComputable"
+# Native property routes through architectural properties and ModifyElements.
+NATIVE_PROPERTY_OPERATIONS = frozenset({"set_native_material", "set_native_calculation_mode"})
 
 
 def _explicitly_stale(adapter):
@@ -195,7 +197,7 @@ def resolve(doc, base, queries, change, writable=False, diagnostics=None, adapte
     if writable:
         # The enumeration deadline ends with enumeration. Material evidence
         # has its own bounded allowance, as it does in preview/readback.
-        if change.get("operation") == "set_native_material":
+        if change.get("operation") in NATIVE_PROPERTY_OPERATIONS:
             from .model_edit import MATERIAL_EVIDENCE_SECONDS
             evidence_started = queries.clock()
             def budget():
@@ -227,7 +229,7 @@ def _writable(doc, base, queries, element, change, diagnostics, budget, *, prese
     if integer(element.GetDrawingfileNumber()) != ref["drawing_file"]:
         raise BridgeError("target_not_writable", "Passive target cannot be changed.", 409)
     if (change.get("native_type") in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}
-            and change.get("operation") not in {"delete_element", "set_native_material"}):
+            and change.get("operation") not in {"delete_element"} | NATIVE_PROPERTY_OPERATIONS):
         _slab_ownership(element, change, budget)
     if change.get("operation") == "set_wall_layer":
         import NemAll_Python_IFW_ElementAdapter as native_adapters
@@ -236,10 +238,10 @@ def _writable(doc, base, queries, element, change, diagnostics, budget, *, prese
     if change.get("operation") == "delete_element":
         from .model_delete import preflight
         preflight(element, change, budget)
-    if change.get("operation") == "set_native_material":
+    if change.get("operation") in NATIVE_PROPERTY_OPERATIONS:
         from .wall_material import read as read_material
         if read_material(base, element, change, budget, preservation=preservation) != change["old_value"]:
-            _conflict("Native material or observed evidence changed before write.")
+            _conflict("Native property or observed evidence changed before write.")
 
 
 def read_consensus(base, queries, elements, change, diagnostics=None, *, post_setter=False):
@@ -257,7 +259,9 @@ def read_consensus(base, queries, elements, change, diagnostics=None, *, post_se
     if not elements or len(elements) > 64:
         return {"status": "not_checked", "value": None, "reason": "representation_count_unavailable_or_over_limit"}
     observations = []
-    material = change.get("operation") == "set_native_material"
+    material = change.get("operation") in NATIVE_PROPERTY_OPERATIONS
+    calculation = change.get("operation") == "set_native_calculation_mode"
+    mirror_rows = []
     selected = next((element for element in elements
                      if guid(element.GetElementUUID()) == change.get("target_view_uuid")), None)
     exact_attribute = (not material and change.get("operation") in {"set_attribute", "add_attribute"}
@@ -296,6 +300,9 @@ def read_consensus(base, queries, elements, change, diagnostics=None, *, post_se
             from .wall_material import read as read_material
             value = read_material(base, element, change, check, preservation=selected is None or element is selected,
                                   post_setter=post_setter, accepted=accepted)
+            if calculation:
+                from .wall_material import mirror_crosscheck
+                mirror_rows.append(mirror_crosscheck(base, element, change))
         else:
             # An exact Slab tier verifies its reviewed owner on the reviewed
             # view; the other wrappers of the same model must agree on value.
@@ -310,10 +317,14 @@ def read_consensus(base, queries, elements, change, diagnostics=None, *, post_se
             "readback_status": value.get("status"), "readback_sha256": fingerprint(value),
             **({"reason": value["reason"]} if "reason" in value else {}),
             **({"preservation": value["preservation"]} if "preservation" in value else {}),
-            **({"accepted_preservation_drift": accepted} if accepted else {})})
+            **({"accepted_preservation_drift": accepted} if accepted else {}),
+            **({"mirror_attribute": mirror_rows[-1]} if calculation and valid else {})})
         observations.append(value)
         check()
     evidence["complete"] = True
+    if calculation:
+        from .wall_material import mirror_summary
+        evidence["mirror_crosscheck"] = mirror_summary(change, mirror_rows)
     first = observations[0]
     readable = all(value.get("status") == "observed" or (
         value.get("status") == "absent" and value.get("presence_proven") is True
@@ -322,7 +333,7 @@ def read_consensus(base, queries, elements, change, diagnostics=None, *, post_se
     if material and not evidence["agreed"]:
         # This is evidence for a separate reviewed journal reconciliation, not
         # success and never authorization to run a setter.
-        current = [value.get("material_readback", value) for value in observations]
+        current = [value.get("material_readback", value.get("native_readback", value)) for value in observations]
         if (all(value.get("status") == "observed" for value in current)
                 and all(same_observation(change, current[0], value) for value in current[1:])):
             evidence["reconciliation_readback"] = current[0]
@@ -341,7 +352,7 @@ def read(base, queries, element, change, *, ownership=True):
     attribute read including computed attributes. Missing from ReadAll alone is
     deliberately reported as unknown, because ReadAll omits computed values.
     """
-    if change.get("operation") == "set_native_material":
+    if change.get("operation") in NATIVE_PROPERTY_OPERATIONS:
         from .wall_material import read as read_material
         return read_material(base, element, change)
     if change.get("operation") == "delete_element":
@@ -526,7 +537,7 @@ def write(base, element, change, doc=None, check=lambda: None, *, trace=None):
     if change.get("operation") == "delete_element":
         from .model_delete import write as delete
         return delete(base, element, change, doc, check)
-    if change.get("operation") == "set_native_material":
+    if change.get("operation") in NATIVE_PROPERTY_OPERATIONS:
         from .wall_material import write as set_material
         return set_material(base, element, change, doc, check, trace=trace)
     # Also guard the final native boundary, including a missing native_type in

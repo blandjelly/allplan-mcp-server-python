@@ -39,6 +39,46 @@ _MATERIAL_OWNERS = {"WallElement": "wall_tier_1", "ColumnElement": "column_prope
                     "SlabElement": "slab_properties"}
 _PROPERTY_ACCESSORS = {"StructuralBeamElement": ("StructuralBeamProperties", "SetStructuralBeamProperties")}
 
+# 0.49.0: the native Material route also carries one CalculationMode write
+# (plan item 5 step 2). SDK 2026 documents the closed code set below; the
+# label is the SDK's. Only the field itself and its observed attribute mirror
+# candidate are excluded from the bound preservation evidence.
+MATERIAL_OPERATION = "set_native_material"
+CALCULATION_MODE_OPERATION = "set_native_calculation_mode"
+NATIVE_PROPERTY_OPERATIONS = frozenset({MATERIAL_OPERATION, CALCULATION_MODE_OPERATION})
+CALCULATION_MODE_CODES = {0: "m3", 1: "m2", 2: "m", 3: "Pcs", 4: "kg"}
+CALCULATION_MODE_MIRROR_ATTRIBUTE = 120
+# Native trial 0.48.0: native code, attribute 120 and UI agree on these
+# families. The MultiSlab's native SlabProperties is not the UI owner, so the
+# slab calculation mode goes through attribute 120 on the MultiSlab instead.
+CALCULATION_MODE_TYPES = frozenset({"Wall_TypeUUID", "Column_TypeUUID", "Beam_TypeUUID"})
+SLAB_CALCULATION_MODE_BLOCK = "slab_calculation_mode_uses_multislab_attribute_120"
+_CALCULATION_STATE_SCHEMA = "m4-native-calculation-mode-state-1"
+_FIELDS = {
+    "Material": {"operation": MATERIAL_OPERATION, "field": "native.material", "setter": "SetMaterial",
+                 "excluded_attribute": 508, "state_key": "native_material_state"},
+    "CalculationMode": {"operation": CALCULATION_MODE_OPERATION, "field": "native.calculation_mode",
+                        "setter": "SetCalculationMode",
+                        "excluded_attribute": CALCULATION_MODE_MIRROR_ATTRIBUTE,
+                        "state_key": "native_property_state"},
+}
+_OPERATION_FIELDS = {spec["operation"]: name for name, spec in _FIELDS.items()}
+
+
+def field_for(change):
+    """Native SDK property name bound by a native property change, or None."""
+    return _OPERATION_FIELDS.get((change or {}).get("operation"))
+
+
+def state_key(change):
+    return _FIELDS[field_for(change) or "Material"]["state_key"]
+
+
+def _preserved_scalars(field):
+    # Material is not an invariant of its own write; every other edit must
+    # preserve it together with the remaining scalar set.
+    return _SCALARS if field == "Material" else tuple(name for name in _SCALARS if name != field) + ("Material",)
+
 
 def _property_accessors(class_name):
     return _PROPERTY_ACCESSORS.get(class_name, ("Properties", "SetProperties"))
@@ -102,7 +142,7 @@ def _identity_key(ref):
     return tuple(ref[key] for key in ("drawing_file", "signed_drawing_file", "model_uuid", "type_name", "type_uuid"))
 
 
-def _read_container_attributes(adapter, base, check, read):
+def _read_container_attributes(adapter, base, check, read, excluded=508):
     """Snapshot all stored metadata on one exact AttributeContainer.
 
     Unknown SDK values are not coerced: they make this optional snapshot unavailable.
@@ -119,9 +159,10 @@ def _read_container_attributes(adapter, base, check, read):
         if type(ident) is not int or not 1 <= ident <= 2147483647 or ident in seen:
             raise ValueError("Invalid or duplicate attribute-container identity")
         seen.add(ident)
-        # The SDK's standard Material attribute can reflect the very native
-        # property being changed. It must not be hashed as an unrelated invariant.
-        if ident == 508:
+        # The SDK's standard Material attribute (508) can reflect the very native
+        # property being changed; for CalculationMode the candidate mirror is
+        # attribute 120. It must not be hashed as an unrelated invariant.
+        if ident == excluded:
             continue
         value = describe_value(pair[1])
         if value.get("status") != "observed":
@@ -201,7 +242,8 @@ def _auxiliary_snapshot(adapter, base, owner, check, read, budget, expected):
     budget["seen"].add(key)
     result = {"ownership": observed, "children": []}
     if observed["target"]["type_name"] == "AttributeContainer_TypeUUID":
-        attrs = read(lambda: _read_container_attributes(adapter, base, check, read),
+        attrs = read(lambda: _read_container_attributes(adapter, base, check, read,
+                                                        budget.get("excluded_attribute", 508)),
                      "material_attribute_container_values")
         result["stored_attributes"] = attrs
         budget["attribute_bytes"] += len(json.dumps(result, ensure_ascii=False, allow_nan=False).encode("utf-8"))
@@ -221,8 +263,8 @@ def _auxiliary_snapshot(adapter, base, owner, check, read, budget, expected):
     return result
 
 
-def _child_preservation(adapter, base, hierarchy, check, read):
-    budget = {"count": 0, "attribute_bytes": 0, "snapshot_bytes": 0,
+def _child_preservation(adapter, base, hierarchy, check, read, excluded=508):
+    budget = {"count": 0, "attribute_bytes": 0, "snapshot_bytes": 0, "excluded_attribute": excluded,
               "seen": {(hierarchy["target"]["signed_drawing_file"], hierarchy["target"]["model_uuid"])}}
     retained_children, children = _live_children(adapter, hierarchy, check, read)
     return sorted([_auxiliary_snapshot(child, base, hierarchy, check, read, budget, ref)
@@ -230,7 +272,7 @@ def _child_preservation(adapter, base, hierarchy, check, read):
 
 
 def _detailed_snapshot(base, adapter, check=lambda: None, *, material_observation=None, captured=None,
-                       trace=None, trace_ref=None):
+                       trace=None, trace_ref=None, field="Material"):
     read = _reader(check, trace, trace_ref)
     arch = read(lambda: importlib.import_module("NemAll_Python_ArchElements"), "material_native_module",
                 api="Python.import.NemAll_Python_ArchElements")
@@ -252,11 +294,13 @@ def _detailed_snapshot(base, adapter, check=lambda: None, *, material_observatio
     material = read(lambda: tier.Material, "material_value", api="WallTierProperties.Material")
     if type(material) is not str or len(material) > 255:
         raise ComponentReadError("material_value", "wall_material_string_unavailable")
+    primary = material if field == "Material" else _field_value(read, tier, field, "WallTierProperties")
     if material_observation is not None:
-        material_observation.update(status="observed", value=material)
+        material_observation.update(status="observed", value=primary)
     if hierarchy["lineage"] != [hierarchy["target"]]:
         raise ComponentReadError("material_hierarchy", "wall_material_standalone_root_required")
-    if not callable(getattr(tier, "SetMaterial", None)) or not callable(getattr(native, "SetProperties", None)):
+    if (not callable(getattr(tier, _FIELDS[field]["setter"], None))
+            or not callable(getattr(native, "SetProperties", None))):
         raise ComponentReadError("material_setters", "wall_material_setters_unavailable")
     children = read(lambda: adapters.BaseElementAdapterChildElementsService.GetChildModelElements(adapter, True),
                     "material_children", api="BaseElementAdapterChildElementsService.GetChildModelElements")
@@ -267,6 +311,7 @@ def _detailed_snapshot(base, adapter, check=lambda: None, *, material_observatio
     state.update(root_attribute_containers=root_metadata,
                  auxiliary_components={"root": root_auxiliary, "tier": tier_auxiliary})
     budget = {"count": 0, "attribute_bytes": 0, "snapshot_bytes": 0,
+              "excluded_attribute": _FIELDS[field]["excluded_attribute"],
               "seen": {(hierarchy["target"]["signed_drawing_file"], hierarchy["target"]["model_uuid"])}}
     for index, child in enumerate(children):
         check()
@@ -322,7 +367,7 @@ def _detailed_snapshot(base, adapter, check=lambda: None, *, material_observatio
              "axis": read(lambda: _representation(props.Axis), "material_axis", api="WallProperties.Axis.repr"),
              "path_axis_type": integer(read(lambda: props.PathElementAxisType, api="WallProperties.PathElementAxisType")),
              "tier": {name: read(lambda name=name: _scalar(getattr(tier, name)), "material_tier_" + name,
-                                  api="WallTierProperties." + name) for name in _SCALARS},
+                                  api="WallTierProperties." + name) for name in _preserved_scalars(field)},
              "common": {name: read(lambda name=name: _scalar(getattr(tier.CommonProperties, name)), "material_common_" + name,
                                     api="WallTierProperties.CommonProperties." + name) for name in _COMMON},
              "complex_properties": {name: read(lambda name=name: _representation(getattr(tier, name)), "material_" + name)
@@ -332,8 +377,10 @@ def _detailed_snapshot(base, adapter, check=lambda: None, *, material_observatio
     state["tier_geometry"] = tiers[0]
     state["geometry_stream_sha256"] = tiers[0].get("stream_sha256")
     state["invariant_coverage"] = "explicit_properties_metadata_and_bounded_auxiliary_tree_with_optional_geometry_streams"
+    if field != "Material":
+        state.update(schema_version=_CALCULATION_STATE_SCHEMA, native_field=field)
     check()
-    return material, state, native, props, tier
+    return primary, state, native, props, tier
 
 
 def _optional(callback, check, stage):
@@ -348,7 +395,21 @@ def _optional(callback, check, stage):
         check()
 
 
-def snapshot(base, adapter, check=lambda: None, *, material_observation=None, trace=None, trace_ref=None, preservation=True):
+def _field_value(read, owner, field, owner_name):
+    """Read the bound native field; CalculationMode must be a documented code."""
+    if field == "Material":
+        value = read(lambda: owner.Material, "material_value", api=owner_name + ".Material")
+        if type(value) is not str or len(value) > 255:
+            raise ComponentReadError("material_value", "native_material_string_unavailable")
+        return value
+    value = read(lambda: getattr(owner, field), "calculation_mode_value", api=owner_name + "." + field)
+    if type(value) is not int or value not in CALCULATION_MODE_CODES:
+        raise ComponentReadError("calculation_mode_value", "native_calculation_mode_code_unavailable")
+    return value
+
+
+def snapshot(base, adapter, check=lambda: None, *, material_observation=None, trace=None, trace_ref=None,
+             preservation=True, field="Material"):
     """Require the field owner and material, not geometry or hidden metadata.
 
     Available invariant evidence is still bound into revalidation/readback.
@@ -364,6 +425,10 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None, tr
     class_names = _NATIVE_CLASSES.get(kind)
     if class_names is None:
         raise ComponentReadError("material_native_type", "native_material_type_unsupported")
+    if field != "Material" and kind not in CALCULATION_MODE_TYPES:
+        raise ComponentReadError("native_property_type", SLAB_CALCULATION_MODE_BLOCK
+                                 if kind in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}
+                                 else "native_calculation_mode_family_unsupported")
     if not _supported_lineage(hierarchy):
         raise ComponentReadError("material_hierarchy", "native_material_standalone_root_required")
     native = read(lambda: base.GetElement(adapter), "material_native_representation", api="BaseElements.GetElement")
@@ -382,18 +447,26 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None, tr
     tier = read(lambda: props.GetWallTierProperties(1), "material_tier_properties",
                 api="WallProperties.GetWallTierProperties(1)") if is_wall else props
     owner_name = "WallTierProperties" if is_wall else class_name.replace("Element", "Properties")
-    material = read(lambda: tier.Material, "material_value", api=owner_name + ".Material")
-    if type(material) is not str or len(material) > 255:
-        raise ComponentReadError("material_value", "native_material_string_unavailable")
+    material = _field_value(read, tier, field, owner_name)
     if material_observation is not None:
         material_observation.update(status="observed", value=material)
-    if not callable(getattr(tier, "SetMaterial", None)) or not callable(getattr(native, setter_name, None)):
-        raise ComponentReadError("material_setters", "native_material_setters_unavailable")
+    if (not callable(getattr(tier, _FIELDS[field]["setter"], None))
+            or not callable(getattr(native, setter_name, None))):
+        raise ComponentReadError("material_setters", "native_material_setters_unavailable"
+                                 if field == "Material" else "native_calculation_mode_setters_unavailable")
+
+    def identify(state):
+        # The Material state keeps its historical schema and keys unchanged so
+        # existing journals compare byte-for-byte; another field is explicit.
+        state.update(schema_version=_STATE_SCHEMA, native_class=class_name,
+                     material_owner=_MATERIAL_OWNERS[class_name])
+        if field != "Material":
+            state.update(schema_version=_CALCULATION_STATE_SCHEMA, native_field=field)
+        return state
 
     state = {"hierarchy": hierarchy, "tier_count": 1 if is_wall else None}
     if not preservation:
-        state.update(schema_version=_STATE_SCHEMA, native_class=class_name,
-                     material_owner=_MATERIAL_OWNERS[class_name])
+        identify(state)
         check()
         return material, state, native, props
     detailed = None
@@ -403,11 +476,12 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None, tr
         retained_core = native, props, tier
         captured = {}
         detailed = _optional(lambda: _detailed_snapshot(base, adapter, check, captured=captured,
-                             trace=trace, trace_ref=trace_ref), check, "material_preservation")
+                             trace=trace, trace_ref=trace_ref, field=field), check, "material_preservation")
         if isinstance(detailed, tuple):
             current_material, state, native, props, tier = detailed
             if current_material != material:
-                raise BridgeError("repair_conflict", "Material changed during observation.", 409)
+                raise BridgeError("repair_conflict", "Material changed during observation."
+                                  if field == "Material" else "CalculationMode changed during observation.", 409)
         else:
             # Keep completed observations even if a later auxiliary read fails.
             # Only the core root identity establishes the mutation target.
@@ -421,7 +495,8 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None, tr
             # exact children and available geometry/metadata without treating
             # any child's adapter as the selected native property owner.
             state["child_components"] = _optional(lambda: _child_preservation(
-                adapter, base, state["component_tree"], check, read), check, "material_child_preservation")
+                adapter, base, state["component_tree"], check, read, _FIELDS[field]["excluded_attribute"]),
+                check, "material_child_preservation")
 
     # Read each unrelated property independently: one unsupported field must
     # not discard all the other available drift evidence.
@@ -434,7 +509,7 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None, tr
         state["optional_properties"] = {
             "tier": {name: _optional(lambda name=name: read.native(owner_name + "." + name,
                                       lambda: _scalar(getattr(tier, name))), check,
-                                      "material_tier_" + name) for name in _SCALARS},
+                                      "material_tier_" + name) for name in _preserved_scalars(field)},
             "common": {name: _optional(lambda name=name: read.native(owner_name + ".CommonProperties." + name,
                                         lambda: _scalar(getattr(tier.CommonProperties, name))), check,
                                         "material_common_" + name) for name in _COMMON},
@@ -444,8 +519,7 @@ def snapshot(base, adapter, check=lambda: None, *, material_observation=None, tr
     if is_wall and not isinstance(detailed, tuple):
         state["optional_properties"]["axis"] = _optional(lambda: read.native("WallProperties.Axis.repr",
                                                           lambda: _representation(props.Axis)), check, "material_axis")
-    state.update(schema_version=_STATE_SCHEMA,
-                 native_class=class_name, material_owner=_MATERIAL_OWNERS[class_name])
+    identify(state)
     check()
     return material, state, native, props
 
@@ -467,7 +541,8 @@ def observation(base, element, check=lambda: None):
     return (value, state) if state is not None else (preservation, None)
 
 
-def preview_observation(base, element, check=lambda: None, *, trace=None, trace_ref=None, preservation=True):
+def preview_observation(base, element, check=lambda: None, *, trace=None, trace_ref=None, preservation=True,
+                        field="Material"):
     """Separate a readable material string from eligibility to preserve the Wall.
 
     Eligibility requires the native property owner and available setters.
@@ -476,7 +551,7 @@ def preview_observation(base, element, check=lambda: None, *, trace=None, trace_
     value = {}
     try:
         material, state, _, _ = snapshot(base, element, check, material_observation=value,
-                                       trace=trace, trace_ref=trace_ref, preservation=preservation)
+                                       trace=trace, trace_ref=trace_ref, preservation=preservation, field=field)
         return {"status": "observed", "value": material}, state, {"status": "observed", "value": True}
     except BridgeError:
         raise
@@ -485,7 +560,40 @@ def preview_observation(base, element, check=lambda: None, *, trace=None, trace_
         return value or blocked, None, blocked
 
 
+def _valid_calculation_change(change):
+    """CalculationMode: one documented code to another on a reviewed owner (0.49.0)."""
+    resource = change.get("resource") or {}
+    evidence = resource.get("native_property_state")
+    if (not isinstance(evidence, dict) or not _supported_lineage(evidence.get("hierarchy"))
+            or "native_material_state" in resource or "exact_target_binding" in resource):
+        return False
+    target = evidence["hierarchy"]["target"]
+    ref = change.get("ref") or {}
+    kind = change.get("native_type")
+    class_name = evidence.get("native_class")
+    old, new = change.get("old_value") or {}, change.get("new_value")
+    return (change.get("field") == "native.calculation_mode" and change.get("property_role") == "native_property"
+            and kind in CALCULATION_MODE_TYPES and class_name in _NATIVE_CLASSES[kind]
+            and resource.get("data_type") == "integer"
+            and resource.get("binding") == "sdk_calculation_mode_code"
+            and resource.get("mirror_attribute_id") == CALCULATION_MODE_MIRROR_ATTRIBUTE
+            and type(new) is int and new in CALCULATION_MODE_CODES
+            and resource.get("new_label") == CALCULATION_MODE_CODES[new]
+            and old.get("status") == "observed" and type(old.get("value")) is int
+            and old["value"] in CALCULATION_MODE_CODES and old["value"] != new
+            and evidence.get("schema_version") == _CALCULATION_STATE_SCHEMA
+            and evidence.get("native_field") == "CalculationMode"
+            and evidence.get("material_owner") == _MATERIAL_OWNERS[class_name]
+            and evidence["hierarchy"]["lineage"] == [target]
+            and (kind != "Wall_TypeUUID" or evidence.get("tier_count") == 1)
+            and all(target.get(key) == ref.get(key) for key in ("drawing_file", "model_uuid", "type_uuid"))
+            and target.get("type_name") == kind
+            and target.get("view_uuid") == change.get("target_view_uuid"))
+
+
 def valid_change(change):
+    if change.get("operation") == CALCULATION_MODE_OPERATION:
+        return _valid_calculation_change(change)
     resource = change.get("resource") or {}
     evidence = resource.get("native_material_state")
     if not isinstance(evidence, dict) or not _supported_lineage(evidence.get("hierarchy")):
@@ -535,8 +643,10 @@ def valid_change(change):
 
 def bound_owner(state, change):
     """Required ownership must match independently of optional preservation."""
-    expected = change["resource"]["native_material_state"]
+    expected = change["resource"][state_key(change)]
     return (state is not None and _supported_lineage(state.get("hierarchy"))
+            and state.get("schema_version") == expected.get("schema_version")
+            and state.get("native_field") == expected.get("native_field")
             and state.get("native_class") == expected.get("native_class")
             and state.get("material_owner") == expected.get("material_owner")
             and state.get("tier_count") == expected.get("tier_count")
@@ -555,28 +665,71 @@ def read(base, element, change, check=lambda: None, *, preservation=True,
     """
     if not valid_change(change):
         raise BridgeError("target_not_writable", "Native material requires an exact reviewed architectural property owner.", 409)
-    value, state, _ = preview_observation(base, element, check, preservation=preservation)
+    field = field_for(change)
+    material = field == "Material"
+    expected = change["resource"][state_key(change)]
+    value, state, _ = preview_observation(base, element, check, preservation=preservation, field=field)
     if not bound_owner(state, change):
-        return {"status": "not_checked", "value": None, "reason": "native_material_owner_unavailable"}
-    if preservation and fingerprint(state) != fingerprint(change["resource"]["native_material_state"]):
-        expected = change["resource"]["native_material_state"]
+        return {"status": "not_checked", "value": None,
+                "reason": "native_material_owner_unavailable" if material else "native_property_owner_unavailable"}
+    if preservation and fingerprint(state) != fingerprint(expected):
         sections = sorted(key for key in set(expected) | set(state) if expected.get(key) != state.get(key))
         report = {"before_sha256": fingerprint(expected), "current_sha256": fingerprint(state),
                   "changed_sections": sections}
         if "component_tree" in sections:
             report["component_tree_diff"] = component_tree_diff(expected.get("component_tree"),
                                                                 state.get("component_tree"))
-            if post_setter and regenerated_auxiliary_children(change["native_type"], expected, state):
+            # Regeneration is accepted only for the field it was observed with
+            # (Beam native Material); a CalculationMode drift stays unknown.
+            if post_setter and material and regenerated_auxiliary_children(change["native_type"], expected, state):
                 if accepted is not None:
                     accepted.update(report, accepted=REGENERATED_CHILDREN_ACCEPTANCE)
                 return value
         # The Wall-specific reason predates Beam/Column/Slab support; keep it
         # for Walls so earlier journals and reports read the same.
+        if not material:
+            return {"status": "not_checked", "value": None, "reason": "native_property_invariants_changed",
+                    "native_readback": value, "preservation": report}
         reason = ("wall_material_invariants_changed" if change["native_type"] == "Wall_TypeUUID"
                   else "native_material_invariants_changed")
         return {"status": "not_checked", "value": None, "reason": reason,
                 "material_readback": value, "preservation": report}
     return value
+
+
+def mirror_crosscheck(base, element, change):
+    """Read the candidate attribute mirror of a CalculationMode change (no setter).
+
+    Reported next to the native readback, never folded into it: a diverging
+    attribute 120 decides the mirror question for the owner and is not
+    accepted automatically in either direction.
+    """
+    from .native_model_edit import attribute_fields
+    ident = CALCULATION_MODE_MIRROR_ATTRIBUTE
+    observation = attribute_fields(element, base, [ident], "all_and_computable")[f"attribute:{ident}"]
+    return {"attribute_id": ident, "observation": observation}
+
+
+def mirror_summary(change, rows):
+    """Bounded verdict over per-view attribute 120 reads; review evidence only."""
+    old, new = change["old_value"]["value"], change["new_value"]
+    labels = {"old_label": CALCULATION_MODE_CODES.get(old), "new_label": CALCULATION_MODE_CODES.get(new)}
+    values = [row["observation"].get("value") for row in rows
+              if isinstance(row, dict) and row.get("observation", {}).get("status") == "observed"]
+    if not rows or len(values) != len(rows):
+        verdict = "unavailable"
+    elif len({json.dumps(value, sort_keys=True) for value in values}) != 1:
+        verdict = "representations_disagree"
+    elif values[0] == labels["new_label"]:
+        verdict = "matches_new_label"
+    elif values[0] == labels["old_label"]:
+        verdict = "matches_old_label"
+    else:
+        verdict = "other_value"
+    return {"attribute_id": CALCULATION_MODE_MIRROR_ATTRIBUTE, **labels,
+            "values": values[:8], "verdict": verdict,
+            "acceptance": "owner_review_required_not_part_of_readback",
+            "decides": "whether_attribute_120_mirrors_native_calculation_mode"}
 
 
 MAX_TREE_DIFF_ITEMS = 4
@@ -727,15 +880,18 @@ def write(base, element, change, doc=None, check=lambda: None, *, trace=None):
         # The facade retains enumeration containers through snapshot/setter.
         base, _ = locate(doc if doc is not None else element.GetDocument(), base,
                          exact["target"], check, trace, expected=exact["inventory_fingerprint"])
-    material, state, native, props = snapshot(base, element, check)
-    if state != change["resource"]["native_material_state"] or material != change["old_value"]["value"]:
-        raise BridgeError("repair_conflict", "Wall material or preservation evidence changed before setter.", 409)
+    field = field_for(change)
+    material, state, native, props = snapshot(base, element, check, field=field)
+    if state != change["resource"][state_key(change)] or material != change["old_value"]["value"]:
+        raise BridgeError("repair_conflict", "Wall material or preservation evidence changed before setter."
+                          if field == "Material" else
+                          "CalculationMode or preservation evidence changed before setter.", 409)
     if doc is None:
         doc = element.GetDocument()
     from .model_delete import final_write_guard
     final_write_guard(base, element, change, doc, check)
     owner = props.GetWallTierProperties(1) if change["native_type"] == "Wall_TypeUUID" else props
-    owner.SetMaterial(change["new_value"])
+    getattr(owner, _FIELDS[field]["setter"])(change["new_value"])
     _, setter_name = _property_accessors(state["native_class"])
     getattr(native, setter_name)(props)
     check()

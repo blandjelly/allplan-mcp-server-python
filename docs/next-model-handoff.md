@@ -1,43 +1,66 @@
 # Current M4 handoff
 
-## Next task — 0.49.0: `CalculationMode` write and slab guidance correction (plan items 3 and 5)
+## Next task — native trial of candidate 0.49.0 (plan items 3 and 5)
 
-Step 1 of item 5 (read-only precheck, including the Wall Trade read) is done;
-results and owner decisions are below and in the
-[API note](m4-editing-api.md#native-observations-0480-read-only-precheck-2026-11-04).
+Start after the owner has merged the 0.49.0 PR with green full CI and
+installed it (health: bridge 0.49.0, the merged source commit,
+`sha256-verified`). Drawing 101, one write per step, UI check, one UI Undo,
+then a fresh read. Do not retry an `unknown` outcome; recover read-only with
+the original execution ID.
 
-1. **Native `CalculationMode` write (code + focused tests)** for **Column,
-   single-tier Wall and Beam** following the API note's step 2 route.
-   Preview: exact owner binding, old code 0–4, different new code. Readback:
-   native `CalculationMode` = new code **and** attribute 120 with the matching
-   label, reported separately so a diverging 120 is visible (it decides the
-   mirror), never auto-accepted. Preservation excludes only the target field
-   and attribute 120. **Slab:** no native `SlabProperties` write (the
-   MultiSlab's native `m2` is not what the UI shows); the slab "Rodzaj
-   rozliczenia" goes through attribute 120 on the MultiSlab ("Cały obiekt").
-2. **Slab guidance (owner decision 2026-11-04, plan item 3):** "Cały obiekt"
-   (MultiSlab) stays the default target for every plain slab request; the
-   tier ("Warstwa bieżąca") is changed only when the request explicitly names
-   the layer, through the existing exact parent-edge route. Keep the 0.47.0
-   redirect behaviour, but rename the block reason
-   `slab_tier_not_shown_in_ui_use_multislab` (premise wrong: the tier is shown
-   in "Warstwa bieżąca") and update the tool description/agent guidance. A
-   MultiSlab preview should report the tier's differing value for the same
-   field (informational, no change) so the owner sees that the layer keeps its
-   own value.
-3. Design (not necessarily in 0.49.0) the Wall-material rule (plan item 2a).
+1. **Column `CalculationMode` first** (`eb88c850…`/`cc752bda…`, native 2 `m`):
+   preview `native_types=["Column_TypeUUID"]` with
+   `{"target":{"kind":"native_calculation_mode"},"value":"m3"}` (narrow with
+   `exclude_model_uuids` if several Columns match), highlight, Apply. Record
+   `readback` (expected `{"status":"observed","value":0}`) and
+   `representation_consensus.mirror_crosscheck` (verdict decides whether
+   attribute 120 mirrors the native code; never auto-accepted), UI "Obmiar",
+   UI Undo, then a fresh preview/`material_comparison` with `attribute_ids
+   [120]` showing code 2 / `m` again.
+2. If step 1 is clean: the same on the single-tier Wall (`06d71e4d…`) and the
+   Beam (`7cc9ac55…`, reviewed view per plan; `material_comparison` needs
+   `6035d406…`). A Beam child regeneration is **not** accepted for this field
+   and would stay `unknown` → read-only recovery and reviewed reconciliation.
+3. **Slab:** a plain request "change the slab calculation mode" must go to
+   attribute 120 on the MultiSlab (`bf097d95…`) with
+   `property_owner="selected_element"`; check that the preview's
+   `slab_tier_values` reports the tier's own value (`m2`) as differing, then
+   Apply, UI ("Cały obiekt"), UI Undo. A native request on a slab must be
+   blocked as `slab_calculation_mode_uses_multislab_attribute_120`.
+4. Optional (plan item 3): one explicit layer request through the exact tier
+   route with a UI check in "Warstwa bieżąca" and UI Undo; a non-exact tier
+   request must show `slab_tier_requires_exact_layer_target`.
 
-Native trial afterwards: Column `CalculationMode` first (its non-default `m`
-makes the strongest check), one write + UI + UI Undo.
+Closure: per family `applied` readback, mirror verdict recorded, UI value and
+UI Undo with restoration read. Then design the Wall-material rule (plan item
+2a). Do not repeat: the 0.48.0 precheck and Trade reads, the MultiSlab
+attribute 508 write (PASS 0.46.0 and 0.47.0), the exact parent-edge tier 508
+write (0.47.0), the Beam native Material write (PASS 0.46.0), the native Slab
+Material Apply (0.43.0) or the 0.40.0–0.45.0 probes.
 
-Do not repeat: the 0.48.0 precheck and Trade reads, the MultiSlab attribute
-508 write (PASS 0.46.0 and 0.47.0), the exact parent-edge tier write (0.47.0),
-the Beam native Material write (PASS 0.46.0), the native Slab Material Apply
-(0.43.0) or the 0.40.0–0.45.0 probes. For the Beam, `material_comparison`
-needs direct view `6035d406…`; `362f80d3…` fails `probe_scope_unavailable`
-(again in 0.48.0).
+## Candidate 0.49.0
 
-## Latest version
+Branch `claude/m4-0490-calculation-mode` (PR to `develop/m4`, link in the PR
+list; the owner checks the tested commit). Behaviour
+([tool reference](tool-reference.md#native_calculation_mode--experimental-calculation-mode-0490),
+[contract](m4-editing-api.md#calculationmode-write-contract-0490)):
+
+- `native_calculation_mode` write for Column, single-tier Wall and
+  `Beam_TypeUUID` on the native Material owner route (same journal, preflight,
+  final write guard, replay, recovery and reconciliation). Preservation
+  excludes only `CalculationMode` and attribute 120; Material is preserved.
+  Attribute 120 is reported separately (`mirror_crosscheck`, preview
+  `criteria.native_property_mirror`). Slabs and SkeletonBeam are blocked.
+- Slab guidance: block renamed `slab_tier_requires_exact_layer_target`,
+  `ui_owner` names "Cały obiekt"/"Warstwa bieżąca"; MultiSlab attribute
+  previews report the tiers' values (`slab_tier_values`, informational).
+- Focused checks (local, Linux): 129 material/ownership/model-edit tests
+  (including 8 new `test_native_calculation_mode` and 2 new slab-tier tests)
+  and 242 dependent material HTTP, recovery, journal, MCP smoke, package and
+  registration tests PASS. Full CI and native acceptance are not run yet; no
+  native write of this field has been observed.
+
+## Installed version and last native evidence
 
 **0.48.0** (source `5faa86d`, merged as PR #61 / `aec0e24`) is installed;
 the evidence's version response reports bridge 0.48.0, source
@@ -77,10 +100,9 @@ What this means:
   bieżąca" (tier/child: 508 `TEST2`, 120 `m2`, priority 200, empty
   `Typ_robót`, layer height 0.2000) — owner screenshots 2026-11-04, values
   equal to the API reads. This corrects the 0.46.0/0.47.0 conclusion that the
-  tier is "not shown": those observations covered "Cały obiekt" only. The
-  0.47.0 block name and guidance must change (next task, point 2). Owner
-  decision: plain slab requests target "Cały obiekt"; the layer only when
-  named.
+  tier is "not shown": those observations covered "Cały obiekt" only (block
+  name and guidance corrected in candidate 0.49.0). Owner decision: plain
+  slab requests target "Cały obiekt"; the layer only when named.
 - **Priority** agrees with the UI on all four families; a later Priority
   write has a direct UI check. **Thickness** is native millimetres, the UI
   shows metres.

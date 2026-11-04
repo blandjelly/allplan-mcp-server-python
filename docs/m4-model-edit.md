@@ -80,15 +80,17 @@ A slab attribute can explicitly set `target.property_owner="selected_element"`.
 Narrow `native_types` to the intended Slab or MultiSlab and check its exact
 ref, view, lineage and children in the plan. The slab material shown in the
 Allplan UI is the MultiSlab's attribute 508, so "change the slab material"
-targets `MultiSlab_TypeUUID`. A Slab tier inside a MultiSlab is not shown in
-the UI; without `exact_target` on its parent-edge view (one `attribute_id`
-replace) it is blocked as `slab_tier_not_shown_in_ui_use_multislab`, and the
+targets `MultiSlab_TypeUUID` ("Cały obiekt", the default for plain slab
+requests). A Slab tier is shown in the palette's "Warstwa bieżąca" mode and is
+changed only when the request names the layer; without `exact_target` on its
+parent-edge view (one `attribute_id` replace) it is blocked as
+`slab_tier_requires_exact_layer_target` (0.49.0; 0.47.0
+`slab_tier_not_shown_in_ui_use_multislab`), and the
 blocked row's `ui_owner` names the MultiSlab to preview instead (0.47.0,
 [contract](m4-editing-api.md#slab-tier-attribute-writes-and-the-ui-material-owner-04500460-observations-0470-contract)). One plan must not cover both an
-aggregate and its layer. **Correction (owner, 2026-11-04):** the tier is shown in the palette's
-"Warstwa bieżąca" mode; the block name and this guidance are to be replaced by
-a whole-object/current-layer choice ([plan item 3](development-plan.md#remaining-work-and-unresolved-errors)).
-The code still behaves as described. A missing owner still blocks attributes of the
+aggregate and its layer. A MultiSlab attribute preview reports the tiers'
+values of the same attribute in `slab_tier_values` (informational, 0.49.0).
+A missing owner still blocks attributes of the
 aggregate and its child slab; organizational layers keep separate ownership
 limits.
 
