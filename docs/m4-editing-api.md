@@ -230,7 +230,8 @@ of the tier's two wrappers.
 MultiSlab `parent_ref` read attribute 508 **`TEST2`** on the tier `8a693925…`
 and **`TEST1`** on the MultiSlab `bf097d95…` (both read modes; native Material
 `" "` on both). The owner sees one slab object in the UI ("slab"), showing
-`TEST1`; the tier is not shown. The 0.46.0 exact-target tier preview was
+`TEST1`; the tier is not shown (in the "Cały obiekt" palette mode; the
+"Warstwa bieżąca" mode shows the tier — owner, 2026-11-04). The 0.46.0 exact-target tier preview was
 therefore `no_op`. A separate MultiSlab preview (`native_types=["MultiSlab_TypeUUID"]`,
 `property_owner="selected_element"`) and Apply `04569db1850748b2b029629c935dd36a`
 changed 508 `TEST1` → `TEST2` on view `b4a59b5b…` (`applied`,
@@ -240,8 +241,8 @@ UI, then UI Undo, and a fresh read returned `TEST1` on the MultiSlab and
 the **MultiSlab's** attribute 508; the tier keeps its own stored value. The
 0.45.0 tier `applied` results most likely wrote that tier value (no other write
 touched the tier since; the 0.45.0 intermediate `TEST1` read is unexplained,
-possibly an unrecorded UI Undo); they were not UI-visible because the UI shows
-the parent. The 0.46.0 parent-edge tier route is still natively unobserved
+possibly an unrecorded UI Undo); they were not visible in "Cały obiekt" mode,
+which shows the parent ("Warstwa bieżąca" was not checked). The 0.46.0 parent-edge tier route is still natively unobserved
 (its preview was `no_op`).
 
 **Contract (0.47.0, automated tests only).** A `selected_element` attribute
@@ -577,7 +578,53 @@ does not prove persistence.
   209 on the same element (SDK text names `@209@`; the 0.31.0 labels match).
   If true, a native write changes an `AttributeContainer` value and the
   preservation comparison must expect exactly that attribute to change; if
-  false, the two routes are separate storage. Not observed.
+  false, the two routes are separate storage. Read-only result in the next
+  subsection; storage coupling needs a write.
+
+### Native observations (0.48.0 read-only precheck, 2026-11-04)
+
+Drawing 101, Allplan 2026.1, bridge 0.48.0 (`5faa86d`, `sha256-verified`),
+`setter_calls_started=0` ([raw evidence](test-results/evidence/0.48.0-2026-11-04/evidence-20261104.jsonl);
+per-element table in the [handoff](next-model-handoff.md#latest-version)).
+UI values are owner-reported.
+
+- **N:** `CalculationMode` equals attribute 120 and the UI "Obmiar" on the
+  single-tier Wall (0 `m3`), the Column (2 `m`) and the Beam (0 `m3`). The
+  hypothesis is *consistent* for these families; equal values do not prove
+  shared storage.
+- **N:** on the MultiSlab, `SlabElement.Properties.CalculationMode` is 1 `m2`
+  (tier 0 also `m2`) while attribute 120 and the UI show `m3`. The MultiSlab's
+  native `SlabProperties` matches its tier 0 and the Slab child (Material `" "`, `m2`,
+  Trade 0, thickness 200.0) and is **not** the UI owner of the calculation
+  mode — the same split as material (0.43.0, 0.46.0). The Slab child reads
+  `m2` natively and in attribute 120.
+- **N:** `Priority` equals the UI on all four (Wall 300, Column 100, Beam 100,
+  Slab 200). `Thickness` is in millimetres (Wall tier 240.0, Slab tier 200.0;
+  UI 0.2400 / 0.2000 m).
+- **N:** `Trade` is −1 on Wall, Column and Beam and 0 on both slab wrappers;
+  attribute 209 ("Typ_robót") is not returned, `<niezdefiniowany>` or `""`,
+  and the UI "Typ robót" is empty on all. The `Trade` ↔ 209 mapping is **not
+  determinable** without an element that has a chosen trade.
+- **N:** the Wall shows two materials in the UI: native tier Material `TEST`
+  in the element dialog ("Materiał/Ilości") and attribute 508 `Silikat` in the
+  attributes palette.
+- **N (Wall Trade read, 2026-11-04, [raw evidence](test-results/evidence/0.48.0-2026-11-04/evidence-20261104-trade.jsonl)):**
+  UI "Typ robót" = "Roboty murarskie" → tier `Trade` 12; cleared in the UI →
+  0 (the initial −1 is not restored). Attribute 209 is `not_returned` in
+  both states and read modes: the Wall trade is **not** mirrored in attribute
+  209 (refutes the `@209@` mirror for the Wall). Each UI edit replaced the
+  Wall's `AttributeContainer` child UUID.
+- **N (owner, 2026-11-04):** the slab properties palette has two modes:
+  "Cały obiekt" shows the MultiSlab (508 `TEST1`, 120 `m3`) and "Warstwa
+  bieżąca" shows the tier (508 `TEST2`, 120 `m2`, priority 200, empty
+  `Typ_robót`). Both match the API reads; the tier is a UI-visible owner.
+
+Consequences for step 2: write `CalculationMode` natively only on Wall,
+Column and Beam, and treat attribute 120 as a separately reported readback
+whose change decides the mirror; route the slab calculation mode through the
+MultiSlab attribute 120 ("Cały obiekt" is the default slab owner by owner
+decision; the tier only when named). No `Trade` write until the project's
+code↔label list is read; only 12 = "Roboty murarskie" is known.
 
 ### One candidate per family
 
@@ -619,8 +666,9 @@ Write/readback/Undo plan for each family (step 2 of item 5, not implemented):
    the old attribute 120 value). The owner confirms the UI field
    ("Rodzaj rozliczenia" in the properties palette).
 
-Open questions: whether the MultiSlab is also the UI owner of
-`CalculationMode` for a slab; whether the Beam regeneration repeats for a
+Open questions: whether the MultiSlab attribute 120 route changes the slab
+quantity mode as the UI expects (0.48.0: the native `SlabProperties` value is
+not what the UI shows); whether the Beam regeneration repeats for a
 non-material field; whether `Trade` codes map one-to-one to the project's
 attribute 209 labels.
 

@@ -3,7 +3,7 @@
 Current version and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
 [development plan](development-plan.md).
-Current installed version **0.47.0** (PR #58) and its native trial are
+Current installed version **0.48.0** (PR #61) and its read-only native trial are
 summarized in the [handoff](next-model-handoff.md); per-pair status is in the [coverage matrix](m4-coverage-matrix.md); this
 file retains older evidence. **0.42.0** (exact Slab child target) was merged through
 [PR #48](https://github.com/blandjelly/allplan-mcp-server-python/pull/48); its

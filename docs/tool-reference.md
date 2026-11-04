@@ -537,7 +537,10 @@ and check that the change ref is the intended MultiSlab (narrow with
 `exclude_model_uuids` if the drawing has several). A tier attribute write
 without `exact_target` is blocked as `slab_tier_not_shown_in_ui_use_multislab`;
 the blocked row's `ui_owner` names the MultiSlab model/view and the
-`next_preview` to run instead. Nothing is redirected automatically.
+`next_preview` to run instead. Nothing is redirected automatically. **Correction (owner, 2026-11-04):** the tier is shown in the palette's
+"Warstwa bieżąca" mode; the block name and this guidance are to be replaced by
+a whole-object/current-layer choice ([plan item 3](development-plan.md#remaining-work-and-unresolved-errors)).
+The code still behaves as described.
 
 **Slab tier attribute (0.46.0, explicit tier storage only).** The same
 `exact_target` also accepts exactly one attribute change
