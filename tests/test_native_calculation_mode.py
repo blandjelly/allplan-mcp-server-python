@@ -91,6 +91,28 @@ class CalculationModeTests(unittest.TestCase):
         self.assertEqual(crosscheck["verdict"], "matches_old_label")
         self.assertEqual(crosscheck["values"], ["m"])
 
+    def test_single_place_plan_hints_at_a_diverging_attribute_120(self):
+        # 0.50.0 trial: plain requests routed to native_calculation_mode left a
+        # diverging attribute 120 unchanged, once as a no-op plan.
+        f = self.column(attribute_120="m3")
+        no_op = self.preview(f, "m")
+        self.assertEqual(no_op["state"], "no_op")
+        hint = no_op["paired_property_hint"]
+        self.assertEqual(hint["new_label"], "m")
+        self.assertEqual(hint["plain_request"], {"target": {"kind": "paired_property",
+                                                            "property": "calculation_mode"}, "value": "m"})
+        row, = hint["attribute_differs"]
+        self.assertEqual((row["attribute_id"], row["observation"]), (120, {"status": "observed", "value": "m3"}))
+        self.assertEqual(row["ref"]["model_uuid"], f.root.GetModelElementUUID.return_value)
+        plan = self.preview(f, "kg")
+        self.assertEqual(plan["paired_property_hint"]["attribute_differs"][0]["observation"]["value"], "m3")
+        self.assertTrue(plan["apply_available"], plan)
+        self.assertEqual([c["field"] for c in plan["changes"]], ["native.calculation_mode"])
+        self.assertNotIn("paired_property_hint", self.preview(f, "m3"))
+        excluded = self.preview(f, "m", exclude_model_uuids=[f.root.GetModelElementUUID.return_value])
+        self.assertNotIn("paired_property_hint", excluded)
+        f.native.base.ModifyElements.assert_not_called()
+
     def test_wall_tier_route_preserves_material_and_other_scalars(self):
         wall = columns.wall_fixtures.WallMaterialEditTests()
         wall.setUp()

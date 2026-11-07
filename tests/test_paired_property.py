@@ -2,7 +2,9 @@
 post-setter identity regeneration rule; SDK doubles do not establish native PASS."""
 import copy
 import importlib
+import json
 import unittest
+from pathlib import Path
 from uuid import uuid4
 
 from pydantic import TypeAdapter, ValidationError
@@ -94,6 +96,7 @@ class PairedPropertyTests(unittest.TestCase):
         self.assertEqual(attribute["resource"]["enum_binding"], {"enum_id": 0, "value": "m3"})
         summary = plan["paired_property"]
         self.assertEqual(summary["targets"][0]["changes"], ["native.calculation_mode", "attribute:120"])
+        self.assertNotIn("paired_property_hint", plan)
         self.assertEqual(summary["attribute_only"], [])
         execution = uuid4().hex
         result = f.native.apply(plan, execution)
@@ -307,6 +310,189 @@ class IdentityRegenerationTests(unittest.TestCase):
         swapped["tier_attribute_containers"][0]["values"] = ["a"]
         self.assertIsNone(self.module.identity_regeneration("Wall_TypeUUID", "CalculationMode",
                                                             wall("r1", "t1"), swapped))
+
+
+TRIAL_0500_WALL_DOOR = Path(__file__).with_name("data") / "wall_door_calculation_mode_0500.json"
+# Pairs read from the 0.50.0 trial's identity_diff (execution bd30912a…); the
+# pairing of the two AttributeContainers is the one whose renamed evidence
+# hashes to the logged post-setter evidence.
+TRIAL_0500_RENAMES = {
+    "40af011e-d3c2-4bc9-9569-455b9eec9e1f": "76ef73aa-90bd-4c3a-a998-07989b0fb572",  # door-tier container
+    "f819e327-d677-405c-82c1-585a45f1542b": "e8bab07a-5a64-40dc-88b9-9eec75167b1c",  # root container
+    "3f997788-393a-429c-b8c2-72d7b7889f4e": "f7e9188a-019d-4f2f-b152-9b1f2280f091",  # DoorSill model
+    "f7cb9413-e631-4949-9e63-ace810f79eb5": "3bdfa64d-35cd-486c-a72e-ebeecad94ba4",  # DoorSill view
+    "7cd38176-c421-4671-8add-ca1d6a0499f8": "def5095f-c354-46f7-abca-d9678f680c26",  # Door model
+    "b2d2514f-ed79-4d9d-819e-3ee64128a705": "795be646-2b1c-47cd-ae9b-ede532372b9d",  # Door view
+}
+
+
+class WallDoorRegenerationTests(unittest.TestCase):
+    """0.50.0 trial: a paired write on the Wall with a door stopped `unknown`
+    because the setter also regenerated the Door and DoorSill identities, so
+    attribute 120 was never written. 0.50.1 lists both types for the Wall."""
+
+    def setUp(self):
+        g = families.NativeMaterialFamiliesTests()
+        f = g.fixture("Column_TypeUUID", families.columns.ColumnElement)
+        self.addCleanup(g.doCleanups)
+        package = f.native.module.__package__
+        self.module = importlib.import_module(package + ".wall_material")
+        self.fingerprint = importlib.import_module(package + ".query_contracts").fingerprint
+        self.trial = json.loads(TRIAL_0500_WALL_DOOR.read_text(encoding="utf-8"))
+
+    def after(self, renames=TRIAL_0500_RENAMES):
+        return self.module._canonical(self.module._rename(self.trial["bound_state"], renames))
+
+    def test_trial_evidence_is_a_renaming_of_door_and_containers(self):
+        reported = self.trial["reported_preservation"]
+        before = self.trial["bound_state"]
+        self.assertEqual(self.fingerprint(before), reported["before_sha256"])
+        after = self.after()
+        # Fixture fidelity: the reconstruction is exactly the logged post-setter evidence.
+        self.assertEqual(self.fingerprint(after), reported["current_sha256"])
+        self.assertEqual(self.module.identity_diff(before, after), reported["identity_diff"])
+        accepted = self.module.identity_regeneration("Wall_TypeUUID", "CalculationMode", before, after)
+        self.assertIsNotNone(accepted)
+        self.assertEqual(accepted["view_map"], {})
+        self.assertEqual(sorted(p["type_name"] for p in accepted["regenerated_identities"]),
+                         ["AttributeContainer_TypeUUID", "AttributeContainer_TypeUUID",
+                          "DoorSill_TypeUUID", "Door_TypeUUID"])
+        pairs = {p["old_model_uuid"]: p["new_model_uuid"] for p in accepted["regenerated_identities"]}
+        self.assertEqual(pairs, {old: new for old, new in TRIAL_0500_RENAMES.items()
+                                 if old in {"40af011e-d3c2-4bc9-9569-455b9eec9e1f",
+                                            "f819e327-d677-405c-82c1-585a45f1542b",
+                                            "3f997788-393a-429c-b8c2-72d7b7889f4e",
+                                            "7cd38176-c421-4671-8add-ca1d6a0499f8"}})
+
+    def test_door_renaming_stays_strict(self):
+        before = self.trial["bound_state"]
+        door_reveal = before["partial_preservation"]["auxiliary_components"]["root"][0]["children"][0]["children"][0]
+        self.assertEqual(door_reveal["ownership"]["target"]["type_name"], "DoorReveal_TypeUUID")
+        cases = {}
+        changed = self.after()
+        reveal = changed["partial_preservation"]["auxiliary_components"]["root"][0]["children"][0]["children"]
+        for item in reveal:
+            if item["ownership"]["target"]["type_name"] == "DoorReveal_TypeUUID":
+                item["geometry"]["stream_sha256"] = "0" * 64
+        cases["door_reveal_geometry"] = ("Wall_TypeUUID", "CalculationMode", changed)
+        cases["door_tier_regenerated"] = ("Wall_TypeUUID", "CalculationMode", self.after(
+            {**TRIAL_0500_RENAMES, "82b89213-157f-4ac5-82ea-0cba3f533270": str(uuid4())}))
+        cases["material_field"] = ("Wall_TypeUUID", "Material", self.after())
+        cases["column_family"] = ("Column_TypeUUID", "CalculationMode", self.after())
+        window = json.loads(json.dumps(before).replace("Door_TypeUUID", "Window_TypeUUID"))
+        window_after = self.module._canonical(self.module._rename(window, TRIAL_0500_RENAMES))
+        for name, (kind, field, after) in cases.items():
+            with self.subTest(case=name):
+                self.assertIsNone(self.module.identity_regeneration(kind, field, before, after))
+        self.assertIsNone(self.module.identity_regeneration("Wall_TypeUUID", "CalculationMode",
+                                                            window, window_after))
+
+    def test_wall_with_door_paired_write_writes_the_attribute_after_regeneration(self):
+        wall = families.columns.wall_fixtures.WallMaterialEditTests("setUp")
+        wall.setUp()
+        self.addCleanup(wall.doCleanups)
+        native, root = wall.native, wall.root
+        shape = families.columns.wall_fixtures.Polyhedron
+        native.base.eAttibuteReadState.ReadAll = "ReadAll"
+        wall.properties.GetWallTierProperties(1).CalculationMode = 0
+        root.GetAttributes.return_value = [(935, ""), (120, "m3")]
+        bind_attribute_120(native)
+        door_tier = native.element(60, name="DoorTier_TypeUUID", solid=shape("door-tier"))
+        reveal = native.element(61, name="DoorReveal_TypeUUID", solid=shape("door-reveal"))
+
+        def door(ident):
+            parts = (native.element(ident, name="Door_TypeUUID", solid=shape("door")),
+                     native.element(ident + 1, name="DoorSill_TypeUUID", solid=shape("sill")),
+                     native.element(ident + 2, name="AttributeContainer_TypeUUID", solid=shape("meta")))
+            parts[2].GetAttributes.return_value = [(508, "door")]
+            return parts
+
+        old, new = door(70), door(80)
+        for before, after in zip(old, new):
+            # Regenerated components keep their SDK type; only identities change.
+            after.GetElementAdapterType.return_value.GetGuid.return_value = (
+                before.GetElementAdapterType.return_value.GetGuid.return_value)
+
+        def attach(parts):
+            opening, sill, container = parts
+            native.children[id(root)] = [wall.tier, opening]
+            native.children[id(opening)] = [door_tier]
+            native.children[id(door_tier)] = [sill, reveal, container]
+            for child, parent in ((opening, root), (door_tier, opening), (sill, door_tier),
+                                  (reveal, door_tier), (container, door_tier)):
+                native.parents[id(child)] = parent
+
+        attach(old)
+        native.base.ElementsSelectService.SelectAllElements.return_value = [root]
+        modify = native.base.ModifyElements.side_effect
+
+        def regenerate(doc, elements):
+            result = modify(doc, elements)
+            attach(new)
+            return result
+
+        native.base.ModifyElements.side_effect = regenerate
+        plan = native.call(wall.request(changes=[
+            {"target": {"kind": "paired_property", "property": "calculation_mode"}, "value": "m"}]))
+        self.assertTrue(plan["apply_available"], plan)
+        self.assertEqual([c["field"] for c in plan["changes"]], ["native.calculation_mode", "attribute:120"])
+        native.highlight(plan)
+        execution = uuid4().hex
+        result = native.apply(plan, execution)
+        self.assertEqual(result["state"], "completed", result)
+        first, second = result["outcomes"]
+        self.assertEqual((first["state"], first["readback"]), ("applied", {"status": "observed", "value": 2}))
+        drift = first["representation_consensus"]["representations"][0]["accepted_preservation_drift"]
+        self.assertEqual(drift["accepted"], "identities_regenerated_evidence_otherwise_equal")
+        self.assertEqual(sorted(p["type_name"] for p in drift["regenerated_identities"]),
+                         ["AttributeContainer_TypeUUID", "DoorSill_TypeUUID", "Door_TypeUUID"])
+        self.assertEqual(drift["view_map"], {})
+        self.assertEqual((second["state"], second["reason"]), ("applied", "readback_matches"))
+        self.assertNotIn("effective_target_view_uuid", second)
+        self.assertEqual(dict(root.GetAttributes.return_value)[120], "m")
+        self.assertEqual(wall.properties.GetWallTierProperties(1).CalculationMode, 2)
+        native.base.ModifyElements.assert_called_once()
+        self.assertEqual(native.base.ElementsAttributeService.ChangeAttributes.call_args.args[0], [(120, "m")])
+        self.assertTrue(native.apply(plan, execution)["replayed"])
+        native.base.ModifyElements.assert_called_once()
+
+    def test_unlisted_opening_regeneration_still_skips_the_attribute(self):
+        wall = families.columns.wall_fixtures.WallMaterialEditTests("setUp")
+        wall.setUp()
+        self.addCleanup(wall.doCleanups)
+        native, root = wall.native, wall.root
+        shape = families.columns.wall_fixtures.Polyhedron
+        wall.properties.GetWallTierProperties(1).CalculationMode = 0
+        root.GetAttributes.return_value = [(935, ""), (120, "m3")]
+        bind_attribute_120(native)
+        old = native.element(70, name="Window_TypeUUID", solid=shape("window"))
+        new = native.element(80, name="Window_TypeUUID", solid=shape("window"))
+        new.GetElementAdapterType.return_value.GetGuid.return_value = (
+            old.GetElementAdapterType.return_value.GetGuid.return_value)
+        native.children[id(root)] = [wall.tier, old]
+        native.parents[id(old)] = native.parents[id(new)] = root
+        native.base.ElementsSelectService.SelectAllElements.return_value = [root]
+        modify = native.base.ModifyElements.side_effect
+
+        def regenerate(doc, elements):
+            result = modify(doc, elements)
+            native.children[id(root)] = [wall.tier, new]
+            return result
+
+        native.base.ModifyElements.side_effect = regenerate
+        plan = native.call(wall.request(changes=[
+            {"target": {"kind": "paired_property", "property": "calculation_mode"}, "value": "m"}]))
+        native.highlight(plan)
+        execution = uuid4().hex
+        result = native.apply(plan, execution)
+        first, second = result["outcomes"]
+        self.assertEqual(first["state"], "unknown", result)
+        diff = first["representation_consensus"]["representations"][0]["preservation"]["identity_diff"]
+        self.assertEqual(diff["removed"]["items"][0].split("|")[0], "Window_TypeUUID")
+        self.assertEqual((second["state"], second["reason"]), ("skipped", "not_attempted"))
+        native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+        self.assertTrue(native.recover(execution)["write_blocked"])
+        native.base.ModifyElements.assert_called_once()
 
 
 if __name__ == "__main__":

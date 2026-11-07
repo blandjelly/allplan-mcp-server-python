@@ -153,6 +153,36 @@ def paired_summary(request, changes, attribute_only):
             "single_place_requests": {"native": spec["native_kind"], "attribute": "attribute"}}
 
 
+def paired_attribute_hint(request, report):
+    """Single-place CalculationMode plan whose attribute 120 differs: review hint.
+
+    0.50.0 trial: plain requests were routed to native_calculation_mode, so a
+    diverging attribute 120 was left unchanged (or the plan was a no-op).
+    Informational only; it never adds a change or blocks the plan.
+    """
+    if paired_property(request):
+        return None
+    binding = next((item for item in report["binding"]
+                    if item.get("operation") == "set_native_calculation_mode"), None)
+    if binding is None:
+        return None
+    label = binding["resource"].get("new_label")
+    matched = {fingerprint(check["ref"]) for check in report["checks"] if check["decision"] == "matched"}
+    rows = [{"ref": copy.deepcopy(item["ref"]), "attribute_id": item.get("attribute_id"),
+             "observation": copy.deepcopy(item["observation"])}
+            for item in report.get("native_property_mirror", [])
+            if fingerprint(item["ref"]) in matched
+            and (item.get("observation") or {}).get("status") == "observed"
+            and item["observation"].get("value") != label]
+    if not rows:
+        return None
+    return {"property": "calculation_mode", "new_label": label, "attribute_differs": rows[:32],
+            "effect": "none: this single-place plan leaves attribute 120 unchanged",
+            "plain_request": {"target": {"kind": "paired_property", "property": "calculation_mode"},
+                              "value": label},
+            "use": "only if the user did not explicitly ask for the native value alone"}
+
+
 def bind_changes(doc, base, request, check, trace):
     """Resolve only explicitly requested resources; never enumerate definitions/enums."""
     bound, fields = [], set()
@@ -769,6 +799,7 @@ def preview(plans, doc, base, settings, request):
                                                    and item["ref"]["model_uuid"] in descendants)]
         targets = [target for target in targets if target["model_uuid"] not in descendants]
     ready = report["coverage"]["criteria_complete"] and not blocked and len(changes) <= plans.executor.MAX_CHANGES
+    pairing_hint = paired_attribute_hint(request, report)
     plan = {"schema_version": SCHEMA, "action": "preview", "read_only": True, "plan_id": uuid4().hex,
             "state": ("preview_ready" if changes else "no_op") if ready else "not_checked",
             "source_kind": KIND, "source_fingerprint": snapshot["source_fingerprint"],
@@ -777,6 +808,7 @@ def preview(plans, doc, base, settings, request):
             **({"slab_tier_values": differing_tiers} if differing_tiers else {}),
             **({"paired_property": paired_summary(request, changes, attribute_only)}
                if paired_property(request) else {}),
+            **({"paired_property_hint": pairing_hint} if pairing_hint else {}),
             "capabilities": capability_probe(base), "counts": {**report["counts"], "changes": len(changes), "blocked": len(blocked),
                                                                 "highlight_targets": len(targets)},
             "requires_highlight": True, "native_selection": "unsupported_use_explicit_highlight",

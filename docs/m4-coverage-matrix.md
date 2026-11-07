@@ -7,7 +7,7 @@ instead of repeating per-pair status in prose ([documentation policy](documentat
 Evidence and its limits are in [validation status](validation-status.md);
 open work is in the [development plan](development-plan.md).
 
-Status as of the 0.49.0 native trial (2026-11-07); 0.50.0 code changes marked CODE. One active drawing, 1–32 changes per Apply.
+Status as of the 0.50.0 native trial (2026-11-07); 0.50.1 code changes marked CODE. One active drawing, 1–32 changes per Apply.
 
 ## Legend
 
@@ -41,14 +41,14 @@ created; an existing definition can be added to an element (`add`/`upsert`).
 
 | Family | Native Material | Other native properties | Organizational layer | Delete |
 | --- | --- | --- | --- | --- |
-| Column | VALUE (0.35.0 record, 0.39.0) | VALUE (`CalculationMode` 2→0, 0.49.0 `7b2e4f91…`: reconciliation readback 0, owner UI check, UI Undo; `unknown` through AttributeContainer + root-view regeneration, reconciled). 0.50.0 CODE: that renaming accepted; paired with attr 120 | PARTIAL (no-op only) | PASS (grouped, 3 Columns + Undo, 0.29.0) |
-| Wall (single tier) | VALUE (0.37.0/0.39.0, preservation unverified) | VALUE (`CalculationMode` 0→2, 0.49.0: plain Wall `9e04b7d1…`, Wall with door `7d3f0c8a…`; reconciliation readback 2, owner UI check, UI Undo restored 0; `unknown` through container/hierarchy drift, reconciled). Attr 120 is not mirrored reliably (did not follow on the door Wall; stayed `m` after Undo on the plain Wall). 0.50.0 CODE: renaming rule, paired with attr 120 | REPORTED (`Ogólne03`, 0.27.0) | PARTIAL (subtree absent; no Undo) |
+| Column | VALUE (0.35.0 record, 0.39.0) | PASS (`CalculationMode` 2→0, 0.50.0 `1214d281…`: `applied` with the accepted AttributeContainer + root-view renaming, attr 120 followed, owner UI check, one UI Undo restored 2/`m`; sent as `native_calculation_mode`, the `paired_property` route is not trialled on the Column) | PARTIAL (no-op only) | PASS (grouped, 3 Columns + Undo, 0.29.0) |
+| Wall (single tier) | VALUE (0.37.0/0.39.0, preservation unverified) | PASS on the plain Wall (`CalculationMode` 0→2, 0.50.0 paired `e4de1f73…`: `applied` with 2 × AttributeContainer + WallAxis renamed, owner UI check, one UI Undo restored 0). VALUE on the Wall with door (0.49.0 `7d3f0c8a…`, 0.50.0 `bd30912a…`: readback 2, `unknown` through Door/DoorSill/AttributeContainer regeneration, reconciled after UI Undo; paired attr 120 skipped). 0.50.1 CODE: door renaming accepted, then the attr 120 setter. Attr 120 is not mirrored reliably (did not follow on the door Wall) | REPORTED (`Ogólne03`, 0.27.0) | PARTIAL (subtree absent; no Undo) |
 | Wall (multi tier) | BLOCKED (one tier only) | NONE | CODE (tier-aware route) | — |
 | SkeletonBeam | BLOCKED (no successful write; view discrepancy) | NONE (write); getter-only read CODE (0.48.0), not read natively | CODE | FIXTURE (no disposable target) |
-| Beam | PASS (0.46.0 execution `5a0bc366…`: `""`→`C30/37`, `applied` with `accepted_preservation_drift.accepted="auxiliary_children_regenerated"` on view `362f80d3…`; owner-reported UI and UI Undo, post-Undo preview old value `""`) | VALUE (`CalculationMode` 0→2, 0.49.0 `5a7c3e9b…`: reconciliation readback 2, attr 120 followed, UI Undo restored 0/`m3`; `unknown` through AttributeContainer + WallAxis regeneration, reconciled). 0.50.0 CODE: renaming rule, paired with attr 120 | FIXTURE | FIXTURE |
+| Beam | PASS (0.46.0 execution `5a0bc366…`: `""`→`C30/37`, `applied` with `accepted_preservation_drift.accepted="auxiliary_children_regenerated"` on view `362f80d3…`; owner-reported UI and UI Undo, post-Undo preview old value `""`) | PASS (`CalculationMode` 0→2, 0.50.0 paired `d129c7c1…`: native `applied` with AttributeContainer + WallAxis renamed, attr 120 `paired_attribute_already_set_by_native_write` without a setter, owner UI check, one UI Undo restored 0/`m3`) | FIXTURE | FIXTURE |
 | Slab (MultiSlab child) | PARTIAL, not the UI material (0.43.0 setter ran, readback `" "`; tier 0 also `" "`; 0.44.2 owner: UI shows `TEST1` = attribute 508). Use the MultiSlab's attribute 508 | BLOCKED for native `CalculationMode` (0.49.0: `slab_calculation_mode_uses_multislab_attribute_120`); getter read observed incl. tier `Thickness`, native = attr 120 `m2` (0.48.0) | BLOCKED (parented child) | BLOCKED (parented child) |
 | Slab (standalone) | CODE | NONE (write); getter-only read CODE (0.48.0), no fixture read | FIXTURE | FIXTURE |
-| MultiSlab | CODE | BLOCKED for native `CalculationMode` (native route not the UI owner: 0.48.0 native `m2` ≠ attr 120/UI `m3`); calculation mode goes through attribute 120 with `property_owner="selected_element"` (CODE, not yet trialled) | BLOCKED (aggregate owner) | FIXTURE |
+| MultiSlab | CODE | BLOCKED for native `CalculationMode` (native route not the UI owner: 0.48.0 native `m2` ≠ attr 120/UI `m3`); calculation mode goes through attribute 120 with `property_owner="selected_element"` (PASS: 0.49.0 `e27b9d4f…`, 0.50.0 `1dac121c…`, UI Undo, tier `m2` unchanged) | BLOCKED (aggregate owner) | FIXTURE |
 | WindowDoor (opening) | — | NONE | CODE | CODE |
 
 "Other native properties" means members of `WallTierProperties`,
@@ -71,7 +71,9 @@ showed that attribute 120 is not one storage with the native value
 0.50.0 (CODE) adds `paired_property` (native value + same-named attribute in
 one plan: `CalculationMode`/120 and `Material`/508; attribute only on slabs and
 SkeletonBeam) and accepts the observed identity regeneration after a
-`CalculationMode` setter.
+`CalculationMode` setter. Its 0.50.0 trial made the Column, plain Wall and
+Beam writes `applied`; the Wall with a door also regenerated the Door and
+DoorSill, which 0.50.1 (CODE) accepts.
 
 Selection: native selection is unsupported for every family; highlight is
 available and is not a selection ([selection API](m4-native-selection-api.md)).
