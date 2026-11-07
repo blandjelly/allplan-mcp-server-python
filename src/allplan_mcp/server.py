@@ -342,7 +342,9 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     when the layer keeps a different value.
     Paired properties (owner decision 2026-11-07): a property that exists both
     natively and as a same-named attribute changes in BOTH places by default.
-    For a plain request ("zmień materiał", "zmień obmiar/rodzaj rozliczenia")
+    Naming the property itself in any language is a plain request ("zmień
+    materiał", "zmień calculation mode/CalculationMode/obmiar/rodzaj
+    rozliczenia", "ustaw te same parametry"); it does not name a place. For it
     use changes=[{target:{kind:paired_property,property:material|calculation_mode},
     value:VALUE}] as the only edit: material = native Material + attribute 508,
     calculation_mode = native CalculationMode + attribute 120 (SDK label m3,
@@ -353,8 +355,11 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     write already set the attribute, it is reported applied without a setter.
     A place that already holds the value gets no change. Use the single-place
     kinds only when the user explicitly names one place: native_material /
-    native_calculation_mode for the native value (element dialog), an attribute
-    target for the attribute only. Never substitute the attribute
+    native_calculation_mode for the native value only ("tylko natywnie",
+    element dialog), an attribute target for the attribute only (attribute,
+    ID, attributes palette). A single-place native_calculation_mode preview
+    whose attribute 120 holds another value reports paired_property_hint;
+    tell the user and offer its plain_request. Never substitute the attribute
     Materiał for native_material or the reverse. Other attribute types
     and computed-only/presence safeguards retain their existing requirements.
     The exact string is a native property value, without catalog validation or
@@ -365,7 +370,7 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     its drift is a conflict before a write or an unknown outcome after a write.
     Complex representations and optional streams provide bounded drift evidence;
     they do not prove preservation of every hidden auxiliary property.
-    Native calculation mode alone (only when the user names the native value)
+    Native calculation mode alone (only when the user asks for the native value alone)
     uses changes=[{target:{kind:native_calculation_mode},value:LABEL_OR_CODE}] as the
     only edit, with the SDK label m3, m2, m, Pcs, kg or code 0-4, on a Column,
     single-tier Wall or Beam_TypeUUID. It sets CalculationMode on the same
@@ -375,7 +380,8 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     representation_consensus.mirror_crosscheck with attribute 120 and a verdict;
     a diverging attribute 120 is evidence for the owner, never auto-accepted.
     After the setter, a regeneration of the family's listed identities
-    (AttributeContainer, Column root view, Beam/Wall axis) is accepted only if
+    (AttributeContainer, Column root view, Beam/Wall axis, a Wall's Door and
+    DoorSill) is accepted only if
     all other bound evidence is equal after renaming
     (accepted_preservation_drift, identities_regenerated_evidence_otherwise_equal);
     any other drift stays unknown with preservation.identity_diff.

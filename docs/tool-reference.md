@@ -608,7 +608,8 @@ unknown-result recovery.
 ### `paired_property` — native property and same-named attribute together (0.50.0)
 
 Default for a plain request (owner decision 2026-11-07): "zmień materiał"
-or "zmień obmiar/rodzaj rozliczenia" changes both places.
+or "zmień calculation mode/obmiar/rodzaj rozliczenia" changes both places;
+naming the property itself does not name a place.
 `{"target":{"kind":"paired_property","property":"calculation_mode"},"value":"m3"}`
 plans native `CalculationMode` + attribute 120; `"property":"material"` with an
 exact string plans native `Material` + attribute 508. It must be the only
@@ -623,6 +624,9 @@ when the native write already set it, the outcome is `applied` with
 Name one place explicitly to use `native_material`/`native_calculation_mode`
 (native only) or an `attribute` target (attribute only)
 ([contract](m4-editing-api.md#paired-properties-and-identity-regeneration-0500)).
+From 0.50.1 a `native_calculation_mode` preview whose attribute 120 holds
+another value reports `paired_property_hint` with the plain request
+(informational, no change).
 
 ### `native_calculation_mode` — experimental calculation mode (0.49.0)
 
@@ -642,10 +646,11 @@ verdict for the owner, never folded into the result
 ([contract](m4-editing-api.md#calculationmode-write-contract-0490)). From
 0.50.0 a post-setter drift that only renames the family's regenerated
 identities (Column: AttributeContainer and root view; Beam: AttributeContainer,
-WallAxis; Wall: AttributeContainer, WallAxis, WallAxisLine) is accepted as
+WallAxis; Wall: AttributeContainer, WallAxis, WallAxisLine, and from 0.50.1
+Door and DoorSill) is accepted as
 `identities_regenerated_evidence_otherwise_equal`; other drift stays
 `unknown` with `preservation.identity_diff`. Use this kind only when the user
-names the native value; a plain request uses `paired_property`.
+asks for the native value alone; a plain request uses `paired_property`.
 
 ### `native_material` — experimental architectural material
 

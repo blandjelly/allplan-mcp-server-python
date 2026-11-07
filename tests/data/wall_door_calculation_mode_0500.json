@@ -1,0 +1,748 @@
+{
+ "bound_state": {
+  "hierarchy": {
+   "child_parent_edges": [],
+   "children": [],
+   "children_complete": false,
+   "lineage": [
+    {
+     "drawing_file": 101,
+     "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+     "signed_drawing_file": 101,
+     "type_name": "Wall_TypeUUID",
+     "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+     "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+    }
+   ],
+   "parent_chain_complete": true,
+   "physical_target_equivalence": "not_established",
+   "property_owner": "not_established",
+   "schema_version": "m4-component-ownership-1",
+   "target": {
+    "drawing_file": 101,
+    "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+    "signed_drawing_file": 101,
+    "type_name": "Wall_TypeUUID",
+    "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+    "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+   },
+   "terminal_root": {
+    "drawing_file": 101,
+    "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+    "signed_drawing_file": 101,
+    "type_name": "Wall_TypeUUID",
+    "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+    "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+   }
+  },
+  "material_owner": "wall_tier_1",
+  "native_class": "WallElement",
+  "native_field": "CalculationMode",
+  "optional_properties": {
+   "axis": "AxisProperties(\n   Position  (2)\n   On layer  (1)\n   Modus     (0)\n   Extension (1)\n   Distance  (100.000000)\n",
+   "common": {
+    "Color": 1,
+    "ColorByLayer": false,
+    "ConstructionLine": false,
+    "DrawOrder": 7,
+    "ForceColor": false,
+    "HelpConstruction": false,
+    "InSpecialWindow": false,
+    "Layer": 65535,
+    "PageNumber": 0,
+    "Pen": 1,
+    "PenByLayer": false,
+    "Printable": true,
+    "Stroke": 1,
+    "StrokeByLayer": false,
+    "Visible": true,
+    "VisibleInsideZoomwindows": true,
+    "VisibleOutsideZoomwindows": true
+   },
+   "complex": {
+    "PlaneReferences": "PlaneReferences(\n   Bottom dependency  (1)\n   Top dependency     (2)\n   Bottom elevation   (0.000000)\n   Top elevation      (500.000000)\n   Max height         (0.000000)\n\n   UpperReferencePlaneID(\n      ModelGuid (00000000-0000-0000-0000-000000000000)\n      PlaneID   (-1))\n\n   LowerReferencePlaneID(\n      ModelGuid (00000000-0000-0000-0000-000000000000)\n      PlaneID   (-1))\n\n   AbsBottomElevation (0.000000)\n   AbsTopElevation    (3000.000000))\n",
+    "SurfaceElementProperties": "SurfaceElementProperties(\n   UseAreaInGroundplan         (1)\n   HatchSelected               (1)\n   HatchID                     (306)\n   PatternSelected             (0)\n   PatternID                   (301)\n   FillingSelected             (0)\n   FillingID                   (24)\n   BitmapSelected              (0)\n   BitmapID                    ()\n   FaceStyleSelected           (0)\n   FaceStyleID                 (301))\n"
+   },
+   "tier": {
+    "BackgroundColor": -1,
+    "BitmapName": "",
+    "CircleDivision": 120,
+    "FaceStyle": -1,
+    "Factor": 1.0,
+    "Filling": -1,
+    "Hatch": 306,
+    "Material": "TEST1",
+    "Name": "",
+    "Pattern": -1,
+    "Priority": 100,
+    "Status": 0,
+    "Surface": "Materials\\Concrete\\Cast\\Cast_Concrete001.surf",
+    "Thickness": 200.0,
+    "Trade": 13
+   }
+  },
+  "partial_preservation": {
+   "auxiliary_components": {
+    "root": [
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "children": [],
+          "geometry": {
+           "status": "observed",
+           "stream_sha256": "53a10a5de75fbc4521f341a10c4778b0ba8409128c2694651dac268bdef2c185"
+          },
+          "ownership": {
+           "child_parent_edges": [],
+           "children": [],
+           "children_complete": true,
+           "lineage": [
+            {
+             "drawing_file": 101,
+             "model_uuid": "a5af19ac-d0bb-45bd-bb41-be1fafe3ddb5",
+             "signed_drawing_file": 101,
+             "type_name": "DoorReveal_TypeUUID",
+             "type_uuid": "38be8300-226a-4ed5-80f4-6663fb09997e",
+             "view_uuid": "5cb45c21-1be8-4cde-a890-e3148786cea8"
+            },
+            {
+             "drawing_file": 101,
+             "model_uuid": "82b89213-157f-4ac5-82ea-0cba3f533270",
+             "signed_drawing_file": 101,
+             "type_name": "DoorTier_TypeUUID",
+             "type_uuid": "a062752a-0653-488f-9c2e-a57462e5cac3",
+             "view_uuid": "3db09eb2-27f8-4e3b-9116-ec7e5b47d14a"
+            },
+            {
+             "drawing_file": 101,
+             "model_uuid": "7cd38176-c421-4671-8add-ca1d6a0499f8",
+             "signed_drawing_file": 101,
+             "type_name": "Door_TypeUUID",
+             "type_uuid": "2290eb05-627e-44b9-919a-89f563ec0c39",
+             "view_uuid": "b2d2514f-ed79-4d9d-819e-3ee64128a705"
+            },
+            {
+             "drawing_file": 101,
+             "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+             "signed_drawing_file": 101,
+             "type_name": "Wall_TypeUUID",
+             "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+             "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+            }
+           ],
+           "parent_chain_complete": true,
+           "physical_target_equivalence": "not_established",
+           "property_owner": "not_established",
+           "schema_version": "m4-component-ownership-1",
+           "target": {
+            "drawing_file": 101,
+            "model_uuid": "a5af19ac-d0bb-45bd-bb41-be1fafe3ddb5",
+            "signed_drawing_file": 101,
+            "type_name": "DoorReveal_TypeUUID",
+            "type_uuid": "38be8300-226a-4ed5-80f4-6663fb09997e",
+            "view_uuid": "5cb45c21-1be8-4cde-a890-e3148786cea8"
+           },
+           "terminal_root": {
+            "drawing_file": 101,
+            "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+            "signed_drawing_file": 101,
+            "type_name": "Wall_TypeUUID",
+            "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+            "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+           }
+          }
+         },
+         {
+          "children": [],
+          "geometry": {
+           "reason": "geometry_stream_unsupported",
+           "status": "not_checked"
+          },
+          "ownership": {
+           "child_parent_edges": [],
+           "children": [],
+           "children_complete": true,
+           "lineage": [
+            {
+             "drawing_file": 101,
+             "model_uuid": "3f997788-393a-429c-b8c2-72d7b7889f4e",
+             "signed_drawing_file": 101,
+             "type_name": "DoorSill_TypeUUID",
+             "type_uuid": "793b4bdd-55c6-46a9-8491-88472ccb8ed8",
+             "view_uuid": "f7cb9413-e631-4949-9e63-ace810f79eb5"
+            },
+            {
+             "drawing_file": 101,
+             "model_uuid": "82b89213-157f-4ac5-82ea-0cba3f533270",
+             "signed_drawing_file": 101,
+             "type_name": "DoorTier_TypeUUID",
+             "type_uuid": "a062752a-0653-488f-9c2e-a57462e5cac3",
+             "view_uuid": "3db09eb2-27f8-4e3b-9116-ec7e5b47d14a"
+            },
+            {
+             "drawing_file": 101,
+             "model_uuid": "7cd38176-c421-4671-8add-ca1d6a0499f8",
+             "signed_drawing_file": 101,
+             "type_name": "Door_TypeUUID",
+             "type_uuid": "2290eb05-627e-44b9-919a-89f563ec0c39",
+             "view_uuid": "b2d2514f-ed79-4d9d-819e-3ee64128a705"
+            },
+            {
+             "drawing_file": 101,
+             "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+             "signed_drawing_file": 101,
+             "type_name": "Wall_TypeUUID",
+             "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+             "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+            }
+           ],
+           "parent_chain_complete": true,
+           "physical_target_equivalence": "not_established",
+           "property_owner": "not_established",
+           "schema_version": "m4-component-ownership-1",
+           "target": {
+            "drawing_file": 101,
+            "model_uuid": "3f997788-393a-429c-b8c2-72d7b7889f4e",
+            "signed_drawing_file": 101,
+            "type_name": "DoorSill_TypeUUID",
+            "type_uuid": "793b4bdd-55c6-46a9-8491-88472ccb8ed8",
+            "view_uuid": "f7cb9413-e631-4949-9e63-ace810f79eb5"
+           },
+           "terminal_root": {
+            "drawing_file": 101,
+            "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+            "signed_drawing_file": 101,
+            "type_name": "Wall_TypeUUID",
+            "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+            "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+           }
+          }
+         },
+         {
+          "children": [],
+          "geometry": {
+           "reason": "geometry_stream_unsupported",
+           "status": "not_checked"
+          },
+          "ownership": {
+           "child_parent_edges": [],
+           "children": [],
+           "children_complete": true,
+           "lineage": [
+            {
+             "drawing_file": 101,
+             "model_uuid": "40af011e-d3c2-4bc9-9569-455b9eec9e1f",
+             "signed_drawing_file": 101,
+             "type_name": "AttributeContainer_TypeUUID",
+             "type_uuid": "572686a1-0ae5-4d22-88d1-35eeaea3f234",
+             "view_uuid": "40af011e-d3c2-4bc9-9569-455b9eec9e1f"
+            },
+            {
+             "drawing_file": 101,
+             "model_uuid": "82b89213-157f-4ac5-82ea-0cba3f533270",
+             "signed_drawing_file": 101,
+             "type_name": "DoorTier_TypeUUID",
+             "type_uuid": "a062752a-0653-488f-9c2e-a57462e5cac3",
+             "view_uuid": "3db09eb2-27f8-4e3b-9116-ec7e5b47d14a"
+            },
+            {
+             "drawing_file": 101,
+             "model_uuid": "7cd38176-c421-4671-8add-ca1d6a0499f8",
+             "signed_drawing_file": 101,
+             "type_name": "Door_TypeUUID",
+             "type_uuid": "2290eb05-627e-44b9-919a-89f563ec0c39",
+             "view_uuid": "b2d2514f-ed79-4d9d-819e-3ee64128a705"
+            },
+            {
+             "drawing_file": 101,
+             "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+             "signed_drawing_file": 101,
+             "type_name": "Wall_TypeUUID",
+             "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+             "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+            }
+           ],
+           "parent_chain_complete": true,
+           "physical_target_equivalence": "not_established",
+           "property_owner": "not_established",
+           "schema_version": "m4-component-ownership-1",
+           "target": {
+            "drawing_file": 101,
+            "model_uuid": "40af011e-d3c2-4bc9-9569-455b9eec9e1f",
+            "signed_drawing_file": 101,
+            "type_name": "AttributeContainer_TypeUUID",
+            "type_uuid": "572686a1-0ae5-4d22-88d1-35eeaea3f234",
+            "view_uuid": "40af011e-d3c2-4bc9-9569-455b9eec9e1f"
+           },
+           "terminal_root": {
+            "drawing_file": 101,
+            "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+            "signed_drawing_file": 101,
+            "type_name": "Wall_TypeUUID",
+            "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+            "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+           }
+          },
+          "stored_attributes": []
+         }
+        ],
+        "geometry": {
+         "status": "observed",
+         "stream_sha256": "ac0b442bc274437108a90598ae539b76de964f8cabab48f5bd8fa4956a30adaf"
+        },
+        "ownership": {
+         "child_parent_edges": [
+          {
+           "child": {
+            "drawing_file": 101,
+            "model_uuid": "a5af19ac-d0bb-45bd-bb41-be1fafe3ddb5",
+            "signed_drawing_file": 101,
+            "type_name": "DoorReveal_TypeUUID",
+            "type_uuid": "38be8300-226a-4ed5-80f4-6663fb09997e",
+            "view_uuid": "5cb45c21-1be8-4cde-a890-e3148786cea8"
+           },
+           "parent": {
+            "drawing_file": 101,
+            "model_uuid": "82b89213-157f-4ac5-82ea-0cba3f533270",
+            "signed_drawing_file": 101,
+            "type_name": "DoorTier_TypeUUID",
+            "type_uuid": "a062752a-0653-488f-9c2e-a57462e5cac3",
+            "view_uuid": "3db09eb2-27f8-4e3b-9116-ec7e5b47d14a"
+           }
+          },
+          {
+           "child": {
+            "drawing_file": 101,
+            "model_uuid": "3f997788-393a-429c-b8c2-72d7b7889f4e",
+            "signed_drawing_file": 101,
+            "type_name": "DoorSill_TypeUUID",
+            "type_uuid": "793b4bdd-55c6-46a9-8491-88472ccb8ed8",
+            "view_uuid": "f7cb9413-e631-4949-9e63-ace810f79eb5"
+           },
+           "parent": {
+            "drawing_file": 101,
+            "model_uuid": "82b89213-157f-4ac5-82ea-0cba3f533270",
+            "signed_drawing_file": 101,
+            "type_name": "DoorTier_TypeUUID",
+            "type_uuid": "a062752a-0653-488f-9c2e-a57462e5cac3",
+            "view_uuid": "3db09eb2-27f8-4e3b-9116-ec7e5b47d14a"
+           }
+          },
+          {
+           "child": {
+            "drawing_file": 101,
+            "model_uuid": "40af011e-d3c2-4bc9-9569-455b9eec9e1f",
+            "signed_drawing_file": 101,
+            "type_name": "AttributeContainer_TypeUUID",
+            "type_uuid": "572686a1-0ae5-4d22-88d1-35eeaea3f234",
+            "view_uuid": "40af011e-d3c2-4bc9-9569-455b9eec9e1f"
+           },
+           "parent": {
+            "drawing_file": 101,
+            "model_uuid": "82b89213-157f-4ac5-82ea-0cba3f533270",
+            "signed_drawing_file": 101,
+            "type_name": "DoorTier_TypeUUID",
+            "type_uuid": "a062752a-0653-488f-9c2e-a57462e5cac3",
+            "view_uuid": "3db09eb2-27f8-4e3b-9116-ec7e5b47d14a"
+           }
+          }
+         ],
+         "children": [
+          {
+           "drawing_file": 101,
+           "model_uuid": "3f997788-393a-429c-b8c2-72d7b7889f4e",
+           "signed_drawing_file": 101,
+           "type_name": "DoorSill_TypeUUID",
+           "type_uuid": "793b4bdd-55c6-46a9-8491-88472ccb8ed8",
+           "view_uuid": "f7cb9413-e631-4949-9e63-ace810f79eb5"
+          },
+          {
+           "drawing_file": 101,
+           "model_uuid": "a5af19ac-d0bb-45bd-bb41-be1fafe3ddb5",
+           "signed_drawing_file": 101,
+           "type_name": "DoorReveal_TypeUUID",
+           "type_uuid": "38be8300-226a-4ed5-80f4-6663fb09997e",
+           "view_uuid": "5cb45c21-1be8-4cde-a890-e3148786cea8"
+          },
+          {
+           "drawing_file": 101,
+           "model_uuid": "40af011e-d3c2-4bc9-9569-455b9eec9e1f",
+           "signed_drawing_file": 101,
+           "type_name": "AttributeContainer_TypeUUID",
+           "type_uuid": "572686a1-0ae5-4d22-88d1-35eeaea3f234",
+           "view_uuid": "40af011e-d3c2-4bc9-9569-455b9eec9e1f"
+          }
+         ],
+         "children_complete": true,
+         "lineage": [
+          {
+           "drawing_file": 101,
+           "model_uuid": "82b89213-157f-4ac5-82ea-0cba3f533270",
+           "signed_drawing_file": 101,
+           "type_name": "DoorTier_TypeUUID",
+           "type_uuid": "a062752a-0653-488f-9c2e-a57462e5cac3",
+           "view_uuid": "3db09eb2-27f8-4e3b-9116-ec7e5b47d14a"
+          },
+          {
+           "drawing_file": 101,
+           "model_uuid": "7cd38176-c421-4671-8add-ca1d6a0499f8",
+           "signed_drawing_file": 101,
+           "type_name": "Door_TypeUUID",
+           "type_uuid": "2290eb05-627e-44b9-919a-89f563ec0c39",
+           "view_uuid": "b2d2514f-ed79-4d9d-819e-3ee64128a705"
+          },
+          {
+           "drawing_file": 101,
+           "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+           "signed_drawing_file": 101,
+           "type_name": "Wall_TypeUUID",
+           "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+           "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+          }
+         ],
+         "parent_chain_complete": true,
+         "physical_target_equivalence": "not_established",
+         "property_owner": "not_established",
+         "schema_version": "m4-component-ownership-1",
+         "target": {
+          "drawing_file": 101,
+          "model_uuid": "82b89213-157f-4ac5-82ea-0cba3f533270",
+          "signed_drawing_file": 101,
+          "type_name": "DoorTier_TypeUUID",
+          "type_uuid": "a062752a-0653-488f-9c2e-a57462e5cac3",
+          "view_uuid": "3db09eb2-27f8-4e3b-9116-ec7e5b47d14a"
+         },
+         "terminal_root": {
+          "drawing_file": 101,
+          "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+          "signed_drawing_file": 101,
+          "type_name": "Wall_TypeUUID",
+          "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+          "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+         }
+        }
+       }
+      ],
+      "geometry": {
+       "reason": "geometry_stream_unsupported",
+       "status": "not_checked"
+      },
+      "ownership": {
+       "child_parent_edges": [
+        {
+         "child": {
+          "drawing_file": 101,
+          "model_uuid": "82b89213-157f-4ac5-82ea-0cba3f533270",
+          "signed_drawing_file": 101,
+          "type_name": "DoorTier_TypeUUID",
+          "type_uuid": "a062752a-0653-488f-9c2e-a57462e5cac3",
+          "view_uuid": "3db09eb2-27f8-4e3b-9116-ec7e5b47d14a"
+         },
+         "parent": {
+          "drawing_file": 101,
+          "model_uuid": "7cd38176-c421-4671-8add-ca1d6a0499f8",
+          "signed_drawing_file": 101,
+          "type_name": "Door_TypeUUID",
+          "type_uuid": "2290eb05-627e-44b9-919a-89f563ec0c39",
+          "view_uuid": "b2d2514f-ed79-4d9d-819e-3ee64128a705"
+         }
+        }
+       ],
+       "children": [
+        {
+         "drawing_file": 101,
+         "model_uuid": "82b89213-157f-4ac5-82ea-0cba3f533270",
+         "signed_drawing_file": 101,
+         "type_name": "DoorTier_TypeUUID",
+         "type_uuid": "a062752a-0653-488f-9c2e-a57462e5cac3",
+         "view_uuid": "3db09eb2-27f8-4e3b-9116-ec7e5b47d14a"
+        }
+       ],
+       "children_complete": true,
+       "lineage": [
+        {
+         "drawing_file": 101,
+         "model_uuid": "7cd38176-c421-4671-8add-ca1d6a0499f8",
+         "signed_drawing_file": 101,
+         "type_name": "Door_TypeUUID",
+         "type_uuid": "2290eb05-627e-44b9-919a-89f563ec0c39",
+         "view_uuid": "b2d2514f-ed79-4d9d-819e-3ee64128a705"
+        },
+        {
+         "drawing_file": 101,
+         "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+         "signed_drawing_file": 101,
+         "type_name": "Wall_TypeUUID",
+         "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+         "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+        }
+       ],
+       "parent_chain_complete": true,
+       "physical_target_equivalence": "not_established",
+       "property_owner": "not_established",
+       "schema_version": "m4-component-ownership-1",
+       "target": {
+        "drawing_file": 101,
+        "model_uuid": "7cd38176-c421-4671-8add-ca1d6a0499f8",
+        "signed_drawing_file": 101,
+        "type_name": "Door_TypeUUID",
+        "type_uuid": "2290eb05-627e-44b9-919a-89f563ec0c39",
+        "view_uuid": "b2d2514f-ed79-4d9d-819e-3ee64128a705"
+       },
+       "terminal_root": {
+        "drawing_file": 101,
+        "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+        "signed_drawing_file": 101,
+        "type_name": "Wall_TypeUUID",
+        "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+        "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+       }
+      }
+     }
+    ],
+    "tier": []
+   },
+   "hierarchy": {
+    "child_parent_edges": [
+     {
+      "child": {
+       "drawing_file": 101,
+       "model_uuid": "7cd38176-c421-4671-8add-ca1d6a0499f8",
+       "signed_drawing_file": 101,
+       "type_name": "Door_TypeUUID",
+       "type_uuid": "2290eb05-627e-44b9-919a-89f563ec0c39",
+       "view_uuid": "b2d2514f-ed79-4d9d-819e-3ee64128a705"
+      },
+      "parent": {
+       "drawing_file": 101,
+       "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+       "signed_drawing_file": 101,
+       "type_name": "Wall_TypeUUID",
+       "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+       "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+      }
+     },
+     {
+      "child": {
+       "drawing_file": 101,
+       "model_uuid": "ab2d33d2-8fc3-43bb-8d60-836403700e82",
+       "signed_drawing_file": 101,
+       "type_name": "WallTier_TypeUUID",
+       "type_uuid": "a7fae808-845c-4491-9f44-3757c493e673",
+       "view_uuid": "d0e65d47-bcda-4826-b1c3-4ba710276aa0"
+      },
+      "parent": {
+       "drawing_file": 101,
+       "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+       "signed_drawing_file": 101,
+       "type_name": "Wall_TypeUUID",
+       "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+       "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+      }
+     },
+     {
+      "child": {
+       "drawing_file": 101,
+       "model_uuid": "f819e327-d677-405c-82c1-585a45f1542b",
+       "signed_drawing_file": 101,
+       "type_name": "AttributeContainer_TypeUUID",
+       "type_uuid": "572686a1-0ae5-4d22-88d1-35eeaea3f234",
+       "view_uuid": "f819e327-d677-405c-82c1-585a45f1542b"
+      },
+      "parent": {
+       "drawing_file": 101,
+       "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+       "signed_drawing_file": 101,
+       "type_name": "Wall_TypeUUID",
+       "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+       "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+      }
+     }
+    ],
+    "children": [
+     {
+      "drawing_file": 101,
+      "model_uuid": "ab2d33d2-8fc3-43bb-8d60-836403700e82",
+      "signed_drawing_file": 101,
+      "type_name": "WallTier_TypeUUID",
+      "type_uuid": "a7fae808-845c-4491-9f44-3757c493e673",
+      "view_uuid": "d0e65d47-bcda-4826-b1c3-4ba710276aa0"
+     },
+     {
+      "drawing_file": 101,
+      "model_uuid": "f819e327-d677-405c-82c1-585a45f1542b",
+      "signed_drawing_file": 101,
+      "type_name": "AttributeContainer_TypeUUID",
+      "type_uuid": "572686a1-0ae5-4d22-88d1-35eeaea3f234",
+      "view_uuid": "f819e327-d677-405c-82c1-585a45f1542b"
+     },
+     {
+      "drawing_file": 101,
+      "model_uuid": "7cd38176-c421-4671-8add-ca1d6a0499f8",
+      "signed_drawing_file": 101,
+      "type_name": "Door_TypeUUID",
+      "type_uuid": "2290eb05-627e-44b9-919a-89f563ec0c39",
+      "view_uuid": "b2d2514f-ed79-4d9d-819e-3ee64128a705"
+     }
+    ],
+    "children_complete": true,
+    "lineage": [
+     {
+      "drawing_file": 101,
+      "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+      "signed_drawing_file": 101,
+      "type_name": "Wall_TypeUUID",
+      "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+      "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+     }
+    ],
+    "parent_chain_complete": true,
+    "physical_target_equivalence": "not_established",
+    "property_owner": "not_established",
+    "schema_version": "m4-component-ownership-1",
+    "target": {
+     "drawing_file": 101,
+     "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+     "signed_drawing_file": 101,
+     "type_name": "Wall_TypeUUID",
+     "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+     "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+    },
+    "terminal_root": {
+     "drawing_file": 101,
+     "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+     "signed_drawing_file": 101,
+     "type_name": "Wall_TypeUUID",
+     "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+     "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+    }
+   },
+   "root_attribute_containers": [
+    {
+     "children": [],
+     "geometry": {
+      "reason": "geometry_stream_unsupported",
+      "status": "not_checked"
+     },
+     "ownership": {
+      "child_parent_edges": [],
+      "children": [],
+      "children_complete": true,
+      "lineage": [
+       {
+        "drawing_file": 101,
+        "model_uuid": "f819e327-d677-405c-82c1-585a45f1542b",
+        "signed_drawing_file": 101,
+        "type_name": "AttributeContainer_TypeUUID",
+        "type_uuid": "572686a1-0ae5-4d22-88d1-35eeaea3f234",
+        "view_uuid": "f819e327-d677-405c-82c1-585a45f1542b"
+       },
+       {
+        "drawing_file": 101,
+        "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+        "signed_drawing_file": 101,
+        "type_name": "Wall_TypeUUID",
+        "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+        "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+       }
+      ],
+      "parent_chain_complete": true,
+      "physical_target_equivalence": "not_established",
+      "property_owner": "not_established",
+      "schema_version": "m4-component-ownership-1",
+      "target": {
+       "drawing_file": 101,
+       "model_uuid": "f819e327-d677-405c-82c1-585a45f1542b",
+       "signed_drawing_file": 101,
+       "type_name": "AttributeContainer_TypeUUID",
+       "type_uuid": "572686a1-0ae5-4d22-88d1-35eeaea3f234",
+       "view_uuid": "f819e327-d677-405c-82c1-585a45f1542b"
+      },
+      "terminal_root": {
+       "drawing_file": 101,
+       "model_uuid": "545bb0a2-a054-4c91-ac6c-ec552d5b0c18",
+       "signed_drawing_file": 101,
+       "type_name": "Wall_TypeUUID",
+       "type_uuid": "ec7f50b0-1a27-49d6-b6a2-007b854513c7",
+       "view_uuid": "32cdf5c8-b19f-4e79-8176-bc4c2ecb416c"
+      }
+     },
+     "stored_attributes": []
+    }
+   ]
+  },
+  "preservation_diagnostic": {
+   "diagnostic": {
+    "error_type": "ValueError",
+    "evidence": {
+     "child": {
+      "drawing_file": 101,
+      "model_uuid": "82b89213-157f-4ac5-82ea-0cba3f533270",
+      "signed_drawing_file": 101,
+      "type_name": "DoorTier_TypeUUID",
+      "type_uuid": "a062752a-0653-488f-9c2e-a57462e5cac3",
+      "view_uuid": "3db09eb2-27f8-4e3b-9116-ec7e5b47d14a"
+     },
+     "observed_parent": {
+      "drawing_file": 101,
+      "model_uuid": "7cd38176-c421-4671-8add-ca1d6a0499f8",
+      "signed_drawing_file": 101,
+      "type_name": "Door_TypeUUID",
+      "type_uuid": "2290eb05-627e-44b9-919a-89f563ec0c39",
+      "view_uuid": "b2d2514f-ed79-4d9d-819e-3ee64128a705"
+     },
+     "target": {
+      "drawing_file": 101,
+      "model_uuid": "ab2d33d2-8fc3-43bb-8d60-836403700e82",
+      "signed_drawing_file": 101,
+      "type_name": "WallTier_TypeUUID",
+      "type_uuid": "a7fae808-845c-4491-9f44-3757c493e673",
+      "view_uuid": "d0e65d47-bcda-4826-b1c3-4ba710276aa0"
+     }
+    },
+    "stage": "child_parent_identity"
+   },
+   "reason": "component_child_owner_mismatch",
+   "status": "not_checked",
+   "value": null
+  },
+  "schema_version": "m4-native-calculation-mode-state-1",
+  "tier_count": 1
+ },
+ "native_field": "CalculationMode",
+ "native_type": "Wall_TypeUUID",
+ "reported_preservation": {
+  "before_sha256": "83f1860fb274807f5321f6e7a913eb66f43db68fd16241f6dd1c9f6768e98261",
+  "changed_sections": [
+   "partial_preservation",
+   "preservation_diagnostic"
+  ],
+  "current_sha256": "a4ed7c437b6e1e5d261cdaccc791531e8be659003a52706e15358612f3e7cb33",
+  "identity_diff": {
+   "added": {
+    "count": 4,
+    "items": [
+     "AttributeContainer_TypeUUID|76ef73aa-90bd-4c3a-a998-07989b0fb572|76ef73aa-90bd-4c3a-a998-07989b0fb572",
+     "AttributeContainer_TypeUUID|e8bab07a-5a64-40dc-88b9-9eec75167b1c|e8bab07a-5a64-40dc-88b9-9eec75167b1c",
+     "DoorSill_TypeUUID|f7e9188a-019d-4f2f-b152-9b1f2280f091|3bdfa64d-35cd-486c-a72e-ebeecad94ba4",
+     "Door_TypeUUID|def5095f-c354-46f7-abca-d9678f680c26|795be646-2b1c-47cd-ae9b-ede532372b9d"
+    ],
+    "truncated": false
+   },
+   "removed": {
+    "count": 4,
+    "items": [
+     "AttributeContainer_TypeUUID|40af011e-d3c2-4bc9-9569-455b9eec9e1f|40af011e-d3c2-4bc9-9569-455b9eec9e1f",
+     "AttributeContainer_TypeUUID|f819e327-d677-405c-82c1-585a45f1542b|f819e327-d677-405c-82c1-585a45f1542b",
+     "DoorSill_TypeUUID|3f997788-393a-429c-b8c2-72d7b7889f4e|f7cb9413-e631-4949-9e63-ace810f79eb5",
+     "Door_TypeUUID|7cd38176-c421-4671-8add-ca1d6a0499f8|b2d2514f-ed79-4d9d-819e-3ee64128a705"
+    ],
+    "truncated": false
+   },
+   "status": "observed"
+  }
+ },
+ "source": "Raw bridge capture docs/test-results/evidence/0.50.0-2026-11-07/evidence-20261107.jsonl, apply response line 38 (request 6323321a-ff97-44fa-b8ee-9a0e732269c3), execution bd30912a43514f148735907c0b4dc258: Wall 200 with door, native CalculationMode 0 -> 2, bridge 0.50.0, Allplan 2026.1. Extracted unchanged; only this subset is kept."
+}

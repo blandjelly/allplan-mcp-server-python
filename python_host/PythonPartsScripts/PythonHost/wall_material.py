@@ -891,6 +891,13 @@ IDENTITY_REGENERATION_ACCEPTANCE = "identities_regenerated_evidence_otherwise_eq
 # - Wall: root/tier attribute containers, hierarchy and auxiliary sections
 #   changed; the WallAxis/WallAxisLine of the tier are the Wall's auxiliary
 #   children. Only these types may be renamed.
+# - Wall with a door (0.50.0 trial, execution bd30912a…, 2026-11-07): the
+#   setter also regenerated the Door and its DoorSill (model and view UUIDs)
+#   next to the root and door-tier AttributeContainers; the DoorTier and
+#   DoorReveal kept their identities and geometry streams. The bound evidence
+#   with exactly these four UUID pairs renamed hashed to the post-setter
+#   evidence, and UI Undo restored the preflight evidence byte for byte.
+#   Windows and other openings are not observed and stay `unknown`.
 IDENTITY_REGENERATION = {
     ("CalculationMode", "Column_TypeUUID"): {"children": frozenset({"AttributeContainer_TypeUUID"}),
                                              "root_view": True},
@@ -899,7 +906,9 @@ IDENTITY_REGENERATION = {
                                            "root_view": False},
     ("CalculationMode", "Wall_TypeUUID"): {"children": frozenset({"AttributeContainer_TypeUUID",
                                                                   "WallAxis_TypeUUID",
-                                                                  "WallAxisLine_TypeUUID"}),
+                                                                  "WallAxisLine_TypeUUID",
+                                                                  "Door_TypeUUID",
+                                                                  "DoorSill_TypeUUID"}),
                                            "root_view": False},
 }
 _MAX_IDENTITY_REFS = 4096

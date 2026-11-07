@@ -760,7 +760,8 @@ Findings:
 
 #### Paired properties and identity regeneration (0.50.0)
 
-Automated tests only; native trial pending.
+Native trial of 0.50.0 below; 0.50.1 extends the Wall rule to the door and
+adds the routing hint (automated tests only).
 
 - **Owner decision (2026-11-07):** a request for a property that exists both
   as a native property and as a same-named attribute changes both places,
@@ -804,12 +805,62 @@ Automated tests only; native trial pending.
   `view_map`. Any other drift stays `unknown` and now carries
   `preservation.identity_diff` (removed/added refs, bounded). The Material
   rule (`auxiliary_children_regenerated`, Beam only) is unchanged.
+- **0.50.1, Wall with door:** the Wall list also contains `Door_TypeUUID`
+  and `DoorSill_TypeUUID` (observed below). The same one-for-one,
+  byte-equal-after-renaming condition applies; the DoorTier, DoorReveal and
+  every geometry stream must stay unchanged. At most 4 identities per type and
+  64 pairings are tried, so a Wall with several doors can exceed the bound
+  and then stays `unknown` (two doors fit, three do not).
+  Windows and other openings are not observed and stay `unknown`.
+- **0.50.1, routing hint:** a single-place `native_calculation_mode` preview
+  whose matched element has an observed attribute 120 different from the new
+  label reports `paired_property_hint` (`attribute_differs` rows,
+  `effect: none`, `plain_request` = the `paired_property` request). It never
+  adds a change or blocks the plan; a `paired_property` preview has no hint.
 
-Open questions: how many UI Undo steps restore a paired write; whether the
-Wall's regenerated identities are exactly the listed ones (0.49.0 reported no
-per-section diff); whether `Pcs`/`kg` are labels of the project enum 120
-(the round trip decides before any write); whether `Trade` codes map
-one-to-one to the project's attribute 209 labels.
+#### Native observations (0.50.0 trial, 2026-11-07)
+
+Bridge 0.50.0, source `bf9605c`, `sha256-verified`, Allplan 2026.1, drawing
+101 of "Kopia MCP_QA_DEMO"
+([raw evidence](test-results/evidence/0.50.0-2026-11-07/evidence-20261107.jsonl),
+[agent log](test-results/evidence/0.50.0-2026-11-07/agent-log.md)). One write
+per step, owner UI check (all logged values agree with the UI), one UI Undo
+per write, fresh reads afterwards.
+
+| Element | Request / execution | Outcome | Accepted renaming | After one UI Undo |
+| --- | --- | --- | --- | --- |
+| Column `eb88c850…` | `native_calculation_mode` 2→0 (`1214d281…`) | `completed`, readback 0, attr 120 `m3` (followed) | AttributeContainer, root view `cc752bda…`→`5b2d4fb8…` | 2 / `m`, view `cc752bda…` |
+| Wall 240 `06d71e4d…` | `native_calculation_mode` `m3` | `no_op` (native already 0; attr 120 `m` left diverged) | — | — |
+| Wall 240 | `paired_property` `m`; plan native 0→2 only (`e4de1f73…`) | `completed`, readback 2 | 2 × AttributeContainer, WallAxis (model only; view kept) | 0 / `m` (attribute was not changed) |
+| Wall 200 with door `545bb0a2…` | `paired_property` `m`: native 0→2 + attr 120 `m3`→`m` (`bd30912a…`) | `stopped`: native `unknown` (`partial_preservation`, `preservation_diagnostic`), attr `skipped`; reconciliation readback 2, attr `m3` | none in 0.50.0; `identity_diff`: 2 × AttributeContainer (root, door tier), Door, DoorSill | recovery `reconciled`/`old_value_observed`, evidence hash equal to preflight |
+| Beam `7cc9ac55…` | `paired_property` `m` (`d129c7c1…`) | `completed`: native readback 2, attr `paired_attribute_already_set_by_native_write`, 0 attribute setters | AttributeContainer, WallAxis | 0 / `m3`; direct view `6035d406…` |
+| MultiSlab `bf097d95…` | attribute 120 `m3`→`m`, `selected_element` (`1dac121c…`) | `completed`, identities unchanged | — | `m3`; tier `m2` unchanged |
+
+Findings:
+
+- The 0.50.0 rule turned every observed single-tier Wall, Column and Beam
+  `CalculationMode` write into `applied`; the reported renamings are exactly
+  the listed types.
+- On the Wall with a door the setter also regenerated the Door (model and
+  view UUID), its DoorSill and the door tier's AttributeContainer. The bound
+  evidence (`partial_preservation`, because the door tier's parent is the
+  Door: `component_child_owner_mismatch`) with those four pairs renamed hashes
+  to the logged `current_sha256` (`a4ed7c43…`); DoorTier/DoorReveal identity
+  and geometry streams are unchanged. 0.50.1 accepts this renaming.
+- UI Undo restored the door's original identities (post-Undo evidence hash
+  `d969033f…` equals the preflight hash).
+- One UI Undo restores a write with one setter, also when the attribute
+  followed the native write. Native write plus attribute setter is not yet
+  observed.
+- Routing: plain requests were sent as single-place kinds on the Column and
+  the first Wall 240 request (no-op with a diverging attribute); 0.50.1 adds
+  the hint and clarifies the tool description.
+
+Open questions: how many UI Undo steps restore a paired write with two
+setters (Wall with door, 0.50.1); whether windows regenerate like doors;
+whether `Pcs`/`kg` are labels of the project enum 120 (the round trip decides
+before any write); whether `Trade` codes map one-to-one to the project's
+attribute 209 labels.
 
 
 
