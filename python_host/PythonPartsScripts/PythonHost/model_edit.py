@@ -9,7 +9,8 @@ from uuid import uuid4
 from .model_context import integer
 from .model_metadata import bounded_text
 from .model_properties import positive_id
-from .model_edit_contracts import (DEFAULT_NATIVE_TYPES, SCHEMA, UNDEFINED_ATTRIBUTE_VALUES,
+from .model_edit_contracts import (DEFAULT_NATIVE_TYPES, PAIRED_ATTRIBUTE_ONLY, PAIRED_NATIVE_TYPES,
+                                  PAIRED_PROPERTIES, SCHEMA, UNDEFINED_ATTRIBUTE_VALUES,
                                   is_undefined_attribute_value, validate_request)
 from .query_contracts import evaluate, fingerprint, predicate_fields
 from .repair_contracts import capability_probe
@@ -89,6 +90,69 @@ def evaluate_criterion(node, fields):
     return evaluate(node, fields)
 
 
+def expand_paired(changes):
+    """Split a paired_property edit into its native and attribute edits.
+
+    The native edit comes first: its ModifyElements may regenerate the
+    AttributeContainer, so the attribute is read and written afterwards.
+    Returns (choice, pairing) tuples; pairing is None for ordinary edits.
+    """
+    expanded = []
+    for choice in changes:
+        target = choice["target"]
+        if target["kind"] != "paired_property":
+            expanded.append((choice, None))
+            continue
+        name = target["property"]
+        spec = PAIRED_PROPERTIES[name]
+        value = choice["value"]
+        native_target = {"kind": spec["native_kind"]}
+        if spec["native_kind"] == "native_material":
+            native_target["tier_index"] = 1
+            label = value
+        else:
+            from .model_edit_contracts import calculation_mode_code
+            from .wall_material import CALCULATION_MODE_CODES
+            label = CALCULATION_MODE_CODES[calculation_mode_code(value)]
+        expanded.append(({"target": native_target, "value": value},
+                         {"paired_property": name, "role": "native", "attribute_id": spec["attribute_id"]}))
+        # The attribute is written on the selected element itself; for a slab
+        # that is the plain-request owner ("Cały obiekt"). A tier still needs
+        # its own exact layer request (slab_tier_requires_exact_layer_target).
+        expanded.append(({"target": {"kind": "attribute", "attribute_id": spec["attribute_id"],
+                                     "property_owner": "selected_element"},
+                          "value": label, "value_type": "auto"},
+                         {"paired_property": name, "role": "attribute", "native_field": spec["native_field"]}))
+    return expanded
+
+
+def paired_property(request):
+    """Name of the request's paired property, or None."""
+    return next((c["target"]["property"] for c in request.get("changes", [])
+                 if isinstance(c, dict) and isinstance(c.get("target"), dict)
+                 and c["target"].get("kind") == "paired_property"), None)
+
+
+def paired_summary(request, changes, attribute_only):
+    """Review evidence for a paired request: which places each target gets."""
+    name = paired_property(request)
+    spec = PAIRED_PROPERTIES[name]
+    per_ref = {}
+    for change in changes:
+        key = fingerprint(change["ref"])
+        per_ref.setdefault(key, {"ref": copy.deepcopy(change["ref"]), "native_type": change["native_type"],
+                                 "changes": []})["changes"].append(change["field"])
+    return {"property": name, "native_field": spec["native_field"],
+            "attribute_field": f"attribute:{spec['attribute_id']}",
+            "native_families": sorted(PAIRED_NATIVE_TYPES),
+            "targets": list(per_ref.values())[:32],
+            "attribute_only": attribute_only[:32],
+            "order": "native_then_attribute_per_target",
+            "attribute_already_set_by_native_write": "applied_without_attribute_setter",
+            "undo": "native and attribute are separate writes; count the UI Undo steps",
+            "single_place_requests": {"native": spec["native_kind"], "attribute": "attribute"}}
+
+
 def bind_changes(doc, base, request, check, trace):
     """Resolve only explicitly requested resources; never enumerate definitions/enums."""
     bound, fields = [], set()
@@ -99,7 +163,7 @@ def bind_changes(doc, base, request, check, trace):
         check()
         return result
 
-    for choice in request["changes"]:
+    for choice, pairing in expand_paired(request["changes"]):
         check()
         target = choice["target"]
         if target["kind"] == "delete":
@@ -236,6 +300,12 @@ def bind_changes(doc, base, request, check, trace):
             if boolean_binding is not None:
                 item["resource"]["boolean_binding"] = boolean_binding
                 item["resource"]["value_codec"] = "integer_checkbox_boolean"
+        if pairing is not None:
+            item["resource"]["paired_property"] = pairing["paired_property"]
+            if pairing["role"] == "native":
+                item["resource"]["paired_attribute_id"] = pairing["attribute_id"]
+            else:
+                item["resource"]["paired_native_field"] = pairing["native_field"]
         if item["field"] in fields:
             raise BridgeError("property_binding_unavailable", "Two changes resolve to the same property.", 409)
         fields.add(item["field"])
@@ -249,7 +319,9 @@ def observe(plans, doc, base, settings, request):
     started = plans.queries.clock()
     native_kinds = {"native_material": ("native.material", "Material"),
                     "native_calculation_mode": ("native.calculation_mode", "CalculationMode")}
-    native_kind = next((c["target"]["kind"] for c in request["changes"] if c["target"]["kind"] in native_kinds), None)
+    paired = paired_property(request)
+    native_kind = (PAIRED_PROPERTIES[paired]["native_kind"] if paired else
+                   next((c["target"]["kind"] for c in request["changes"] if c["target"]["kind"] in native_kinds), None))
     material_requested = native_kind is not None
     native_field, sdk_field = native_kinds.get(native_kind, ("native.material", "Material"))
     evidence_seconds = (max(plans.queries.SCAN_SECONDS, MATERIAL_EVIDENCE_SECONDS)
@@ -321,6 +393,14 @@ def observe(plans, doc, base, settings, request):
                     "status": "not_checked", "value": None, "reason": "destination_not_requested_for_non_target"}
                 continue
             kind = element["fields"]["type_name"].get("value")
+            if paired and kind not in PAIRED_NATIVE_TYPES:
+                # A paired request changes only the attribute on families
+                # without a reviewed native owner route (slabs, SkeletonBeam).
+                skipped = {"status": "not_checked", "value": None, "reason": PAIRED_ATTRIBUTE_ONLY}
+                element["fields"][native_field] = copy.deepcopy(skipped)
+                element["native_material_preservation"] = copy.deepcopy(skipped)
+                element["native_material_ownership"] = copy.deepcopy(skipped)
+                continue
             if sdk_field != "Material" and kind not in CALCULATION_MODE_TYPES:
                 # No native getter on an unsupported owner: the MultiSlab's
                 # native SlabProperties is not what the UI shows (0.48.0).
@@ -382,7 +462,8 @@ def observe(plans, doc, base, settings, request):
     # ownership conflict for otherwise agreeing representations of one model.
     from .component_ownership import observation as ownership_observation
     for element in snapshot["elements"]:
-        if material_requested or element["fields"]["type_name"].get("value") not in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}:
+        if ((material_requested and not paired)
+                or element["fields"]["type_name"].get("value") not in {"Slab_TypeUUID", "MultiSlab_TypeUUID"}):
             continue
         representations = live.get((element["ref"]["drawing_file"], element["ref"]["model_uuid"]), {})
         if exact is not None and element["ref"]["model_uuid"] == exact["model_uuid"]:
@@ -486,6 +567,7 @@ def observe(plans, doc, base, settings, request):
         if decisions[fingerprint(element["ref"])] == "matched"
         and field in destination_fields
         and value.get("status") not in {"observed", "absent", "missing"}
+        and value.get("reason") != PAIRED_ATTRIBUTE_ONLY
     ]
     field_complete = not required_failures
     complete = snapshot["coverage"]["requested_scope_complete"] and field_complete and not any(c["decision"] == "unknown" for c in checks)
@@ -508,7 +590,8 @@ def observe(plans, doc, base, settings, request):
                    "observation": copy.deepcopy(element["native_material_preservation"])}
                   for element in snapshot["elements"]
                   if decisions[fingerprint(element["ref"])] == "matched"
-                  and element.get("native_material_preservation", {}).get("status") == "not_checked"],
+                  and element.get("native_material_preservation", {}).get("status") == "not_checked"
+                  and element["native_material_preservation"].get("reason") != PAIRED_ATTRIBUTE_ONLY],
               "component_ownership": [{"ref": element["ref"], "observation": element["component_ownership"]}
                                       for element in snapshot["elements"] if "component_ownership" in element],
               ("native_material_ownership" if sdk_field == "Material" else "native_property_ownership"): [
@@ -541,7 +624,7 @@ def preview(plans, doc, base, settings, request):
     from .native_model_edit import value_matches
     report, snapshot, _ = observe(plans, doc, base, settings, request)
     decisions = {fingerprint(c["ref"]): c["decision"] for c in report["checks"]}
-    changes, blocked, targets = [], [], []
+    changes, blocked, targets, attribute_only = [], [], [], []
     for element in snapshot["elements"]:
         if decisions[fingerprint(element["ref"])] != "matched":
             continue
@@ -549,6 +632,11 @@ def preview(plans, doc, base, settings, request):
         for bound in report["binding"]:
             old = element["fields"][bound["field"]]
             native_property = bound["operation"] in {"set_native_material", "set_native_calculation_mode"}
+            if native_property and old.get("reason") == PAIRED_ATTRIBUTE_ONLY:
+                attribute_only.append({"ref": copy.deepcopy(element["ref"]), "field": bound["field"],
+                                       "native_type": element["fields"]["type_name"].get("value"),
+                                       "reason": PAIRED_ATTRIBUTE_ONLY})
+                continue
             if native_property and not element.get("native_material_state"):
                 from .wall_material import SLAB_CALCULATION_MODE_BLOCK
                 family_reason = old.get("reason") if old.get("reason") in {
@@ -687,6 +775,8 @@ def preview(plans, doc, base, settings, request):
             "evidence_fingerprint": report["report_fingerprint"], "scope": report["scope"], "coverage": report["coverage"],
             "changes": changes, "blocked": blocked, "highlight_targets": targets, "criteria": report,
             **({"slab_tier_values": differing_tiers} if differing_tiers else {}),
+            **({"paired_property": paired_summary(request, changes, attribute_only)}
+               if paired_property(request) else {}),
             "capabilities": capability_probe(base), "counts": {**report["counts"], "changes": len(changes), "blocked": len(blocked),
                                                                 "highlight_targets": len(targets)},
             "requires_highlight": True, "native_selection": "unsupported_use_explicit_highlight",

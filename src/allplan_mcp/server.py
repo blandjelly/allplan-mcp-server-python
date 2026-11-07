@@ -339,9 +339,23 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     parent-edge child view and the MultiSlab model/view) and one attribute_id
     replace. A MultiSlab attribute preview reports its tiers' values of the same
     attribute in slab_tier_values (informational, never written); tell the user
-    when the layer keeps a different value. Never substitute the attribute
-    Materiał for native_material or the reverse: use the target kind the user
-    or the trial instruction names. Other attribute types
+    when the layer keeps a different value.
+    Paired properties (owner decision 2026-11-07): a property that exists both
+    natively and as a same-named attribute changes in BOTH places by default.
+    For a plain request ("zmień materiał", "zmień obmiar/rodzaj rozliczenia")
+    use changes=[{target:{kind:paired_property,property:material|calculation_mode},
+    value:VALUE}] as the only edit: material = native Material + attribute 508,
+    calculation_mode = native CalculationMode + attribute 120 (SDK label m3,
+    m2, m, Pcs, kg or code 0-4; the attribute gets the same label). The native
+    half is planned only on Wall (one tier), Column and Beam_TypeUUID; slabs
+    and other families get the attribute alone (plan.paired_property.attribute_only).
+    Apply writes the native value first, then the attribute; when the native
+    write already set the attribute, it is reported applied without a setter.
+    A place that already holds the value gets no change. Use the single-place
+    kinds only when the user explicitly names one place: native_material /
+    native_calculation_mode for the native value (element dialog), an attribute
+    target for the attribute only. Never substitute the attribute
+    Materiał for native_material or the reverse. Other attribute types
     and computed-only/presence safeguards retain their existing requirements.
     The exact string is a native property value, without catalog validation or
     catalog creation. The report field is native.material and resource evidence
@@ -351,8 +365,8 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     its drift is a conflict before a write or an unknown outcome after a write.
     Complex representations and optional streams provide bounded drift evidence;
     they do not prove preservation of every hidden auxiliary property.
-    Native calculation mode ("Obmiar"/"Rodzaj rozliczenia") uses
-    changes=[{target:{kind:native_calculation_mode},value:LABEL_OR_CODE}] as the
+    Native calculation mode alone (only when the user names the native value)
+    uses changes=[{target:{kind:native_calculation_mode},value:LABEL_OR_CODE}] as the
     only edit, with the SDK label m3, m2, m, Pcs, kg or code 0-4, on a Column,
     single-tier Wall or Beam_TypeUUID. It sets CalculationMode on the same
     owner as native Material through ModifyElements. The old code must be 0-4
@@ -360,6 +374,11 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     attribute 120. Readback reports native.calculation_mode, and separately
     representation_consensus.mirror_crosscheck with attribute 120 and a verdict;
     a diverging attribute 120 is evidence for the owner, never auto-accepted.
+    After the setter, a regeneration of the family's listed identities
+    (AttributeContainer, Column root view, Beam/Wall axis) is accepted only if
+    all other bound evidence is equal after renaming
+    (accepted_preservation_drift, identities_regenerated_evidence_otherwise_equal);
+    any other drift stays unknown with preservation.identity_diff.
     Do not read or filter attribute 120 in the same plan. For a slab use
     attribute 120 on the MultiSlab with property_owner=selected_element (no
     native slab write; blocked as slab_calculation_mode_uses_multislab_attribute_120).

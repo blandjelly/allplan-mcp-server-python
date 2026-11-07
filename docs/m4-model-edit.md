@@ -94,6 +94,13 @@ A missing owner still blocks attributes of the
 aggregate and its child slab; organizational layers keep separate ownership
 limits.
 
+A property that exists natively and as a same-named attribute (material:
+native Material + attribute 508; calculation mode: native `CalculationMode` +
+attribute 120) is changed in both places by a plain request with
+`target.kind="paired_property"` (0.50.0, owner decision 2026-11-07); a request
+that names one place uses the single-place kind
+([tool reference](tool-reference.md#paired_property--native-property-and-same-named-attribute-together-0500)).
+
 Material read and safe-write availability are separate results.
 `criteria.operation_eligibility_failures` shows owner/setter blockers and
 `criteria.required_field_failures` unread required target fields. Geometry,

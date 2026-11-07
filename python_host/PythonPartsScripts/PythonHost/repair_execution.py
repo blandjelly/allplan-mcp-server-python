@@ -77,6 +77,50 @@ def _model_edit_fields_match(actual, expected, changes):
     return fingerprint(actual) == fingerprint(expected)
 
 
+def paired_attribute_change(item, native):
+    """The attribute half of a paired_property plan (0.50.0), bound to ``native``'s pair."""
+    from .model_edit_contracts import PAIRED_PROPERTIES
+    resource, native_resource = item.get("resource") or {}, native.get("resource") or {}
+    name = resource.get("paired_property")
+    spec = PAIRED_PROPERTIES.get(name) if isinstance(name, str) else None
+    return (spec is not None and item.get("operation") in {"set_attribute", "add_attribute"}
+            and native_resource.get("paired_property") == name
+            and native_resource.get("paired_attribute_id") == spec["attribute_id"]
+            and native.get("field") == spec["native_field"]
+            and resource.get("paired_native_field") == spec["native_field"]
+            and resource.get("attribute_id") == spec["attribute_id"]
+            and item.get("field") == f"attribute:{spec['attribute_id']}")
+
+
+def paired_native_index(changes, index):
+    """Index of the native change planned before this paired attribute change, or None."""
+    item = changes[index]
+    if not (item.get("resource") or {}).get("paired_native_field"):
+        return None
+    for position in range(index):
+        native = changes[position]
+        if (native["ref"]["model_uuid"] == item["ref"]["model_uuid"]
+                and native["ref"]["drawing_file"] == item["ref"]["drawing_file"]
+                and native.get("field") == item["resource"]["paired_native_field"]
+                and paired_attribute_change(item, native)):
+            return position
+    return None
+
+
+def regenerated_view(outcome, change):
+    """New view UUID of an applied native change whose reviewed view was regenerated."""
+    if outcome.get("state") != "applied":
+        return None
+    old = change.get("target_view_uuid")
+    views = set()
+    for representation in (outcome.get("representation_consensus") or {}).get("representations", []):
+        drift = representation.get("accepted_preservation_drift") or {}
+        mapped = (drift.get("view_map") or {}).get(old)
+        if mapped:
+            views.add(mapped)
+    return views.pop() if len(views) == 1 else None
+
+
 class RepairExecutor:
     # Keep enough resolved history for multiple interactive batches before
     # requiring the existing confirmed archival workflow.
@@ -359,7 +403,8 @@ class RepairExecutor:
                 capability = plan["capabilities"]["symbols"].get("ModifyElements", {})
                 if (not valid_change(change) or capability.get("status") != "observed"
                         or capability.get("callable") is not True
-                        or any(item.get("operation") != change["operation"] for item in changes)):
+                        or any(item.get("operation") != change["operation"]
+                               and not paired_attribute_change(item, change) for item in changes)):
                     return False
                 continue
             if change.get("operation") == "delete_element":
@@ -551,12 +596,42 @@ class RepairExecutor:
                 if self.plans.queries.clock() - started >= 20:
                     outcome["reason"] = "execution_time_budget"
                     break
+                # Paired attribute (0.50.0): it follows its applied native
+                # change. An accepted regeneration of the reviewed view is
+                # carried over; the reviewed model, type and old value stay bound.
+                native_index = paired_native_index(record["changes"], index)
+                if native_index is not None:
+                    native_change = record["changes"][native_index]
+                    if record["outcomes"][native_index].get("state") != "applied":
+                        outcome["reason"] = "paired_native_change_not_applied"
+                        break
+                    view = regenerated_view(record["outcomes"][native_index], native_change)
+                    if view is not None and change.get("target_view_uuid") == native_change.get("target_view_uuid"):
+                        change = {**copy.deepcopy(change), "target_view_uuid": view}
+                        outcome["effective_target_view_uuid"] = view
                 stage = "pre_set_resolve"
                 try:
                     native_owners = []
                     element = native_repairs.resolve(doc, base, self.plans.queries, change, writable=True, adapter_owners=native_owners)
                     stage = "pre_set_read"
                     old = native_repairs.read(base, self.plans.queries, element, change)
+                    if native_index is not None and new_value_observed(change, old):
+                        # The native write already set the same-named attribute
+                        # (observed mirror). Confirm on every representation;
+                        # no attribute setter runs.
+                        stage = "paired_readback"
+                        resolution = {}
+                        observed = native_repairs.observe(doc, base, self.plans.queries, change, resolution)
+                        if resolution:
+                            outcome["representation_consensus"] = resolution
+                        outcome["readback"] = observed
+                        if new_value_observed(change, observed):
+                            outcome.update(state="applied", reason="paired_attribute_already_set_by_native_write",
+                                           setter_calls_started=0)
+                            self.save(record)
+                            continue
+                        outcome.update(state="conflict", reason="paired_attribute_readback_disagrees")
+                        break
                     if not same_observation(change, old, change["old_value"]):
                         outcome.update(state="conflict", reason="old_value_changed", readback=old)
                         break

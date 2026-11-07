@@ -34,6 +34,28 @@ def calculation_mode_code(value):
     return None
 
 
+# 0.50.0 (owner decision 2026-11-07): a plain request for a property that
+# exists both as a native property and as a same-named project attribute
+# changes both together. Naming one place keeps the single-target kinds
+# (native_material, native_calculation_mode, attribute). The native side is
+# planned only on families with a reviewed native owner route; slabs and
+# other families get the attribute change alone.
+PAIRED_PROPERTIES = {
+    "calculation_mode": {"native_kind": "native_calculation_mode", "native_field": "native.calculation_mode",
+                         "attribute_id": 120},
+    "material": {"native_kind": "native_material", "native_field": "native.material", "attribute_id": 508},
+}
+PAIRED_NATIVE_TYPES = frozenset({"Wall_TypeUUID", "Column_TypeUUID", "Beam_TypeUUID"})
+PAIRED_ATTRIBUTE_ONLY = "paired_property_attribute_only_for_family"
+
+
+def paired_value_valid(name, value):
+    if name == "calculation_mode":
+        return calculation_mode_code(value) is not None
+    return (isinstance(value, str) and bool(value.strip()) and len(value) <= 255
+            and not any(ord(c) < 32 for c in value))
+
+
 UUID = re.compile(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}")
 
 
@@ -114,6 +136,17 @@ def _preview(request):
                 invalid("Native calculation mode must be an SDK label m3, m2, m, Pcs, kg or its code 0-4.")
             if len(changes) != 1:
                 invalid("Native calculation mode must be the only change in a plan.")
+        elif target.get("kind") == "paired_property":
+            keys(change, {"target", "value"}, {"target", "value"})
+            keys(target, {"kind", "property"}, {"kind", "property"})
+            if not isinstance(target["property"], str) or target["property"] not in PAIRED_PROPERTIES:
+                invalid("paired_property must name calculation_mode or material.")
+            if not paired_value_valid(target["property"], change["value"]):
+                invalid("Paired calculation mode needs an SDK label m3, m2, m, Pcs, kg or code 0-4; "
+                        "paired material needs an exact nonempty string of at most 255 characters.")
+            if len(changes) != 1:
+                invalid("A paired property must be the only change in a plan.")
+            referenced_ids.add(PAIRED_PROPERTIES[target["property"]]["attribute_id"])
         elif target.get("kind") == "attribute":
             keys(change, {"target", "value_type", "value", "mode"}, {"target", "value"})
             keys(target, {"kind", "attribute_id", "name", "property_owner"}, {"kind"})
@@ -159,7 +192,8 @@ def _preview(request):
             if not isinstance(name, str) or not name.strip() or len(name) > limit:
                 invalid(f"Layer {field} must be a bounded nonempty string.")
         else:
-            invalid("target.kind must be attribute, layer, native_material, native_calculation_mode or delete.")
+            invalid("target.kind must be attribute, layer, native_material, native_calculation_mode, "
+                    "paired_property or delete.")
     if "exact_target" in request:
         t = request["exact_target"]
         keys(t, {"drawing_file", "model_uuid", "view_uuid", "parent_ref"},
