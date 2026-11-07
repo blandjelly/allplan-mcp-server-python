@@ -359,6 +359,27 @@ class ComponentIdentityTests(unittest.TestCase):
         self.assertIn("component_child_owner_mismatch at child_parent_identity", str(error.exception))
         self.base.GetElement.assert_not_called()
 
+    def test_wall_tier_lists_its_wall_window_tier_as_a_shared_child(self):
+        # 0.51.1: the WallTier's extra WindowTier edge is bound to the Wall's
+        # own Window child; any other foreign parent stays a mismatch above.
+        wall = self.element(70, name="Wall_TypeUUID")
+        tier = self.element(71, name="WallTier_TypeUUID")
+        window = self.element(72, name="Window_TypeUUID")
+        window_tier = self.element(73, name="WindowTier_TypeUUID")
+        self.fixture([tier, window])
+        self.parents.update({id(wall): self.null_adapter(), id(tier): wall, id(window): wall,
+                             id(window_tier): window})
+        self.children.update({id(wall): [tier, window], id(tier): [window_tier], id(window): [window_tier]})
+        result = self.identity_probe(tier)
+        ownership = result["ownership"]
+        self.assertEqual(ownership["children"], [])
+        shared, = ownership["shared_children"]
+        self.assertEqual((shared["child"]["type_name"], shared["parent"]["type_name"]),
+                         ("WindowTier_TypeUUID", "Window_TypeUUID"))
+        self.assertEqual([ref["type_name"] for ref in ownership["lineage"]],
+                         ["WallTier_TypeUUID", "Wall_TypeUUID"])
+        self.assertNotIn("shared_children", self.identity_probe(window)["ownership"])
+
     def test_native_enumeration_container_lives_through_identity_probe(self):
         target = self.element(70)
         self.fixture([target])

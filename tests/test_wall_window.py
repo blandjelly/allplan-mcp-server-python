@@ -31,6 +31,9 @@ class WallFixture:
         paired.bind_attribute_120(self.native)
         self.native.base.ElementsSelectService.SelectAllElements.return_value = [self.root]
         self.tier_lists = []
+        # Position of the WallTier among the Wall's enumerated children
+        # (0 = first, None = last); the native order is not documented.
+        self.tier_position = 0
 
     def part(self, ident, name, attrs=None):
         element = self.native.element(ident, name=name, solid=Polyhedron(name))
@@ -63,6 +66,10 @@ class WallFixture:
         for parent_id in list(self.native.children):
             self.native.children[parent_id] = []
         self.native.children.update(children)
+        root_children = self.native.children[id(self.root)]
+        root_children.remove(self.wall.tier)
+        root_children.insert(len(root_children) if self.tier_position is None else self.tier_position,
+                             self.wall.tier)
         for listed in self.tier_lists:
             # 0.50.1 query: the WallTier also enumerates the opening tier,
             # whose parent is the opening (component_child_owner_mismatch).
@@ -74,11 +81,12 @@ class WallFixture:
             after.GetElementAdapterType.return_value.GetGuid.return_value = (
                 before.GetElementAdapterType.return_value.GetGuid.return_value)
 
-    def regenerate_on_write(self, *subtrees):
+    def regenerate_on_write(self, *subtrees, tier_position=0):
         modify = self.native.base.ModifyElements.side_effect
 
         def regenerate(doc, elements):
             result = modify(doc, elements)
+            self.tier_position = tier_position
             self.attach(*subtrees)
             return result
 
@@ -216,8 +224,10 @@ class ColumnPairedMaterialTests(unittest.TestCase):
 
 
 class WallWithWindowTests(unittest.TestCase):
-    def window_wall(self, attributes=((935, ""), (508, "Silikat")), tier_lists=False):
+    def window_wall(self, attributes=((935, ""), (508, "Silikat")), tier_lists=False,
+                    tier_before=0, tier_after=0):
         w = WallFixture(self, attributes)
+        w.tier_position = tier_before
         keep = (w.part(50, "WindowTier_TypeUUID"), w.part(51, "WindowReveal_TypeUUID"))
         if tier_lists:
             w.tier_lists.append(keep[0])
@@ -226,7 +236,7 @@ class WallWithWindowTests(unittest.TestCase):
         w.same_types([p for p in old if p not in keep] + list(old_meta),
                      [p for p in new if p not in keep] + list(new_meta))
         w.attach(old, old_meta)
-        w.regenerate_on_write(new, new_meta)
+        w.regenerate_on_write(new, new_meta, tier_position=tier_after)
         return w
 
     def test_paired_calculation_mode_accepts_the_window_regeneration(self):
@@ -251,20 +261,57 @@ class WallWithWindowTests(unittest.TestCase):
         self.assertEqual(result["state"], "completed", result)
         self.assertEqual((w.wall.material, w.attribute(508)), ("Cegła", "Cegła"))
 
-    def test_window_tier_listed_under_the_wall_tier_gives_partial_evidence_still_accepted(self):
+    def test_window_tier_listed_under_the_wall_tier_is_a_bound_shared_child(self):
+        # 0.51.0 trial: the WallTier also enumerates the WindowTier, whose
+        # parent is the Window. 0.51.1 binds that edge instead of falling back
+        # to partial evidence (component_child_owner_mismatch).
         w = self.window_wall(tier_lists=True)
         plan = w.plan(PAIRED_MATERIAL)
         self.assertTrue(plan["apply_available"], plan)
         state = plan["changes"][0]["resource"]["native_material_state"]
-        self.assertIn("partial_preservation", state)
-        self.assertEqual(state["preservation_diagnostic"]["reason"], "component_child_owner_mismatch")
+        self.assertNotIn("partial_preservation", state)
+        self.assertNotIn("preservation_diagnostic", state)
+        shared, = state["tier_hierarchy"]["shared_children"]
+        self.assertEqual((shared["child"]["type_name"], shared["parent"]["type_name"]),
+                         ("WindowTier_TypeUUID", "Window_TypeUUID"))
+        self.assertNotIn(shared["child"], state["tier_hierarchy"]["children"])
+        window, = state["auxiliary_components"]["root"]
+        self.assertIn(shared["child"], window["ownership"]["children"])
+        self.assertEqual(state["auxiliary_components"]["tier"], [])
         result = w.native.apply(plan)
         self.assertEqual(result["state"], "completed", result)
         drift = result["outcomes"][0]["representation_consensus"]["representations"][0][
             "accepted_preservation_drift"]
-        self.assertEqual(drift["changed_sections"], ["partial_preservation", "preservation_diagnostic"])
         self.assertIn("Window_TypeUUID", {p["type_name"] for p in drift["regenerated_identities"]})
         self.assertEqual((w.wall.material, w.attribute(508)), ("Cegła", "Cegła"))
+
+    def test_window_wall_regeneration_that_reorders_the_children_is_accepted(self):
+        # 0.51.0 trial (a47dca16…, 5346fd71…): only Window, Sill and two
+        # AttributeContainers were renamed, yet both writes stayed unknown.
+        # The partial evidence held whatever was enumerated before the
+        # WallTier, so regenerated parts listed after it changed its shape.
+        for change, expected in ((PAIRED_MATERIAL, ("Cegła", "Cegła")),
+                                 ({"target": {"kind": "paired_property", "property": "calculation_mode"},
+                                   "value": "m"}, None)):
+            with self.subTest(change=change["target"]["property"]):
+                w = self.window_wall(tier_lists=True, tier_before=None, tier_after=0)
+                result = w.native.apply(w.plan(change))
+                self.assertEqual(result["state"], "completed", result)
+                self.assertEqual([o["state"] for o in result["outcomes"]], ["applied", "applied"])
+                self.assertEqual(result["undo_group"]["setters_in_step"], 2)
+                if expected:
+                    self.assertEqual((w.wall.material, w.attribute(508)), expected)
+                else:
+                    self.assertEqual(w.attribute(120), "m")
+
+    def test_a_tier_child_owned_by_a_non_opening_stays_partial(self):
+        w = WallFixture(self)
+        meta = w.root_container(80)
+        w.tier_lists.append(next(iter(meta)))
+        w.attach(meta)
+        plan = w.plan(PAIRED_MATERIAL)
+        state = plan["changes"][0]["resource"]["native_material_state"]
+        self.assertEqual(state["preservation_diagnostic"]["reason"], "component_child_owner_mismatch")
 
     def test_regenerated_window_tier_or_changed_reveal_geometry_stays_unknown(self):
         w = WallFixture(self)
@@ -296,6 +343,13 @@ class WallWithWindowTests(unittest.TestCase):
         result = g.native.apply(g.plan(PAIRED_MATERIAL))
         self.assertEqual(result["outcomes"][0]["state"], "unknown", result)
         g.native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+        preservation = result["outcomes"][0]["representation_consensus"]["representations"][0]["preservation"]
+        residual = preservation["regeneration_residual"]
+        self.assertEqual((residual["status"], residual["unpaired_types"]), ("observed", []))
+        row, = residual["paths"]
+        self.assertTrue(row["path"].startswith("/auxiliary_components/root/[Window_TypeUUID|"), row)
+        self.assertTrue(row["path"].endswith("/[WindowReveal_TypeUUID|00000000-0000-4000-8000-000000000051]"
+                                             "/geometry/stream_sha256"), row)
 
 
 if __name__ == "__main__":

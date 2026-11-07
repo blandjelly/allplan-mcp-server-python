@@ -679,7 +679,12 @@ accepted as
 `identities_regenerated_evidence_otherwise_equal`; other drift stays
 `unknown` with `preservation.identity_diff`. From 0.51.0 the same family rule
 applies after a native `Material` setter (the Beam's earlier
-`auxiliary_children_regenerated` rule is kept). Use this kind only when the user
+`auxiliary_children_regenerated` rule is kept). From 0.51.1 an unaccepted
+renaming also reports `preservation.regeneration_residual` (up to 8 evidence
+paths that still differ after renaming; review evidence only), and a window
+Wall's WindowTier listed under its WallTier is bound as
+`tier_hierarchy.shared_children` instead of reducing the evidence to
+`partial_preservation`. Use this kind only when the user
 asks for the native value alone; a plain request uses `paired_property`.
 
 ### `native_material` — experimental architectural material

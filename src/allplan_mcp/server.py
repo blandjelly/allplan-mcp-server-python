@@ -396,7 +396,10 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     accepted only if
     all other bound evidence is equal after renaming
     (accepted_preservation_drift, identities_regenerated_evidence_otherwise_equal);
-    any other drift stays unknown with preservation.identity_diff.
+    any other drift stays unknown with preservation.identity_diff and
+    preservation.regeneration_residual (the evidence paths that still differ
+    after the renaming). A Wall's opening tier listed under its WallTier is
+    bound as tier_hierarchy.shared_children (not a partial snapshot).
     Do not read or filter attribute 120 in the same plan. For a slab use
     attribute 120 on the MultiSlab with property_owner=selected_element (no
     native slab write; blocked as slab_calculation_mode_uses_multislab_attribute_120).
