@@ -47,6 +47,34 @@ PAIRED_PROPERTIES = {
 }
 PAIRED_NATIVE_TYPES = frozenset({"Wall_TypeUUID", "Column_TypeUUID", "Beam_TypeUUID"})
 PAIRED_ATTRIBUTE_ONLY = "paired_property_attribute_only_for_family"
+# 0.51.0: owner observation in the 0.50.1 trial (Wall 200 with door, native
+# Material write 37196703…): attribute 508 was not stored on the Wall (absent
+# from ReadAll and ReadAllAndComputable), and after the native write the
+# attributes palette showed the new material as well. Where the paired
+# attribute is proven absent, its UI place follows the native value, so a
+# paired request plans only the native change. Observed for Material on the
+# Wall only; other families/properties keep a blocker until observed.
+PAIRED_ATTRIBUTE_FOLLOWS_NATIVE = frozenset({("material", "Wall_TypeUUID")})
+PAIRED_ATTRIBUTE_NOT_STORED = "paired_attribute_not_stored_follows_native"
+
+
+def paired_property_name(request):
+    """Name of the request's paired property, or None."""
+    return next((c["target"]["property"] for c in request.get("changes", [])
+                 if isinstance(c, dict) and isinstance(c.get("target"), dict)
+                 and c["target"].get("kind") == "paired_property"), None)
+
+
+def attribute_read_mode(request):
+    """Requested attribute read mode.
+
+    A paired request reads with presence proof by default (0.51.0) so an
+    attribute that is not stored is ``absent`` rather than an unknown old
+    value; an explicit request value is kept.
+    """
+    if "attribute_read_mode" in request:
+        return request["attribute_read_mode"]
+    return "all_and_computable" if paired_property_name(request) else "stored"
 
 
 def paired_value_valid(name, value):

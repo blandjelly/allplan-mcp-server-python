@@ -161,7 +161,7 @@ class PropertyTests(unittest.TestCase):
         for route, request in (("/model-properties", {"schema_version": "m4-properties-1", "metadata_limit": True}),
                                ("/model-properties", {"schema_version": "m4-properties-1", "attribute_names": ["x", "x"]}),
                                ("/model-properties", {"schema_version": "m4-properties-1", "scope": "project"}),
-                               ("/model-properties", {"schema_version": "m4-properties-1", "native_types": ["Door_TypeUUID"]}),
+                               ("/model-properties", {"schema_version": "m4-properties-1", "native_types": ["DoorTier_TypeUUID"]}),
                                ("/model-selection", {"schema_version": "m4-selection-1", "action": "clear_highlight", "selection_id": "a" * 32})):
             self.assert_code("invalid_payload", lambda: self.handler.handle(route, request))
         self.coord.GetInputViewDocument.assert_not_called()

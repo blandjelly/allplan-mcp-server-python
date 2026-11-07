@@ -539,6 +539,50 @@ class ModelDeleteTests(unittest.TestCase):
         self.assertTrue(reveal.IsDeleted.return_value)
         self.base.DeleteElements.assert_called_once()
 
+    def test_wall_owned_window_deletes_its_whole_subtree_without_deleting_the_wall(self):
+        # 0.51.0: Allplan 2026.1 reports a window as Window_TypeUUID owned by
+        # its Wall; subtree from the 0.50.1 trial query (Window -> WindowTier ->
+        # Sill, WindowReveal -> WindowOpeningSmartPart -> AttributeContainer,
+        # and the tier's AttributeContainer).
+        wall = self.fixture(("",))[0]
+        wall.GetElementAdapterType.return_value.GetTypeName.return_value = "Wall_TypeUUID"
+        names = ("Window_TypeUUID", "WindowTier_TypeUUID", "Sill_TypeUUID", "WindowReveal_TypeUUID",
+                 "WindowOpeningSmartPart_TypeUUID", "AttributeContainer_TypeUUID", "AttributeContainer_TypeUUID")
+        window, tier, sill, reveal, smart, smart_meta, tier_meta = parts = [
+            self.element(2 + index, name=name) for index, name in enumerate(names)]
+        for method, value in (("IsNull", False), ("IsDeleted", False), ("IsValid", True),
+                              ("IsInActiveDocument", True), ("IsInActiveLayer", True),
+                              ("IsLabelElement", False)):
+            for adapter in parts:
+                getattr(adapter, method).return_value = value
+        for child, parent in ((window, wall), (tier, window), (sill, tier), (reveal, tier),
+                              (smart, reveal), (smart_meta, smart), (tier_meta, tier)):
+            self.parents[id(child)] = parent
+            self.children.setdefault(id(parent), []).append(child)
+        self.elements = [wall, *parts]
+        self.base.ElementsSelectService.SelectAllElements.return_value = self.elements
+        self.live_elements()
+
+        def delete_window(doc, adapters):
+            self.assertEqual([item.GetModelElementUUID() for item in adapters], [window.GetModelElementUUID()])
+            for adapter in parts:
+                adapter.IsDeleted.return_value = True
+
+        self.base.DeleteElements.side_effect = delete_window
+        plan = self.preview(predicate=None, native_types=["Window_TypeUUID"],
+                            changes=[{"target": {"kind": "delete"}}])
+        self.assertTrue(plan["apply_available"], plan)
+        change, = plan["changes"]
+        self.assertEqual(change["native_type"], "Window_TypeUUID")
+        ownership = change["resource"]["delete_ownership"]["value"]
+        self.assertEqual(ownership["lineage"][1]["model_uuid"], wall.GetModelElementUUID())
+        self.assertEqual(sorted(item["type_name"] for item in ownership["descendants"]), sorted(names[1:]))
+        self.highlight(plan)
+        result = self.apply(plan, uuid4().hex)
+        self.assertEqual(result["state"], "completed", result)
+        self.assertFalse(wall.IsDeleted.return_value)
+        self.base.DeleteElements.assert_called_once()
+
     def test_delete_ownership_preserves_component_read_failure_diagnostic(self):
         import importlib
         ComponentReadError = importlib.import_module(self.module.__package__ + ".component_ownership").ComponentReadError

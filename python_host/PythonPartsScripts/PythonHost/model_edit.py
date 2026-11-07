@@ -9,9 +9,10 @@ from uuid import uuid4
 from .model_context import integer
 from .model_metadata import bounded_text
 from .model_properties import positive_id
-from .model_edit_contracts import (DEFAULT_NATIVE_TYPES, PAIRED_ATTRIBUTE_ONLY, PAIRED_NATIVE_TYPES,
-                                  PAIRED_PROPERTIES, SCHEMA, UNDEFINED_ATTRIBUTE_VALUES,
-                                  is_undefined_attribute_value, validate_request)
+from .model_edit_contracts import (DEFAULT_NATIVE_TYPES, PAIRED_ATTRIBUTE_FOLLOWS_NATIVE,
+                                  PAIRED_ATTRIBUTE_NOT_STORED, PAIRED_ATTRIBUTE_ONLY, PAIRED_NATIVE_TYPES,
+                                  PAIRED_PROPERTIES, SCHEMA, UNDEFINED_ATTRIBUTE_VALUES, attribute_read_mode,
+                                  is_undefined_attribute_value, paired_property_name, validate_request)
 from .query_contracts import evaluate, fingerprint, predicate_fields
 from .repair_contracts import capability_probe
 from .transport import BridgeError
@@ -126,14 +127,10 @@ def expand_paired(changes):
     return expanded
 
 
-def paired_property(request):
-    """Name of the request's paired property, or None."""
-    return next((c["target"]["property"] for c in request.get("changes", [])
-                 if isinstance(c, dict) and isinstance(c.get("target"), dict)
-                 and c["target"].get("kind") == "paired_property"), None)
+paired_property = paired_property_name
 
 
-def paired_summary(request, changes, attribute_only):
+def paired_summary(request, changes, attribute_only, follows_native=()):
     """Review evidence for a paired request: which places each target gets."""
     name = paired_property(request)
     spec = PAIRED_PROPERTIES[name]
@@ -147,40 +144,48 @@ def paired_summary(request, changes, attribute_only):
             "native_families": sorted(PAIRED_NATIVE_TYPES),
             "targets": list(per_ref.values())[:32],
             "attribute_only": attribute_only[:32],
+            "attribute_follows_native": list(follows_native)[:32],
             "order": "native_then_attribute_per_target",
             "attribute_already_set_by_native_write": "applied_without_attribute_setter",
-            "undo": "native and attribute are separate writes; count the UI Undo steps",
+            "undo": ("native and attribute setters of one Apply share one UI Undo step (undo_group, 0.51.0); "
+                     "count the UI Undo steps"),
             "single_place_requests": {"native": spec["native_kind"], "attribute": "attribute"}}
 
 
 def paired_attribute_hint(request, report):
-    """Single-place CalculationMode plan whose attribute 120 differs: review hint.
+    """Single-place native plan whose same-named attribute differs: review hint.
 
-    0.50.0 trial: plain requests were routed to native_calculation_mode, so a
-    diverging attribute 120 was left unchanged (or the plan was a no-op).
-    Informational only; it never adds a change or blocks the plan.
+    0.50.0/0.50.1 trials: plain requests were routed to a single-place native
+    kind (native_calculation_mode; native_material on the Wall 240 after the
+    previous request had named the native place), so a diverging attribute
+    120/508 was left unchanged. Informational only; it never adds a change
+    or blocks the plan.
     """
     if paired_property(request):
         return None
     binding = next((item for item in report["binding"]
-                    if item.get("operation") == "set_native_calculation_mode"), None)
+                    if item.get("operation") in {"set_native_calculation_mode", "set_native_material"}), None)
     if binding is None:
         return None
-    label = binding["resource"].get("new_label")
+    if binding["operation"] == "set_native_calculation_mode":
+        name, label = "calculation_mode", binding["resource"].get("new_label")
+    else:
+        name, label = "material", binding["new_value"]
+    ident = PAIRED_PROPERTIES[name]["attribute_id"]
     matched = {fingerprint(check["ref"]) for check in report["checks"] if check["decision"] == "matched"}
     rows = [{"ref": copy.deepcopy(item["ref"]), "attribute_id": item.get("attribute_id"),
              "observation": copy.deepcopy(item["observation"])}
             for item in report.get("native_property_mirror", [])
-            if fingerprint(item["ref"]) in matched
+            if fingerprint(item["ref"]) in matched and item.get("attribute_id") == ident
             and (item.get("observation") or {}).get("status") == "observed"
             and item["observation"].get("value") != label]
     if not rows:
         return None
-    return {"property": "calculation_mode", "new_label": label, "attribute_differs": rows[:32],
-            "effect": "none: this single-place plan leaves attribute 120 unchanged",
-            "plain_request": {"target": {"kind": "paired_property", "property": "calculation_mode"},
-                              "value": label},
-            "use": "only if the user did not explicitly ask for the native value alone"}
+    return {"property": name, "new_label": label, "attribute_differs": rows[:32],
+            "effect": f"none: this single-place plan leaves attribute {ident} unchanged",
+            "plain_request": {"target": {"kind": "paired_property", "property": name}, "value": label},
+            "use": ("only if the user did not explicitly ask for the native value alone in this request; "
+                    "an earlier request that named one place does not carry over")}
 
 
 def bind_changes(doc, base, request, check, trace):
@@ -320,7 +325,7 @@ def bind_changes(doc, base, request, check, trace):
                     "resource": {"attribute_id": ident, "name": name,
                                  "data_type": {"text": "string"}.get(value_type, value_type),
                                  "native_type_member": type_name,
-                                 "read_mode": request.get("attribute_read_mode", "stored")},
+                                 "read_mode": attribute_read_mode(request)},
                     "new_value": float(new_value) if value_type == "real" else new_value,
                     "mode": choice.get("mode", "replace")}
             if "property_owner" in target:
@@ -466,11 +471,17 @@ def observe(plans, doc, base, settings, request):
                 {"status": "observed", "value": {key: copy.deepcopy(state[key])
                     for key in ("native_class", "material_owner", "hierarchy")}}
                 if state is not None else copy.deepcopy(element["native_material_preservation"]))
-            if sdk_field == "CalculationMode" and selected is not None:
-                # Before-state of the candidate mirror on the reviewed view:
-                # reported beside the native value, never part of it.
+            if selected is not None and (sdk_field == "CalculationMode"
+                                         or (exact is None and kind in PAIRED_NATIVE_TYPES)):
+                # Before-state of the same-named attribute (120 or, 0.51.0,
+                # 508) on the reviewed view: reported beside the native
+                # value, never part of it.
+                mirror_id = PAIRED_PROPERTIES["calculation_mode" if sdk_field == "CalculationMode"
+                                              else "material"]["attribute_id"]
                 element["native_property_mirror"] = trace.call(
-                    "Native.calculation_mode_mirror", lambda: mirror_crosscheck(base, selected, None),
+                    "Native.calculation_mode_mirror" if sdk_field == "CalculationMode"
+                    else "Native.material_attribute_mirror",
+                    lambda: mirror_crosscheck(base, selected, None, mirror_id),
                     drawing_file=element["ref"]["drawing_file"], model_uuid=element["ref"]["model_uuid"])
     if delete_requested:
         from .model_delete import ownership as delete_ownership
@@ -526,7 +537,7 @@ def observe(plans, doc, base, settings, request):
                 continue
             element["multislab_tier_values"] = trace.call(
                 "MultiSlab.tier_attribute_values", lambda adapter=adapter: multislab_tier_values(
-                    adapter, base, tier_ids, request.get("attribute_read_mode", "stored"), check),
+                    adapter, base, tier_ids, attribute_read_mode(request), check),
                 drawing_file=element["ref"]["drawing_file"], model_uuid=element["ref"]["model_uuid"])
     if layer_requested:
         from .wall_layer import observe as observe_wall_layer
@@ -554,7 +565,7 @@ def observe(plans, doc, base, settings, request):
             except Exception as exc:
                 element["fields"]["layer_id"] = {"status": "not_checked", "value": None, "reason": type(exc).__name__}
     # A new opt-in reader can establish absence; legacy ReadAll paths stay intact.
-    if request.get("attribute_read_mode", "stored") == "all_and_computable" and attribute_ids:
+    if attribute_read_mode(request) == "all_and_computable" and attribute_ids:
         from .native_model_edit import attribute_fields
         for element in snapshot["elements"]:
             representations = live.get((element["ref"]["drawing_file"], element["ref"]["model_uuid"]), {})
@@ -612,7 +623,7 @@ def observe(plans, doc, base, settings, request):
               "source_fingerprint": snapshot["source_fingerprint"], "scope": snapshot["scope"],
               "coverage": {**snapshot["coverage"], "criteria_complete": complete},
               "counts": dict(Counter(c["decision"] for c in checks)), "omissions": snapshot["omissions"],
-              "attribute_read_mode": request.get("attribute_read_mode", "stored"),
+              "attribute_read_mode": attribute_read_mode(request),
               "required_field_failures": required_failures,
               "operation_eligibility_failures": [
                   {"ref": element["ref"], "field": native_field,
@@ -640,7 +651,7 @@ def observe(plans, doc, base, settings, request):
             {"ref": element["ref"], "observation": element["multislab_tier_values"],
              "informational": True, "tier_ui_mode": "Warstwa bieżąca"}
             for element in snapshot["elements"] if "multislab_tier_values" in element]
-    if sdk_field == "CalculationMode":
+    if any("native_property_mirror" in element for element in snapshot["elements"]):
         report["native_property_mirror"] = [
             {"ref": element["ref"], **element["native_property_mirror"],
              "acceptance": "owner_review_required_not_part_of_readback"}
@@ -654,7 +665,7 @@ def preview(plans, doc, base, settings, request):
     from .native_model_edit import value_matches
     report, snapshot, _ = observe(plans, doc, base, settings, request)
     decisions = {fingerprint(c["ref"]): c["decision"] for c in report["checks"]}
-    changes, blocked, targets, attribute_only = [], [], [], []
+    changes, blocked, targets, attribute_only, follows_native = [], [], [], [], []
     for element in snapshot["elements"]:
         if decisions[fingerprint(element["ref"])] != "matched":
             continue
@@ -688,6 +699,15 @@ def preview(plans, doc, base, settings, request):
                 continue
             mode = bound.get("mode", "replace")
             absent = old.get("status") == "absent" and old.get("presence_proven") is True
+            native_type = element["fields"]["type_name"].get("value")
+            if (absent and bound["operation"] == "set_attribute"
+                    and (bound["resource"].get("paired_property"), native_type) in PAIRED_ATTRIBUTE_FOLLOWS_NATIVE):
+                # Not stored: the UI place shows the native value (0.50.1
+                # owner observation), so only the native change is planned.
+                follows_native.append({"ref": copy.deepcopy(element["ref"]), "field": bound["field"],
+                                       "native_type": native_type, "reason": PAIRED_ATTRIBUTE_NOT_STORED,
+                                       "observation": copy.deepcopy(old)})
+                continue
             observed = old.get("status") == "observed"
             real_equal = (bound["resource"].get("data_type") == "real"
                           and value_matches(old.get("value"), "real") and old.get("value") == bound["new_value"])
@@ -806,7 +826,7 @@ def preview(plans, doc, base, settings, request):
             "evidence_fingerprint": report["report_fingerprint"], "scope": report["scope"], "coverage": report["coverage"],
             "changes": changes, "blocked": blocked, "highlight_targets": targets, "criteria": report,
             **({"slab_tier_values": differing_tiers} if differing_tiers else {}),
-            **({"paired_property": paired_summary(request, changes, attribute_only)}
+            **({"paired_property": paired_summary(request, changes, attribute_only, follows_native)}
                if paired_property(request) else {}),
             **({"paired_property_hint": pairing_hint} if pairing_hint else {}),
             "capabilities": capability_probe(base), "counts": {**report["counts"], "changes": len(changes), "blocked": len(blocked),

@@ -59,10 +59,12 @@ Operators: eq/ne/in (typed comparison), lt/lte/gt/gte (numeric), contains
 trim/case_sensitive are explicit. Numeric tolerance is finite, nonnegative and
 absolute; strict comparisons use < v-t / > v+t, inclusive use <= v+t / >= v-t.
 Attribute values retain raw attribute units; no implicit mm conversion.
-`family` uses exact supported native adapter names; `opening_kind` applies only
-to `WindowDoor_TypeUUID`, uses runtime element-class checks, and returns
-`not_applicable` for other adapters. Unsupported opening representations are
-`not_checked` and keep predicates incomplete.
+`family` uses exact supported native adapter names. Allplan 2026.1 reports
+openings as `Door_TypeUUID` and `Window_TypeUUID` (family `opening` from
+0.51.0); for these two `opening_kind` is `door`/`window` from the exact type
+name. For the SDK-documented `WindowDoor_TypeUUID` it uses runtime
+element-class checks; other adapters return `not_applicable`. Unsupported
+opening representations are `not_checked` and keep predicates incomplete.
 Null, empty, absent and failed reads remain distinct. Unknown stays unknown under
 not; all/any use three-valued logic. exists=false requires observed absence,
 not a failed/passive attribute read.
@@ -566,9 +568,12 @@ inventory unchanged; no UI Undo).
 ### `delete` — exact component root only
 
 The delete target is eligible only for a terminal supported component root in
-one active foreground drawing, with one narrow exception: a `WindowDoor_TypeUUID`
-opening is independently deletable when its complete lineage is exactly
-`[opening, Wall root]` (no macro ancestors). The operation binds only that
+one active foreground drawing, with one narrow exception: an opening
+(`Door_TypeUUID` or `Window_TypeUUID` as Allplan 2026.1 reports them, from
+0.51.0, or the SDK-documented `WindowDoor_TypeUUID`) is independently deletable
+when its complete lineage is exactly `[opening, Wall root]` (no macro
+ancestors). A window's subtree is its WindowTier, Sill, WindowReveal,
+WindowOpeningSmartPart and their AttributeContainers (0.50.1 query). The operation binds only that
 opening and its owned subtree; it never redirects to the parent Wall. Slab
 children remain blocked unless covered by the full subtree of an explicitly
 selected `MultiSlab_TypeUUID` root. Planning binds the exact target identity
@@ -624,9 +629,31 @@ when the native write already set it, the outcome is `applied` with
 Name one place explicitly to use `native_material`/`native_calculation_mode`
 (native only) or an `attribute` target (attribute only)
 ([contract](m4-editing-api.md#paired-properties-and-identity-regeneration-0500)).
+The choice belongs to one request: "only native" for one request does not
+carry over to the next plain request.
 From 0.50.1 a `native_calculation_mode` preview whose attribute 120 holds
 another value reports `paired_property_hint` with the plain request
-(informational, no change).
+(informational, no change); from 0.51.0 also a `native_material` preview whose
+attribute 508 differs.
+From 0.51.0 a paired request reads its attribute with presence proof
+(`attribute_read_mode` defaults to `all_and_computable`). On a Wall whose
+attribute 508 is not stored the attributes palette follows the native
+material (0.50.1 owner observation), so the plan has only the native change
+and lists the Wall in `paired_property.attribute_follows_native`
+(`paired_attribute_not_stored_follows_native`). Other families with a
+missing paired attribute stay blocked (`replace_requires_existing_attribute`).
+
+### One UI Undo step per Apply (0.51.0)
+
+Apply opens `NemAll_Python_IFW_Input.UndoRedoService(doc, True, True, True)`
+right before the first setter of a typed plan with two or more changes and
+calls `CreateUndoStep()` once after the last setter, also when the execution
+stops early. The result reports `undo_group` (`status` `created`,
+`unavailable` or `close_failed`, `setters_in_step`, the flags and
+`IsInUndoService` before/after); a failure there never changes a setter
+outcome or causes a retry. Single-change plans and the delete batch (one
+`DeleteElements` call) are unchanged. That Allplan restores the whole Apply
+with one UI Undo is not yet observed natively; count the UI Undo steps.
 
 ### `native_calculation_mode` — experimental calculation mode (0.49.0)
 
@@ -646,10 +673,13 @@ verdict for the owner, never folded into the result
 ([contract](m4-editing-api.md#calculationmode-write-contract-0490)). From
 0.50.0 a post-setter drift that only renames the family's regenerated
 identities (Column: AttributeContainer and root view; Beam: AttributeContainer,
-WallAxis; Wall: AttributeContainer, WallAxis, WallAxisLine, and from 0.50.1
-Door and DoorSill) is accepted as
+WallAxis; Wall: AttributeContainer, WallAxis, WallAxisLine, from 0.50.1
+Door and DoorSill, from 0.51.0 Window, Sill and WindowOpeningSmartPart) is
+accepted as
 `identities_regenerated_evidence_otherwise_equal`; other drift stays
-`unknown` with `preservation.identity_diff`. Use this kind only when the user
+`unknown` with `preservation.identity_diff`. From 0.51.0 the same family rule
+applies after a native `Material` setter (the Beam's earlier
+`auxiliary_children_regenerated` rule is kept). Use this kind only when the user
 asks for the native value alone; a plain request uses `paired_property`.
 
 ### `native_material` — experimental architectural material
@@ -735,8 +765,11 @@ is intended to resolve the case-sensitive `mcp_qa_mark` lookup while returning
 the canonical project name and ID.
 
 The default native type list is Column, Beam, SkeletonBeam, Wall, Slab,
-MultiSlab, and the documented `WindowDoor_TypeUUID` opening adapter. Without
-an additional criterion, an opening is not classified as a door or a window.
+MultiSlab, and the documented `WindowDoor_TypeUUID` opening adapter. The
+Allplan 2026.1 opening adapters `Door_TypeUUID` and `Window_TypeUUID` are
+supported from 0.51.0 but are not in the default list: name them in
+`native_types`. Without
+an additional criterion, a `WindowDoor_TypeUUID` opening is not classified as a door or a window.
 The optional `opening_kind` predicate field can request `door` or `window`;
 the reader resolves the element with `GetElement(adapter)` and checks the
 documented `DoorOpeningElement` or `WindowOpeningElement` runtime class. If

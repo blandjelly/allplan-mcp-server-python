@@ -67,7 +67,18 @@ def probe_identity(queries, doc, base, settings, request, trace, check):
         except BridgeError:
             raise
         except Exception as exc:
-            raise BridgeError("probe_scope_unavailable", "Identity hierarchy or native representation is unavailable; no owner was chosen.", 409) from exc
+            # 0.51.0: name the bounded cause (never the native message). The
+            # 0.50.1 trial hit this on a WallTier whose child list includes an
+            # opening tier owned by the opening, and on a window Sill/Reveal.
+            cause = failure(exc, "native_representation" if api.startswith("BaseElements") else "component_ownership")
+            raise BridgeError(
+                "probe_scope_unavailable",
+                "Identity hierarchy or native representation is unavailable (%s at %s, %s); no owner was "
+                "chosen. Read-only alternative for child components: model_query with fields "
+                "[hierarchy, component_ownership] (component_kind=model_identity) lists each child's "
+                "lineage and direct children or this same bounded cause." % (
+                    cause["reason"], cause["diagnostic"]["stage"], cause["diagnostic"]["error_type"]),
+                409) from exc
 
     for adapter in unique.values():
         check()

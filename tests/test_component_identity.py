@@ -335,8 +335,29 @@ class ComponentIdentityTests(unittest.TestCase):
         self.base.GetElement.assert_not_called()
         self.adapter_module.BaseElementAdapterParentElementService.GetParentElement.side_effect = lambda _: self.null_adapter()
         self.base.GetElement.side_effect = RuntimeError("unavailable")
-        self.assert_code("probe_scope_unavailable", lambda: self.probe(**request))
+        with self.assertRaises(self.module.BridgeError) as error:
+            self.probe(**request)
+        # 0.51.0: the bounded cause is named; the native message never is.
+        self.assertIn("RuntimeError at native_representation", str(error.exception))
+        self.assertIn("component_ownership", str(error.exception))
         self.base.GetElement.assert_called_once_with(target)
+
+    def test_identity_probe_names_a_child_owner_mismatch(self):
+        # 0.50.1 trial: a WallTier also lists the opening's tier, whose parent
+        # is the opening, so its ownership read fails with this bounded cause.
+        target, child, other = self.element(61), self.element(62), self.element(63)
+        self.fixture([target])
+        self.parents[id(target)] = self.null_adapter()
+        self.children[id(target)] = [child]
+        self.parents[id(child)] = other
+        request = {"phase": "component_identity", "drawing_file": 101,
+                   "model_uuid": target.GetModelElementUUID.return_value,
+                   "view_uuid": target.GetElementUUID.return_value}
+        with self.assertRaises(self.module.BridgeError) as error:
+            self.probe(**request)
+        self.assertEqual(error.exception.code, "probe_scope_unavailable")
+        self.assertIn("component_child_owner_mismatch at child_parent_identity", str(error.exception))
+        self.base.GetElement.assert_not_called()
 
     def test_native_enumeration_container_lives_through_identity_probe(self):
         target = self.element(70)

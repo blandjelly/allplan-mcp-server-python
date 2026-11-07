@@ -372,6 +372,9 @@ class ModelQueryService:
                 raise ValueError("Native type has no supported semantic family")
             return value
         def opening_kind():
+            from .native_readers import OPENING_KIND_BY_TYPE
+            if type_name() in OPENING_KIND_BY_TYPE:
+                return OPENING_KIND_BY_TYPE[type_name()]
             if type_name() != "WindowDoor_TypeUUID":
                 return "not_applicable"
             import NemAll_Python_ArchElements as architecture

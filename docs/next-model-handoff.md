@@ -1,121 +1,131 @@
 # Current M4 handoff
 
-## Next task — native trial of candidate 0.50.1 (plan items 2a and 5)
+## Next task — native trial of candidate 0.51.0 (plan items 2a, 5 and 8)
 
-Start after the owner has merged the 0.50.1 PR with green full CI and
-installed it (health: bridge 0.50.1, the merged source commit,
-`sha256-verified`). Drawing 101, one Apply per step, UI check of both places
-("Obmiar" in the element dialog and "Rodzaj rozliczenia" in the attributes
-palette), then UI Undo **counting the steps needed until both places show the
-old value**, then a fresh `material_comparison` with `attribute_ids [120]`.
-Do not retry an `unknown` outcome; recover read-only with the original
-execution ID and record `preservation.identity_diff`.
+Start after the owner has merged the 0.51.0 PR with green full CI and
+installed it (health: bridge 0.51.0, the merged source commit,
+`sha256-verified`). Drawing 101, plain-language requests, one Apply per step,
+UI check of both places ("Obmiar"/material in the element dialog and "Rodzaj
+rozliczenia"/"Materiał" in the attributes palette), then UI Undo **counting
+the steps until every changed place shows the old value**, then a fresh
+`material_comparison` with `attribute_ids` [120] or [508]. Do not retry an
+`unknown` outcome; recover read-only with the original execution ID and
+record `preservation.identity_diff`.
 
-Current state (fresh reads after the 0.50.0 trial's UI Undos, 2026-11-07):
-Column native 2 / attribute 120 `m` (view `cc752bda…`); Wall 240 native 0
-`m3` but attribute 120 `m` (still diverged); Wall 200 with door native 0 /
-`m3`; Beam 0 / `m3` (direct view `6035d406…`); MultiSlab attribute 120 `m3`
-(tier `m2`).
+Current state (fresh reads at the end of the 0.50.1 trial, 2026-11-07):
+Column `eb88c850…` native 2 / attr 120 `m` (view `cc752bda…`); Wall 240
+`06d71e4d…` Material `TEST`, 508 `Silikat`, native 0 / attr 120 `m`; Wall 200
+with door `545bb0a2…` Material `TEST1`, 508 not stored, native 0 / attr 120
+`m3`; Wall 300 with window `f4da72fe…` new (values not read); Beam 0/`m3`,
+MultiSlab attr 120 `m3` (unchanged since 0.50.0).
 
-1. **Wall 200 with door `545bb0a2…` → `m`**, plain request
-   ("zmień calculation mode dla ściany 200 mm na m"). The plan must be
-   `paired_property` with the native change and attribute 120 (`m3`→`m`).
-   Expect native `applied` with
-   `accepted_preservation_drift.accepted="identities_regenerated_evidence_otherwise_equal"`,
-   `regenerated_identities` = 2 × AttributeContainer, Door, DoorSill and an
-   empty `view_map`, then attribute 120 `applied`/`readback_matches` (its
-   setter runs: the attribute did not follow the native write in 0.49.0 and
-   0.50.0). Check the door in the UI. This is the first paired write with two
-   setters, so the UI Undo step count is the key result. Any other
-   regeneration stays `unknown` with `identity_diff`: record it, recover
-   read-only, do not retry.
-2. **Routing check, Column → `m3`**, plain request ("zmień calculation mode
-   dla słupa na m3"). The agent must send `paired_property` (0.50.0 trial: it
-   sent `native_calculation_mode`). Expect native `applied` (AttributeContainer
-   + root view renamed) and attribute 120 `applied` with
-   `paired_attribute_already_set_by_native_write`, `setter_calls_started=0`.
-   A single-place preview now reports `paired_property_hint` when attribute
-   120 differs.
-3. Optional (item 2a): paired material on Wall 240 (native `TEST`, 508
-   `Silikat`). The Material drift rule is unchanged (Beam only), so an
-   `unknown` native outcome with `identity_diff` is a possible result; it is
-   evidence for a Wall Material rule, not a failure to retry.
+1. **One UI Undo for two setters — Wall 200 with door → `m`** ("zmień
+   calculation mode dla ściany 200 mm na m"). Plan `paired_property` with
+   native 0→2 and attribute 120 `m3`→`m`. Expect native `applied` (door
+   renaming), attribute 120 `applied`/`readback_matches`, and
+   `undo_group.status="created"`, `setters_in_step=2`. Key result: **one** UI
+   Undo restores 0/`m3`. If two steps are still needed, keep the result's
+   `undo_group` (incl. `in_undo_service_*`) for the next API route.
+2. **Paired material, Wall 240 → `Cegła`** ("zmień materiał ściany 240 mm na
+   Cegła"). Plan native `TEST`→`Cegła` + 508 `Silikat`→`Cegła` (not
+   `native_material`). Expect native `applied` with
+   `identities_regenerated_evidence_otherwise_equal` (2 × AttributeContainer
+   + WallAxis expected), attribute 508 `applied`, both places in the UI, one
+   UI Undo.
+3. **Paired material, Wall 200 with door → `Cegła`**. Plan native only, with
+   the Wall in `paired_property.attribute_follows_native` (508 not stored).
+   Expect native `applied` with Door/DoorSill/2 × AttributeContainer renamed;
+   both UI places show `Cegła`; one UI Undo.
+4. **Wall 300 with window.** Read-only first: `model_query` lists the Window
+   with `family=opening`, `opening_kind=window`. Then a paired calculation
+   mode (or material) request on the window Wall. Expected (hypothesis):
+   `applied` with Window, Sill, WindowOpeningSmartPart and AttributeContainers
+   renamed; WindowTier/WindowReveal unchanged. Any other drift stays
+   `unknown` with `identity_diff`: record it, recover read-only, do not retry.
+5. Optional: `component_identity` on the window Wall's WallTier names
+   `component_child_owner_mismatch`; deleting the window (disposable) with UI
+   Undo only if the owner wants that destructive check (plan item 8).
 
-Closure: Wall with door `applied` native and attribute, UI values of both
-places, the UI Undo step count and a restoration read of both; Column routed
-as `paired_property`. Then plan item 3's explicit layer write or item 4. Do
-not repeat: the 0.50.0 writes listed below, the 0.49.0 single-place writes,
-the 0.48.0 reads, the MultiSlab attribute 508/120 writes, the exact
-parent-edge tier 508 write (0.47.0), the Beam native Material write (PASS
-0.46.0), the native Slab Material Apply (0.43.0) or the 0.40.0–0.45.0 probes.
+Closure: one UI Undo for a paired write with two setters; Wall Material
+`applied` on both Walls with UI check; the window Wall `applied`. Then plan
+item 3's explicit layer write or item 4. Do not repeat: the 0.50.1 Column
+routing check and its writes, the 0.50.0/0.49.0 writes, the 0.48.0 reads, the
+MultiSlab attribute 508/120 writes, the exact parent-edge tier 508 write
+(0.47.0), the Beam native Material write (PASS 0.46.0), the native Slab
+Material Apply (0.43.0) or the 0.40.0–0.45.0 probes.
 
-## Candidate 0.50.1
+## Candidate 0.51.0
 
-Branch `claude/m4-0501-wall-door-regeneration` (PR to `develop/m4`, link in
-the PR list; the owner checks the tested commit). Fixes the one failure of the
-0.50.0 trial ([contract](m4-editing-api.md#paired-properties-and-identity-regeneration-0500)):
+Branch `claude/m4-0510-undo-group-wall-window` (PR to `develop/m4`, link in
+the PR list; the owner checks the tested commit). Fixes the 0.50.1 trial
+findings ([contract](m4-editing-api.md#one-ui-undo-step-wall-material-and-openings-0510-contract)):
 
-- **Wall with door:** the `CalculationMode` identity-regeneration rule for
-  `Wall_TypeUUID` also lists `Door_TypeUUID` and `DoorSill_TypeUUID`. In the
-  trial (`bd30912a…`) the setter regenerated exactly the Door, its DoorSill
-  and two AttributeContainers (root and door tier); DoorTier and DoorReveal
-  kept identity and geometry. The bound evidence with these four pairs renamed
-  hashes to the logged post-setter evidence, so 0.50.1 reports that write
-  `applied` and the paired attribute 120 setter then runs. Windows and other
-  openings are not observed and stay `unknown`. A regression test replays the
-  logged evidence ([fixture](../tests/data/wall_door_calculation_mode_0500.json)).
-- **Routing:** the `model_edit` description states that naming the property
-  ("calculation mode", "obmiar", "materiał") is a plain request, and a
-  single-place `native_calculation_mode` preview reports
-  `paired_property_hint` (attribute 120 differs; informational, no change)
-  with the plain `paired_property` request.
-- Focused checks (local, Linux): 382 tests in 21 affected/dependent modules
-  PASS (paired property, CalculationMode, Wall material/HTTP, model edit,
-  ownership, native families, executor, recovery, exact target, material
-  comparison, probe, package, registration, host, MCP smoke), including 4 new
-  Wall-with-door tests and 1 hint test. Full CI and native acceptance are not
-  run yet.
+- **One UI Undo per Apply:** every setter of a typed plan with two or more
+  changes runs inside one `NemAll_Python_IFW_Input.UndoRedoService(doc,
+  True, True, True)` (official-example pattern), closed by one
+  `CreateUndoStep()` after the last setter, also after a stop. The result and
+  journal report `undo_group`; a failure there never changes an outcome.
+- **Wall Material:** the identity-renaming rule is per family and applies to
+  `Material` as well (the 0.50.1 Material writes changed exactly the sections
+  of the accepted CalculationMode renamings); Material drift now reports
+  `identity_diff`.
+- **Paired material without stored 508:** paired requests read the attribute
+  with presence proof; on a Wall a not-stored 508 follows the native material
+  (owner observation), so only the native change is planned
+  (`attribute_follows_native`). Other families stay blocked.
+- **Routing:** `native_material` previews report `paired_property_hint` when
+  508 differs; the description says a single-place choice does not carry over.
+- **Wall with window / openings:** Window, Sill and WindowOpeningSmartPart may
+  be renamed on a Wall (not observed natively); `Door_TypeUUID` and
+  `Window_TypeUUID` are openings (`opening_kind`, `native_types`, delete of a
+  Wall-owned door/window with its subtree); `component_identity` names the
+  bounded cause of a failure.
+- Local checks (Linux): all 876 tests in 68 modules PASS with the CI runner
+  (`utils/run_tests_parallel.py`), including 8 undo-group, 9 wall/window and
+  new query/delete/identity tests. Full CI and native acceptance are not run.
 
 ## Installed version and last native evidence
 
-**0.50.0** (source `bf9605c`, merged as PR #64 / `297e89f`) is installed;
-health reports bridge 0.50.0, source
-`bf9605ca5b497a3e949aa746e4309502ffb7548d`, `sha256-verified`, Allplan 2026.1
+**0.50.1** (source `6b04d97`, merged as PR #65 / `a1b2e04`) is installed;
+health reports bridge 0.50.1, source
+`6b04d975e05212fefeff35de69f86db81dc51262`, `sha256-verified`, Allplan 2026.1
 (executable 16.1617.8659.814). Full CI before the merge was the owner's gate.
 
-**Native trial 2026-11-07 — `applied` with UI Undo on Column, Wall 240, Beam and MultiSlab; Wall with door `unknown`**
-([raw evidence](test-results/evidence/0.50.0-2026-11-07/evidence-20261107.jsonl),
-[agent log](test-results/evidence/0.50.0-2026-11-07/agent-log.md), table in
-the [API note](m4-editing-api.md#native-observations-0500-trial-2026-11-07)).
-One UI Undo after each write; the owner confirmed every logged value in the UI.
+**Native trial 2026-11-07 — door renaming and Column routing PASS; two UI Undo steps; Wall Material `unknown`**
+([raw evidence](test-results/evidence/0.50.1-2026-11-07/evidence-20261107.jsonl),
+[agent log](test-results/evidence/0.50.1-2026-11-07/agent-log.md), table in
+the [API note](m4-editing-api.md#native-observations-0501-trial-2026-11-07)).
+The owner confirmed every logged value in the UI.
 
-- Column `1214d281…` (native 2→0, sent as `native_calculation_mode`):
-  `applied` with AttributeContainer + root view `cc752bda…`→`5b2d4fb8…`
-  accepted; attribute 120 followed (`m3`). One UI Undo restored 2/`m` and the
-  original view.
-- Wall 240 `e4de1f73…` (paired → `m`; plan native only, attribute already
-  `m`): `applied` with 2 × AttributeContainer + WallAxis accepted. One UI Undo
-  restored native 0; attribute stays `m` (it was not changed). The first
-  plain Wall 240 request was sent as `native_calculation_mode` → `no_op`
-  despite the diverging attribute (routing finding, fixed by the hint).
-- **Wall 200 with door `bd30912a…` (paired → `m`): `stopped`, native
-  `unknown` (`native_property_invariants_changed`, `partial_preservation` and
-  `preservation_diagnostic` with Door/DoorSill/2 × AttributeContainer renamed),
-  attribute `skipped`.** Reconciliation readback 2, attribute 120 `m3`. After
-  one UI Undo the read-only recovery returned `reconciled`/`old_value_observed`
-  with the preflight evidence hash restored (`d969033f…`); no acknowledgement
-  was needed. Fixed in 0.50.1.
-- Beam `d129c7c1…` (paired → `m`): `completed`; native `applied`
-  (AttributeContainer + WallAxis accepted), attribute
-  `paired_attribute_already_set_by_native_write`, no attribute setter. One UI
-  Undo restored 0/`m3`; the Beam's direct view is now `6035d406…`
-  (`362f80d3…` gives `probe_scope_unavailable` in `material_comparison`).
-- MultiSlab `1dac121c…` (attribute 120 → `m`, sent as a plain attribute
-  write; equal to the paired attribute-only plan): `completed`, identities
-  unchanged; one UI Undo restored `m3`; tier `m2` unchanged.
-- **UI Undo:** one step restored every write with a single setter, including
-  the native write whose attribute followed (Column, Beam). The count for a
-  native write plus an attribute setter is not established (item 1 above).
+- **Wall 200 with door `4043e559…` (paired → `m`): `completed`**; native
+  `applied` with 2 × AttributeContainer, Door, DoorSill renamed; attribute 120
+  setter `applied`. **Two UI Undo steps** (first the attribute: read 2/`m3`;
+  then the native value: 0/`m3`). Fixed in 0.51.0 (one undo step).
+- Column `341415e4…` (plain request routed as `paired_property` → `m3`):
+  `completed`; native `applied` (AttributeContainer + root view
+  `cc752bda…`→`86a9536a…`), attribute already set by the native write. One UI
+  Undo (the UI offered no second) restored 2/`m` and view `cc752bda…`.
+- Wall 200 paired material `Cegła`: preview blocked (`attribute:508`
+  `old_value_unknown`: 508 not stored). Native only `37196703…`: `unknown`
+  (`partial_preservation`, `preservation_diagnostic`), readback `Cegła`;
+  the owner saw both UI places change. One UI Undo; recovery
+  `reconciled`/`old_value_observed`.
+- Wall 240 plain material sent as `native_material` (routing error)
+  `9ed2e229…`: `unknown` (the sections of the accepted CalculationMode
+  renaming), readback `Cegła`, 508 stayed `Silikat`. One UI Undo; recovery
+  `reconciled`/`old_value_observed`.
+- Wall 300 with window `f4da72fe…` inserted; read-only tree: Window →
+  WindowTier → Sill, WindowReveal → WindowOpeningSmartPart → AttributeContainer,
+  AttributeContainer; the WallTier also lists the WindowTier.
+  `component_identity` failed on the WallTier, Sill and WindowReveal.
+
+**0.50.0 trial (2026-11-07)** ([raw evidence](test-results/evidence/0.50.0-2026-11-07/evidence-20261107.jsonl),
+[observations](m4-editing-api.md#native-observations-0500-trial-2026-11-07)):
+Column, plain Wall 240 and Beam `CalculationMode` writes `applied` with the
+renaming rule and one UI Undo each; the Wall with door stopped `unknown`
+(Door/DoorSill regeneration, fixed in 0.50.1 and PASS in its trial); the
+Beam's direct view is `6035d406…` (`362f80d3…` gives `probe_scope_unavailable`
+in `material_comparison`).
 
 **0.49.0 trial (2026-11-07)** ([raw evidence](test-results/evidence/0.49.0-2026-11-07/evidence-20261107.jsonl),
 [observations](m4-editing-api.md#native-observations-0490-trial-2026-11-07)):
@@ -184,6 +194,15 @@ setter ran, readback stayed `" "`, UI Undo restored it; do not repeat.
 
 ## Key errors and necessary earlier context
 
+- **0.50.1 executions:** `4043e5598cd444ab8c6c194baa1653f5` (Wall 200 paired
+  calculation mode) and `341415e41d8f41e499b6cbd2b4397ccf` (Column) are
+  `completed` and UI-undone (two steps and one step).
+  `37196703c18e4cb2a7292b8fba30c953` (Wall 200 native Material) and
+  `9ed2e229963f4611a206676c46c56a43` (Wall 240 native Material) are `stopped`:
+  `unknown`, then read-only recovery after one UI Undo each returned
+  `reconciled`/`old_value_observed`, `write_blocked=false` (one acknowledged
+  recovery attempt was rejected with `repair_conflict` because the evidence
+  had changed). Not applied PASS results; nothing to replay.
 - **0.50.0 executions:** `1214d281a5a64144bc34506292ae7e72` (Column),
   `e4de1f7396cf43d79b404c55a94c93f0` (Wall 240),
   `d129c7c181f4407ab27fbf533dc7a954` (Beam) and
