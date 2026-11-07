@@ -679,11 +679,21 @@ def read(base, element, change, check=lambda: None, *, preservation=True,
         if "component_tree" in sections:
             report["component_tree_diff"] = component_tree_diff(expected.get("component_tree"),
                                                                 state.get("component_tree"))
-            # Regeneration is accepted only for the field it was observed with
-            # (Beam native Material); a CalculationMode drift stays unknown.
+            # The Beam native Material acceptance keeps its 0.44.2 rule.
             if post_setter and material and regenerated_auxiliary_children(change["native_type"], expected, state):
                 if accepted is not None:
                     accepted.update(report, accepted=REGENERATED_CHILDREN_ACCEPTANCE)
+                return value
+        if not material:
+            report["identity_diff"] = identity_diff(expected, state)
+            # 0.50.0: CalculationMode accepts only a renaming of the families'
+            # observed regenerated identities (0.49.0 trial); every other
+            # byte of the bound evidence must be equal after that renaming.
+            regeneration = (identity_regeneration(change["native_type"], field, expected, state)
+                            if post_setter else None)
+            if regeneration is not None:
+                if accepted is not None:
+                    accepted.update(report, accepted=IDENTITY_REGENERATION_ACCEPTANCE, **regeneration)
                 return value
         # The Wall-specific reason predates Beam/Column/Slab support; keep it
         # for Walls so earlier journals and reports read the same.
@@ -868,6 +878,160 @@ def regenerated_auxiliary_children(native_type, expected, current):
         return False
     return ({edge for edge in old_edges if edge[0] in changed} == {(key, root) for key in removed}
             and {edge for edge in new_edges if edge[0] in changed} == {(key, root) for key in added})
+
+
+IDENTITY_REGENERATION_ACCEPTANCE = "identities_regenerated_evidence_otherwise_equal"
+
+# Identities that ModifyElements replaced after a native CalculationMode
+# setter in the 0.49.0 trial (2026-11-07), per family, with the owner's UI
+# check and UI Undo restoring the original value:
+# - Column: the AttributeContainer child and the reviewed root view
+#   (cc752bda… -> 8f88036e…, restored by UI Undo); model UUID unchanged.
+# - Beam: the AttributeContainer and WallAxis children (as for Material).
+# - Wall: root/tier attribute containers, hierarchy and auxiliary sections
+#   changed; the WallAxis/WallAxisLine of the tier are the Wall's auxiliary
+#   children. Only these types may be renamed.
+IDENTITY_REGENERATION = {
+    ("CalculationMode", "Column_TypeUUID"): {"children": frozenset({"AttributeContainer_TypeUUID"}),
+                                             "root_view": True},
+    ("CalculationMode", "Beam_TypeUUID"): {"children": frozenset({"AttributeContainer_TypeUUID",
+                                                                  "WallAxis_TypeUUID"}),
+                                           "root_view": False},
+    ("CalculationMode", "Wall_TypeUUID"): {"children": frozenset({"AttributeContainer_TypeUUID",
+                                                                  "WallAxis_TypeUUID",
+                                                                  "WallAxisLine_TypeUUID"}),
+                                           "root_view": False},
+}
+_MAX_IDENTITY_REFS = 4096
+_MAX_REGENERATED_PER_TYPE = 4
+_MAX_PAIRINGS = 64
+
+
+def _identity_refs(value, found=None, depth=0):
+    """Every ref-shaped dict (type_name, model_uuid, view_uuid) in bounded state evidence."""
+    found = set() if found is None else found
+    if depth > 32 or len(found) > _MAX_IDENTITY_REFS:
+        raise ValueError("identity evidence over limit")
+    if isinstance(value, dict):
+        if all(isinstance(value.get(key), str) for key in ("type_name", "model_uuid", "view_uuid")):
+            found.add((value["type_name"], value["model_uuid"], value["view_uuid"]))
+        for item in value.values():
+            _identity_refs(item, found, depth + 1)
+    elif isinstance(value, list):
+        for item in value:
+            _identity_refs(item, found, depth + 1)
+    return found
+
+
+def identity_diff(expected, current):
+    """Bounded report of identities that disappeared/appeared; review evidence only."""
+    try:
+        before, after = _identity_refs(expected), _identity_refs(current)
+    except ValueError:
+        return {"status": "not_checked", "reason": "identity_evidence_over_limit"}
+
+    def listed(values):
+        values = sorted("|".join(item) for item in values)
+        return {"count": len(values), "items": values[:MAX_TREE_DIFF_ITEMS * 2],
+                "truncated": len(values) > MAX_TREE_DIFF_ITEMS * 2}
+
+    return {"status": "observed", "removed": listed(before - after), "added": listed(after - before)}
+
+
+def _rename(value, mapping):
+    if isinstance(value, dict):
+        return {_rename(key, mapping): _rename(item, mapping) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_rename(item, mapping) for item in value]
+    if isinstance(value, str):
+        for old, new in mapping.items():
+            if old in value:
+                value = value.replace(old, new)
+        return value
+    return value
+
+
+def _canonical(value, key=None):
+    """Order-normalize identity-sorted collections after a renaming.
+
+    Producers sort children, edges and container snapshots by identity, so a
+    renamed identity can move. Lineage keeps its order (child -> root).
+    """
+    if isinstance(value, dict):
+        return {name: _canonical(item, name) for name, item in value.items()}
+    if isinstance(value, list):
+        items = [_canonical(item) for item in value]
+        if key != "lineage" and items and all(isinstance(item, dict) for item in items):
+            items.sort(key=fingerprint)
+        return items
+    return value
+
+
+def identity_regeneration(native_type, field, expected, current):
+    """Accept drift that is only a renaming of listed regenerated identities.
+
+    Returns the renaming report, or None. The reviewed root model UUID and
+    type never change; a root view may change only where the family lists it.
+    Each removed identity pairs one-for-one with an added identity of the
+    same type, and the expected evidence with every such UUID renamed must be
+    byte-identical to the current evidence (fingerprint).
+    """
+    from itertools import permutations, product
+
+    rule = IDENTITY_REGENERATION.get((field, native_type))
+    if rule is None or not isinstance(expected, dict) or not isinstance(current, dict):
+        return None
+    try:
+        before, after = _identity_refs(expected), _identity_refs(current)
+    except ValueError:
+        return None
+    removed, added = before - after, after - before
+    if not removed or len(removed) != len(added):
+        return None
+    groups = {}
+    for side, items in (("removed", removed), ("added", added)):
+        for item in items:
+            groups.setdefault(item[0], {"removed": [], "added": []})[side].append(item)
+    for type_name, group in groups.items():
+        group["removed"].sort()
+        group["added"].sort()
+        if len(group["removed"]) != len(group["added"]) or len(group["removed"]) > _MAX_REGENERATED_PER_TYPE:
+            return None
+        if type_name == native_type:
+            if (not rule["root_view"] or len(group["removed"]) != 1
+                    or group["removed"][0][1] != group["added"][0][1]):
+                return None
+        elif type_name not in rule["children"]:
+            return None
+    names = sorted(groups)
+    options = [list(permutations(groups[name]["added"])) for name in names]
+    combinations = 1
+    for choice in options:
+        combinations *= len(choice)
+    if combinations > _MAX_PAIRINGS:
+        return None
+    target = fingerprint(_canonical(current))
+    remaining = {value for ref in after for value in ref[1:]}
+    for selection in product(*options):
+        mapping, pairs, valid = {}, [], True
+        for name, chosen in zip(names, selection):
+            for old, new in zip(groups[name]["removed"], chosen):
+                pairs.append({"type_name": name, "old_model_uuid": old[1], "new_model_uuid": new[1],
+                              "old_view_uuid": old[2], "new_view_uuid": new[2]})
+                for old_id, new_id in ((old[1], new[1]), (old[2], new[2])):
+                    if old_id == new_id:
+                        continue
+                    if mapping.get(old_id, new_id) != new_id or old_id in remaining:
+                        valid = False
+                    mapping[old_id] = new_id
+        if not valid or not mapping:
+            continue
+        if fingerprint(_canonical(_rename(expected, mapping))) == target:
+            root_views = {pair["old_view_uuid"]: pair["new_view_uuid"]
+                          for pair in pairs if pair["type_name"] == native_type}
+            return {"regenerated_identities": sorted(pairs, key=lambda p: (p["type_name"], p["old_model_uuid"]))[:16],
+                    "view_map": root_views}
+    return None
 
 
 def write(base, element, change, doc=None, check=lambda: None, *, trace=None):

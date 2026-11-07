@@ -130,6 +130,28 @@ class EditOwnershipTests(unittest.TestCase):
         tier, = self.explicit_material_plan("MultiSlab_TypeUUID")["slab_tier_values"][0]["tiers"]
         self.assertFalse(tier["differs_from_new_value"])
 
+    def test_paired_slab_request_writes_the_multislab_attribute_only(self):
+        # 0.50.0: a plain "material" request on a slab has no native half;
+        # "Cały obiekt" gets attribute 508, the layer stays blocked.
+        slab, aggregate = self.material_slabs()
+        tier_before = copy.deepcopy(slab.GetAttributes.return_value)
+        paired = [{"target": {"kind": "paired_property", "property": "material"}, "value": "Beton1"}]
+        plan = self.preview(native_types=["MultiSlab_TypeUUID"], predicate=None, changes=paired)
+        self.assertTrue(plan["apply_available"], plan)
+        change, = plan["changes"]
+        self.assertEqual((change["field"], change["ref"]["model_uuid"]), ("attribute:508", aggregate.GetModelElementUUID()))
+        self.assertEqual(change["resource"]["property_owner"], "selected_element")
+        skipped, = plan["paired_property"]["attribute_only"]
+        self.assertEqual(skipped["native_type"], "MultiSlab_TypeUUID")
+        self.highlight(plan)
+        self.assertEqual(self.apply(plan)["state"], "completed")
+        self.assertEqual(dict(aggregate.GetAttributes.return_value)[508], "Beton1")
+        self.assertEqual(slab.GetAttributes.return_value, tier_before)
+        self.base.ModifyElements.assert_not_called()
+        tier = self.preview(native_types=["Slab_TypeUUID"], predicate=None, changes=paired)
+        self.assertFalse(tier["apply_available"])
+        self.assertEqual(tier["blocked"][0]["reason"], "slab_tier_requires_exact_layer_target")
+
     def test_tier_value_change_after_preview_invalidates_the_multislab_plan(self):
         slab, _ = self.material_slabs()
         plan = self.explicit_material_plan("MultiSlab_TypeUUID")

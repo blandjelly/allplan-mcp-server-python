@@ -103,7 +103,34 @@ class NativeCalculationModeEdit(ContractModel):
     value: Literal["m3", "m2", "m", "Pcs", "kg"] | Annotated[int, Field(ge=0, le=4)]
 
 
-Edit = AttributeEdit | LayerEdit | DeleteEdit | NativeMaterialEdit | NativeCalculationModeEdit
+class PairedPropertyTarget(ContractModel):
+    kind: Literal["paired_property"]
+    property: Literal["calculation_mode", "material"]
+
+
+class PairedPropertyEdit(ContractModel):
+    """One property in both places: the native property and its same-named attribute.
+
+    calculation_mode: native CalculationMode + attribute 120 ("Rodzaj
+    rozliczenia"); material: native Material + attribute 508 ("Materiał").
+    """
+    target: PairedPropertyTarget
+    value: str | Annotated[int, Field(ge=0, le=4)]
+
+    @model_validator(mode="after")
+    def value_for_property(self):
+        if self.target.property == "calculation_mode":
+            if self.value not in ("m3", "m2", "m", "Pcs", "kg") and not (
+                    isinstance(self.value, int) and not isinstance(self.value, bool)):
+                raise ValueError("Paired calculation mode needs an SDK label m3, m2, m, Pcs, kg or code 0-4.")
+        elif (not isinstance(self.value, str) or not self.value.strip() or len(self.value) > 255
+              or any(ord(character) < 32 for character in self.value)):
+            raise ValueError("Paired material needs an exact nonempty string without control characters.")
+        return self
+
+
+Edit = (AttributeEdit | LayerEdit | DeleteEdit | NativeMaterialEdit | NativeCalculationModeEdit
+        | PairedPropertyEdit)
 
 _QUERY_FIELDS = {"display_name", "type_name", "type_uuid", "layer_id", "drawing_file", "file_state",
                  "bounding_box_mm", "size_x_mm", "size_y_mm", "size_z_mm", "center_x_mm", "center_y_mm",
@@ -178,6 +205,8 @@ class ModelEditPreview(ContractModel):
             raise ValueError("Deletion must be the only change in a plan.")
         if any(isinstance(edit, NativeMaterialEdit) for edit in self.changes) and len(self.changes) != 1:
             raise ValueError("Native material must be the only change in a plan.")
+        if any(isinstance(edit, PairedPropertyEdit) for edit in self.changes) and len(self.changes) != 1:
+            raise ValueError("A paired property must be the only change in a plan.")
         if any(isinstance(edit, NativeCalculationModeEdit) for edit in self.changes):
             if len(self.changes) != 1:
                 raise ValueError("Native calculation mode must be the only change in a plan.")

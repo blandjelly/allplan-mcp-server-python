@@ -605,6 +605,25 @@ blocked target. This reporting does not relax exact lineage, subtree
 completeness, exclusion, confirmation, fresh absence/parent checks, or
 unknown-result recovery.
 
+### `paired_property` — native property and same-named attribute together (0.50.0)
+
+Default for a plain request (owner decision 2026-11-07): "zmień materiał"
+or "zmień obmiar/rodzaj rozliczenia" changes both places.
+`{"target":{"kind":"paired_property","property":"calculation_mode"},"value":"m3"}`
+plans native `CalculationMode` + attribute 120; `"property":"material"` with an
+exact string plans native `Material` + attribute 508. It must be the only
+change. Per target the native change comes first, then the attribute (same
+label/string, `value_type=auto`, `property_owner="selected_element"`); a place
+that already holds the value is not changed. The native half exists only on
+single-tier Wall, Column and `Beam_TypeUUID`; slabs and other families get the
+attribute alone (`plan.paired_property.attribute_only`); a Slab tier stays
+blocked. The attribute is written only after the native change is `applied`;
+when the native write already set it, the outcome is `applied` with
+`paired_attribute_already_set_by_native_write` and no attribute setter.
+Name one place explicitly to use `native_material`/`native_calculation_mode`
+(native only) or an `attribute` target (attribute only)
+([contract](m4-editing-api.md#paired-properties-and-identity-regeneration-0500)).
+
 ### `native_calculation_mode` — experimental calculation mode (0.49.0)
 
 `{"target":{"kind":"native_calculation_mode"},"value":"m3"}` sets the native
@@ -620,7 +639,13 @@ blocked (`slab_calculation_mode_uses_multislab_attribute_120`, with an
 `resource.native_property_state`. Readback compares the native code only;
 `representation_consensus.mirror_crosscheck` reports attribute 120 and a
 verdict for the owner, never folded into the result
-([contract](m4-editing-api.md#calculationmode-write-contract-0490)).
+([contract](m4-editing-api.md#calculationmode-write-contract-0490)). From
+0.50.0 a post-setter drift that only renames the family's regenerated
+identities (Column: AttributeContainer and root view; Beam: AttributeContainer,
+WallAxis; Wall: AttributeContainer, WallAxis, WallAxisLine) is accepted as
+`identities_regenerated_evidence_otherwise_equal`; other drift stays
+`unknown` with `preservation.identity_diff`. Use this kind only when the user
+names the native value; a plain request uses `paired_property`.
 
 ### `native_material` — experimental architectural material
 

@@ -685,7 +685,8 @@ Column, Wall and Beam in 0.49.0, see the contract below):
 
 ### `CalculationMode` write contract (0.49.0)
 
-Automated tests only; no native observation yet.
+Native trial 2026-11-07 (below); 0.50.0 changes the post-setter drift rule and
+adds the paired request ([paired properties](#paired-properties-and-identity-regeneration-0500)).
 
 - **Request:** `{"target":{"kind":"native_calculation_mode"},"value":LABEL_OR_CODE}`
   with the SDK label `m3`, `m2`, `m`, `Pcs`, `kg` or the code 0–4, as the only
@@ -709,10 +710,9 @@ Automated tests only; no native observation yet.
 - **Preservation:** the same snapshot as native Material with `CalculationMode`
   removed from the scalar set and `Material` added; on Wall attribute
   containers attribute 120 (not 508) is excluded. Preflight and the final
-  setter boundary are byte-exact. The Beam child regeneration accepted for
-  native Material (`auxiliary_children_regenerated`) is **not** accepted for
-  this field; such a drift stays `unknown` and goes through the reviewed
-  reconciliation route.
+  setter boundary are byte-exact. In 0.49.0 every post-setter drift stayed
+  `unknown`; from 0.50.0 only an identity renaming of the family's listed
+  regenerated components is accepted after the setter (see below).
 - **Apply:** setter `SetCalculationMode(code)` on the bound owner,
   `SetProperties`/`SetStructuralBeamProperties`, one `ModifyElements`.
 - **Readback:** native `CalculationMode` on every live wrapper decides
@@ -725,11 +725,91 @@ Automated tests only; no native observation yet.
   The verdict is evidence for the mirror question, never accepted
   automatically in either direction.
 
-Open questions: whether the MultiSlab attribute 120 route changes the slab
-quantity mode as the UI expects (0.48.0: the native `SlabProperties` value is
-not what the UI shows); whether the Beam regeneration repeats for a
-non-material field; whether `Trade` codes map one-to-one to the project's
-attribute 209 labels.
+#### Native observations (0.49.0 trial, 2026-11-07)
+
+Bridge 0.49.0, source `c4be672`, `sha256-verified`, Allplan 2026.1, drawing 101
+of the disposable copy "Kopia MCP_QA_DEMO"
+([raw evidence](test-results/evidence/0.49.0-2026-11-07/evidence-20261107.jsonl),
+[agent log](test-results/evidence/0.49.0-2026-11-07/agent-log.md)). One write
+per step, owner UI check, one UI Undo per write, fresh reads afterwards.
+
+| Element | Write (execution) | Outcome | Native readback / attr 120 after the write | After UI Undo |
+| --- | --- | --- | --- | --- |
+| Column `eb88c850…` | native 2→0 (`7b2e4f91…`) | `unknown`: `component_tree` + `hierarchy`; AttributeContainer `82c18eca…`→`09954407…` and root view `cc752bda…`→`8f88036e…`; reconciliation readback 0 | 0 / `m3` (`matches_new_label`) | view `cc752bda…`, attr 120 `m` (native not read); reconciled with the owner's acknowledgement |
+| Wall 240 `06d71e4d…` | attr 120 `m3`→`m` (`c41d8e2a…`) | `applied` | — / `m` (native not read) | attr 120 `m3` |
+| Wall 240 | native 0→2 (`9e04b7d1…`) | `unknown`: `auxiliary_components`, `hierarchy`, `root_attribute_containers`, `tier_attribute_containers`, `tier_hierarchy` (no per-section diff in 0.49.0); reconciliation readback 2 | 2 / `m` (`matches_new_label`) | **native 0, attr 120 `m`** (they diverge); reconciled `old_value_observed` |
+| Beam `7cc9ac55…` | native 0→2 (`5a7c3e9b…`) | `unknown`: `component_tree`, AttributeContainer + WallAxis regenerated one-for-one (as for Material); reconciliation readback 2 | 2 / `m` (`matches_new_label`) | native 0, attr 120 `m3`, view `6035d406…`; reconciled after a fresh recover (first hash stale) |
+| MultiSlab `bf097d95…` | attr 120 `m3`→`m`, `property_owner=selected_element` (`e27b9d4f…`) | `applied`; `slab_tier_values` reported the tier's `m2` as differing (tier unchanged) | — / `m` | attr 120 `m3` |
+| Wall 200 with door `545bb0a2…` | native 0→2 (`7d3f0c8a…`) | `unknown`: `partial_preservation`, `preservation_diagnostic` (the preview already had `component_child_owner_mismatch` for the door tier); reconciliation readback 2 | 2 / **`m3`** (`matches_old_label`) | native 0, attr 120 `m3`; door unchanged (owner); reconciled `old_value_observed` |
+
+Findings:
+
+- The native `CalculationMode` setter works on Column, single-tier Wall and
+  Beam: the reconciliation readback, the owner's UI check and the UI Undo
+  agree. Every native write ended `unknown` only through post-setter identity
+  drift; no other value change was reported where a diff was available.
+- **Attribute 120 is not one storage with the native value.** It followed the
+  native write on Column, Beam and the plain Wall, did not follow on the Wall
+  with a door, and on the plain Wall the UI Undo restored the native code but
+  left attribute 120 at `m`. Native value and attribute must be planned and
+  read separately; this is the basis of the paired request (0.50.0).
+- An attribute 120 write needs `value_type` `enum` or `auto` (SDK Enum); `text`
+  is rejected as `attribute_type_unsupported` before any write.
+- Slab route: a plain slab request goes to the MultiSlab attribute 120 and the
+  tier keeps its own value, as designed in 0.49.0.
+
+#### Paired properties and identity regeneration (0.50.0)
+
+Automated tests only; native trial pending.
+
+- **Owner decision (2026-11-07):** a request for a property that exists both
+  as a native property and as a same-named attribute changes both places,
+  unless the user names one place. Pairs: `calculation_mode` = native
+  `CalculationMode` + attribute 120 "Rodzaj rozliczenia"; `material` = native
+  `Material` + attribute 508 "Materiał". `Trade` has no attribute mirror on
+  the Wall (0.48.0, attribute 209 not returned), `Priority` has no known
+  attribute; neither is paired.
+- **Request:** `{"target":{"kind":"paired_property","property":"calculation_mode"|"material"},"value":V}`
+  as the only change; `V` is an SDK label/code (calculation mode) or an exact
+  string (material). The attribute gets the SDK label or the same string,
+  bound with `value_type=auto` (enum label round trip for attribute 120) and
+  `property_owner="selected_element"`.
+- **Plan:** per matched target the native change first, then the attribute
+  change (`resource.paired_property`, `paired_attribute_id` /
+  `paired_native_field`). A place that already holds the value gets no change.
+  The native half is planned only on `Wall_TypeUUID` (one tier),
+  `Column_TypeUUID` and `Beam_TypeUUID`; other families (slabs, SkeletonBeam)
+  get only the attribute and are listed in `plan.paired_property.attribute_only`
+  with `paired_property_attribute_only_for_family` (not a required-field
+  failure). Slab tiers stay blocked (`slab_tier_requires_exact_layer_target`).
+- **Executor:** a native plan may contain only its own native operation and
+  the matching paired attribute changes. The attribute change runs only after
+  its native change is `applied`; otherwise it is not attempted. If the
+  attribute already shows the new value after the native write, it is
+  `applied` with reason `paired_attribute_already_set_by_native_write`, after a
+  consensus read and without an attribute setter. If the native write's
+  accepted drift regenerated the reviewed view, the attribute write resolves
+  that new view (`effective_target_view_uuid`); model, type and old value stay
+  bound. Two writes are two native operations; the number of UI Undo steps is
+  not established.
+- **Identity regeneration (CalculationMode only):** after the setter
+  (readback/recovery, never preflight or the setter boundary) drift is
+  accepted as `identities_regenerated_evidence_otherwise_equal` only if every
+  disappeared ref pairs one-for-one with a new ref of the same type, the types
+  are listed for the family (Column: AttributeContainer and the root view with
+  the same model UUID; Beam: AttributeContainer, WallAxis; Wall:
+  AttributeContainer, WallAxis, WallAxisLine), and the bound evidence with
+  those UUIDs renamed is byte-identical to the current evidence (identity-sorted
+  lists re-sorted; lineage order kept). The report lists the pairs and
+  `view_map`. Any other drift stays `unknown` and now carries
+  `preservation.identity_diff` (removed/added refs, bounded). The Material
+  rule (`auxiliary_children_regenerated`, Beam only) is unchanged.
+
+Open questions: how many UI Undo steps restore a paired write; whether the
+Wall's regenerated identities are exactly the listed ones (0.49.0 reported no
+per-section diff); whether `Pcs`/`kg` are labels of the project enum 120
+(the round trip decides before any write); whether `Trade` codes map
+one-to-one to the project's attribute 209 labels.
 
 
 
