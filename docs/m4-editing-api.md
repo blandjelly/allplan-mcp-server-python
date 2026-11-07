@@ -965,6 +965,74 @@ Automated tests only; no native observation yet.
 
 
 
+#### Native observations (0.51.0 trial, 2026-11-07)
+
+Bridge 0.51.0, source `f7ee761`, `sha256-verified`, Allplan 2026.1
+(executable 16.1617.8659.814), drawing 101
+([raw evidence](test-results/evidence/0.51.0-2026-11-07/evidence-20261107.jsonl)).
+The owner reported the UI checks and UI Undo per test.
+
+| Element | Request / execution | Outcome | UI Undo |
+| --- | --- | --- | --- |
+| Wall 200 with door `545bb0a2…` | paired calculation mode `m` (`6e6c83d2…`) | `completed`: native 0→2 `applied` (2 × AttributeContainer, Door, DoorSill renamed), attr 120 `applied`; `undo_group` `created`, `setters_in_step=2` | **one step** restored both places (owner) |
+| Wall 240 `06d71e4d…` | paired material `Cegła` (`c6183d71…`) | `completed`: native `TEST`→`Cegła` `applied` (2 × AttributeContainer, WallAxis renamed), attr 508 `Silikat`→`Cegła` `applied`; `setters_in_step=2` | one step (owner PASS) |
+| Wall 200 with door | paired material `Cegła` (`9109d250…`), 508 not stored → `attribute_follows_native` | `completed`: native `applied` (2 × AttributeContainer, Door, DoorSill renamed) | one step (owner PASS) |
+| Wall 300 with window `f4da72fe…` | paired calculation mode `m` (`a47dca16…`) | `stopped`: native `unknown` (`native_property_invariants_changed`, sections `partial_preservation`, `preservation_diagnostic`), attr 120 `skipped`; `identity_diff` exactly Window, Sill, 2 × AttributeContainer; read after the setter: native 2, attr 120 still `m3` | one step; read-only recovery `reconciled`/`old_value_observed` (native 0) |
+| Wall 300 with window | paired material `Cegła` (`5346fd71…`), 508 not stored → native only | `stopped`: native `unknown` (`wall_material_invariants_changed`, same sections and the same four renamed types), reconciliation readback `Cegła`; the owner saw the native material change | reviewed reconciliation `reviewed_material_preservation_conflict` (`preservation_verified=false`), then one UI Undo; read `TEST1` |
+
+Findings:
+
+- **One UI Undo per Apply works natively** (`UndoRedoService(doc, True,
+  True, True)` + one `CreateUndoStep()`): both setters of a paired write were
+  restored by one UI Undo on the Wall with door and the Wall 240.
+- **Wall Material** is `applied` with the family renaming rule on the Wall
+  240 and the Wall with door (identity sets hash-verified this time).
+- **Window Wall:** the renamed identities were exactly the expected types
+  (Window, Sill, two AttributeContainers; WindowTier, WindowReveal and
+  WindowOpeningSmartPart kept theirs), yet both writes stayed `unknown`.
+  The preflight evidence of this Wall was partial: the detailed snapshot
+  stops at the WallTier (`component_child_owner_mismatch`, it lists the
+  WindowTier owned by the Window), so `partial_preservation` holds only what
+  was enumerated before the WallTier. The response carries hashes only, so
+  the exact residual difference is not logged; the likely cause (reproduced
+  with SDK doubles) is that regenerated parts are enumerated after the
+  WallTier, which changes the shape of the partial snapshot. Fixed in 0.51.1.
+- Attribute 120 on the window Wall did not follow the native write (native
+  2, attribute `m3`), as on the Wall with door: the paired attribute setter is
+  needed there.
+- `material_comparison` on a Wall whose 508 is not stored reports
+  `not_checked`/`evidence_complete=false` (508 `not_returned`, absence not
+  proven); the native and 120 values in it are still read.
+
+#### Shared opening tier and regeneration residual (0.51.1 contract)
+
+Automated tests only; no native observation yet.
+
+- **Shared opening child.** `component_ownership.observe` takes
+  `shared_parents`: a child whose `GetParentElement` is one of these exact
+  refs is reported in `shared_children` (child + observed parent edge), not
+  as a child and not as `component_child_owner_mismatch`; the key appears
+  only when such a child exists, so all other evidence keeps its shape. The
+  Wall Material/CalculationMode snapshot passes the Wall's direct
+  `Door_TypeUUID`/`Window_TypeUUID` children for its WallTier, skips the
+  shared child there and requires it to be a snapshotted child of exactly
+  that opening (`wall_material_shared_opening_child_unbound` otherwise). A
+  window Wall now gets the complete (sorted, order-independent) evidence
+  instead of `partial_preservation`. Any other foreign parent still fails
+  closed. `component_identity` and the drawing identity inventory use the
+  same rule for a WallTier (openings read from its parent Wall).
+- **Regeneration residual.** When a post-setter read has an observed
+  `identity_diff` and the renaming rule does not accept it, the preservation
+  report adds `regeneration_residual`: identities of one type are paired in
+  sorted order, the expected evidence is renamed, and up to 8 differing paths
+  (components keyed by type and model UUID, short scalar values) are listed.
+  It is review evidence only and never accepts drift.
+- Unchanged: the renaming rule, the byte-equality condition, unknown
+  outcomes, recovery and journals. Evidence recorded by 0.51.0 for the window
+  Wall (partial) differs in shape from 0.51.1 evidence, so a 0.51.0 plan of
+  that Wall must be previewed again; both 0.51.0 executions are already
+  reconciled.
+
 ## Earlier findings by version
 
 Each section below retains the scope and build stated in its original note.

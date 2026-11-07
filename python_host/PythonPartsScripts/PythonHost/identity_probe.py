@@ -1,5 +1,5 @@
 """Read one explicit adapter identity, its ancestry and native representation."""
-from .component_ownership import failure, observation, observe
+from .component_ownership import failure, observation, observe, opening_tier_parents
 from .query_contracts import SCHEMA, fingerprint
 from .transport import BridgeError
 
@@ -82,7 +82,9 @@ def probe_identity(queries, doc, base, settings, request, trace, check):
 
     for adapter in unique.values():
         check()
-        manifest = read("Adapter.component_ownership", lambda: observe(adapter, check))
+        # 0.51.1: a WallTier may list its Wall's opening tier (Window).
+        manifest = read("Adapter.component_ownership", lambda: observe(
+            adapter, check, shared_parents=opening_tier_parents(adapter, check)))
         evidence.append(manifest)
         def native_representation():
             native = base.GetElement(adapter)
@@ -141,7 +143,8 @@ def probe_drawing_identity(queries, doc, base, settings, request, trace, check):
             evidence, represented = [], []
             for adapter in unique.values():
                 check()
-                evidence.append(trace.call("Adapter.drawing_component_ownership", lambda: observation(adapter, check)))
+                evidence.append(trace.call("Adapter.drawing_component_ownership", lambda: observation(
+                    adapter, check, shared_parents=opening_tier_parents(adapter, check))))
                 try:
                     native = trace.call("BaseElements.GetElement.drawing_identity", lambda: base.GetElement(adapter))
                     if native is None:

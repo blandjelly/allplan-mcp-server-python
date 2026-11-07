@@ -53,8 +53,18 @@ def failure(exc, stage="component_ownership"):
     return result
 
 
-def observe(adapter, check=lambda: None, *, include_children=True, trace=None):
-    """Read exact ancestry/direct children; no writable property owner is inferred."""
+def observe(adapter, check=lambda: None, *, include_children=True, trace=None, shared_parents=None):
+    """Read exact ancestry/direct children; no writable property owner is inferred.
+
+    ``shared_parents`` (0.51.1) names exact refs that may own a child this
+    adapter also enumerates. Allplan 2026.1 lists a Window's WindowTier under
+    the Wall's WallTier too, while GetParentElement returns the Window (0.50.1
+    query, 0.51.0 trial). Such a child is reported separately in
+    ``shared_children`` with its observed edge, never as this adapter's child;
+    the key is present only when one was observed, so all other evidence
+    keeps its shape. Any other foreign parent stays
+    ``component_child_owner_mismatch``.
+    """
     import NemAll_Python_IFW_ElementAdapter as adapters
 
     def read(stage, callback, *, api=None):
@@ -87,7 +97,7 @@ def observe(adapter, check=lambda: None, *, include_children=True, trace=None):
         current = parent
     else:
         raise ComponentReadError("parent", "component_parent_limit")
-    children, child_parent_edges, child_models = {}, [], set()
+    children, child_parent_edges, child_models, shared = {}, [], set(), []
     if include_children:
         owner = read("children", lambda: adapters.BaseElementAdapterChildElementsService.GetChildModelElements(adapter, True),
                      api="BaseElementAdapterChildElementsService.GetChildModelElements")
@@ -106,6 +116,14 @@ def observe(adapter, check=lambda: None, *, include_children=True, trace=None):
                 raise ComponentReadError("child_parent_identity", "component_child_owner_mismatch",
                                          evidence={"target": target, "child": child_ref, "observed_parent": None})
             parent_ref = read("child_parent_identity", lambda: identity(parent, trace=trace))
+            if (not same_model_identity(parent_ref, target) and model_identity_key(child_ref) not in seen
+                    and any(same_model_identity(parent_ref, owner) for owner in shared_parents or ())):
+                child_key = model_identity_key(child_ref)
+                if child_key in child_models:
+                    raise ComponentReadError("child_identity", "component_child_identity_ambiguous")
+                child_models.add(child_key)
+                shared.append({"child": child_ref, "parent": parent_ref})
+                continue
             if not same_model_identity(parent_ref, target) or model_identity_key(child_ref) in seen:
                 raise ComponentReadError("child_parent_identity", "component_child_owner_mismatch",
                                          evidence={"target": target, "child": child_ref, "observed_parent": parent_ref})
@@ -116,17 +134,47 @@ def observe(adapter, check=lambda: None, *, include_children=True, trace=None):
             children[fingerprint(child_ref)] = child_ref
             child_parent_edges.append({"child": child_ref, "parent": parent_ref})
     check()
-    return {"schema_version": "m4-component-ownership-1", "target": target,
-            "lineage": lineage, "terminal_root": lineage[-1],
-            "parent_chain_complete": True, "children_complete": include_children,
-            "children": sorted(children.values(), key=fingerprint),
-            "child_parent_edges": sorted(child_parent_edges, key=fingerprint),
-            "property_owner": "not_established", "physical_target_equivalence": "not_established"}
+    result = {"schema_version": "m4-component-ownership-1", "target": target,
+              "lineage": lineage, "terminal_root": lineage[-1],
+              "parent_chain_complete": True, "children_complete": include_children,
+              "children": sorted(children.values(), key=fingerprint),
+              "child_parent_edges": sorted(child_parent_edges, key=fingerprint),
+              "property_owner": "not_established", "physical_target_equivalence": "not_established"}
+    if shared:
+        result["shared_children"] = sorted(shared, key=fingerprint)
+    return result
 
 
-def observation(adapter, check=lambda: None, *, include_children=True):
+def opening_tier_parents(adapter, check=lambda: None, *, trace=None):
+    """Openings that may share a child with a WallTier (0.51.1), else None.
+
+    Only for a WallTier: the direct Window/Door children of its parent Wall,
+    read from that Wall's own complete child edges. Any read failure leaves
+    the strict observation unchanged (None).
+    """
+    import NemAll_Python_IFW_ElementAdapter as adapters
+    from .native_readers import OPENING_TYPES
+
     try:
-        return {"status": "observed", "value": observe(adapter, check, include_children=include_children)}
+        if text(adapter.GetElementAdapterType().GetTypeName()) != "WallTier_TypeUUID":
+            return None
+        parent = adapters.BaseElementAdapterParentElementService.GetParentElement(adapter)
+        if boolean(parent.IsNull()):
+            return None
+        wall = observe(parent, check, trace=trace)
+    except BridgeError:
+        raise
+    except Exception:
+        return None
+    if wall["target"]["type_name"] != "Wall_TypeUUID":
+        return None
+    return [ref for ref in wall["children"] if ref["type_name"] in OPENING_TYPES] or None
+
+
+def observation(adapter, check=lambda: None, *, include_children=True, shared_parents=None):
+    try:
+        return {"status": "observed", "value": observe(adapter, check, include_children=include_children,
+                                                       shared_parents=shared_parents)}
     except BridgeError:
         raise
     except Exception as exc:

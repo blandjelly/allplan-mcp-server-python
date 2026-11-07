@@ -13,6 +13,7 @@ import math
 from .component_ownership import ComponentReadError, failure, identity, observe, same_model_identity
 from .attribute_evidence import describe_value
 from .model_context import integer, text
+from .native_readers import OPENING_TYPES
 from .query_contracts import fingerprint
 from .transport import BridgeError
 
@@ -188,11 +189,15 @@ def _live_children(adapter, observed, check, read):
             raise ComponentReadError("material_component_children", "wall_material_component_limit")
         live.append(child)
     refs = [read(lambda child=child: identity(child, trace=read.native), "material_component_identity") for child in live]
+    # A shared opening tier (0.51.1) is enumerated here but owned and
+    # snapshotted by its opening; it is bound by its observed edge instead.
+    shared = {_identity_key(edge["child"]) for edge in observed.get("shared_children", [])}
     if (len({_identity_key(ref) for ref in refs}) != len(refs)
-            or {_identity_key(ref) for ref in refs} != {_identity_key(ref) for ref in observed["children"]}):
+            or {_identity_key(ref) for ref in refs}
+            != {_identity_key(ref) for ref in observed["children"]} | shared):
         raise ComponentReadError("material_component_children", "wall_material_component_children_changed")
     # Some native collections own the wrapper lifetimes; callers must retain it.
-    return collection, list(zip(live, refs))
+    return collection, [(child, ref) for child, ref in zip(live, refs) if _identity_key(ref) not in shared]
 
 
 def _auxiliary_geometry(adapter, check, read=None):
@@ -271,6 +276,22 @@ def _child_preservation(adapter, base, hierarchy, check, read, excluded=508):
                    for child, ref in children], key=fingerprint)
 
 
+def _bind_shared_opening_children(tier_hierarchy, root_auxiliary):
+    """Each tier-listed opening child must be a snapshotted child of that opening.
+
+    The opening's own subtree (geometry, metadata, identities) is the
+    preservation evidence; the tier keeps only the exact observed edge.
+    """
+    for edge in tier_hierarchy.get("shared_children", []):
+        owners = [component["ownership"] for component in root_auxiliary
+                  if same_model_identity(component["ownership"]["target"], edge["parent"])]
+        if (len(owners) != 1 or owners[0]["target"] != edge["parent"]
+                or _identity_key(edge["child"]) not in {_identity_key(ref) for ref in owners[0]["children"]}):
+            raise ComponentReadError("material_tier_children", "wall_material_shared_opening_child_unbound",
+                                     evidence={"tier": tier_hierarchy["target"], "child": edge["child"],
+                                               "observed_parent": edge["parent"]})
+
+
 def _detailed_snapshot(base, adapter, check=lambda: None, *, material_observation=None, captured=None,
                        trace=None, trace_ref=None, field="Material"):
     read = _reader(check, trace, trace_ref)
@@ -310,6 +331,9 @@ def _detailed_snapshot(base, adapter, check=lambda: None, *, material_observatio
     root_auxiliary, tier_auxiliary = [], []
     state.update(root_attribute_containers=root_metadata,
                  auxiliary_components={"root": root_auxiliary, "tier": tier_auxiliary})
+    # Openings that are direct children of this Wall may also be listed under
+    # its tier through their own tier (Window, 0.51.0 trial); see observe.
+    openings = [ref for ref in hierarchy["children"] if ref["type_name"] in OPENING_TYPES]
     budget = {"count": 0, "attribute_bytes": 0, "snapshot_bytes": 0,
               "excluded_attribute": _FIELDS[field]["excluded_attribute"],
               "seen": {(hierarchy["target"]["signed_drawing_file"], hierarchy["target"]["model_uuid"])}}
@@ -326,7 +350,8 @@ def _detailed_snapshot(base, adapter, check=lambda: None, *, material_observatio
             child_refs.append(component["ownership"]["target"])
             (root_metadata if kind == "AttributeContainer_TypeUUID" else root_auxiliary).append(component)
             continue
-        child_hierarchy = read(lambda: observe(child, check, trace=read.native), "material_tier_hierarchy")
+        child_hierarchy = read(lambda: observe(child, check, trace=read.native, shared_parents=openings),
+                               "material_tier_hierarchy")
         state["tier_hierarchy"] = child_hierarchy
         lineage = child_hierarchy["lineage"]
         # A tier's parent can be another view wrapper of this same Wall.
@@ -354,6 +379,8 @@ def _detailed_snapshot(base, adapter, check=lambda: None, *, material_observatio
         # Polyhedron3D (or any serializable geometry) to accept it.
         tiers.append(_auxiliary_geometry(child, check, read))
         state["tier_geometry"] = tiers[-1]
+    if len(tiers) == 1:
+        _bind_shared_opening_children(child_hierarchy, root_auxiliary)
     if (len(tiers) != 1 or len(child_refs) != len(hierarchy["children"])
             or len({_identity_key(ref) for ref in child_refs}) != len(child_refs)
             or {_identity_key(ref) for ref in child_refs} != {_identity_key(ref) for ref in hierarchy["children"]}):
@@ -694,6 +721,11 @@ def read(base, element, change, check=lambda: None, *, preservation=True,
             if accepted is not None:
                 accepted.update(report, accepted=IDENTITY_REGENERATION_ACCEPTANCE, **regeneration)
             return value
+        if post_setter and report["identity_diff"].get("status") == "observed" and (
+                report["identity_diff"]["removed"]["count"] or report["identity_diff"]["added"]["count"]):
+            # 0.51.1: the 0.51.0 window-Wall trial renamed only listed types
+            # yet stayed unknown; name what else differs for the next review.
+            report["regeneration_residual"] = identity_regeneration_residual(expected, state)
         # The Wall-specific reason predates Beam/Column/Slab support; keep it
         # for Walls so earlier journals and reports read the same.
         if not material:
@@ -1048,6 +1080,101 @@ def identity_regeneration(native_type, field, expected, current):
             return {"regenerated_identities": sorted(pairs, key=lambda p: (p["type_name"], p["old_model_uuid"]))[:16],
                     "view_map": root_views}
     return None
+
+
+_MAX_RESIDUAL_PATHS = 8
+_MAX_RESIDUAL_SCALAR = 96
+
+
+def _keyed(items):
+    """Identity-keyed list items (component snapshots, refs, edges), or None."""
+    keyed = {}
+    for item in items:
+        if not isinstance(item, dict):
+            return None
+        ref = (item.get("ownership") or {}).get("target") if isinstance(item.get("ownership"), dict) else None
+        ref = ref or item.get("target") or item.get("child") or item
+        if not isinstance(ref, dict) or not isinstance(ref.get("type_name"), str) \
+                or not isinstance(ref.get("model_uuid"), str):
+            return None
+        key = ref["type_name"] + "|" + ref["model_uuid"]
+        if "parent" in item and isinstance(item["parent"], dict):
+            key += ">" + str(item["parent"].get("model_uuid"))
+        if key in keyed:
+            return None
+        keyed[key] = item
+    return keyed
+
+
+def _residual_paths(before, after, path, found):
+    if len(found) > _MAX_RESIDUAL_PATHS:
+        return
+    if isinstance(before, dict) and isinstance(after, dict):
+        for key in sorted(set(before) | set(after)):
+            if key not in before or key not in after:
+                found.append({"path": path + "/" + str(key),
+                              "difference": "added" if key not in before else "removed"})
+            elif before[key] != after[key]:
+                _residual_paths(before[key], after[key], path + "/" + str(key), found)
+        return
+    if isinstance(before, list) and isinstance(after, list):
+        left, right = _keyed(before), _keyed(after)
+        if left is not None and right is not None:
+            # Pair components by identity so one difference is not reported
+            # as a shifted list position.
+            for key in sorted(set(left) | set(right)):
+                if key not in left or key not in right:
+                    found.append({"path": path + "/[" + key + "]",
+                                  "difference": "added" if key not in left else "removed"})
+                elif left[key] != right[key]:
+                    _residual_paths(left[key], right[key], path + "/[" + key + "]", found)
+            return
+        if len(before) != len(after):
+            found.append({"path": path, "difference": "length", "before": len(before), "after": len(after)})
+            return
+        for index, (left, right) in enumerate(zip(before, after)):
+            if left != right:
+                _residual_paths(left, right, path + "/" + str(index), found)
+        return
+    row = {"path": path, "difference": "value"}
+    for name, value in (("before", before), ("after", after)):
+        if value is None or isinstance(value, (bool, int, float)) or (
+                isinstance(value, str) and len(value) <= _MAX_RESIDUAL_SCALAR):
+            row[name] = value
+    found.append(row)
+
+
+def identity_regeneration_residual(expected, current):
+    """Where the evidence still differs after renaming same-type identities.
+
+    Review evidence for an `unknown` outcome only (0.51.1): identities of one
+    type are paired in sorted order, the expected evidence is renamed and the
+    first differing paths are listed. It never accepts drift.
+    """
+    if not isinstance(expected, dict) or not isinstance(current, dict):
+        return {"status": "not_checked", "reason": "evidence_unavailable"}
+    try:
+        before, after = _identity_refs(expected), _identity_refs(current)
+    except ValueError:
+        return {"status": "not_checked", "reason": "identity_evidence_over_limit"}
+    groups = {}
+    for side, items in (("removed", before - after), ("added", after - before)):
+        for item in sorted(items):
+            groups.setdefault(item[0], {"removed": [], "added": []})[side].append(item)
+    mapping, unpaired = {}, []
+    for name in sorted(groups):
+        removed, added = groups[name]["removed"], groups[name]["added"]
+        if len(removed) != len(added):
+            unpaired.append({"type_name": name, "removed": len(removed), "added": len(added)})
+        for old, new in zip(removed, added):
+            for old_id, new_id in ((old[1], new[1]), (old[2], new[2])):
+                if old_id != new_id:
+                    mapping.setdefault(old_id, new_id)
+    found = []
+    _residual_paths(_canonical(_rename(expected, mapping)), _canonical(current), "", found)
+    return {"status": "observed", "pairing": "same_type_sorted_order", "unpaired_types": unpaired[:8],
+            "paths": found[:_MAX_RESIDUAL_PATHS], "truncated": len(found) > _MAX_RESIDUAL_PATHS,
+            "acceptance": "review_evidence_only"}
 
 
 def write(base, element, change, doc=None, check=lambda: None, *, trace=None):

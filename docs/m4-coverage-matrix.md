@@ -7,7 +7,7 @@ instead of repeating per-pair status in prose ([documentation policy](documentat
 Evidence and its limits are in [validation status](validation-status.md);
 open work is in the [development plan](development-plan.md).
 
-Status as of the 0.50.1 native trial (2026-11-07); 0.51.0 code changes marked CODE. One active drawing, 1–32 changes per Apply. 0.51.0 (CODE) submits all setters of one Apply with two or more changes in one UndoRedoService step; the 0.50.1 trial still needed one UI Undo per setter.
+Status as of the 0.51.0 native trial (2026-11-07); 0.51.1 code changes marked CODE. One active drawing, 1–32 changes per Apply. One UndoRedoService step per Apply with two or more changes: PASS in the 0.51.0 trial (one UI Undo restored both places of a paired write).
 
 ## Legend
 
@@ -42,7 +42,7 @@ created; an existing definition can be added to an element (`add`/`upsert`).
 | Family | Native Material | Other native properties | Organizational layer | Delete |
 | --- | --- | --- | --- | --- |
 | Column | VALUE (0.35.0 record, 0.39.0); 0.51.0 CODE: the Column renaming rule (AttributeContainer + root view) also after a Material setter, not observed | PASS (`CalculationMode` 2→0: 0.50.0 `1214d281…` as `native_calculation_mode`, and 0.50.1 `341415e4…` with the plain request routed as `paired_property`: native `applied` with AttributeContainer + root view `cc752bda…`→`86a9536a…` renamed, attr 120 followed without a setter, owner UI check, one UI Undo restored 2/`m` and view `cc752bda…`) | PARTIAL (no-op only) | PASS (grouped, 3 Columns + Undo, 0.29.0) |
-| Wall (single tier) | VALUE (0.50.1: Wall 240 `9ed2e229…` and Wall with door `37196703…` reached `Cegła`, owner UI check, one UI Undo each, but `unknown` with the sections of the accepted CalculationMode renaming; reconciled `old_value_observed`). 0.51.0 CODE: same family renaming rule for Material; paired material writes 508 after it, or plans native only when 508 is not stored (palette follows native, Wall 200) | PASS on the plain Wall (`CalculationMode` 0→2, 0.50.0 paired `e4de1f73…`: `applied` with 2 × AttributeContainer + WallAxis renamed, owner UI check, one UI Undo restored 0). Wall with door: paired `CalculationMode` 0→2 `applied` with 2 × AttributeContainer, Door, DoorSill renamed and attr 120 written (0.50.1 `4043e559…`, owner UI check) but **two UI Undo steps** (attribute, then native); 0.51.0 CODE: one undo step. Wall with window: CODE (Window, Sill, WindowOpeningSmartPart renaming, not observed). Attr 120 is not mirrored reliably (did not follow on the door Wall) | REPORTED (`Ogólne03`, 0.27.0) | PARTIAL (subtree absent; no Undo) |
+| Wall (single tier) | PASS (0.51.0 paired material `Cegła`: Wall 240 `c6183d71…` native + 508 `applied` with 2 × AttributeContainer + WallAxis renamed; Wall with door `9109d250…` native only, 508 follows; owner UI check, one UI Undo each). Wall with window: VALUE (`5346fd71…` reached `Cegła`, `unknown`, reviewed reconciliation, UI Undo); 0.51.1 CODE: complete evidence with the shared WindowTier | PASS on the plain Wall (`CalculationMode` 0→2, 0.50.0 paired `e4de1f73…`: `applied` with 2 × AttributeContainer + WallAxis renamed, owner UI check, one UI Undo restored 0). Wall with door: paired `CalculationMode` 0→2 `applied` with 2 × AttributeContainer, Door, DoorSill renamed and attr 120 written, **one UI Undo** (0.51.0 `6e6c83d2…`). Wall with window: VALUE (0.51.0 `a47dca16…` reached native 2 with exactly Window, Sill, 2 × AttributeContainer renamed but stayed `unknown` on partial evidence, attr 120 skipped; UI Undo, reconciled); 0.51.1 CODE (shared WindowTier, complete evidence). Attr 120 is not mirrored reliably (did not follow on the door Wall) | REPORTED (`Ogólne03`, 0.27.0) | PARTIAL (subtree absent; no Undo) |
 | Wall (multi tier) | BLOCKED (one tier only) | NONE | CODE (tier-aware route) | — |
 | SkeletonBeam | BLOCKED (no successful write; view discrepancy) | NONE (write); getter-only read CODE (0.48.0), not read natively | CODE | FIXTURE (no disposable target) |
 | Beam | PASS (0.46.0 execution `5a0bc366…`: `""`→`C30/37`, `applied` with `accepted_preservation_drift.accepted="auxiliary_children_regenerated"` on view `362f80d3…`; owner-reported UI and UI Undo, post-Undo preview old value `""`) | PASS (`CalculationMode` 0→2, 0.50.0 paired `d129c7c1…`: native `applied` with AttributeContainer + WallAxis renamed, attr 120 `paired_attribute_already_set_by_native_write` without a setter, owner UI check, one UI Undo restored 0/`m3`) | FIXTURE | FIXTURE |
@@ -74,8 +74,10 @@ SkeletonBeam) and accepts the observed identity regeneration after a
 `CalculationMode` setter. Its 0.50.0 trial made the Column, plain Wall and
 Beam writes `applied`; the Wall with a door also regenerated the Door and
 DoorSill, which 0.50.1 accepts (native PASS of the renaming in the 0.50.1
-trial, two UI Undo steps). 0.51.0 (CODE) groups the setters of one Apply in
-one undo step and applies the family renaming rule to Material and windows.
+trial, two UI Undo steps). 0.51.0 grouped the setters of one Apply in one
+undo step and applied the family renaming rule to Material (both PASS in its
+trial); the window Wall stayed `unknown` on partial evidence, which 0.51.1
+(CODE) replaces with complete evidence.
 
 Selection: native selection is unsupported for every family; highlight is
 available and is not a selection ([selection API](m4-native-selection-api.md)).
