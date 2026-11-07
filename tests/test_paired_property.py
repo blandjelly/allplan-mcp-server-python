@@ -280,7 +280,8 @@ class IdentityRegenerationTests(unittest.TestCase):
             "property_changed": ("Column_TypeUUID", "CalculationMode",
                                  self.column_state("v2", "c2", common={"Pen": 2})),
             "no_identity_change": ("Column_TypeUUID", "CalculationMode", self.column_state(common={"Pen": 2})),
-            "material_field": ("Column_TypeUUID", "Material", self.column_state("v2", "c2")),
+            "unlisted_family": ("SkeletonBeam_TypeUUID", "Material", self.column_state("v2", "c2")),
+            "unlisted_field": ("Column_TypeUUID", "Thickness", self.column_state("v2", "c2")),
             "beam_root_view": ("Beam_TypeUUID", "CalculationMode", self.column_state("v2", "c1")),
         }
         for name, (kind, field, after) in cases.items():
@@ -292,6 +293,16 @@ class IdentityRegenerationTests(unittest.TestCase):
         unlisted = self.column_state("v1", "c2")
         unlisted["component_tree"]["children"][0]["type_name"] = "Opening_TypeUUID"
         self.assertIsNone(self.module.identity_regeneration("Column_TypeUUID", "CalculationMode", before, unlisted))
+
+    def test_material_uses_the_same_family_rule_0510(self):
+        """0.51.0: the renaming is a property of the family's ModifyElements."""
+        before, after = self.column_state(), self.column_state("v2", "c2")
+        for field in ("CalculationMode", "Material"):
+            with self.subTest(field=field):
+                accepted = self.module.identity_regeneration("Column_TypeUUID", field, before, after)
+                self.assertEqual(accepted["view_map"], {"v1": "v2"})
+        self.assertIsNone(self.module.identity_regeneration(
+            "Column_TypeUUID", "Material", before, self.column_state("v2", "c2", common={"Pen": 2})))
 
     def test_two_containers_pair_by_content(self):
         def wall(root_container, tier_container, priority=300):
@@ -377,15 +388,21 @@ class WallDoorRegenerationTests(unittest.TestCase):
         cases["door_reveal_geometry"] = ("Wall_TypeUUID", "CalculationMode", changed)
         cases["door_tier_regenerated"] = ("Wall_TypeUUID", "CalculationMode", self.after(
             {**TRIAL_0500_RENAMES, "82b89213-157f-4ac5-82ea-0cba3f533270": str(uuid4())}))
-        cases["material_field"] = ("Wall_TypeUUID", "Material", self.after())
         cases["column_family"] = ("Column_TypeUUID", "CalculationMode", self.after())
-        window = json.loads(json.dumps(before).replace("Door_TypeUUID", "Window_TypeUUID"))
-        window_after = self.module._canonical(self.module._rename(window, TRIAL_0500_RENAMES))
         for name, (kind, field, after) in cases.items():
             with self.subTest(case=name):
                 self.assertIsNone(self.module.identity_regeneration(kind, field, before, after))
+        # 0.51.0: the same Wall rule covers Material and a window; an
+        # unlisted opening type is still rejected.
+        self.assertIsNotNone(self.module.identity_regeneration("Wall_TypeUUID", "Material", before, self.after()))
+        window = json.loads(json.dumps(before).replace("Door_TypeUUID", "Window_TypeUUID"))
+        window_after = self.module._canonical(self.module._rename(window, TRIAL_0500_RENAMES))
+        self.assertIsNotNone(self.module.identity_regeneration("Wall_TypeUUID", "CalculationMode",
+                                                               window, window_after))
+        niche = json.loads(json.dumps(before).replace("Door_TypeUUID", "Niche_TypeUUID"))
+        niche_after = self.module._canonical(self.module._rename(niche, TRIAL_0500_RENAMES))
         self.assertIsNone(self.module.identity_regeneration("Wall_TypeUUID", "CalculationMode",
-                                                            window, window_after))
+                                                            niche, niche_after))
 
     def test_wall_with_door_paired_write_writes_the_attribute_after_regeneration(self):
         wall = families.columns.wall_fixtures.WallMaterialEditTests("setUp")
@@ -465,8 +482,9 @@ class WallDoorRegenerationTests(unittest.TestCase):
         wall.properties.GetWallTierProperties(1).CalculationMode = 0
         root.GetAttributes.return_value = [(935, ""), (120, "m3")]
         bind_attribute_120(native)
-        old = native.element(70, name="Window_TypeUUID", solid=shape("window"))
-        new = native.element(80, name="Window_TypeUUID", solid=shape("window"))
+        # Window_TypeUUID is listed from 0.51.0; a niche is still unlisted.
+        old = native.element(70, name="Niche_TypeUUID", solid=shape("niche"))
+        new = native.element(80, name="Niche_TypeUUID", solid=shape("niche"))
         new.GetElementAdapterType.return_value.GetGuid.return_value = (
             old.GetElementAdapterType.return_value.GetGuid.return_value)
         native.children[id(root)] = [wall.tier, old]
@@ -488,7 +506,7 @@ class WallDoorRegenerationTests(unittest.TestCase):
         first, second = result["outcomes"]
         self.assertEqual(first["state"], "unknown", result)
         diff = first["representation_consensus"]["representations"][0]["preservation"]["identity_diff"]
-        self.assertEqual(diff["removed"]["items"][0].split("|")[0], "Window_TypeUUID")
+        self.assertEqual(diff["removed"]["items"][0].split("|")[0], "Niche_TypeUUID")
         self.assertEqual((second["state"], second["reason"]), ("skipped", "not_attempted"))
         native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
         self.assertTrue(native.recover(execution)["write_blocked"])

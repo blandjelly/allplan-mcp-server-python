@@ -760,8 +760,9 @@ Findings:
 
 #### Paired properties and identity regeneration (0.50.0)
 
-Native trial of 0.50.0 below; 0.50.1 extends the Wall rule to the door and
-adds the routing hint (automated tests only).
+Native trials of 0.50.0 and 0.50.1 below; 0.51.0 adds one undo step per
+Apply, the Material and window renaming and the paired presence read
+(automated tests only).
 
 - **Owner decision (2026-11-07):** a request for a property that exists both
   as a native property and as a same-named attribute changes both places,
@@ -791,8 +792,8 @@ adds the routing hint (automated tests only).
   consensus read and without an attribute setter. If the native write's
   accepted drift regenerated the reviewed view, the attribute write resolves
   that new view (`effective_target_view_uuid`); model, type and old value stay
-  bound. Two writes are two native operations; the number of UI Undo steps is
-  not established.
+  bound. Two setters were two UI Undo steps in the 0.50.1 trial; 0.51.0
+  submits them in one undo step (see the 0.51.0 contract below).
 - **Identity regeneration (CalculationMode only):** after the setter
   (readback/recovery, never preflight or the setter boundary) drift is
   accepted as `identities_regenerated_evidence_otherwise_equal` only if every
@@ -856,11 +857,111 @@ Findings:
   the first Wall 240 request (no-op with a diverging attribute); 0.50.1 adds
   the hint and clarifies the tool description.
 
-Open questions: how many UI Undo steps restore a paired write with two
-setters (Wall with door, 0.50.1); whether windows regenerate like doors;
-whether `Pcs`/`kg` are labels of the project enum 120 (the round trip decides
-before any write); whether `Trade` codes map one-to-one to the project's
-attribute 209 labels.
+Open questions after 0.50.0 (answered or carried below): the UI Undo count
+for two setters (answered by the 0.50.1 trial: two steps); whether windows
+regenerate like doors (open); whether `Pcs`/`kg` are labels of the project
+enum 120 (the round trip decides before any write); whether `Trade` codes map
+one-to-one to the project's attribute 209 labels.
+
+#### Native observations (0.50.1 trial, 2026-11-07)
+
+Bridge 0.50.1, source `6b04d97`, `sha256-verified`, Allplan 2026.1
+(executable 16.1617.8659.814), drawing 101 of "Kopia MCP_QA_DEMO"
+([raw evidence](test-results/evidence/0.50.1-2026-11-07/evidence-20261107.jsonl),
+[agent log](test-results/evidence/0.50.1-2026-11-07/agent-log.md)). The owner
+confirmed that every logged value agrees with the UI.
+
+| Element | Request / execution | Outcome | UI Undo |
+| --- | --- | --- | --- |
+| Wall 200 with door `545bb0a2…` | `paired_property` `m` (`4043e559…`): native 0→2 + attr 120 `m3`→`m` | `completed`: native `applied` with 2 × AttributeContainer, Door, DoorSill renamed (0.50.1 rule), attr 120 `applied`/`readback_matches` (setter ran) | **two steps**: after the first the read was native 2 / attr `m3` (the attribute setter was undone), after the second 0 / `m3` |
+| Column `eb88c850…` | plain request routed as `paired_property` `m3` (`341415e4…`) | `completed`: native `applied` (AttributeContainer + root view `cc752bda…`→`86a9536a…`), attr `paired_attribute_already_set_by_native_write` (no setter) | one step (the UI offered no second); read 2/`m`, view `cc752bda…` |
+| Wall 200 with door | `paired_property` material `Cegła` | preview `not_checked`: `attribute:508` `old_value_unknown` — 508 is not stored (`missing` in ReadAll; `not_returned`, absence not proven, in both modes of `material_comparison`) | — |
+| Wall 200 with door | `native_material` `TEST1`→`Cegła` after the owner chose "only native" (`37196703…`) | `stopped`, `unknown` (`wall_material_invariants_changed`, sections `partial_preservation`, `preservation_diagnostic`), reconciliation readback `Cegła`; owner: the element dialog **and the attributes palette** showed `Cegła` | one step → `TEST1`; read-only recovery (after one rejected acknowledgement with stale evidence) `reconciled`/`old_value_observed` |
+| Wall 240 `06d71e4d…` | plain material request, sent as `native_material` `TEST`→`Cegła` (`9ed2e229…`) | `stopped`, `unknown` (sections `auxiliary_components`, `hierarchy`, `root_attribute_containers`, `tier_attribute_containers`, `tier_hierarchy`), readback `Cegła`; attr 508 stayed `Silikat` (not in the plan) | one step → `TEST`; recovery `reconciled`/`old_value_observed` |
+| Wall 300 with window `f4da72fe…` (new) | read-only | query lists Window → WindowTier → (Sill, WindowReveal → WindowOpeningSmartPart → AttributeContainer, AttributeContainer); WallTier and root AttributeContainer; the WallTier also lists the WindowTier (parent: Window) | — |
+
+Findings:
+
+- The 0.50.1 door rule worked natively (the paired CalculationMode write on
+  the Wall with door was `applied` and the attribute setter ran), but each
+  setter is its own UI Undo step. The owner requires one UI Undo per change
+  of several values (fixed in 0.51.0 below).
+- The native Material writes on both Walls changed exactly the sections of
+  the accepted CalculationMode renamings of the same Walls (0.50.0
+  `e4de1f73…` on the Wall 240, 0.50.1 `4043e559…` on the Wall with door).
+  0.50.1 reported `identity_diff` only for CalculationMode, so the Material
+  renaming is inferred from the sections, not hash-verified.
+- Attribute 508 on the Wall 200 is not stored; the attributes palette showed
+  the native material after the native write. On the Wall 240 the stored 508
+  (`Silikat`) did not follow the native write.
+- Routing: the plain Wall 240 request was sent as `native_material` because
+  the previous request had named "only native".
+- `component_identity` failed with a generic message on the WallTier
+  (`component_child_owner_mismatch`: it lists the WindowTier owned by the
+  Window) and on the Sill and WindowReveal; `model_query` with
+  `component_ownership` read the same tree.
+- Openings are reported as `Door_TypeUUID`/`Window_TypeUUID`, not the
+  SDK-documented `WindowDoor_TypeUUID`; their `opening_kind` was
+  `not_applicable` and they could not be named in `native_types`.
+
+#### One UI Undo step, Wall Material and openings (0.51.0 contract)
+
+Automated tests only; no native observation yet.
+
+- **One UI Undo step per Apply.** SDK 2026
+  [`UndoRedoService`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/UndoRedoService/):
+  `UndoRedoService(doc, isPassivateAll, isLockPreviewDraw,
+  collectEleForMultipleTransactions)` "collect[s] the elements for adding
+  multiple transactions to one undo step", `CreateUndoStep()` creates it and
+  `IsInUndoService()` reports an active service. `ModifyElements` and
+  `ElementsAttributeService.ChangeAttributes` have no undo parameter. The
+  official examples
+  [SlopedSlabOpening](https://github.com/NemetschekAllplan/PythonPartsExamples/blob/8e2c252477e20bc9afac8918f78a8eeabd473a81/PythonPartsExampleScripts/ArchitectureExamples/Objects/SlopedSlabOpening.py),
+  GeneralOpeningsFor3DSolids and SlabOpeningsFor3DSolids open it with
+  `(doc, True, True, True)` before several transactions and call
+  `CreateUndoStep()` once afterwards (HaunchReinforcementFromFileInteractor
+  does the same around `CreateElements(..., createUndoStep=False)`). 0.51.0
+  opens it with those flags right before the first setter of a typed plan
+  with two or more changes (lazily, so a plan stopped before any setter
+  creates no step) and calls `CreateUndoStep()` once after the last setter,
+  also after an `unknown`/failed setter. The journal records `undo_group`
+  (`created` / `unavailable` / `close_failed`, `setters_in_step`, flags,
+  `IsInUndoService` before/after). A failure there never changes a setter
+  outcome or causes a retry; with `unavailable` each setter may be its own
+  step. Single-change plans and the delete batch are unchanged. Hypothesis
+  for the trial: ModifyElements and ChangeAttributes join the open step.
+- **Material uses the family renaming rule.** `IDENTITY_REGENERATION` is per
+  family and applies to `CalculationMode` and `Material` (Column:
+  AttributeContainer + root view; Beam: AttributeContainer, WallAxis; Wall:
+  AttributeContainer, WallAxis, WallAxisLine, Door, DoorSill, Window, Sill,
+  WindowOpeningSmartPart). The conditions are unchanged: one-for-one pairs of
+  the same type, every other byte equal after renaming, at most 4 per type
+  and 64 pairings. Material drift now also reports `identity_diff`. The Beam
+  Material `auxiliary_children_regenerated` rule is kept and checked first.
+  Column Material and the window types are not yet observed natively.
+- **Paired attribute presence.** A paired request reads attributes with
+  `attribute_read_mode=all_and_computable` unless the request names a mode
+  (both modes agreed for 508 and 120 in every trial from 0.43.1 to 0.50.1). A
+  proven-absent attribute 508 on a Wall follows the native material
+  (`PAIRED_ATTRIBUTE_FOLLOWS_NATIVE`, observed only for Material on the
+  Wall): the plan has the native change alone and lists the Wall in
+  `paired_property.attribute_follows_native`
+  (`paired_attribute_not_stored_follows_native`). Elsewhere a missing paired
+  attribute stays blocked (`replace_requires_existing_attribute`).
+- **Hint for native Material.** A single-place `native_material` preview on
+  Wall/Column/Beam reads attribute 508 beside the native value
+  (`native_property_mirror`, not part of the readback) and reports
+  `paired_property_hint` when it differs; the tool description states that a
+  single-place choice does not carry over to the next request.
+- **Openings.** `Door_TypeUUID` and `Window_TypeUUID` join the `opening`
+  family (`COMPONENT_TYPES`): `opening_kind` is `door`/`window` from the exact
+  type name; they can be named in `native_types` (not in the default list);
+  a Wall-owned door or window can be deleted with its whole subtree (lineage
+  `[opening, Wall]`). As component stop types, an opening's children resolve
+  to the opening in semantic scans, so a Wall has fewer root wrappers there.
+- **`component_identity` failures** name the bounded cause (reason, stage,
+  error type, never the native message) and point to `model_query` with
+  `component_ownership` for child components.
 
 
 

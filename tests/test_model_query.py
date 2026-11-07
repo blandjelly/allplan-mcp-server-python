@@ -215,6 +215,24 @@ class QueryTests(unittest.TestCase):
                          {"status": "observed", "value": "not_applicable"})
         self.assertEqual(self.base.GetElement.call_count, 4)
 
+    def test_allplan_2026_door_and_window_adapters_are_openings_by_exact_type_name(self):
+        # 0.50.1 trial query: Allplan 2026.1 reports Door_TypeUUID and
+        # Window_TypeUUID (each owned by its Wall), not WindowDoor_TypeUUID.
+        door, window = self.adapter(ident=1), self.adapter(ident=2)
+        door.GetElementAdapterType.return_value.GetTypeName.return_value = "Door_TypeUUID"
+        window.GetElementAdapterType.return_value.GetTypeName.return_value = "Window_TypeUUID"
+        self.prepare([door, window])
+        result = self.query(fields=["type_name", "family", "opening_kind"],
+                            predicate={"field": "opening_kind", "op": "eq", "value": "window"})
+        element, = result["elements"]
+        self.assertEqual(element["fields"]["type_name"]["value"], "Window_TypeUUID")
+        self.assertEqual(element["fields"]["family"], {"status": "observed", "value": "opening"})
+        self.assertEqual(element["fields"]["opening_kind"], {"status": "observed", "value": "window"})
+        self.prepare([door])
+        door_result = self.query(fields=["opening_kind"])
+        self.assertEqual(door_result["elements"][0]["fields"]["opening_kind"], {"status": "observed", "value": "door"})
+        self.base.GetElement.assert_not_called()
+
     def test_scalar_types_are_not_coerced_and_ordered_type_mismatch_is_unknown(self):
         self.prepare()
         field = "attribute:83"

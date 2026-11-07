@@ -353,15 +353,26 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     and other families get the attribute alone (plan.paired_property.attribute_only).
     Apply writes the native value first, then the attribute; when the native
     write already set the attribute, it is reported applied without a setter.
-    A place that already holds the value gets no change. Use the single-place
+    A place that already holds the value gets no change. A paired request reads
+    the attribute with presence proof; on a Wall whose attribute 508 is not
+    stored, the attributes palette follows the native material, so only the
+    native change is planned (plan.paired_property.attribute_follows_native).
+    Use the single-place
     kinds only when the user explicitly names one place: native_material /
     native_calculation_mode for the native value only ("tylko natywnie",
     element dialog), an attribute target for the attribute only (attribute,
-    ID, attributes palette). A single-place native_calculation_mode preview
-    whose attribute 120 holds another value reports paired_property_hint;
-    tell the user and offer its plain_request. Never substitute the attribute
+    ID, attributes palette). Decide this for every request on its own: "only
+    native" in an earlier request does not carry over, so the next plain
+    request is paired again. A single-place native_calculation_mode or
+    native_material preview whose attribute 120/508 holds another value
+    reports paired_property_hint; tell the user and offer its plain_request.
+    Never substitute the attribute
     Materiał for native_material or the reverse. Other attribute types
     and computed-only/presence safeguards retain their existing requirements.
+    Undo: all setters of one Apply with two or more changes are submitted in
+    one UndoRedoService step (result.undo_group: created, unavailable or
+    close_failed), so one UI Undo should restore the whole Apply; ask the user
+    to count the UI Undo steps until native acceptance exists.
     The exact string is a native property value, without catalog validation or
     catalog creation. The report field is native.material and resource evidence
     is native_material_state. Geometry, formatting and auxiliary metadata reads
@@ -379,9 +390,10 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     attribute 120. Readback reports native.calculation_mode, and separately
     representation_consensus.mirror_crosscheck with attribute 120 and a verdict;
     a diverging attribute 120 is evidence for the owner, never auto-accepted.
-    After the setter, a regeneration of the family's listed identities
-    (AttributeContainer, Column root view, Beam/Wall axis, a Wall's Door and
-    DoorSill) is accepted only if
+    After a native CalculationMode or Material setter, a regeneration of the
+    family's listed identities (AttributeContainer, Column root view, Beam/Wall
+    axis, a Wall's Door/DoorSill and Window/Sill/WindowOpeningSmartPart) is
+    accepted only if
     all other bound evidence is equal after renaming
     (accepted_preservation_drift, identities_regenerated_evidence_otherwise_equal);
     any other drift stays unknown with preservation.identity_diff.
@@ -389,9 +401,10 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     attribute 120 on the MultiSlab with property_owner=selected_element (no
     native slab write; blocked as slab_calculation_mode_uses_multislab_attribute_120).
     Delete with changes=[{target:{kind:delete}}] as the only edit. This binds
-    exact terminal component roots and their full bounded owned subtrees, or a
-    WindowDoor opening directly owned by a Wall; it never uses the current UI
-    selection or redirects an opening to its wall. Other children cannot be
+    exact terminal component roots and their full bounded owned subtrees, or an
+    opening (Door_TypeUUID, Window_TypeUUID as Allplan 2026.1 reports them, or
+    WindowDoor_TypeUUID) directly owned by a Wall, with native_types naming it;
+    it never uses the current UI selection or redirects an opening to its wall. Other children cannot be
     deleted independently. A root
     and matching child become one root deletion; excluded descendants block it.
     Review the complete cascade scope in resource.delete_ownership before Apply.

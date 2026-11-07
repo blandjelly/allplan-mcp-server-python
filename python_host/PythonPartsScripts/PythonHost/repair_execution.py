@@ -591,101 +591,19 @@ class RepairExecutor:
         if all(change.get("operation") == "delete_element" for change in record["changes"]):
             self._apply_delete_batch(doc, base, record, started)
         else:
-            for index, change in enumerate(record["changes"]):
-                outcome = record["outcomes"][index]
-                if self.plans.queries.clock() - started >= 20:
-                    outcome["reason"] = "execution_time_budget"
-                    break
-                # Paired attribute (0.50.0): it follows its applied native
-                # change. An accepted regeneration of the reviewed view is
-                # carried over; the reviewed model, type and old value stay bound.
-                native_index = paired_native_index(record["changes"], index)
-                if native_index is not None:
-                    native_change = record["changes"][native_index]
-                    if record["outcomes"][native_index].get("state") != "applied":
-                        outcome["reason"] = "paired_native_change_not_applied"
-                        break
-                    view = regenerated_view(record["outcomes"][native_index], native_change)
-                    if view is not None and change.get("target_view_uuid") == native_change.get("target_view_uuid"):
-                        change = {**copy.deepcopy(change), "target_view_uuid": view}
-                        outcome["effective_target_view_uuid"] = view
-                stage = "pre_set_resolve"
-                try:
-                    native_owners = []
-                    element = native_repairs.resolve(doc, base, self.plans.queries, change, writable=True, adapter_owners=native_owners)
-                    stage = "pre_set_read"
-                    old = native_repairs.read(base, self.plans.queries, element, change)
-                    if native_index is not None and new_value_observed(change, old):
-                        # The native write already set the same-named attribute
-                        # (observed mirror). Confirm on every representation;
-                        # no attribute setter runs.
-                        stage = "paired_readback"
-                        resolution = {}
-                        observed = native_repairs.observe(doc, base, self.plans.queries, change, resolution)
-                        if resolution:
-                            outcome["representation_consensus"] = resolution
-                        outcome["readback"] = observed
-                        if new_value_observed(change, observed):
-                            outcome.update(state="applied", reason="paired_attribute_already_set_by_native_write",
-                                           setter_calls_started=0)
-                            self.save(record)
-                            continue
-                        outcome.update(state="conflict", reason="paired_attribute_readback_disagrees")
-                        break
-                    if not same_observation(change, old, change["old_value"]):
-                        outcome.update(state="conflict", reason="old_value_changed", readback=old)
-                        break
-                    if self.plans.queries.clock() - started >= 20:
-                        outcome["reason"] = "execution_time_budget"
-                        break
-                except Exception as exc:
-                    outcome.update(state="conflict", **_error_details(exc), stage=stage)
-                    break
-                outcome.update(state="unknown", reason="setter_may_have_run")
-                self.save(record)  # Write-ahead marker: a crash cannot authorize replay.
-                stage = "setter"
-                try:
-                    if change.get("operation") in {"delete_element", "set_native_material",
-                                                   "set_native_calculation_mode"}:
-                        def write_budget():
-                            if self.plans.queries.clock() - started >= 20:
-                                raise BridgeError("scan_limit_exceeded", "Native mutation preflight exceeded execution budget.", 409)
-                        extra = {}
-                        if (change.get("resource") or {}).get("exact_target_binding") is not None:
-                            from .property_probe import NativeProbeTrace
-                            extra["trace"] = NativeProbeTrace(self.plans.trace_path, "exact_material_pre_setter")
-                        native_repairs.write(base, element, change, doc=doc, check=write_budget, **extra)
-                    else:
-                        native_repairs.write(base, element, change)
-                    if index == 0 and request.get("evaluation_stop"):
-                        # Leave the actual durable write-ahead marker unchanged. No
-                        # readback, final save, second setter or fabricated failure.
-                        # Exact-ID replay and Recover use the normal journal route.
-                        return self.result(record)
-                    # Never trust returned/stale adapters or setter return values as success.
-                    stage = "fresh_resolve"
-                    resolution = {}
-                    observed = native_repairs.observe(doc, base, self.plans.queries, change, resolution)
-                    stage = "readback"
-                    if resolution:
-                        outcome["representation_consensus"] = resolution
-                    outcome["readback"] = observed
-                    inventory = resolution.get("exact_inventory", {})
-                    if inventory.get("status") == "changed" and not inventory.get("accepted"):
-                        # Evidence for read-only recovery, never applied success.
-                        outcome.update(state="unknown", reason="exact_inventory_changed_after_setter",
-                                       stage="readback")
-                    elif new_value_observed(change, observed):
-                        outcome.update(state="applied", reason="readback_matches")
-                    elif same_observation(change, observed, change["old_value"]):
-                        outcome.update(state="failed", reason="readback_unchanged")
-                    else:
-                        outcome.update(state="unknown", reason="readback_differs_or_unavailable")
-                except Exception as exc:
-                    outcome.update(state="unknown", **_error_details(exc), stage=stage)
-                self.save(record)
-                if outcome["state"] != "applied":
-                    break
+            # 0.51.0: every setter of one typed model-edit Apply joins one UI
+            # Undo step (owner requirement). Closed after the last setter,
+            # also when the loop stops early; it never changes an outcome.
+            from .undo_group import UndoGroup
+            group = UndoGroup(doc, len(record["changes"]) if plan.get("source_kind") == "typed_model_edit" else 0)
+            try:
+                stopped = self._apply_changes(doc, base, request, record, started, group)
+            finally:
+                report = group.close()
+            if stopped is not None:
+                return stopped
+            if group.requested:
+                record["undo_group"] = report  # Persisted with the final save below.
         record["state"] = "completed" if all(o["state"] == "applied" for o in record["outcomes"]) else "stopped"
         try:
             report_key = "criteria_after" if "criterion_request" in record else "audit_after"
@@ -706,6 +624,109 @@ class RepairExecutor:
                 record["state"] = "verification_failed"
         self.save(record)
         return self.result(record)
+
+    def _apply_changes(self, doc, base, request, record, started, group):
+        """Run the planned setters in order; stop at the first non-applied outcome.
+
+        Returns the early result of an M3 evaluation stop, otherwise None.
+        """
+        for index, change in enumerate(record["changes"]):
+            outcome = record["outcomes"][index]
+            if self.plans.queries.clock() - started >= 20:
+                outcome["reason"] = "execution_time_budget"
+                break
+            # Paired attribute (0.50.0): it follows its applied native
+            # change. An accepted regeneration of the reviewed view is
+            # carried over; the reviewed model, type and old value stay bound.
+            native_index = paired_native_index(record["changes"], index)
+            if native_index is not None:
+                native_change = record["changes"][native_index]
+                if record["outcomes"][native_index].get("state") != "applied":
+                    outcome["reason"] = "paired_native_change_not_applied"
+                    break
+                view = regenerated_view(record["outcomes"][native_index], native_change)
+                if view is not None and change.get("target_view_uuid") == native_change.get("target_view_uuid"):
+                    change = {**copy.deepcopy(change), "target_view_uuid": view}
+                    outcome["effective_target_view_uuid"] = view
+            stage = "pre_set_resolve"
+            try:
+                native_owners = []
+                element = native_repairs.resolve(doc, base, self.plans.queries, change, writable=True, adapter_owners=native_owners)
+                stage = "pre_set_read"
+                old = native_repairs.read(base, self.plans.queries, element, change)
+                if native_index is not None and new_value_observed(change, old):
+                    # The native write already set the same-named attribute
+                    # (observed mirror). Confirm on every representation;
+                    # no attribute setter runs.
+                    stage = "paired_readback"
+                    resolution = {}
+                    observed = native_repairs.observe(doc, base, self.plans.queries, change, resolution)
+                    if resolution:
+                        outcome["representation_consensus"] = resolution
+                    outcome["readback"] = observed
+                    if new_value_observed(change, observed):
+                        outcome.update(state="applied", reason="paired_attribute_already_set_by_native_write",
+                                       setter_calls_started=0)
+                        self.save(record)
+                        continue
+                    outcome.update(state="conflict", reason="paired_attribute_readback_disagrees")
+                    break
+                if not same_observation(change, old, change["old_value"]):
+                    outcome.update(state="conflict", reason="old_value_changed", readback=old)
+                    break
+                if self.plans.queries.clock() - started >= 20:
+                    outcome["reason"] = "execution_time_budget"
+                    break
+            except Exception as exc:
+                outcome.update(state="conflict", **_error_details(exc), stage=stage)
+                break
+            outcome.update(state="unknown", reason="setter_may_have_run")
+            self.save(record)  # Write-ahead marker: a crash cannot authorize replay.
+            stage = "setter"
+            try:
+                group.before_setter()
+                if change.get("operation") in {"delete_element", "set_native_material",
+                                               "set_native_calculation_mode"}:
+                    def write_budget():
+                        if self.plans.queries.clock() - started >= 20:
+                            raise BridgeError("scan_limit_exceeded", "Native mutation preflight exceeded execution budget.", 409)
+                    extra = {}
+                    if (change.get("resource") or {}).get("exact_target_binding") is not None:
+                        from .property_probe import NativeProbeTrace
+                        extra["trace"] = NativeProbeTrace(self.plans.trace_path, "exact_material_pre_setter")
+                    native_repairs.write(base, element, change, doc=doc, check=write_budget, **extra)
+                else:
+                    native_repairs.write(base, element, change)
+                if index == 0 and request.get("evaluation_stop"):
+                    # Leave the actual durable write-ahead marker unchanged. No
+                    # readback, final save, second setter or fabricated failure.
+                    # Exact-ID replay and Recover use the normal journal route.
+                    return self.result(record)
+                # Never trust returned/stale adapters or setter return values as success.
+                stage = "fresh_resolve"
+                resolution = {}
+                observed = native_repairs.observe(doc, base, self.plans.queries, change, resolution)
+                stage = "readback"
+                if resolution:
+                    outcome["representation_consensus"] = resolution
+                outcome["readback"] = observed
+                inventory = resolution.get("exact_inventory", {})
+                if inventory.get("status") == "changed" and not inventory.get("accepted"):
+                    # Evidence for read-only recovery, never applied success.
+                    outcome.update(state="unknown", reason="exact_inventory_changed_after_setter",
+                                   stage="readback")
+                elif new_value_observed(change, observed):
+                    outcome.update(state="applied", reason="readback_matches")
+                elif same_observation(change, observed, change["old_value"]):
+                    outcome.update(state="failed", reason="readback_unchanged")
+                else:
+                    outcome.update(state="unknown", reason="readback_differs_or_unavailable")
+            except Exception as exc:
+                outcome.update(state="unknown", **_error_details(exc), stage=stage)
+            self.save(record)
+            if outcome["state"] != "applied":
+                break
+        return None
 
     def _apply_delete_batch(self, doc, base, record, started):
         """One delete command is one native submission for all reviewed roots."""
@@ -902,7 +923,10 @@ class RepairExecutor:
     def result(record, replayed=False):
         return copy.deepcopy({**record, "action": "apply", "read_only": replayed,
                               "replayed": replayed, "automatic_retry": False,
-                              "undo": "not_checked; observe native UI Undo on disposable copy; no automatic rollback",
+                              "undo": ("one UI Undo step requested for every setter of this Apply (undo_group); "
+                                       "not_checked natively; count the UI Undo steps; no automatic rollback"
+                                       if (record.get("undo_group") or {}).get("status") == "created" else
+                                       "not_checked; observe native UI Undo on disposable copy; no automatic rollback"),
                               "allplan_acceptance": "not_run", "runtime_verified": False,
                               "report_text": "Repair execution " + record["state"] + ": " +
                               ", ".join(o["state"] for o in record["outcomes"]) + ". No automatic rollback or retry."})

@@ -4,7 +4,7 @@ from __future__ import annotations
 from .component_ownership import (ComponentReadError, failure, identity, model_identity_key,
                                   observe, same_model_identity)
 from .model_context import boolean, guid, integer
-from .native_readers import COMPONENT_TYPES
+from .native_readers import COMPONENT_TYPES, OPENING_TYPES
 from .query_contracts import fingerprint
 from .transport import BridgeError
 
@@ -73,7 +73,7 @@ def blocker(evidence):
             or not isinstance(value.get("descendants"), list) or len(value["descendants"]) > 255):
         return "delete_ownership_unavailable"
     lineage = value.get("lineage")
-    opening_owner = (value["target"].get("type_name") == "WindowDoor_TypeUUID"
+    opening_owner = (value["target"].get("type_name") in OPENING_TYPES
                      and isinstance(lineage, list) and len(lineage) == 2 and lineage[0] == value["target"]
                      and lineage[1].get("type_name") == "Wall_TypeUUID" and value.get("terminal_root") == lineage[1])
     if not opening_owner and (lineage != [value["target"]] or value.get("terminal_root") != value["target"]):

@@ -12,10 +12,15 @@ FAMILY_TYPES = {
     "wall": {"Wall_TypeUUID"},
     "slab": {"Slab_TypeUUID", "MultiSlab_TypeUUID"},
     "beam": {"Beam_TypeUUID", "SkeletonBeam_TypeUUID"},
-    # The SDK exposes one WindowDoor adapter for both openings. Keep it
-    # explicitly classified as opening until a documented discriminator exists.
-    "opening": {"WindowDoor_TypeUUID"},
+    # The SDK documents one WindowDoor adapter for both openings. Allplan
+    # 2026.1 projects report the openings as Door_TypeUUID ("Otwór
+    # drzwiowy") and Window_TypeUUID ("Otwór okienny"), each owned by its
+    # Wall (0.49.0-0.50.1 trial queries); 0.51.0 classifies those too.
+    "opening": {"WindowDoor_TypeUUID", "Door_TypeUUID", "Window_TypeUUID"},
 }
+# Exact adapter type names whose name alone gives the opening kind.
+OPENING_KIND_BY_TYPE = {"Door_TypeUUID": "door", "Window_TypeUUID": "window"}
+OPENING_TYPES = frozenset(FAMILY_TYPES["opening"])
 TYPE_FAMILIES = {name: family for family, names in FAMILY_TYPES.items() for name in names}
 COMPONENT_TYPES = set(TYPE_FAMILIES)
 

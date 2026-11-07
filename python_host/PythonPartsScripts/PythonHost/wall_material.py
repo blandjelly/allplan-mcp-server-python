@@ -684,17 +684,16 @@ def read(base, element, change, check=lambda: None, *, preservation=True,
                 if accepted is not None:
                     accepted.update(report, accepted=REGENERATED_CHILDREN_ACCEPTANCE)
                 return value
-        if not material:
-            report["identity_diff"] = identity_diff(expected, state)
-            # 0.50.0: CalculationMode accepts only a renaming of the families'
-            # observed regenerated identities (0.49.0 trial); every other
-            # byte of the bound evidence must be equal after that renaming.
-            regeneration = (identity_regeneration(change["native_type"], field, expected, state)
-                            if post_setter else None)
-            if regeneration is not None:
-                if accepted is not None:
-                    accepted.update(report, accepted=IDENTITY_REGENERATION_ACCEPTANCE, **regeneration)
-                return value
+        report["identity_diff"] = identity_diff(expected, state)
+        # 0.50.0 (CalculationMode), 0.51.0 (Material): accept only a renaming
+        # of the family's observed regenerated identities; every other byte
+        # of the bound evidence must be equal after that renaming.
+        regeneration = (identity_regeneration(change["native_type"], field, expected, state)
+                        if post_setter else None)
+        if regeneration is not None:
+            if accepted is not None:
+                accepted.update(report, accepted=IDENTITY_REGENERATION_ACCEPTANCE, **regeneration)
+            return value
         # The Wall-specific reason predates Beam/Column/Slab support; keep it
         # for Walls so earlier journals and reports read the same.
         if not material:
@@ -707,15 +706,14 @@ def read(base, element, change, check=lambda: None, *, preservation=True,
     return value
 
 
-def mirror_crosscheck(base, element, change):
-    """Read the candidate attribute mirror of a CalculationMode change (no setter).
+def mirror_crosscheck(base, element, change, ident=CALCULATION_MODE_MIRROR_ATTRIBUTE):
+    """Read the candidate attribute mirror of a native property (no setter).
 
     Reported next to the native readback, never folded into it: a diverging
-    attribute 120 decides the mirror question for the owner and is not
-    accepted automatically in either direction.
+    attribute 120 (or 508 beside native Material, 0.51.0) is review evidence
+    and is not accepted automatically in either direction.
     """
     from .native_model_edit import attribute_fields
-    ident = CALCULATION_MODE_MIRROR_ATTRIBUTE
     observation = attribute_fields(element, base, [ident], "all_and_computable")[f"attribute:{ident}"]
     return {"attribute_id": ident, "observation": observation}
 
@@ -882,35 +880,44 @@ def regenerated_auxiliary_children(native_type, expected, current):
 
 IDENTITY_REGENERATION_ACCEPTANCE = "identities_regenerated_evidence_otherwise_equal"
 
-# Identities that ModifyElements replaced after a native CalculationMode
-# setter in the 0.49.0 trial (2026-11-07), per family, with the owner's UI
-# check and UI Undo restoring the original value:
-# - Column: the AttributeContainer child and the reviewed root view
-#   (cc752bda… -> 8f88036e…, restored by UI Undo); model UUID unchanged.
-# - Beam: the AttributeContainer and WallAxis children (as for Material).
-# - Wall: root/tier attribute containers, hierarchy and auxiliary sections
-#   changed; the WallAxis/WallAxisLine of the tier are the Wall's auxiliary
-#   children. Only these types may be renamed.
-# - Wall with a door (0.50.0 trial, execution bd30912a…, 2026-11-07): the
-#   setter also regenerated the Door and its DoorSill (model and view UUIDs)
-#   next to the root and door-tier AttributeContainers; the DoorTier and
-#   DoorReveal kept their identities and geometry streams. The bound evidence
-#   with exactly these four UUID pairs renamed hashed to the post-setter
-#   evidence, and UI Undo restored the preflight evidence byte for byte.
-#   Windows and other openings are not observed and stay `unknown`.
-IDENTITY_REGENERATION = {
-    ("CalculationMode", "Column_TypeUUID"): {"children": frozenset({"AttributeContainer_TypeUUID"}),
-                                             "root_view": True},
-    ("CalculationMode", "Beam_TypeUUID"): {"children": frozenset({"AttributeContainer_TypeUUID",
-                                                                  "WallAxis_TypeUUID"}),
-                                           "root_view": False},
-    ("CalculationMode", "Wall_TypeUUID"): {"children": frozenset({"AttributeContainer_TypeUUID",
-                                                                  "WallAxis_TypeUUID",
-                                                                  "WallAxisLine_TypeUUID",
-                                                                  "Door_TypeUUID",
-                                                                  "DoorSill_TypeUUID"}),
-                                           "root_view": False},
+# Identities that ModifyElements replaced after a native property setter,
+# per family. The renaming is a property of the family's ModifyElements, not
+# of the written field: the same sets appear for both bound native fields.
+# - Column (CalculationMode, 0.49.0/0.50.0): the AttributeContainer child and
+#   the reviewed root view (cc752bda… -> 8f88036e…, restored by UI Undo);
+#   model UUID unchanged.
+# - Beam: the AttributeContainer and WallAxis children (CalculationMode
+#   0.50.0; the same pair as the Beam Material regeneration of 0.44.1/0.44.2).
+# - Wall: root/tier attribute containers and the tier's WallAxis/WallAxisLine
+#   (CalculationMode 0.50.0, Wall 240).
+# - Wall with a door (CalculationMode 0.50.0, execution bd30912a…): also the
+#   Door and its DoorSill; the DoorTier and DoorReveal kept their identities
+#   and geometry streams. The bound evidence with exactly these four UUID
+#   pairs renamed hashed to the post-setter evidence, and UI Undo restored the
+#   preflight evidence byte for byte.
+# - Wall Material (0.50.1 trial, executions 9ed2e229… on Wall 240 and
+#   37196703… on the Wall with door): the native value was reached (owner UI
+#   check, UI Undo) and the changed sections were exactly those of the
+#   accepted CalculationMode renamings of the same walls; 0.50.1 did not log
+#   the Material identity_diff, so 0.51.0 applies the same rule to Material.
+# - Wall with a window (0.51.0, not yet observed natively): by analogy with
+#   the door, the Window, its Sill and the WindowOpeningSmartPart (child of
+#   the WindowReveal, 0.50.1 query) may be renamed; the WindowTier and
+#   WindowReveal must keep their identities.
+# Column Material uses the Column rule (not yet observed natively). Every
+# other byte of the bound evidence must be equal after the renaming, so an
+# unlisted or wrong regeneration stays `unknown` with identity_diff.
+_WALL_REGENERATED = frozenset({"AttributeContainer_TypeUUID", "WallAxis_TypeUUID", "WallAxisLine_TypeUUID",
+                               "Door_TypeUUID", "DoorSill_TypeUUID",
+                               "Window_TypeUUID", "Sill_TypeUUID", "WindowOpeningSmartPart_TypeUUID"})
+_FAMILY_REGENERATION = {
+    "Column_TypeUUID": {"children": frozenset({"AttributeContainer_TypeUUID"}), "root_view": True},
+    "Beam_TypeUUID": {"children": frozenset({"AttributeContainer_TypeUUID", "WallAxis_TypeUUID"}),
+                      "root_view": False},
+    "Wall_TypeUUID": {"children": _WALL_REGENERATED, "root_view": False},
 }
+IDENTITY_REGENERATION = {(field, family): rule for family, rule in _FAMILY_REGENERATION.items()
+                         for field in ("CalculationMode", "Material")}
 _MAX_IDENTITY_REFS = 4096
 _MAX_REGENERATED_PER_TYPE = 4
 _MAX_PAIRINGS = 64
