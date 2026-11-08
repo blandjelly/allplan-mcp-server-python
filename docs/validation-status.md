@@ -3,7 +3,7 @@
 Current version and next action: [handoff](next-model-handoff.md).
 Remaining development and unresolved errors:
 [development plan](development-plan.md).
-Current installed version **0.50.1** (PR #65) and its native trial (2026-11-07) are
+Current installed version **0.51.1** (PR #67) and its native trial (2026-11-08) are
 summarized in the [handoff](next-model-handoff.md); per-pair status is in the [coverage matrix](m4-coverage-matrix.md); this
 file retains older evidence. **0.42.0** (exact Slab child target) was merged through
 [PR #48](https://github.com/blandjelly/allplan-mcp-server-python/pull/48); its
@@ -258,7 +258,7 @@ native acceptance. The retained evidence is scoped as follows.
 | Operation / declared owner | Retained native evidence | Missing evidence or scope limit |
 | --- | --- | --- |
 | Layer, Column | 0.30.0 no-op is specifically reported for Column/W1. | Exact refs and raw preview/revalidation showing zero setters and no Apply are absent. No changed Column layer write/Undo trial is identified. |
-| Layer, Wall | A 20 cm Wall was reported moved to `Ogólne03` (ID 3702) in 0.27.0; no raw request or restoration result is retained. W1 generic read/write report does not identify this Wall. | Exact identity, fresh owner-bound readback/Undo and restoration are absent; no proof for tier-aware `set_wall_layer` route. |
+| Layer, Wall | 0.51.1 (2026-11-08, [evidence](test-results/evidence/0.51.1-2026-11-08/evidence-20261108.jsonl)): Wall 200 `545bb0a2…` 65535→3701 `SZ_OGÓ02` through `set_wall_layer` (root + tier, `b3e8d1f4…`), fresh readback, owner UI check, one UI Undo, read 65535. Earlier: a 20 cm Wall reported moved to `Ogólne03` in 0.27.0 without raw evidence. | One single-tier Wall only; multi-tier Walls and grouped Undo are not observed. |
 | Layer, “Beam” report (type unknown) | 0.27.0 reports two elements described generically as “belki” moved to W1 with readback; their adapter type is not recorded. | Do not attribute this to `Beam_TypeUUID` without exact type evidence. Exact refs, owner, Undo and restoration are absent. |
 | Layer, SkeletonBeam | No SkeletonBeam-specific W1/layer trial is identified. | Pair-specific trial, readback, Undo and restoration are missing; the generic “belki” report does not prove this family. |
 | Layer, Slab | No Slab-specific layer trial is identified. | For a standalone root, fixture availability is not established and pair-specific trial/Undo are missing. A parented Slab child is blocked by the current owner contract for layer writes. |
@@ -272,7 +272,7 @@ native acceptance. The retained evidence is scoped as follows.
 | Delete, Slab root | No Slab-root delete trial is identified; the observed Slab was a MultiSlab child. | Standalone Slab fixture availability is not established by the bounded comparison; no root deletion, absence readback or Undo/restoration evidence. |
 | Delete, parented Slab child | This combination is blocked by the owner contract: deletion permits a top-level component root or a directly Wall-owned `WindowDoor`, not a child Slab. | Do not classify the absent child trial as a missing fixture or request an owner trial for this forbidden target shape. |
 | Delete, MultiSlab root | A MultiSlab was present in the 2026-10-27 comparison, but no delete trial is identified. | A disposable test fixture is not established; no subtree absence, neighbor-preservation or Undo/restoration evidence. |
-| Delete, WindowDoor root/opening | Code permits a top-level `WindowDoor` root or a directly Wall-owned opening with complete subtree evidence; no separate opening deletion result is identified. | Fixture availability is not established; no exact opening refs, absence readback or Undo/restoration evidence. |
+| Delete, WindowDoor root/opening | 0.51.1 (2026-11-08): Wall-owned `Window_TypeUUID` `268dec66…` deleted with its 7-adapter subtree (`d5a79c20…`), fresh absence readback, Wall 300 and neighbours kept, owner UI check, one UI Undo restored the window and WindowTier with their identities (other parts inferred from counts). | Door and top-level openings are not observed; disposable fixtures are allowed by the owner (2026-11-08). |
 
 Evidence sources: [0.27.0 observations](test-results/evidence/allplan-chat-log-0.27.0-2026-10-23.md), [0.29.0 Column deletion](test-results/evidence/allplan-test-log-0.29.0-2026-10-23.md), and [0.30.0 typed trials](test-results/evidence/0.30.0-2026-10-23/allplan-attribute-trials-log.md). The current declaration is in [ModelEditPreview](../src/allplan_mcp/model_edit_models.py) and [model_delete](../python_host/PythonPartsScripts/PythonHost/model_delete.py).
 

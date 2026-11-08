@@ -168,7 +168,7 @@ class WallMaterialTests(unittest.TestCase):
         self.assertEqual(sorted(p["type_name"] for p in drift["regenerated_identities"]),
                          ["AttributeContainer_TypeUUID", "DoorSill_TypeUUID", "Door_TypeUUID"])
         w.native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
-        self.assertNotIn("undo_group", result)
+        self.assertEqual(result["undo_group"]["status"], "not_requested")
         self.assertIsNone(w.attribute(508))
 
     def test_single_place_native_material_hints_at_a_differing_attribute_508(self):
@@ -346,10 +346,156 @@ class WallWithWindowTests(unittest.TestCase):
         preservation = result["outcomes"][0]["representation_consensus"]["representations"][0]["preservation"]
         residual = preservation["regeneration_residual"]
         self.assertEqual((residual["status"], residual["unpaired_types"]), ("observed", []))
-        row, = residual["paths"]
-        self.assertTrue(row["path"].startswith("/auxiliary_components/root/[Window_TypeUUID|"), row)
-        self.assertTrue(row["path"].endswith("/[WindowReveal_TypeUUID|00000000-0000-4000-8000-000000000051]"
-                                             "/geometry/stream_sha256"), row)
+        # A different shape differs in the exact, shape and structure hashes.
+        self.assertEqual(sorted(row["path"].rsplit("/", 1)[1] for row in residual["paths"]),
+                         ["shape_sha256", "stream_sha256", "structure_sha256"])
+        for row in residual["paths"]:
+            self.assertTrue(row["path"].startswith("/auxiliary_components/root/[Window_TypeUUID|"), row)
+            self.assertIn("/[WindowReveal_TypeUUID|00000000-0000-4000-8000-000000000051]/geometry/", row["path"])
+
+    def reserialize(self, w, keep, tier_stream, reveal_stream, tier_after=None, reveal_after=None, new=None):
+        """Regenerate the Window and re-serialize its kept tier/reveal geometry."""
+        tier, reveal = keep
+        tier.GetModelGeometry.return_value = Polyhedron(tier_stream)
+        reveal.GetModelGeometry.return_value = Polyhedron(reveal_stream)
+        modify = w.native.base.ModifyElements.side_effect
+
+        def regenerate(doc, elements):
+            result = modify(doc, elements)
+            if new is not None:
+                w.attach(*new)
+            tier.GetModelGeometry.return_value = Polyhedron(tier_after or tier_stream)
+            reveal.GetModelGeometry.return_value = Polyhedron(reveal_after or reveal_stream)
+            return result
+
+        w.native.base.ModifyElements.side_effect = regenerate
+
+    def regenerating_window_wall(self):
+        w = WallFixture(self)
+        keep = (w.part(50, "WindowTier_TypeUUID"), w.part(51, "WindowReveal_TypeUUID"))
+        w.tier_lists.append(keep[0])
+        old, new = w.window(60, keep), w.window(70, keep)
+        old_meta, new_meta = w.root_container(80), w.root_container(81)
+        w.same_types([p for p in old if p not in keep] + list(old_meta),
+                     [p for p in new if p not in keep] + list(new_meta))
+        w.attach(old, old_meta)
+        w.old_subtrees = (old, old_meta)
+        return w, keep, (new, new_meta)
+
+    TIER = "Polyhedron3D 8 0.0 0.0 0.0 1010.0 0.0 0.0 1010.0 300.0 0.0 0.0 300.0 1500.0"
+    TIER_NOISE = "Polyhedron3D 8 0.0 -0.0 1e-12 1010.0000000000002 0.0 0.0 1010.0 300.0 0.0 0.0 300.0 1500.0"
+    REVEAL = "Polyhedron3D 4 -12.5 0.0 1010.0 300.0"
+    REVEAL_NOISE = "Polyhedron3D 4 -12.499999999999998 0.0 1010.0 300.00000000000006"
+
+    def test_window_tier_and_reveal_reserialized_within_tolerance_are_accepted(self):
+        # 0.51.1 trial (5008fcbe…, c1395fe6…, 3c5df3d9…): the regenerated
+        # Window left WindowTier/WindowReveal identities but changed their
+        # exact stream hashes, identically for CalculationMode and Material.
+        for change, check in ((PAIRED_MATERIAL, lambda w: (w.wall.material, w.attribute(508))),
+                              ({"target": {"kind": "paired_property", "property": "calculation_mode"},
+                                "value": "m"}, lambda w: w.attribute(120))):
+            with self.subTest(change=change["target"]["property"]):
+                w, keep, new = self.regenerating_window_wall()
+                self.reserialize(w, keep, self.TIER, self.REVEAL, self.TIER_NOISE, self.REVEAL_NOISE, new)
+                plan = w.plan(change)
+                self.assertTrue(plan["apply_available"], plan)
+                state = plan["changes"][0]["resource"][
+                    "native_material_state" if change is PAIRED_MATERIAL else "native_property_state"]
+                window, = state["auxiliary_components"]["root"]
+                geometry = window["children"][0]["geometry"]
+                self.assertEqual(set(geometry), {"status", "stream_sha256", "shape_sha256",
+                                                 "structure_sha256", "numbers"})
+                result = w.native.apply(plan)
+                self.assertEqual(result["state"], "completed", result)
+                self.assertEqual([o["state"] for o in result["outcomes"]], ["applied", "applied"])
+                drift = result["outcomes"][0]["representation_consensus"]["representations"][0][
+                    "accepted_preservation_drift"]
+                self.assertEqual(drift["accepted"], "identities_regenerated_evidence_otherwise_equal")
+                reserialized = drift["reserialized_geometry"]
+                self.assertEqual(reserialized["accepted"], "opening_geometry_reserialized_shape_equal")
+                self.assertEqual([row["type_name"] for row in reserialized["components"]],
+                                 ["WindowReveal_TypeUUID", "WindowTier_TypeUUID"])
+                for row in reserialized["components"]:
+                    self.assertNotEqual(row["before_stream_sha256"], row["after_stream_sha256"])
+                self.assertEqual(result["undo_group"]["setters_in_step"], 2)
+                self.assertEqual(check(w), ("Cegła", "Cegła") if change is PAIRED_MATERIAL else "m")
+
+    def test_opening_geometry_beyond_the_tolerance_or_restructured_stays_unknown(self):
+        for label, tier_after, expected in (
+                ("moved", "Polyhedron3D 8 0.0 0.0 0.0 1010.5 0.0 0.0 1010.0 300.0 0.0 0.0 300.0 1500.0",
+                 ["shape_sha256", "stream_sha256"]),
+                ("reordered", "Polyhedron3D 8 0.0 0.0 0.0 1010.0 0.0 0.0 1010.0 300.0 0.0 0.0 300.0 1500.0 0.0",
+                 ["numbers", "shape_sha256", "stream_sha256", "structure_sha256"])):
+            with self.subTest(label=label):
+                w, keep, new = self.regenerating_window_wall()
+                self.reserialize(w, keep, self.TIER, self.REVEAL, tier_after, self.REVEAL_NOISE, new)
+                execution = uuid4().hex
+                result = w.native.apply(w.plan(PAIRED_MATERIAL), execution)
+                native, attribute = result["outcomes"]
+                self.assertEqual((native["state"], attribute["state"]), ("unknown", "skipped"))
+                residual = native["representation_consensus"]["representations"][0]["preservation"][
+                    "regeneration_residual"]
+                tier_rows = sorted(row["path"].rsplit("/", 1)[1] for row in residual["paths"]
+                                   if "/[WindowTier_TypeUUID|" in row["path"]
+                                   and "/[WindowReveal_TypeUUID|" not in row["path"])
+                self.assertEqual(tier_rows, expected)
+                self.assertTrue(w.native.recover(execution)["write_blocked"])
+                w.native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+
+    def test_reserialized_geometry_without_a_renamed_window_stays_unknown(self):
+        # Only the parts below a regenerated (renamed) Window may re-serialize.
+        w, keep, _ = self.regenerating_window_wall()
+        old_window, old_meta = w.old_subtrees
+        new_meta = w.root_container(82)
+        w.same_types(list(old_meta), list(new_meta))
+        self.reserialize(w, keep, self.TIER, self.REVEAL, self.TIER_NOISE, self.REVEAL_NOISE,
+                         new=(old_window, new_meta))
+        result = w.native.apply(w.plan(PAIRED_MATERIAL))
+        native = result["outcomes"][0]
+        self.assertEqual(native["state"], "unknown", result)
+        preservation = native["representation_consensus"]["representations"][0]["preservation"]
+        self.assertEqual([item.split("|")[0] for item in preservation["identity_diff"]["removed"]["items"]],
+                         ["AttributeContainer_TypeUUID"])
+        self.assertTrue(any(row["path"].endswith("/geometry/stream_sha256")
+                            for row in preservation["regeneration_residual"]["paths"]))
+
+    def test_door_parts_do_not_get_the_window_geometry_tolerance(self):
+        w = WallFixture(self)
+        door_tier, reveal = w.part(60, "DoorTier_TypeUUID"), w.part(61, "DoorReveal_TypeUUID")
+
+        def door(ident):
+            opening = w.part(ident, "Door_TypeUUID")
+            sill = w.part(ident + 1, "DoorSill_TypeUUID")
+            return [opening, sill], {opening: w.root, door_tier: opening, sill: door_tier, reveal: door_tier}
+
+        old_parts, old = door(70)
+        new_parts, new = door(80)
+        w.same_types(old_parts, new_parts)
+        w.attach(old)
+        self.reserialize(w, (door_tier, reveal), self.TIER, self.REVEAL, self.TIER_NOISE, self.REVEAL_NOISE,
+                         new=(new,))
+        result = w.native.apply(w.plan(PAIRED_MATERIAL))
+        native = result["outcomes"][0]
+        self.assertEqual(native["state"], "unknown", result)
+        residual = native["representation_consensus"]["representations"][0]["preservation"]["regeneration_residual"]
+        self.assertTrue(residual["paths"], residual)
+        self.assertTrue(all("/geometry/stream_sha256" in row["path"] for row in residual["paths"]), residual)
+
+
+class GeometryShapeTests(unittest.TestCase):
+    def test_shape_ignores_numeric_noise_and_structure_ignores_numbers(self):
+        import importlib
+        w = WallFixture(self)
+        geometry_shape = importlib.import_module(w.native.module.__package__ + ".wall_material").geometry_shape
+        exact = geometry_shape("P 2 0.0 1010.0 300.0")
+        noise = geometry_shape("P 2 -0.0 1010.0000000000002 3.0e2")
+        moved = geometry_shape("P 2 0.0 1010.5 300.0")
+        longer = geometry_shape("P 2 0.0 1010.0 300.0 1")
+        self.assertEqual(exact, noise)
+        self.assertEqual(exact["numbers"], 4)
+        self.assertNotEqual(exact["shape_sha256"], moved["shape_sha256"])
+        self.assertEqual(exact["structure_sha256"], moved["structure_sha256"])
+        self.assertNotEqual(exact["structure_sha256"], longer["structure_sha256"])
 
 
 if __name__ == "__main__":

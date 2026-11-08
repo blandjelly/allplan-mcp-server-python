@@ -10,7 +10,7 @@ PROBE_SCHEMA = "m4-property-probe-1"
 
 
 def validate_probe(request):
-    keys(request, {"schema_version", "phase", "drawing_file", "attribute_name", "attribute_id", "layer_short_name",
+    keys(request, {"schema_version", "phase", "drawing_file", "attribute_name", "attribute_id", "layer_short_name", "layer_id",
                    "layer_name", "offset", "limit", "candidate_ids",
                    "model_uuid", "view_uuid", "name_contains", "attribute_ids", "include_parent", "parent_ref"},
          {"schema_version", "phase"})
@@ -89,12 +89,16 @@ def validate_probe(request):
     required = {"column_sample": "drawing_file", "attribute_name": "attribute_name",
                 "attribute_definition": "attribute_id"}.get(request["phase"] if isinstance(request["phase"], str) else "")
     if request["phase"] == "layer_name":
-        keys(request, {"schema_version", "phase", "layer_short_name", "layer_name"},
+        keys(request, {"schema_version", "phase", "layer_short_name", "layer_name", "layer_id"},
              {"schema_version", "phase"})
-        has_short, has_name = "layer_short_name" in request, "layer_name" in request
-        if has_short == has_name:
-            invalid("Provide exactly one of layer_short_name or layer_name.")
-        field = "layer_short_name" if has_short else "layer_name"
+        given = [field for field in ("layer_short_name", "layer_name", "layer_id") if field in request]
+        if len(given) != 1:
+            invalid("Provide exactly one of layer_short_name, layer_name or layer_id.")
+        if given[0] == "layer_id":
+            bounded_int(request["layer_id"], 0, 65535, "layer_id")
+            return
+        has_short = given[0] == "layer_short_name"
+        field = given[0]
         names([request[field]], 1, 16 if has_short else 128, field)
         return
     if required is None:

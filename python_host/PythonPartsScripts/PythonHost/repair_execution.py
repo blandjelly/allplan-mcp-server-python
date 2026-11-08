@@ -588,8 +588,13 @@ class RepairExecutor:
         self.save(record)
         self.plans.invalidate_for_execution()
         self.plans.queries.selections.clear()
+        typed = plan.get("source_kind") == "typed_model_edit"
         if all(change.get("operation") == "delete_element" for change in record["changes"]):
             self._apply_delete_batch(doc, base, record, started)
+            if typed:
+                # 0.51.2: reported on every typed Apply (0.51.1 trial asked
+                # why the field was missing); one native DeleteElements call.
+                record["undo_group"] = {"status": "not_requested", "reason": "single_native_delete_call"}
         else:
             # 0.51.0: every setter of one typed model-edit Apply joins one UI
             # Undo step (owner requirement). Closed after the last setter,
@@ -602,8 +607,10 @@ class RepairExecutor:
                 report = group.close()
             if stopped is not None:
                 return stopped
-            if group.requested:
-                record["undo_group"] = report  # Persisted with the final save below.
+            if group.requested or typed:
+                # Persisted with the final save below; a single-change plan
+                # reports not_requested/single_change_plan (0.51.2).
+                record["undo_group"] = report
         record["state"] = "completed" if all(o["state"] == "applied" for o in record["outcomes"]) else "stopped"
         try:
             report_key = "criteria_after" if "criterion_request" in record else "audit_after"
@@ -926,6 +933,9 @@ class RepairExecutor:
                               "undo": ("one UI Undo step requested for every setter of this Apply (undo_group); "
                                        "not_checked natively; count the UI Undo steps; no automatic rollback"
                                        if (record.get("undo_group") or {}).get("status") == "created" else
+                                       "one setter call (undo_group not_requested): expected as one UI Undo step; "
+                                       "not_checked natively; no automatic rollback"
+                                       if (record.get("undo_group") or {}).get("status") == "not_requested" else
                                        "not_checked; observe native UI Undo on disposable copy; no automatic rollback"),
                               "allplan_acceptance": "not_run", "runtime_verified": False,
                               "report_text": "Repair execution " + record["state"] + ": " +

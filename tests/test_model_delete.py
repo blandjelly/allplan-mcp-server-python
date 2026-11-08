@@ -239,6 +239,7 @@ class ModelDeleteTests(unittest.TestCase):
         self.assertEqual([item["state"] for item in result["outcomes"]], ["applied"] * 3)
         self.assertEqual(result["native_delete_batch"]["submission"], "returned")
         self.assertEqual(result["native_delete_batch"]["target_count"], 3)
+        self.assertEqual(result["undo_group"], {"status": "not_requested", "reason": "single_native_delete_call"})
         self.assertEqual([id(item) for item in submitted], [id(item) for item in targets])
         self.assertFalse(peer.IsDeleted.return_value)
         self.base.DeleteElements.assert_called_once()

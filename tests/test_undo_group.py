@@ -86,8 +86,9 @@ class UndoGroupTests(unittest.TestCase):
         self.assertEqual(result["state"], "completed", result)
         self.assertEqual(calls, ["ChangeAttributes"])
         service_type.assert_not_called()
-        self.assertNotIn("undo_group", result)
-        self.assertTrue(result["undo"].startswith("not_checked"))
+        # 0.51.2: every typed Apply reports undo_group (0.51.1 trial).
+        self.assertEqual(result["undo_group"], {"status": "not_requested", "reason": "single_change_plan"})
+        self.assertTrue(result["undo"].startswith("one setter call"))
 
     def test_step_is_closed_after_an_unknown_native_outcome(self):
         f = self.family(mirror=False, children=("AttributeContainer_TypeUUID",),

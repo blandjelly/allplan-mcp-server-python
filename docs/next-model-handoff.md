@@ -1,91 +1,160 @@
 # Current M4 handoff
 
-## Next task — native trial of candidate 0.51.1 (plan items 2a, 5 and 8)
+## Next task — native trial of candidate 0.51.2 (plan items 2a, 4 and 7)
 
-Start after the owner has merged the 0.51.1 PR with green full CI and
-installed it (health: bridge 0.51.1, the merged source commit,
-`sha256-verified`). Drawing 101, Wall 300 with window `f4da72fe…` only,
-plain-language requests, one Apply per step, UI check of both places
-("Obmiar"/material in the element dialog and "Rodzaj rozliczenia"/"Materiał"
-in the attributes palette), UI Undo counting the steps, then a fresh
-`material_comparison` with `attribute_ids` [120] (508 is not stored there, so
-`evidence_complete=false` is expected). Do not retry an `unknown` outcome;
-recover read-only with the original execution ID and record
-`preservation.identity_diff` and `preservation.regeneration_residual`.
+Start after the owner has merged the 0.51.2 PR with green full CI and
+installed it (health: bridge 0.51.2, the merged source commit,
+`sha256-verified`). Drawing 101, one Apply per step, plain-language
+requests, UI check of both places and one UI Undo per Apply, then a fresh
+read. Do not retry an `unknown` outcome; recover read-only with the original
+execution ID and record `preservation.identity_diff`,
+`preservation.regeneration_residual` and, when accepted,
+`accepted_preservation_drift.reserialized_geometry`.
 
-Current state (fresh reads at the end of the 0.51.0 trial, 2026-11-07):
-Wall 300 with window `f4da72fe…` (view `a76b11f4…`): Material `TEST1`, native
-CalculationMode 0, attribute 120 `m3`, 508 not stored. Wall 240 `06d71e4d…`
-and the Wall 200 with door `545bb0a2…` were UI-undone after PASS writes
-(expected: Wall 240 `TEST`/508 `Silikat`, 0/`m`; Wall 200 `TEST1`, 0/`m3`).
+Current state (fresh reads at the end of the 0.51.1 trial, 2026-11-08, all
+writes UI-undone): Wall 300 with window `f4da72fe…` Material `TEST1`, native
+CalculationMode 0, attribute 120 `m3`, 508 not stored, window `268dec66…`
+restored with its original identities; Wall 240 `06d71e4d…` 1371 = 0,
+1442 = 1, 230 = 1; Wall 200 with door `545bb0a2…` layer 65535; Column
+`eb88c850…` `TEST1`/508 `TEST1`, view `cc752bda…`; Beam `7cc9ac55…` 0/`m3`;
+MultiSlab `bf097d95…` 110 = 200, 981 `<niezdefiniowany>`, 508 `TEST1`;
+slab tier `8a693925…` 508 `TEST2`.
 
-1. **Read-only first:** a preview of the step-2 request; its
-   `resource.native_property_state` must have no `partial_preservation` and
-   `tier_hierarchy.shared_children` with the WindowTier (parent: Window).
-2. **Paired calculation mode → `m`** ("zmień calculation mode dla ściany
-   300 mm na m"): expect native 0→2 `applied` with
-   `identities_regenerated_evidence_otherwise_equal` (Window, Sill,
-   2 × AttributeContainer renamed, as observed in 0.51.0), attribute 120
-   `m3`→`m` `applied`, `undo_group` `setters_in_step=2`; one UI Undo
-   restores 0/`m3`.
-3. **Paired material → `Cegła`**: native only (`attribute_follows_native`),
-   expect `applied` with the same renaming; both UI places `Cegła`; one UI
-   Undo.
-4. If either stays `unknown`, the result names the residual paths; record
-   them and recover read-only. Optional (plan item 8): `component_identity`
-   on the window Wall's WallTier now reports `shared_children`; deleting the
-   window only if the owner wants that destructive check.
+1. **Window Wall, paired calculation mode → `m`** ("zmień calculation mode
+   dla ściany 300 mm na m", exclude the Walls 240 and 200): expect native
+   0→2 `applied` with `identities_regenerated_evidence_otherwise_equal`
+   (Window, Sill, WallAxis, 3 × AttributeContainer renamed) and
+   `reserialized_geometry` naming WindowTier and WindowReveal, attribute 120
+   `m3`→`m` `applied`, `undo_group` `created`, `setters_in_step=2`; highlight
+   `counts.matched=1`. UI: "Obmiar" and "Rodzaj rozliczenia" = `m`; one UI
+   Undo restores 0/`m3`.
+2. **Window Wall, paired material → `Cegła`**: native only
+   (`attribute_follows_native`), expect `applied` with the same renaming and
+   `reserialized_geometry`; both UI places `Cegła`; one UI Undo; read `TEST1`.
+3. If 1 or 2 stays `unknown`: the residual now lists `stream_sha256`,
+   `shape_sha256`, `structure_sha256` and `numbers` separately. Record which
+   differ (equal structure + different shape = numbers changed beyond 1e-4;
+   different structure = a different serialization) and recover read-only.
+4. **Read-only checks of the 0.51.2 fixes:** a preview of "zmień TYLKO
+   atrybut Rodzaj rozliczenia podciągu na m" must be blocked
+   (`attribute_write_also_changes_native_property`, `paired_route`); a
+   preview of attribute 1442 = 2 on the Wall 240 must fail with
+   `attribute_value_out_of_range`; `model_property_probe` `layer_name` with
+   `layer_id` 3700 must return `SZ_OGÓ01` and a `confirmed_target`.
+5. Optional (plan item 4, owner labels from 2026-11-08): Column attribute 49
+   `Status` to a confirmed label (for example `Nowo projektowane`) with the
+   enum round trip, UI and one UI Undo; Beam Integer/Real from the B2
+   discovery list.
 
 Closure: the window Wall `applied` for both paired properties with UI check
-and one UI Undo. Then plan item 3's explicit layer write or item 4. Do not
-repeat: the 0.51.0 writes on the Wall 240 and the Wall with door (PASS), the
-0.50.1/0.50.0/0.49.0 writes, the 0.48.0 reads, the MultiSlab attribute
-508/120 writes, the exact parent-edge tier 508 write (0.47.0), the Beam native
-Material write (PASS 0.46.0), the native Slab Material Apply (0.43.0) or the
-0.40.0–0.45.0 probes.
+and one UI Undo (plan item 2a). Do not repeat: the 0.51.1 PASS writes (slab
+tier `1a019448…`, Wall 1442/230/1371, MultiSlab 110/981, Column paired
+material `7c1e4a92…`, Wall 200 layer `b3e8d1f4…`, window delete
+`d5a79c20…`, Beam 120 `8cc1e687…`), the 0.51.0 writes on the Wall 240 and
+the Wall with door, the 0.50.1/0.50.0/0.49.0 writes, the 0.48.0 reads, the
+MultiSlab attribute 508/120 writes, the Beam native Material write (PASS
+0.46.0), the native Slab Material Apply (0.43.0) or the 0.40.0–0.45.0 probes.
 
-## Candidate 0.51.1
+## Candidate 0.51.2
 
-Branch `claude/m4-0511-window-wall-evidence` (PR to `develop/m4`, link in
-the PR list; the owner checks the tested commit). Fixes the 0.51.0 trial
-finding ([contract](m4-editing-api.md#shared-opening-tier-and-regeneration-residual-0511-contract)):
+Branch `claude/m4-0512-window-geometry-trial-fixes` (PR to `develop/m4`,
+link in the PR list; the owner checks the tested commit). Fixes the 0.51.1
+trial findings ([contract](m4-editing-api.md#opening-geometry-tolerance-and-trial-fixes-0512-contract)):
 
-- **Window Wall evidence:** the WallTier's WindowTier (parent: Window) is a
-  bound `shared_children` edge instead of `component_child_owner_mismatch`,
-  so the Wall snapshot is complete and order-independent rather than
-  `partial_preservation` (reproduced with SDK doubles: regenerated parts
-  enumerated after the WallTier changed the partial snapshot). Any other
-  foreign parent still fails closed. `component_identity` uses the same rule.
-- **`regeneration_residual`:** an unaccepted post-setter renaming lists up to
-  8 evidence paths that still differ after renaming (review evidence only).
-- Renaming rule, byte-equality, unknown outcomes, journals and recovery are
-  unchanged.
-- Focused local checks (Linux): 445 tests in 24 affected/dependent modules PASS
-  (`unittest`). Full CI and native acceptance are not run.
+- **Window geometry re-serialization:** geometry evidence adds
+  `shape_sha256` (numbers rounded to 4 decimals), `structure_sha256`
+  (numbers replaced) and `numbers`. On a Wall, the WindowTier and
+  WindowReveal below a renamed Window may differ in the exact stream hash
+  when shape, structure and count are equal; every other byte must still be
+  equal after renaming. The residual picks the pairing with the fewest
+  differing paths.
+- **Beam attribute 120 alone** is blocked
+  (`attribute_write_also_changes_native_property`) with a `paired_route`.
+- **CheckBox Integer** attributes accept only 0/1 (`attribute_value_out_of_range`).
+- **Plan highlight counts** report the reviewed targets as `matched`
+  (`scope_elements` = scanned peers, `count_kind=reviewed_plan_targets`).
+- **Layer probe:** `layer_name` accepts `layer_id`; `layer_catalog`
+  `candidate_ids` of another name fail with `layer_candidate_mismatch`
+  instead of `host_error`.
+- **`undo_group`** is reported on every typed Apply (`not_requested` with
+  `single_change_plan` or `single_native_delete_call`).
+- Unchanged: renaming types, journals, recovery, unknown outcomes, write
+  guards and the plan TTL.
+- Focused local checks (Linux): 517 tests in 30 affected/dependent modules
+  PASS, plus `test_package`/`test_ci_policy` (32) and the version check
+  (`pyproject`, `uv.lock`, `__version__` = 0.51.2). Full CI and native
+  acceptance are not run.
 
 ## Installed version and last native evidence
 
-**0.51.0** (source `f7ee761`, merged as PR #66 / `d46c5a2`) is installed;
-health reports bridge 0.51.0, source
-`f7ee761cf7902c719098523ed3e0afcd400cd276`, `sha256-verified`, Allplan 2026.1
-(executable 16.1617.8659.814).
+**0.51.1** (source `0fdc2a8`, merged as PR #67 / `c3fc7b9`) is installed;
+health reports bridge 0.51.1, source
+`0fdc2a8e9c4294c6efb867add3f8f07e8493913c`, `sha256-verified`, Allplan
+2026.1.
 
-**Native trial 2026-11-07 — one UI Undo per Apply and Wall Material PASS; window Wall `unknown`**
-([raw evidence](test-results/evidence/0.51.0-2026-11-07/evidence-20261107.jsonl),
-table in the [API note](m4-editing-api.md#native-observations-0510-trial-2026-11-07)).
-Owner results: tests 1–3 PASS, test 4 `unknown` with correct native values.
+**Native trial 2026-11-08 — window Wall `unknown`; attribute types, slab
+tier, Column Material, Wall layer and window delete PASS**
+([raw evidence](test-results/evidence/0.51.1-2026-11-08/evidence-20261108.jsonl),
+[test card with the owner's results](test-results/evidence/0.51.1-2026-11-08/test-card.md),
+table in the [API note](m4-editing-api.md#native-observations-0511-trial-2026-11-08),
+per-pair status in the [coverage matrix](m4-coverage-matrix.md)).
 
-- Wall 200 with door paired calculation mode `m` (`6e6c83d2…`): `completed`,
-  both setters in one `undo_group`; **one UI Undo** restored both places.
-- Wall 240 paired material `Cegła` (`c6183d71…`): native + 508 `applied`
-  (2 × AttributeContainer, WallAxis renamed); one UI Undo.
-- Wall 200 with door paired material (`9109d250…`): native only (508 follows),
-  `applied` (Door, DoorSill, 2 × AttributeContainer renamed); one UI Undo.
-- Wall 300 with window: calculation mode (`a47dca16…`) and material
-  (`5346fd71…`) reached the value (native 2 with attribute 120 still `m3`;
-  `Cegła`) but stayed `unknown` on partial evidence with exactly Window, Sill
-  and 2 × AttributeContainer renamed; the attribute 120 setter was skipped.
-  Fixed in 0.51.1.
+- **Window Wall (blocking, item 2a):** A1 preview had complete evidence
+  (`shared_children` WindowTier, no `partial_preservation`). Three Applies
+  reached the native value and stayed `unknown`: paired calculation mode
+  `5008fcbe…` (plan `7a76ed98…`, the A1 plan; not in the card table) and
+  `c1395fe6…`, paired material `3c5df3d9…`. Renamed: Window, Sill,
+  WallAxis, 3 × AttributeContainer. The only residual besides pairing noise:
+  the exact geometry stream hashes of WindowTier `360e85e2…` and
+  WindowReveal `8ad3fe60…` (identities kept), identical before/after hashes
+  in all three writes; UI Undo restored them. Attribute 120 was skipped; in
+  A3 the owner saw `Cegła` in both places. All three reconciled. Fixed in
+  0.51.2 (tolerance evidence, not yet observed).
+- **PASS (one Apply, UI, one UI Undo, read after Undo):** slab tier 508
+  `TEST2`→`TEST4` (exact route, `1a019448…`, all wrappers agree, inventory
+  unchanged; the owner's UI check did not separate the two palette modes);
+  Wall 240 Integer 1442 (CheckBox control) 1→0 (`9bf9d05d…`) and 1→2
+  (`360930f8…`); Wall 240 Real 230 1→2 (`3be71e58…`); Wall 240 CheckBox 1371
+  0→1 (`56739a30…`); MultiSlab Integer 110 200→201 (`1ca552c6…`, tier and
+  native Priority unchanged) and Real 981 `<niezdefiniowany>`→0.25
+  (`0a7fc6d5…`); Column paired material `TEST1`→`C35/45` (`7c1e4a92…`,
+  native `applied` with AttributeContainer + root view renamed, 508 followed
+  without a setter); Wall 200 layer 65535→3701 `SZ_OGÓ02` (`b3e8d1f4…`,
+  root + tier); window delete with its 7-adapter subtree (`d5a79c20…`, Wall
+  and neighbours kept, one UI Undo restored the window with its original
+  identities).
+- **Findings fixed in 0.51.2:** Beam attribute 120 alone (`8cc1e687…`)
+  also changed native CalculationMode 0→2 (one UI Undo restored both); a
+  CheckBox Integer took 2; highlight `counts.matched` counted all peers of
+  the type; `layer_catalog` with `candidate_ids` gave `host_error`
+  (`110b1ced-501d-49cb-9b53-a52843a4a301`); no read of a layer's name by ID;
+  `undo_group` missing on single-setter Applies.
+- **Not a product fault:** Wall Real 220 "Długość" did not change
+  (`052283c9…`, `failed`/`readback_unchanged`, nothing written; likely
+  geometry-derived). The agent's note that the plan TTL expired before the
+  B3 Apply is not supported: preview 13:11:11, Apply 13:11:37 UTC.
+- **Owner answers (card section C):** Trade list: 78 labels in alphabetical
+  order without codes (screenshots `C1-*.png`; "Roboty murarskie" = 12 is
+  not its list position), so codes need per-label readback. Column `Status`
+  (ID 49) labels: Inny, Nieokreślony, Nieznany, Nowo projektowane,
+  Rozbiórka, Tymczasowy, Wybudowane (`C2.png`). No Date attribute in the
+  project. Selection experiment and the upgrade/restore check after the
+  earlier stages. Destructive tests (and disposable elements) allowed. The
+  tier `TEST1`→`TEST2` change after 0.47.0: unknown. Geometric native
+  properties (thickness, length, height) are not pursued; the owner names
+  Priority (the trial wrote attribute 110, which is not coupled to native
+  Priority).
+- Open observations: `host_session_id` changed between steps (the host
+  restarted; no host log); `size_x_mm`/`size_y_mm` of the Wall 240 read
+  `not_checked` (`ValueError`) once; the owner saw the deleted window vanish
+  from the UI when stopping the host, although the Apply had already
+  reported an empty subtree.
+
+**0.51.0 trial (2026-11-07)** ([raw evidence](test-results/evidence/0.51.0-2026-11-07/evidence-20261107.jsonl),
+[observations](m4-editing-api.md#native-observations-0510-trial-2026-11-07)):
+one UI Undo per Apply (Wall with door paired calculation mode, Wall 240 and
+Wall with door paired material) PASS; the window Wall stayed `unknown` on
+partial evidence (fixed in 0.51.1).
 
 **0.50.1 trial (2026-11-07)** ([raw evidence](test-results/evidence/0.50.1-2026-11-07/evidence-20261107.jsonl),
 [agent log](test-results/evidence/0.50.1-2026-11-07/agent-log.md),
@@ -171,6 +240,21 @@ setter ran, readback stayed `" "`, UI Undo restored it; do not repeat.
 
 ## Key errors and necessary earlier context
 
+- **0.51.1 executions (2026-11-08):** window Wall
+  `5008fcbefbde45cfaf0d258e9ea87db9` and `c1395fe64f0743fab54e8bbd6d9da3cc`
+  (calculation mode) and `3c5df3d971a6427da2748854e2b75114` (material) are
+  `stopped`, read-only recovery after one UI Undo each:
+  `reconciled`/`old_value_observed`, `write_blocked=false`; not applied PASS
+  results, nothing to replay. `052283c9fbb047e8ac50c697c3eb3a5d` (Wall 240
+  attribute 220) is `stopped`/`failed` (`readback_unchanged`, nothing
+  written). `1a0194481b164593a6ed23231cbbb416`,
+  `9bf9d05d03a643699d6c0dcc6e75aa3a`, `360930f8b4ff44098791e287d892060c`,
+  `3be71e58cb87469c80d60f706fafdc45`, `8cc1e6871aae449dae601a27abab5c2b`,
+  `1ca552c6efa8482a8d316217ca561e1a`, `0a7fc6d5fbdd4c54a2639cf93f0b416f`,
+  `56739a3058334c6182269a2fafa95aef`, `7c1e4a92b5d84f60a3e91d2c8b0f5a47`,
+  `b3e8d1f46a2c4975918c0d7e5f2a6b13` and `d5a79c20e1b64f38a7c4829b0e6f1d35`
+  are `completed` and UI-undone (the journal does not know the Undo; do not
+  replay or recover them).
 - **0.51.0 executions:** `6e6c83d25205408dbf610c4f41c54b3f`,
   `c6183d71b59f4af99b74c406f65e6467` and `9109d2501c264b4a8ad928d24c2d87dd`
   are `completed` and UI-undone. `a47dca1661274ac5a9f3390a816f3cd4` (window

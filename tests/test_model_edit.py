@@ -160,9 +160,13 @@ class ModelEditTests(unittest.TestCase):
         self.assertEqual(plan["counts"]["matched"], 1)
         self.assertEqual({change["ref"]["model_uuid"] for change in plan["changes"]},
                          {elements[1].GetModelElementUUID()})
-        self.highlight(plan)
+        highlighted = self.highlight(plan)
         shown = self.module.AllplanIFW.HighlightService.HighlightElements.call_args.args[0]
         self.assertEqual([id(item) for item in shown], [id(elements[1])])
+        # 0.51.1 trial: matched counted every scanned peer of the plan's type.
+        counts = highlighted["counts"]
+        self.assertEqual((counts["matched"], counts["excluded"], counts["scope_elements"]), (1, 2, 3))
+        self.assertEqual((counts["count_kind"], counts["submitted_model_identities"]), ("reviewed_plan_targets", 1))
 
     def test_newly_matching_peer_conflicts_before_any_setter(self):
         elements = self.fixture(("", "F60"))
@@ -359,6 +363,32 @@ class ModelEditTests(unittest.TestCase):
         self.highlight(plan)
         self.assertEqual(self.apply(plan)["state"], "completed")
         self.assertEqual(elements[0].GetAttributes.return_value, [(935, ""), (20001, 1)])
+
+    def test_integer_checkbox_rejects_values_other_than_zero_and_one(self):
+        # 0.51.1 trial (360930f8…): 2 was written to the CheckBox attribute
+        # 1442 and read back as 2; the UI shows it as checked.
+        elements = self.fixture(("",))
+        elements[0].GetAttributes.return_value.extend([(20001, 1)])
+        self.attribute_catalog({935: "Fire", 20001: "Wysokość pomieszczenia ściana"})
+        self.attribute_type_names[20001] = "Integer"
+        controls = SimpleNamespace(CheckBox=41, Edit=42)
+        self.base.AttributeService.AttributeControlType = controls
+        self.base.AttributeService.GetAttributeControlType.return_value = controls.CheckBox
+        self.setter_fakes(elements)
+        self.assert_code("attribute_value_out_of_range", lambda: self.preview(predicate=None, changes=[{
+            "target": {"kind": "attribute", "attribute_id": 20001}, "value": 2,
+        }]))
+        plan = self.preview(predicate=None, changes=[{
+            "target": {"kind": "attribute", "attribute_id": 20001}, "value": 0,
+        }])
+        self.assertEqual(plan["changes"][0]["new_value"], 0)
+        # An ordinary Integer control keeps any integer.
+        self.base.AttributeService.GetAttributeControlType.return_value = controls.Edit
+        plan = self.preview(predicate=None, changes=[{
+            "target": {"kind": "attribute", "attribute_id": 20001}, "value": 2,
+        }])
+        self.assertEqual(plan["changes"][0]["new_value"], 2)
+        self.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
 
     def test_integer_boolean_requires_runtime_checkbox_control_member(self):
         self.fixture(("",))

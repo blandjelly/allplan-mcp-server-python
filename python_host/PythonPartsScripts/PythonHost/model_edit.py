@@ -9,7 +9,8 @@ from uuid import uuid4
 from .model_context import integer
 from .model_metadata import bounded_text
 from .model_properties import positive_id
-from .model_edit_contracts import (DEFAULT_NATIVE_TYPES, PAIRED_ATTRIBUTE_FOLLOWS_NATIVE,
+from .model_edit_contracts import (ATTRIBUTE_COUPLES_NATIVE, ATTRIBUTE_COUPLES_NATIVE_REASON,
+                                  DEFAULT_NATIVE_TYPES, PAIRED_ATTRIBUTE_FOLLOWS_NATIVE,
                                   PAIRED_ATTRIBUTE_NOT_STORED, PAIRED_ATTRIBUTE_ONLY, PAIRED_NATIVE_TYPES,
                                   PAIRED_PROPERTIES, SCHEMA, UNDEFINED_ATTRIBUTE_VALUES, attribute_read_mode,
                                   is_undefined_attribute_value, paired_property_name, validate_request)
@@ -304,6 +305,22 @@ def bind_changes(doc, base, request, check, trace):
                                        "encoded_value": int(choice["value"])}
                     value_type = "integer"
                     new_value = boolean_binding["encoded_value"]
+            elif (type(choice["value"]) is int and choice["value"] not in (0, 1) and scalar_binding
+                    and scalar_binding[0] == "integer" and requested_type in {"auto", "integer"}):
+                # 0.51.2: native trial 0.51.1 (360930f8…) wrote 2 to the
+                # CheckBox attribute 1442 and read 2 back; the UI shows any
+                # nonzero value as checked. A CheckBox takes only 0/1.
+                from .attribute_codecs import checkbox_integer_boolean_binding
+                try:
+                    control_type = read("AttributeService.GetAttributeControlType",
+                                        lambda: base.AttributeService.GetAttributeControlType(doc, ident))
+                    checkbox = checkbox_integer_boolean_binding(base, control_type) is not None
+                except BridgeError:
+                    raise
+                except Exception:
+                    checkbox = False  # No control evidence: the integer route is unchanged.
+                if checkbox:
+                    raise BridgeError("attribute_value_out_of_range", "This Integer attribute uses a CheckBox control: only 0/1 or true/false are valid. Ask the user for the intended checked state.", 409)
             if value_type == "enum":
                 compatible_members = [member for member in ("Enum", "Integer", "String")
                                       if getattr(enum_type, member, None) is not None
@@ -731,6 +748,21 @@ def preview(plans, doc, base, settings, request):
                 )
                 if not undefined_numeric_or_boolean:
                     reason = "old_value_type_differs"
+            coupled = (ATTRIBUTE_COUPLES_NATIVE.get((bound["resource"].get("attribute_id"), native_type))
+                       if bound["operation"] == "set_attribute" and "paired_property" not in bound["resource"]
+                       else None)
+            if reason is None and coupled is not None:
+                spec = PAIRED_PROPERTIES[coupled]
+                blocked.append({"ref": element["ref"], "field": bound["field"],
+                                "reason": ATTRIBUTE_COUPLES_NATIVE_REASON,
+                                "native_field": spec["native_field"], "observation": copy.deepcopy(old),
+                                "effect": (f"on {native_type} attribute {spec['attribute_id']} and the native "
+                                           f"{spec['native_field']} change together (0.51.1 trial); "
+                                           "this attribute cannot be changed alone"),
+                                "paired_route": {"target": {"kind": "paired_property", "property": coupled},
+                                                 "value": bound["new_value"]},
+                                "use": "ask the user whether both places may change; then send paired_route"})
+                continue
             if reason:
                 blocked.append({"ref": element["ref"], "field": bound["field"], "reason": reason,
                                 "observation": copy.deepcopy(old)})

@@ -131,11 +131,12 @@ class LayerNameProbeInput(ContractModel):
     phase: Literal["layer_name"]
     layer_short_name: str | None = Field(default=None, min_length=1, max_length=16)
     layer_name: str | None = Field(default=None, min_length=1, max_length=128)
+    layer_id: int | None = Field(default=None, ge=0, le=65535)
 
     @model_validator(mode="after")
     def exactly_one_layer_spelling(self):
-        if (self.layer_short_name is None) == (self.layer_name is None):
-            raise ValueError("Provide exactly one of layer_short_name or layer_name.")
+        if sum(value is not None for value in (self.layer_short_name, self.layer_name, self.layer_id)) != 1:
+            raise ValueError("Provide exactly one of layer_short_name, layer_name or layer_id.")
         return self
 
 

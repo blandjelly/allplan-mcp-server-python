@@ -906,7 +906,8 @@ Findings:
 
 #### One UI Undo step, Wall Material and openings (0.51.0 contract)
 
-Automated tests only; no native observation yet.
+Native trials: 0.51.0 (one UI Undo, Wall Material) and 0.51.1 (Column
+Material, window delete) below.
 
 - **One UI Undo step per Apply.** SDK 2026
   [`UndoRedoService`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/UndoRedoService/):
@@ -1006,7 +1007,9 @@ Findings:
 
 #### Shared opening tier and regeneration residual (0.51.1 contract)
 
-Automated tests only; no native observation yet.
+Native trial below (2026-11-08): the complete evidence and the residual
+worked; the window Wall stayed `unknown` on re-serialized opening geometry
+(0.51.2 contract).
 
 - **Shared opening child.** `component_ownership.observe` takes
   `shared_parents`: a child whose `GetParentElement` is one of these exact
@@ -1032,6 +1035,96 @@ Automated tests only; no native observation yet.
   Wall (partial) differs in shape from 0.51.1 evidence, so a 0.51.0 plan of
   that Wall must be previewed again; both 0.51.0 executions are already
   reconciled.
+
+#### Native observations (0.51.1 trial, 2026-11-08)
+
+Bridge 0.51.1, source `0fdc2a8`, `sha256-verified`, Allplan 2026.1, drawing
+101 ([raw evidence](test-results/evidence/0.51.1-2026-11-08/evidence-20261108.jsonl),
+[test card with the owner's results](test-results/evidence/0.51.1-2026-11-08/test-card.md)).
+The owner reported the UI checks and UI Undo per test.
+
+| Element | Request / execution | Outcome | UI Undo |
+| --- | --- | --- | --- |
+| Wall 300 with window `f4da72fe…` | read-only preview, paired calculation mode `m` | complete evidence: `tier_hierarchy.shared_children` = WindowTier `360e85e2…` (parent Window `268dec66…`), no `partial_preservation` | — |
+| Wall 300 with window | paired calculation mode `m` (`5008fcbe…` on the preview plan, then `c1395fe6…`) | `stopped`: native `unknown` (`native_property_invariants_changed`), attr 120 `skipped`; `identity_diff` Window, Sill, WallAxis, 3 × AttributeContainer; residual (truncated) = WindowTier and WindowReveal geometry stream hashes plus a mispaired AttributeContainer | one step each; recovery `reconciled`/`old_value_observed` |
+| Wall 300 with window | paired material `Cegła` (`3c5df3d9…`), 508 not stored → native only | `stopped`: native `unknown` (`wall_material_invariants_changed`), same renaming; residual exactly two paths: WindowTier `ed683b7d…`→`b8831123…` and WindowReveal `51139ff9…`→`e992dc2f…` (`geometry/stream_sha256`) | one step; recovery `reconciled`; owner saw `Cegła` in both places |
+| WallTier `e6e244c9…` | `component_identity` | `observed`, `shared_children` = WindowTier (parent Window) | — |
+| Slab tier `8a693925…` (exact route) | attribute 508 `TEST2`→`TEST4` (`1a019448…`) | `completed`, both tier wrappers agree, `exact_inventory` unchanged, MultiSlab 508 `TEST1` | one step → `TEST2` |
+| Wall 240 `06d71e4d…` | attribute 1442 (Integer, CheckBox control 67) 1→0 (`9bf9d05d…`), 1→2 (`360930f8…`) | `completed`, readback 0 and 2 (2 not normalized; the UI shows it checked) | one step → 1 |
+| Wall 240 | attribute 220 "Długość" 4.65→5 (`052283c9…`) | `failed`/`readback_unchanged`, nothing written | — |
+| Wall 240 | attribute 230 "Współczynnik" (Real) 1→2 (`3be71e58…`) | `completed` | one step → 1 |
+| Wall 240 | attribute 1371 (CheckBox) `true` (`56739a30…`) | `completed`, `integer_checkbox_boolean`, readback 1 | one step → 0 |
+| Beam `7cc9ac55…` | attribute 120 only, `m3`→`m` (`8cc1e687…`) | `completed`; **native CalculationMode also 0→2**; the UI showed `m` in both places | one step restored both (0/`m3`) |
+| MultiSlab `bf097d95…` | attribute 110 "Priorytet" 200→201 (`1ca552c6…`); 981 "Wartość U" `<niezdefiniowany>`→0.25 (`0a7fc6d5…`) | `completed`; tier values unchanged (`slab_tier_values`); native Priority 200 unchanged | one step each |
+| Column `eb88c850…` | paired material `TEST1`→`C35/45` (`7c1e4a92…`) | `completed`: native `applied` (AttributeContainer `82c18eca…`→`966e12f9…`, root view `cc752bda…`→`55509cf2…`), 508 `paired_attribute_already_set_by_native_write` | one step; identities restored |
+| Column `4f3cc27e…` | layer to its current `SZ_OGÓ01` (3700) | `no_op`, 0 setters, no Apply | — |
+| Wall 200 with door `545bb0a2…` | layer 65535→3701 `SZ_OGÓ02` (`b3e8d1f4…`, `set_wall_layer` root + tier) | `completed`, view kept | one step → 65535 |
+| Window `268dec66…` | delete (`d5a79c20…`) | `completed`: subtree of 7 adapters absent, Wall 300 and neighbours kept | one step restored the window and WindowTier with their identities (other parts inferred from counts) |
+
+Findings:
+
+- **Window regeneration re-serializes the opening's geometry.** Besides the
+  renamed identities, only the exact geometry streams of the WindowTier and
+  WindowReveal (identities kept) differed, with the same before/after hashes
+  for a CalculationMode and a Material write, and UI Undo restored the
+  original. The stream text is not logged, so whether numbers or structure
+  differ is unknown; 0.51.2 records tolerance evidence (below).
+- The complete evidence (0.51.1) also lists the WindowTier's own
+  AttributeContainer and the WallAxis among the renamed identities.
+- **Beam attribute 120 and native CalculationMode change together in both
+  directions** (0.50.0: native write sets the attribute; 0.51.1: attribute
+  write sets the native value). A request for one place cannot be honoured
+  on the Beam.
+- **MultiSlab attribute 110** is independent of native `Priority`.
+- An Integer attribute with a CheckBox control stores any integer.
+- The attribute probe does not report units, control types or
+  `computed_only` for stored values; `attribute_definition` gave control type
+  67 for 1371 and 1442. Attribute 220 is stored but not writable.
+- Highlight `counts.matched` counted every scanned peer of the plan's type;
+  `layer_catalog` with `candidate_ids` of another name failed as
+  `host_error`; a layer ID could not be resolved to its short name.
+- Owner data: Trade has 78 labels shown alphabetically without codes
+  ([screenshots](test-results/evidence/0.51.1-2026-11-08/C1-1.png)); Column
+  `Status` (ID 49) shows Inny, Nieokreślony, Nieznany, Nowo projektowane,
+  Rozbiórka, Tymczasowy, Wybudowane ([screenshot](test-results/evidence/0.51.1-2026-11-08/C2.png));
+  the project has no Date attribute.
+
+#### Opening geometry tolerance and trial fixes (0.51.2 contract)
+
+Automated tests only; no native observation yet.
+
+- **Geometry evidence.** Every observed `geometry` (tier and auxiliary
+  components) adds `shape_sha256` (the stream with every numeric literal
+  rounded to 4 decimals, −0 normalized), `structure_sha256` (numbers
+  replaced) and `numbers` (count). `stream_sha256` stays and is still part
+  of the byte-equal comparison. Older plans have to be previewed again.
+- **Window rule.** For a Wall, after the renaming that the family rule
+  accepts, the WindowTier and WindowReveal below a renamed Window may differ
+  in `stream_sha256` only if both sides are `observed`, carry the shape
+  evidence and agree in `shape_sha256`, `structure_sha256` and `numbers`;
+  everything else must be byte-equal. The report adds
+  `reserialized_geometry` (`opening_geometry_reserialized_shape_equal`, the
+  components with before/after stream hashes). Doors, an unrenamed Window
+  and other types keep the exact comparison.
+- **Residual pairing.** Where every type pairs one-for-one within the rule's
+  64-pairing bound, the residual uses the pairing with the fewest differing
+  paths (`same_type_fewest_residual_paths`).
+- **Beam attribute 120.** A single-place attribute 120 change on
+  `Beam_TypeUUID` is blocked (`attribute_write_also_changes_native_property`)
+  with `native_field`, `effect` and `paired_route`; the paired request is
+  unchanged. Other families stay open (not observed in that direction).
+- **CheckBox Integer.** An integer other than 0/1 on an Integer attribute
+  whose SDK control type is CheckBox fails with `attribute_value_out_of_range`.
+- **Highlight counts.** A plan highlight reports `matched` = reviewed
+  targets, `excluded` = scanned peers outside the plan, `scope_elements`
+  and `count_kind=reviewed_plan_targets`; `model_query` highlights are
+  unchanged.
+- **Layer names.** `layer_name` accepts `layer_id` (0–65535) and returns
+  the record with the short-name round trip and a `confirmed_target`;
+  `layer_catalog` `candidate_ids` that do not match the name fail with
+  `layer_candidate_mismatch`.
+- **`undo_group`** is present on every typed Apply: `not_requested` with
+  `single_change_plan` or `single_native_delete_call`.
 
 ## Earlier findings by version
 

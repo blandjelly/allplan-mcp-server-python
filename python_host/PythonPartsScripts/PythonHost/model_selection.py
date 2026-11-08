@@ -75,7 +75,13 @@ def present_selection(service, doc, base, settings, ifw, request, *, target_mode
     result.update({"selection_id": ident, "source_fingerprint": snapshot["source_fingerprint"],
                    "scope": copy.deepcopy(snapshot["scope"]), "coverage": copy.deepcopy(snapshot["coverage"]),
                    "omissions": copy.deepcopy(snapshot["omissions"]), "exclude_model_uuids": sorted(excluded),
-                   "counts": {"matched": len(snapshot["elements"]), "excluded": len(snapshot["elements"]) - len(targets),
+                   # 0.51.2: a plan highlight counts the reviewed targets as
+                   # matched (0.51.1 trial: matched=6 for one Column target);
+                   # the scanned peers of the plan's type stay in scope_elements.
+                   "counts": {"matched": len(snapshot["elements"]) if target_model_uuids is None else len(targets),
+                              "excluded": len(snapshot["elements"]) - len(targets),
+                              **({"scope_elements": len(snapshot["elements"]), "count_kind": "reviewed_plan_targets"}
+                                 if target_model_uuids is not None else {}),
                               "requested_model_identities": len(targets), "requested_adapters": len(adapters),
                               "submitted_model_identities": None, "submitted_adapters": None,
                               "selected": None, "highlighted": None, "not_visible": None,

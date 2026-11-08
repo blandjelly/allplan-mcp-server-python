@@ -9,6 +9,7 @@ import hashlib
 import importlib
 import json
 import math
+import re
 
 from .component_ownership import ComponentReadError, failure, identity, observe, same_model_identity
 from .attribute_evidence import describe_value
@@ -200,6 +201,44 @@ def _live_children(adapter, observed, check, read):
     return collection, [(child, ref) for child, ref in zip(live, refs) if _identity_key(ref) not in shared]
 
 
+# 0.51.2: tolerance evidence beside the exact stream hash. The 0.51.1 trial
+# (executions 5008fcbe…, c1395fe6…, 3c5df3d9…) regenerated the Window of the
+# Wall 300 and changed only the stream hashes of its WindowTier and
+# WindowReveal, which kept their identities: the same before/after hashes for
+# a CalculationMode and a Material write, and UI Undo restored the original.
+# The stream text is not logged, so the shape (numbers rounded to
+# _SHAPE_DECIMALS) and the structure (numbers replaced) are hashed as well.
+_NUMBER = re.compile(r"[-+]?(?:\d+\.\d*|\.\d+|\d+)(?:[eE][-+]?\d+)?")
+_SHAPE_DECIMALS = 4
+
+
+def _rounded(match):
+    try:
+        value = round(float(match.group(0)), _SHAPE_DECIMALS)
+    except (OverflowError, ValueError):
+        return match.group(0)
+    if not math.isfinite(value):
+        return match.group(0)
+    return format(value + 0.0, f".{_SHAPE_DECIMALS}f")  # -0.0 -> 0.0000
+
+
+def geometry_shape(stream):
+    """Hashes of a geometry stream that ignore number formatting below 1e-4.
+
+    ``shape_sha256``: every numeric literal rounded to 4 decimals (Allplan
+    model coordinates are millimetres); ``structure_sha256``: every numeric
+    literal replaced, so a reordered or different shape is distinguished from
+    numeric noise; ``numbers``: count of numeric literals. Evidence only:
+    the exact ``stream_sha256`` stays the default preservation comparison.
+    """
+    numbers = _NUMBER.findall(stream)
+    shape = _NUMBER.sub(_rounded, stream)
+    structure = _NUMBER.sub("#", stream)
+    return {"shape_sha256": hashlib.sha256(shape.encode("utf-8")).hexdigest(),
+            "structure_sha256": hashlib.sha256(structure.encode("utf-8")).hexdigest(),
+            "numbers": len(numbers)}
+
+
 def _auxiliary_geometry(adapter, check, read=None):
     """Keep stream evidence when available, without requiring every child to be a solid.
 
@@ -219,7 +258,8 @@ def _auxiliary_geometry(adapter, check, read=None):
         code, stream = native_read("Geometry.WriteToStream", serializer)
         if code != geometry_api.eGeometryErrorCode.eOK or type(stream) is not str or not stream or len(stream) > 524288:
             return {"status": "not_checked", "reason": "geometry_stream_unavailable"}
-        return {"status": "observed", "stream_sha256": hashlib.sha256(stream.encode("utf-8")).hexdigest()}
+        return {"status": "observed", "stream_sha256": hashlib.sha256(stream.encode("utf-8")).hexdigest(),
+                **geometry_shape(stream)}
     except (BridgeError, ComponentReadError):
         raise
     except Exception as exc:
@@ -932,10 +972,15 @@ IDENTITY_REGENERATION_ACCEPTANCE = "identities_regenerated_evidence_otherwise_eq
 #   check, UI Undo) and the changed sections were exactly those of the
 #   accepted CalculationMode renamings of the same walls; 0.50.1 did not log
 #   the Material identity_diff, so 0.51.0 applies the same rule to Material.
-# - Wall with a window (0.51.0, not yet observed natively): by analogy with
-#   the door, the Window, its Sill and the WindowOpeningSmartPart (child of
-#   the WindowReveal, 0.50.1 query) may be renamed; the WindowTier and
-#   WindowReveal must keep their identities.
+# - Wall with a window (0.51.1 trial, executions 5008fcbe…, c1395fe6… for
+#   CalculationMode and 3c5df3d9… for Material, Wall 300): the Window, its
+#   Sill, the WallAxis and three AttributeContainers (root, window tier,
+#   tier) were renamed; the WindowTier and WindowReveal kept their identities
+#   but their geometry streams were re-serialized (identical before/after
+#   hashes in all three writes; UI Undo restored the original). Only for
+#   these two types under a renamed Window may the exact stream hash differ,
+#   and only when the shape (numbers rounded) and structure hashes are equal
+#   (``opening_geometry``); the WindowOpeningSmartPart stays listed.
 # Column Material uses the Column rule (not yet observed natively). Every
 # other byte of the bound evidence must be equal after the renaming, so an
 # unlisted or wrong regeneration stays `unknown` with identity_diff.
@@ -946,8 +991,11 @@ _FAMILY_REGENERATION = {
     "Column_TypeUUID": {"children": frozenset({"AttributeContainer_TypeUUID"}), "root_view": True},
     "Beam_TypeUUID": {"children": frozenset({"AttributeContainer_TypeUUID", "WallAxis_TypeUUID"}),
                       "root_view": False},
-    "Wall_TypeUUID": {"children": _WALL_REGENERATED, "root_view": False},
+    "Wall_TypeUUID": {"children": _WALL_REGENERATED, "root_view": False,
+                      "opening_geometry": {"Window_TypeUUID": frozenset({"WindowTier_TypeUUID",
+                                                                         "WindowReveal_TypeUUID"})}},
 }
+OPENING_GEOMETRY_ACCEPTANCE = "opening_geometry_reserialized_shape_equal"
 IDENTITY_REGENERATION = {(field, family): rule for family, rule in _FAMILY_REGENERATION.items()
                          for field in ("CalculationMode", "Material")}
 _MAX_IDENTITY_REFS = 4096
@@ -1022,10 +1070,11 @@ def identity_regeneration(native_type, field, expected, current):
     type never change; a root view may change only where the family lists it.
     Each removed identity pairs one-for-one with an added identity of the
     same type, and the expected evidence with every such UUID renamed must be
-    byte-identical to the current evidence (fingerprint).
+    byte-identical to the current evidence (fingerprint). The one exception
+    (0.51.2, Wall ``opening_geometry``): listed parts below a renamed opening
+    may differ in their exact geometry stream hash when their shape and
+    structure hashes are equal (``reserialized_geometry`` in the report).
     """
-    from itertools import permutations, product
-
     rule = IDENTITY_REGENERATION.get((field, native_type))
     if rule is None or not isinstance(expected, dict) or not isinstance(current, dict):
         return None
@@ -1051,6 +1100,37 @@ def identity_regeneration(native_type, field, expected, current):
                 return None
         elif type_name not in rule["children"]:
             return None
+    mappings = _candidate_mappings(groups, after)
+    if mappings is None:
+        return None
+    canonical_current = _canonical(current)
+    target = fingerprint(canonical_current)
+    opening_geometry = rule.get("opening_geometry") or {}
+    for mapping, pairs in mappings:
+        renamed = _canonical(_rename(expected, mapping))
+        reserialized = None
+        if fingerprint(renamed) != target:
+            # 0.51.2: the one tolerated residual of a renamed opening.
+            reserialized = _reserialized_opening_geometry(renamed, canonical_current, pairs, opening_geometry)
+            if reserialized is None:
+                continue
+        root_views = {pair["old_view_uuid"]: pair["new_view_uuid"]
+                      for pair in pairs if pair["type_name"] == native_type}
+        report = {"regenerated_identities": sorted(pairs, key=lambda p: (p["type_name"], p["old_model_uuid"]))[:16],
+                  "view_map": root_views}
+        if reserialized is not None:
+            report["reserialized_geometry"] = {"accepted": OPENING_GEOMETRY_ACCEPTANCE,
+                                               "components": reserialized[:8],
+                                               "condition": "identity kept, shape_sha256, structure_sha256 and "
+                                                            "numbers equal; every other byte equal after renaming"}
+        return report
+    return None
+
+
+def _candidate_mappings(groups, after):
+    """Every one-for-one same-type pairing as (uuid mapping, pairs); None over the bound."""
+    from itertools import permutations, product
+
     names = sorted(groups)
     options = [list(permutations(groups[name]["added"])) for name in names]
     combinations = 1
@@ -1058,8 +1138,8 @@ def identity_regeneration(native_type, field, expected, current):
         combinations *= len(choice)
     if combinations > _MAX_PAIRINGS:
         return None
-    target = fingerprint(_canonical(current))
     remaining = {value for ref in after for value in ref[1:]}
+    result = []
     for selection in product(*options):
         mapping, pairs, valid = {}, [], True
         for name, chosen in zip(names, selection):
@@ -1072,14 +1152,59 @@ def identity_regeneration(native_type, field, expected, current):
                     if mapping.get(old_id, new_id) != new_id or old_id in remaining:
                         valid = False
                     mapping[old_id] = new_id
-        if not valid or not mapping:
-            continue
-        if fingerprint(_canonical(_rename(expected, mapping))) == target:
-            root_views = {pair["old_view_uuid"]: pair["new_view_uuid"]
-                          for pair in pairs if pair["type_name"] == native_type}
-            return {"regenerated_identities": sorted(pairs, key=lambda p: (p["type_name"], p["old_model_uuid"]))[:16],
-                    "view_map": root_views}
-    return None
+        if valid and mapping:
+            result.append((mapping, pairs))
+    return result
+
+
+def _opening_geometry_parts(evidence, renamed_openings, opening_geometry):
+    """Geometry of the listed parts below each renamed opening, keyed by identity.
+
+    Returns ``(masked_evidence, {key: (type_name, model_uuid, geometry)})``.
+    Only an ``observed`` geometry that carries the shape evidence is masked
+    (its exact ``stream_sha256`` removed); everything else stays compared.
+    """
+    parts = {}
+
+    def walk(value, listed):
+        if isinstance(value, list):
+            return [walk(item, listed) for item in value]
+        if not isinstance(value, dict):
+            return value
+        target = (value.get("ownership") or {}).get("target") if isinstance(value.get("ownership"), dict) else None
+        if isinstance(target, dict) and "children" in value:
+            kind = target.get("type_name")
+            if listed is not None and kind in listed:
+                geometry = value.get("geometry")
+                if (isinstance(geometry, dict) and geometry.get("status") == "observed"
+                        and {"stream_sha256", "shape_sha256", "structure_sha256", "numbers"} <= set(geometry)):
+                    key = (kind, target.get("model_uuid"), target.get("view_uuid"))
+                    parts[key] = geometry
+                    value = {**value, "geometry": {k: v for k, v in geometry.items() if k != "stream_sha256"}}
+            if listed is None and (kind, target.get("model_uuid")) in renamed_openings:
+                listed = opening_geometry[kind]
+            return {name: (walk(item, listed) if name == "children" else item) for name, item in value.items()}
+        return {name: walk(item, listed) for name, item in value.items()}
+
+    return walk(evidence, None), parts
+
+
+def _reserialized_opening_geometry(renamed, current, pairs, opening_geometry):
+    """Rows of re-serialized opening-part geometry, or None if anything else differs."""
+    renamed_openings = {(pair["type_name"], pair["new_model_uuid"]) for pair in pairs
+                        if pair["type_name"] in opening_geometry}
+    if not renamed_openings:
+        return None
+    masked_before, before = _opening_geometry_parts(renamed, renamed_openings, opening_geometry)
+    masked_after, after = _opening_geometry_parts(current, renamed_openings, opening_geometry)
+    # Masking changes component fingerprints, so restore the canonical order.
+    if set(before) != set(after) or fingerprint(_canonical(masked_before)) != fingerprint(_canonical(masked_after)):
+        return None
+    rows = [{"type_name": key[0], "model_uuid": key[1],
+             "before_stream_sha256": before[key]["stream_sha256"], "after_stream_sha256": after[key]["stream_sha256"],
+             "shape_sha256": after[key]["shape_sha256"], "numbers": after[key]["numbers"]}
+            for key in sorted(before) if before[key]["stream_sha256"] != after[key]["stream_sha256"]]
+    return sorted(rows, key=lambda row: (row["type_name"], row["model_uuid"])) or None
 
 
 _MAX_RESIDUAL_PATHS = 8
@@ -1148,8 +1273,11 @@ def identity_regeneration_residual(expected, current):
     """Where the evidence still differs after renaming same-type identities.
 
     Review evidence for an `unknown` outcome only (0.51.1): identities of one
-    type are paired in sorted order, the expected evidence is renamed and the
-    first differing paths are listed. It never accepts drift.
+    type are paired, the expected evidence is renamed and the first differing
+    paths are listed. It never accepts drift. 0.51.2: where every type pairs
+    one-for-one within the rule's pairing bound, the pairing with the fewest
+    differing paths is reported (the 0.51.1 trial's sorted pairing of three
+    AttributeContainers reported a mismatched pair as a difference).
     """
     if not isinstance(expected, dict) or not isinstance(current, dict):
         return {"status": "not_checked", "reason": "evidence_unavailable"}
@@ -1170,9 +1298,18 @@ def identity_regeneration_residual(expected, current):
             for old_id, new_id in ((old[1], new[1]), (old[2], new[2])):
                 if old_id != new_id:
                     mapping.setdefault(old_id, new_id)
-    found = []
-    _residual_paths(_canonical(_rename(expected, mapping)), _canonical(current), "", found)
-    return {"status": "observed", "pairing": "same_type_sorted_order", "unpaired_types": unpaired[:8],
+    canonical_current = _canonical(current)
+    found, pairing = [], "same_type_sorted_order"
+    _residual_paths(_canonical(_rename(expected, mapping)), canonical_current, "", found)
+    candidates = None if unpaired else _candidate_mappings(groups, after)
+    for candidate, _ in candidates or ():
+        if len(found) <= 1:
+            break
+        trial = []
+        _residual_paths(_canonical(_rename(expected, candidate)), canonical_current, "", trial)
+        if len(trial) < len(found):
+            found, pairing = trial, "same_type_fewest_residual_paths"
+    return {"status": "observed", "pairing": pairing, "unpaired_types": unpaired[:8],
             "paths": found[:_MAX_RESIDUAL_PATHS], "truncated": len(found) > _MAX_RESIDUAL_PATHS,
             "acceptance": "review_evidence_only"}
 
