@@ -168,6 +168,33 @@ class PairedPropertyTests(unittest.TestCase):
         self.assertEqual(drift["view_map"], {})
         self.assertEqual(sorted(p["type_name"] for p in drift["regenerated_identities"]), sorted(children))
 
+    def test_single_place_attribute_120_on_the_beam_is_blocked_and_routed(self):
+        # 0.51.1 trial (8cc1e687…): "only attribute 120" on the Beam also
+        # changed the native CalculationMode 0 -> 2; one UI Undo restored both.
+        f = self.family("Beam_TypeUUID", families.BeamElement, code=0, attribute="m3")
+        single = {"target": {"kind": "attribute", "attribute_id": 120, "property_owner": "selected_element"},
+                  "value": "m", "value_type": "auto"}
+        plan = f.native.call(f.fixture.request(native_types=["Beam_TypeUUID"], changes=[single]))
+        self.assertFalse(plan["apply_available"], plan)
+        self.assertEqual(plan["changes"], [])
+        blocked, = plan["blocked"]
+        self.assertEqual((blocked["field"], blocked["reason"], blocked["native_field"]),
+                         ("attribute:120", "attribute_write_also_changes_native_property",
+                          "native.calculation_mode"))
+        self.assertEqual(blocked["paired_route"],
+                         {"target": {"kind": "paired_property", "property": "calculation_mode"}, "value": "m"})
+        f.native.base.ElementsAttributeService.ChangeAttributes.assert_not_called()
+        # The paired route plans both places; the attribute half is not blocked.
+        paired_plan = self.plan(f, "m")
+        self.assertTrue(paired_plan["apply_available"], paired_plan)
+        self.assertEqual([c["field"] for c in paired_plan["changes"]],
+                         ["native.calculation_mode", "attribute:120"])
+        # Column: not observed in this direction, the single place stays open.
+        g = self.family(code=0, attribute="m3")
+        column = g.native.call(g.fixture.request(native_types=["Column_TypeUUID"], changes=[single]))
+        self.assertTrue(column["apply_available"], column)
+        self.assertEqual([c["field"] for c in column["changes"]], ["attribute:120"])
+
     def test_attribute_is_not_attempted_after_an_unknown_native_outcome(self):
         f = self.family(mirror=False, children=("AttributeContainer_TypeUUID",),
                         regenerate=("Opening_TypeUUID",))

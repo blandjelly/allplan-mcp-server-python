@@ -300,8 +300,11 @@ def model_edit(request: ModelEditRequest) -> dict[str, Any]:
     Attribute targets accept text/integer/real/boolean values with replace/add/upsert;
     value_type=auto infers loaded-SDK scalar types and exact SDK Enum labels.
     JSON booleans for Integer attributes require the loaded SDK CheckBox control;
-    the reviewed resource binds true/false to native 1/0. Other integers never
-    silently accept booleans. Explicit enum labels use
+    the reviewed resource binds true/false to native 1/0, and a CheckBox
+    attribute rejects other integers (attribute_value_out_of_range). Other
+    integers never silently accept booleans. On the Beam, attribute 120 and
+    native CalculationMode change together, so a request naming only one of
+    them is blocked with a paired_route (ask the user first). Explicit enum labels use
     targeted label/key roundtrips and a runtime-bound Enum/Integer/String type;
     no enum catalog is enumerated. Dates remain unsupported. Layer targets accept
     an existing short_name or name. Search both full and short layer names;
@@ -571,8 +574,10 @@ def model_property_probe(request: PropertyProbeRequest) -> dict[str, Any]:
     and suppresses next_offset. This is not a project definition catalog, does
     not prove omissions, applicability or writability, and never probes
     enum/control/unit metadata.
-    layer_name accepts layer_name for a full or short name, or the legacy
-    layer_short_name. If the SDK cannot resolve the full name, follow the returned
+    layer_name accepts layer_name for a full or short name, the legacy
+    layer_short_name, or layer_id (an element's layer ID) to read that layer's
+    short/full name with a round trip and a confirmed_target for a no-op or
+    change preview. If the SDK cannot resolve the full name, follow the returned
     layer_catalog continuation. That read-only phase scans bounded ID pages and
     searches full and short names without removing Polish diacritics. Its page
     trace records the batch before native reads. Ask the user to confirm the

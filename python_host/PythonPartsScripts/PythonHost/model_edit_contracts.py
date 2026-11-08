@@ -56,6 +56,15 @@ PAIRED_ATTRIBUTE_ONLY = "paired_property_attribute_only_for_family"
 # Wall only; other families/properties keep a blocker until observed.
 PAIRED_ATTRIBUTE_FOLLOWS_NATIVE = frozenset({("material", "Wall_TypeUUID")})
 PAIRED_ATTRIBUTE_NOT_STORED = "paired_attribute_not_stored_follows_native"
+# 0.51.2: native trial 0.51.1 (execution 8cc1e687…, Beam 7cc9ac55…): a
+# request naming only attribute 120 wrote it with ChangeAttributes, and the
+# native CalculationMode followed (0 -> 2, both places showed "m"; one UI
+# Undo restored both). Together with the 0.50.0 observation that the native
+# write sets attribute 120 on the Beam, the two places cannot be changed
+# separately there: a single-place attribute request is blocked and names the
+# paired route. Other families are not observed in this direction.
+ATTRIBUTE_COUPLES_NATIVE = {(120, "Beam_TypeUUID"): "calculation_mode"}
+ATTRIBUTE_COUPLES_NATIVE_REASON = "attribute_write_also_changes_native_property"
 
 
 def paired_property_name(request):

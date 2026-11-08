@@ -83,7 +83,10 @@ def scan_layer_name_page(base, doc, document_id, requested_name, offset, limit, 
         record = layer_record(base, ident, document_id, read, doc)
         matches = exact_layer_name_matches(record, requested_name)
         if not matches:
-            raise ValueError("A previous layer candidate no longer matches the requested name")
+            # 0.51.2: the 0.51.1 trial sent candidate_ids [3700] with a
+            # placeholder name and got a generic host_error. candidate_ids
+            # only carry earlier matches of this same name forward.
+            raise BridgeError("layer_candidate_mismatch", "candidate_ids must be IDs returned by an earlier page for this exact layer_name. To read the names of a known layer ID use phase=layer_name with layer_id.", 409)
         candidates.append({**record, "matched_names": matches})
     scanned_to = offset
     for ident in range(offset, stop):

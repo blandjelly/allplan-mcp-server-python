@@ -227,10 +227,31 @@ class PropertyProbeTests(unittest.TestCase):
         self.assertNotIn("schema_version", continuation["request"])
         self.assertFalse(catalog["scan"]["complete"])
 
+    def test_layer_id_reads_the_exact_names_of_a_known_layer(self):
+        # 0.51.1 trial: an element's layer ID (3700) had no read route to its
+        # short name; layer_catalog with candidate_ids ended as host_error.
+        self.fixture()
+        result = self.probe(phase="layer_name", layer_id=7)
+        self.assertEqual(result["requested_layer_id"], 7)
+        candidate, = result["resolution"]["candidates"]
+        self.assertEqual((candidate["layer_id"], candidate["short_name"], candidate["name"]), (7, "COL", "Columns"))
+        self.assertEqual(result["confirmed_target"], {"kind": "layer", "short_name": "COL",
+                                                      "expected_layer_id": 7, "expected_name": "Columns"})
+        result = self.probe(phase="layer_name", layer_id=9)
+        self.assertEqual(result["resolution"]["status"], "not_checked")
+        self.assertNotIn("confirmed_target", result)
+
+    def test_catalog_candidate_ids_of_another_name_are_a_named_error(self):
+        self.fixture()
+        self.assert_code("layer_candidate_mismatch",
+                         lambda: self.probe(phase="layer_catalog", layer_name="_", limit=1, candidate_ids=[7]))
+
     def test_layer_name_contract_rejects_multiple_spellings_and_oversized_catalog_page(self):
         self.fixture()
         for request in (
             {"phase": "layer_name", "layer_name": "W1", "layer_short_name": "W1"},
+            {"phase": "layer_name", "layer_id": 7, "layer_short_name": "W1"},
+            {"phase": "layer_name", "layer_id": 65536},
             {"phase": "layer_name"},
             {"phase": "layer_catalog", "layer_name": "W1", "limit": 8193},
         ):

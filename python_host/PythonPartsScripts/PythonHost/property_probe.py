@@ -626,9 +626,12 @@ class PropertyProbeService:
                     break  # stop this phase at the first unavailable API value
             result["enum_values"] = {"status": "not_checked", "value": None, "reason": "native_enum_probe_not_accepted"}
         elif phase in ("layer_name", "layer_catalog"):
-            from .layer_names import resolve_direct_layer_name, scan_layer_name_page
+            from .layer_names import layer_record, resolve_direct_layer_name, scan_layer_name_page
             requested_name = request.get("layer_name", request.get("layer_short_name"))
-            result["requested_layer_name"] = requested_name
+            if "layer_id" in request:
+                result["requested_layer_id"] = request["layer_id"]
+            else:
+                result["requested_layer_name"] = requested_name
             doc_id = read("DocumentAdapter.GetDocumentID", lambda: integer(doc.GetDocumentID()))
             if doc_id["status"] == "observed":
                 def native_read(api, callback):
@@ -681,6 +684,24 @@ class PropertyProbeService:
                     result["catalog_policy"] = (
                         "A partial scan never authorizes an edit. Confirm an exact candidate with the user, then send its confirmed_targets entry to model_edit without dropping the expected ID/name. "
                         "Read errors are counted per page and the lookup never proves absence; when the ID range is exhausted without a candidate, ask for the exact short name.")
+                elif "layer_id" in request:
+                    # 0.51.2: names of a layer ID read from an element
+                    # (layer_id field, attribute 141), with the short-name
+                    # round trip; the 0.51.1 trial had no route for it.
+                    try:
+                        record = layer_record(base, request["layer_id"], doc_id["value"], native_read, doc)
+                    except BridgeError:
+                        raise
+                    except Exception as exc:
+                        result["resolution"] = {"status": "not_checked", "reason": "layer_id_unreadable",
+                                                "error_type": type(exc).__name__}
+                    else:
+                        result["resolution"] = {"status": "resolved", "candidates": [
+                            {**record, "lookup_methods": ["layer_id_round_trip"]}]}
+                        result["confirmed_target"] = {"kind": "layer", "short_name": record["short_name"],
+                                                      "expected_layer_id": record["layer_id"],
+                                                      "expected_name": record["name"]}
+                    result["next_action"] = None
                 else:
                     result["resolution"] = resolve_direct_layer_name(
                         base, doc, doc_id["value"], requested_name, native_read)
