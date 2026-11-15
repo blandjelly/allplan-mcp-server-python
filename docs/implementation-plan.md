@@ -36,6 +36,13 @@ code flow, and any expected speed-up needs a benchmark. This is an
 optimization design, not an extension of the accepted product scope. Product
 priorities remain in the [development plan](development-plan.md).
 
+**Re-verified on 2026-11-15** against `develop/m4` `f4b46ab` (0.51.2) and the
+2026 API reference. The numeric limits are unchanged since 0.39.0 except the
+trace capacity. The text below is corrected for the 0.40.0–0.51.2 changes that
+affect cost: exact Slab targets, paired properties, the Undo group, trace
+auto-archive and the client evidence log. There is still no shared resolver,
+identity index or new cache. No measurements were made.
+
 ### Conclusion and meaning of the limits
 
 **Larger models can be supported, but raising 32 and 200 alone will not solve
@@ -51,11 +58,11 @@ exceed the enumeration budget.
 | Enumeration | Default 5000, max 10000 **raw adapters**, 5 s per scan; `ModelQueryService._scan` in [model_query.py](../python_host/PythonPartsScripts/PythonHost/model_query.py). | Adapters are not business elements. The counter grows before out-of-scope files are rejected; narrowing predicate/scope does not shrink the `SelectAllElements` enumeration. |
 | Read memory | 4 MiB total of serialized `source` records during a scan; 8 selections, TTL 300 s (`ModelQueryService`). | Not a strict RAM limit or a 4 MiB response. `source`, groups, results, hashing and copies raise peak memory. The selection cache has no total byte limit. |
 | Fields and scope | Max 32 attributes, explicit scope up to 100 files, `max_adapters` as above. | The attribute limit is independent of the change limit; unloaded files do not become available by widening scope. |
-| M4 plan | Up to 16 `changes` declarations in [model_edit_models.py](../src/allplan_mcp/model_edit_models.py); `preview` expands them per element and field in [model_edit.py](../python_host/PythonPartsScripts/PythonHost/model_edit.py). | 20 elements × 2 changed fields = 40 changes, above 32. A no-op adds no change. Changes need not equal SDK calls (delete has a grouped setter). |
-| Apply | `RepairExecutor.MAX_CHANGES = 32`; also enforced in plan eligibility and stored-record validation, [repair_execution.py](../python_host/PythonPartsScripts/PythonHost/repair_execution.py). One active foreground drawing. | Changing one constant needs a compatibility review of the journal, recovery and all M3/M4 routes, not just a longer request list. |
+| M4 plan | Up to 16 `changes` declarations in [model_edit_models.py](../src/allplan_mcp/model_edit_models.py); `preview` expands them per element and field in [model_edit.py](../python_host/PythonPartsScripts/PythonHost/model_edit.py). | 20 elements × 2 changed fields = 40 changes, above 32. A no-op adds no change. Changes need not equal SDK calls (delete has a grouped setter). A paired property (`expand_paired`) expands one declaration into a native **and** an attribute change per element, so a plain paired edit fits at most 16 elements. |
+| Apply | `RepairExecutor.MAX_CHANGES = 32`; also enforced in plan eligibility and stored-record validation, [repair_execution.py](../python_host/PythonPartsScripts/PythonHost/repair_execution.py). The same bound is repeated in preview readiness (`model_edit.py`, `column_layer.py`), as a literal in the grouped delete (`model_delete.py`) and as the public M3 `repairs` limit (`repair_models.py`). One active foreground drawing. | Changing one constant needs a compatibility review of the journal, recovery and all M3/M4 routes, not just a longer request list. |
 | Plan cache | TTL 300 s, up to 8 plans, 4 MiB/plan, 8 MiB total, [model_repair.py](../python_host/PythonPartsScripts/PythonHost/model_repair.py). | A large preview may not fit the cache. Apply invalidates other plans and clears selections. |
-| Journal and trace | 512 active records, 1 MiB/record (`RepairExecutor`); trace 8 MiB and durable call boundaries in [property_probe.py](../python_host/PythonPartsScripts/PythonHost/property_probe.py). | Batches increase space use; a full journal/trace stops the workflow. Never delete unresolved data to free space. |
-| Time and transport | Apply budget checks 20 s; material evidence 10 s, base scan 5 s. [transport.py](../python_host/PythonPartsScripts/PythonHost/transport.py): queue of 32 requests, 3 s UI start, 1 MiB request body. [allplan_client.py](../src/allplan_mcp/allplan_client.py): default 30 s timeout. | These are different limits. A time check does not interrupt a running native call. A lost Apply reply may mean the write happened. The queue of 32 is not a model-change limit. |
+| Journal and trace | 512 active records, 1 MiB/record (`RepairExecutor`). Trace: 8 MiB **active segment**, rotated automatically into an archive of up to 256 MiB (since 0.44.0), with durable call boundaries in [property_probe.py](../python_host/PythonPartsScripts/PythonHost/property_probe.py). | Batches increase space use; a full journal, or a trace whose archive budget is exhausted, stops the workflow. Never delete unresolved data to free space. |
+| Time and transport | Apply budget checks 20 s; material evidence 10 s, base scan 5 s. [transport.py](../python_host/PythonPartsScripts/PythonHost/transport.py): queue of 32 requests, 3 s UI start, 1 MiB request body. [allplan_client.py](../src/allplan_mcp/allplan_client.py): default 30 s timeout, overridable with `ALLPLAN_HOST_TIMEOUT`. | These are different limits. A time check does not interrupt a running native call. A lost Apply reply may mean the write happened. The queue of 32 is not a model-change limit. |
 
 An exceeded read budget ends with an error and no complete selection. Such a
 result must never be presented as "found 0". `page.complete` means the end of
@@ -74,32 +81,47 @@ still-open Beam/SkeletonBeam discovery.
    geometry and hierarchy before the final group filter. Rejected records stay
    in the fingerprint to detect new hits. Keep that safeguard, but expensive
    presentation fields need not always be read for excluded candidates. The
-   native-material path already narrows this in `model_edit.observe`; do not
-   describe it as a new feature.
+   native-material path already narrows this in `model_edit.observe`, and
+   `_scan(native_type_gate=…)` already skips non-matching families for the
+   Column layer and Wall filter routes; do not describe either as a new
+   feature.
 3. **Repeated observation during highlight.** `model_edit.highlight` runs
    revalidate, another observe, a separate `_scan`, and then
    [model_selection.present_selection](../python_host/PythonPartsScripts/PythonHost/model_selection.py)
-   scans again: four scans per highlight in the typical M4 path. Each is
-   justified by current service boundaries, but sharing them within one UI
-   operation is a concrete refactoring candidate.
+   scans again: four scans per highlight in the typical M4 path. With an
+   `exact_target` (exact Slab tier, 0.42.0) `exact_material_target.locate`
+   adds three more `SelectAllElements` calls, seven enumerations in total.
+   Each is justified by current service boundaries, but sharing them within
+   one UI operation is a concrete refactoring candidate. The highlight also
+   inserts a temporary entry into the shared selection cache and can evict the
+   oldest user selection. `model_wall_filter` is an existing counter-example:
+   it scans once and highlights one top-level adapter per wall in the same
+   callback.
 4. **Every target resolved from scratch.**
    [native_model_edit.resolve](../python_host/PythonPartsScripts/PythonHost/native_model_edit.py)
    runs `SelectAllElements` again. A normal Apply resolves each target in
-   preflight, before the setter and at fresh readback, and also observes the
-   whole scope before/after execution. Enumeration therefore grows as N × K for
-   K changes. Delete has a separate grouped path; measure it separately, as
-   well as the material preservation cost.
+   preflight, before the setter and at fresh readback, and also scans the
+   whole scope three times (revalidation, source observation before and
+   after). Enumeration therefore grows as roughly N × (3K + 3) for K changes. An exact
+   target doubles every resolve through `locate`. Delete has one grouped
+   native call but still resolves per change in preflight and before the call,
+   plus one absence scan; measure it separately, as well as the material
+   preservation cost.
 5. **Durable writes and serialization.** `RepairExecutor.save` serializes and
    hashes the whole record, writes a temp file, fsyncs and replaces. The full
    record is rewritten before each setter and after readback. A large
    monolithic plan multiplies this cost. The trace also persists call
-   boundaries; optimization must not remove fsync.
+   boundaries: every traced native call appends two fsynced lines (started,
+   returned/failed). Optimization must not remove fsync.
 6. **Agent interaction cost.** [server.py](../src/allplan_mcp/server.py) has
    long descriptions of multi-action tools, and results repeat metadata.
    `model_edit` already returns `write_blockers`, `required_steps` and
    `next_action`; unify this pattern rather than building a second workflow.
    The client classifies read-only by endpoint, so even a preview timeout on
-   `/model-edit` is reported as `execution_unknown`.
+   `/model-edit` is reported as `execution_unknown`. When
+   `ALLPLAN_MCP_EVIDENCE_DIR` is set, the client also appends every request
+   and full response to a daily evidence file (256 MiB cap); large pages add
+   that I/O and can exhaust the cap.
 
 There is no basis for promising a specific speed-up. In particular, parallel
 MCP requests will not speed up the Allplan API: the dispatcher runs one
@@ -200,7 +222,11 @@ set. Proposed lifecycle:
 6. **Finish:** report `applied/failed/conflict/unknown/not_attempted/no_op`,
    element and change counts and the final validation scope. Check global rules
    again at the end. Do not promise atomicity, a single Undo or automatic
-   rollback of the whole job without separate API/build evidence.
+   rollback of the whole job without separate API/build evidence. Since
+   0.51.0 one typed Apply with two or more changes is one UI Undo step
+   (`undo_group.py`, native PASS recorded in the development plan), so a job
+   of B batches is expected to leave **B Undo steps**, not one and not one per
+   change. Report that count; whether batches can share a step is unproven.
 
 The manifest/job store must survive plan-cache invalidation. Its versioning,
 execution lock, integrity validation, limits and replay form a new contract
@@ -216,6 +242,27 @@ setter is not allowed without proof of correctness; readback must come from a
 new read and still cover all required representations. A targeted UUID lookup
 is a separate API spike, not an assumed feature. Optimizing the final audit
 must not skip new hits, neighbour drift or preservation.
+
+**Documented candidates for that spike** (2026 API reference; signatures only,
+not used by the host and not observed natively):
+
+- [`BaseElementAdapter.FromGUID(guid, doc)`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_ElementAdapter/BaseElementAdapter/)
+  returns one adapter for a GUID. Undocumented: whether it takes the element
+  or the model-element UUID, the result for a missing, deleted or
+  other-drawing GUID, which view representation it returns, and its cost.
+- [`ElementsSelectService.SelectElementsByIfcGuid`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/ElementsSelectService/)
+  looks up a list of IFC GUIDs; the query would first have to read and bind
+  that identity.
+- [`ElementsByAttributeService`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/ElementsByAttributeService/)
+  (`Init(attributeID, doc)`, `GetElements(value)`) is described as fast
+  element access by one attribute value. It is a process-wide singleton bound
+  to one attribute ID, so it is at most a candidate prefilter for equality
+  predicates; it cannot replace three-valued evaluation or the detection of
+  elements entering the result.
+- No revision token is documented: `GetTimeStamp()` is the element
+  **creation** time and `DocumentAdapter` exposes only the document ID and
+  scale. No per-file enumeration is documented either; `SelectAllElements`
+  takes only the document.
 
 ### Faster and more intuitive MCP tools
 
@@ -300,6 +347,7 @@ responsiveness, exact targets, fresh readback, preservation and the real Undo
 scope on a disposable fixture. Do not repeat accepted small writes to recreate
 history. CI/delivery details are in the [testing policy](testing-policy.md).
 
-**Verification of this analysis:** source review, diff and links only. No
-runtime changes, benchmarks, product tests, builds or new native acceptance;
-the current version's limits are unchanged.
+**Verification of this analysis:** source review, diff and links only, for
+both the original analysis and the 2026-11-15 re-verification. No runtime
+changes, benchmarks, product tests, builds or new native acceptance; the
+current version's limits are unchanged.

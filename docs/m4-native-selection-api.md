@@ -10,6 +10,15 @@ Facts from code/documentation, the implementation design and the required
 native observations are separated below. Allplan was not run and runtime was
 not changed for this work.
 
+**Re-verified on 2026-11-15** against `develop/m4` `f4b46ab` (0.51.2) and the
+complete 2026 API reference, manual and examples (the pinned examples
+revision is still current). Section 2 still matches the code and no host code
+calls a native selection API. The conclusion stands; the additions are the
+previously unreviewed symbols in section 3, the structural assumption in
+section 4 and the extended experiment and vendor questions in section 7.
+`model_wall_filter` is a second highlight path (one top-level adapter per
+wall, plan presentations invalidated); it is not native selection either.
+
 ## 1. Conclusion and recommendation
 
 **The public API documents interactive user selection, but the checked
