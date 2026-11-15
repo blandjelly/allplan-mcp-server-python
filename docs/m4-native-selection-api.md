@@ -10,6 +10,15 @@ Facts from code/documentation, the implementation design and the required
 native observations are separated below. Allplan was not run and runtime was
 not changed for this work.
 
+**Re-verified on 2026-11-15** against `develop/m4` `f4b46ab` (0.51.2) and the
+complete 2026 API reference, manual and examples (the pinned examples
+revision is still current). Section 2 still matches the code and no host code
+calls a native selection API. The conclusion stands; the additions are the
+previously unreviewed symbols in section 3, the structural assumption in
+section 4 and the extended experiment and vendor questions in section 7.
+`model_wall_filter` is a second highlight path (one top-level adapter per
+wall, plan presentations invalidated); it is not native selection either.
+
 ## 1. Conclusion and recommendation
 
 **The public API documents interactive user selection, but the checked
@@ -91,6 +100,23 @@ query model.
 is a higher layer for script objects. It still handles user choice; rewriting
 the working host as a script object does not supply the missing setter.
 
+The reference documents the completion rule: the selection ends when at
+least one element was selected **or** a selection rectangle was drawn, even an
+empty one. The result is then stored in `PostElementSelection` and the function
+is removed from the input function stack by Allplan; `process_mouse_msg` is not
+called until then. Only one selection function may be on the stack. The
+[selection manual](https://pythonparts.allplan.com/2026/manual/features/input/selection/)
+adds that starting a second selection or calling `RemoveFunction` with no
+running selection crashes Allplan, and that a filter the user sets with
+Allplan's own filter functions **overrides** the script filter. A default
+`ElementSelectFilterSetting()` does not state its document/layer scope; set
+`eDocumentSnoopType`/`eLayerSnoopType` explicitly.
+
+`ElementSelect` (`InitSelection(text)`, `IsMouseMove`) and
+`CoordinateInput.SelectElement(mouseMsg, pnt, …, bHighlight, …)` are further
+input-side wrappers. The former takes only a prompt; the latter identifies one
+element under a view point. Neither accepts an adapter list.
+
 ### Reads — three different meanings of "selected"
 
 | API | Documented result | Evidence limit |
@@ -98,6 +124,15 @@ the working host as a script object does not supply the missing setter.
 | [`PostElementSelection.GetSelectedElements(doc)`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/PostElementSelection/) | `BaseElementAdapterList` taken and removed from the interaction result container. | A consuming read. A second empty result does not prove the UI selection was cleared. |
 | [`SelectElementsService.GetPreSelectedElements(doc, filter)`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/SelectElementsService/) | List of preselected elements matching a `SelectionQuery`. | Candidate for reading preselection. Timing relative to tool start, persistence, consumption and use as readback after set/clear are not established. |
 | [`CoordinateInput.GetSelectedElements()`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_Input/CoordinateInput/) | Elements at the same distance from the cursor, tied to input identification. | Not a documented read of the whole UI selection. `GetSelectedElement()` also concerns element identification during input. |
+
+The script-object framework has
+[`StartFunctionResult.PRE_SELECTED_ELEMENTS`](https://pythonparts.allplan.com/2026/api_reference/ScriptObjectInteractors/StartFunctionResult/)
+("direct use of the pre-selected elements") as a `start_input` result. This
+documents that framework interactors take over a preselection **when the tool
+starts**. It suggests, but does not prove, that preselection is a start-time
+state: what `GetPreSelectedElements` returns while the host interactor has
+already been running for minutes is not documented. No official example at the
+pinned revision calls `GetPreSelectedElements`.
 
 Preselection deserves its own experiment rather than early rejection. A
 potential readback must never be filtered only to the requested set: that
@@ -120,10 +155,41 @@ would hide accidentally selected extra elements and give a false PASS.
   [GetObjectByAttributeValue.py](https://github.com/NemetschekAllplan/PythonPartsExamples/blob/8e2c252477e20bc9afac8918f78a8eeabd473a81/PythonPartsExampleScripts/ObjectAccessExamples/GetObjectByAttributeValue.py)
   shows query, highlight and redraw. It does not document selection set/clear/readback.
 - [`BaseElementAdapter`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_ElementAdapter/BaseElementAdapter/)
-  has `IsActive()` described as an activation check, without a contract strong
-  enough to equate it with the current UI selection. Its method list has no
-  `IsSelected`/`SetSelected`. Neither `IsActive` nor `SetVisibilityState`
+  has `IsActive()` ("True, if the element is activated"), without a contract
+  strong enough to equate it with the current UI selection. Its method list has
+  no `IsSelected`/`SetSelected`. Neither `IsActive` nor `SetVisibilityState`
   justifies implementing selection setters.
+- Related per-element state flags exist and were not reviewed before:
+  [`CommonProperties.Activated` and `.Marked`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/CommonProperties/)
+  ("Get the activated/marked state") and
+  [`BaseElementAdapterService.IsPostActivation(ele)`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_IFW_ElementAdapter/BaseElementAdapterService/).
+  **Hypothesis:** "activation" may be Allplan's native term for element
+  selection, which would make these and `IsActive()` per-element **read**
+  candidates. The same API also uses "active" for layers and documents
+  (`IsInActiveLayer`, `IsInActiveDocument`), so the meaning must be observed,
+  not inferred. `Marked` may relate to `markSelectedElements`. Writing
+  `Activated`/`Marked` and submitting the element through `ModifyElements`
+  would be a guessed setter on the **model-write** path; do not try it.
+- [`ModifyElementsWithSaveAndRestoreSelection(doc, modelEleList)`](https://pythonparts.allplan.com/2026/api_reference/InterfaceStubs/NemAll_Python_BaseElements/)
+  is documented by name only. It is a model modification, not a selection
+  setter. The name does show that the native layer keeps a selection state
+  that a plain `ModifyElements` can disturb. Together with the observed child
+  regeneration under new model UUIDs after `ModifyElements` (see the
+  [editing API notes](m4-editing-api.md)), a selection must not be assumed to
+  survive an M4 Apply, and refs selected before a write may no longer exist.
+- `UndoRedoService.ActivateCollectedElementsForFinishUpdate()` concerns the
+  elements of an undo step, not a caller-supplied list or the UI selection.
+
+A search of the complete 2026 site index (API reference, manual and release
+notes) on 2026-11-15 for selection, activation, marking and preselection
+symbols found no method that takes an adapter list to set or clear the
+selection, and no release note announcing one. This strengthens, but still
+does not prove, the conclusion of section 1.
+
+The example [MultiSelection.py](https://github.com/NemetschekAllplan/PythonPartsExamples/blob/8e2c252477e20bc9afac8918f78a8eeabd473a81/PythonPartsExampleScripts/ModelObjectExamples/SelectionExamples/MultiSelection.py)
+shows the full lifecycle: it restarts the selection after every completion,
+including an empty one, so a selection function is always running, and
+therefore calls `RemoveFunction` unconditionally in `on_cancel_function`.
 
 The example [SelectObjectsByAttributeID.py](https://github.com/NemetschekAllplan/PythonPartsExamples/blob/8e2c252477e20bc9afac8918f78a8eeabd473a81/PythonPartsExampleScripts/ModelObjectExamples/SelectionExamples/SelectObjectsByAttributeID.py)
 confirms the path `StartElementSelect → callback → PostElementSelection`.
@@ -138,6 +204,16 @@ The names below are **a proposed M4 contract, not existing Allplan methods**.
 A minimal backend should separate `replace_exact`, `clear` and `read_current`,
 with declared scope, supported builds, identity and synchronicity. Missing any
 part does not allow announcing full support of the item.
+
+**Unverified structural assumption.** The design assumes that a native
+selection can exist and stay visible **while the host interactor is the active
+input function**. The host must keep running to serve MCP, and ESC stops it.
+The reviewed API only shows selection as an input step of a running function
+(`StartElementSelect`) or as a preselection taken over at tool start. If
+Allplan keeps a user-visible selection only when no function is active, the
+target `query result → selection the user can act on` cannot be met from
+inside the host at all, whatever setter exists. Establish this first; it is
+question 1 for the vendor and for the experiment.
 
 ### MCP contract
 
@@ -240,10 +316,15 @@ In the proposed integration the SDK pattern uses a resumed `process_mouse_msg`
 to fetch the result after the interaction ends; the current host does not
 implement this. The callback is not for polling the result during the choice.
 Fetch `PostElementSelection` once, convert it into a bounded ref snapshot and
-re-check scope/types/relations. Do not trust the filter alone. An empty result
-is a valid completion, not a reason for an automatic restart. Call
-`RemoveFunction` only for a still active function owned by the host; do not
-remove it again after a normal completion.
+re-check scope/types/relations. Do not trust the filter alone: the user can
+override it. An empty result is a valid completion, not a reason for an
+automatic restart. This deliberately differs from the manual and
+`MultiSelection.py`, which restart on an empty result and can therefore call
+`RemoveFunction` unconditionally on ESC. Because the host has an idle state
+with no selection running, it must track whether its function is still on the
+stack. Call `RemoveFunction` only for a still active function owned by the
+host; do not remove it again after a normal completion, which already removed
+it.
 
 While waiting, other UI mutations and Apply/delete/Undo should get
 `selection_busy`. Allow status/cancel and only checked reads; the timer
@@ -264,6 +345,7 @@ consent and must pass normal preview/revalidation before editing.
 | Public replace/clear/read-current backend | Meets the target query → native UI direction if the contract is confirmed. | Preferred; currently BLOCKED by a missing complete contract. |
 | `StartElementSelect` + callback result | The user chooses elements with native gestures. | A real separate feature; medium lifecycle complexity, does not close the current requirement. |
 | `GetPreSelectedElements` | Potential import of a previously selected scope. | The smallest read experiment; semantics and scope need checking. |
+| `IsActive()`, `CommonProperties.Activated`/`Marked`, `IsPostActivation` | Potential per-element readback over an enumeration, not limited to the requested set. | Read-only candidates with undocumented meaning; costs one full enumeration per read. Not setters. |
 | Another official SDK/vendor extension | Potentially the missing setter and readback. | To be clarified with the vendor; no concrete C++/.NET path is confirmed here. Adds installation, ABI/build and a bridge to the host. |
 | Highlight, rectangle geometry or synthetic clicks | Presentation or an attempt to reproduce a gesture. | Do not provide a documented exact set/clear/readback; not a substitute for the requirement. |
 
@@ -288,6 +370,12 @@ resume broad property discovery or historic trials that led to crashes.
    filter really covers the whole scope. Compare a narrowing filter with a
    non-narrowing variant after checking its construction in the 2026 bindings.
    An empty `SelectionQuery` alone does not prove a global or complete readback.
+   In the same states read, **without writing**, `IsActive()`,
+   `GetCommonProperties().Activated`/`.Marked` and `IsPostActivation` for A, B
+   and an unselected control C, and record whether any of them follows the UI
+   selection, the highlight, or the layer/document state. Also record whether
+   a selection made before starting the host is still visible and usable while
+   the host runs and after it stops.
 3. For a separate pick check one completion, an empty result and cancellation;
    record callback order, timer behaviour, the `markSelectedElements` scope and
    what remains afterwards. No deliberate double start/Remove.
@@ -300,13 +388,18 @@ resume broad property discovery or historic trials that led to crashes.
    change, lost reply, ESC and restart. Do not extend acceptance from one family
    to others; mark a missing example `fixture_missing`.
 
-Questions for the vendor: which public method takes exact existing adapters as
+Questions for the vendor: can a selection exist and remain usable while a
+PythonPart interactor is the active function, or only between functions? Which
+public method takes exact existing adapters as
 the selection, is replace atomic, how is the state cleared and which getter
 reads it independently of cursor/callback? What is the scope
 (drawing/document/view/application), lifetime and behaviour after the
 interactor ends? Are there normalizations to parent/children? Does
 `GetPreSelectedElements` consume the preselection and work after a
-programmatic set/clear? What exactly does `IsActive()` mean? Are these calls
+programmatic set/clear? What exactly do `IsActive()`,
+`CommonProperties.Activated`/`Marked` and `IsPostActivation` mean? What does
+`ModifyElementsWithSaveAndRestoreSelection` save and restore, and does a plain
+`ModifyElements` clear the selection? Are these calls
 supported from a `DispatcherTimer` callback on the UI in 2026.1? Does
 `markSelectedElements` leave a selection after the function ends, and can that
 set differ from the `PostElementSelection` result?

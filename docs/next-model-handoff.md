@@ -330,8 +330,8 @@ setter ran, readback stayed `" "`, UI Undo restored it; do not repeat.
 - **0.39.0 reports** of native-value PASS on Wall, Wall with opening and Column
   and of attribute writes on two SkeletonBeams and the Slab/MultiSlab assembly
   stay limited to those reports ([coverage matrix](m4-coverage-matrix.md)).
-- Scalability is bounded by the 200-result page, 10,000 adapters, time,
-  memory and journal limits; more than 32 changes needs a durable manifest
+- Scalability is bounded by full rescans, 10,000 adapters, time, memory and
+  journal limits (200 is only the page size); more than 32 changes needs a durable manifest
   ([S0–S5](implementation-plan.md#scaling-analysis-of-developm4-and-mcp-ergonomics)).
 - Native selection stays unsupported ([selection API](m4-native-selection-api.md)).
 - `ci-required` is a required check on `develop/m4`; direct pushes are
